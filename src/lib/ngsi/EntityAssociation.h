@@ -1,5 +1,5 @@
-#ifndef ENTITY_ASSOCIATION
-#define ENTITY_ASSOCIATION
+#ifndef SRC_LIB_NGSI_ENTITYASSOCIATION_H_
+#define SRC_LIB_NGSI_ENTITYASSOCIATION_H_
 
 /*
 *
@@ -25,8 +25,9 @@
 *
 * Author: Ken Zangelin
 */
-#include "ngsi/EntityId.h"
+#include <string>
 
+#include "ngsi/EntityId.h"
 
 
 /* ****************************************************************************
@@ -41,7 +42,12 @@ typedef struct EntityAssociation
   EntityAssociation();
 
   std::string render(Format format, const std::string& indent, bool comma);
-  std::string check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+
+  std::string check(RequestType         requestType,
+                    Format              format,
+                    const std::string&  indent,
+                    const std::string&  predetectedError,
+                    int                 counter);
 } EntityAssociation;
 
-#endif
+#endif  // SRC_LIB_NGSI_ENTITYASSOCIATION_H_

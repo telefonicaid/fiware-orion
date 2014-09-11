@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::push_back - 
+* ContextRegistrationVector::push_back -
 */
 void ContextRegistrationVector::push_back(ContextRegistration* item)
 {
@@ -47,7 +47,7 @@ void ContextRegistrationVector::push_back(ContextRegistration* item)
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::render - 
+* ContextRegistrationVector::render -
 */
 std::string ContextRegistrationVector::render(Format format, const std::string& indent, bool comma)
 {
@@ -56,12 +56,16 @@ std::string ContextRegistrationVector::render(Format format, const std::string& 
   std::string  jsonTag = "contextRegistrations";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1, true);
+  }
 
   out += endTag(indent, xmlTag, format, comma, comma);
 
@@ -72,28 +76,30 @@ std::string ContextRegistrationVector::render(Format format, const std::string& 
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::present - 
+* ContextRegistrationVector::present -
 */
 void ContextRegistrationVector::present(const std::string& indent)
 {
-   PRINTF("%lu ContextRegistrations", (unsigned long) vec.size());
+  PRINTF("%lu ContextRegistrations", (uint64_t) vec.size());
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-      vec[ix]->present(indent, ix);
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(indent, ix);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::release - 
+* ContextRegistrationVector::release -
 */
 void ContextRegistrationVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     vec[ix]->release();
-     delete(vec[ix]);
+    vec[ix]->release();
+    delete(vec[ix]);
   }
 
   vec.clear();
@@ -103,7 +109,7 @@ void ContextRegistrationVector::release(void)
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::get - 
+* ContextRegistrationVector::get -
 */
 ContextRegistration* ContextRegistrationVector::get(int ix)
 {
@@ -114,7 +120,7 @@ ContextRegistration* ContextRegistrationVector::get(int ix)
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::size - 
+* ContextRegistrationVector::size -
 */
 unsigned int ContextRegistrationVector::size(void)
 {
@@ -125,16 +131,25 @@ unsigned int ContextRegistrationVector::size(void)
 
 /* ****************************************************************************
 *
-* ContextRegistrationVector::check - 
+* ContextRegistrationVector::check -
 */
-std::string ContextRegistrationVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextRegistrationVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     std::string res;
+    std::string res;
 
-     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
-       return res;
+    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
+      return res;
+    }
   }
 
   return "OK";

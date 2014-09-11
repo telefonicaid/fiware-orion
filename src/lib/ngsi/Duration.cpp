@@ -22,9 +22,10 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
 #include <string.h>   // strdup
 #include <stdlib.h>   // free
+#include <stdint.h>   // int64_t et al
+#include <string>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -33,6 +34,8 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/Duration.h"
+
+
 
 /* ****************************************************************************
 *
@@ -48,23 +51,36 @@ Duration::Duration()
   used    = false;
 }
 
+
+
 /* ****************************************************************************
 *
-* Duration::check - 
+* Duration::check -
 */
-std::string Duration::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string Duration::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (string == "")
+  {
     return "OK";
+  }
 
   if (parse() == -1)
   {
     valid = false;
     LM_W(("Bad Input (syntax error in duration string)"));
+
     return "syntax error in duration string";
   }
 
   valid = true;
+
   return "OK";
 }
 
@@ -72,24 +88,26 @@ std::string Duration::check(RequestType requestType, Format format, const std::s
 
 /* ****************************************************************************
 *
-* Duration::set - 
+* Duration::set -
 */
 void Duration::set(const std::string& value)
 {
   string = value;
-  parse(); // just to flag valid/invalid
+  parse();  // just to flag valid/invalid
 }
 
 
 
 /* ****************************************************************************
 *
-* Duration::get - 
+* Duration::get -
 */
 std::string Duration::get(void)
 {
   return string;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -98,17 +116,20 @@ std::string Duration::get(void)
 bool Duration::isEmpty(void)
 {
   if (string == "")
+  {
     return true;
+  }
 
   return false;
 }
 
 
+
 /* ****************************************************************************
 *
-* Duration::parse - 
+* Duration::parse -
 */
-long long Duration::parse(void)
+int64_t Duration::parse(void)
 {
   seconds = parse8601(string);
 
@@ -117,31 +138,41 @@ long long Duration::parse(void)
   return seconds;
 }
 
+
+
 /* ****************************************************************************
 *
-* Duration::present - 
+* Duration::present -
 */
 void Duration::present(const std::string& indent)
 {
   if (string != "")
+  {
     PRINTF("%sDuration: %s\n", indent.c_str(), string.c_str());
+  }
   else
+  {
     PRINTF("%sNo Duration\n", indent.c_str());
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* Duration::render - 
+* Duration::render -
 */
 std::string Duration::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+  {
     return "";
+  }
 
   if (valid == false)
+  {
     return "";
+  }
 
   return valueTag(indent, "duration", string, format, comma);
 }
@@ -150,9 +181,9 @@ std::string Duration::render(Format format, const std::string& indent, bool comm
 
 /* ****************************************************************************
 *
-* release - 
+* release -
 */
 void Duration::release(void)
 {
-   /* This method is included for the sake of homogeneity */
+  /* This method is included for the sake of homogeneity */
 }

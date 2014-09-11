@@ -1,5 +1,5 @@
-#ifndef ENTITY_ID_VECTOR_H
-#define ENTITY_ID_VECTOR_H
+#ifndef SRC_LIB_NGSI_ENTITYIDVECTOR_H_
+#define SRC_LIB_NGSI_ENTITYIDVECTOR_H_
 
 /*
 *
@@ -41,14 +41,27 @@ typedef struct EntityIdVector
   std::vector<EntityId*>  vec;
 
   std::string  render(Format format, const std::string& indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent);
   void         push_back(EntityId* item);
   unsigned int size(void);
   EntityId*    get(int ix);
   void         release();
 
-  EntityId*    operator[](unsigned int ix)       { if (ix < vec.size()) return vec[ix]; else return NULL; }
+  EntityId*    operator[](unsigned int ix)
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;
+  }
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } EntityIdVector;
 
-#endif
+#endif  // SRC_LIB_NGSI_ENTITYIDVECTOR_H_

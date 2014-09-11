@@ -1,5 +1,5 @@
-#ifndef CONTEXT_ELEMENT_RESPONSE_H
-#define CONTEXT_ELEMENT_RESPONSE_H
+#ifndef SRC_LIB_NGSI_CONTEXTELEMENTRESPONSE_H_
+#define SRC_LIB_NGSI_CONTEXTELEMENTRESPONSE_H_
 
 /*
 *
@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* ContextElementResponse - 
+* ContextElementResponse -
 */
 typedef struct ContextElementResponse
 {
@@ -42,9 +42,14 @@ typedef struct ContextElementResponse
   StatusCode       statusCode;                 // Mandatory
 
   std::string  render(RequestType requestType, Format format, const std::string& indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent, int ix);
   void         release(void);
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } ContextElementResponse;
 
-#endif
+#endif  // SRC_LIB_NGSI_CONTEXTELEMENTRESPONSE_H_

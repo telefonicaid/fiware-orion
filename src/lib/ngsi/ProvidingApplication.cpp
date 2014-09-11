@@ -36,12 +36,21 @@
 
 /* ****************************************************************************
 *
-* ProvidingApplication::check - 
+* ProvidingApplication::check -
 */
-std::string ProvidingApplication::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ProvidingApplication::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (isEmpty())
-     return "no providing application";
+  {
+    return "no providing application";
+  }
 
   return "OK";
 }
@@ -50,18 +59,18 @@ std::string ProvidingApplication::check(RequestType requestType, Format format, 
 
 /* ****************************************************************************
 *
-* ProvidingApplication::isEmpty - 
+* ProvidingApplication::isEmpty -
 */
 bool ProvidingApplication::isEmpty(void)
 {
-   return (string == "")? true : false;
+  return (string == "")? true : false;
 }
 
 
 
 /* ****************************************************************************
 *
-* ProvidingApplication::set - 
+* ProvidingApplication::set -
 */
 void ProvidingApplication::set(const std::string& value)
 {
@@ -72,7 +81,7 @@ void ProvidingApplication::set(const std::string& value)
 
 /* ****************************************************************************
 *
-* ProvidingApplication::get - 
+* ProvidingApplication::get -
 */
 std::string ProvidingApplication::get(void)
 {
@@ -83,26 +92,32 @@ std::string ProvidingApplication::get(void)
 
 /* ****************************************************************************
 *
-* ProvidingApplication::present - 
+* ProvidingApplication::present -
 */
 void ProvidingApplication::present(const std::string& indent)
 {
   if (string != "")
+  {
     PRINTF("%sProvidingApplication: %s\n", indent.c_str(), string.c_str());
+  }
   else
+  {
     PRINTF("%sNo ProvidingApplication\n", indent.c_str());
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* ProvidingApplication::render - 
+* ProvidingApplication::render -
 */
 std::string ProvidingApplication::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+  {
     return "";
+  }
 
   return valueTag(indent, "providingApplication", string, format, comma);
 }
@@ -111,20 +126,20 @@ std::string ProvidingApplication::render(Format format, const std::string& inden
 
 /* ****************************************************************************
 *
-* ProvidingApplication::c_str - 
+* ProvidingApplication::c_str -
 */
 const char* ProvidingApplication::c_str(void)
 {
-   return string.c_str();
+  return string.c_str();
 }
 
 
 
 /* ****************************************************************************
 *
-* release - 
+* release -
 */
 void ProvidingApplication::release(void)
 {
-   /* This method is included for the sake of homogeneity */
+  /* This method is included for the sake of homogeneity */
 }

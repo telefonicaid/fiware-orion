@@ -1,5 +1,5 @@
-#ifndef ATTRIBUTE_ASSOCIATION
-#define ATTRIBUTE_ASSOCIATION
+#ifndef SRC_LIB_NGSI_ATTRIBUTEASSOCIATION_H_
+#define SRC_LIB_NGSI_ATTRIBUTEASSOCIATION_H_
 
 /*
 *
@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* AttributeAssociation - 
+* AttributeAssociation -
 */
 typedef struct AttributeAssociation
 {
@@ -42,8 +42,13 @@ typedef struct AttributeAssociation
   std::string  target;
 
   std::string  render(Format format, const std::string& indent, bool comma);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
-  void         present(const std::string& indent, int ix);  
+  void         present(const std::string& indent, int ix);
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } AttributeAssociation;
 
-#endif
+#endif  // SRC_LIB_NGSI_ATTRIBUTEASSOCIATION_H_

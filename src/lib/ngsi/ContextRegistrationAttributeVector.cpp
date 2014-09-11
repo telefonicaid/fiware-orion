@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::render - 
+* ContextRegistrationAttributeVector::render -
 */
 std::string ContextRegistrationAttributeVector::render(Format format, const std::string& indent, bool comma)
 {
@@ -57,16 +57,25 @@ std::string ContextRegistrationAttributeVector::render(Format format, const std:
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::check - 
+* ContextRegistrationAttributeVector::check -
 */
-std::string ContextRegistrationAttributeVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextRegistrationAttributeVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     std::string res;
+    std::string res;
 
-     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
-       return res;
+    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
+      return res;
+    }
   }
 
   return "OK";
@@ -76,21 +85,23 @@ std::string ContextRegistrationAttributeVector::check(RequestType requestType, F
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::present - 
+* ContextRegistrationAttributeVector::present -
 */
 void ContextRegistrationAttributeVector::present(const std::string& indent)
 {
-   PRINTF("%lu ContextRegistrationAttributes", (unsigned long) vec.size());
+  PRINTF("%lu ContextRegistrationAttributes", (uint64_t) vec.size());
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-      vec[ix]->present(ix, indent);
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(ix, indent);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::push_back - 
+* ContextRegistrationAttributeVector::push_back -
 */
 void ContextRegistrationAttributeVector::push_back(ContextRegistrationAttribute* item)
 {
@@ -101,7 +112,7 @@ void ContextRegistrationAttributeVector::push_back(ContextRegistrationAttribute*
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::get - 
+* ContextRegistrationAttributeVector::get -
 */
 ContextRegistrationAttribute* ContextRegistrationAttributeVector::get(int ix)
 {
@@ -112,7 +123,7 @@ ContextRegistrationAttribute* ContextRegistrationAttributeVector::get(int ix)
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::size - 
+* ContextRegistrationAttributeVector::size -
 */
 unsigned int ContextRegistrationAttributeVector::size(void)
 {
@@ -123,7 +134,7 @@ unsigned int ContextRegistrationAttributeVector::size(void)
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttributeVector::release - 
+* ContextRegistrationAttributeVector::release -
 */
 void ContextRegistrationAttributeVector::release(void)
 {

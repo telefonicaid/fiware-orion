@@ -63,7 +63,14 @@ std::string ConditionValueList::render(Format format, const std::string& indent,
 *
 * ConditionValueList::check - 
 */
-std::string ConditionValueList::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ConditionValueList::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -118,7 +125,7 @@ void ConditionValueList::push_back(const std::string& attributeName)
 */
 unsigned int ConditionValueList::size(void)
 {
-   return vec.size();
+  return vec.size();
 }
 
 
@@ -129,5 +136,5 @@ unsigned int ConditionValueList::size(void)
 */
 std::string ConditionValueList::get(int ix)
 {
-   return vec[ix];
+  return vec[ix];
 }

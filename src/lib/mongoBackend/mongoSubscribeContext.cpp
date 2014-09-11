@@ -75,7 +75,7 @@ HttpStatusCode mongoSubscribeContext
 
     /* Throttling */
     if (!requestP->throttling.isEmpty()) {
-        sub.append(CSUB_THROTTLING, requestP->throttling.parse());
+      sub.append(CSUB_THROTTLING, (long long) requestP->throttling.parse());
     }
 
     /* Build entities array */

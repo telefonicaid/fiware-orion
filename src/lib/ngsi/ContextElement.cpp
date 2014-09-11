@@ -22,8 +22,8 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
 #include <stdio.h>
+#include <string>
 
 #include "common/Format.h"
 #include "common/globals.h"
@@ -46,17 +46,17 @@ std::string ContextElement::render(RequestType requestType, Format format, const
   bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
   bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
 
-  bool         commaAfterDomainMetadataVector   = false; // Last element
+  bool         commaAfterDomainMetadataVector   = false;  // Last element
   bool         commaAfterContextAttributeVector = domainMetadataVectorRendered;
-  bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered || contextAttributeVectorRendered;
-  bool         commaAfterEntityId               = domainMetadataVectorRendered || contextAttributeVectorRendered || attributeDomainNameRendered;
+  bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
+  bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
 
   out += startTag(indent, xmlTag, jsonTag, format, false, true);
 
-  out += entityId.render(format,               indent + "  ", commaAfterEntityId, false);
-  out += attributeDomainName.render(format,    indent + "  ", commaAfterAttributeDomainName);
+  out += entityId.render(format,                            indent + "  ", commaAfterEntityId, false);
+  out += attributeDomainName.render(format,                 indent + "  ", commaAfterAttributeDomainName);
   out += contextAttributeVector.render(requestType, format, indent + "  ", commaAfterContextAttributeVector);
-  out += domainMetadataVector.render(format,   indent + "  ", commaAfterDomainMetadataVector);
+  out += domainMetadataVector.render(format,                indent + "  ", commaAfterDomainMetadataVector);
 
   out += endTag(indent, xmlTag, format, comma, false);
 
@@ -69,14 +69,36 @@ std::string ContextElement::render(RequestType requestType, Format format, const
 *
 * ContextElement::check
 */
-std::string ContextElement::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextElement::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   std::string res;
 
-  if ((res = entityId.check(requestType, format, indent, predetectedError, counter)) != "OK")                 return res;
-  if ((res = attributeDomainName.check(requestType, format, indent, predetectedError, counter)) != "OK")      return res;
-  if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")   return res;
-  if ((res = domainMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")     return res;
+  if ((res = entityId.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = attributeDomainName.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = domainMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
 
   return "OK";
 }
@@ -104,9 +126,13 @@ void ContextElement::release(void)
 void ContextElement::present(const std::string& indent, int ix)
 {
   if (ix == -1)
+  {
     PRINTF("%sContext Element:\n", indent.c_str());
+  }
   else
+  {
     PRINTF("%sContext Element %d:\n", indent.c_str(), ix);
+  }
 
   entityId.present(indent + "  ", -1);
   attributeDomainName.present(indent + "  ");

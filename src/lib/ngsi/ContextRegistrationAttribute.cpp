@@ -29,31 +29,40 @@
 #include "common/tag.h"
 #include "ngsi/ContextRegistrationAttribute.h"
 
+
+
 /* ****************************************************************************
 *
 * ContextRegistrationAttribute::ContextRegistrationAttribute -
 */
 ContextRegistrationAttribute::ContextRegistrationAttribute()
 {
-    name = "";
-    type = "";
-    isDomain = "";
+  name     = "";
+  type     = "";
+  isDomain = "";
 }
+
+
 
 /* ****************************************************************************
 *
 * ContextRegistrationAttribute::ContextRegistrationAttribute -
 */
-ContextRegistrationAttribute::ContextRegistrationAttribute(const std::string& _name, const std::string& _type, const std::string& _isDomain)
+ContextRegistrationAttribute::ContextRegistrationAttribute
+(
+  const std::string&  _name,
+  const std::string&  _type,
+  const std::string&  _isDomain
+)
 {
-    name = _name;
-    type = _type;
-    isDomain = _isDomain;
+  name      = _name;
+  type      = _type;
+  isDomain  = _isDomain;
 }
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttribute::render - 
+* ContextRegistrationAttribute::render -
 */
 std::string ContextRegistrationAttribute::render(Format format, const std::string& indent, bool comma)
 {
@@ -69,6 +78,7 @@ std::string ContextRegistrationAttribute::render(Format format, const std::strin
   // have the comma set to true for the render methods.
   // The only doubt here is whether isDomain should have the comma or not,
   // that depends on whether the metadataVector is empty or not.
+  //
   out += startTag(indent, xmlTag, jsonTag, format, false, false);
   out += valueTag(indent + "  ", "name",     name, format, true);
   out += valueTag(indent + "  ", "type",     type, format, true);
@@ -83,24 +93,39 @@ std::string ContextRegistrationAttribute::render(Format format, const std::strin
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttribute::check - 
+* ContextRegistrationAttribute::check -
 */
-std::string ContextRegistrationAttribute::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextRegistrationAttribute::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   std::string errorString;
 
   if (name == "")
+  {
     return "missing name for registration attribute";
+  }
 
   if (isDomain == "")
+  {
     return "missing isDomain value for registration attribute";
+  }
 
   if (!isTrue(isDomain) && !isFalse(isDomain))
+  {
     return std::string("invalid isDomain (boolean) value for registration attribute: '") + isDomain + "'";
+  }
 
   std::string res;
   if ((res = metadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
     return res;
+  }
 
   return "OK";
 }
@@ -109,7 +134,7 @@ std::string ContextRegistrationAttribute::check(RequestType requestType, Format 
 
 /* ****************************************************************************
 *
-* ContextRegistrationAttribute::present - 
+* ContextRegistrationAttribute::present -
 */
 void ContextRegistrationAttribute::present(int ix, const std::string& indent)
 {
@@ -129,5 +154,5 @@ void ContextRegistrationAttribute::present(int ix, const std::string& indent)
 */
 void ContextRegistrationAttribute::release(void)
 {
-   metadataVector.release();
+  metadataVector.release();
 }

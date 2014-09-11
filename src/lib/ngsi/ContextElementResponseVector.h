@@ -1,5 +1,5 @@
-#ifndef CONTEXT_ELEMENT_RESPONSE_VECTOR_H
-#define CONTEXT_ELEMENT_RESPONSE_VECTOR_H
+#ifndef SRC_LIB_NGSI_CONTEXTELEMENTRESPONSEVECTOR_H_
+#define SRC_LIB_NGSI_CONTEXTELEMENTRESPONSEVECTOR_H_
 
 /*
 *
@@ -34,21 +34,38 @@
 
 /* ****************************************************************************
 *
-* ContextElementResponseVector - 
+* ContextElementResponseVector -
 */
 typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(RequestType requestType, Format format, const std::string& indent, bool comma = false);
-  std::string              check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string              render(RequestType         requestType,
+                                  Format              format,
+                                  const std::string&  indent,
+                                  bool                comma = false);
+
   void                     present(const std::string& indent);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void);
   ContextElementResponse*  get(unsigned int ix);
   void                     release();
 
-  ContextElementResponse*  operator[](unsigned int ix)       { if (ix < vec.size()) return vec[ix]; else return NULL; }
+  ContextElementResponse*  operator[](unsigned int ix)
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;
+  }
+
+  std::string              check(RequestType         requestType,
+                                 Format              format,
+                                 const std::string&  indent,
+                                 const std::string&  predetectedError,
+                                 int                 counter);
 } ContextElementResponseVector;
 
-#endif
+#endif  // SRC_LIB_NGSI_CONTEXTELEMENTRESPONSEVECTOR_H_

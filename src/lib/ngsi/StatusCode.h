@@ -1,5 +1,5 @@
-#ifndef STATUS_CODE_H
-#define STATUS_CODE_H
+#ifndef SRC_LIB_NGSI_STATUSCODE_H_
+#define SRC_LIB_NGSI_STATUSCODE_H_
 
 /*
 *
@@ -26,8 +26,6 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <iostream>
-#include <sstream>
 
 #include "common/Format.h"
 #include "ngsi/Request.h"
@@ -52,12 +50,17 @@ typedef struct StatusCode
   StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag = "statusCode");
 
   std::string  render(Format format, const std::string& indent, bool comma = false, bool showTag = true);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         fill(HttpStatusCode _code, const std::string& _details = "");
   void         fill(StatusCode* scP);
   void         present(const std::string& indent);
   void         release(void);
   void         tagSet(const std::string& _tag);
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } StatusCode;
 
-#endif
+#endif  // SRC_LIB_NGSI_STATUSCODE_H_

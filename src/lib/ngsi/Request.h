@@ -1,5 +1,5 @@
-#ifndef REQUEST_H
-#define REQUEST_H
+#ifndef SRC_LIB_NGSI_REQUEST_H_
+#define SRC_LIB_NGSI_REQUEST_H_
 
 /*
 *
@@ -136,4 +136,4 @@ typedef std::string (*RequestCheck)(ParseData* reqDataP, ConnectionInfo* ciP);
 */
 typedef void (*RequestPresent)(ParseData* reqDataP);
 
-#endif
+#endif  // SRC_LIB_NGSI_REQUEST_H_
