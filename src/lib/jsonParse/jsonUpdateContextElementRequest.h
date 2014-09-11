@@ -1,5 +1,5 @@
-#ifndef JSON_UPDATE_CONTEXT_ELEMENT_REQUEST_H
-#define JSON_UPDATE_CONTEXT_ELEMENT_REQUEST_H
+#ifndef SRC_LIB_JSONPARSE_JSONUPDATECONTEXTELEMENTREQUEST_H_
+#define SRC_LIB_JSONPARSE_JSONUPDATECONTEXTELEMENTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string jsonUcerCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void jsonUcerPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONUPDATECONTEXTELEMENTREQUEST_H_

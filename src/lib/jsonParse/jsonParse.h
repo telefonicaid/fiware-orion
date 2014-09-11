@@ -1,5 +1,5 @@
-#ifndef JSON_PARSE_H
-#define JSON_PARSE_H
+#ifndef SRC_LIB_JSONPARSE_JSONPARSE_H_
+#define SRC_LIB_JSONPARSE_JSONPARSE_H_
 
 /*
 *
@@ -37,6 +37,13 @@
 *
 * jsonParse - 
 */
-extern std::string jsonParse(ConnectionInfo* ciP, const char* content, const std::string& requestType, JsonNode* parseVector, ParseData* reqDataP);
+extern std::string jsonParse
+(
+  ConnectionInfo*     ciP,
+  const char*         content,
+  const std::string&  requestType,
+  JsonNode*           parseVector,
+  ParseData*          reqDataP
+);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONPARSE_H_

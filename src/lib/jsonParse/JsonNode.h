@@ -1,5 +1,5 @@
-#ifndef JSON_NODE_H
-#define JSON_NODE_H
+#ifndef SRC_LIB_JSONPARSE_JSONNODE_H_
+#define SRC_LIB_JSONPARSE_JSONNODE_H_
 
 /*
 *
@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "ngsi/Request.h"
 #include "ngsi/ParseData.h"
 
@@ -48,4 +50,4 @@ typedef struct JsonNode
   JsonNodeTreat  treat;
 } JsonNode;
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONNODE_H_

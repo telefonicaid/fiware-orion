@@ -100,5 +100,6 @@ std::string getAttributeValueInstance
   }
 
   request.release();
+
   return car.render(ciP, AttributeValueInstance, "");
 }

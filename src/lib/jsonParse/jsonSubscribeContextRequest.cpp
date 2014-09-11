@@ -42,7 +42,7 @@ using namespace orion;
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static std::string entityId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -65,35 +65,35 @@ static std::string entityId(const std::string& path, const std::string& value, P
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-   parseDataP->scr.entityIdP->id = value;
-   LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->scr.entityIdP->id.c_str()));
+  parseDataP->scr.entityIdP->id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", parseDataP->scr.entityIdP->id.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
 
 /* ****************************************************************************
 *
-* entityIdType - 
+* entityIdType -
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-   parseDataP->scr.entityIdP->type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->scr.entityIdP->type.c_str()));
+  parseDataP->scr.entityIdP->type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->scr.entityIdP->type.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
 
 /* ****************************************************************************
 *
-* entityIdIsPattern - 
+* entityIdIsPattern -
 */
 static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -108,7 +108,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
 /* ****************************************************************************
 *
-* attribute - 
+* attribute -
 */
 static std::string attribute(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -123,7 +123,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 
 /* ****************************************************************************
 *
-* reference - 
+* reference -
 */
 static std::string reference(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -138,7 +138,7 @@ static std::string reference(const std::string& path, const std::string& value, 
 
 /* ****************************************************************************
 *
-* duration - 
+* duration -
 */
 static std::string duration(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -161,7 +161,7 @@ static std::string duration(const std::string& path, const std::string& value, P
 
 /* ****************************************************************************
 *
-* restriction - 
+* restriction -
 */
 static std::string restriction(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -176,7 +176,7 @@ static std::string restriction(const std::string& path, const std::string& value
 
 /* ****************************************************************************
 *
-* attributeExpression - 
+* attributeExpression -
 */
 static std::string attributeExpression(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -191,7 +191,7 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
 /* ****************************************************************************
 *
-* scope - 
+* scope -
 */
 static std::string scope(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -207,7 +207,7 @@ static std::string scope(const std::string& path, const std::string& value, Pars
 
 /* ****************************************************************************
 *
-* scopeType - 
+* scopeType -
 */
 static std::string scopeType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -222,7 +222,7 @@ static std::string scopeType(const std::string& path, const std::string& value, 
 
 /* ****************************************************************************
 *
-* scopeValue - 
+* scopeValue -
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -250,7 +250,7 @@ static std::string scopeValue(const std::string& path, const std::string& value,
 
 /* ****************************************************************************
 *
-* circle - 
+* circle -
 */
 static std::string circle(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -263,7 +263,7 @@ static std::string circle(const std::string& path, const std::string& value, Par
 
 /* ****************************************************************************
 *
-* circleCenterLatitude - 
+* circleCenterLatitude -
 */
 static std::string circleCenterLatitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -277,7 +277,7 @@ static std::string circleCenterLatitude(const std::string& path, const std::stri
 
 /* ****************************************************************************
 *
-* circleCenterLongitude - 
+* circleCenterLongitude -
 */
 static std::string circleCenterLongitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -290,7 +290,7 @@ static std::string circleCenterLongitude(const std::string& path, const std::str
 
 /* ****************************************************************************
 *
-* circleRadius - 
+* circleRadius -
 */
 static std::string circleRadius(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -303,7 +303,7 @@ static std::string circleRadius(const std::string& path, const std::string& valu
 
 /* ****************************************************************************
 *
-* circleInverted - 
+* circleInverted -
 */
 static std::string circleInverted(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -325,7 +325,7 @@ static std::string circleInverted(const std::string& path, const std::string& va
 
 /* ****************************************************************************
 *
-* polygon - 
+* polygon -
 */
 static std::string polygon(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -338,13 +338,13 @@ static std::string polygon(const std::string& path, const std::string& value, Pa
 
 /* ****************************************************************************
 *
-* polygonInverted - 
+* polygonInverted -
 */
 static std::string polygonInverted(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonInverted: %s", value.c_str()));
 
-  parseDataP->scr.scopeP->polygon.invertedSet(value);;
+  parseDataP->scr.scopeP->polygon.invertedSet(value);
 
   if (!isTrue(value) && !isFalse(value))
   {
@@ -359,7 +359,7 @@ static std::string polygonInverted(const std::string& path, const std::string& v
 
 /* ****************************************************************************
 *
-* polygonVertexList - 
+* polygonVertexList -
 */
 static std::string  polygonVertexList(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -371,7 +371,7 @@ static std::string  polygonVertexList(const std::string& path, const std::string
 
 /* ****************************************************************************
 *
-* polygonVertex - 
+* polygonVertex -
 */
 static std::string  polygonVertex(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -385,7 +385,7 @@ static std::string  polygonVertex(const std::string& path, const std::string& va
 
 /* ****************************************************************************
 *
-* polygonVertexLatitude - 
+* polygonVertexLatitude -
 */
 static std::string  polygonVertexLatitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -398,7 +398,7 @@ static std::string  polygonVertexLatitude(const std::string& path, const std::st
 
 /* ****************************************************************************
 *
-* polygonVertexLongitude - 
+* polygonVertexLongitude -
 */
 static std::string  polygonVertexLongitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -411,7 +411,7 @@ static std::string  polygonVertexLongitude(const std::string& path, const std::s
 
 /* ****************************************************************************
 *
-* notifyCondition - 
+* notifyCondition -
 */
 static std::string notifyCondition(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -425,7 +425,7 @@ static std::string notifyCondition(const std::string& path, const std::string& v
 
 /* ****************************************************************************
 *
-* notifyConditionRestriction - 
+* notifyConditionRestriction -
 */
 static std::string notifyConditionRestriction(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -439,7 +439,7 @@ static std::string notifyConditionRestriction(const std::string& path, const std
 
 /* ****************************************************************************
 *
-* notifyConditionType - 
+* notifyConditionType -
 */
 static std::string notifyConditionType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -452,7 +452,7 @@ static std::string notifyConditionType(const std::string& path, const std::strin
 
 /* ****************************************************************************
 *
-* condValue - 
+* condValue -
 */
 static std::string notifyConditionCondValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -465,7 +465,7 @@ static std::string notifyConditionCondValue(const std::string& path, const std::
 
 /* ****************************************************************************
 *
-* throttling - 
+* throttling -
 */
 static std::string throttling(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -482,41 +482,41 @@ static std::string throttling(const std::string& path, const std::string& value,
 */
 JsonNode jsonScrParseVector[] =
 {
-  { "/entities",                                               jsonNullTreat              },
-  { "/entities/entity",                                        entityId                   },
-  { "/entities/entity/id",                                     entityIdId                 },
-  { "/entities/entity/type",                                   entityIdType               },
-  { "/entities/entity/isPattern",                              entityIdIsPattern          },
-  { "/attributes",                                             jsonNullTreat              },
-  { "/attributes/attribute",                                   attribute                  },
-  { "/reference",                                              reference                  },
-  { "/duration",                                               duration                   },
-  { "/restriction",                                            restriction                },
-  { "/restriction/attributeExpression",                        attributeExpression        },
-  { "/restriction/scopes",                                     jsonNullTreat              },
-  { "/restriction/scopes/scope",                               scope,                     },
-  { "/restriction/scopes/scope/type",                          scopeType                  },
-  { "/restriction/scopes/scope/value",                         scopeValue                 },
-  { "/restriction/scopes/scope/value/circle",                              circle                  },
-  { "/restriction/scopes/scope/value/circle/centerLatitude",               circleCenterLatitude    },
-  { "/restriction/scopes/scope/value/circle/centerLongitude",              circleCenterLongitude   },
-  { "/restriction/scopes/scope/value/circle/radius",                       circleRadius            },
-  { "/restriction/scopes/scope/value/circle/inverted",                     circleInverted          },
+  { "/entities",                                                           jsonNullTreat              },
+  { "/entities/entity",                                                    entityId                   },
+  { "/entities/entity/id",                                                 entityIdId                 },
+  { "/entities/entity/type",                                               entityIdType               },
+  { "/entities/entity/isPattern",                                          entityIdIsPattern          },
+  { "/attributes",                                                         jsonNullTreat              },
+  { "/attributes/attribute",                                               attribute                  },
+  { "/reference",                                                          reference                  },
+  { "/duration",                                                           duration                   },
+  { "/restriction",                                                        restriction                },
+  { "/restriction/attributeExpression",                                    attributeExpression        },
+  { "/restriction/scopes",                                                 jsonNullTreat              },
+  { "/restriction/scopes/scope",                                           scope,                     },
+  { "/restriction/scopes/scope/type",                                      scopeType                  },
+  { "/restriction/scopes/scope/value",                                     scopeValue                 },
+  { "/restriction/scopes/scope/value/circle",                              circle                     },
+  { "/restriction/scopes/scope/value/circle/centerLatitude",               circleCenterLatitude       },
+  { "/restriction/scopes/scope/value/circle/centerLongitude",              circleCenterLongitude      },
+  { "/restriction/scopes/scope/value/circle/radius",                       circleRadius               },
+  { "/restriction/scopes/scope/value/circle/inverted",                     circleInverted             },
 
-  { "/restriction/scopes/scope/value/polygon",                             polygon                 },
-  { "/restriction/scopes/scope/value/polygon/vertices",                    polygonVertexList       },
-  { "/restriction/scopes/scope/value/polygon/vertices/vertice",            polygonVertex           },
-  { "/restriction/scopes/scope/value/polygon/vertices/vertice/latitude",   polygonVertexLatitude   },
-  { "/restriction/scopes/scope/value/polygon/vertices/vertice/longitude",  polygonVertexLongitude  },
-  { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted         },
+  { "/restriction/scopes/scope/value/polygon",                             polygon                    },
+  { "/restriction/scopes/scope/value/polygon/vertices",                    polygonVertexList          },
+  { "/restriction/scopes/scope/value/polygon/vertices/vertice",            polygonVertex              },
+  { "/restriction/scopes/scope/value/polygon/vertices/vertice/latitude",   polygonVertexLatitude      },
+  { "/restriction/scopes/scope/value/polygon/vertices/vertice/longitude",  polygonVertexLongitude     },
+  { "/restriction/scopes/scope/value/polygon/inverted",                    polygonInverted            },
 
-  { "/notifyConditions",                                       jsonNullTreat              },
-  { "/notifyConditions/notifyCondition",                       notifyCondition            },
-  { "/notifyConditions/notifyCondition/type",                  notifyConditionType        },
-  { "/notifyConditions/notifyCondition/condValues",            jsonNullTreat              },
-  { "/notifyConditions/notifyCondition/condValues/condValue",  notifyConditionCondValue   },
-  { "/notifyConditions/notifyCondition/restriction",           notifyConditionRestriction },
-  { "/throttling",                                             throttling                 },
+  { "/notifyConditions",                                                   jsonNullTreat              },
+  { "/notifyConditions/notifyCondition",                                   notifyCondition            },
+  { "/notifyConditions/notifyCondition/type",                              notifyConditionType        },
+  { "/notifyConditions/notifyCondition/condValues",                        jsonNullTreat              },
+  { "/notifyConditions/notifyCondition/condValues/condValue",              notifyConditionCondValue   },
+  { "/notifyConditions/notifyCondition/restriction",                       notifyConditionRestriction },
+  { "/throttling",                                                         throttling                 },
 
   { "LAST", NULL }
 };
@@ -525,7 +525,7 @@ JsonNode jsonScrParseVector[] =
 
 /* ****************************************************************************
 *
-* jsonScrInit - 
+* jsonScrInit -
 */
 void jsonScrInit(ParseData* parseDataP)
 {
@@ -533,7 +533,7 @@ void jsonScrInit(ParseData* parseDataP)
 
   parseDataP->scr.entityIdP              = NULL;
   parseDataP->scr.notifyConditionP       = NULL;
-  parseDataP->scr.scopeP                 = NULL;  
+  parseDataP->scr.scopeP                 = NULL;
   parseDataP->scr.res.restrictions       = 0;
   parseDataP->errorString                = "";
 }
@@ -542,7 +542,7 @@ void jsonScrInit(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* jsonScrRelease - 
+* jsonScrRelease -
 */
 void jsonScrRelease(ParseData* parseDataP)
 {
@@ -553,27 +553,29 @@ void jsonScrRelease(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* jsonScrCheck - 
+* jsonScrCheck -
 */
 std::string jsonScrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-   std::string s;
-   s = parseDataP->scr.res.check(SubscribeContext, ciP->outFormat, "", parseDataP->errorString, 0);
-   return s;
+  std::string s;
+  s = parseDataP->scr.res.check(SubscribeContext, ciP->outFormat, "", parseDataP->errorString, 0);
+  return s;
 }
 
 
 
 /* ****************************************************************************
 *
-* jsonScrPresent - 
+* jsonScrPresent -
 */
 void jsonScrPresent(ParseData* parseDataP)
 {
   printf("jsonScrPresent\n");
 
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   parseDataP->scr.res.present("");
 }

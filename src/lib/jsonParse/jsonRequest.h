@@ -1,5 +1,5 @@
-#ifndef JSON_REQUEST_H
-#define JSON_REQUEST_H
+#ifndef SRC_LIB_JSONPARSE_JSONREQUEST_H_
+#define SRC_LIB_JSONPARSE_JSONREQUEST_H_
 
 /*
 *
@@ -56,6 +56,14 @@ typedef struct JsonRequest
 *
 * jsonTreat - 
 */
-extern std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, const std::string& payloadWord, JsonRequest** reqPP);
+extern std::string jsonTreat
+(
+  const char*         content,
+  ConnectionInfo*     ciP,
+  ParseData*          parseDataP,
+  RequestType         request,
+  const std::string&  payloadWord,
+  JsonRequest**       reqPP
+);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONREQUEST_H_

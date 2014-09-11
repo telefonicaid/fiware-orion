@@ -1,5 +1,5 @@
-#ifndef JSON_NOTIFY_CONTEXT_REQUEST_H
-#define JSON_NOTIFY_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_JSONPARSE_JSONNOTIFYCONTEXTREQUEST_H_
+#define SRC_LIB_JSONPARSE_JSONNOTIFYCONTEXTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string jsonNcrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 */
 extern void jsonNcrPresent(ParseData* reqDataP);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONNOTIFYCONTEXTREQUEST_H_
