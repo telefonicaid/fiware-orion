@@ -204,7 +204,7 @@ fi
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 151
+Content-Length: 158
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -212,7 +212,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service '/NGSI10/queryContext' not found</details>
+  <details>ngsi10 service '/NGSI10/queryContext' not found</details>
 </orionError>
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
