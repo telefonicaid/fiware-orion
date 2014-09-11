@@ -1,5 +1,5 @@
-#ifndef POST_SUBSCRIBE_CONTEXT_AVAILABILITY_H
-#define POST_SUBSCRIBE_CONTEXT_AVAILABILITY_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTAVAILABILITY_H_
+#define SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTAVAILABILITY_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postSubscribeContextAvailability - 
 */
-extern std::string postSubscribeContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postSubscribeContextAvailability
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTAVAILABILITY_H_

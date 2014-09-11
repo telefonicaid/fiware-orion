@@ -1,5 +1,5 @@
-#ifndef POST_NGSI9_CONTEXT_ENTITY_TYPES_H
-#define POST_NGSI9_CONTEXT_ENTITY_TYPES_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTCONTEXTENTITYTYPES_H_
+#define SRC_LIB_SERVICEROUTINES_POSTCONTEXTENTITYTYPES_H_
 
 /*
 *
@@ -40,6 +40,12 @@
 *
 * postContextEntityTypes - 
 */
-extern std::string postContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postContextEntityTypes
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTCONTEXTENTITYTYPES_H_

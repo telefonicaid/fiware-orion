@@ -36,7 +36,13 @@
 *
 * deleteAvailabilitySubscriptionConvOp - 
 */
-std::string deleteAvailabilitySubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string deleteAvailabilitySubscriptionConvOp
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   UnsubscribeContextAvailabilityRequest*  ucarP          = &parseDataP->ucar.res;
   std::string                             subscriptionId = compV[2];

@@ -38,16 +38,24 @@
 
 /* ****************************************************************************
 *
-* getContextEntityTypeAttribute - 
+* getContextEntityTypeAttribute -
 */
-std::string getContextEntityTypeAttribute(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string getContextEntityTypeAttribute
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   std::string                          entityType     = compV[2];
   std::string                          attributeName  = compV[4];
   DiscoverContextAvailabilityRequest*  requestP = &parseDataP->dcar.res;
   EntityId                             entityId(".*", entityType, "true");
-  
-  LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entity type '%s', attribute: '%s'", entityType.c_str(), attributeName.c_str()));
+
+  LM_T(LmtConvenience,
+       ("CONVENIENCE: got a  'GET' request for entity type '%s', attribute: '%s'",
+        entityType.c_str(), attributeName.c_str()));
 
   requestP->entityIdVector.push_back(&entityId);
   requestP->attributeList.push_back(attributeName);

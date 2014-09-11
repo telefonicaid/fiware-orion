@@ -1,5 +1,5 @@
-#ifndef BAD_REQUEST_H
-#define BAD_REQUEST_H
+#ifndef SRC_LIB_SERVICEROUTINES_BADREQUEST_H_
+#define SRC_LIB_SERVICEROUTINES_BADREQUEST_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * badRequest - 
 */
-extern std::string badRequest(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string badRequest
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_BADREQUEST_H_

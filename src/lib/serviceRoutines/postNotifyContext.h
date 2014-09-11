@@ -1,5 +1,5 @@
-#ifndef POST_NOTIFY_CONTEXT_H
-#define POST_NOTIFY_CONTEXT_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTNOTIFYCONTEXT_H_
+#define SRC_LIB_SERVICEROUTINES_POSTNOTIFYCONTEXT_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postNotifyContext - 
 */
-extern std::string postNotifyContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postNotifyContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTNOTIFYCONTEXT_H_

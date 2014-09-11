@@ -40,7 +40,7 @@
 
 /* ****************************************************************************
 *
-* xmlPayloadClean - 
+* xmlPayloadClean -
 */
 static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 {
@@ -51,9 +51,15 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 
 /* ****************************************************************************
 *
-* postUpdateContext - 
+* postUpdateContext -
 */
-std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postUpdateContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   UpdateContextResponse  upcr;
   std::string            answer;
@@ -105,14 +111,14 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     std::string     protocol;
     int             port;
     std::string     prefix;
-    
+
     if (parseUrl(cerP->statusCode.details, ip, port, prefix, protocol) == false)
     {
       cerP->statusCode.fill(SccReceiverInternalError, "error parsing providing application");
       continue;
     }
 
-    // Saving port as a string - portV will be used composing detailed error messages 
+    // Saving port as a string - portV will be used composing detailed error messages
     char portV[16];
     snprintf(portV, sizeof(portV), "%d", port);
 
@@ -144,7 +150,7 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     std::string     verb         = "POST";
     std::string     resource     = prefix + "/updateContext";
     std::string     tenant       = ciP->tenant;
-    
+
     out = sendHttpSocket(ip, port, protocol, verb, tenant, resource, "application/xml", payloadIn, false, true);
 
     // Should be safe to free up ucrP now ...
@@ -170,13 +176,14 @@ std::string postUpdateContext(ConnectionInfo* ciP, int components, std::vector<s
     UpdateContextResponse*  provUpcrsP;
 
     cleanPayload = xmlPayloadClean(out.c_str(), "<updateContextResponse>");
-    
+
     s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
     provUpcrsP = &parseData.upcrs.res;
     if (s != "OK")
     {
-      std::string details = "error forwarding 'Update' to providing application " + ip + portV + resource + ": " + "error parsing XML";
-      
+      std::string details = "error forwarding 'Update' to providing application " +
+        ip + portV + resource + ": " + "error parsing XML";
+
       cerP->statusCode.fill(SccContextElementNotFound, "");
       LM_E(("Runtime Error (%s)", details.c_str()));
       continue;

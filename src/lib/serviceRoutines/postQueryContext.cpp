@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* xmlPayloadClean - 
+* xmlPayloadClean -
 */
 static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 {
@@ -49,13 +49,19 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 
 /* ****************************************************************************
 *
-* postQueryContext - 
+* postQueryContext -
 */
-std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postQueryContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   QueryContextResponse  qcr;
   std::string           answer;
-   
+
   ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, &qcr, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   // If no redirectioning is necessary, just return the result
@@ -81,7 +87,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   // 3. Render an XML-string of the request we want to forward
   // 4. Send the request to the providing application (and await the response)
   // 5. Parse the XML response and fill in a binary QueryContextResponse
-  // 6. Render QueryContextResponse from the providing application 
+  // 6. Render QueryContextResponse from the providing application
   //
 
 
@@ -169,7 +175,7 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
 
 
   //
-  // 6. Render QueryContextResponse from the providing application 
+  // 6. Render QueryContextResponse from the providing application
   //
   char portV[16];
   snprintf(portV, sizeof(portV), "%d", port);
@@ -184,9 +190,11 @@ std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<st
   {
     qcrsP->errorCode.details = "Redirected to context provider " + ip + ":" + portV + prefix;
   }
-  else if ((qcrsP->contextElementResponseVector.size() > 0) && (qcrsP->contextElementResponseVector[0]->statusCode.details == ""))
+  else if ((qcrsP->contextElementResponseVector.size() > 0) &&
+           (qcrsP->contextElementResponseVector[0]->statusCode.details == ""))
   {
-    qcrsP->contextElementResponseVector[0]->statusCode.details = "Redirected to context provider " + ip + ":" + portV + prefix;
+    qcrsP->contextElementResponseVector[0]->statusCode.details =
+      "Redirected to context provider " + ip + ":" + portV + prefix;
   }
 
   answer = qcrsP->render(ciP, QueryContext, "");

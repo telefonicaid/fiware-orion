@@ -1,5 +1,5 @@
-#ifndef GET_ENTITY_BY_ID_ATTRIBUTE_BY_NAME_H
-#define GET_ENTITY_BY_ID_ATTRIBUTE_BY_NAME_H
+#ifndef SRC_LIB_SERVICEROUTINES_GETENTITYBYIDATTRIBUTEBYNAME_H_
+#define SRC_LIB_SERVICEROUTINES_GETENTITYBYIDATTRIBUTEBYNAME_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * getEntityByIdAttributeByName - 
 */
-extern std::string getEntityByIdAttributeByName(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string getEntityByIdAttributeByName
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_GETENTITYBYIDATTRIBUTEBYNAME_H_

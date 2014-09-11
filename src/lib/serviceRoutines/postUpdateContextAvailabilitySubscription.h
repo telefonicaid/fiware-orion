@@ -1,5 +1,5 @@
-#ifndef POST_UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION_H
-#define POST_UPDATE_CONTEXT_AVAILABILITY_SUBSCRIPTION_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTUPDATECONTEXTAVAILABILITYSUBSCRIPTION_H_
+#define SRC_LIB_SERVICEROUTINES_POSTUPDATECONTEXTAVAILABILITYSUBSCRIPTION_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postUpdateContextAvailabilitySubscription - 
 */
-extern std::string postUpdateContextAvailabilitySubscription(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postUpdateContextAvailabilitySubscription
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTUPDATECONTEXTAVAILABILITYSUBSCRIPTION_H_

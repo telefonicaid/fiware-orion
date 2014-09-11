@@ -53,15 +53,16 @@ static char versionString[30] = { 'a', 'l', 'p', 'h', 'a', 0 };
 */
 void versionSet(const char* version)
 {
-   strncpy(versionString, version, sizeof(versionString));
+  strncpy(versionString, version, sizeof(versionString));
 }
 
 /* ****************************************************************************
 *
 * versionGet -
 */
-char* versionGet() {
-    return versionString;
+char* versionGet()
+{
+  return versionString;
 }
 
 
@@ -69,7 +70,13 @@ char* versionGet() {
 *
 * versionTreat - 
 */
-std::string versionTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string versionTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   std::string out     = "";
   std::string tag     = "orion";
