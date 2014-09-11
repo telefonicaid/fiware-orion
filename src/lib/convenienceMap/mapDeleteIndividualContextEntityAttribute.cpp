@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "convenienceMap/mapDeleteIndividualContextEntityAttribute.h"
@@ -38,14 +40,20 @@
 *
 * mapDeleteIndividualContextEntityAttribute - 
 */
-HttpStatusCode mapDeleteIndividualContextEntityAttribute(const std::string& entityId, const std::string& attributeName, StatusCode* response, ConnectionInfo* ciP)
+HttpStatusCode mapDeleteIndividualContextEntityAttribute
+(
+  const std::string&  entityId,
+  const std::string&  attributeName,
+  StatusCode*         response,
+  ConnectionInfo*     ciP
+)
 {
   HttpStatusCode         ms;
   UpdateContextRequest   ucRequest;
   UpdateContextResponse  ucResponse;
   ContextElement         ce;
   ContextAttribute       contextAttribute(attributeName, "", "");
-  
+
   ce.entityId.fill(entityId, "", "false");
   ce.contextAttributeVector.push_back(&contextAttribute);
   ucRequest.updateActionType.set("Delete");
@@ -55,7 +63,9 @@ HttpStatusCode mapDeleteIndividualContextEntityAttribute(const std::string& enti
   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
 
   if (ms == SccOk)
+  {
     *response = ucResponse.contextElementResponseVector.get(0)->statusCode;
+  }
 
   return ms;
 }

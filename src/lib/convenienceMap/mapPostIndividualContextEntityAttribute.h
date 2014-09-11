@@ -1,5 +1,5 @@
-#ifndef MAP_POST_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
-#define MAP_POST_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
+#ifndef SRC_LIB_CONVENIENCEMAP_MAPPOSTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
+#define SRC_LIB_CONVENIENCEMAP_MAPPOSTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
 
 /*
 *
@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "mongoBackend/MongoGlobal.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
@@ -33,10 +35,18 @@
 #include "rest/HttpStatusCode.h"
 
 
+
 /* ****************************************************************************
 *
 * mapPostIndividualContextEntityAttribute - 
 */
-extern HttpStatusCode mapPostIndividualContextEntityAttribute(const std::string& entityId, const std::string& attributeName, UpdateContextAttributeRequest* request, StatusCode* response, ConnectionInfo* ciP);
+extern HttpStatusCode mapPostIndividualContextEntityAttribute
+(
+  const std::string&              entityId,
+  const std::string&              attributeName,
+  UpdateContextAttributeRequest*  request,
+  StatusCode*                     response,
+  ConnectionInfo*                 ciP
+);
 
-#endif
+#endif  // SRC_LIB_CONVENIENCEMAP_MAPPOSTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_

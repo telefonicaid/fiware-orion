@@ -22,6 +22,8 @@
 *
 * Author: TID Developer
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 
 #include "convenience/UpdateContextAttributeRequest.h"
@@ -31,8 +33,8 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
-#include "rest/ConnectionInfo.h" 
-#include "rest/HttpStatusCode.h" 
+#include "rest/ConnectionInfo.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -40,7 +42,14 @@
 *
 * mapPutIndividualContextEntityAttribute -
 */
-HttpStatusCode mapPutIndividualContextEntityAttribute(const std::string& entityId, const std::string& attributeName, UpdateContextAttributeRequest* request, StatusCode* response, ConnectionInfo* ciP)
+HttpStatusCode mapPutIndividualContextEntityAttribute
+(
+  const std::string&              entityId,
+  const std::string&              attributeName,
+  UpdateContextAttributeRequest*  request,
+  StatusCode*                     response,
+  ConnectionInfo*                 ciP
+)
 {
   HttpStatusCode         ms;
   UpdateContextRequest   ucRequest;

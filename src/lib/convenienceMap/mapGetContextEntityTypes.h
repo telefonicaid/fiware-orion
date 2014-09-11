@@ -1,5 +1,5 @@
-#ifndef MAP_GET_CONTEXT_ENTITIES_BY_ENTITY_ID_H
-#define MAP_GET_CONTEXT_ENTITIES_BY_ENTITY_ID_H
+#ifndef SRC_LIB_CONVENIENCEMAP_MAPGETCONTEXTENTITYTYPES_H_
+#define SRC_LIB_CONVENIENCEMAP_MAPGETCONTEXTENTITYTYPES_H_
 
 /*
 *
@@ -37,6 +37,11 @@
 *
 * mapGetContextEntityTypes - 
 */
-extern HttpStatusCode mapGetContextEntityTypes(const std::string& typeName, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP);
+extern HttpStatusCode mapGetContextEntityTypes
+(
+  const std::string&                    typeName,
+  DiscoverContextAvailabilityResponse*  response,
+  ConnectionInfo*                       ciP
+);
 
-#endif
+#endif  // SRC_LIB_CONVENIENCEMAP_MAPGETCONTEXTENTITYTYPES_H_

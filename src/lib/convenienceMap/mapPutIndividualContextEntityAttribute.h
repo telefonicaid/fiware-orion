@@ -1,5 +1,5 @@
-#ifndef MAP_PUT_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
-#define MAP_PUT_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTE_H
+#ifndef SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
+#define SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
 
 /*
 *
@@ -25,6 +25,8 @@
 *
 * Author: TID Developer
 */
+#include <string>
+
 #include "convenience/UpdateContextAttributeRequest.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "rest/ConnectionInfo.h"
@@ -45,4 +47,4 @@ extern HttpStatusCode mapPutIndividualContextEntityAttribute
   ConnectionInfo*                 ciP
 );
 
-#endif
+#endif  // SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
