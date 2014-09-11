@@ -32,6 +32,7 @@
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -47,10 +48,14 @@ typedef struct AppendContextElementRequest
 
   AppendContextElementRequest();
 
-  std::string render(RequestType requestType, Format format, std::string indent);
-  std::string check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
-  void        present(std::string indent);
-  void        release();
+  std::string  render(ConnectionInfo* ciP, RequestType requestType, std::string indent);
+  void         present(std::string indent);
+  void         release();
+  std::string  check(ConnectionInfo*  ciP,
+                     RequestType      requestType,
+                     std::string      indent,
+                     std::string      predetectedError,
+                     int              counter);
 } AppendContextElementRequest;
 
 #endif  // SRC_LIB_CONVENIENCE_APPENDCONTEXTELEMENTREQUEST_H_

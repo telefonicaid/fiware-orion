@@ -526,7 +526,7 @@ unset CB_DIFF_TOOL
 
 if [ "$runHarness" -eq "1" ]
 then
-  if [ "$BROKER_PORT" == "" ]
+  if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
   then
     echo "$0: please source the test script (scripts/testEnv.sh)"
     exit 1

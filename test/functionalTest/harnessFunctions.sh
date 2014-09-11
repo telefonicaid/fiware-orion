@@ -48,6 +48,25 @@ function harnessExit()
 
 # ------------------------------------------------------------------------------
 #
+# vMsg - verbose output
+#
+# Remember that if the '--verbose' flag is used, the verboser messages pollute
+# the total answer and the harness test will fail.
+#
+# Verbose mode is only meant to troubleshoot harness tests that fail.
+#
+function vMsg()
+{
+  if [ "$_verbose" == "on" ]
+  then
+    echo $*
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # dbInit - 
 #
 function dbInit()
@@ -57,10 +76,19 @@ function dbInit()
 
   if [ "$role" == "CB" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo ${CB_DATABASE_NAME} --quiet
   elif [ "$role" == "CM" ]
   then
-    echo 'db.dropDatabase()' | mongo ${BROKER_DATABASE2_NAME} --quiet
+    echo 'db.dropDatabase()' | mongo ${CM_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP1" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP1_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP2" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP2_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP3" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP3_DATABASE_NAME} --quiet
   else
     echo 'db.dropDatabase()' | mongo $db --quiet
   fi
@@ -94,13 +122,28 @@ function localBrokerStart()
 
   if [ "$role" == "CB" ]
   then
-    port=$BROKER_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE}     -db ${BROKER_DATABASE_NAME} -t $traceLevels $IPvOption $extraParams"
+    port=$CB_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CB_PORT  -pidpath $CB_PID_FILE  -db $CB_DATABASE_NAME  -t $traceLevels $IPvOption $extraParams"
   elif [ "$role" == "CM" ]
   then
-    mkdir -p /tmp/configManager
+    mkdir -p $CM_LOG_DIR
     port=$CM_PORT
-    CB_START_CMD="contextBroker -harakiri -port ${CM_PORT}     -pidpath ${BROKER_PID2_FILE} -db ${BROKER_DATABASE2_NAME} -t $traceLevels -fwdPort ${BROKER_PORT} -logDir /tmp/configManager -ngsi9 $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CM_PORT  -pidpath $CM_PID_FILE  -db $CM_DATABASE_NAME  -t $traceLevels $IPvOption -logDir $CM_LOG_DIR -fwdPort $CB_PORT -ngsi9 $extraParams"
+  elif [ "$role" == "CP1" ]
+  then
+    mkdir -p $CP1_LOG_DIR
+    port=$CP1_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP1_PORT -pidpath $CP1_PID_FILE -db $CP1_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP1_LOG_DIR $extraParams"
+  elif [ "$role" == "CP2" ]
+  then
+    mkdir -p $CP2_LOG_DIR
+    port=$CP2_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP2_PORT -pidpath $CP2_PID_FILE -db $CP2_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP2_LOG_DIR $extraParams"
+  elif [ "$role" == "CP3" ]
+  then
+    mkdir -p $CP3_LOG_DIR
+    port=$CP3_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -db $CP3_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -133,9 +176,19 @@ function localBrokerStop
 
   if [ "$role" == "CB" ]
   then
-    port=$BROKER_PORT
-  else
-    port=CM_PORT
+    port=$CB_PORT
+  elif [ "$role" == "CM" ]
+  then
+    port=$CM_PORT
+  elif [ "$role" == "CP1" ]
+  then
+    port=$CP1_PORT
+  elif [ "$role" == "CP2" ]
+  then
+    port=$CP2_PORT
+  elif [ "$role" == "CP3" ]
+  then
+    port=$CP3_PORT
   fi
 
   # Test to see if we have a broker running on $port if so kill it!
@@ -203,12 +256,24 @@ function brokerStop
 
   if [ "$role" == "CB" ]
   then
-    pidFile=$BROKER_PID_FILE
-    port=$BROKER_PORT
+    pidFile=$CB_PID_FILE
+    port=$CB_PORT
   elif [ "$role" == "CM" ]
   then
-    pidFile=$BROKER_PID2_FILE
+    pidFile=$CM_PID_FILE
     port=$CM_PORT
+  elif [ "$role" == "CP1" ]
+  then
+    pidFile=$CP1_PID_FILE
+    port=$CP1_PORT
+  elif [ "$role" == "CP2" ]
+  then
+    pidFile=$CP2_PID_FILE
+    port=$CP2_PORT
+  elif [ "$role" == "CP3" ]
+  then
+    pidFile=$CP3_PID_FILE
+    port=$CP3_PORT
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -234,10 +299,10 @@ function proxyCoapStart()
 {
   extraParams=$*
 
-  proxyCoap $extraParams -cbPort $BROKER_PORT
+  proxyCoap $extraParams -cbPort $CB_PORT
 
   # Test to see whether we have a proxy running. If not raise an error
-  running_proxyCoap=$(ps -fe | grep ' proxyCoap' | grep "cbPort $BROKER_PORT" | wc -l)
+  running_proxyCoap=$(ps -fe | grep ' proxyCoap' | grep "cbPort $CB_PORT" | wc -l)
   if [ "$running_proxyCoap" == "" ]
   then
     echo "Unable to start proxyCoap"
@@ -431,7 +496,7 @@ function dbInsertEntity()
 # Options:
 #   -X            <HTTP method>    (default: according to curl. GET if no payload, POST if with payload)
 #   --host        <host>           (default: localhost)
-#   --port        <port>           (default: $BROKER_PORT)
+#   --port        <port>           (default: $CB_PORT)
 #   --url         <URL>            (default: empty string)
 #   --payload     <payload>        (default: NO PAYLOAD. Possible values: [filename | "${string}"])
 #   --in          (input payload)  (default: xml => application/xml, If 'json': application/json)
@@ -440,6 +505,8 @@ function dbInsertEntity()
 #   --httpTenant  <tenant>         (tenant in HTTP header)
 #   --urlTenant   <tenant>         (tenant in URL)
 #   --servicePath <path>           (Service Path in HTTP header)
+#   --urlParams   <params>         (URI parameters 'in' URL-string)
+#   --verbose                      
 #
 # Any parameters are sent as is to 'curl'
 # 
@@ -450,7 +517,7 @@ function orionCurl()
   #
   _method=""
   _host="localhost"
-  _port=$BROKER_PORT
+  _port=$CB_PORT
   _url=""
   _payload=""
   _inFormat=application/xml
@@ -459,7 +526,10 @@ function orionCurl()
   _httpTenant=""
   _servicePath=""
   _urlTenant=""
+  _urlParams=''
   _xtra=''
+  _verbose='off'
+  _debug='off'
 
   while [ "$#" != 0 ]
   do
@@ -474,11 +544,21 @@ function orionCurl()
     elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
     elif [ "$1" == "--urlTenant" ]; then       _urlTenant="$2"; shift;
+    elif [ "$1" == "--urlParams" ]; then       _urlParams=$2; shift;
+    elif [ "$1" == "--verbose" ]; then         _verbose=on;
+    elif [ "$1" == "--debug" ]; then           _debug=on;
     else                                       _xtra="$_xtra $1"; shift;
     fi
 
     shift
   done
+
+
+
+  vMsg urlParams: $_urlParams
+  vMsg URL: $_URL
+
+
 
   #
   # Sanity check of parameters
@@ -532,6 +612,13 @@ function orionCurl()
     _URL=$_host:$_port$_url
   fi
   
+  if [ "$_urlParams" != "" ]
+  then
+    _URL=$_URL'?'$_urlParams
+  fi
+
+  vMsg URL: $_URL
+
   _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
 
 #   echo '==============================================================================================================================================================='
@@ -544,15 +631,19 @@ function orionCurl()
   then
      if [ "$_servicePath" != "" ]
      then
+       vMsg _URL1: $_URL
        _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "service-path: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
      else
+       vMsg _URL2: $_URL
        _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
      fi
   else
      if [ "$_servicePath" != "" ]
      then
+       vMsg _URL3: $_URL
        _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "service-path: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
      else
+       vMsg _URL4: $_URL
        _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" $_BUILTINS $_xtra)
      fi
   fi
@@ -569,11 +660,14 @@ function orionCurl()
   then
     if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
     then
+      vMsg Running xmllint tool for $_response
       echo $_response | xmllint --format -
     elif [ "$_outFormat" == application/json ]
     then
+      vMsg Running python tool for $_response
       echo $_response | python -mjson.tool
     else
+      vMsg Running xmllint tool for $_response
       echo $_response | xmllint --format -
     fi
   fi
@@ -747,6 +841,7 @@ function coapCurl()
       echo $_response | xmllint --format -
     elif [ "$_outFormat" == application/json ]
     then
+      vMsg "JSON check for:" $_response
       echo $_response | python -mjson.tool
     else
       echo $_response | xmllint --format -
@@ -769,3 +864,4 @@ export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
 export -f coapCurl
+export -f vMsg

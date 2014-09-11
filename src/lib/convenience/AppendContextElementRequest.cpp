@@ -32,6 +32,7 @@
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -49,16 +50,16 @@ AppendContextElementRequest::AppendContextElementRequest()
 *
 * render - 
 */
-std::string AppendContextElementRequest::render(RequestType requestType, Format format, std::string indent)
+std::string AppendContextElementRequest::render(ConnectionInfo* ciP, RequestType requestType, std::string indent)
 {
   std::string tag = "appendContextElementRequest";
   std::string out = "";
 
-  out += startTag(indent, tag, format, false);
-  out += attributeDomainName.render(format, indent + "  ", true);
-  out += contextAttributeVector.render(requestType, format, indent + "  ");
-  out += domainMetadataVector.render(format, indent + "  ");
-  out += endTag(indent, tag, format);
+  out += startTag(indent, tag, ciP->outFormat, false);
+  out += attributeDomainName.render(ciP->outFormat, indent + "  ", true);
+  out += contextAttributeVector.render(ciP, requestType, indent + "  ");
+  out += domainMetadataVector.render(ciP->outFormat, indent + "  ");
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }
@@ -80,25 +81,26 @@ std::string AppendContextElementRequest::render(RequestType requestType, Format 
 */
 std::string AppendContextElementRequest::check
 (
-  RequestType  requestType,
-  Format       format,
-  std::string  indent,
-  std::string  preError,     // Predetected Error, normally during parsing
-  int counter
+  ConnectionInfo*  ciP,
+  RequestType      requestType,
+  std::string      indent,
+  std::string      predetectedError,     // Predetected Error, normally during parsing
+  int              counter
 )
 {
   AppendContextElementResponse  response;
   std::string                   res;
+  Format                        fmt = ciP->outFormat;
 
-  if (preError != "")
+  if (predetectedError != "")
   {
-    response.errorCode.fill(SccBadRequest, preError);
+    response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextAttributeVector.check(AppendContextElement, format, indent, preError, counter)) != "OK")
+  else if ((res = contextAttributeVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
-  else if ((res = domainMetadataVector.check(AppendContextElement, format, indent, preError, counter)) != "OK")
+  else if ((res = domainMetadataVector.check(AppendContextElement, fmt, indent, predetectedError, counter)) != "OK")
   {
     response.errorCode.fill(SccBadRequest, res);
   }
@@ -107,7 +109,7 @@ std::string AppendContextElementRequest::check
     return "OK";
   }
 
-  return response.render(requestType, format, indent);
+  return response.render(ciP, requestType, indent);
 }
 
 

@@ -34,7 +34,7 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextResponse.h"
-
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -47,16 +47,6 @@ UpdateContextResponse::UpdateContextResponse()
   errorCode.tagSet("errorCode");
 }
 
-/* ****************************************************************************
-*
-* UpdateContextResponse::~UpdateContextResponse -
-*/
-UpdateContextResponse::~UpdateContextResponse()
-{
-  errorCode.release();
-  contextElementResponseVector.release();
-  LM_T(LmtDestructor,("destroyed"));
-}
 
 
 /* ****************************************************************************
@@ -65,9 +55,23 @@ UpdateContextResponse::~UpdateContextResponse()
 */
 UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 {
-  errorCode = _errorCode;
-
+  errorCode.fill(&_errorCode);
   errorCode.tagSet("errorCode");
+  LM_T(LmtDestructor, ("destroyed"));
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::~UpdateContextResponse -
+*/
+UpdateContextResponse::~UpdateContextResponse()
+{
+  errorCode.release();
+//  errorCode.tagSet("errorCode");
+  contextElementResponseVector.release();
+  LM_T(LmtDestructor, ("destroyed"));
 }
 
 
@@ -76,31 +80,75 @@ UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 *
 * UpdateContextResponse::render - 
 */
-std::string UpdateContextResponse::render(RequestType requestType, Format format, const std::string& indent)
+std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
 {
   std::string out = "";
   std::string tag = "updateContextResponse";
 
-  out += startTag(indent, tag, format, false);
+  out += startTag(indent, tag, ciP->outFormat, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(format, indent + "  ");
+    out += errorCode.render(ciP->outFormat, indent + "  ");
   }
   else
   {
     if (contextElementResponseVector.size() == 0)
     {
       errorCode.fill(SccContextElementNotFound);
-      out += errorCode.render(format, indent + "  ");
+      out += errorCode.render(ciP->outFormat, indent + "  ");
     }
     else
-      out += contextElementResponseVector.render(UpdateContext, format, indent + "  ");
+      out += contextElementResponseVector.render(ciP, UpdateContext, indent + "  ");
   }
   
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::check -
+*/
+std::string UpdateContextResponse::check
+(
+  ConnectionInfo*     ciP,
+  RequestType         requestType,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
+{
+  std::string  res;
+
+  if (predetectedError != "")
+  {
+    errorCode.fill(SccBadRequest, predetectedError);
+  }
+  else if (contextElementResponseVector.check(UpdateContext, ciP->outFormat, indent, predetectedError, 0) != "OK")
+  {
+    LM_W(("Bad Input (%s)", res.c_str()));
+    errorCode.fill(SccBadRequest, res);
+  }
+  else
+    return "OK";
+
+  return render(ciP, UpdateContext, indent);
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::present -
+*/
+void UpdateContextResponse::present(const std::string& indent)
+{
+  contextElementResponseVector.present(indent + "  ");
+  errorCode.present(indent + "  ");
 }
 
 

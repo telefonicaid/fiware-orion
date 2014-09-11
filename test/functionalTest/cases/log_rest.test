@@ -65,7 +65,7 @@ echo
 
 
 echo "=== 7. DELETE trace level"
-curl localhost:${BROKER_PORT}/log/traceLevel/23 -X DELETE  2> /dev/null
+curl localhost:${CB_PORT}/log/traceLevel/23 -X DELETE  2> /dev/null
 # FIXME: Y U NO orionCurl --url "/log/traceLevel/23" -X "DELETE" 2> /dev/null ?
 echo
 echo

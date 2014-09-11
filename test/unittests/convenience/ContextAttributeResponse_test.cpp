@@ -29,6 +29,7 @@
 
 #include "common/Format.h"
 #include "convenience/ContextAttributeResponse.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -43,13 +44,14 @@ TEST(ContextAttributeResponse, render_xml)
   ContextAttribute          ca("caName", "caType", "caValue");
   ContextAttributeResponse  car;
   std::string               out;
+  ConnectionInfo            ci;
 
   utInit();
 
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk);
 
-  out = car.render(ContextEntityAttributes, XML, "");
+  out = car.render(&ci, ContextEntityAttributes, "");
 
   utExit();
 }
@@ -65,13 +67,15 @@ TEST(ContextAttributeResponse, render_json)
   ContextAttribute          ca("caName", "caType", "caValue");
   ContextAttributeResponse  car;
   std::string               out;
+  ConnectionInfo            ci;
 
   utInit();
 
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "OK"); 
 
-  out = car.render(ContextEntityAttributes, JSON, "");
+  ci.outFormat = JSON;
+  out = car.render(&ci, ContextEntityAttributes, "");
 
   utExit();
 }
@@ -89,6 +93,7 @@ TEST(ContextAttributeResponse, check_xml)
   std::string               out;
   const char*               outfile1 = "ngsi10.contextAttributeResponse.check3.valid.xml";
   const char*               outfile2 = "ngsi10.contextAttributeResponse.check4.valid.xml";
+  ConnectionInfo            ci;
 
   utInit();
 
@@ -96,12 +101,12 @@ TEST(ContextAttributeResponse, check_xml)
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk); 
 
-  out = car.check(UpdateContextAttribute, XML, "", "", 0);
+  out = car.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
 
   // 2. predetectedError
-  out = car.check(UpdateContextAttribute, XML, "", "PRE Error", 0);
+  out = car.check(&ci, UpdateContextAttribute, "", "PRE Error", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -111,7 +116,7 @@ TEST(ContextAttributeResponse, check_xml)
   car.contextAttributeVector.push_back(&ca2);
   
   LM_M(("car.contextAttributeVector.size: %d - calling ContextAttributeResponse::check", car.contextAttributeVector.size()));
-  out = car.check(UpdateContextAttribute, XML, "", "", 0);
+  out = car.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -131,6 +136,7 @@ TEST(ContextAttributeResponse, check_json)
   std::string               out;
   const char*               outfile1 = "ngsi10.contextAttributeResponse.check3.valid.json";
   const char*               outfile2 = "ngsi10.contextAttributeResponse.check4.valid.json";
+  ConnectionInfo            ci;
 
   utInit();
 
@@ -138,12 +144,13 @@ TEST(ContextAttributeResponse, check_json)
   car.contextAttributeVector.push_back(&ca);
   car.statusCode.fill(SccOk, "OK"); 
 
-  out = car.check(UpdateContextAttribute, JSON, "", "", 0);
+  ci.outFormat = JSON;
+  out = car.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_STREQ("OK", out.c_str());
 
 
   // 2. predetectedError
-  out = car.check(UpdateContextAttribute, JSON, "", "PRE Error", 0);
+  out = car.check(&ci, UpdateContextAttribute, "", "PRE Error", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -153,7 +160,7 @@ TEST(ContextAttributeResponse, check_json)
   car.contextAttributeVector.push_back(&ca2);
   
   LM_M(("car.contextAttributeVector.size: %d - calling ContextAttributeResponse::check", car.contextAttributeVector.size()));
-  out = car.check(UpdateContextAttribute, JSON, "", "", 0);
+  out = car.check(&ci, UpdateContextAttribute, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

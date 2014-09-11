@@ -53,8 +53,9 @@ typedef enum TraceLevels
   LmtServicePath,
   LmtPagination,
   LmtCoap,
-  LmtHttps,
+  LmtHttps = 35,
   LmtIpVersion,
+  LmtCtxProviders,
 
   /* Parser (40-59) */
   LmtParse    = 40,
@@ -73,6 +74,7 @@ typedef enum TraceLevels
   LmtCompoundValueContainer,
   LmtCompoundValueStep,
   LmtCompoundValueShow = 55,
+  LmtJsonAttributes,
 
   /* RestService and Service (60-79) */
   LmtService     = 60,

@@ -34,6 +34,7 @@
 #include "ngsi/ContextElement.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -51,7 +52,7 @@ void UpdateContextRequest::init(void)
 *
 * UpdateContextRequest::render - 
 */
-std::string UpdateContextRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string UpdateContextRequest::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
 {
   std::string  out = "";
   std::string  tag = "updateContextRequest";
@@ -59,10 +60,10 @@ std::string UpdateContextRequest::render(RequestType requestType, Format format,
   // JSON commas:
   // Both fields are MANDATORY, so, comma after "contextElementVector"
   //
-  out += startTag(indent, tag, format, false);
-  out += contextElementVector.render(UpdateContext, format, indent + "  ", true);
-  out += updateActionType.render(format, indent + "  ", false);
-  out += endTag(indent, tag, format, false);
+  out += startTag(indent, tag, ciP->outFormat, false);
+  out += contextElementVector.render(ciP, UpdateContext, indent + "  ", true);
+  out += updateActionType.render(ciP->outFormat, indent + "  ", false);
+  out += endTag(indent, tag, ciP->outFormat, false);
 
   return out;
 }
@@ -73,7 +74,7 @@ std::string UpdateContextRequest::render(RequestType requestType, Format format,
 *
 * UpdateContextRequest::check - 
 */
-std::string UpdateContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string            res;
   UpdateContextResponse  response;
@@ -81,14 +82,14 @@ std::string UpdateContextRequest::check(RequestType requestType, Format format, 
   if (predetectedError != "")
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
-    return response.render(UpdateContext, format, indent);
+    return response.render(ciP, UpdateContext, indent);
   }
 
-  if (((res = contextElementVector.check(requestType, format, indent, predetectedError, counter)) != "OK") || 
-      ((res = updateActionType.check(requestType, format, indent, predetectedError, counter)) != "OK"))
+  if (((res = contextElementVector.check(requestType, ciP->outFormat, indent, predetectedError, counter)) != "OK") || 
+      ((res = updateActionType.check(requestType,     ciP->outFormat, indent, predetectedError, counter)) != "OK"))
   {
     response.errorCode.fill(SccBadRequest, res);
-    return response.render(UpdateContext, format, indent);
+    return response.render(ciP, UpdateContext, indent);
   }
 
   return "OK";

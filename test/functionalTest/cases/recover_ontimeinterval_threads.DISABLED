@@ -55,18 +55,18 @@ until [ $port_not_ok == 0 ]; do
    port_not_ok=$?
 done
 
-# Test to see if we have a broker running on ${BROKER_PORT} if so kill it!
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+# Test to see if we have a broker running on ${CB_PORT} if so kill it!
+running_broker=$(ps -fe | grep contextBroker | grep ${CB_PORT} | wc -l)
 if [ $running_broker -ne 0 ]; then
-  kill $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
+  kill $(ps -fe | grep contextBroker | grep ${CB_PORT} | awk '{print $2}')
   # Wait some time so the broker can finish properly
   sleep 1
-  running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+  running_broker=$(ps -fe | grep contextBroker | grep ${CB_PORT} | wc -l)
   if [ $running_broker -ne 0 ]; then
     # If the broker refuses to stop politely, kill the process by brute force
-    kill -9 $(ps -fe | grep contextBroker | grep ${BROKER_PORT} | awk '{print $2}')
+    kill -9 $(ps -fe | grep contextBroker | grep ${CB_PORT} | awk '{print $2}')
     sleep 1
-    running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+    running_broker=$(ps -fe | grep contextBroker | grep ${CB_PORT} | wc -l)
     if [ $running_broker -ne 0 ]; then
       echo "Existing contextBroker is inmortal, can not be killed!"
       exit 1
@@ -76,7 +76,7 @@ fi
 
 # Set MongoDB with initial status (2 subscriptions)
 # expiration 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years
-mongo ${BROKER_DATABASE_NAME} <<EOF
+mongo ${CB_DATABASE_NAME} <<EOF
 db.dropDatabase()
 db.csubs.insert({
         "expiration" : 1879048191,
@@ -116,7 +116,7 @@ db.csubs.insert({
 })
 EOF
 
-CB_START_CMD="contextBroker -harakiri -port ${BROKER_PORT} -pidpath ${BROKER_PID_FILE} -db ${BROKER_DATABASE_NAME} -t 0-255"
+CB_START_CMD="contextBroker -harakiri -port ${CB_PORT} -pidpath ${CB_PID_FILE} -db ${CB_DATABASE_NAME} -t 0-255"
 if [ "$VALGRIND" == "" ]; then
   $CB_START_CMD
   # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
@@ -127,15 +127,15 @@ else
   sleep 10s
 fi
 
-# Test to see if we have a broker running on ${BROKER_PORT} if not raise an error
-running_broker=$(ps -fe | grep contextBroker | grep ${BROKER_PORT} | wc -l)
+# Test to see if we have a broker running on ${CB_PORT} if not raise an error
+running_broker=$(ps -fe | grep contextBroker | grep ${CB_PORT} | wc -l)
 if [ $running_broker -ne 1 ]; then
   echo "Unable to start contextBroker"
   exit 1
 fi
 
 --SHELL--
-(curl localhost:${BROKER_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+(curl localhost:${CB_PORT}/NGSI9/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
 <?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -337,10 +337,10 @@ Content-Type: application/xml
 =======================================
 --TEARDOWN--
 if [ "$VALGRIND" == "" ]; then
-  kill $(cat ${BROKER_PID_FILE})
-  rm /tmp/orion_${BROKER_PORT}.pid
+  kill $(cat ${CB_PID_FILE})
+  rm /tmp/orion_${CB_PORT}.pid
 else
-  curl localhost:${BROKER_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
+  curl localhost:${CB_PORT}/exit/harakiri >> ${TEST_BASENAME}.valgrind.stop.out
   # Waiting for valgrind to terminate (sleep 10)
   sleep 10
 fi

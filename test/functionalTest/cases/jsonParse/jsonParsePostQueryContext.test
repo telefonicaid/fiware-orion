@@ -64,51 +64,6 @@ payload='{
 orionCurl --url ${url} --payload "${payload}" --json
 
 echo "2: ***********************************"
-url="/NGSI9/registerContext"
-payload='{
-  "contextRegistrations": [
-    {
-      "entities": [
-        {
-          "type": "Room",
-          "isPattern": "false",
-          "id": "ConferenceRoom"
-        },
-        {
-          "type": "Room",
-          "isPattern": "false",
-          "id": "OfficeRoom"
-        }
-      ],
-      "attributes": [
-        {
-          "name": "temperature",
-          "type": "degree",
-          "isDomain": "false",
-          "metadatas": [
-            {
-              "name": "ID",
-              "type": "string",
-              "value": "1110"
-            }
-          ]
-        }
-      ],
-      "metadatas": [
-        {
-          "name": "ID",
-          "type": "string",
-          "value": "2212"
-        }
-      ],
-      "providingApplication": "http://192.168.100.1:70/application"
-    }
-  ],
-  "duration": "PT1M"
-}'
-orionCurl --url ${url} --payload "${payload}" --json
-
-echo "3: ***********************************"
 url="/NGSI10/queryContext"
 payload='{
   "entities": [
@@ -144,7 +99,7 @@ payload='{
 }'
 orionCurl --url ${url} --payload "${payload}" --json
 
-echo "4: ***********************************"
+echo "3: ***********************************"
 --REGEXPECT--
 1: ***********************************
 HTTP/1.1 200 OK
@@ -160,16 +115,6 @@ Date: REGEX(.*)
 }
 2: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 75
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "PT1M",
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-3: ***********************************
-HTTP/1.1 200 OK
 Content-Length: 94
 Content-Type: application/json
 Date: REGEX(.*)
@@ -180,6 +125,6 @@ Date: REGEX(.*)
         "reasonPhrase": "No context element found"
     }
 }
-4: ***********************************
+3: ***********************************
 --TEARDOWN--
 brokerStop CB
