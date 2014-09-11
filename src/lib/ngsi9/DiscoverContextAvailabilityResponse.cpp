@@ -125,4 +125,5 @@ void DiscoverContextAvailabilityResponse::release(void)
 {
   responseVector.release();
   errorCode.release();
+  errorCode.tagSet("errorCode");
 }

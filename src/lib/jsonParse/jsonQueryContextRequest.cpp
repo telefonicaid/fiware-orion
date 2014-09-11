@@ -247,6 +247,7 @@ static std::string circle(const std::string& path, const std::string& value, Par
 {
   LM_T(LmtParse, ("Got a circle"));
   reqDataP->qcr.scopeP->areaType = orion::CircleType;
+
   return "OK";
 }
 
@@ -274,6 +275,7 @@ static std::string circleCenterLongitude(const std::string& path, const std::str
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
   reqDataP->qcr.scopeP->circle.center.longitudeSet(value);
+
   return "OK";
 }
 
@@ -287,6 +289,7 @@ static std::string circleRadius(const std::string& path, const std::string& valu
 {
   LM_T(LmtParse, ("Got a circleRadius: %s", value.c_str()));
   reqDataP->qcr.scopeP->circle.radiusSet(value);
+
   return "OK";
 }
 
@@ -320,6 +323,7 @@ static std::string polygon(const std::string& path, const std::string& value, Pa
 {
   LM_T(LmtParse, ("Got a polygon"));
   parseDataP->qcr.scopeP->areaType = orion::PolygonType;
+
   return "OK";
 }
 
@@ -352,6 +356,7 @@ static std::string polygonInverted(const std::string& path, const std::string& v
 static std::string polygonVertexList(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonVertexList"));
+
   return "OK";
 }
 
@@ -367,6 +372,7 @@ static std::string polygonVertex(const std::string& path, const std::string& val
   parseDataP->qcr.vertexP = new orion::Point();
   parseDataP->qcr.scopeP->polygon.vertexAdd(parseDataP->qcr.vertexP);
   // parseDataP->qcr.scopeP->polygon.vertexList.push_back(parseDataP->qcr.vertexP);
+
   return "OK";
 }
 
@@ -380,6 +386,7 @@ static std::string polygonVertexLatitude(const std::string& path, const std::str
 {
   LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", value.c_str()));
   parseDataP->qcr.vertexP->latitudeSet(value);
+
   return "OK";
 }
 
@@ -393,6 +400,7 @@ static std::string polygonVertexLongitude(const std::string& path, const std::st
 {
   LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", value.c_str()));
   parseDataP->qcr.vertexP->longitudeSet(value);
+
   return "OK";
 }
 
@@ -473,8 +481,8 @@ void jsonQcrRelease(ParseData* reqDataP)
 */
 std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->qcr.res.check(DiscoverContextAvailability,
-                                 ciP->outFormat,
+  return reqDataP->qcr.res.check(ciP,
+                                 DiscoverContextAvailability,
                                  "",
                                  reqDataP->errorString,
                                  reqDataP->qcr.res.restrictions);

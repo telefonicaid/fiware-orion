@@ -22,21 +22,21 @@
 *
 * Author: Fermin Galan
 */
-#include "NotifyContextRequest.h"
-
 #include <string>
 
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
+#include "rest/ConnectionInfo.h"
+
 
 
 /* ****************************************************************************
 *
 * NotifyContextRequest::render -
 */
-std::string NotifyContextRequest::render(RequestType requestType, Format format, const std::string& indent)
+std::string NotifyContextRequest::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
 {
   std::string  out                                  = "";
   std::string  tag                                  = "notifyContextRequest";
@@ -48,21 +48,22 @@ std::string NotifyContextRequest::render(RequestType requestType, Format format,
   //   The only doubt here if whether originator should end in a comma.
   //   This doubt is taken care of by the variable 'contextElementResponseVectorRendered'
   //
-  out += startTag(indent, tag, format, false);
-  out += subscriptionId.render(NotifyContext, format, indent + "  ", true);
-  out += originator.render(format, indent  + "  ", contextElementResponseVectorRendered);
-  out += contextElementResponseVector.render(NotifyContext, format, indent  + "  ", false);
-  out += endTag(indent, tag, format);
+  out += startTag(indent, tag, ciP->outFormat, false);
+  out += subscriptionId.render(NotifyContext, ciP->outFormat, indent + "  ", true);
+  out += originator.render(ciP->outFormat, indent  + "  ", contextElementResponseVectorRendered);
+  out += contextElementResponseVector.render(ciP, NotifyContext, indent  + "  ", false);
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }
+
 
 
 /* ****************************************************************************
 *
 * NotifyContextRequest::check
 */
-std::string NotifyContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string NotifyContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string            res;
   NotifyContextResponse  response;
@@ -71,17 +72,20 @@ std::string NotifyContextRequest::check(RequestType requestType, Format format, 
   {
     response.responseCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = subscriptionId.check(QueryContext, format, indent, predetectedError, 0))               != "OK") ||
-           ((res = originator.check(QueryContext, format, indent, predetectedError, 0))                   != "OK") ||
-           ((res = contextElementResponseVector.check(QueryContext, format, indent, predetectedError, 0)) != "OK"))
+  else if (((res = subscriptionId.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))               != "OK") ||
+           ((res = originator.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))                   != "OK") ||
+           ((res = contextElementResponseVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0)) != "OK"))
   {
     response.responseCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
-  return response.render(NotifyContext, format, indent);
+  return response.render(NotifyContext, ciP->outFormat, indent);
 }
+
 
 
 /* ****************************************************************************

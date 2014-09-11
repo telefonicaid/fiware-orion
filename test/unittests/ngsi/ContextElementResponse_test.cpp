@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextElementResponse.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -67,10 +68,12 @@ TEST(ContextElementResponse, check)
 */
 TEST(ContextElementResponse, render)
 {
-   ContextElementResponse  cer;
-   const char*             outfile1 = "ngsi.contextElementResponse.render.middle.xml";
-   const char*             outfile2 = "ngsi.contextElementResponse.render.middle.json";
-   std::string             out;
+  ContextElementResponse  cer;
+  const char*             outfile1 = "ngsi.contextElementResponse.render.middle.xml";
+  const char*             outfile2 = "ngsi.contextElementResponse.render.middle.json";
+  std::string             out;
+  ConnectionInfo          ciX(XML);
+  ConnectionInfo          ciJ(JSON);
 
    utInit();
 
@@ -80,11 +83,11 @@ TEST(ContextElementResponse, render)
 
    cer.statusCode.fill(SccOk, "details");
 
-   out = cer.render(UpdateContextElement, XML, "");
+   out = cer.render(&ciX, UpdateContextElement, "");
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 
-   out = cer.render(UpdateContextElement, JSON, "");
+   out = cer.render(&ciJ, UpdateContextElement, "");
    EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
    EXPECT_STREQ(expectedBuf, out.c_str());
 

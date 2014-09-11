@@ -42,7 +42,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 </queryContextRequest>'
 
 echo "0.0: Add an Entity with UpdateContext:APPEND"
-(curl localhost:${BROKER_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
+(curl localhost:${CB_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
