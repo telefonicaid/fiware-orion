@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -41,148 +39,156 @@
 
 /* ****************************************************************************
 *
-* contextMetadata - 
+* contextMetadata -
 */
 static int contextMetadata(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata"));
-   reqData->rpr.metadataP = new Metadata();
-   reqData->rpr.res.metadataVector.push_back(reqData->rpr.metadataP);
-   return 0;
+  LM_T(LmtParse, ("Got a metadata"));
+
+  reqData->rpr.metadataP = new Metadata();
+  reqData->rpr.res.metadataVector.push_back(reqData->rpr.metadataP);
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextMetadataName - 
+* contextMetadataName -
 */
 static int contextMetadataName(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata name '%s'", node->value()));
-   reqData->rpr.metadataP->name = node->value();
-   return 0;
+  LM_T(LmtParse, ("Got a metadata name '%s'", node->value()));
+  reqData->rpr.metadataP->name = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextMetadataType - 
+* contextMetadataType -
 */
 static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata type '%s'", node->value()));
-   reqData->rpr.metadataP->type = node->value();
-   return 0;
+  LM_T(LmtParse, ("Got a metadata type '%s'", node->value()));
+  reqData->rpr.metadataP->type = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* contextMetadataValue - 
+* contextMetadataValue -
 */
 static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
-   reqData->rpr.metadataP->value = node->value();
-   return 0;
+  LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
+  reqData->rpr.metadataP->value = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* duration - 
+* duration -
 */
 static int duration(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a duration '%s'", node->value()));
-   reqData->rpr.res.duration.set(node->value());
-   return 0;
+  LM_T(LmtParse, ("Got a duration '%s'", node->value()));
+  reqData->rpr.res.duration.set(node->value());
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* providingApplication - 
+* providingApplication -
 */
 static int providingApplication(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a providingApplication '%s'", node->value()));
-   reqData->rpr.res.providingApplication.set(node->value());
-   return 0;
+  LM_T(LmtParse, ("Got a providingApplication '%s'", node->value()));
+  reqData->rpr.res.providingApplication.set(node->value());
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* registrationId - 
+* registrationId -
 */
 static int registrationId(xml_node<>* node, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a registrationId '%s'", node->value()));
-   reqData->rpr.res.registrationId.set(node->value());
-   return 0;
+  LM_T(LmtParse, ("Got a registrationId '%s'", node->value()));
+  reqData->rpr.res.registrationId.set(node->value());
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* rprParseVector - 
+* rprParseVector -
 */
 XmlNode rprParseVector[] =
 {
-   { "/registerProviderRequest",                                 nullTreat             },
+  { "/registerProviderRequest",                                 nullTreat             },
 
-   { "/registerProviderRequest/metadata",                        nullTreat             },
-   { "/registerProviderRequest/metadata/contextMetadata",        contextMetadata       },
-   { "/registerProviderRequest/metadata/contextMetadata/name",   contextMetadataName   },
-   { "/registerProviderRequest/metadata/contextMetadata/type",   contextMetadataType   },
-   { "/registerProviderRequest/metadata/contextMetadata/value",  contextMetadataValue  },
+  { "/registerProviderRequest/metadata",                        nullTreat             },
+  { "/registerProviderRequest/metadata/contextMetadata",        contextMetadata       },
+  { "/registerProviderRequest/metadata/contextMetadata/name",   contextMetadataName   },
+  { "/registerProviderRequest/metadata/contextMetadata/type",   contextMetadataType   },
+  { "/registerProviderRequest/metadata/contextMetadata/value",  contextMetadataValue  },
 
-   { "/registerProviderRequest/duration",                        duration              },
-   { "/registerProviderRequest/providingApplication",            providingApplication  },
-   { "/registerProviderRequest/registrationId",                  registrationId        },
+  { "/registerProviderRequest/duration",                        duration              },
+  { "/registerProviderRequest/providingApplication",            providingApplication  },
+  { "/registerProviderRequest/registrationId",                  registrationId        },
 
-   { "LAST", NULL }
+  { "LAST", NULL }
 };
 
 
 
 /* ****************************************************************************
 *
-* rprInit - 
+* rprInit -
 */
 void rprInit(ParseData* reqData)
 {
-   reqData->rpr.res.registrationId.set("");
-   reqData->rpr.res.providingApplication.set("");
-   reqData->rpr.res.duration.set("");
+  reqData->rpr.res.registrationId.set("");
+  reqData->rpr.res.providingApplication.set("");
+  reqData->rpr.res.duration.set("");
 
-   reqData->rpr.metadataP = NULL;
+  reqData->rpr.metadataP = NULL;
 }
 
 
 
 /* ****************************************************************************
 *
-* rprRelease - 
+* rprRelease -
 */
 void rprRelease(ParseData* reqData)
 {
-   reqData->rpr.res.release();
+  reqData->rpr.res.release();
 }
 
 
 
 /* ****************************************************************************
 *
-* rprCheck - 
+* rprCheck -
 */
 std::string rprCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
@@ -193,9 +199,9 @@ std::string rprCheck(ParseData* reqData, ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* rprPresent - 
+* rprPresent -
 */
 void rprPresent(ParseData* reqData)
 {
-   reqData->rpr.res.present("");
+  reqData->rpr.res.present("");
 }

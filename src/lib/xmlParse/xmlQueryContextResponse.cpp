@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -46,7 +44,7 @@ using namespace orion;
 
 /* ****************************************************************************
 *
-* contextElementResponse - 
+* contextElementResponse -
 */
 static int contextElementResponse(xml_node<>* node, ParseData* parseDataP)
 {
@@ -60,14 +58,14 @@ static int contextElementResponse(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId"));
 
   std::string es = entityIdParse(QueryContext, node, &parseDataP->qcrs.cerP->contextElement.entityId);
-  
+
   if (es != "OK")
     parseDataP->errorString = es;
 
@@ -78,7 +76,7 @@ static int entityId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 {
@@ -93,7 +91,7 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttribute - 
+* contextAttribute -
 */
 static int contextAttribute(xml_node<>* node, ParseData* parseDataP)
 {
@@ -107,7 +105,7 @@ static int contextAttribute(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttributeName - 
+* contextAttributeName -
 */
 static int contextAttributeName(xml_node<>* node, ParseData* parseDataP)
 {
@@ -120,7 +118,7 @@ static int contextAttributeName(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttributeType - 
+* contextAttributeType -
 */
 static int contextAttributeType(xml_node<>* node, ParseData* parseDataP)
 {
@@ -133,7 +131,7 @@ static int contextAttributeType(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextAttributeValue - 
+* contextAttributeValue -
 */
 static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 {
@@ -148,7 +146,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadata - 
+* contextMetadata -
 */
 static int contextMetadata(xml_node<>* node, ParseData* parseDataP)
 {
@@ -162,7 +160,7 @@ static int contextMetadata(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadataName - 
+* contextMetadataName -
 */
 static int contextMetadataName(xml_node<>* node, ParseData* parseDataP)
 {
@@ -175,7 +173,7 @@ static int contextMetadataName(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadataType - 
+* contextMetadataType -
 */
 static int contextMetadataType(xml_node<>* node, ParseData* parseDataP)
 {
@@ -188,7 +186,7 @@ static int contextMetadataType(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* contextMetadataValue - 
+* contextMetadataValue -
 */
 static int contextMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
@@ -201,7 +199,7 @@ static int contextMetadataValue(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* statusCodeCode - 
+* statusCodeCode -
 */
 static int statusCodeCode(xml_node<>* node, ParseData* parseDataP)
 {
@@ -214,12 +212,12 @@ static int statusCodeCode(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* statusCodeReasonPhrase - 
+* statusCodeReasonPhrase -
 */
 static int statusCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode reasonPhrase: '%s'", node->value()));
-  parseDataP->qcrs.cerP->statusCode.reasonPhrase = node->value(); // OK - parsing step
+  parseDataP->qcrs.cerP->statusCode.reasonPhrase = node->value();  // OK - parsing step
   return 0;
 }
 
@@ -227,7 +225,7 @@ static int statusCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* statusCodeDetails - 
+* statusCodeDetails -
 */
 static int statusCodeDetails(xml_node<>* node, ParseData* parseDataP)
 {
@@ -240,7 +238,7 @@ static int statusCodeDetails(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* errorCodeCode - 
+* errorCodeCode -
 */
 static int errorCodeCode(xml_node<>* node, ParseData* parseDataP)
 {
@@ -253,12 +251,12 @@ static int errorCodeCode(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* errorCodeReasonPhrase - 
+* errorCodeReasonPhrase -
 */
 static int errorCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a errorCode reasonPhrase: '%s'", node->value()));
-  parseDataP->qcrs.res.errorCode.reasonPhrase = node->value(); // OK - parsing step
+  parseDataP->qcrs.res.errorCode.reasonPhrase = node->value();  // OK - parsing step
   return 0;
 }
 
@@ -266,7 +264,7 @@ static int errorCodeReasonPhrase(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* errorCodeDetails - 
+* errorCodeDetails -
 */
 static int errorCodeDetails(xml_node<>* node, ParseData* parseDataP)
 {
@@ -277,41 +275,47 @@ static int errorCodeDetails(xml_node<>* node, ParseData* parseDataP)
 
 
 
+#define QCR    "/queryContextResponse"
+#define CR_L   "/contextResponseList"
+#define CER    "/contextElementResponse"
+#define CE     "/contextElement"
+#define CA_L   "/contextAttributeList"
+#define CA     "/contextAttribute"
 /* ****************************************************************************
 *
-* qcrsParseVector - 
+* qcrsParseVector -
 */
-XmlNode qcrsParseVector[] = 
+XmlNode qcrsParseVector[] =
 {
-  { "/queryContextResponse",                                             nullTreat             },
+  { "/queryContextResponse",                                     nullTreat               },
 
-  { "/queryContextResponse/contextResponseList",                                                    nullTreat               },
-  { "/queryContextResponse/contextResponseList/contextElementResponse",                             contextElementResponse  },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement",              nullTreat               },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/entityId",     entityId                },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/entityId/id",  entityIdId              },
+  { QCR "/contextResponseList",                                  nullTreat               },
+  { QCR CR_L "/contextElementResponse",                          contextElementResponse  },
+  { QCR CR_L CER "/contextElement",                              nullTreat               },
+  { QCR CR_L CER CE "/entityId",                                 entityId                },
+  { QCR CR_L CER CE "/entityId/id",                              entityIdId              },
 
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList",                                nullTreat              },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute",               contextAttribute       },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/name",          contextAttributeName   },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/type",          contextAttributeType   },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/contextValue",  contextAttributeValue  },
+  { QCR CR_L CER CE "/contextAttributeList",                     nullTreat               },
+  { QCR CR_L CER CE CA_L "/contextAttribute",                    contextAttribute        },
+  { QCR CR_L CER CE CA_L CA  "/name",                            contextAttributeName    },
+  { QCR CR_L CER CE CA_L CA  "/type",                            contextAttributeType    },
+  { QCR CR_L CER CE CA_L CA  "/contextValue",                    contextAttributeValue   },
 
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata",                        nullTreat             },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata",        contextMetadata       },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/name",   contextMetadataName   },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/type",   contextMetadataType   },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/contextElement/contextAttributeList/contextAttribute/metadata/contextMetadata/value",  contextMetadataValue  },
+  { QCR CR_L CER CE CA_L CA  "/metadata",                        nullTreat               },
+  { QCR CR_L CER CE CA_L CA  "/metadata/contextMetadata",        contextMetadata         },
+  { QCR CR_L CER CE CA_L CA  "/metadata/contextMetadata/name",   contextMetadataName     },
+  { QCR CR_L CER CE CA_L CA  "/metadata/contextMetadata/type",   contextMetadataType     },
+  { QCR CR_L CER CE CA_L CA  "/metadata/contextMetadata/value",  contextMetadataValue    },
 
-  { "/queryContextResponse/contextResponseList/contextElementResponse/statusCode",               nullTreat                  },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/statusCode/code",          statusCodeCode             },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/statusCode/reasonPhrase",  statusCodeReasonPhrase     },
-  { "/queryContextResponse/contextResponseList/contextElementResponse/statusCode/details",       statusCodeDetails          },
+  { QCR CR_L CER "/statusCode",                                  nullTreat               },
+  { QCR CR_L CER "/statusCode/code",                             statusCodeCode          },
+  { QCR CR_L CER "/statusCode/reasonPhrase",                     statusCodeReasonPhrase  },
+  { QCR CR_L CER "/statusCode/details",                          statusCodeDetails       },
 
-  { "/queryContextResponse/errorCode",                                   nullTreat             },
-  { "/queryContextResponse/errorCode/code",                              errorCodeCode         },
-  { "/queryContextResponse/errorCode/reasonPhrase",                      errorCodeReasonPhrase },
-  { "/queryContextResponse/errorCode/details",                           errorCodeDetails      },
+  { QCR "/errorCode",                                            nullTreat               },
+  { QCR "/errorCode/code",                                       errorCodeCode           },
+  { QCR "/errorCode/reasonPhrase",                               errorCodeReasonPhrase   },
+  { QCR "/errorCode/details",                                    errorCodeDetails        },
   { "LAST", NULL }
 };
 
@@ -319,7 +323,7 @@ XmlNode qcrsParseVector[] =
 
 /* ****************************************************************************
 *
-* qcrsInit - 
+* qcrsInit -
 */
 void qcrsInit(ParseData* parseDataP)
 {
@@ -332,7 +336,7 @@ void qcrsInit(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* qcrsRelease - 
+* qcrsRelease -
 */
 void qcrsRelease(ParseData* parseDataP)
 {
@@ -343,7 +347,7 @@ void qcrsRelease(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* qcrsCheck - 
+* qcrsCheck -
 */
 std::string qcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
@@ -354,7 +358,7 @@ std::string qcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 #define PRINTF printf
 /* ****************************************************************************
 *
-* qcrsPresent - 
+* qcrsPresent -
 */
 void qcrsPresent(ParseData* parseDataP)
 {

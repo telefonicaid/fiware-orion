@@ -1,5 +1,5 @@
-#ifndef XML_REGISTER_PROVIDER_REQUEST_H
-#define XML_REGISTER_PROVIDER_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLREGISTERPROVIDERREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLREGISTERPROVIDERREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string rprCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void rprPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLREGISTERPROVIDERREQUEST_H_

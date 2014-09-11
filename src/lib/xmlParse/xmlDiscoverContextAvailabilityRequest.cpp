@@ -42,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* reqDataP)
 {
@@ -54,7 +54,9 @@ static int entityId(xml_node<>* node, ParseData* reqDataP)
   std::string es = entityIdParse(DiscoverContextAvailability, node, reqDataP->dcar.entityIdP);
 
   if (es != "OK")
+  {
     reqDataP->errorString = es;
+  }
 
   return 0;
 }
@@ -63,7 +65,7 @@ static int entityId(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 {
@@ -78,7 +80,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* attribute - 
+* attribute -
 */
 static int attribute(xml_node<>* node, ParseData* reqDataP)
 {
@@ -93,7 +95,7 @@ static int attribute(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* restriction - 
+* restriction -
 */
 static int restriction(xml_node<>* node, ParseData* reqDataP)
 {
@@ -105,7 +107,7 @@ static int restriction(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* attributeExpression - 
+* attributeExpression -
 */
 static int attributeExpression(xml_node<>* node, ParseData* reqDataP)
 {
@@ -119,7 +121,7 @@ static int attributeExpression(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* operationScope - 
+* operationScope -
 */
 static int operationScope(xml_node<>* node, ParseData* reqDataP)
 {
@@ -136,7 +138,7 @@ static int operationScope(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scopeType - 
+* scopeType -
 */
 static int scopeType(xml_node<>* node, ParseData* reqDataP)
 {
@@ -149,7 +151,7 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scopeValue - 
+* scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqDataP)
 {
@@ -162,7 +164,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* dcarInit - 
+* dcarInit -
 */
 void dcarInit(ParseData* reqDataP)
 {
@@ -180,7 +182,7 @@ void dcarInit(ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* dcarRelease - 
+* dcarRelease -
 */
 void dcarRelease(ParseData* reqDataP)
 {
@@ -191,11 +193,15 @@ void dcarRelease(ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* dcarCheck - 
+* dcarCheck -
 */
 std::string dcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-   return reqDataP->dcar.res.check(DiscoverContextAvailability, ciP->outFormat, "", reqDataP->errorString, reqDataP->dcar.res.restrictions);
+  return reqDataP->dcar.res.check(DiscoverContextAvailability,
+                                  ciP->outFormat,
+                                  "",
+                                  reqDataP->errorString,
+                                  reqDataP->dcar.res.restrictions);
 }
 
 
@@ -203,12 +209,14 @@ std::string dcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 #define PRINTF printf
 /* ****************************************************************************
 *
-* dcarPresent - 
+* dcarPresent -
 */
 void dcarPresent(ParseData* reqDataP)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   PRINTF("\n\n");
   reqDataP->dcar.res.present("");
@@ -218,9 +226,9 @@ void dcarPresent(ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* dcarParseVector - 
+* dcarParseVector -
 */
-XmlNode dcarParseVector[] = 
+XmlNode dcarParseVector[] =
 {
   { "/discoverContextAvailabilityRequest",                                             nullTreat            },
 

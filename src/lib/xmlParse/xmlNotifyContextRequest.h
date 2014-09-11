@@ -1,5 +1,5 @@
-#ifndef XML_NOTIFY_CONTEXT_REQUEST_H
-#define XML_NOTIFY_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLNOTIFYCONTEXTREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLNOTIFYCONTEXTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string ncrCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void ncrPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLNOTIFYCONTEXTREQUEST_H_

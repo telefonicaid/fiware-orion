@@ -1,5 +1,5 @@
-#ifndef XML_SUBSCRIBE_CONTEXT_REQUEST_H
-#define XML_SUBSCRIBE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLSUBSCRIBECONTEXTREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLSUBSCRIBECONTEXTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string scrCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void scrPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLSUBSCRIBECONTEXTREQUEST_H_

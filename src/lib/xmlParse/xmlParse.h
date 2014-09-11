@@ -1,5 +1,5 @@
-#ifndef XML_PARSE_H
-#define XML_PARSE_H
+#ifndef SRC_LIB_XMLPARSE_XMLPARSE_H_
+#define SRC_LIB_XMLPARSE_XMLPARSE_H_
 
 /*
 *
@@ -26,8 +26,6 @@
 * Author: Ken Zangelin
 */
 #include <string>
-
-#include "XmlNode.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
@@ -77,4 +75,4 @@ extern std::string entityIdParse(RequestType request, xml_node<>* node, EntityId
 */
 extern std::string xmlTypeAttributeGet(xml_node<>* node);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLPARSE_H_

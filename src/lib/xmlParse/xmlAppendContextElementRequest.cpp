@@ -25,17 +25,15 @@
 #include <string>
 #include <vector>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "ngsi/Request.h"
-#include "xmlParse/xmlParse.h"
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlAppendContextElementRequest.h"
+#include "xmlParse/xmlParse.h"
 
 
 
@@ -213,6 +211,8 @@ static int domainMetadataValue(xml_node<>* node, ParseData* reqData)
 
 
 
+#define CATTR "/appendContextElementRequest/contextAttributeList/contextAttribute"
+#define DM    "/appendContextElementRequest/domainMetadata"
 /* ****************************************************************************
 *
 * acerParseVector - 
@@ -222,23 +222,23 @@ XmlNode acerParseVector[] =
   { "/appendContextElementRequest",                          nullTreat             },
   { "/appendContextElementRequest/attributeDomainName",      attributeDomainName   },
 
-  { "/appendContextElementRequest/contextAttributeList",                                   nullTreat              },
-  { "/appendContextElementRequest/contextAttributeList/contextAttribute",                  contextAttribute       },
-  { "/appendContextElementRequest/contextAttributeList/contextAttribute/name",             contextAttributeName   },
-  { "/appendContextElementRequest/contextAttributeList/contextAttribute/type",             contextAttributeType   },
-  { "/appendContextElementRequest/contextAttributeList/contextAttribute/contextValue",     contextAttributeValue  },
+  { "/appendContextElementRequest/contextAttributeList",     nullTreat             },
+  { CATTR,                                                   contextAttribute      },
+  { CATTR "/name",                                           contextAttributeName  },
+  { CATTR "/type",                                           contextAttributeType  },
+  { CATTR "/contextValue",                                   contextAttributeValue },
 
-  { "/appendContextElementRequest/contextAttributeList/contextAttribute/metadata",                        nullTreat             },
-  { "/appendContextElementRequest/contextAttributeList/contextAttribute/metadata/contextMetadata",        contextMetadata       },
-  { "/appendContextElementRequest/contextAttributeList/contextAttribute/metadata/contextMetadata/name",   contextMetadataName   },
-  { "/appendContextElementRequest/contextAttributeList/contextAttribute/metadata/contextMetadata/type",   contextMetadataType   },
-  { "/appendContextElementRequest/contextAttributeList/contextAttribute/metadata/contextMetadata/value",  contextMetadataValue  },
+  { CATTR "/metadata",                                       nullTreat             },
+  { CATTR "/metadata/contextMetadata",                       contextMetadata       },
+  { CATTR "/metadata/contextMetadata/name",                  contextMetadataName   },
+  { CATTR "/metadata/contextMetadata/type",                  contextMetadataType   },
+  { CATTR "/metadata/contextMetadata/value",                 contextMetadataValue  },
 
-  { "/appendContextElementRequest/domainMetadata",                                   nullTreat             },
-  { "/appendContextElementRequest/domainMetadata/contextMetadata",                   domainMetadata        },
-  { "/appendContextElementRequest/domainMetadata/contextMetadata/name",              domainMetadataName    },
-  { "/appendContextElementRequest/domainMetadata/contextMetadata/type",              domainMetadataType    },
-  { "/appendContextElementRequest/domainMetadata/contextMetadata/value",             domainMetadataValue   },
+  { DM,                                                      nullTreat             },
+  { DM "/contextMetadata",                                   domainMetadata        },
+  { DM "/contextMetadata/name",                              domainMetadataName    },
+  { DM "/contextMetadata/type",                              domainMetadataType    },
+  { DM "/contextMetadata/value",                             domainMetadataValue   },
 
   { "LAST", NULL }
 };
