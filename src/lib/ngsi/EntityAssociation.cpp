@@ -46,12 +46,13 @@ EntityAssociation::EntityAssociation() : source("", "", "", "sourceEntityId"), t
 std::string EntityAssociation::render(Format format, const std::string& indent, bool comma)
 {
   std::string out;
-  std::string tag = "entityAssociation";
+  std::string xmlTag = "entityAssociation";
+  std::string jsonTag = "entities";
 
-  out += startTag(indent, tag, format, false);
+  out += startTag(indent, xmlTag, jsonTag, format, false, true);
   out += source.render(format, indent + "  ", true, true, "source");
   out += target.render(format, indent + "  ", false, true, "target");
-  out += endTag(indent, tag, format, comma);
+  out += endTag(indent, xmlTag, format, comma);
 
   return out;
 }

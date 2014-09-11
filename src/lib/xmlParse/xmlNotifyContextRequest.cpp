@@ -69,7 +69,7 @@ void ncrRelease(ParseData* parseDataP)
 */
 std::string ncrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
-  return parseDataP->ncr.res.check(NotifyContext, ciP->outFormat, "", parseDataP->errorString, 0);
+  return parseDataP->ncr.res.check(ciP, NotifyContext, "", parseDataP->errorString, 0);
 }
 
 

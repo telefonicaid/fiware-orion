@@ -26,6 +26,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ContextElementResponseVector.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -70,10 +71,11 @@ TEST(ContextElementResponseVector, render)
   ContextElementResponse        cer;
   std::string                   out;
   const char*                   outfile = "ngsi.contextElementResponseVector.render.middle.xml";
+  ConnectionInfo                ci(XML);
 
   utInit();
 
-  out = cerv.render(UpdateContextElement, XML, "");
+  out = cerv.render(&ci, UpdateContextElement, "");
   EXPECT_STREQ("", out.c_str());
 
   cer.contextElement.entityId.id         = "ID";
@@ -82,7 +84,7 @@ TEST(ContextElementResponseVector, render)
   cer.statusCode.fill(SccOk, "details");
 
   cerv.push_back(&cer);
-  out = cerv.render(UpdateContextElement, XML, "");
+  out = cerv.render(&ci, UpdateContextElement, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 

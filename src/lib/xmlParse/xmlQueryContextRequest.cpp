@@ -384,7 +384,7 @@ void qcrRelease(ParseData* reqDataP)
 */
 std::string qcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->qcr.res.check(QueryContext, ciP->outFormat, "", reqDataP->errorString, 0);
+  return reqDataP->qcr.res.check(ciP, QueryContext, "", reqDataP->errorString, 0);
 }
 
 

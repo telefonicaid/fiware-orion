@@ -183,6 +183,7 @@ void StatusCode::release(void)
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
+  tag          = "statusCode";
 }
 
 

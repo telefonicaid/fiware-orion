@@ -31,6 +31,7 @@
 #include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
 #include "xmlParse/xmlParse.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -78,16 +79,16 @@ TEST(UpdateContextRequest, ok_xml)
   const char* outfile2 = "ngsi10.updateContextRequest.checked.valid.xml";
   const char* outfile3 = "ngsi10.updateContextRequest.badUpdateActionType.invalid.xml";
 
-  out = upcrP->render(UpdateContext, XML, "");
+  out = upcrP->render(&ci, UpdateContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1;
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out  = upcrP->check(UpdateContext, XML, "", "FORCED ERROR", 0);
+  out  = upcrP->check(&ci, UpdateContext, "", "FORCED ERROR", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2;
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   upcrP->updateActionType.set("invalid");
-  out  = upcrP->check(RegisterContext, XML, "", "", 0);
+  out  = upcrP->check(&ci, RegisterContext, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3;
   EXPECT_STREQ(expectedBuf, out.c_str());
 
