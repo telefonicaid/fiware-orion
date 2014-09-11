@@ -219,6 +219,16 @@ std::string statisticsTreat
     out += TAG_ADD("updateResponsesReceived", noOfUpdateContextResponses);
   }
 
+  if (noOfQueryContextResponses != -1)
+  {
+    out += TAG_ADD("queryResponsesReceived", noOfQueryContextResponses);
+  }
+
+  if (noOfUpdateContextResponses != -1)
+  {
+    out += TAG_ADD("updateResponsesReceived", noOfUpdateContextResponses);
+  }
+
   if (noOfContextEntitiesByEntityId != -1)
   {
     out += TAG_ADD("contextEntitiesByEntityId", noOfContextEntitiesByEntityId);
