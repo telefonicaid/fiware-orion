@@ -33,6 +33,7 @@
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -47,9 +48,11 @@ typedef struct ContextElement
   ContextAttributeVector  contextAttributeVector;  // Optional
   MetadataVector          domainMetadataVector;    // Optional
 
-  std::string  render(RequestType requestType, Format format, const std::string& indent, bool comma);
+  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma);
   void         present(const std::string& indent, int ix);
   void         release(void);
+  void         fill(const struct ContextElement& ce);
+  void         fill(ContextElement* ceP);
 
   std::string  check(RequestType         requestType,
                      Format              format,

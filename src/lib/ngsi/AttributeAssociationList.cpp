@@ -52,7 +52,7 @@ std::string AttributeAssociationList::render(Format format, const std::string& i
 {
   std::string out     = "";
   std::string xmlTag  = "attributeAssociationList";
-  std::string jsonTag = "associations";
+  std::string jsonTag = "attributeAssociations";
 
   if (vec.size() == 0)
     return "";

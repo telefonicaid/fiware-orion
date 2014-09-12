@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "ngsi/ContextElementResponse.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -40,8 +41,8 @@ typedef struct ContextElementResponseVector
 {
   std::vector<ContextElementResponse*>  vec;
 
-  std::string              render(RequestType         requestType,
-                                  Format              format,
+  std::string              render(ConnectionInfo*     ciP,
+                                  RequestType         requestType,
                                   const std::string&  indent,
                                   bool                comma = false);
 

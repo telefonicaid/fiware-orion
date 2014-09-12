@@ -47,7 +47,7 @@ typedef struct AttributeDomainName
   void          present(const std::string& indent);
   const char*   c_str();
   void          release(void);
-
+  void          fill(const AttributeDomainName& adn);
   std::string   check(RequestType         requestType,
                       Format              format,
                       const std::string&  indent,

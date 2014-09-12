@@ -323,7 +323,7 @@ coverage: install_coverage
 	# Execute test for coverage
 	echo "Executing coverage test"
 	BUILD_COVERAGE/test/unittests/unitTest --gtest_output=xml:BUILD_COVERAGE/unit_test.xml
-	if [ -z "${BROKER_PORT}" ]; then \
+	if [ -z "${CONTEXTBROKER_TESTENV_SOURCED}" ]; then \
 	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
 	    exit 1; \
 	fi
@@ -379,7 +379,7 @@ coverage_functional_test: install_coverage
 	lcov --capture --initial --directory BUILD_COVERAGE -b BUILD_COVERAGE --output-file coverage/broker.init.info
 	# Execute test for coverage
 	echo "Executing coverage test"
-	if [ -z "${BROKER_PORT}" ]; then \
+	if [ -z "${CONTEXTBROKER_TESTENV_SOURCED}" ]; then \
 	    echo "Execute '. scripts/testEnv.sh' before executing the tests"; \
 	    exit 1; \
 	fi

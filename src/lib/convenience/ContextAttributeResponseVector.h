@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "convenience/ContextAttributeResponse.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -40,14 +41,17 @@ typedef struct ContextAttributeResponseVector
 {
   std::vector<ContextAttributeResponse*>  vec;
 
-  std::string   render(RequestType requestType, Format format, std::string indent);
-  std::string   check(RequestType requestType, Format format, std::string indent, std::string preError, int counter);
-  void          present(std::string indent);
-  void          push_back(ContextAttributeResponse* item);
-  unsigned int  size(void);
-  void          release();
-
+  std::string                render(ConnectionInfo* ciP, RequestType requestType, std::string indent);
+  void                       present(std::string indent);
+  void                       push_back(ContextAttributeResponse* item);
+  unsigned int               size(void);
   ContextAttributeResponse*  get(int ix);
+  void                       release(void);
+  std::string                check(ConnectionInfo*  ciP,
+                                   RequestType      requestType,
+                                   std::string      indent,
+                                   std::string      predetectedError,
+                                   int              counter);
 } ContextAttributeResponseVector;
 
 #endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSEVECTOR_H_

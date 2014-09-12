@@ -63,6 +63,7 @@ typedef struct Metadata
   std::string  render(Format format, const std::string& indent, bool comma = false);
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
+  void         fill(const struct Metadata& md);
 
   std::string  check(RequestType         requestType,
                      Format              format,

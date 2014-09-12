@@ -32,6 +32,9 @@
 #include "common/Format.h"
 #include "ngsi/Request.h"
 #include "parse/CompoundValueNode.h"
+#include "rest/ConnectionInfo.h"
+
+
 
 /* ****************************************************************************
 *
@@ -56,7 +59,8 @@ typedef struct ContextAttribute
   std::string  getId();
   std::string  getLocation();
 
-  std::string  render(Format format, const std::string& indent, bool comma = false);
+  std::string  render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
+  std::string  renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(void);

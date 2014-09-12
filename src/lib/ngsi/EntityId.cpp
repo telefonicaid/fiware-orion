@@ -177,7 +177,20 @@ void EntityId::fill(const std::string& _id, const std::string& _type, const std:
 
 /* ****************************************************************************
 *
-* EntityId::present -
+* EntityId::fill -
+*/
+void EntityId::fill(const struct EntityId* eidP)
+{
+  id        = eidP->id;
+  type      = eidP->type;
+  isPattern = eidP->isPattern;
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityId::present - 
 */
 void EntityId::present(const std::string& indent, int ix)
 {

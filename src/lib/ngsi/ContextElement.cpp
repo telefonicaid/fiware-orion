@@ -30,6 +30,7 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/ContextElement.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -37,7 +38,7 @@
 *
 * ContextElement::render - 
 */
-std::string ContextElement::render(RequestType requestType, Format format, const std::string& indent, bool comma)
+std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma)
 {
   std::string  out                              = "";
   std::string  xmlTag                           = "contextElement";
@@ -51,14 +52,14 @@ std::string ContextElement::render(RequestType requestType, Format format, const
   bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
   bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
 
-  out += startTag(indent, xmlTag, jsonTag, format, false, true);
+  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
 
-  out += entityId.render(format,                            indent + "  ", commaAfterEntityId, false);
-  out += attributeDomainName.render(format,                 indent + "  ", commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(requestType, format, indent + "  ", commaAfterContextAttributeVector);
-  out += domainMetadataVector.render(format,                indent + "  ", commaAfterDomainMetadataVector);
+  out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
+  out += attributeDomainName.render(ciP->outFormat, indent + "  ", commaAfterAttributeDomainName);
+  out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector);
+  out += domainMetadataVector.render(ciP->outFormat, indent + "  ", commaAfterDomainMetadataVector);
 
-  out += endTag(indent, xmlTag, format, comma, false);
+  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
 
   return out;
 }
@@ -138,4 +139,32 @@ void ContextElement::present(const std::string& indent, int ix)
   attributeDomainName.present(indent + "  ");
   contextAttributeVector.present(indent + "  ");
   domainMetadataVector.present("Domain", indent + "  ");
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::fill - 
+*/
+void ContextElement::fill(const struct ContextElement& ce)
+{
+  entityId.fill(&ce.entityId);
+  attributeDomainName.fill(ce.attributeDomainName);
+  contextAttributeVector.fill((ContextAttributeVector*) &ce.contextAttributeVector);
+  domainMetadataVector.fill((MetadataVector*) &ce.domainMetadataVector);
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::fill - 
+*/
+void ContextElement::fill(ContextElement* ceP)
+{
+  entityId.fill(&ceP->entityId);
+  attributeDomainName.fill(ceP->attributeDomainName);
+  contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector);
+  domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
 }

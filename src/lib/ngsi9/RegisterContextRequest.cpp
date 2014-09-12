@@ -124,7 +124,7 @@ void RegisterContextRequest::fill(RegisterProviderRequest& rpr, const std::strin
   duration       = rpr.duration;
   registrationId = rpr.registrationId;
 
-  crP->registrationMetadataVector.fill(&rpr.metadataVector);
+  crP->registrationMetadataVector.fill((MetadataVector*) &rpr.metadataVector);
   crP->providingApplication = rpr.providingApplication;
 
   crP->entityIdVector.push_back(entityIdP);

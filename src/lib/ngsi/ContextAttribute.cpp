@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextAttribute.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -128,7 +129,7 @@ ContextAttribute::ContextAttribute
 *
 * ContextAttribute::getId() -
 */
-std::string ContextAttribute::getId()
+std::string ContextAttribute::getId(void)
 {
   for (unsigned int ix = 0; ix < metadataVector.size(); ++ix)
   {
@@ -164,29 +165,21 @@ std::string ContextAttribute::getLocation()
 
 /* ****************************************************************************
 *
-* render - 
+* renderAsJsonObject - 
 */
-std::string ContextAttribute::render(Format format, const std::string& indent, bool comma)
+std::string ContextAttribute::renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma)
 {
   std::string  out                    = "";
-  std::string  xmlTag                 = "contextAttribute";
-  std::string  jsonTag                = "attribute";
+  std::string  jsonTag                = name;
   bool         commaAfterContextValue = metadataVector.size() != 0;
 
-  metadataVector.tagSet("metadata");
-
-  //
-  // About JSON commas:
-  // contextValue is MANDATORY, so up to that field, all will wear the JSON comma
-  // contextValue itself has a comma if metadataVector is rendered
-  //
-  out += startTag(indent, xmlTag, jsonTag, format, false, false);
-  out += valueTag(indent + "  ", "name",         name,  format, true);
-  out += valueTag(indent + "  ", "type",         type,  format, true);
+  out += startTag(indent, "", jsonTag, ciP->outFormat, false, true);
+  out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, true);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent + "  ", ((format == XML)? "contextValue" : "value"), value, format, commaAfterContextValue);
+    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                    value, ciP->outFormat, commaAfterContextValue);
   }
   else
   {
@@ -197,13 +190,68 @@ std::string ContextAttribute::render(Format format, const std::string& indent, b
       isCompoundVector = true;
     }
 
-    out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
-    out += compoundValueP->render(format, indent + "    ");
-    out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
+    out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
+    out += compoundValueP->render(ciP->outFormat, indent + "    ");
+    out += endTag(indent + "  ", "contextValue", ciP->outFormat, commaAfterContextValue, isCompoundVector);
   }
 
-  out += metadataVector.render(format, indent + "  ", false);
-  out += endTag(indent, xmlTag, format, comma);
+  out += metadataVector.render(ciP->outFormat, indent + "  ", false);
+  out += endTag(indent, "", ciP->outFormat, comma);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* render - 
+*/
+std::string ContextAttribute::render(ConnectionInfo* ciP, const std::string& indent, bool comma)
+{
+  std::string  out                    = "";
+  std::string  xmlTag                 = "contextAttribute";
+  std::string  jsonTag                = "attribute";
+  bool         commaAfterContextValue = metadataVector.size() != 0;
+
+  metadataVector.tagSet("metadata");
+
+  if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
+  {
+    return renderAsJsonObject(ciP, indent, comma);
+  }
+
+
+  //
+  // About JSON commas:
+  // contextValue is MANDATORY, so up to that field, all will wear the JSON comma
+  // contextValue itself has a comma if metadataVector is rendered
+  //
+  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  out += valueTag(indent + "  ", "name",         name,  ciP->outFormat, true);
+  out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, true);
+
+  if (compoundValueP == NULL)
+  {
+    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                    value, ciP->outFormat, commaAfterContextValue);
+  }
+  else
+  {
+    bool isCompoundVector = false;
+
+    if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+    {
+      isCompoundVector = true;
+    }
+
+    out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
+    out += compoundValueP->render(ciP->outFormat, indent + "    ");
+    out += endTag(indent + "  ", "contextValue", ciP->outFormat, commaAfterContextValue, isCompoundVector);
+  }
+
+  out += metadataVector.render(ciP->outFormat, indent + "  ", false);
+  out += endTag(indent, xmlTag, ciP->outFormat, comma);
 
   return out;
 }

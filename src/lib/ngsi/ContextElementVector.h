@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "ngsi/ContextElement.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -43,9 +44,21 @@ typedef struct ContextElementVector
   void             push_back(ContextElement* item);
   unsigned int     size(void);
   ContextElement*  get(int ix);
-  std::string      render(RequestType requestType, Format format, const std::string& indent, bool comma);
+  std::string      render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma);
   void             present(const std::string& indent);
   void             release(void);
+
+  ContextElement*  operator[](unsigned int ix)
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+    else
+    {
+      return NULL;
+    }
+  }
 
   std::string      check(RequestType         requestType,
                          Format              format,

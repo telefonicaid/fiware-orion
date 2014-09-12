@@ -63,7 +63,8 @@ extern int noOfUnsubscriptions;
 extern int noOfUnsubscriptionErrors;
 extern int noOfNotificationsReceived;
 extern int noOfNotificationsSent;
-
+extern int noOfQueryContextResponses;
+extern int noOfUpdateContextResponses;
 extern int noOfContextEntitiesByEntityId;
 extern int noOfContextEntityAttributes;
 extern int noOfEntityByIdAttributeByName;

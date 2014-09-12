@@ -33,6 +33,7 @@
 #include "ngsi/StatusCode.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "ngsi10/NotifyContextResponse.h"
+#include "rest/ConnectionInfo.h"
 
 #include "unittest.h"
 
@@ -52,6 +53,8 @@ TEST(NotifyContextRequest, xml_ok)
   NotifyContextRequest*  ncrP     = &reqData.ncr.res;
 
   utInit();
+  
+  ci.outFormat = XML;
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
 
@@ -62,7 +65,7 @@ TEST(NotifyContextRequest, xml_ok)
 
   ncrP->present("");
 
-  rendered = ncrP->render(NotifyContext, XML, "");
+  rendered = ncrP->render(&ci, NotifyContext, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
@@ -89,6 +92,8 @@ TEST(NotifyContextRequest, json_ok)
 
   utInit();
 
+  ci.outFormat = JSON;
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   
   ci.inFormat  = JSON;
@@ -104,7 +109,7 @@ TEST(NotifyContextRequest, json_ok)
   //
   ncrP->present("");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  rendered = ncrP->render(NotifyContext, JSON, "");
+  rendered = ncrP->render(&ci, NotifyContext, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   ncrP->release();
@@ -197,11 +202,12 @@ TEST(NotifyContextRequest, predetectedError)
   NotifyContextRequest ncr;
   const char*          outfile = "ngsi10.notifyContextResponse.predetectedError.valid.xml";
   std::string          out;
+  ConnectionInfo       ci(XML);
 
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
-  out = ncr.check(NotifyContext, XML, "", "predetected error", 0);
+  out = ncr.check(&ci, NotifyContext, "", "predetected error", 0);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -245,6 +251,7 @@ TEST(NotifyContextRequest, json_render)
   NotifyContextRequest*    ncrP;
   ContextElementResponse*  cerP;
   std::string              rendered;
+  ConnectionInfo           ci(JSON);
 
   utInit();
   
@@ -255,7 +262,7 @@ TEST(NotifyContextRequest, json_render)
 
   // 1. Without ContextResponseList
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename1)) << "Error getting test data from '" << filename1 << "'";
-  rendered = ncrP->render(QueryContext, JSON, "");
+  rendered = ncrP->render(&ci, QueryContext, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -266,7 +273,7 @@ TEST(NotifyContextRequest, json_render)
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";
-  rendered = ncrP->render(QueryContext, JSON, "");
+  rendered = ncrP->render(&ci, QueryContext, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
 
@@ -277,7 +284,7 @@ TEST(NotifyContextRequest, json_render)
   cerP->statusCode.fill(SccOk);
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename3)) << "Error getting test data from '" << filename3 << "'";
-  rendered = ncrP->render(QueryContext, JSON, "");
+  rendered = ncrP->render(&ci, QueryContext, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   utExit();

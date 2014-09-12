@@ -29,6 +29,7 @@
 
 #include "ngsi/ContextElement.h"
 #include "ngsi/StatusCode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -41,7 +42,7 @@ typedef struct ContextElementResponse
   ContextElement   contextElement;             // Mandatory
   StatusCode       statusCode;                 // Mandatory
 
-  std::string  render(RequestType requestType, Format format, const std::string& indent, bool comma = false);
+  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma = false);
   void         present(const std::string& indent, int ix);
   void         release(void);
 

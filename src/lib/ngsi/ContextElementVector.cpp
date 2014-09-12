@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementVector.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -49,7 +50,13 @@ void ContextElementVector::push_back(ContextElement* item)
 *
 * ContextElementVector::render -
 */
-std::string ContextElementVector::render(RequestType requestType, Format format, const std::string& indent, bool comma)
+std::string ContextElementVector::render
+(
+  ConnectionInfo*     ciP,
+  RequestType         requestType,
+  const std::string&  indent,
+  bool                comma
+)
 {
   std::string  out     = "";
   std::string  xmlTag  = "contextElementList";
@@ -60,14 +67,14 @@ std::string ContextElementVector::render(RequestType requestType, Format format,
     return "";
   }
 
-  out += startTag(indent, xmlTag, jsonTag, format, true, true);
+  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(requestType, format, indent + "  ", ix != vec.size() - 1);
+    out += vec[ix]->render(ciP, requestType, indent + "  ", ix != vec.size() - 1);
   }
 
-  out += endTag(indent, xmlTag, format, comma);
+  out += endTag(indent, xmlTag, ciP->outFormat, comma);
 
   return out;
 }
