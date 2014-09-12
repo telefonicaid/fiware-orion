@@ -35,7 +35,7 @@ namespace orion
 {
 /* ****************************************************************************
 *
-* AreaType - 
+* AreaType -
 */
 typedef enum AreaType
 {
@@ -48,15 +48,15 @@ typedef enum AreaType
 
 /* ****************************************************************************
 *
-* Point - 
+* Point -
 */
 class Point
 {
-private:
+ private:
   ::std::string _latitude;
   ::std::string _longitude;
 
-public:
+ public:
   double latitude(void);
   double longitude(void);
   void   latitudeSet(::std::string latitude);
@@ -69,15 +69,15 @@ public:
 
 /* ****************************************************************************
 *
-* Circle - 
+* Circle -
 */
 class Circle
 {
-private:
-  ::std::string  _radius; 
+ private:
+  ::std::string  _radius;
   ::std::string  _inverted;
 
-public:
+ public:
   Point          center;
   bool           inverted(void);
   double         radius(void);
@@ -92,14 +92,14 @@ public:
 
 /* ****************************************************************************
 *
-* Polygon - 
+* Polygon -
 */
 class Polygon
 {
-private:
+ private:
   ::std::string         _inverted;
 
-public:
+ public:
   ::std::vector<Point*> vertexList;
   bool                  inverted(void);
   void                  invertedSet(::std::string inverted);
@@ -107,7 +107,6 @@ public:
   void                  vertexAdd(Point* p);
   void                  release(void);
 };
-
 }
 
 #endif  // SRC_LIB_ORIONTYPES_AREAS_H_
