@@ -1,5 +1,5 @@
-#ifndef CONTEXT_REGISTRATION_H
-#define CONTEXT_REGISTRATION_H
+#ifndef SRC_LIB_NGSI_CONTEXTREGISTRATION_H_
+#define SRC_LIB_NGSI_CONTEXTREGISTRATION_H_
 
 /*
 *
@@ -51,9 +51,14 @@ typedef struct ContextRegistration
 
   ContextRegistration();
   std::string  render(Format format, const std::string& indent, bool comma, bool isInVector);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent, int ix);
   void         release();
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } ContextRegistration;
 
-#endif
+#endif  // SRC_LIB_NGSI_CONTEXTREGISTRATION_H_

@@ -53,7 +53,7 @@ ContextAttributeVector::ContextAttributeVector()
 *
 * addedLookup - 
 */
-static std::string addedLookup(std::vector<std::string>& added, std::string value)
+static std::string addedLookup(const std::vector<std::string>& added, std::string value)
 {
   for (unsigned int ix = 0; ix < added.size(); ++ix)
   {
@@ -72,7 +72,13 @@ static std::string addedLookup(std::vector<std::string>& added, std::string valu
 *
 * ContextAttributeVector::render - 
 */
-std::string ContextAttributeVector::render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma)
+std::string ContextAttributeVector::render
+(
+  ConnectionInfo*     ciP,
+  RequestType         request,
+  const std::string&  indent,
+  bool                comma
+)
 {
   std::string out      = "";
   std::string xmlTag   = "contextAttributeList";
@@ -149,7 +155,14 @@ std::string ContextAttributeVector::render(ConnectionInfo* ciP, RequestType requ
 *
 * ContextAttributeVector::check - 
 */
-std::string ContextAttributeVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextAttributeVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -170,10 +183,12 @@ std::string ContextAttributeVector::check(RequestType requestType, Format format
 */
 void ContextAttributeVector::present(const std::string& indent)
 {
-   PRINTF("%lu ContextAttributes", (unsigned long) vec.size());
+  PRINTF("%lu ContextAttributes", (uint64_t) vec.size());
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-      vec[ix]->present(indent, ix);
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(indent, ix);
+  }
 }
 
 
@@ -215,17 +230,17 @@ unsigned int ContextAttributeVector::size(void)
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::release - 
+* ContextAttributeVector::release -
 */
 void ContextAttributeVector::release(void)
-{ 
+{
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     vec[ix]->release();
     delete vec[ix];
   }
 
- vec.clear();
+  vec.clear();
 }
 
 

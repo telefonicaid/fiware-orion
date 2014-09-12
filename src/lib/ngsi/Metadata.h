@@ -1,5 +1,5 @@
-#ifndef META_DATA_H
-#define META_DATA_H
+#ifndef SRC_LIB_NGSI_METADATA_H_
+#define SRC_LIB_NGSI_METADATA_H_
 
 /*
 *
@@ -39,9 +39,10 @@
 #define NGSI_MD_MODDATE  "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
 
 
+
 /* ****************************************************************************
 *
-* Metadata - 
+* Metadata -
 *
 * FIXME
 *   The Association field should be added not in this class but in a class that inherits
@@ -60,10 +61,15 @@ typedef struct Metadata
   Metadata(const std::string& _name, const std::string& _type, const std::string& _value = "");
 
   std::string  render(Format format, const std::string& indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
-  void         present(const std::string& metadataType, int ix, const std::string& indent);  
+  void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
   void         fill(const struct Metadata& md);
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } Metadata;
 
-#endif
+#endif  // SRC_LIB_NGSI_METADATA_H_

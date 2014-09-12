@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONDITION_H
-#define NOTIFY_CONDITION_H
+#ifndef SRC_LIB_NGSI_NOTIFYCONDITION_H_
+#define SRC_LIB_NGSI_NOTIFYCONDITION_H_
 
 /*
 *
@@ -35,6 +35,8 @@
 #define ON_CHANGE_CONDITION "ONCHANGE"
 #define ON_VALUE_CONDITION "ONVALUE"
 
+
+
 /* ****************************************************************************
 *
 * NotifyCondition - 
@@ -46,9 +48,14 @@ typedef struct NotifyCondition
   RestrictionString         restriction;     // Optional
 
   std::string   render(Format format, const std::string& indent, bool notLastInVector);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent, int ix);
   void          release(void);
+
+  std::string   check(RequestType         requestType,
+                      Format              format,
+                      const std::string&  indent,
+                      const std::string&  predetectedError,
+                      int                 counter);
 } NotifyCondition;
 
-#endif
+#endif  // SRC_LIB_NGSI_NOTIFYCONDITION_H_

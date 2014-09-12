@@ -31,7 +31,7 @@
 
 /* ****************************************************************************
 *
-* EntityAssociation::EntityAssociation - 
+* EntityAssociation::EntityAssociation -
 */
 EntityAssociation::EntityAssociation() : source("", "", "", "sourceEntityId"), target("", "", "", "targetEntityId")
 {
@@ -41,7 +41,7 @@ EntityAssociation::EntityAssociation() : source("", "", "", "sourceEntityId"), t
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 std::string EntityAssociation::render(Format format, const std::string& indent, bool comma)
 {
@@ -61,14 +61,28 @@ std::string EntityAssociation::render(Format format, const std::string& indent, 
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
-std::string EntityAssociation::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string EntityAssociation::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   std::string res;
 
-  if ((res = source.check(requestType, format, indent, predetectedError, counter)) != "OK")   return res;
-  if ((res = target.check(requestType, format, indent, predetectedError, counter)) != "OK")   return res;
+  if ((res = source.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = target.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
 
   return "OK";
 }

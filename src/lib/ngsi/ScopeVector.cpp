@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* ScopeVector::render - 
+* ScopeVector::render -
 */
 std::string ScopeVector::render(Format format, const std::string& indent, bool comma)
 {
@@ -44,11 +44,15 @@ std::string ScopeVector::render(Format format, const std::string& indent, bool c
   std::string tag = "scope";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
   out += startTag(indent, tag, tag, format, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
      out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+  }
   out += endTag(indent, tag, format, comma, true);
 
   return out;
@@ -58,9 +62,16 @@ std::string ScopeVector::render(Format format, const std::string& indent, bool c
 
 /* ****************************************************************************
 *
-* ScopeVector::check - 
+* ScopeVector::check -
 */
-std::string ScopeVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ScopeVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -80,24 +91,30 @@ std::string ScopeVector::check(RequestType requestType, Format format, const std
 
 /* ****************************************************************************
 *
-* ScopeVector::present - 
+* ScopeVector::present -
 */
 void ScopeVector::present(const std::string& indent)
 {
   if (vec.size() == 0)
+  {
     PRINTF("No scopes\n");
+  }
   else
-    PRINTF("%lu Scopes:\n", (unsigned long) vec.size());
+  {
+    PRINTF("%lu Scopes:\n", (uint64_t) vec.size());
+  }
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     vec[ix]->present(indent, ix);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* ScopeVector::push_back - 
+* ScopeVector::push_back -
 */
 void ScopeVector::push_back(Scope* item)
 {
@@ -108,7 +125,7 @@ void ScopeVector::push_back(Scope* item)
 
 /* ****************************************************************************
 *
-* ScopeVector::get - 
+* ScopeVector::get -
 */
 Scope* ScopeVector::get(int ix)
 {
@@ -119,7 +136,7 @@ Scope* ScopeVector::get(int ix)
 
 /* ****************************************************************************
 *
-* ScopeVector::size - 
+* ScopeVector::size -
 */
 unsigned int ScopeVector::size(void)
 {
@@ -130,7 +147,7 @@ unsigned int ScopeVector::size(void)
 
 /* ****************************************************************************
 *
-* ScopeVector::release - 
+* ScopeVector::release -
 */
 void ScopeVector::release(void)
 {

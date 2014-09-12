@@ -38,7 +38,14 @@
 *
 * AttributeDomainName::check - 
 */
-std::string AttributeDomainName::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string AttributeDomainName::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   // FIXME P3: AttributeDomainName::check always returns "OK"
   return "OK";
@@ -53,7 +60,9 @@ std::string AttributeDomainName::check(RequestType requestType, Format format, c
 bool AttributeDomainName::isEmpty(void)
 {
   if (string == "")
+  {
     return true;
+  }
 
   return false;
 }
@@ -89,9 +98,13 @@ std::string AttributeDomainName::get(void)
 void AttributeDomainName::present(const std::string& indent)
 {
   if (string != "")
+  {
     PRINTF("%sAttributeDomainName: %s\n", indent.c_str(), string.c_str());
+  }
   else
+  {
     PRINTF("%sNo AttributeDomainName\n", indent.c_str());
+  }
 }
 
 
@@ -103,7 +116,9 @@ void AttributeDomainName::present(const std::string& indent)
 std::string AttributeDomainName::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+  {
     return "";
+  }
 
   return valueTag(indent, "attributeDomainName", string, format, comma);
 }
@@ -116,7 +131,7 @@ std::string AttributeDomainName::render(Format format, const std::string& indent
 */
 const char* AttributeDomainName::c_str(void)
 {
-   return string.c_str();
+  return string.c_str();
 }
 
 
@@ -127,7 +142,7 @@ const char* AttributeDomainName::c_str(void)
 */
 void AttributeDomainName::release(void)
 {
-   /* This method is included for the sake of homogeneity */
+  /* This method is included for the sake of homogeneity */
 }
 
 

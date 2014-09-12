@@ -1,5 +1,5 @@
-#ifndef NOTIFY_CONDITION_VECTOR_H
-#define NOTIFY_CONDITION_VECTOR_H
+#ifndef SRC_LIB_NGSI_NOTIFYCONDITIONVECTOR_H_
+#define SRC_LIB_NGSI_NOTIFYCONDITIONVECTOR_H_
 
 /*
 *
@@ -41,12 +41,17 @@ typedef struct NotifyConditionVector
   std::vector<NotifyCondition*>  vec;
 
   std::string       render(Format format, const std::string& indent, bool comma);
-  std::string       check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void              present(const std::string& indent);
   void              push_back(NotifyCondition* item);
   unsigned int      size(void);
   NotifyCondition*  get(int ix);
   void              release(void);
+
+  std::string       check(RequestType         requestType,
+                          Format              format,
+                          const std::string&  indent,
+                          const std::string&  predetectedError,
+                          int                 counter);
 } NotifyConditionVector;
 
-#endif
+#endif  // SRC_LIB_NGSI_NOTIFYCONDITIONVECTOR_H_

@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponse::ContextRegistrationResponse - 
+* ContextRegistrationResponse::ContextRegistrationResponse -
 */
 ContextRegistrationResponse::ContextRegistrationResponse()
 {
@@ -45,7 +45,7 @@ ContextRegistrationResponse::ContextRegistrationResponse()
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponse::render - 
+* ContextRegistrationResponse::render -
 */
 std::string ContextRegistrationResponse::render(Format format, const std::string& indent, bool comma)
 {
@@ -59,7 +59,9 @@ std::string ContextRegistrationResponse::render(Format format, const std::string
   out += contextRegistration.render(format, indent + "  ", errorCodeRendered, false);
 
   if (errorCodeRendered)
-     out += errorCode.render(format, indent + "  ", false);
+  {
+    out += errorCode.render(format, indent + "  ", false);
+  }
 
   out += endTag(indent, xmlTag, format, comma);
 
@@ -70,18 +72,25 @@ std::string ContextRegistrationResponse::render(Format format, const std::string
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponse::check - 
+* ContextRegistrationResponse::check -
 */
-std::string ContextRegistrationResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextRegistrationResponse::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
-   return contextRegistration.check(requestType, format, indent, predetectedError, counter);
+  return contextRegistration.check(requestType, format, indent, predetectedError, counter);
 }
 
 
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponse::present - 
+* ContextRegistrationResponse::present -
 */
 void ContextRegistrationResponse::present(const std::string& indent)
 {
@@ -93,7 +102,7 @@ void ContextRegistrationResponse::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponse::release - 
+* ContextRegistrationResponse::release -
 */
 void ContextRegistrationResponse::release(void)
 {

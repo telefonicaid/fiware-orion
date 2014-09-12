@@ -1449,7 +1449,7 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
             interval.parse();
 
             conds.append(BSON(CSUB_CONDITIONS_TYPE << ON_TIMEINTERVAL_CONDITION <<
-                              CSUB_CONDITIONS_VALUE << interval.seconds));
+                              CSUB_CONDITIONS_VALUE << (long long) interval.seconds));
 
             processOntimeIntervalCondition(subId, interval.seconds, tenant);
         }

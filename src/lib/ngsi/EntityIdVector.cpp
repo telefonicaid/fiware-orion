@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* EntityIdVector::render - 
+* EntityIdVector::render -
 */
 std::string EntityIdVector::render(Format format, const std::string& indent, bool comma)
 {
@@ -61,9 +61,16 @@ std::string EntityIdVector::render(Format format, const std::string& indent, boo
 
 /* ****************************************************************************
 *
-* EntityIdVector::check - 
+* EntityIdVector::check -
 */
-std::string EntityIdVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string EntityIdVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   // Only OK to be empty if part of a ContextRegistration
   if ((requestType == DiscoverContextAvailability)           ||
@@ -97,21 +104,23 @@ std::string EntityIdVector::check(RequestType requestType, Format format, const 
 
 /* ****************************************************************************
 *
-* EntityIdVector::present - 
+* EntityIdVector::present -
 */
 void EntityIdVector::present(const std::string& indent)
 {
-   PRINTF("%lu EntityIds:\n", (unsigned long) vec.size());
+  PRINTF("%lu EntityIds:\n", (uint64_t) vec.size());
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-      vec[ix]->present(indent, ix);
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(indent, ix);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* EntityIdVector::push_back - 
+* EntityIdVector::push_back -
 */
 void EntityIdVector::push_back(EntityId* item)
 {
@@ -122,7 +131,7 @@ void EntityIdVector::push_back(EntityId* item)
 
 /* ****************************************************************************
 *
-* EntityIdVector::get - 
+* EntityIdVector::get -
 */
 EntityId* EntityIdVector::get(int ix)
 {
@@ -133,7 +142,7 @@ EntityId* EntityIdVector::get(int ix)
 
 /* ****************************************************************************
 *
-* EntityIdVector::size - 
+* EntityIdVector::size -
 */
 unsigned int EntityIdVector::size(void)
 {
@@ -144,7 +153,7 @@ unsigned int EntityIdVector::size(void)
 
 /* ****************************************************************************
 *
-* EntityIdVector::release - 
+* EntityIdVector::release -
 */
 void EntityIdVector::release(void)
 {

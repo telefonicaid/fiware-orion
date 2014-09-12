@@ -35,6 +35,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
 
 #include "common/string.h"
 #include "logMsg/logMsg.h"

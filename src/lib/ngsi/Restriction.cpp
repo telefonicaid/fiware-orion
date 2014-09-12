@@ -36,14 +36,21 @@
 
 /* ****************************************************************************
 *
-* Restriction::check - 
+* Restriction::check -
 */
-std::string Restriction::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string Restriction::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   std::string res;
 
   LM_T(LmtRestriction, ("In Restriction::check"));
-  if (counter == 0) // Restriction is always optional
+  if (counter == 0)  // Restriction is always optional
   {
     LM_T(LmtRestriction, ("Restriction::check returns OK (counter == 0)"));
     return "OK";
@@ -55,11 +62,12 @@ std::string Restriction::check(RequestType requestType, Format format, const std
     return "empty restriction";
   }
 
-  if (((res = scopeVector.check(requestType, format, indent, predetectedError,  counter)) != "OK") ||
+  if (((res = scopeVector.check(requestType, format, indent, predetectedError,  counter))         != "OK") ||
       ((res = attributeExpression.check(requestType, format, indent, predetectedError,  counter)) != "OK"))
   {
     LM_T(LmtRestriction, ("Restriction::check returns '%s'", res.c_str()));
     LM_W(("Bad Input (%s)", res.c_str()));
+
     return res;
   }
 
@@ -71,7 +79,7 @@ std::string Restriction::check(RequestType requestType, Format format, const std
 
 /* ****************************************************************************
 *
-* Restriction::present - 
+* Restriction::present -
 */
 void Restriction::present(const std::string& indent)
 {
@@ -83,7 +91,7 @@ void Restriction::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* Restriction::render - 
+* Restriction::render -
 */
 std::string Restriction::render(Format format, const std::string& indent, int restrictions, bool comma)
 {
@@ -92,7 +100,9 @@ std::string Restriction::render(Format format, const std::string& indent, int re
   bool         scopeVectorRendered = scopeVector.size() != 0;
 
   if (restrictions == 0)
+  {
     return "";
+  }
 
   out += startTag(indent, tag, format);
   out += attributeExpression.render(format, indent + "  ", scopeVectorRendered);
@@ -106,10 +116,10 @@ std::string Restriction::render(Format format, const std::string& indent, int re
 
 /* ****************************************************************************
 *
-* Restriction::release - 
+* Restriction::release -
 */
 void Restriction::release(void)
 {
-   attributeExpression.release();
-   scopeVector.release();
+  attributeExpression.release();
+  scopeVector.release();
 }

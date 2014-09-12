@@ -61,13 +61,24 @@ std::string AttributeAssociation::render(Format format, const std::string& inden
 *
 * check - 
 */
-std::string AttributeAssociation::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string AttributeAssociation::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (source == "")
+  {
     return "empty source";
+  }
 
   if (target == "")
+  {
     return "empty target";
+  }
 
   return "OK";
 }
@@ -81,9 +92,13 @@ std::string AttributeAssociation::check(RequestType requestType, Format format, 
 void AttributeAssociation::present(const std::string& indent, int ix)
 {
   if (ix == -1)
+  {
     PRINTF("%sAttribute Association:\n",       indent.c_str());
+  }
   else
+  {
     PRINTF("%sAttribute Association %d:\n",    indent.c_str(), ix);
+  }
 
   PRINTF("%s  Source: %s\n", indent.c_str(), source.c_str());
   PRINTF("%s  Target: %s\n", indent.c_str(), target.c_str());

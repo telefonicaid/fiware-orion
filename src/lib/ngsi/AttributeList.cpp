@@ -63,7 +63,14 @@ std::string AttributeList::render(Format format, const std::string& indent, bool
 *
 * AttributeList::check - 
 */
-std::string AttributeList::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string AttributeList::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
@@ -118,7 +125,7 @@ void AttributeList::push_back(const std::string& attributeName)
 */
 unsigned int AttributeList::size(void)
 {
-   return attributeV.size();
+  return attributeV.size();
 }
 
 
@@ -129,5 +136,5 @@ unsigned int AttributeList::size(void)
 */
 std::string AttributeList::get(int ix)
 {
-   return attributeV[ix];
+  return attributeV[ix];
 }

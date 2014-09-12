@@ -22,13 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "Request.h"
+#include "ngsi/Request.h"
 
 
 
 /* ****************************************************************************
 *
-* requestType - 
+* requestType -
 */
 const char* requestType(RequestType rt)
 {

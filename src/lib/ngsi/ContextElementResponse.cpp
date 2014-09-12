@@ -37,7 +37,13 @@
 *
 * ContextElementResponse::render - 
 */
-std::string ContextElementResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma)
+std::string ContextElementResponse::render
+(
+  ConnectionInfo*     ciP,
+  RequestType         requestType,
+  const std::string&  indent,
+  bool                comma
+)
 {
   std::string xmlTag   = "contextElementResponse";
   std::string jsonTag  = "contextElement";
@@ -59,8 +65,8 @@ std::string ContextElementResponse::render(ConnectionInfo* ciP, RequestType requ
 */
 void ContextElementResponse::release(void)
 {
-   contextElement.release();
-   statusCode.release();
+  contextElement.release();
+  statusCode.release();
 }
 
 
@@ -69,12 +75,26 @@ void ContextElementResponse::release(void)
 *
 * ContextElementResponse::check - 
 */
-std::string ContextElementResponse::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextElementResponse::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   std::string res;
 
-  if ((res = contextElement.check(requestType, format, indent, predetectedError, counter)) != "OK")   return res;
-  if ((res = statusCode.check(requestType, format, indent, predetectedError, counter))     != "OK")   return res;
+  if ((res = contextElement.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = statusCode.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
 
   return "OK";
 }
@@ -87,6 +107,6 @@ std::string ContextElementResponse::check(RequestType requestType, Format format
 */
 void ContextElementResponse::present(const std::string& indent, int ix)
 {
-   contextElement.present(indent, ix);
-   statusCode.present(indent);
+  contextElement.present(indent, ix);
+  statusCode.present(indent);
 }

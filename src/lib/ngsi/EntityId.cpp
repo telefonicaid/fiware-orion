@@ -47,7 +47,16 @@ EntityId::EntityId() : tag("entityId")
 *
 * EntityId::EntityId -
 */
-EntityId::EntityId(const std::string& _id, const std::string& _type, const std::string& _isPattern, const std::string& _tag) : id(_id), type(_type), isPattern(_isPattern), tag(_tag)
+EntityId::EntityId
+(
+  const std::string&  _id,
+  const std::string&  _type,
+  const std::string&  _isPattern,
+  const std::string&  _tag
+) : id(_id),
+    type(_type),
+    isPattern(_isPattern),
+    tag(_tag)
 {
 }
 
@@ -55,7 +64,7 @@ EntityId::EntityId(const std::string& _id, const std::string& _type, const std::
 
 /* ****************************************************************************
 *
-* tagSet - 
+* tagSet -
 */
 void EntityId::tagSet(const std::string& tagName)
 {
@@ -66,12 +75,19 @@ void EntityId::tagSet(const std::string& tagName)
 
 /* ****************************************************************************
 *
-* EntityId::render - 
+* EntityId::render -
 *
 * FIXME P1: startTag() is not enough for the XML case of entityId - XML attributes ...
 *           Perhaps add a vector of attributes to startTag() ?
 */
-std::string EntityId::render(Format format, const std::string& indent, bool comma, bool isInVector, const std::string& assocTag)
+std::string EntityId::render
+(
+  Format              format,
+  const std::string&  indent,
+  bool                comma,
+  bool                isInVector,
+  const std::string&  assocTag
+)
 {
   std::string out     = "";
 
@@ -87,7 +103,9 @@ std::string EntityId::render(Format format, const std::string& indent, bool comm
     std::string indent2 = indent;
 
     if (isInVector)
+    {
        indent2 += "  ";
+    }
 
     out += (isInVector? indent + (isAssoc? "\"" + assocTag + "\" : ": "") + "{\n": "");
     out += indent2 + "\"type\" : \""      + type      + "\","  + "\n";
@@ -95,7 +113,9 @@ std::string EntityId::render(Format format, const std::string& indent, bool comm
     out += indent2 + "\"id\" : \""        + id        + "\"";
 
     if ((comma == true) && (isInVector == false))
+    {
        out += ",\n";
+    }
     else
     {
       out += "\n";
@@ -111,18 +131,31 @@ std::string EntityId::render(Format format, const std::string& indent, bool comm
 
 /* ****************************************************************************
 *
-* EntityId::check - 
+* EntityId::check -
 */
-std::string EntityId::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string EntityId::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (id == "")
+  {
     return "empty entityId:id";
+  }
 
   if (!isTrue(isPattern) && !isFalse(isPattern) && isPattern != "")
-     return std::string("invalid isPattern (boolean) value for entity: '") + isPattern + "'";
+  {
+    return std::string("invalid isPattern (boolean) value for entity: '") + isPattern + "'";
+  }
 
   if ((requestType == RegisterContext) && (isTrue(isPattern)))
+  {
     return "'isPattern' set to true for a registration";
+  }
 
   return "OK";
 }
@@ -162,9 +195,13 @@ void EntityId::fill(const struct EntityId* eidP)
 void EntityId::present(const std::string& indent, int ix)
 {
   if (ix == -1)
+  {
     PRINTF("%sEntity Id:\n",       indent.c_str());
+  }
   else
+  {
     PRINTF("%sEntity Id %d:\n",       indent.c_str(), ix);
+  }
 
   PRINTF("%s  Id:         %s\n", indent.c_str(), id.c_str());
   PRINTF("%s  Type:       %s\n", indent.c_str(), type.c_str());
@@ -175,18 +212,18 @@ void EntityId::present(const std::string& indent, int ix)
 
 /* ****************************************************************************
 *
-* release  - 
+* release -
 */
 void EntityId::release(void)
 {
-   /* This method is included for the sake of homogeneity */
+  /* This method is included for the sake of homogeneity */
 }
 
 
 
 /* ****************************************************************************
 *
-* toString - 
+* toString -
 */
 std::string EntityId::toString(bool useIsPattern, const std::string& delimiter)
 {
@@ -195,7 +232,9 @@ std::string EntityId::toString(bool useIsPattern, const std::string& delimiter)
   s = id + delimiter + type;
 
   if (useIsPattern)
+  {
     s += delimiter + isPattern;
+  }
 
   return s;
 }

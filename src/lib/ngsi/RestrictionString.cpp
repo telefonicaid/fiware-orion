@@ -36,9 +36,16 @@
 
 /* ****************************************************************************
 *
-* RestrictionString::check - 
+* RestrictionString::check -
 */
-std::string RestrictionString::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string RestrictionString::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   return "OK";
 }
@@ -47,18 +54,18 @@ std::string RestrictionString::check(RequestType requestType, Format format, con
 
 /* ****************************************************************************
 *
-* RestrictionString::isEmpty - 
+* RestrictionString::isEmpty -
 */
 bool RestrictionString::isEmpty(void)
 {
-   return (string == "")? true : false;
+  return (string == "")? true : false;
 }
 
 
 
 /* ****************************************************************************
 *
-* RestrictionString::set - 
+* RestrictionString::set -
 */
 void RestrictionString::set(const std::string& value)
 {
@@ -69,7 +76,7 @@ void RestrictionString::set(const std::string& value)
 
 /* ****************************************************************************
 *
-* RestrictionString::get - 
+* RestrictionString::get -
 */
 std::string RestrictionString::get(void)
 {
@@ -80,26 +87,32 @@ std::string RestrictionString::get(void)
 
 /* ****************************************************************************
 *
-* RestrictionString::present - 
+* RestrictionString::present -
 */
 void RestrictionString::present(const std::string& indent)
 {
   if (string != "")
+  {
     PRINTF("%sRestrictionString: %s\n", indent.c_str(), string.c_str());
+  }
   else
+  {
     PRINTF("%sNo RestrictionString\n", indent.c_str());
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* RestrictionString::render - 
+* RestrictionString::render -
 */
 std::string RestrictionString::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+  {
     return "";
+  }
 
   return valueTag(indent, "restriction", string, format, comma);
 }
@@ -108,9 +121,9 @@ std::string RestrictionString::render(Format format, const std::string& indent, 
 
 /* ****************************************************************************
 *
-* RestrictionString::c_str - 
+* RestrictionString::c_str -
 */
 const char* RestrictionString::c_str(void)
 {
-   return string.c_str();
+  return string.c_str();
 }
