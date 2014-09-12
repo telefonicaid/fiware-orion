@@ -98,9 +98,6 @@ using ::testing::Return;
 *
 */
 
-#define NO_CODE 0
-
-
 /* ****************************************************************************
 *
 * prepareDatabase -
@@ -231,7 +228,7 @@ static void prepareDatabasePatternTrue(void) {
    *
    * (*) same name but different types. This is included to check that type is taken into account,
    *     so Reg3 is not returned never (except patternNoType). You can try to change types in Reg3
-   *     to make them equat to the ones in Reg1 and Reg2 and check that some tests are failing.
+   *     to make them equal to the ones in Reg1 and Reg2 and check that some tests are failing.
    * (**)same name but without type
    */
 
@@ -359,7 +356,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -435,7 +432,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern_JSON)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -512,7 +509,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_AttrN_noPattern)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -591,7 +588,7 @@ TEST(mongoSubscribeContextAvailability, EntN_Attr0_noPattern)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -674,7 +671,7 @@ TEST(mongoSubscribeContextAvailability, EntN_AttrN_noPattern)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -758,7 +755,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_pattern)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -849,7 +846,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -940,7 +937,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll_JSON)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1028,7 +1025,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneSingle)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1126,7 +1123,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneMulti)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1219,7 +1216,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsSubset)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1318,7 +1315,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralCREs)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1414,7 +1411,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralRegistrations)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1521,7 +1518,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntity)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1620,7 +1617,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiAttr)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1727,7 +1724,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntityAttrs)
     EXPECT_EQ("PT1H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1842,7 +1839,7 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
     EXPECT_EQ(SccOk, ms);
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1945,7 +1942,7 @@ TEST(mongoSubscribeContextAvailability, pattern0Attr)
     EXPECT_EQ(SccOk, ms);
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2031,7 +2028,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrSingle)
     EXPECT_EQ(SccOk, ms);
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2125,7 +2122,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrMulti)
     EXPECT_EQ(SccOk, ms);
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2227,7 +2224,7 @@ TEST(mongoSubscribeContextAvailability, patternNAttr)
     EXPECT_EQ(SccOk, ms);
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2339,7 +2336,7 @@ TEST(mongoSubscribeContextAvailability, patternNoType)
     EXPECT_EQ(SccOk, ms);
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2448,7 +2445,7 @@ TEST(mongoSubscribeContextAvailability, mixPatternAndNotPattern)
     EXPECT_EQ(SccOk, ms);
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2526,7 +2523,7 @@ TEST(mongoSubscribeContextAvailability, defaultDuration)
     EXPECT_EQ("PT24H", res.duration.get());
     EXPECT_FALSE(res.subscriptionId.isEmpty());
     std::string id = res.subscriptionId.get();
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 

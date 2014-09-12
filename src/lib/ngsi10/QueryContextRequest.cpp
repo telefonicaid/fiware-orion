@@ -33,6 +33,9 @@
 #include "ngsi/Restriction.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/QueryContextRequest.h"
+#include "rest/ConnectionInfo.h"
+
+
 
 /* ****************************************************************************
 *
@@ -45,6 +48,7 @@ QueryContextRequest::QueryContextRequest()
 {
   restrictions = 0;
 }
+
 
 
 /* ****************************************************************************
@@ -75,7 +79,7 @@ std::string QueryContextRequest::render(RequestType requestType, Format format, 
 *
 * QueryContextRequest::check - 
 */
-std::string QueryContextRequest::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string QueryContextRequest::check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter)
 {
   std::string           res;
   QueryContextResponse  response;
@@ -84,17 +88,19 @@ std::string QueryContextRequest::check(RequestType requestType, Format format, c
   {
     response.errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if (((res = entityIdVector.check(QueryContext, format, indent, predetectedError, 0))         != "OK") ||
-           ((res = attributeList.check(QueryContext, format, indent, predetectedError, 0))          != "OK") ||
-           ((res = restriction.check(QueryContext, format, indent, predetectedError, restrictions)) != "OK"))
+  else if (((res = entityIdVector.check(QueryContext, ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
+           ((res = attributeList.check(QueryContext,  ciP->outFormat, indent, predetectedError, 0))            != "OK") ||
+           ((res = restriction.check(QueryContext,    ciP->outFormat, indent, predetectedError, restrictions)) != "OK"))
   {
     LM_W(("Bad Input (%s)", res.c_str()));
     response.errorCode.fill(SccBadRequest, res);
   }
   else
+  {
     return "OK";
+  }
 
-  return response.render(QueryContext, format, indent);
+  return response.render(ciP, QueryContext, indent);
 }
 
 
@@ -135,5 +141,7 @@ void QueryContextRequest::fill(const std::string& entityId, const std::string& e
   entityIdVector.push_back(eidP);
 
   if (attributeName != "")
+  {
     attributeList.push_back(attributeName);
+  }
 }

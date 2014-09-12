@@ -228,6 +228,8 @@ SET (SOURCES
     mongoBackend/mongoUpdateContextCompoundValues_test.cpp
     mongoBackend/mongoNotifyContext_test.cpp
     mongoBackend/mongoNotifyContextAvailability_test.cpp
+    mongoBackend/mongoContextProvidersQuery_test.cpp
+    mongoBackend/mongoContextProvidersUpdate_test.cpp
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp

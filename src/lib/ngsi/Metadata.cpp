@@ -144,3 +144,17 @@ void Metadata::release(void)
 {
    association.release();
 }
+
+
+
+/* ****************************************************************************
+*
+* fill - 
+*/
+void Metadata::fill(const struct Metadata& md)
+{
+  name        = md.name;
+  type        = md.type;
+  value       = md.value;
+  association = md.association;
+}

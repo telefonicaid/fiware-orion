@@ -123,7 +123,6 @@ payload='{
 orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json"
 
 echo "8: ++++++++++++++++++++"
-
 # Accept preference is correctly taken into account (XML preferred to JSON), order is JSON, XML
 url="/NGSI10/queryContext"
 payload='{
@@ -137,8 +136,8 @@ payload='{
 }'
 orionCurl --url "$url" --payload "${payload}" --in "application/json" --out "application/json, application/xml"
 
-echo "9: ++++++++++++++++++++"
 
+echo "9: ++++++++++++++++++++"
 # Accept preference is correctly taken into account (XML preferred to JSON), order is XML, JSON
 url="/NGSI10/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
@@ -155,7 +154,7 @@ echo "10: ++++++++++++++++++++"
 
 # Cross Accept/Content-Type XML/JSON test (only a weird client will do this, but it is theoretically possible)
 # FIXME P6: Once issue #317 is fixed - move this test to use curlIt
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' -d @- | xmllint --format -) <<EOF
+(curl localhost:${CB_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/xml' -d @- | xmllint --format -) <<EOF
 {
   "entities": [
     {
@@ -170,7 +169,7 @@ echo "11: ++++++++++++++++++++"
 
 # Cross Accept/Content-Type JSON/XML test (only a weird client will do this, but it is theoretically possible)
 # FIXME P6: Once issue #317 is fixed - move this test to use curlIt
-(curl localhost:${BROKER_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/json' -d @-) <<EOF
+(curl localhost:${CB_PORT}/NGSI10/queryContext -s -S --header 'Content-Type: application/xml' --header 'Accept: application/json' -d @-) <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>

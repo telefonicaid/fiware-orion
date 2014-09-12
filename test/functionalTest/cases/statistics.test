@@ -28,7 +28,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-# curl localhost:${BROKER_PORT}/statistics 2> /dev/null | xmllint --format -
+# curl localhost:${CB_PORT}/statistics 2> /dev/null | xmllint --format -
 echo "+++++ 1. statistics in XML"
 orionCurl --url /statistics 
 echo

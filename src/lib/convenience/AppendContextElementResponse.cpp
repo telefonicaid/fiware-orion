@@ -33,6 +33,7 @@
 #include "convenience/ContextAttributeResponseVector.h"
 #include "ngsi/StatusCode.h"
 #include "convenience/AppendContextElementResponse.h"
+#include "rest/ConnectionInfo.h"
 
 
 
@@ -50,23 +51,23 @@ AppendContextElementResponse::AppendContextElementResponse() : errorCode("errorC
 *
 * AppendContextElementResponse::render - 
 */
-std::string AppendContextElementResponse::render(RequestType requestType, Format format, std::string indent)
+std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestType requestType, std::string indent)
 {
   std::string tag = "appendContextElementResponse";
   std::string out = "";
 
-  out += startTag(indent, tag, format, false);
+  out += startTag(indent, tag, ciP->outFormat, false);
 
   if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
-    out += errorCode.render(format, indent + "  ");
+    out += errorCode.render(ciP->outFormat, indent + "  ");
   }
   else
   {
-    out += contextResponseVector.render(requestType, format, indent + "  ");
+    out += contextResponseVector.render(ciP, requestType, indent + "  ");
   }
 
-  out += endTag(indent, tag, format);
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }
@@ -79,11 +80,11 @@ std::string AppendContextElementResponse::render(RequestType requestType, Format
 */
 std::string AppendContextElementResponse::check
 (
-  RequestType  requestType,
-  Format       format,
-  std::string  indent,
-  std::string  predetectedError,
-  int          counter
+  ConnectionInfo*  ciP,
+  RequestType      requestType,
+  std::string      indent,
+  std::string      predetectedError,
+  int              counter
 )
 {
   std::string res;
@@ -92,7 +93,7 @@ std::string AppendContextElementResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextResponseVector.check(requestType, format, indent, "", counter)) != "OK")
+  else if ((res = contextResponseVector.check(ciP, requestType, indent, "", counter)) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }
@@ -101,7 +102,7 @@ std::string AppendContextElementResponse::check
     return "OK";
   }
 
-  return render(requestType, format, indent);
+  return render(ciP, requestType, indent);
 }
 
 

@@ -158,9 +158,6 @@ using ::testing::Return;
 *
 */
 
-#define NO_CODE 0
-
-
 /* ****************************************************************************
 *
 * prepareDatabase -
@@ -621,7 +618,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     EXPECT_EQ("PT5H",res.subscribeResponse.duration.get());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -718,7 +715,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_EQ("PT4S",res.subscribeResponse.throttling.get());
     EXPECT_EQ("51307b66f481db11bf860005", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -802,7 +799,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_EQ("PT0S",res.subscribeResponse.throttling.get());
     EXPECT_EQ("51307b66f481db11bf860005", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -890,7 +887,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -973,7 +970,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0_JSON)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1056,7 +1053,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T1_C0)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1146,7 +1143,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_C0)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1237,7 +1234,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_C0)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1325,7 +1322,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1410,7 +1407,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1499,7 +1496,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1590,7 +1587,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1679,7 +1676,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1772,7 +1769,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1870,7 +1867,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -1975,7 +1972,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2077,7 +2074,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2184,7 +2181,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2278,7 +2275,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T1_C0)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2368,7 +2365,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T1_C0)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2463,7 +2460,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_C0)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2558,7 +2555,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_C0)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2650,7 +2647,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2739,7 +2736,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2832,7 +2829,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -2927,7 +2924,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3019,7 +3016,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3116,7 +3113,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3218,7 +3215,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3327,7 +3324,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3433,7 +3430,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3544,7 +3541,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3663,7 +3660,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3768,7 +3765,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3871,7 +3868,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -3976,7 +3973,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4097,7 +4094,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860022", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4218,7 +4215,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860022", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4330,7 +4327,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4442,7 +4439,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4568,7 +4565,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860022", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4694,7 +4691,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860022", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4804,7 +4801,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -4918,7 +4915,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5031,7 +5028,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5138,7 +5135,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5252,7 +5249,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5366,7 +5363,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5478,7 +5475,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5596,7 +5593,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5721,7 +5718,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5841,7 +5838,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -5966,7 +5963,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860002", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6088,7 +6085,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6201,7 +6198,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6322,7 +6319,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6445,7 +6442,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6561,7 +6558,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6680,7 +6677,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6808,7 +6805,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -6943,7 +6940,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860003", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -7071,7 +7068,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -7204,7 +7201,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
     EXPECT_TRUE(res.subscribeResponse.duration.isEmpty());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860004", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
@@ -7308,7 +7305,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     EXPECT_EQ("PT5H",res.subscribeResponse.duration.get());
     EXPECT_TRUE(res.subscribeResponse.throttling.isEmpty());
     EXPECT_EQ("51307b66f481db11bf860001", res.subscribeResponse.subscriptionId.get());
-    EXPECT_EQ(NO_CODE, res.subscribeError.errorCode.code);
+    EXPECT_EQ(SccNone, res.subscribeError.errorCode.code);
     EXPECT_EQ(0, res.subscribeError.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 

@@ -45,7 +45,8 @@ extern void xmlParse
   const std::string&  indentation,
   const std::string&  fatherPath,
   XmlNode*            treatV,
-  ParseData*          reqData
+  ParseData*          reqData,
+  std::string*        errorMsgP = NULL
 );
 
 

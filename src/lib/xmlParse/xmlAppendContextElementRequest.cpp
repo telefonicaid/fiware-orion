@@ -277,7 +277,7 @@ void acerRelease(ParseData* reqData)
 */
 std::string acerCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-  return reqData->acer.res.check(AppendContextElement, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->acer.res.check(ciP, AppendContextElement, "", reqData->errorString, 0);
 }
 
 

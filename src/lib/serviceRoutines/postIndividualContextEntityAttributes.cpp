@@ -55,7 +55,7 @@ std::string postIndividualContextEntityAttributes
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s'", entityId.c_str()));
 
   ciP->httpStatusCode = mapPostIndividualContextEntityAttributes(entityId, &parseDataP->acer.res, responseP, ciP);
-  answer = responseP->render(IndividualContextEntityAttributes, ciP->outFormat, "");
+  answer = responseP->render(ciP, IndividualContextEntityAttributes, "");
   responseP->release();
   delete responseP;
 

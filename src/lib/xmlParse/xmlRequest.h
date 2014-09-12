@@ -62,7 +62,8 @@ extern std::string xmlTreat
   ParseData*       reqData,
   RequestType      requestType,
   std::string      payloadWord,
-  XmlRequest**     reqP
+  XmlRequest**     reqP,
+  std::string*     errorMsgP = NULL
 );
 
 #endif  // SRC_LIB_XMLPARSE_XMLREQUEST_H_

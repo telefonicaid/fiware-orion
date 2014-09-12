@@ -214,7 +214,7 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
 *
 * parseUrl -
 *
-* Breaks an URL into pieces. It returns false if the string passed as first
+* Breaks a URL into pieces. It returns false if the string passed as first
 * argument is not a valid URL. Otherwise, it returns true.
 *
 */

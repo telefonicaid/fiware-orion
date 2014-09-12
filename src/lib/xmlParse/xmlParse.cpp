@@ -230,7 +230,8 @@ void xmlParse
   const std::string&  indentation,
   const std::string&  fatherPath,
   XmlNode*            parseVector,
-  ParseData*          parseDataP
+  ParseData*          parseDataP,
+  std::string*        errorMsgP
 )
 {
   std::string  value            = wsStrip(node->value());
@@ -275,6 +276,11 @@ void xmlParse
 
     LM_W(("Bad Input (%s)", ciP->answer.c_str()));
 
+    if (errorMsgP)
+    {
+      *errorMsgP = std::string("Bad Input: ") + ciP->answer;
+    }
+
     return;
   }
 
@@ -284,7 +290,7 @@ void xmlParse
   {
     if ((child != NULL) && (child->name() != NULL) && (onlyWs(child->name()) == false))
     {
-      xmlParse(ciP, node, child, indentation + "  ", path, parseVector, parseDataP);
+      xmlParse(ciP, node, child, indentation + "  ", path, parseVector, parseDataP, errorMsgP);
     }
 
     child = child->next_sibling();
@@ -306,7 +312,7 @@ void xmlParse
 */
 int nullTreat(xml_node<>* node, ParseData* parseDataP)
 {
-  LM_T(LmtNullNode, ("Not treating node '%s'", node->name()));
+  LM_T(LmtNullNode, ("Node '%s' is recognized but no action is needed", node->name()));
 
   return 0;
 }
