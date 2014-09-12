@@ -272,6 +272,7 @@ SET (STATIC_LIBS
     ngsi9
     ngsi10
     ngsi
+    orionTypes
     common
     lm
     pa

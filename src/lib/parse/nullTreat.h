@@ -1,5 +1,5 @@
-#ifndef NULL_TREAT_H
-#define NULL_TREAT_H
+#ifndef SRC_LIB_PARSE_NULLTREAT_H_
+#define SRC_LIB_PARSE_NULLTREAT_H_
 
 /*
 *
@@ -27,8 +27,9 @@
 */
 #include <string>
 
-
 struct ParseData;
+
+
 
 /* ****************************************************************************
 *
@@ -36,4 +37,4 @@ struct ParseData;
 */
 extern std::string jsonNullTreat(const std::string& path, const std::string& value, ParseData* reqDataP);
 
-#endif
+#endif  // SRC_LIB_PARSE_NULLTREAT_H_

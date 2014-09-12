@@ -1,5 +1,5 @@
-#ifndef PARSE_COMPOUND_VALUE_H
-#define PARSE_COMPOUND_VALUE_H
+#ifndef SRC_LIB_PARSE_COMPOUNDVALUE_H_
+#define SRC_LIB_PARSE_COMPOUNDVALUE_H_
 
 /*
 *
@@ -34,20 +34,19 @@
 
 namespace orion
 {
-
 /* ****************************************************************************
 *
 * compoundValueStart - 
 */
 extern void compoundValueStart
 (
-   ConnectionInfo*          ciP,
-   const std::string&       path,
-   const std::string&       name,
-   const std::string&       value,
-   const std::string&       rest,
-   CompoundValueNode::Type  type,
-   bool                     fatherIsVector
+  ConnectionInfo*          ciP,
+  const std::string&       path,
+  const std::string&       name,
+  const std::string&       value,
+  const std::string&       rest,
+  CompoundValueNode::Type  type,
+  bool                     fatherIsVector
 );
 
 
@@ -58,11 +57,11 @@ extern void compoundValueStart
 */
 extern void compoundValueMiddle
 (
-   ConnectionInfo*          ciP,
-   const std::string&       relPath,
-   const std::string&       name,
-   const std::string&       value,
-   CompoundValueNode::Type  type
+  ConnectionInfo*          ciP,
+  const std::string&       relPath,
+  const std::string&       name,
+  const std::string&       value,
+  CompoundValueNode::Type  type
 );
 
 
@@ -72,7 +71,6 @@ extern void compoundValueMiddle
 * compoundValueEnd - 
 */
 extern void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP);
-
 }
 
-#endif
+#endif  // SRC_LIB_PARSE_COMPOUNDVALUE_H_

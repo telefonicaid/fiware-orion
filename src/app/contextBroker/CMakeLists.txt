@@ -41,6 +41,7 @@ SET (STATIC_LIBS
     ngsi10
     ngsi
     parse
+    orionTypes
     common
     lm
     pa
