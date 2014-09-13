@@ -44,9 +44,9 @@
 */
 static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attributeDomainName"));
-   reqData->ucer.res.attributeDomainName.set(value);
-   return "OK";
+  LM_T(LmtParse, ("Got an attributeDomainName"));
+  reqData->ucer.res.attributeDomainName.set(value);
+  return "OK";
 }
 
 
@@ -57,10 +57,10 @@ static std::string attributeDomainName(const std::string& path, const std::strin
 */
 static std::string contextAttribute(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attribute"));
-   reqData->ucer.attributeP = new ContextAttribute();
-   reqData->ucer.res.contextAttributeVector.push_back(reqData->ucer.attributeP);
-   return "OK";
+  LM_T(LmtParse, ("Got an attribute"));
+  reqData->ucer.attributeP = new ContextAttribute();
+  reqData->ucer.res.contextAttributeVector.push_back(reqData->ucer.attributeP);
+  return "OK";
 }
 
 
@@ -71,9 +71,9 @@ static std::string contextAttribute(const std::string& path, const std::string& 
 */
 static std::string contextAttributeName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attribute name: %s", value.c_str()));
-   reqData->ucer.attributeP->name = value;
-   return "OK";
+  LM_T(LmtParse, ("Got an attribute name: %s", value.c_str()));
+  reqData->ucer.attributeP->name = value;
+  return "OK";
 }
 
 
@@ -84,9 +84,9 @@ static std::string contextAttributeName(const std::string& path, const std::stri
 */
 static std::string contextAttributeType(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attribute type: %s", value.c_str()));
-   reqData->ucer.attributeP->type = value;
-   return "OK";
+  LM_T(LmtParse, ("Got an attribute type: %s", value.c_str()));
+  reqData->ucer.attributeP->type = value;
+  return "OK";
 }
 
 
@@ -97,9 +97,9 @@ static std::string contextAttributeType(const std::string& path, const std::stri
 */
 static std::string contextAttributeValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
-   reqData->ucer.attributeP->value = value;
-   return "OK";
+  LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
+  reqData->ucer.attributeP->value = value;
+  return "OK";
 }
 
 
@@ -110,10 +110,10 @@ static std::string contextAttributeValue(const std::string& path, const std::str
 */
 static std::string contextMetadata(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata"));
-   reqData->ucer.metadataP = new Metadata();
-   reqData->ucer.attributeP->metadataVector.push_back(reqData->ucer.metadataP);
-   return "OK";
+  LM_T(LmtParse, ("Got a metadata"));
+  reqData->ucer.metadataP = new Metadata();
+  reqData->ucer.attributeP->metadataVector.push_back(reqData->ucer.metadataP);
+  return "OK";
 }
 
 
@@ -124,9 +124,9 @@ static std::string contextMetadata(const std::string& path, const std::string& v
 */
 static std::string contextMetadataName(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
-   reqData->ucer.metadataP->name = value;
-   return "OK";
+  LM_T(LmtParse, ("Got a metadata name '%s'", value.c_str()));
+  reqData->ucer.metadataP->name = value;
+  return "OK";
 }
 
 
@@ -137,9 +137,9 @@ static std::string contextMetadataName(const std::string& path, const std::strin
 */
 static std::string contextMetadataType(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
-   reqData->ucer.metadataP->type = value;
-   return "OK";
+  LM_T(LmtParse, ("Got a metadata type '%s'", value.c_str()));
+  reqData->ucer.metadataP->type = value;
+  return "OK";
 }
 
 
@@ -150,9 +150,9 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 */
 static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
-   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
-   reqData->ucer.metadataP->value = value;
-   return "OK";
+  LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
+  reqData->ucer.metadataP->value = value;
+  return "OK";
 }
 
 

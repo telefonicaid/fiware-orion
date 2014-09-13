@@ -41,7 +41,7 @@
 
 /* ****************************************************************************
 *
-* StatusCode::StatusCode - 
+* StatusCode::StatusCode -
 */
 StatusCode::StatusCode()
 {
@@ -55,7 +55,7 @@ StatusCode::StatusCode()
 
 /* ****************************************************************************
 *
-* StatusCode::StatusCode - 
+* StatusCode::StatusCode -
 */
 StatusCode::StatusCode(const std::string& _tag)
 {
@@ -69,7 +69,7 @@ StatusCode::StatusCode(const std::string& _tag)
 
 /* ****************************************************************************
 *
-* StatusCode::StatusCode - 
+* StatusCode::StatusCode -
 */
 StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag)
 {
@@ -83,7 +83,7 @@ StatusCode::StatusCode(HttpStatusCode _code, const std::string& _details, const 
 
 /* ****************************************************************************
 *
-* StatusCode::render - 
+* StatusCode::render -
 */
 std::string StatusCode::render(Format format, const std::string& indent, bool comma, bool showTag)
 {
@@ -110,7 +110,9 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
   out += valueTag(indent + "  ", "reasonPhrase", reasonPhrase, format, details != "");
 
   if (details != "")
-     out += valueTag(indent + "  ", "details", details, format, false);
+  {
+    out += valueTag(indent + "  ", "details", details, format, false);
+  }
 
   out += endTag(indent, tag, format, comma);
 
@@ -121,13 +123,13 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
 
 /* ****************************************************************************
 *
-* StatusCode::fill - 
+* StatusCode::fill -
 */
 void StatusCode::fill(HttpStatusCode _code, const std::string& _details)
 {
-   code          = _code;
-   reasonPhrase  = httpStatusCodeString(code);
-   details       = _details;
+  code          = _code;
+  reasonPhrase  = httpStatusCodeString(code);
+  details       = _details;
 }
 
 
@@ -138,22 +140,33 @@ void StatusCode::fill(HttpStatusCode _code, const std::string& _details)
 */
 void StatusCode::fill(StatusCode* scP)
 {
-   fill(scP->code, scP->details);
+  fill(scP->code, scP->details);
 }
 
 
 
 /* ****************************************************************************
 *
-* StatusCode::check - 
+* StatusCode::check -
 */
-std::string StatusCode::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string StatusCode::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (code == SccNone)
+  {
     return "no code";
+  }
 
   if (reasonPhrase == "")
+  {
     return "no reason phrase";
+  }
 
   return "OK";
 }
@@ -162,34 +175,35 @@ std::string StatusCode::check(RequestType requestType, Format format, const std:
 
 /* ****************************************************************************
 *
-* StatusCode::present - 
+* StatusCode::present -
 */
 void StatusCode::present(const std::string& indent)
 {
-   PRINTF("%sCode:            %d\n",   indent.c_str(), code);
-   PRINTF("%sReasonPhrase:    '%s'\n", indent.c_str(), reasonPhrase.c_str());
-   PRINTF("%sDetail:          '%s'\n", indent.c_str(), details.c_str());
-   PRINTF("%sTag:             '%s'\n", indent.c_str(), tag.c_str());
+  PRINTF("%sCode:            %d\n",   indent.c_str(), code);
+  PRINTF("%sReasonPhrase:    '%s'\n", indent.c_str(), reasonPhrase.c_str());
+  PRINTF("%sDetail:          '%s'\n", indent.c_str(), details.c_str());
+  PRINTF("%sTag:             '%s'\n", indent.c_str(), tag.c_str());
 }
 
 
 
 /* ****************************************************************************
 *
-* release - 
+* release -
 */
 void StatusCode::release(void)
 {
   code         = SccNone;
   reasonPhrase = "";
   details      = "";
+  tag          = "statusCode";
 }
 
 
 
 /* ****************************************************************************
 *
-* tagSet - 
+* tagSet -
 */
 void StatusCode::tagSet(const std::string& _tag)
 {

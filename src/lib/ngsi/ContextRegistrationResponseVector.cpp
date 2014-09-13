@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::push_back - 
+* ContextRegistrationResponseVector::push_back -
 */
 void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* item)
 {
@@ -47,7 +47,7 @@ void ContextRegistrationResponseVector::push_back(ContextRegistrationResponse* i
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::render - 
+* ContextRegistrationResponseVector::render -
 */
 std::string ContextRegistrationResponseVector::render(Format format, const std::string& indent, bool comma)
 {
@@ -56,12 +56,16 @@ std::string ContextRegistrationResponseVector::render(Format format, const std::
   std::string  jsonTag = "contextRegistrationResponses";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
   out += startTag(indent, xmlTag, jsonTag, format, true, true);
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
      out += vec[ix]->render(format, indent + "  ", (ix != vec.size() - 1));
+  }
 
   out += endTag(indent, xmlTag, format, comma, true);
 
@@ -72,21 +76,23 @@ std::string ContextRegistrationResponseVector::render(Format format, const std::
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::present - 
+* ContextRegistrationResponseVector::present -
 */
 void ContextRegistrationResponseVector::present(const std::string& indent)
 {
-   PRINTF("%lu ContextRegistrationResponses", (unsigned long) vec.size());
+  PRINTF("%lu ContextRegistrationResponses", (uint64_t) vec.size());
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-     vec[ix]->present(indent);
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(indent);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::release - 
+* ContextRegistrationResponseVector::release -
 */
 void ContextRegistrationResponseVector::release(void)
 {
@@ -103,7 +109,7 @@ void ContextRegistrationResponseVector::release(void)
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::get - 
+* ContextRegistrationResponseVector::get -
 */
 ContextRegistrationResponse* ContextRegistrationResponseVector::get(int ix)
 {
@@ -114,7 +120,7 @@ ContextRegistrationResponse* ContextRegistrationResponseVector::get(int ix)
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::size - 
+* ContextRegistrationResponseVector::size -
 */
 unsigned int ContextRegistrationResponseVector::size(void)
 {
@@ -125,16 +131,25 @@ unsigned int ContextRegistrationResponseVector::size(void)
 
 /* ****************************************************************************
 *
-* ContextRegistrationResponseVector::check - 
+* ContextRegistrationResponseVector::check -
 */
-std::string ContextRegistrationResponseVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextRegistrationResponseVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
       return res;
+    }
   }
 
   return "OK";

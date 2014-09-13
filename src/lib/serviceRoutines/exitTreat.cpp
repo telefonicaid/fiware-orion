@@ -43,41 +43,49 @@
 *
 * exitTreat - 
 */
-std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string exitTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
-   std::string password = "XXX";
-   std::string out;
+  std::string password = "XXX";
+  std::string out;
 
-   if (harakiri == false)
-   {
-     OrionError orionError(SccBadRequest, "no such service");
+  if (harakiri == false)
+  {
+    OrionError orionError(SccBadRequest, "no such service");
 
-     ciP->httpStatusCode = SccOk;
-     out = orionError.render(ciP->outFormat, "");
-     return out;
-   }
+    ciP->httpStatusCode = SccOk;
+    out = orionError.render(ciP->outFormat, "");
+    return out;
+  }
 
-   if (components > 1)
+  if (components > 1)
+  {
     password = compV[1];
+  }
 
-   if (components == 1)
-   {
-      OrionError orionError(SccBadRequest, "Password requested");
-      ciP->httpStatusCode = SccOk;
-      out = orionError.render(ciP->outFormat, "");
-   }
-   else if (password != "harakiri")
-   {
-      OrionError orionError(SccBadRequest, "Request denied - password erroneous");
-      ciP->httpStatusCode = SccOk;
-      out = orionError.render(ciP->outFormat, "");
-   }
-   else
-   {
-      mongoDisconnect();
-      compV.clear();
-      return "DIE";
-   }
+  if (components == 1)
+  {
+    OrionError orionError(SccBadRequest, "Password requested");
+    ciP->httpStatusCode = SccOk;
+    out = orionError.render(ciP->outFormat, "");
+  }
+  else if (password != "harakiri")
+  {
+    OrionError orionError(SccBadRequest, "Request denied - password erroneous");
+    ciP->httpStatusCode = SccOk;
+    out = orionError.render(ciP->outFormat, "");
+  }
+  else
+  {
+    mongoDisconnect();
+    compV.clear();
+    return "DIE";
+  }
 
-   return out;
+  return out;
 }

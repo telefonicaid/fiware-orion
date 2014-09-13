@@ -1,5 +1,5 @@
-#ifndef BAD_VERB_ALL_FOUR_H
-#define BAD_VERB_ALL_FOUR_H
+#ifndef SRC_LIB_SERVICEROUTINES_BADVERBALLFOUR_H_
+#define SRC_LIB_SERVICEROUTINES_BADVERBALLFOUR_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * badVerbAllFour - 
 */
-extern std::string badVerbAllFour(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string badVerbAllFour
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_BADVERBALLFOUR_H_

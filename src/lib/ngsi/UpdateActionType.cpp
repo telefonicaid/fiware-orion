@@ -38,7 +38,14 @@
 *
 * UpdateActionType::check - 
 */
-std::string UpdateActionType::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string UpdateActionType::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if ((string == "update") || (string == "UPDATE") || (string == "Update") ||
       (string == "append") || (string == "APPEND") || (string == "Append") ||
@@ -48,7 +55,9 @@ std::string UpdateActionType::check(RequestType requestType, Format format, cons
   }
 
   if (string == "")
+  {
     return "empty update action type";
+  }
 
   return std::string("invalid update action type: '") + string + "'";
 }
@@ -61,7 +70,7 @@ std::string UpdateActionType::check(RequestType requestType, Format format, cons
 */
 bool UpdateActionType::isEmpty(void)
 {
-   return (string == "")? true : false;
+  return (string == "")? true : false;
 }
 
 
@@ -95,9 +104,13 @@ std::string UpdateActionType::get(void)
 void UpdateActionType::present(const std::string& indent)
 {
   if (string != "")
+  {
     PRINTF("%sUpdateActionType: %s\n", indent.c_str(), string.c_str());
+  }
   else
+  {
     PRINTF("%sNo UpdateActionType\n", indent.c_str());
+  }
 }
 
 
@@ -109,7 +122,9 @@ void UpdateActionType::present(const std::string& indent)
 std::string UpdateActionType::render(Format format, const std::string& indent, bool comma)
 {
   if (string == "")
+  {
     return "";
+  }
 
   return valueTag(indent, "updateAction", string, format, comma);
 }

@@ -1,5 +1,5 @@
-#ifndef JSON_SUBSCRIBE_CONTEXT_REQUEST_H
-#define JSON_SUBSCRIBE_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_JSONPARSE_JSONSUBSCRIBECONTEXTREQUEST_H_
+#define SRC_LIB_JSONPARSE_JSONSUBSCRIBECONTEXTREQUEST_H_
 
 /*
 *
@@ -71,4 +71,4 @@ extern std::string jsonScrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 */
 extern void jsonScrPresent(ParseData* reqDataP);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONSUBSCRIBECONTEXTREQUEST_H_

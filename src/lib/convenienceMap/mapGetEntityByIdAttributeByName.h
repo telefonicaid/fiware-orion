@@ -1,5 +1,5 @@
-#ifndef MAP_GET_ENTITY_BY_ID_ATTRIBUTE_BY_NAME_H
-#define MAP_GET_ENTITY_BY_ID_ATTRIBUTE_BY_NAME_H
+#ifndef SRC_LIB_CONVENIENCEMAP_MAPGETENTITYBYIDATTRIBUTEBYNAME_H_
+#define SRC_LIB_CONVENIENCEMAP_MAPGETENTITYBYIDATTRIBUTEBYNAME_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * mapGetEntityByIdAttributeByName - 
 */
-extern HttpStatusCode mapGetEntityByIdAttributeByName(const std::string& id, const std::string& attributeName, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP);
+extern HttpStatusCode mapGetEntityByIdAttributeByName
+(
+  const std::string&                    id,
+  const std::string&                    attributeName,
+  DiscoverContextAvailabilityResponse*  response,
+  ConnectionInfo*                       ciP
+);
 
-#endif
+#endif  // SRC_LIB_CONVENIENCEMAP_MAPGETENTITYBYIDATTRIBUTEBYNAME_H_

@@ -1,5 +1,5 @@
-#ifndef RESTRICTION_H
-#define RESTRICTION_H
+#ifndef SRC_LIB_NGSI_RESTRICTION_H_
+#define SRC_LIB_NGSI_RESTRICTION_H_
 
 /*
 *
@@ -44,9 +44,14 @@ typedef struct Restriction
   ScopeVector          scopeVector;           // Optional
 
   std::string   render(Format format, const std::string& indent, int restrictions = 1, bool comma = false);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   void          release();
+
+  std::string   check(RequestType         requestType,
+                      Format              format,
+                      const std::string&  indent,
+                      const std::string&  predetectedError,
+                      int                 counter);
 } Restriction;
 
-#endif
+#endif  // SRC_LIB_NGSI_RESTRICTION_H_

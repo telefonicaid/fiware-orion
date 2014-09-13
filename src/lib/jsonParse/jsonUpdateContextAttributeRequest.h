@@ -1,5 +1,5 @@
-#ifndef JSON_UPDATE_CONTEXT_ATTRIBUTE_REQUEST_H
-#define JSON_UPDATE_CONTEXT_ATTRIBUTE_REQUEST_H
+#ifndef SRC_LIB_JSONPARSE_JSONUPDATECONTEXTATTRIBUTEREQUEST_H_
+#define SRC_LIB_JSONPARSE_JSONUPDATECONTEXTATTRIBUTEREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string jsonUpcarCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void jsonUpcarPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONUPDATECONTEXTATTRIBUTEREQUEST_H_

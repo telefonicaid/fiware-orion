@@ -41,7 +41,13 @@
 *
 * GET /ngsi10/contextEntityTypes/{typeName}
 */
-std::string getNgsi10ContextEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string getNgsi10ContextEntityTypes
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   std::string typeName = compV[2];
 
@@ -49,6 +55,6 @@ std::string getNgsi10ContextEntityTypes(ConnectionInfo* ciP, int components, std
   parseDataP->qcr.res.fill(".*", typeName, "");
   std::string answer = postQueryContext(ciP, components, compV, parseDataP);
   parseDataP->qcr.res.release();
-  
+
   return answer;
 }

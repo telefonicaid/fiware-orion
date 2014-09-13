@@ -1,5 +1,5 @@
-#ifndef REFERENCE_H
-#define REFERENCE_H
+#ifndef SRC_LIB_NGSI_REFERENCE_H_
+#define SRC_LIB_NGSI_REFERENCE_H_
 
 /*
 *
@@ -44,9 +44,14 @@ typedef struct Reference
   std::string   get(void);
   bool          isEmpty(void);
   std::string   render(Format format, const std::string& indent, bool comma);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   const char*   c_str();
+
+  std::string   check(RequestType         requestType,
+                      Format              format,
+                      const std::string&  indent,
+                      const std::string&  predetectedError,
+                      int                 counter);
 } Reference;
 
-#endif
+#endif  // SRC_LIB_NGSI_REFERENCE_H_

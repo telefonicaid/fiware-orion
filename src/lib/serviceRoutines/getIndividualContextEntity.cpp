@@ -38,13 +38,19 @@
 
 /* ****************************************************************************
 *
-* getIndividualContextEntity - 
+* getIndividualContextEntity -
 */
-std::string getIndividualContextEntity(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string getIndividualContextEntity
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   std::string             answer;
   std::string             entityId = compV[2];
-  ContextElementResponse  response;  
+  ContextElementResponse  response;
 
   LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
 

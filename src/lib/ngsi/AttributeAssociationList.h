@@ -1,5 +1,5 @@
-#ifndef ASSOCIATION_LIST_H
-#define ASSOCIATION_LIST_H
+#ifndef SRC_LIB_NGSI_ATTRIBUTEASSOCIATIONLIST_H_
+#define SRC_LIB_NGSI_ATTRIBUTEASSOCIATIONLIST_H_
 
 /*
 *
@@ -36,19 +36,24 @@
 
 /* ****************************************************************************
 *
-* AttributeAssociationList - 
+* AttributeAssociationList -
 */
 typedef struct AttributeAssociationList
 {
   std::vector<AttributeAssociation*>  vec;
 
   std::string            render(Format format, const std::string& indent, bool comma);
-  std::string            check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void                   present(const std::string& indent);
   void                   push_back(AttributeAssociation* aaP);
   unsigned int           size(void);
   AttributeAssociation*  get(int ix);
   void                   release(void);
+
+  std::string            check(RequestType         requestType,
+                               Format              format,
+                               const std::string&  indent,
+                               const std::string&  predetectedError,
+                               int                 counter);
 } AttributeAssociationList;
 
-#endif
+#endif  // SRC_LIB_NGSI_ATTRIBUTEASSOCIATIONLIST_H_

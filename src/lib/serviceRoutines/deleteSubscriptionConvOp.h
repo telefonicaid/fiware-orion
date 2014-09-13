@@ -1,5 +1,5 @@
-#ifndef DELETE_SUBSCRIPTION_CONV_OP_H
-#define DELETE_SUBSCRIPTION_CONV_OP_H
+#ifndef SRC_LIB_SERVICEROUTINES_DELETESUBSCRIPTIONCONVOP_H_
+#define SRC_LIB_SERVICEROUTINES_DELETESUBSCRIPTIONCONVOP_H_
 
 /*
 *
@@ -37,7 +37,13 @@
 *
 * deleteSubscriptionConvOp - 
 */
-extern std::string deleteSubscriptionConvOp(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string deleteSubscriptionConvOp
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_DELETESUBSCRIPTIONCONVOP_H_
 

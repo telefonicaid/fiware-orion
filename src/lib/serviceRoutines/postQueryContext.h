@@ -1,5 +1,5 @@
-#ifndef POST_QUERY_CONTEXT_H
-#define POST_QUERY_CONTEXT_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTQUERYCONTEXT_H_
+#define SRC_LIB_SERVICEROUTINES_POSTQUERYCONTEXT_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postQueryContext - 
 */
-extern std::string postQueryContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postQueryContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTQUERYCONTEXT_H_

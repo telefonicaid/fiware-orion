@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -42,13 +40,13 @@
 
 /* ****************************************************************************
 *
-* contextRegistration - 
+* contextRegistration -
 */
 static int contextRegistration(xml_node<>* node, ParseData* parseDataP)
 {
   parseDataP->rcr.crP = new ContextRegistration();
-  
   parseDataP->rcr.res.contextRegistrationVector.push_back(parseDataP->rcr.crP);
+
   return 0;
 }
 
@@ -56,7 +54,7 @@ static int contextRegistration(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* parseDataP)
 {
@@ -68,7 +66,9 @@ static int entityId(xml_node<>* node, ParseData* parseDataP)
   std::string es = entityIdParse(RegisterContext, node, parseDataP->rcr.entityIdP);
 
   if (es != "OK")
+  {
     parseDataP->errorString = es;
+  }
 
   return 0;
 }
@@ -77,12 +77,11 @@ static int entityId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
-
   parseDataP->rcr.entityIdP->id = node->value();
 
   return 0;
@@ -92,13 +91,15 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* crAttribute - 
+* crAttribute -
 */
 static int crAttribute(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating an attribute"));
+
   parseDataP->rcr.attributeP = new ContextRegistrationAttribute();
   parseDataP->rcr.crP->contextRegistrationAttributeVector.push_back(parseDataP->rcr.attributeP);
+
   return 0;
 }
 
@@ -106,12 +107,13 @@ static int crAttribute(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* craName - 
+* craName -
 */
 static int craName(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute name: '%s'", node->value()));
   parseDataP->rcr.attributeP->name = node->value();
+
   return 0;
 }
 
@@ -119,12 +121,13 @@ static int craName(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* craType - 
+* craType -
 */
 static int craType(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute type: '%s'", node->value()));
   parseDataP->rcr.attributeP->type = node->value();
+
   return 0;
 }
 
@@ -132,12 +135,13 @@ static int craType(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* craIsDomain - 
+* craIsDomain -
 */
 static int craIsDomain(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a isDomain: '%s'", node->value()));
   parseDataP->rcr.attributeP->isDomain = node->value();
+
   return 0;
 }
 
@@ -145,13 +149,15 @@ static int craIsDomain(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* craMetadata - 
+* craMetadata -
 */
 static int craMetadata(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating a metadata"));
+
   parseDataP->rcr.attributeMetadataP = new Metadata();
   parseDataP->rcr.attributeP->metadataVector.push_back(parseDataP->rcr.attributeMetadataP);
+
   return 0;
 }
 
@@ -159,12 +165,13 @@ static int craMetadata(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* craMetadataName - 
+* craMetadataName -
 */
 static int craMetadataName(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a metadata name: '%s'", node->value()));
   parseDataP->rcr.attributeMetadataP->name = node->value();
+
   return 0;
 }
 
@@ -172,12 +179,13 @@ static int craMetadataName(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* craMetadataType - 
+* craMetadataType -
 */
 static int craMetadataType(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a metadata type: '%s'", node->value()));
   parseDataP->rcr.attributeMetadataP->type = node->value();
+
   return 0;
 }
 
@@ -185,12 +193,13 @@ static int craMetadataType(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* craMetadataValue - 
+* craMetadataValue -
 */
 static int craMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", node->value()));
   parseDataP->rcr.attributeMetadataP->value = node->value();
+
   return 0;
 }
 
@@ -198,13 +207,15 @@ static int craMetadataValue(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* regMetadata - 
+* regMetadata -
 */
 static int regMetadata(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Creating a reg metadata"));
+
   parseDataP->rcr.registrationMetadataP = new Metadata();
   parseDataP->rcr.crP->registrationMetadataVector.push_back(parseDataP->rcr.registrationMetadataP);
+
   return 0;
 }
 
@@ -212,12 +223,13 @@ static int regMetadata(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* regMetadataName - 
+* regMetadataName -
 */
 static int regMetadataName(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata name: '%s'", node->value()));
   parseDataP->rcr.registrationMetadataP->name = node->value();
+
   return 0;
 }
 
@@ -225,12 +237,13 @@ static int regMetadataName(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* regMetadataType - 
+* regMetadataType -
 */
 static int regMetadataType(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata type: '%s'", node->value()));
   parseDataP->rcr.registrationMetadataP->type = node->value();
+
   return 0;
 }
 
@@ -238,12 +251,13 @@ static int regMetadataType(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* regMetadataValue - 
+* regMetadataValue -
 */
 static int regMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata value: '%s'", node->value()));
   parseDataP->rcr.registrationMetadataP->value = node->value();
+
   return 0;
 }
 
@@ -251,12 +265,13 @@ static int regMetadataValue(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* providingApplication - 
+* providingApplication -
 */
 static int providingApplication(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a providing application: '%s'", node->value()));
   parseDataP->rcr.crP->providingApplication.set(node->value());
+
   return 0;
 }
 
@@ -264,12 +279,13 @@ static int providingApplication(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* duration - 
+* duration -
 */
 static int duration(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a duration: '%s'", node->value()));
   parseDataP->rcr.res.duration.set(node->value());
+
   return 0;
 }
 
@@ -277,12 +293,13 @@ static int duration(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* registrationId - 
+* registrationId -
 */
 static int registrationId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registration id: '%s'", node->value()));
   parseDataP->rcr.res.registrationId.set(node->value());
+
   return 0;
 }
 
@@ -290,14 +307,17 @@ static int registrationId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* sourceEntityId - 
+* sourceEntityId -
 */
 static int sourceEntityId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("got a sourceEntityId"));
 
   LM_T(LmtParse, ("calling entityIdParse"));
-  std::string es = entityIdParse(RegisterContext, node, &parseDataP->rcr.registrationMetadataP->association.entityAssociation.source);
+  std::string es = entityIdParse(RegisterContext,
+                                 node,
+                                 &parseDataP->rcr.registrationMetadataP->association.entityAssociation.source);
+
   LM_T(LmtParse, ("back from  entityIdParse"));
 
   if (es != "OK")
@@ -313,12 +333,11 @@ static int sourceEntityId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* sourceEntityIdId - 
+* sourceEntityIdId -
 */
 static int sourceEntityIdId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("got a source entityId:id: '%s'", node->value()));
-
   parseDataP->rcr.registrationMetadataP->association.entityAssociation.source.id = node->value();
 
   return 0;
@@ -328,16 +347,20 @@ static int sourceEntityIdId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* targetEntityId - 
+* targetEntityId -
 */
 static int targetEntityId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("got a targetEntityId"));
 
-  std::string es = entityIdParse(RegisterContext, node, &parseDataP->rcr.registrationMetadataP->association.entityAssociation.target);
+  std::string es = entityIdParse(RegisterContext,
+                                 node,
+                                 &parseDataP->rcr.registrationMetadataP->association.entityAssociation.target);
 
   if (es != "OK")
+  {
     parseDataP->errorString = es;
+  }
 
   return 0;
 }
@@ -346,12 +369,11 @@ static int targetEntityId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* targetEntityIdId - 
+* targetEntityIdId -
 */
 static int targetEntityIdId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("got a target entityId:id: '%s'", node->value()));
-
   parseDataP->rcr.registrationMetadataP->association.entityAssociation.target.id = node->value();
 
   return 0;
@@ -361,68 +383,74 @@ static int targetEntityIdId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* attributeAssociation - 
+* attributeAssociation -
 */
 static int attributeAssociation(xml_node<>* node, ParseData* parseDataP)
 {
-   LM_T(LmtParse, ("got an attribute association"));
-   parseDataP->rcr.attributeAssociationP = new AttributeAssociation();
+  LM_T(LmtParse, ("got an attribute association"));
 
-   parseDataP->rcr.registrationMetadataP->association.attributeAssociationList.push_back(parseDataP->rcr.attributeAssociationP);
-   return 0;
+  parseDataP->rcr.attributeAssociationP = new AttributeAssociation();
+  parseDataP->rcr.registrationMetadataP->association.attributeAssociationList.push_back(
+    parseDataP->rcr.attributeAssociationP);
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* sourceAttribute - 
+* sourceAttribute -
 */
 static int sourceAttribute(xml_node<>* node, ParseData* parseDataP)
 {
-   LM_T(LmtParse, ("got a source attribute association"));
-   parseDataP->rcr.attributeAssociationP->source = node->value();
-   return 0;
+  LM_T(LmtParse, ("got a source attribute association"));
+  parseDataP->rcr.attributeAssociationP->source = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* targetAttribute - 
+* targetAttribute -
 */
 static int targetAttribute(xml_node<>* node, ParseData* parseDataP)
 {
-   LM_T(LmtParse, ("got a target attribute association"));
-   parseDataP->rcr.attributeAssociationP->target = node->value();
-   return 0;
+  LM_T(LmtParse, ("got a target attribute association"));
+  parseDataP->rcr.attributeAssociationP->target = node->value();
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* entityIdList - 
+* entityIdList -
 */
 static int entityIdList(xml_node<>* node, ParseData* parseDataP)
 {
-   LM_T(LmtParse, ("got an entityIdList"));
-   if (parseDataP->rcr.crP->entityIdVectorPresent == true)
-   {
-     parseDataP->errorString = "Got an entityIdList when one was present already";
-     LM_W(("Bad Input (more than one list of entityId)"));
-     return 1;
-   }
+  LM_T(LmtParse, ("got an entityIdList"));
 
-   parseDataP->rcr.crP->entityIdVectorPresent = true;
-   return 0;
+  if (parseDataP->rcr.crP->entityIdVectorPresent == true)
+  {
+    parseDataP->errorString = "Got an entityIdList when one was present already";
+    LM_W(("Bad Input (more than one list of entityId)"));
+    return 1;
+  }
+
+  parseDataP->rcr.crP->entityIdVectorPresent = true;
+
+  return 0;
 }
 
 
 
 /* ****************************************************************************
 *
-* rcrInit - 
+* rcrInit -
 */
 void rcrInit(ParseData* parseDataP)
 {
@@ -438,7 +466,7 @@ void rcrInit(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* rcrRelease - 
+* rcrRelease -
 */
 void rcrRelease(ParseData* parseDataP)
 {
@@ -449,7 +477,7 @@ void rcrRelease(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* rcrCheck - 
+* rcrCheck -
 */
 std::string rcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 {
@@ -460,12 +488,14 @@ std::string rcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 #define PRINTF printf
 /* ****************************************************************************
 *
-* rcrPresent - 
+* rcrPresent -
 */
 void rcrPresent(ParseData* parseDataP)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   PRINTF("\n\n");
   parseDataP->rcr.res.contextRegistrationVector.present("");
@@ -477,54 +507,69 @@ void rcrPresent(ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* registerContextRequestParseVector - 
+* registerContextRequestParseVector -
 */
-XmlNode rcrParseVector[] = 
+#define RCR   "/registerContextRequest"
+#define CRL   "/contextRegistrationList"
+#define CR    "/contextRegistration"
+#define EL    "/entityIdList"
+#define CRAL  "/contextRegistrationAttributeList"
+#define CRA   "/contextRegistrationAttribute"
+#define MDL   "/metadata"
+#define MD    "/contextMetadata"
+#define RMDL  "/registrationMetadata"
+#define VAL   "/value"
+#define EA    "/entityAssociation"
+#define SEI   "/sourceEntityId"
+#define TEI   "/targetEntityId"
+#define AAL   "/attributeAssociationList"
+#define AA    "/attributeAssociation"
+
+XmlNode rcrParseVector[] =
 {
-  { "/registerContextRequest",                         nullTreat },
+  { RCR "",                                            nullTreat            },
 
-  { "/registerContextRequest/contextRegistrationList", nullTreat },
+  { RCR CRL "",                                        nullTreat            },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration",                                   contextRegistration },
+  { RCR CRL CR "",                                     contextRegistration  },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList",                      entityIdList        },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList/entityId",             entityId            },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/entityIdList/entityId/id",          entityIdId          },
+  { RCR CRL CR EL "",                                  entityIdList         },
+  { RCR CRL CR EL "/entityId",                         entityId             },
+  { RCR CRL CR EL "/entityId/id",                      entityIdId           },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList",  nullTreat           },
+  { RCR CRL CR CRAL "",                                nullTreat            },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute",           crAttribute },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/name",      craName     },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/type",      craType     },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/isDomain",  craIsDomain },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata",  nullTreat   },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata/contextMetadata",       craMetadata      },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata/contextMetadata/name",  craMetadataName  },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata/contextMetadata/type",  craMetadataType  },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/contextRegistrationAttributeList/contextRegistrationAttribute/metadata/contextMetadata/value", craMetadataValue },
+  { RCR CRL CR CRAL CRA,                               crAttribute          },
+  { RCR CRL CR CRAL CRA "/name",                       craName              },
+  { RCR CRL CR CRAL CRA "/type",                       craType              },
+  { RCR CRL CR CRAL CRA "/isDomain",                   craIsDomain          },
+  { RCR CRL CR CRAL CRA MDL,                           nullTreat            },
+  { RCR CRL CR CRAL CRA MDL MD,                        craMetadata          },
+  { RCR CRL CR CRAL CRA MDL MD "/name",                craMetadataName      },
+  { RCR CRL CR CRAL CRA MDL MD "/type",                craMetadataType      },
+  { RCR CRL CR CRAL CRA MDL MD "/value",               craMetadataValue     },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata",                       nullTreat            },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata",       regMetadata          },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/name",  regMetadataName      },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/type",  regMetadataType      },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value", regMetadataValue     },
+  { RCR CRL CR RMDL "",                                nullTreat            },
+  { RCR CRL CR RMDL MD "",                             regMetadata          },
+  { RCR CRL CR RMDL MD "/name",                        regMetadataName      },
+  { RCR CRL CR RMDL MD "/type",                        regMetadataType      },
+  { RCR CRL CR RMDL MD "/value",                       regMetadataValue     },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/entityAssociation",      nullTreat },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/entityAssociation/sourceEntityId",    sourceEntityId    },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/entityAssociation/sourceEntityId/id", sourceEntityIdId  },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/entityAssociation/targetEntityId",    targetEntityId    },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/entityAssociation/targetEntityId/id", targetEntityIdId  },
+  { RCR CRL CR RMDL MD VAL EA "",                      nullTreat            },
+  { RCR CRL CR RMDL MD VAL EA SEI "",                  sourceEntityId       },
+  { RCR CRL CR RMDL MD VAL EA SEI "/id",               sourceEntityIdId     },
+  { RCR CRL CR RMDL MD VAL EA TEI "",                  targetEntityId       },
+  { RCR CRL CR RMDL MD VAL EA TEI "/id",               targetEntityIdId     },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/attributeAssociationList",                                      nullTreat },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/attributeAssociationList/attributeAssociation",                 attributeAssociation},
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/attributeAssociationList/attributeAssociation/sourceAttribute", sourceAttribute },
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/registrationMetadata/contextMetadata/value/attributeAssociationList/attributeAssociation/targetAttribute", targetAttribute },
+  { RCR CRL CR RMDL MD VAL AAL "",                     nullTreat            },
+  { RCR CRL CR RMDL MD VAL AAL AA "",                  attributeAssociation },
+  { RCR CRL CR RMDL MD VAL AAL AA "/sourceAttribute",  sourceAttribute      },
+  { RCR CRL CR RMDL MD VAL AAL AA "/targetAttribute",  targetAttribute      },
 
-  { "/registerContextRequest/contextRegistrationList/contextRegistration/providingApplication",                       providingApplication },
+  { RCR CRL CR "/providingApplication",                providingApplication },
 
-  { "/registerContextRequest/duration",        duration       },
-
-  { "/registerContextRequest/registrationId",  registrationId },
+  { RCR "/duration",                                   duration             },
+  { RCR "/registrationId",                             registrationId       },
 
   { "LAST", NULL }
 };

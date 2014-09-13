@@ -36,7 +36,7 @@
 
 /* ****************************************************************************
 *
-* Scope::Scope - 
+* Scope::Scope -
 */
 Scope::Scope()
 {
@@ -49,7 +49,7 @@ Scope::Scope()
 
 /* ****************************************************************************
 *
-* Scope::Scope - 
+* Scope::Scope -
 */
 Scope::Scope(const std::string& _type, const std::string& _value)
 {
@@ -61,7 +61,7 @@ Scope::Scope(const std::string& _type, const std::string& _value)
 
 /* ****************************************************************************
 *
-* Scope::render - 
+* Scope::render -
 */
 std::string Scope::render(Format format, const std::string& indent, bool notLastInVector)
 {
@@ -82,9 +82,16 @@ std::string Scope::render(Format format, const std::string& indent, bool notLast
 
 /* ****************************************************************************
 *
-* Scope::check - 
+* Scope::check -
 */
-std::string Scope::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string Scope::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (type == "FIWARE_Location")
   {
@@ -201,19 +208,25 @@ std::string Scope::check(RequestType requestType, Format format, const std::stri
 
 /* ****************************************************************************
 *
-* Scope::present - 
+* Scope::present -
 */
 void Scope::present(const std::string& indent, int ix)
 {
   if (ix == -1)
+  {
     PRINTF("%sScope:\n",       indent.c_str());
+  }
   else
+  {
     PRINTF("%sScope %d:\n",    indent.c_str(), ix);
+  }
 
   PRINTF("%s  Type:     %s\n", indent.c_str(), type.c_str());
 
   if (areaType == orion::NoArea)
+  {
     PRINTF("%s  Value:    %s\n", indent.c_str(), value.c_str());
+  }
   else if (areaType == orion::CircleType)
   {
     PRINTF("%s  FI-WARE Circle Area:\n", indent.c_str());
@@ -240,7 +253,7 @@ void Scope::present(const std::string& indent, int ix)
 
 /* ****************************************************************************
 *
-* release - 
+* release -
 */
 void Scope::release(void)
 {

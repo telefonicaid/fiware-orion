@@ -1,5 +1,5 @@
-#ifndef CONTEXT_ATTRIBUTE_VECTOR_H
-#define CONTEXT_ATTRIBUTE_VECTOR_H
+#ifndef SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_
+#define SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_
 
 /*
 *
@@ -37,22 +37,40 @@
 *
 * ContextAttributeVector - 
 */
+struct ContextAttributeVector;
 typedef struct ContextAttributeVector
 {
   std::vector<ContextAttribute*>  vec;
 
   ContextAttributeVector();
 
-  std::string        render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma = false);
-  std::string        check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void               present(const std::string& indent);
   void               push_back(ContextAttribute* item);
   unsigned int       size(void);
   ContextAttribute*  get(unsigned int ix);
   void               release(void);
-  void               fill(ContextAttributeVector& caV);
+  void               fill(struct ContextAttributeVector* cavP);
 
-  ContextAttribute*  operator[](unsigned int ix)       { if (ix < vec.size()) return vec[ix]; else return NULL; }
+  ContextAttribute*  operator[](unsigned int ix)
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;
+  }
+
+  std::string        check(RequestType          requestType,
+                           Format               format,
+                           const std::string&   indent,
+                           const std::string&   predetectedError,
+                           int                  counter);
+
+  std::string        render(ConnectionInfo*     ciP,
+                            RequestType         requestType,
+                            const std::string&  indent,
+                            bool comma = false);
 } ContextAttributeVector;
 
-#endif
+#endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

@@ -35,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* push_back - 
+* push_back -
 */
 void AttributeAssociationList::push_back(AttributeAssociation* aaP)
 {
@@ -46,7 +46,7 @@ void AttributeAssociationList::push_back(AttributeAssociation* aaP)
 
 /* ****************************************************************************
 *
-* render - 
+* render -
 */
 std::string AttributeAssociationList::render(Format format, const std::string& indent, bool comma)
 {
@@ -71,16 +71,25 @@ std::string AttributeAssociationList::render(Format format, const std::string& i
 
 /* ****************************************************************************
 *
-* check - 
+* check -
 */
-std::string AttributeAssociationList::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string AttributeAssociationList::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, 0)) != "OK")
+    {
       return res;
+    }
   }
 
   return "OK";
@@ -90,21 +99,23 @@ std::string AttributeAssociationList::check(RequestType requestType, Format form
 
 /* ****************************************************************************
 *
-* present - 
+* present -
 */
 void AttributeAssociationList::present(const std::string& indent)
 {
-  PRINTF("%lu Attribute Associations", (unsigned long) vec.size());
+  PRINTF("%lu Attribute Associations", (uint64_t) vec.size());
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     vec[ix]->present(indent, ix);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* AttributeAssociationList::get - 
+* AttributeAssociationList::get -
 */
 AttributeAssociation* AttributeAssociationList::get(int ix)
 {
@@ -115,7 +126,7 @@ AttributeAssociation* AttributeAssociationList::get(int ix)
 
 /* ****************************************************************************
 *
-* AttributeAssociationList::size - 
+* AttributeAssociationList::size -
 */
 unsigned int AttributeAssociationList::size(void)
 {
@@ -126,12 +137,14 @@ unsigned int AttributeAssociationList::size(void)
 
 /* ****************************************************************************
 *
-* AttributeAssociationList::release - 
+* AttributeAssociationList::release -
 */
 void AttributeAssociationList::release(void)
 {
-  for (unsigned int ix = 0; ix < vec.size(); ++ix) {
-      delete vec[ix];
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    delete vec[ix];
   }
+
   vec.clear();
 }

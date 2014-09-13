@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -41,12 +39,11 @@
 #include "xmlParse/xmlParse.h"
 #include "xmlParse/xmlSubscribeContextRequest.h"
 
-using namespace orion;
 
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* reqData)
 {
@@ -70,7 +67,7 @@ static int entityId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* reqData)
 {
@@ -83,7 +80,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* attribute - 
+* attribute -
 */
 static int attribute(xml_node<>* node, ParseData* reqData)
 {
@@ -97,7 +94,7 @@ static int attribute(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* restriction - 
+* restriction -
 */
 static int restriction(xml_node<>* node, ParseData* reqData)
 {
@@ -111,7 +108,7 @@ static int restriction(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* attributeExpression - 
+* attributeExpression -
 */
 static int attributeExpression(xml_node<>* node, ParseData* reqData)
 {
@@ -125,7 +122,7 @@ static int attributeExpression(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* operationScope - 
+* operationScope -
 */
 static int operationScope(xml_node<>* node, ParseData* reqData)
 {
@@ -142,7 +139,7 @@ static int operationScope(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scopeType - 
+* scopeType -
 */
 static int scopeType(xml_node<>* node, ParseData* reqData)
 {
@@ -155,7 +152,7 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scopeValue - 
+* scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
@@ -183,7 +180,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circle - 
+* circle -
 */
 static int circle(xml_node<>* node, ParseData* reqData)
 {
@@ -196,7 +193,7 @@ static int circle(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleCenterLatitude - 
+* circleCenterLatitude -
 */
 static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 {
@@ -210,7 +207,7 @@ static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleCenterLongitude - 
+* circleCenterLongitude -
 */
 static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 {
@@ -223,7 +220,7 @@ static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleRadius - 
+* circleRadius -
 */
 static int circleRadius(xml_node<>* node, ParseData* reqData)
 {
@@ -236,7 +233,7 @@ static int circleRadius(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleInverted - 
+* circleInverted -
 */
 static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 {
@@ -257,7 +254,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* polygon - 
+* polygon -
 */
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
@@ -270,7 +267,7 @@ static int polygon(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonInverted - 
+* polygonInverted -
 */
 static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 {
@@ -291,7 +288,7 @@ static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* polygonVertexList - 
+* polygonVertexList -
 */
 static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 {
@@ -303,7 +300,7 @@ static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonVertex - 
+* polygonVertex -
 */
 static int polygonVertex(xml_node<>* node, ParseData* reqData)
 {
@@ -318,7 +315,7 @@ static int polygonVertex(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonVertexLatitude - 
+* polygonVertexLatitude -
 */
 static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 {
@@ -331,7 +328,7 @@ static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonVertexLongitude - 
+* polygonVertexLongitude -
 */
 static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
 {
@@ -344,7 +341,7 @@ static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* reference - 
+* reference -
 */
 static int reference(xml_node<>* node, ParseData* reqData)
 {
@@ -357,7 +354,7 @@ static int reference(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* duration - 
+* duration -
 */
 static int duration(xml_node<>* node, ParseData* reqData)
 {
@@ -369,7 +366,7 @@ static int duration(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* notifyCondition - 
+* notifyCondition -
 */
 static int notifyCondition(xml_node<>* node, ParseData* reqData)
 {
@@ -383,7 +380,7 @@ static int notifyCondition(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* notifyConditionRestriction - 
+* notifyConditionRestriction -
 */
 static int notifyConditionRestriction(xml_node<>* node, ParseData* reqData)
 {
@@ -397,7 +394,7 @@ static int notifyConditionRestriction(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* notifyConditionType - 
+* notifyConditionType -
 */
 static int notifyConditionType(xml_node<>* node, ParseData* reqData)
 {
@@ -410,7 +407,7 @@ static int notifyConditionType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* condValue - 
+* condValue -
 */
 static int condValue(xml_node<>* node, ParseData* reqData)
 {
@@ -423,7 +420,7 @@ static int condValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* throttling - 
+* throttling -
 */
 static int throttling(xml_node<>* node, ParseData* reqData)
 {
@@ -436,7 +433,7 @@ static int throttling(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scrInit - 
+* scrInit -
 */
 void scrInit(ParseData* reqData)
 {
@@ -444,7 +441,7 @@ void scrInit(ParseData* reqData)
   reqData->scr.attributeMetadataP     = NULL;
   reqData->scr.restrictionP           = NULL;
   reqData->scr.notifyConditionP       = NULL;
-  reqData->scr.scopeP                 = NULL;  
+  reqData->scr.scopeP                 = NULL;
   reqData->scr.res.restrictions       = 0;
   reqData->errorString                = "";
 }
@@ -453,7 +450,7 @@ void scrInit(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scrRelease - 
+* scrRelease -
 */
 void scrRelease(ParseData* reqData)
 {
@@ -464,7 +461,7 @@ void scrRelease(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scrCheck - 
+* scrCheck -
 */
 std::string scrCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
@@ -475,7 +472,7 @@ std::string scrCheck(ParseData* reqData, ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* scrPresent - 
+* scrPresent -
 */
 void scrPresent(ParseData* reqData)
 {
@@ -489,50 +486,66 @@ void scrPresent(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scrParseVector - 
+* scrParseVector -
 */
-XmlNode scrParseVector[] = 
+#define SCR   "/subscribeContextRequest"
+#define EIDL  "/entityIdList"
+#define EID   "/entityId"
+#define ATTRL "/attributeList"
+#define RS    "/restriction"
+#define SC    "/scope"
+#define OSC   "/operationScope"
+#define SVAL  "/scopeValue"
+#define CRC   "/circle"
+#define POL   "/polygon"
+#define VXL   "/vertexList"
+#define VX    "/vertex"
+#define NCL   "/notifyConditions"
+#define NC    "/notifyCondition"
+#define CVL   "/condValueList"
+
+XmlNode scrParseVector[] =
 {
-  { "/subscribeContextRequest", nullTreat },
+  { "/subscribeContextRequest",                    nullTreat                  },
 
-  { "/subscribeContextRequest/entityIdList",                     nullTreat         },
-  { "/subscribeContextRequest/entityIdList/entityId",            entityId          },
-  { "/subscribeContextRequest/entityIdList/entityId/id",         entityIdId        },
+  { SCR "/entityIdList",                           nullTreat                  },
+  { SCR EIDL "/entityId",                          entityId                   },
+  { SCR EIDL EID "/id",                            entityIdId                 },
 
-  { "/subscribeContextRequest/attributeList",            nullTreat },
-  { "/subscribeContextRequest/attributeList/attribute",  attribute },
+  { SCR "/attributeList",                          nullTreat                  },
+  { SCR ATTRL "/attribute",                        attribute                  },
 
-  { "/subscribeContextRequest/reference", reference },
-  { "/subscribeContextRequest/duration",  duration  },
+  { SCR "/reference",                              reference                  },
+  { SCR "/duration",                               duration                   },
 
-  { "/subscribeContextRequest/restriction",                                  restriction          },
-  { "/subscribeContextRequest/restriction/attributeExpression",              attributeExpression  },
-  { "/subscribeContextRequest/restriction/scope",                            nullTreat            },
-  { "/subscribeContextRequest/restriction/scope/operationScope",             operationScope       },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeType",   scopeType            },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue",  scopeValue           },
+  { SCR "/restriction",                            restriction                },
+  { SCR RS "/attributeExpression",                 attributeExpression        },
+  { SCR RS "/scope",                               nullTreat                  },
+  { SCR RS SC "/operationScope",                   operationScope             },
+  { SCR RS SC OSC "/scopeType",                    scopeType                  },
+  { SCR RS SC OSC "/scopeValue",                   scopeValue                 },
 
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLatitude",               circleCenterLatitude    },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLongitude",              circleCenterLongitude   },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
+  { SCR RS SC OSC SVAL "/circle",                  circle                     },
+  { SCR RS SC OSC SVAL CRC "/centerLatitude",      circleCenterLatitude       },
+  { SCR RS SC OSC SVAL CRC "/centerLongitude",     circleCenterLongitude      },
+  { SCR RS SC OSC SVAL CRC "/radius",              circleRadius               },
+  { SCR RS SC OSC SVAL CRC "/inverted",            circleInverted             },
 
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon",                             polygon                 },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon/inverted",                    polygonInverted         },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList",                  polygonVertexList       },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex",           polygonVertex           },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },
-  { "/subscribeContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/longitude", polygonVertexLongitude  },
+  { SCR RS SC OSC SVAL "/polygon",                 polygon                    },
+  { SCR RS SC OSC SVAL POL "/inverted",            polygonInverted            },
+  { SCR RS SC OSC SVAL POL "/vertexList",          polygonVertexList          },
+  { SCR RS SC OSC SVAL POL VXL "/vertex",          polygonVertex              },
+  { SCR RS SC OSC SVAL POL VXL VX "/latitude",     polygonVertexLatitude      },
+  { SCR RS SC OSC SVAL POL VXL VX "/longitude",    polygonVertexLongitude     },
 
-  { "/subscribeContextRequest/notifyConditions",                                          nullTreat                  },
-  { "/subscribeContextRequest/notifyConditions/notifyCondition",                          notifyCondition            },
-  { "/subscribeContextRequest/notifyConditions/notifyCondition/restriction",              notifyConditionRestriction },
-  { "/subscribeContextRequest/notifyConditions/notifyCondition/type",                     notifyConditionType        },
-  { "/subscribeContextRequest/notifyConditions/notifyCondition/condValueList",            nullTreat                  },
-  { "/subscribeContextRequest/notifyConditions/notifyCondition/condValueList/condValue",  condValue                  },
+  { SCR "/notifyConditions",                       nullTreat                  },
+  { SCR NCL "/notifyCondition",                    notifyCondition            },
+  { SCR NCL NC "/restriction",                     notifyConditionRestriction },
+  { SCR NCL NC "/type",                            notifyConditionType        },
+  { SCR NCL NC "/condValueList",                   nullTreat                  },
+  { SCR NCL NC CVL "/condValue",                   condValue                  },
 
-  { "/subscribeContextRequest/throttling", throttling },
+  { SCR "/throttling", throttling },
 
   { "LAST", NULL }
 };

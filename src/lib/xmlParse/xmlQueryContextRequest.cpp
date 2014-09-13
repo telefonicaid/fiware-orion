@@ -24,8 +24,6 @@
 */
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -40,13 +38,11 @@
 #include "xmlParse/xmlQueryContextRequest.h"
 #include "xmlParse/xmlParse.h"
 
-using namespace orion;
-
 
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* reqDataP)
 {
@@ -56,9 +52,11 @@ static int entityId(xml_node<>* node, ParseData* reqDataP)
   reqDataP->qcr.res.entityIdVector.push_back(reqDataP->qcr.entityIdP);
 
   std::string es = entityIdParse(QueryContext, node, reqDataP->qcr.entityIdP);
-  
+
   if (es != "OK")
+  {
     reqDataP->errorString = es;
+  }
 
   return 0;
 }
@@ -67,12 +65,11 @@ static int entityId(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
-
   reqDataP->qcr.entityIdP->id = node->value();
 
   return 0;
@@ -82,12 +79,11 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* attribute - 
+* attribute -
 */
 static int attribute(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attribute"));
-
   reqDataP->qcr.res.attributeList.push_back(node->value());
 
   return 0;
@@ -97,7 +93,7 @@ static int attribute(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* restriction - 
+* restriction -
 */
 static int restriction(xml_node<>* node, ParseData* reqDataP)
 {
@@ -114,13 +110,13 @@ static int restriction(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* attributeExpression - 
+* attributeExpression -
 */
 static int attributeExpression(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an attributeExpression: '%s'", node->value()));
-
   reqDataP->qcr.res.restriction.attributeExpression.set(node->value());
+
   return 0;
 }
 
@@ -128,7 +124,7 @@ static int attributeExpression(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* operationScope - 
+* operationScope -
 */
 static int operationScope(xml_node<>* node, ParseData* reqDataP)
 {
@@ -145,13 +141,13 @@ static int operationScope(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scopeType - 
+* scopeType -
 */
 static int scopeType(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeType: '%s'", node->value()));
-
   reqDataP->qcr.scopeP->type = node->value();
+
   return 0;
 }
 
@@ -159,7 +155,7 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scopeValue - 
+* scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
@@ -187,12 +183,13 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circle - 
+* circle -
 */
 static int circle(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circle"));
   reqData->qcr.scopeP->areaType = orion::CircleType;
+
   return 0;
 }
 
@@ -200,7 +197,7 @@ static int circle(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleCenterLatitude - 
+* circleCenterLatitude -
 */
 static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 {
@@ -214,12 +211,13 @@ static int circleCenterLatitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleCenterLongitude - 
+* circleCenterLongitude -
 */
 static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", node->value()));
   reqData->qcr.scopeP->circle.center.longitudeSet(node->value());
+
   return 0;
 }
 
@@ -227,12 +225,13 @@ static int circleCenterLongitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleRadius - 
+* circleRadius -
 */
 static int circleRadius(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a circleRadius: %s", node->value()));
   reqData->qcr.scopeP->circle.radiusSet(node->value());
+
   return 0;
 }
 
@@ -240,7 +239,7 @@ static int circleRadius(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* circleInverted - 
+* circleInverted -
 */
 static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 {
@@ -261,12 +260,13 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* polygon - 
+* polygon -
 */
 static int polygon(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygon"));
   reqData->qcr.scopeP->areaType = orion::PolygonType;
+
   return 0;
 }
 
@@ -274,7 +274,7 @@ static int polygon(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonInverted - 
+* polygonInverted -
 */
 static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 {
@@ -294,11 +294,12 @@ static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* polygonVertexList - 
+* polygonVertexList -
 */
 static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertexList"));
+
   return 0;
 }
 
@@ -306,13 +307,15 @@ static int polygonVertexList(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonVertex - 
+* polygonVertex -
 */
 static int polygonVertex(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertex - creating new vertex for the vertex list"));
+
   reqData->qcr.vertexP = new orion::Point();
   reqData->qcr.scopeP->polygon.vertexList.push_back(reqData->qcr.vertexP);
+
   return 0;
 }
 
@@ -320,12 +323,13 @@ static int polygonVertex(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonVertexLatitude - 
+* polygonVertexLatitude -
 */
 static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", node->value()));
   reqData->qcr.vertexP->latitudeSet(node->value());
+
   return 0;
 }
 
@@ -333,12 +337,13 @@ static int polygonVertexLatitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* polygonVertexLongitude - 
+* polygonVertexLongitude -
 */
 static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", node->value()));
   reqData->qcr.vertexP->longitudeSet(node->value());
+
   return 0;
 }
 
@@ -346,7 +351,7 @@ static int polygonVertexLongitude(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* qcrInit - 
+* qcrInit -
 */
 void qcrInit(ParseData* reqDataP)
 {
@@ -364,7 +369,7 @@ void qcrInit(ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* qcrRelease - 
+* qcrRelease -
 */
 void qcrRelease(ParseData* reqDataP)
 {
@@ -375,7 +380,7 @@ void qcrRelease(ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* qcrCheck - 
+* qcrCheck -
 */
 std::string qcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
@@ -386,12 +391,14 @@ std::string qcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 #define PRINTF printf
 /* ****************************************************************************
 *
-* qcrPresent - 
+* qcrPresent -
 */
 void qcrPresent(ParseData* reqDataP)
 {
   if (!lmTraceIsSet(LmtDump))
+  {
     return;
+  }
 
   PRINTF("\n\n");
   reqDataP->qcr.res.present("");
@@ -401,35 +408,47 @@ void qcrPresent(ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* qcrParseVector - 
+* qcrParseVector -
 */
-XmlNode qcrParseVector[] = 
+#define QCR  "/queryContextRequest"
+#define EL   "/entityIdList"
+#define AL   "/attributeList"
+#define RS   "/restriction"
+#define SC   "/scope"
+#define OSC  "/operationScope"
+#define SV   "/scopeValue"
+#define CRC  "/circle"
+#define POL  "/polygon"
+#define VXL  "/vertexList"
+#define VX   "/vertex"
+
+XmlNode qcrParseVector[] =
 {
-  { "/queryContextRequest",                                             nullTreat            },
-  { "/queryContextRequest/entityIdList",                                nullTreat            },
-  { "/queryContextRequest/entityIdList/entityId",                       entityId             },
-  { "/queryContextRequest/entityIdList/entityId/id",                    entityIdId           },
-  { "/queryContextRequest/attributeList",                               nullTreat            },
-  { "/queryContextRequest/attributeList/attribute",                     attribute            },
-  { "/queryContextRequest/restriction",                                 restriction          },
-  { "/queryContextRequest/restriction/attributeExpression",             attributeExpression  },
-  { "/queryContextRequest/restriction/scope",                           nullTreat            },
-  { "/queryContextRequest/restriction/scope/operationScope",            operationScope       },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeType",  scopeType            },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue", scopeValue           },
+  { "/queryContextRequest",                       nullTreat               },
+  { QCR "/entityIdList",                          nullTreat               },
+  { QCR EL "/entityId",                           entityId                },
+  { QCR EL "/entityId/id",                        entityIdId              },
+  { QCR "/attributeList",                         nullTreat               },
+  { QCR AL "/attribute",                          attribute               },
+  { QCR "/restriction",                           restriction             },
+  { QCR RS "/attributeExpression",                attributeExpression     },
+  { QCR RS "/scope",                              nullTreat               },
+  { QCR RS SC "/operationScope",                  operationScope          },
+  { QCR RS SC OSC "/scopeType",                   scopeType               },
+  { QCR RS SC OSC "/scopeValue",                  scopeValue              },
 
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle",                              circle                  },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLatitude",               circleCenterLatitude    },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/centerLongitude",              circleCenterLongitude   },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/radius",                       circleRadius            },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/circle/inverted",                     circleInverted          },
+  { QCR RS SC OSC SV "/circle",                   circle                  },
+  { QCR RS SC OSC SV CRC "/centerLatitude",       circleCenterLatitude    },
+  { QCR RS SC OSC SV CRC "/centerLongitude",      circleCenterLongitude   },
+  { QCR RS SC OSC SV CRC "/radius",               circleRadius            },
+  { QCR RS SC OSC SV CRC "/inverted",             circleInverted          },
 
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon",                             polygon                 },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/inverted",                    polygonInverted         },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList",                  polygonVertexList       },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex",           polygonVertex           },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/latitude",  polygonVertexLatitude   },
-  { "/queryContextRequest/restriction/scope/operationScope/scopeValue/polygon/vertexList/vertex/longitude", polygonVertexLongitude  },
+  { QCR RS SC OSC SV "/polygon",                  polygon                 },
+  { QCR RS SC OSC SV POL "/inverted",             polygonInverted         },
+  { QCR RS SC OSC SV POL "/vertexList",           polygonVertexList       },
+  { QCR RS SC OSC SV POL VXL "/vertex",           polygonVertex           },
+  { QCR RS SC OSC SV POL VXL VX "/latitude",      polygonVertexLatitude   },
+  { QCR RS SC OSC SV POL VXL VX "/longitude",     polygonVertexLongitude  },
 
   { "LAST", NULL }
 };

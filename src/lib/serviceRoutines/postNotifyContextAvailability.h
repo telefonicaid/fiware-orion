@@ -1,5 +1,5 @@
-#ifndef POST_NOTIFY_CONTEXT_AVAILABILITY_H
-#define POST_NOTIFY_CONTEXT_AVAILABILITY_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTNOTIFYCONTEXTAVAILABILITY_H_
+#define SRC_LIB_SERVICEROUTINES_POSTNOTIFYCONTEXTAVAILABILITY_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postNotifyContextAvailability - 
 */
-extern std::string postNotifyContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postNotifyContextAvailability
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTNOTIFYCONTEXTAVAILABILITY_H_

@@ -1,5 +1,5 @@
-#ifndef ATTRIBUTE_EXPRESSION_H
-#define ATTRIBUTE_EXPRESSION_H
+#ifndef SRC_LIB_NGSI_ATTRIBUTEEXPRESSION_H_
+#define SRC_LIB_NGSI_ATTRIBUTEEXPRESSION_H_
 
 /*
 *
@@ -34,13 +34,12 @@
 
 /* ****************************************************************************
 *
-* AttributeExpression - 
+* AttributeExpression -
 */
 typedef struct AttributeExpression
 {
   std::string   string;
 
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          set(const std::string& value);
   std::string   get(void);
   bool          isEmpty(void);
@@ -48,6 +47,12 @@ typedef struct AttributeExpression
   void          present(const std::string& indent);
   const char*   c_str();
   void          release(void);
+
+  std::string   check(RequestType         requestType,
+                      Format              format,
+                      const std::string&  indent,
+                      const std::string&  predetectedError,
+                      int                 counter);
 } AttributeExpression;
 
-#endif
+#endif  // SRC_LIB_NGSI_ATTRIBUTEEXPRESSION_H_

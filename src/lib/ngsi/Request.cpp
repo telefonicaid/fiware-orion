@@ -22,13 +22,13 @@
 *
 * Author: Ken Zangelin
 */
-#include "Request.h"
+#include "ngsi/Request.h"
 
 
 
 /* ****************************************************************************
 *
-* requestType - 
+* requestType -
 */
 const char* requestType(RequestType rt)
 {
@@ -42,11 +42,13 @@ const char* requestType(RequestType rt)
   case UnsubscribeContextAvailability:              return "UnsubscribeContextAvailabilityRequest";
   case NotifyContextAvailability:                   return "NotifyContextAvailabilityRequest";
   case QueryContext:                                return "QueryContextRequest";
+  case RtQueryContextResponse:                      return "QueryContextResponse";
   case SubscribeContext:                            return "SubscribeContextRequest";
   case UpdateContextSubscription:                   return "UpdateContextSubscriptionRequest";
   case UnsubscribeContext:                          return "UnsubscribeContextRequest";
   case NotifyContext:                               return "NotifyContextRequest";
   case UpdateContext:                               return "UpdateContextRequest";
+  case RtUpdateContextResponse:                     return "UpdateContextResponse";
 
   case ContextEntitiesByEntityId:                   return "ContextEntitiesByEntityId";
   case ContextEntityAttributes:                     return "ContextEntityAttributes";

@@ -1,5 +1,5 @@
-#ifndef MAP_GET_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTES_H
-#define MAP_GET_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTES_H
+#ifndef SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITYATTRIBUTES_H_
+#define SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITYATTRIBUTES_H_
 
 /*
 *
@@ -25,6 +25,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsi/ContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
@@ -36,6 +38,11 @@
 *
 * mapGetIndividualContextEntityAttributes - 
 */
-extern HttpStatusCode mapGetIndividualContextEntityAttributes(const std::string& entityId, ContextElementResponse* response, ConnectionInfo* ciP);
+extern HttpStatusCode mapGetIndividualContextEntityAttributes
+(
+  const std::string&       entityId,
+  ContextElementResponse*  response,
+  ConnectionInfo*          ciP
+);
 
-#endif
+#endif  // SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITYATTRIBUTES_H_

@@ -1,5 +1,5 @@
-#ifndef CONTEXT_ATTRIBUTE_H
-#define CONTEXT_ATTRIBUTE_H
+#ifndef SRC_LIB_NGSI_CONTEXTATTRIBUTE_H_
+#define SRC_LIB_NGSI_CONTEXTATTRIBUTE_H_
 
 /*
 *
@@ -38,7 +38,7 @@
 
 /* ****************************************************************************
 *
-* Contextattribute - 
+* ContextAttribute -
 */
 typedef struct ContextAttribute
 {
@@ -60,12 +60,16 @@ typedef struct ContextAttribute
   std::string  getLocation();
 
   std::string  render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string  renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(void);
 
-  std::string  renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma);
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } ContextAttribute;
 
-#endif
+#endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTE_H_

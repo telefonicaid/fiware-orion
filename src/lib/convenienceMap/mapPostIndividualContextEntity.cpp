@@ -22,13 +22,14 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
 #include "convenienceMap/mapPostIndividualContextEntity.h"
-#include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ContextElementResponse.h"
@@ -43,7 +44,13 @@
 *
 * mapPostIndividualContextEntity - 
 */
-HttpStatusCode mapPostIndividualContextEntity(const std::string& entityId, AppendContextElementRequest* request, AppendContextElementResponse* response, ConnectionInfo* ciP)
+HttpStatusCode mapPostIndividualContextEntity
+(
+  const std::string&             entityId,
+  AppendContextElementRequest*   request,
+  AppendContextElementResponse*  response,
+  ConnectionInfo*                ciP
+)
 {
   HttpStatusCode         ms;
   UpdateContextRequest   ucRequest;
@@ -52,26 +59,26 @@ HttpStatusCode mapPostIndividualContextEntity(const std::string& entityId, Appen
 
   ceP->entityId.fill(entityId, "", "false");
   ceP->attributeDomainName    = request->attributeDomainName;
-  ceP->contextAttributeVector.fill(request->contextAttributeVector); // Here I get a pointer to the metadata that is freed twice ...
-  
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &request->contextAttributeVector);
+
   ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Append");
 
   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
 
-  ContextAttributeResponse* car                      = new ContextAttributeResponse();
-  ContextElementResponse*   ucContextElementResponse = ucResponse.contextElementResponseVector.get(0);
+  ContextAttributeResponse* car                     = new ContextAttributeResponse();
+  ContextElementResponse*   contextElementResponse  = ucResponse.contextElementResponseVector.get(0);
 
   car->contextAttributeVector.vec.clear();
 
-  for (unsigned caIx = 0; caIx < ucContextElementResponse->contextElement.contextAttributeVector.size(); ++caIx)
+  for (unsigned caIx = 0; caIx < contextElementResponse->contextElement.contextAttributeVector.size(); ++caIx)
   {
-     LM_T(LmtClone, ("Copying ContextAttribute %d", caIx));
-     ContextAttribute* caP = new ContextAttribute(ucContextElementResponse->contextElement.contextAttributeVector.get(caIx));
-     
-     car->contextAttributeVector.push_back(caP);     
+    LM_T(LmtClone, ("Copying ContextAttribute %d", caIx));
+    ContextAttribute* caP = new ContextAttribute(contextElementResponse->contextElement.contextAttributeVector[caIx]);
+
+    car->contextAttributeVector.push_back(caP);
   }
-  car->statusCode.fill(&ucContextElementResponse->statusCode);
+  car->statusCode.fill(&contextElementResponse->statusCode);
 
   response->contextResponseVector.push_back(car);
   response->errorCode.fill(&ucResponse.contextElementResponseVector.get(0)->statusCode);

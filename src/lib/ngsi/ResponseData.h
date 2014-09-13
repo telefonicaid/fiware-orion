@@ -1,5 +1,5 @@
-#ifndef RESPONSE_DATA_H
-#define RESPONSE_DATA_H
+#ifndef SRC_LIB_NGSI_RESPONSEDATA_H_
+#define SRC_LIB_NGSI_RESPONSEDATA_H_
 
 /*
 *
@@ -62,4 +62,4 @@ typedef struct ResponseData
   UpdateContextSubscriptionResponse               ucsr;
 } ResponseData;
 
-#endif
+#endif  // SRC_LIB_NGSI_RESPONSEDATA_H_

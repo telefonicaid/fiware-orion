@@ -40,7 +40,13 @@
 *
 * postDiscoverContextAvailability - 
 */
-std::string postDiscoverContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postDiscoverContextAvailability
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   DiscoverContextAvailabilityResponse  dcar;
   std::string                          answer;
@@ -49,5 +55,6 @@ std::string postDiscoverContextAvailability(ConnectionInfo* ciP, int components,
   jsonDcarPresent(parseDataP);
   ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, &dcar, ciP->tenant, ciP->uriParam);
   answer = dcar.render(DiscoverContextAvailability, ciP->outFormat, "");
+
   return answer;
 }

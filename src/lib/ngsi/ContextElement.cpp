@@ -22,8 +22,8 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
 #include <stdio.h>
+#include <string>
 
 #include "common/Format.h"
 #include "common/globals.h"
@@ -47,10 +47,10 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
   bool         contextAttributeVectorRendered   = contextAttributeVector.size() != 0;
   bool         domainMetadataVectorRendered     = domainMetadataVector.size() != 0;
 
-  bool         commaAfterDomainMetadataVector   = false; // Last element
+  bool         commaAfterDomainMetadataVector   = false;  // Last element
   bool         commaAfterContextAttributeVector = domainMetadataVectorRendered;
-  bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered || contextAttributeVectorRendered;
-  bool         commaAfterEntityId               = domainMetadataVectorRendered || contextAttributeVectorRendered || attributeDomainNameRendered;
+  bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
+  bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
 
   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
 
@@ -70,14 +70,36 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 *
 * ContextElement::check
 */
-std::string ContextElement::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextElement::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   std::string res;
 
-  if ((res = entityId.check(requestType, format, indent, predetectedError, counter)) != "OK")                 return res;
-  if ((res = attributeDomainName.check(requestType, format, indent, predetectedError, counter)) != "OK")      return res;
-  if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")   return res;
-  if ((res = domainMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")     return res;
+  if ((res = entityId.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = attributeDomainName.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = contextAttributeVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
+
+  if ((res = domainMetadataVector.check(requestType, format, indent, predetectedError, counter)) != "OK")
+  {
+    return res;
+  }
 
   return "OK";
 }
@@ -105,12 +127,44 @@ void ContextElement::release(void)
 void ContextElement::present(const std::string& indent, int ix)
 {
   if (ix == -1)
+  {
     PRINTF("%sContext Element:\n", indent.c_str());
+  }
   else
+  {
     PRINTF("%sContext Element %d:\n", indent.c_str(), ix);
+  }
 
   entityId.present(indent + "  ", -1);
   attributeDomainName.present(indent + "  ");
   contextAttributeVector.present(indent + "  ");
   domainMetadataVector.present("Domain", indent + "  ");
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::fill - 
+*/
+void ContextElement::fill(const struct ContextElement& ce)
+{
+  entityId.fill(&ce.entityId);
+  attributeDomainName.fill(ce.attributeDomainName);
+  contextAttributeVector.fill((ContextAttributeVector*) &ce.contextAttributeVector);
+  domainMetadataVector.fill((MetadataVector*) &ce.domainMetadataVector);
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::fill - 
+*/
+void ContextElement::fill(ContextElement* ceP)
+{
+  entityId.fill(&ceP->entityId);
+  attributeDomainName.fill(ceP->attributeDomainName);
+  contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector);
+  domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
 }

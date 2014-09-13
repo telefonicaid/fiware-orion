@@ -1,5 +1,5 @@
-#ifndef POST_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTES_H
-#define POST_INDIVIDUAL_CONTEXT_ENTITY_ATTRIBUTES_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTINDIVIDUALCONTEXTENTITYATTRIBUTES_H_
+#define SRC_LIB_SERVICEROUTINES_POSTINDIVIDUALCONTEXTENTITYATTRIBUTES_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postIndividualContextEntityAttributes - 
 */
-extern std::string postIndividualContextEntityAttributes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postIndividualContextEntityAttributes
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTINDIVIDUALCONTEXTENTITYATTRIBUTES_H_

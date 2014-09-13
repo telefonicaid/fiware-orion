@@ -29,11 +29,11 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
-#include "ngsi/EntityId.h"
+#include "jsonParse/JsonNode.h"
 #include "ngsi/ContextRegistrationAttribute.h"
+#include "ngsi/EntityId.h"
 #include "ngsi/Metadata.h"
 #include "ngsi9/RegisterContextRequest.h"
-#include "jsonParse/JsonNode.h"
 #include "parse/nullTreat.h"
 #include "rest/ConnectionInfo.h"
 
@@ -47,7 +47,7 @@ static std::string contextElement(const std::string& path, const std::string& va
 {
   LM_T(LmtParse, ("new contextElement"));
   reqDataP->upcr.ceP = new ContextElement();
-  
+
   reqDataP->upcr.res.contextElementVector.push_back(reqDataP->upcr.ceP);
 
   reqDataP->upcr.ceP->entityId.id          = "";
@@ -66,10 +66,10 @@ static std::string contextElement(const std::string& path, const std::string& va
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->upcr.ceP->entityId.id = value;
-   LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->upcr.ceP->entityId.id.c_str()));
+  reqDataP->upcr.ceP->entityId.id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->upcr.ceP->entityId.id.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -80,10 +80,10 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->upcr.ceP->entityId.type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->upcr.ceP->entityId.type.c_str()));
+  reqDataP->upcr.ceP->entityId.type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->upcr.ceP->entityId.type.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -109,10 +109,10 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 */
 static std::string attributeDomainName(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->upcr.ceP->attributeDomainName.set(value);
-   LM_T(LmtParse, ("Got an attributeDomainName: '%s'", reqDataP->upcr.ceP->attributeDomainName.get().c_str()));
+  reqDataP->upcr.ceP->attributeDomainName.set(value);
+  LM_T(LmtParse, ("Got an attributeDomainName: '%s'", reqDataP->upcr.ceP->attributeDomainName.get().c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -323,28 +323,28 @@ static std::string updateAction(const std::string& path, const std::string& valu
 */
 JsonNode jsonUpcrParseVector[] =
 {
-  { "/contextElements",                                                                       jsonNullTreat       },
-  { "/contextElements/contextElement",                                                        contextElement      },
-  { "/contextElements/contextElement/type",                                                   entityIdType        },
-  { "/contextElements/contextElement/isPattern",                                              entityIdIsPattern   },
-  { "/contextElements/contextElement/id",                                                     entityIdId          },
-  { "/contextElements/contextElement/attributeDomainName",                                    attributeDomainName },
-  { "/contextElements/contextElement/attributes",                                             jsonNullTreat       },
-  { "/contextElements/contextElement/attributes/attribute",                                   attribute           },
-  { "/contextElements/contextElement/attributes/attribute/name",                              attributeName       },
-  { "/contextElements/contextElement/attributes/attribute/type",                              attributeType       },
-  { "/contextElements/contextElement/attributes/attribute/value",                             attributeValue      },
-  { "/contextElements/contextElement/attributes/attribute/metadatas",                         jsonNullTreat       },
-  { "/contextElements/contextElement/attributes/attribute/metadatas/metadata",                metadata            },
-  { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/name",           metadataName        },
-  { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/type",           metadataType        },
-  { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/value",          metadataValue       },
-  { "/contextElements/contextElement/domainMetadatas",                                        jsonNullTreat       },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata",                         domainMetadata      },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata/name",                    domainMetadataName  },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata/type",                    domainMetadataType  },
-  { "/contextElements/contextElement/domainMetadatas/domainMetadata/value",                   domainMetadataValue },
-  { "/updateAction",                                                                          updateAction        },
+  { "/contextElements",                                                               jsonNullTreat       },
+  { "/contextElements/contextElement",                                                contextElement      },
+  { "/contextElements/contextElement/type",                                           entityIdType        },
+  { "/contextElements/contextElement/isPattern",                                      entityIdIsPattern   },
+  { "/contextElements/contextElement/id",                                             entityIdId          },
+  { "/contextElements/contextElement/attributeDomainName",                            attributeDomainName },
+  { "/contextElements/contextElement/attributes",                                     jsonNullTreat       },
+  { "/contextElements/contextElement/attributes/attribute",                           attribute           },
+  { "/contextElements/contextElement/attributes/attribute/name",                      attributeName       },
+  { "/contextElements/contextElement/attributes/attribute/type",                      attributeType       },
+  { "/contextElements/contextElement/attributes/attribute/value",                     attributeValue      },
+  { "/contextElements/contextElement/attributes/attribute/metadatas",                 jsonNullTreat       },
+  { "/contextElements/contextElement/attributes/attribute/metadatas/metadata",        metadata            },
+  { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/name",   metadataName        },
+  { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/type",   metadataType        },
+  { "/contextElements/contextElement/attributes/attribute/metadatas/metadata/value",  metadataValue       },
+  { "/contextElements/contextElement/domainMetadatas",                                jsonNullTreat       },
+  { "/contextElements/contextElement/domainMetadatas/domainMetadata",                 domainMetadata      },
+  { "/contextElements/contextElement/domainMetadatas/domainMetadata/name",            domainMetadataName  },
+  { "/contextElements/contextElement/domainMetadatas/domainMetadata/type",            domainMetadataType  },
+  { "/contextElements/contextElement/domainMetadatas/domainMetadata/value",           domainMetadataValue },
+  { "/updateAction",                                                                  updateAction        },
 
   { "LAST", NULL }
 };

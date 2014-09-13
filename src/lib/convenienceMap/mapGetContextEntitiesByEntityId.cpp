@@ -40,11 +40,16 @@
 *
 * mapGetContextEntitiesByEntityId - 
 */
-HttpStatusCode mapGetContextEntitiesByEntityId(const std::string& id, DiscoverContextAvailabilityResponse* response, ConnectionInfo* ciP)
+HttpStatusCode mapGetContextEntitiesByEntityId
+(
+  const std::string&                    id,
+  DiscoverContextAvailabilityResponse*  response,
+  ConnectionInfo*                       ciP
+)
 {
-   DiscoverContextAvailabilityRequest request;
-   EntityId                           entityId(id, "", "false");
+  DiscoverContextAvailabilityRequest request;
+  EntityId                           entityId(id, "", "false");
 
-   request.entityIdVector.push_back(&entityId);
-   return mongoDiscoverContextAvailability(&request, response, ciP->tenant, ciP->uriParam);
+  request.entityIdVector.push_back(&entityId);
+  return mongoDiscoverContextAvailability(&request, response, ciP->tenant, ciP->uriParam);
 }

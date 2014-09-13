@@ -1,5 +1,5 @@
-#ifndef ATTRIBUTE_DOMAIN_NAME_H
-#define ATTRIBUTE_DOMAIN_NAME_H
+#ifndef SRC_LIB_NGSI_ATTRIBUTEDOMAINNAME_H_
+#define SRC_LIB_NGSI_ATTRIBUTEDOMAINNAME_H_
 
 /*
 *
@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* AttributeDomainName - 
+* AttributeDomainName -
 */
 typedef struct AttributeDomainName
 {
@@ -44,10 +44,15 @@ typedef struct AttributeDomainName
   std::string   get(void);
   bool          isEmpty(void);
   std::string   render(Format format, const std::string& indent, bool comma = false);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   const char*   c_str();
   void          release(void);
+  void          fill(const AttributeDomainName& adn);
+  std::string   check(RequestType         requestType,
+                      Format              format,
+                      const std::string&  indent,
+                      const std::string&  predetectedError,
+                      int                 counter);
 } AttributeDomainName;
 
-#endif
+#endif  // SRC_LIB_NGSI_ATTRIBUTEDOMAINNAME_H_

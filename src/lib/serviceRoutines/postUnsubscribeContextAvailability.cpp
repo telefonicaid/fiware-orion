@@ -37,7 +37,13 @@
 *
 * postUnsubscribeContextAvailability - 
 */
-std::string postUnsubscribeContextAvailability(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string postUnsubscribeContextAvailability
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   UnsubscribeContextAvailabilityResponse  ucar;
   std::string                             answer;

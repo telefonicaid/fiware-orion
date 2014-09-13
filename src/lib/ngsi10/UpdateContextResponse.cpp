@@ -51,25 +51,27 @@ UpdateContextResponse::UpdateContextResponse()
 
 /* ****************************************************************************
 *
-* UpdateContextResponse::~UpdateContextResponse -
+* UpdateContextResponse::UpdateContextResponse - 
 */
-UpdateContextResponse::~UpdateContextResponse()
+UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
 {
-  errorCode.release();
-  contextElementResponseVector.release();
-  LM_T(LmtDestructor,("destroyed"));
+  errorCode.fill(&_errorCode);
+  errorCode.tagSet("errorCode");
+  LM_T(LmtDestructor, ("destroyed"));
 }
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextResponse::UpdateContextResponse - 
+* UpdateContextResponse::~UpdateContextResponse -
 */
-UpdateContextResponse::UpdateContextResponse(StatusCode& _errorCode)
+UpdateContextResponse::~UpdateContextResponse()
 {
-  errorCode = _errorCode;
-  errorCode.tagSet("errorCode");
+  errorCode.release();
+//  errorCode.tagSet("errorCode");
+  contextElementResponseVector.release();
+  LM_T(LmtDestructor, ("destroyed"));
 }
 
 
@@ -103,6 +105,50 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
   out += endTag(indent, tag, ciP->outFormat);
 
   return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::check -
+*/
+std::string UpdateContextResponse::check
+(
+  ConnectionInfo*     ciP,
+  RequestType         requestType,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
+{
+  std::string  res;
+
+  if (predetectedError != "")
+  {
+    errorCode.fill(SccBadRequest, predetectedError);
+  }
+  else if (contextElementResponseVector.check(UpdateContext, ciP->outFormat, indent, predetectedError, 0) != "OK")
+  {
+    LM_W(("Bad Input (%s)", res.c_str()));
+    errorCode.fill(SccBadRequest, res);
+  }
+  else
+    return "OK";
+
+  return render(ciP, UpdateContext, indent);
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::present -
+*/
+void UpdateContextResponse::present(const std::string& indent)
+{
+  contextElementResponseVector.present(indent + "  ");
+  errorCode.present(indent + "  ");
 }
 
 

@@ -1,5 +1,5 @@
-#ifndef LOG_TRACE_TREAT_H
-#define LOG_TRACE_TREAT_H
+#ifndef SRC_LIB_SERVICEROUTINES_LOGTRACETREAT_H_
+#define SRC_LIB_SERVICEROUTINES_LOGTRACETREAT_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * logTraceTreat - 
 */
-extern std::string logTraceTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string logTraceTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_LOGTRACETREAT_H_

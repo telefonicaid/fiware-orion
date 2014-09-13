@@ -1,5 +1,5 @@
-#ifndef PARSE_DATA_H
-#define PARSE_DATA_H
+#ifndef SRC_LIB_NGSI_PARSEDATA_H_
+#define SRC_LIB_NGSI_PARSEDATA_H_
 
 /*
 *
@@ -32,6 +32,7 @@
 #include "ngsi/AttributeAssociation.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
+#include "ngsi/ContextElementResponse.h"
 #include "ngsi/Metadata.h"
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -42,8 +43,10 @@
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/QueryContextRequest.h"
+#include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UpdateContextRequest.h"
+#include "ngsi10/UpdateContextResponse.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "ngsi10/NotifyContextRequest.h"
 #include "convenience/RegisterProviderRequest.h"
@@ -83,7 +86,7 @@ typedef struct RegisterContextResponseData
 
 /* ****************************************************************************
 *
-* DiscoverContextAvailabilityData - 
+* DiscoverContextAvailabilityData -
 */
 typedef struct DiscoverContextAvailabilityData
 {
@@ -96,15 +99,30 @@ typedef struct DiscoverContextAvailabilityData
 
 /* ****************************************************************************
 *
-* QueryContextData - 
+* QueryContextData -
 */
 typedef struct QueryContextData
 {
-   QueryContextRequest  res;
-   EntityId*            entityIdP;
-   Scope*               scopeP;
-   orion::Point*        vertexP;
+  QueryContextRequest  res;
+  EntityId*            entityIdP;
+  Scope*               scopeP;
+  orion::Point*        vertexP;
 } QueryContextData;
+
+
+
+/* ****************************************************************************
+*
+* QueryContextResponseData - 
+*/
+typedef struct QueryContextResponseData
+{
+  QueryContextResponse     res;
+  ContextElementResponse*  cerP;
+  ContextAttribute*        attributeP;
+  Metadata*                metadataP;
+  Metadata*                domainMetadataP;
+} QueryContextResponseData;
 
 
 
@@ -114,44 +132,44 @@ typedef struct QueryContextData
 */
 typedef struct SubscribeContextAvailabilityData
 {
-   SubscribeContextAvailabilityRequest  res;
-   EntityId*                            entityIdP;
-   Scope*                               scopeP;
+  SubscribeContextAvailabilityRequest  res;
+  EntityId*                            entityIdP;
+  Scope*                               scopeP;
 } SubscribeContextAvailabilityData;
 
 
 
 /* ****************************************************************************
 *
-* SubscribeContextData - 
+* SubscribeContextData -
 */
 typedef struct SubscribeContextData
 {
-   SubscribeContextRequest        res;
-   EntityId*                      entityIdP;
-   Metadata*                      attributeMetadataP;
-   Restriction*                   restrictionP;
-   NotifyCondition*               notifyConditionP;
-   Scope*                         scopeP;
-   orion::Point*                  vertexP;
+  SubscribeContextRequest        res;
+  EntityId*                      entityIdP;
+  Metadata*                      attributeMetadataP;
+  Restriction*                   restrictionP;
+  NotifyCondition*               notifyConditionP;
+  Scope*                         scopeP;
+  orion::Point*                  vertexP;
 } SubscribeContextData;
 
 
 
 /* ****************************************************************************
 *
-* UnsubscribeContextAvailabilityData - 
+* UnsubscribeContextAvailabilityData -
 */
 typedef struct UnsubscribeContextAvailabilityData
 {
-   UnsubscribeContextAvailabilityRequest        res;
+  UnsubscribeContextAvailabilityRequest        res;
 } UnsubscribeContextAvailabilityData;
 
 
 
 /* ****************************************************************************
 *
-* UnsubscribeContextData - 
+* UnsubscribeContextData -
 */
 typedef struct UnsubscribeContextData
 {
@@ -162,7 +180,7 @@ typedef struct UnsubscribeContextData
 
 /* ****************************************************************************
 *
-* NotifyContextData - 
+* NotifyContextData -
 */
 typedef struct NotifyContextData
 {
@@ -177,7 +195,7 @@ typedef struct NotifyContextData
 
 /* ****************************************************************************
 *
-* NotifyContextAvailabilityData - 
+* NotifyContextAvailabilityData -
 */
 typedef struct NotifyContextAvailabilityData
 {
@@ -187,36 +205,51 @@ typedef struct NotifyContextAvailabilityData
   ContextRegistrationAttribute*        craP;
   Metadata*                            attributeMetadataP;
   Metadata*                            regMetadataP;
-} NotifyContextAvailabilityData; 
+} NotifyContextAvailabilityData;
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextAvailabilitySubscriptionData - 
-*/ 
+* UpdateContextAvailabilitySubscriptionData -
+*/
 typedef struct UpdateContextAvailabilitySubscriptionData
 {
-   UpdateContextAvailabilitySubscriptionRequest  res;
-   EntityId*                                     entityIdP;
-   Scope*                                        scopeP;
+  UpdateContextAvailabilitySubscriptionRequest  res;
+  EntityId*                                     entityIdP;
+  Scope*                                        scopeP;
 } UpdateContextAvailabilitySubscriptionData;
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextData - 
+* UpdateContextData -
 */
 typedef struct UpdateContextData
 {
-   UpdateContextRequest   res;
-   ContextElement*        ceP;
-   EntityId*              entityIdP;
-   ContextAttribute*      attributeP;
-   Metadata*              contextMetadataP;
-   Metadata*              domainMetadataP;
+  UpdateContextRequest   res;
+  ContextElement*        ceP;
+  EntityId*              entityIdP;
+  ContextAttribute*      attributeP;
+  Metadata*              contextMetadataP;
+  Metadata*              domainMetadataP;
 } UpdateContextData;
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponseData - 
+*/
+typedef struct UpdateContextResponseData
+{
+  UpdateContextResponse    res;
+  ContextElementResponse*  cerP;
+  ContextAttribute*        attributeP;
+  Metadata*                metadataP;
+  Metadata*                domainMetadataP;
+} UpdateContextResponseData;
 
 
 
@@ -240,47 +273,47 @@ typedef struct UpdateContextSubscriptionData
 */
 typedef struct RegisterProviderRequestData
 {
-   RegisterProviderRequest  res;
-   Metadata*                metadataP;
+  RegisterProviderRequest  res;
+  Metadata*                metadataP;
 } RegisterProviderRequestData;
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextElementData - 
+* UpdateContextElementData -
 */
 typedef struct UpdateContextElementData
 {
-   UpdateContextElementRequest  res;
-   ContextAttribute*            attributeP;
-   Metadata*                    metadataP;
+  UpdateContextElementRequest  res;
+  ContextAttribute*            attributeP;
+  Metadata*                    metadataP;
 } UpdateContextElementData;
 
 
 
 /* ****************************************************************************
 *
-* AppendContextElementData - 
+* AppendContextElementData -
 */
 typedef struct AppendContextElementData
 {
-   AppendContextElementRequest  res;
-   ContextAttribute*            attributeP;
-   Metadata*                    metadataP;
-   Metadata*                    domainMetadataP;
+  AppendContextElementRequest  res;
+  ContextAttribute*            attributeP;
+  Metadata*                    metadataP;
+  Metadata*                    domainMetadataP;
 } AppendContextElementData;
 
 
 
 /* ****************************************************************************
 *
-* UpdateContextAttributeData - 
+* UpdateContextAttributeData -
 */
 typedef struct UpdateContextAttributeData
 {
-   UpdateContextAttributeRequest  res;
-   Metadata*                      metadataP;
+  UpdateContextAttributeRequest  res;
+  Metadata*                      metadataP;
 } UpdateContextAttributeData;
 
 
@@ -318,6 +351,8 @@ typedef struct ParseData
   UpdateContextAttributeData                  upcar;
 
   RegisterContextResponseData                 rcrs;
+  QueryContextResponseData                    qcrs;
+  UpdateContextResponseData                   upcrs;
 } ParseData;
 
-#endif
+#endif  // SRC_LIB_NGSI_PARSEDATA_H_

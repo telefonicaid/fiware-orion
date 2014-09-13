@@ -1,5 +1,5 @@
-#ifndef XML_REQUEST_H
-#define XML_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLREQUEST_H_
 
 /*
 *
@@ -35,7 +35,7 @@
 
 /* ****************************************************************************
 *
-* XmlRequest - 
+* XmlRequest -
 */
 typedef struct XmlRequest
 {
@@ -53,8 +53,17 @@ typedef struct XmlRequest
 
 /* ****************************************************************************
 *
-* xmlTreat - 
+* xmlTreat -
 */
-extern std::string xmlTreat(const char* content, ConnectionInfo* ciP, ParseData* reqData, RequestType requestType, std::string payloadWord, XmlRequest** reqP);
+extern std::string xmlTreat
+(
+  const char*      content,
+  ConnectionInfo*  ciP,
+  ParseData*       reqData,
+  RequestType      requestType,
+  std::string      payloadWord,
+  XmlRequest**     reqP,
+  std::string*     errorMsgP = NULL
+);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLREQUEST_H_

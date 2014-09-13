@@ -33,14 +33,19 @@
 #include "common/tag.h"
 #include "ngsi/MetadataVector.h"
 
+
+
 /* ****************************************************************************
 *
 * MetadataVector::MetadataVector -
 */
-MetadataVector::MetadataVector(const std::string& _tag) {
+MetadataVector::MetadataVector(const std::string& _tag)
+{
   vec.clear();
   tagSet(_tag);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -55,7 +60,7 @@ void MetadataVector::tagSet(const std::string& tagName)
 
 /* ****************************************************************************
 *
-* MetadataVector::render - 
+* MetadataVector::render -
 */
 std::string MetadataVector::render(Format format, const std::string& indent, bool comma)
 {
@@ -63,11 +68,15 @@ std::string MetadataVector::render(Format format, const std::string& indent, boo
   std::string jsonTag = "metadatas";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
   out += startTag(indent, tag, jsonTag, format, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+  }
   out += endTag(indent, tag, format, comma, true);
 
 
@@ -78,16 +87,25 @@ std::string MetadataVector::render(Format format, const std::string& indent, boo
 
 /* ****************************************************************************
 *
-* MetadataVector::check - 
+* MetadataVector::check -
 */
-std::string MetadataVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string MetadataVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-     std::string res;
+    std::string res;
 
-     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
-       return res;
+    if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
+      return res;
+    }
   }
 
   return "OK";
@@ -97,21 +115,23 @@ std::string MetadataVector::check(RequestType requestType, Format format, const 
 
 /* ****************************************************************************
 *
-* MetadataVector::present - 
+* MetadataVector::present -
 */
 void MetadataVector::present(const std::string& metadataType, const std::string& indent)
 {
-   PRINTF("%lu %s Metadata%s\n", (unsigned long) vec.size(), metadataType.c_str(), (vec.size() == 1)? "" : "s");
+  PRINTF("%lu %s Metadata%s\n", (uint64_t) vec.size(), metadataType.c_str(), (vec.size() == 1)? "" : "s");
 
-   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-     vec[ix]->present(metadataType, ix, indent);
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    vec[ix]->present(metadataType, ix, indent);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* MetadataVector::push_back - 
+* MetadataVector::push_back -
 */
 void MetadataVector::push_back(Metadata* item)
 {
@@ -122,7 +142,7 @@ void MetadataVector::push_back(Metadata* item)
 
 /* ****************************************************************************
 *
-* MetadataVector::get - 
+* MetadataVector::get -
 */
 Metadata* MetadataVector::get(int ix)
 {
@@ -133,7 +153,7 @@ Metadata* MetadataVector::get(int ix)
 
 /* ****************************************************************************
 *
-* MetadataVector::size - 
+* MetadataVector::size -
 */
 unsigned int MetadataVector::size(void)
 {
@@ -144,7 +164,7 @@ unsigned int MetadataVector::size(void)
 
 /* ****************************************************************************
 *
-* MetadataVector::release - 
+* MetadataVector::release -
 */
 void MetadataVector::release(void)
 {
@@ -162,13 +182,13 @@ void MetadataVector::release(void)
 
 /* ****************************************************************************
 *
-* MetadataVector::fill - 
+* MetadataVector::fill -
 */
-void MetadataVector::fill(MetadataVector& mV)
+void MetadataVector::fill(MetadataVector* mvP)
 {
-  for (unsigned int ix = 0; ix < mV.size(); ++ix)
+  for (unsigned int ix = 0; ix < mvP->size(); ++ix)
   {
-    Metadata* mP = new Metadata(mV.get(ix));
+    Metadata* mP = new Metadata(mvP->get(ix));
 
     push_back(mP);
   }

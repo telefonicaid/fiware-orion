@@ -1,5 +1,5 @@
-#ifndef CONTEXT_ELEMENT_H
-#define CONTEXT_ELEMENT_H
+#ifndef SRC_LIB_NGSI_CONTEXTELEMENT_H_
+#define SRC_LIB_NGSI_CONTEXTELEMENT_H_
 
 /*
 *
@@ -39,7 +39,7 @@
 
 /* ****************************************************************************
 *
-* ContextElement - 
+* ContextElement -
 */
 typedef struct ContextElement
 {
@@ -49,9 +49,16 @@ typedef struct ContextElement
   MetadataVector          domainMetadataVector;    // Optional
 
   std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent, int ix);
   void         release(void);
+  void         fill(const struct ContextElement& ce);
+  void         fill(ContextElement* ceP);
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } ContextElement;
 
-#endif
+#endif  // SRC_LIB_NGSI_CONTEXTELEMENT_H_

@@ -43,9 +43,10 @@
 using namespace orion;
 
 
+
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static std::string entityId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
@@ -67,43 +68,12 @@ static std::string entityId(const std::string& path, const std::string& value, P
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->qcr.entityIdP->id = value;
-   LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->qcr.entityIdP->id.c_str()));
-
-   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdType - 
-*/
-static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-   reqDataP->qcr.entityIdP->type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->qcr.entityIdP->type.c_str()));
-
-   return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* entityIdIsPattern - 
-*/
-static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
-
-  reqDataP->qcr.entityIdP->isPattern = value;
-  if (!isTrue(value) && !isFalse(value))
-    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  reqDataP->qcr.entityIdP->id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->qcr.entityIdP->id.c_str()));
 
   return "OK";
 }
@@ -112,7 +82,40 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
 /* ****************************************************************************
 *
-* attribute - 
+* entityIdType -
+*/
+static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  reqDataP->qcr.entityIdP->type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->qcr.entityIdP->type.c_str()));
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* entityIdIsPattern -
+*/
+static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
+
+  reqDataP->qcr.entityIdP->isPattern = value;
+  if (!isTrue(value) && !isFalse(value))
+  {
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* attribute -
 */
 static std::string attribute(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
@@ -133,7 +136,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 
 /* ****************************************************************************
 *
-* attributeList - 
+* attributeList -
 */
 static std::string attributeList(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
@@ -145,7 +148,7 @@ static std::string attributeList(const std::string& path, const std::string& val
 
 /* ****************************************************************************
 *
-* restriction - 
+* restriction -
 */
 static std::string restriction(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
@@ -157,7 +160,7 @@ static std::string restriction(const std::string& path, const std::string& value
 
 /* ****************************************************************************
 *
-* attributeExpression - 
+* attributeExpression -
 */
 static std::string attributeExpression(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
@@ -178,12 +181,12 @@ static std::string attributeExpression(const std::string& path, const std::strin
 
 /* ****************************************************************************
 *
-* operationScope - 
+* operationScope -
 */
 static std::string operationScope(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an operationScope"));
-  
+
   reqDataP->qcr.scopeP = new Scope();
   reqDataP->qcr.res.restriction.scopeVector.push_back(reqDataP->qcr.scopeP);
   reqDataP->qcr.scopeP->type  = "";
@@ -196,21 +199,21 @@ static std::string operationScope(const std::string& path, const std::string& va
 
 /* ****************************************************************************
 *
-* scopeType - 
+* scopeType -
 */
 static std::string scopeType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->qcr.scopeP->type = value;
-   LM_T(LmtParse, ("Set scope 'type' to '%s' for a scope", reqDataP->qcr.scopeP->type.c_str()));
+  reqDataP->qcr.scopeP->type = value;
+  LM_T(LmtParse, ("Set scope 'type' to '%s' for a scope", reqDataP->qcr.scopeP->type.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
 
 /* ****************************************************************************
 *
-* scopeValue - 
+* scopeValue -
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
@@ -238,12 +241,13 @@ static std::string scopeValue(const std::string& path, const std::string& value,
 
 /* ****************************************************************************
 *
-* circle - 
+* circle -
 */
 static std::string circle(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a circle"));
   reqDataP->qcr.scopeP->areaType = orion::CircleType;
+
   return "OK";
 }
 
@@ -251,7 +255,7 @@ static std::string circle(const std::string& path, const std::string& value, Par
 
 /* ****************************************************************************
 *
-* circleCenterLatitude - 
+* circleCenterLatitude -
 */
 static std::string circleCenterLatitude(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
@@ -265,12 +269,13 @@ static std::string circleCenterLatitude(const std::string& path, const std::stri
 
 /* ****************************************************************************
 *
-* circleCenterLongitude - 
+* circleCenterLongitude -
 */
 static std::string circleCenterLongitude(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a circleCenterLongitude: %s", value.c_str()));
   reqDataP->qcr.scopeP->circle.center.longitudeSet(value);
+
   return "OK";
 }
 
@@ -278,12 +283,13 @@ static std::string circleCenterLongitude(const std::string& path, const std::str
 
 /* ****************************************************************************
 *
-* circleRadius - 
+* circleRadius -
 */
 static std::string circleRadius(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a circleRadius: %s", value.c_str()));
   reqDataP->qcr.scopeP->circle.radiusSet(value);
+
   return "OK";
 }
 
@@ -291,7 +297,7 @@ static std::string circleRadius(const std::string& path, const std::string& valu
 
 /* ****************************************************************************
 *
-* circleInverted - 
+* circleInverted -
 */
 static std::string circleInverted(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -311,12 +317,13 @@ static std::string circleInverted(const std::string& path, const std::string& va
 
 /* ****************************************************************************
 *
-* polygon - 
+* polygon -
 */
 static std::string polygon(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygon"));
   parseDataP->qcr.scopeP->areaType = orion::PolygonType;
+
   return "OK";
 }
 
@@ -324,7 +331,7 @@ static std::string polygon(const std::string& path, const std::string& value, Pa
 
 /* ****************************************************************************
 *
-* polygonInverted - 
+* polygonInverted -
 */
 static std::string polygonInverted(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -344,11 +351,12 @@ static std::string polygonInverted(const std::string& path, const std::string& v
 
 /* ****************************************************************************
 *
-* polygonVertexList - 
+* polygonVertexList -
 */
 static std::string polygonVertexList(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonVertexList"));
+
   return "OK";
 }
 
@@ -356,7 +364,7 @@ static std::string polygonVertexList(const std::string& path, const std::string&
 
 /* ****************************************************************************
 *
-* polygonVertex - 
+* polygonVertex -
 */
 static std::string polygonVertex(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
@@ -364,6 +372,7 @@ static std::string polygonVertex(const std::string& path, const std::string& val
   parseDataP->qcr.vertexP = new orion::Point();
   parseDataP->qcr.scopeP->polygon.vertexAdd(parseDataP->qcr.vertexP);
   // parseDataP->qcr.scopeP->polygon.vertexList.push_back(parseDataP->qcr.vertexP);
+
   return "OK";
 }
 
@@ -371,12 +380,13 @@ static std::string polygonVertex(const std::string& path, const std::string& val
 
 /* ****************************************************************************
 *
-* polygonVertexLatitude - 
+* polygonVertexLatitude -
 */
 static std::string polygonVertexLatitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonVertexLatitude: %s", value.c_str()));
   parseDataP->qcr.vertexP->latitudeSet(value);
+
   return "OK";
 }
 
@@ -384,12 +394,13 @@ static std::string polygonVertexLatitude(const std::string& path, const std::str
 
 /* ****************************************************************************
 *
-* polygonVertexLongitude - 
+* polygonVertexLongitude -
 */
 static std::string polygonVertexLongitude(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonVertexLongitude: %s", value.c_str()));
   parseDataP->qcr.vertexP->longitudeSet(value);
+
   return "OK";
 }
 
@@ -401,21 +412,21 @@ static std::string polygonVertexLongitude(const std::string& path, const std::st
 */
 JsonNode jsonQcrParseVector[] =
 {
-  { "/entities",                   jsonNullTreat      },
-  { "/entities/entity",            entityId           },
-  { "/entities/entity/id",         entityIdId         },
-  { "/entities/entity/type",       entityIdType       },
-  { "/entities/entity/isPattern",  entityIdIsPattern  },
+  { "/entities",                                                           jsonNullTreat           },
+  { "/entities/entity",                                                    entityId                },
+  { "/entities/entity/id",                                                 entityIdId              },
+  { "/entities/entity/type",                                               entityIdType            },
+  { "/entities/entity/isPattern",                                          entityIdIsPattern       },
 
-  { "/attributes",                 attributeList       },
-  { "/attributes/attribute",       attribute           },
+  { "/attributes",                                                         attributeList           },
+  { "/attributes/attribute",                                               attribute               },
 
-  { "/restriction",                     restriction            },
-  { "/restriction/attributeExpression", attributeExpression    },
-  { "/restriction/scopes",              jsonNullTreat          },
-  { "/restriction/scopes/scope",        operationScope         },
-  { "/restriction/scopes/scope/type",   scopeType              },
-  { "/restriction/scopes/scope/value",  scopeValue             },
+  { "/restriction",                                                        restriction             },
+  { "/restriction/attributeExpression",                                    attributeExpression     },
+  { "/restriction/scopes",                                                 jsonNullTreat           },
+  { "/restriction/scopes/scope",                                           operationScope          },
+  { "/restriction/scopes/scope/type",                                      scopeType               },
+  { "/restriction/scopes/scope/value",                                     scopeValue              },
 
   { "/restriction/scopes/scope/value/circle",                              circle                  },
   { "/restriction/scopes/scope/value/circle/centerLatitude",               circleCenterLatitude    },
@@ -470,7 +481,11 @@ void jsonQcrRelease(ParseData* reqDataP)
 */
 std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 {
-  return reqDataP->qcr.res.check(ciP, DiscoverContextAvailability, "", reqDataP->errorString, reqDataP->qcr.res.restrictions);
+  return reqDataP->qcr.res.check(ciP,
+                                 DiscoverContextAvailability,
+                                 "",
+                                 reqDataP->errorString,
+                                 reqDataP->qcr.res.restrictions);
 }
 
 

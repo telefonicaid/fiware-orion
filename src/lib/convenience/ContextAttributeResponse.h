@@ -1,5 +1,5 @@
-#ifndef CONTEXT_ATTRIBUTE_RESPONSE_H
-#define CONTEXT_ATTRIBUTE_RESPONSE_H
+#ifndef SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSE_H_
+#define SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSE_H_
 
 /*
 *
@@ -45,9 +45,13 @@ typedef struct ContextAttributeResponse
   StatusCode                 statusCode;                 // Mandatory
 
   std::string render(ConnectionInfo* ciP, RequestType requestType, std::string indent);
-  std::string check(ConnectionInfo* ciP, RequestType requestType, std::string indent, std::string predetectedError, int counter);
   void        present(std::string indent);
   void        release(void);
+  std::string check(ConnectionInfo*  ciP,
+                    RequestType      requestType,
+                    std::string      indent,
+                    std::string      predetectedError,
+                    int              counter);
 } ContextAttributeResponse;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSE_H_

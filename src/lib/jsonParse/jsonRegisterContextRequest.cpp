@@ -45,10 +45,10 @@
 */
 static std::string contextRegistration(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  //LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
+  // LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
   reqDataP->rcr.crP = new ContextRegistration();
-  //LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
-  
+  // LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
+
   reqDataP->rcr.res.contextRegistrationVector.push_back(reqDataP->rcr.crP);
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
@@ -84,10 +84,10 @@ static std::string entityId(const std::string& path, const std::string& value, P
 */
 static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->rcr.entityIdP->id = value;
-   LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->rcr.entityIdP->id.c_str()));
+  reqDataP->rcr.entityIdP->id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->rcr.entityIdP->id.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -98,10 +98,10 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->rcr.entityIdP->type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->rcr.entityIdP->type.c_str()));
+  reqDataP->rcr.entityIdP->type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->rcr.entityIdP->type.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -140,7 +140,6 @@ static std::string crAttribute(const std::string& path, const std::string& value
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
   reqDataP->rcr.attributeP = new ContextRegistrationAttribute("", "");
-
   reqDataP->rcr.crP->contextRegistrationAttributeVector.push_back(reqDataP->rcr.attributeP);
 
   return "OK";
@@ -188,7 +187,8 @@ static std::string craIsDomain(const std::string& path, const std::string& value
   }
 
   reqDataP->rcr.attributeP->isDomain = value;
-  LM_T(LmtParse, ("Set 'isDomain' to '%s' for a contextRegistrationAttribute", reqDataP->rcr.attributeP->isDomain.c_str()));
+  LM_T(LmtParse, ("Set 'isDomain' to '%s' for a contextRegistrationAttribute",
+                  reqDataP->rcr.attributeP->isDomain.c_str()));
 
   return "OK";
 }
@@ -396,10 +396,10 @@ static std::string sourceEntityIdId(const std::string& path, const std::string& 
 */
 static std::string sourceEntityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", value.c_str()));
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.source.type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", value.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -464,10 +464,10 @@ static std::string targetEntityIdId(const std::string& path, const std::string& 
 */
 static std::string targetEntityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", value.c_str()));
+  reqDataP->rcr.registrationMetadataP->association.entityAssociation.target.type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", value.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -503,11 +503,13 @@ static std::string targetEntityIdIsPattern(const std::string& path, const std::s
 */
 static std::string attributeAssociation(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   LM_T(LmtParse, ("got an attribute association"));
-   reqDataP->rcr.attributeAssociationP = new AttributeAssociation();
+  LM_T(LmtParse, ("got an attribute association"));
+  reqDataP->rcr.attributeAssociationP = new AttributeAssociation();
 
-   reqDataP->rcr.registrationMetadataP->association.attributeAssociationList.push_back(reqDataP->rcr.attributeAssociationP);
-   return "OK";
+  Association* aP = &reqDataP->rcr.registrationMetadataP->association;
+  aP->attributeAssociationList.push_back(reqDataP->rcr.attributeAssociationP);
+
+  return "OK";
 }
 
 
@@ -518,9 +520,10 @@ static std::string attributeAssociation(const std::string& path, const std::stri
 */
 static std::string sourceAttribute(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   LM_T(LmtParse, ("got a source attribute association"));
-   reqDataP->rcr.attributeAssociationP->source = value;
-   return "OK";
+  LM_T(LmtParse, ("got a source attribute association"));
+  reqDataP->rcr.attributeAssociationP->source = value;
+
+  return "OK";
 }
 
 
@@ -531,62 +534,63 @@ static std::string sourceAttribute(const std::string& path, const std::string& v
 */
 static std::string targetAttribute(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-   LM_T(LmtParse, ("got a target attribute association"));
-   reqDataP->rcr.attributeAssociationP->target = value;
-   return "OK";
+  LM_T(LmtParse, ("got a target attribute association"));
+  reqDataP->rcr.attributeAssociationP->target = value;
+
+  return "OK";
 }
 
 
-
+#define CR "/contextRegistrations"
 /* ****************************************************************************
 *
 * jsonRcrParseVector -
 */
 JsonNode jsonRcrParseVector[] =
 {
-  { "/contextRegistrations",                                                                       jsonNullTreat     },
-  { "/contextRegistrations/contextRegistration",                                                   contextRegistration },
-  { "/contextRegistrations/contextRegistration/entities",                                          jsonNullTreat     },
-  { "/contextRegistrations/contextRegistration/entities/entity",                                   entityId          },
-  { "/contextRegistrations/contextRegistration/entities/entity/id",                                entityIdId        },
-  { "/contextRegistrations/contextRegistration/entities/entity/type",                              entityIdType      },
-  { "/contextRegistrations/contextRegistration/entities/entity/isPattern",                         entityIdIsPattern },
+  { "/contextRegistrations",                                                            jsonNullTreat            },
+  { CR "/contextRegistration",                                                          contextRegistration      },
+  { CR "/contextRegistration/entities",                                                 jsonNullTreat            },
+  { CR "/contextRegistration/entities/entity",                                          entityId                 },
+  { CR "/contextRegistration/entities/entity/id",                                       entityIdId               },
+  { CR "/contextRegistration/entities/entity/type",                                     entityIdType             },
+  { CR "/contextRegistration/entities/entity/isPattern",                                entityIdIsPattern        },
 
-  { "/contextRegistrations/contextRegistration/attributes",                                        jsonNullTreat     },
-  { "/contextRegistrations/contextRegistration/attributes/attribute",                              crAttribute       },
-  { "/contextRegistrations/contextRegistration/attributes/attribute/name",                         craName           },
-  { "/contextRegistrations/contextRegistration/attributes/attribute/type",                         craType           },
-  { "/contextRegistrations/contextRegistration/attributes/attribute/isDomain",                     craIsDomain       },
+  { CR "/contextRegistration/attributes",                                               jsonNullTreat            },
+  { CR "/contextRegistration/attributes/attribute",                                     crAttribute              },
+  { CR "/contextRegistration/attributes/attribute/name",                                craName                  },
+  { CR "/contextRegistration/attributes/attribute/type",                                craType                  },
+  { CR "/contextRegistration/attributes/attribute/isDomain",                            craIsDomain              },
 
-  { "/contextRegistrations/contextRegistration/attributes/attribute/metadatas",                    jsonNullTreat     },
-  { "/contextRegistrations/contextRegistration/attributes/attribute/metadatas/metadata",           craMetadata       },
-  { "/contextRegistrations/contextRegistration/attributes/attribute/metadatas/metadata/name",      craMetadataName   },
-  { "/contextRegistrations/contextRegistration/attributes/attribute/metadatas/metadata/type",      craMetadataType   },
-  { "/contextRegistrations/contextRegistration/attributes/attribute/metadatas/metadata/value",     craMetadataValue  },
+  { CR "/contextRegistration/attributes/attribute/metadatas",                           jsonNullTreat            },
+  { CR "/contextRegistration/attributes/attribute/metadatas/metadata",                  craMetadata              },
+  { CR "/contextRegistration/attributes/attribute/metadatas/metadata/name",             craMetadataName          },
+  { CR "/contextRegistration/attributes/attribute/metadatas/metadata/type",             craMetadataType          },
+  { CR "/contextRegistration/attributes/attribute/metadatas/metadata/value",            craMetadataValue         },
 
-  { "/contextRegistrations/contextRegistration/metadatas",                                         jsonNullTreat    },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata",                                regMetadata      },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/name",                           regMetadataName  },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/type",                           regMetadataType  },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value",                          regMetadataValue },
+  { CR "/contextRegistration/metadatas",                                                jsonNullTreat            },
+  { CR "/contextRegistration/metadatas/metadata",                                       regMetadata              },
+  { CR "/contextRegistration/metadatas/metadata/name",                                  regMetadataName          },
+  { CR "/contextRegistration/metadatas/metadata/type",                                  regMetadataType          },
+  { CR "/contextRegistration/metadatas/metadata/value",                                 regMetadataValue         },
 
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/source",                       sourceEntityId          },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/source/id",                    sourceEntityIdId        },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/source/type",                  sourceEntityIdType      },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/source/isPattern",             sourceEntityIdIsPattern },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/target",                       targetEntityId          },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/target/id",                    targetEntityIdId        },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/target/type",                  targetEntityIdType      },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/target/isPattern",             targetEntityIdIsPattern },
+  { CR "/contextRegistration/metadatas/metadata/value/source",                          sourceEntityId           },
+  { CR "/contextRegistration/metadatas/metadata/value/source/id",                       sourceEntityIdId         },
+  { CR "/contextRegistration/metadatas/metadata/value/source/type",                     sourceEntityIdType       },
+  { CR "/contextRegistration/metadatas/metadata/value/source/isPattern",                sourceEntityIdIsPattern  },
+  { CR "/contextRegistration/metadatas/metadata/value/target",                          targetEntityId           },
+  { CR "/contextRegistration/metadatas/metadata/value/target/id",                       targetEntityIdId         },
+  { CR "/contextRegistration/metadatas/metadata/value/target/type",                     targetEntityIdType       },
+  { CR "/contextRegistration/metadatas/metadata/value/target/isPattern",                targetEntityIdIsPattern  },
 
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/associations",                    jsonNullTreat        },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/associations/association",        attributeAssociation },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/associations/association/source", sourceAttribute      },
-  { "/contextRegistrations/contextRegistration/metadatas/metadata/value/associations/association/target", targetAttribute      },
+  { CR "/contextRegistration/metadatas/metadata/value/associations",                    jsonNullTreat            },
+  { CR "/contextRegistration/metadatas/metadata/value/associations/association",        attributeAssociation     },
+  { CR "/contextRegistration/metadatas/metadata/value/associations/association/source", sourceAttribute          },
+  { CR "/contextRegistration/metadatas/metadata/value/associations/association/target", targetAttribute          },
 
-  { "/contextRegistrations/contextRegistration/providingApplication",                providingApplication },
-  { "/duration",                                                                     duration             },
-  { "/registrationId",                                                               registrationId       },
+  { CR "/contextRegistration/providingApplication",                                     providingApplication     },
+  { "/duration",                                                                        duration                 },
+  { "/registrationId",                                                                  registrationId           },
 
   { "LAST", NULL }
 };

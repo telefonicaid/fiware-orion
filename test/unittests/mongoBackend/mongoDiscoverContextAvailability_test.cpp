@@ -92,12 +92,10 @@
 * - mongoDBQueryAssociationFail
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
-* mocked MongoDB. Actually, we think is very much powerfull to check that everything is ok at
+* mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
 * MongoDB layer.
 *
 */
-
-#define NO_CODE 0
 
 /* ****************************************************************************
 *
@@ -123,7 +121,7 @@ static void prepareDatabase(void) {
    *
    * (*) same name but different types. This is included to check that type is taken into account,
    *     so Reg3 is not returned never (except noPatternNoType). You can try to change types in Reg3
-   *     to make them equat to the ones in Reg1 and Reg2 and check that some tests are failing.
+   *     to make them equal to the ones in Reg1 and Reg2 and check that some tests are failing.
    * (**)same name but without type
    */
 
@@ -244,7 +242,7 @@ static void prepareDatabasePatternTrue(void) {
    *
    * (*) same name but different types. This is included to check that type is taken into account,
    *     so Reg3 is not returned never (except patternNoType). You can try to change types in Reg3
-   *     to make them equat to the ones in Reg1 and Reg2 and check that some tests are failing.
+   *     to make them equal to the ones in Reg1 and Reg2 and check that some tests are failing.
    * (**)same name but without type
    */
 
@@ -412,7 +410,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -426,7 +424,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
   EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -440,7 +438,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(2, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
   EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
@@ -454,7 +452,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(3, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(3, 0)->isDomain);
   EXPECT_EQ("http://cr4.com", RES_CNTX_REG(3).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(3)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(3)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
 
@@ -468,7 +466,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(4, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(4, 0)->isDomain);
   EXPECT_EQ("http://cr5.com", RES_CNTX_REG(4).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(4)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(4)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
 
@@ -503,7 +501,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -518,7 +516,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -532,7 +530,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
   EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -546,7 +544,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(2, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
   EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
@@ -560,7 +558,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(3, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(3, 0)->isDomain);
   EXPECT_EQ("http://cr4.com", RES_CNTX_REG(3).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(3)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(3)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
 
@@ -574,7 +572,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(4, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(4, 0)->isDomain);
   EXPECT_EQ("http://cr5.com", RES_CNTX_REG(4).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(4)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(4)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
 
@@ -611,7 +609,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlyFirst)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -626,7 +624,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlyFirst)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -663,7 +661,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlySecond)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -678,7 +676,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlySecond)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr2.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -715,7 +713,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -730,7 +728,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr3.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -744,7 +742,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
   EXPECT_EQ("http://cr4.com", RES_CNTX_REG(1).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -758,7 +756,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(2, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
   EXPECT_EQ("http://cr5.com", RES_CNTX_REG(2).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
@@ -834,7 +832,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingOverlap)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -849,7 +847,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingOverlap)
   EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ("http://cr5.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -924,7 +922,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsAll)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_STREQ("", res.errorCode.reasonPhrase.c_str());
   EXPECT_STREQ("", res.errorCode.details.c_str());
 
@@ -945,7 +943,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsAll)
   EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
   EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
   EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -988,7 +986,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1003,7 +1001,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -1053,7 +1051,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1068,7 +1066,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -1082,7 +1080,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -1130,7 +1128,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1148,7 +1146,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(0, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 1)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -1193,7 +1191,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1214,7 +1212,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
     /* Context registration element #2 */
@@ -1230,7 +1228,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -1275,7 +1273,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1296,7 +1294,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
     /* Context registration element #2 */
@@ -1312,7 +1310,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -1453,7 +1451,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1477,7 +1475,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
     /* Context registration element #2 */
@@ -1493,7 +1491,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
     /* Context registration element #3 */
@@ -1509,7 +1507,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(2, 1)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 1)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
@@ -1557,7 +1555,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1572,7 +1570,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
     /* Context registration element #2 */
@@ -1585,7 +1583,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -1636,7 +1634,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1654,7 +1652,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
     /* Context registration element #2 */
@@ -1667,7 +1665,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
     /* Context registration element #3 */
@@ -1680,7 +1678,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(2, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 0)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
@@ -1732,7 +1730,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1747,7 +1745,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -1761,7 +1759,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -1775,7 +1773,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     EXPECT_EQ("TA1bis", RES_CNTX_REG_ATTR(2, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(2, 0)->isDomain);
     EXPECT_EQ("http://cr4.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
@@ -1789,7 +1787,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(3, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(3, 0)->isDomain);
     EXPECT_EQ("http://cr5.com", RES_CNTX_REG(3).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(3)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(3)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
 
@@ -1838,7 +1836,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1862,7 +1860,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_STREQ("", res.responseVector.get(0)->errorCode.reasonPhrase.c_str());
     EXPECT_STREQ("", res.responseVector.get(0)->errorCode.details.c_str());
 
@@ -1879,7 +1877,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -1924,7 +1922,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrSingle)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -1939,7 +1937,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrSingle)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -1985,7 +1983,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2003,7 +2001,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -2017,7 +2015,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -2065,7 +2063,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2086,7 +2084,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(0, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 1)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -2100,7 +2098,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     EXPECT_EQ("TA1", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -2114,7 +2112,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(2, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(2, 0)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
@@ -2211,7 +2209,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2229,7 +2227,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(0, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -2243,7 +2241,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(1, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 0)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -2257,7 +2255,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     EXPECT_EQ("TA2bis", RES_CNTX_REG_ATTR(2, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(2, 0)->isDomain);
     EXPECT_EQ("http://cr4.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
@@ -2271,7 +2269,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     EXPECT_EQ("TA2", RES_CNTX_REG_ATTR(3, 0)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(3, 0)->isDomain);
     EXPECT_EQ("http://cr5.com", RES_CNTX_REG(3).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(3)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(3)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
 
@@ -2320,7 +2318,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2347,7 +2345,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(0, 2)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 2)->isDomain);
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -2364,7 +2362,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     EXPECT_EQ("TA4", RES_CNTX_REG_ATTR(1, 1)->type);
     EXPECT_EQ("false", RES_CNTX_REG_ATTR(1, 1)->isDomain);
     EXPECT_EQ("http://cr2.com", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -2381,7 +2379,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     EXPECT_EQ("TA3", RES_CNTX_REG_ATTR(2, 1)->type);
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(2, 1)->isDomain);
     EXPECT_EQ("http://cr3.com", RES_CNTX_REG(2).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(2)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(2)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
@@ -2428,7 +2426,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(NO_CODE, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2444,7 +2442,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
   EXPECT_EQ("false", RES_CNTX_REG_ATTR(0, 0)->isDomain);
   EXPECT_EQ(0, RES_CNTX_REG(0).registrationMetadataVector.size());
   EXPECT_EQ("http://cr2.com", RES_CNTX_REG(0).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -2462,7 +2460,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
   EXPECT_EQ("A4", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.get(0)->source);
   EXPECT_EQ("A1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.get(0)->target);
   EXPECT_EQ("http://www.fi-ware.eu/NGSI/association", RES_CNTX_REG(1).providingApplication.get());
-  EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+  EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
@@ -2555,7 +2553,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, targetAssociations)
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(NO_CODE, res.errorCode.code);
+    EXPECT_EQ(SccNone, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -2571,7 +2569,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, targetAssociations)
     EXPECT_EQ("true", RES_CNTX_REG_ATTR(0, 0)->isDomain);
     EXPECT_EQ(0, RES_CNTX_REG(0).registrationMetadataVector.size());
     EXPECT_EQ("http://cr1.com", RES_CNTX_REG(0).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(0)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(0)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
@@ -2589,7 +2587,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, targetAssociations)
     EXPECT_EQ("A4", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.get(0)->source);
     EXPECT_EQ("A1", RES_CNTX_REG(1).registrationMetadataVector.get(0)->association.attributeAssociationList.get(0)->target);
     EXPECT_EQ("http://www.fi-ware.eu/NGSI/association", RES_CNTX_REG(1).providingApplication.get());
-    EXPECT_EQ(NO_CODE, res.responseVector.get(1)->errorCode.code);
+    EXPECT_EQ(SccNone, res.responseVector.get(1)->errorCode.code);
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 

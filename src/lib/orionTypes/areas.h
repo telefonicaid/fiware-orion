@@ -1,5 +1,5 @@
-#ifndef ORION_AREAS_H
-#define ORION_AREAS_H
+#ifndef SRC_LIB_ORIONTYPES_AREAS_H_
+#define SRC_LIB_ORIONTYPES_AREAS_H_
 
 /*
 *
@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include <stdlib.h>    // atof
+#include <string>
 #include <vector>
 
 
@@ -34,7 +35,7 @@ namespace orion
 {
 /* ****************************************************************************
 *
-* AreaType - 
+* AreaType -
 */
 typedef enum AreaType
 {
@@ -44,64 +45,68 @@ typedef enum AreaType
 } AreaType;
 
 
+
 /* ****************************************************************************
 *
-* Point - 
+* Point -
 */
 class Point
 {
-private:
+ private:
   ::std::string _latitude;
   ::std::string _longitude;
 
-public:
-  double latitude(void)                        { return atof(_latitude.c_str());  }
-  double longitude(void)                       { return atof(_longitude.c_str()); }
-  void   latitudeSet(::std::string latitude)   { _latitude  = latitude;           }
-  void   longitudeSet(::std::string longitude) { _longitude = longitude;          }
-  ::std::string latitudeString(void)           { return _latitude;                }
-  ::std::string longitudeString(void)          { return _longitude;               }
+ public:
+  double latitude(void);
+  double longitude(void);
+  void   latitudeSet(::std::string latitude);
+  void   longitudeSet(::std::string longitude);
+  ::std::string latitudeString(void);
+  ::std::string longitudeString(void);
 };
+
+
 
 /* ****************************************************************************
 *
-* Circle - 
+* Circle -
 */
 class Circle
 {
-private:
-  ::std::string  _radius; 
+ private:
+  ::std::string  _radius;
   ::std::string  _inverted;
 
-public:
+ public:
   Point          center;
-  bool           inverted(void) { if ((_inverted == "true") || (_inverted == "1")) return true; return false; }
-  double         radius(void)   { return atof(_radius.c_str()); }
+  bool           inverted(void);
+  double         radius(void);
 
-  ::std::string  radiusString(void)                   { return  _radius;      }
-  ::std::string  invertedString(void)                 { return  _inverted;    }
-  void           radiusSet(::std::string radius)      { _radius   = radius;   }
-  void           invertedSet(::std::string inverted)  { _inverted = inverted; }
+  ::std::string  radiusString(void);
+  ::std::string  invertedString(void);
+  void           radiusSet(::std::string radius);
+  void           invertedSet(::std::string inverted);
 };
+
+
 
 /* ****************************************************************************
 *
-* Polygon - 
+* Polygon -
 */
 class Polygon
 {
-private:
+ private:
   ::std::string         _inverted;
 
-public:
+ public:
   ::std::vector<Point*> vertexList;
-  bool                  inverted(void)                      { if ((_inverted == "true") || (_inverted == "1")) return true; return false; }
-  void                  invertedSet(::std::string inverted) { _inverted = inverted;    }
-  ::std::string         invertedString(void)                { return _inverted;        }
-  void                  vertexAdd(Point* p)                 { vertexList.push_back(p); }
-  void                  release(void)                       { for (unsigned int ix = 0; ix < vertexList.size(); ++ix) delete(vertexList[ix]); vertexList.clear(); }
+  bool                  inverted(void);
+  void                  invertedSet(::std::string inverted);
+  ::std::string         invertedString(void);
+  void                  vertexAdd(Point* p);
+  void                  release(void);
 };
-
 }
 
-#endif
+#endif  // SRC_LIB_ORIONTYPES_AREAS_H_

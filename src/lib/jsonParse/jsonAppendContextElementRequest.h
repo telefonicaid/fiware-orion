@@ -1,5 +1,5 @@
-#ifndef JSON_APPEND_CONTEXT_ELEMENT_REQUEST_H
-#define JSON_APPEND_CONTEXT_ELEMENT_REQUEST_H
+#ifndef SRC_LIB_JSONPARSE_JSONAPPENDCONTEXTELEMENTREQUEST_H_
+#define SRC_LIB_JSONPARSE_JSONAPPENDCONTEXTELEMENTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string jsonAcerCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void jsonAcerPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONAPPENDCONTEXTELEMENTREQUEST_H_

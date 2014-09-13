@@ -1,5 +1,5 @@
-#ifndef XML_REGISTER_CONTEXT_REQUEST_H
-#define XML_REGISTER_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLREGISTERCONTEXTREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLREGISTERCONTEXTREQUEST_H_
 
 /*
 *
@@ -73,4 +73,4 @@ extern std::string rcrCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void rcrPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLREGISTERCONTEXTREQUEST_H_

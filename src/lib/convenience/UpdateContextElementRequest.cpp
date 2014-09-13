@@ -69,23 +69,33 @@ std::string UpdateContextElementRequest::render(ConnectionInfo* ciP, RequestType
 *   }
 *
 */
-std::string UpdateContextElementRequest::check(ConnectionInfo* ciP, RequestType requestType, std::string indent, std::string predetectedError, int counter)
+std::string UpdateContextElementRequest::check
+(
+  ConnectionInfo*  ciP,
+  RequestType      requestType,
+  std::string      indent,
+  std::string      predetectedError,     // Predetected Error, normally during parsing
+  int              counter
+)
 {
-   UpdateContextElementResponse  response;
-   std::string                   res;
+  UpdateContextElementResponse  response;
+  std::string                   res;
+  Format                        fmt = ciP->outFormat;
 
-   if (predetectedError != "")
-   {
-     response.errorCode.fill(SccBadRequest, predetectedError);
-   }
-   else if ((res = contextAttributeVector.check(UpdateContextElement, ciP->outFormat, indent, predetectedError, counter)) != "OK")
-   {
-     response.errorCode.fill(SccBadRequest, res);
-   }
-   else
-     return "OK";
-   
-   return response.render(ciP, requestType, indent);
+  if (predetectedError != "")
+  {
+    response.errorCode.fill(SccBadRequest, predetectedError);
+  }
+  else if ((res = contextAttributeVector.check(UpdateContextElement, fmt, indent, predetectedError, counter)) != "OK")
+  {
+    response.errorCode.fill(SccBadRequest, res);
+  }
+  else
+  {
+    return "OK";
+  }
+
+  return response.render(ciP, requestType, indent);
 }
 
 

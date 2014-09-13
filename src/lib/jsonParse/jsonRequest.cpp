@@ -58,58 +58,62 @@
 #include "rest/restReply.h"
 
 
+#define FUNCS(prefix) json##prefix##ParseVector, json##prefix##Init,    \
+                      json##prefix##Check,       json##prefix##Present, \
+                      json##prefix##Release
+
+
 
 /* ****************************************************************************
 *
-* jsonRequest - 
+* jsonRequest -
 */
-static JsonRequest jsonRequest[] = 
+static JsonRequest jsonRequest[] =
 {
   // NGSI9
-  { RegisterContext,                       "POST", "registerContextRequest",                        jsonRcrParseVector,  jsonRcrInit,  jsonRcrCheck,   jsonRcrPresent,  jsonRcrRelease  },
-  { DiscoverContextAvailability,           "POST", "discoverContextAvailabilityRequest",            jsonDcarParseVector, jsonDcarInit, jsonDcarCheck,  jsonDcarPresent, jsonDcarRelease },
-  { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           jsonScarParseVector, jsonScarInit, jsonScarCheck,  jsonScarPresent, jsonScarRelease },
-  { UnsubscribeContextAvailability,        "POST", "unsubscribeContextAvailabilityRequest",         jsonUcarParseVector, jsonUcarInit, jsonUcarCheck,  jsonUcarPresent, jsonUcarRelease },
-  { NotifyContextAvailability,             "POST", "notifyContextRequestAvailability",              jsonNcarParseVector, jsonNcarInit, jsonNcarCheck,  jsonNcarPresent, jsonNcarRelease },
-  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  jsonUcasParseVector, jsonUcasInit, jsonUcasCheck,  jsonUcasPresent, jsonUcasRelease },
+  { RegisterContext,                       "POST", "registerContextRequest",                        FUNCS(Rcr)   },
+  { DiscoverContextAvailability,           "POST", "discoverContextAvailabilityRequest",            FUNCS(Dcar)  },
+  { SubscribeContextAvailability,          "POST", "subscribeContextAvailabilityRequest",           FUNCS(Scar)  },
+  { UnsubscribeContextAvailability,        "POST", "unsubscribeContextAvailabilityRequest",         FUNCS(Ucar)  },
+  { NotifyContextAvailability,             "POST", "notifyContextRequestAvailability",              FUNCS(Ncar)  },
+  { UpdateContextAvailabilitySubscription, "POST", "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
 
   // NGSI10
-  { QueryContext,                          "POST", "queryContextRequest",                           jsonQcrParseVector,  jsonQcrInit,  jsonQcrCheck,   jsonQcrPresent,  jsonQcrRelease  },
-  { UpdateContext,                         "POST", "updateContextRequest",                          jsonUpcrParseVector, jsonUpcrInit, jsonUpcrCheck,  jsonUpcrPresent, jsonUpcrRelease },
-  { SubscribeContext,                      "POST", "subscribeContextRequest",                       jsonScrParseVector,  jsonScrInit,  jsonScrCheck,   jsonScrPresent,  jsonScrRelease  },
-  { NotifyContext,                         "POST", "notifyContextRequest",                          jsonNcrParseVector,  jsonNcrInit,  jsonNcrCheck,   jsonNcrPresent,  jsonNcrRelease  },
-  { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     jsonUncrParseVector, jsonUncrInit, jsonUncrCheck,  jsonUncrPresent, jsonUncrRelease },
-  { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              jsonUcsrParseVector, jsonUcsrInit, jsonUcsrCheck,  jsonUcsrPresent, jsonUcsrRelease },
+  { QueryContext,                          "POST", "queryContextRequest",                           FUNCS(Qcr)   },
+  { UpdateContext,                         "POST", "updateContextRequest",                          FUNCS(Upcr)  },
+  { SubscribeContext,                      "POST", "subscribeContextRequest",                       FUNCS(Scr)   },
+  { NotifyContext,                         "POST", "notifyContextRequest",                          FUNCS(Ncr)   },
+  { UnsubscribeContext,                    "POST", "unsubscribeContextRequest",                     FUNCS(Uncr)  },
+  { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              FUNCS(Ucsr)  },
 
   // Convenience
-  { ContextEntityAttributes,               "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntityAttributes,               "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntityTypeAttributeContainer,   "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntityTypeAttributeContainer,   "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntitiesByEntityId,             "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntitiesByEntityId,             "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { EntityByIdAttributeByName,             "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { EntityByIdAttributeByName,             "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntityTypes,                    "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntityTypes,                    "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntityTypeAttribute,            "POST", "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { ContextEntityTypeAttribute,            "*",    "registerProviderRequest",                       jsonRprParseVector,  jsonRprInit,  jsonRprCheck,   jsonRprPresent,  jsonRprRelease  },
-  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextAvailabilitySubscriptionRequest",  jsonUcasParseVector, jsonUcasInit, jsonUcasCheck,  jsonUcasPresent, jsonUcasRelease },
-  { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                   jsonUcerParseVector, jsonUcerInit, jsonUcerCheck,  jsonUcerPresent, jsonUcerRelease },
-  { IndividualContextEntity,               "POST", "appendContextElementRequest",                   jsonAcerParseVector, jsonAcerInit, jsonAcerCheck,  jsonAcerPresent, jsonAcerRelease },
-  { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
-  { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
-  { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                   jsonAcerParseVector, jsonAcerInit, jsonAcerCheck,  jsonAcerPresent, jsonAcerRelease },
-  { IndividualContextEntityAttributes,     "PUT",  "updateContextElementRequest",                   jsonUcerParseVector, jsonUcerInit, jsonUcerCheck,  jsonUcerPresent, jsonUcerRelease },
-  { AttributeValueInstance,                "PUT",  "updateContextAttributeRequest",                 jsonUpcarParseVector,jsonUpcarInit,jsonUpcarCheck, jsonUpcarPresent,jsonUpcarRelease},
-  { Ngsi10SubscriptionsConvOp,             "PUT",  "updateContextSubscriptionRequest",              jsonUcsrParseVector, jsonUcsrInit, jsonUcsrCheck,  jsonUcsrPresent, jsonUcsrRelease }
-
+  { ContextEntityAttributes,               "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityAttributes,               "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityTypeAttributeContainer,   "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityTypeAttributeContainer,   "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntitiesByEntityId,             "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntitiesByEntityId,             "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
+  { EntityByIdAttributeByName,             "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
+  { EntityByIdAttributeByName,             "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityTypes,                    "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityTypes,                    "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityTypeAttribute,            "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityTypeAttribute,            "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
+  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
+  { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                   FUNCS(Ucer)  },
+  { IndividualContextEntity,               "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
+  { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                 FUNCS(Upcar) },
+  { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                 FUNCS(Upcar) },
+  { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
+  { IndividualContextEntityAttributes,     "PUT",  "updateContextElementRequest",                   FUNCS(Ucer)  },
+  { AttributeValueInstance,                "PUT",  "updateContextAttributeRequest",                 FUNCS(Upcar) },
+  { Ngsi10SubscriptionsConvOp,             "PUT",  "updateContextSubscriptionRequest",              FUNCS(Ucsr)  }
 };
 
 
 /* ****************************************************************************
 *
-* jsonRequestGet - 
+* jsonRequestGet -
 */
 static JsonRequest* jsonRequestGet(RequestType request, std::string method)
 {
@@ -118,7 +122,11 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
     if ((request == jsonRequest[ix].type) && (jsonRequest[ix].method == method))
     {
       if (jsonRequest[ix].parseVector != NULL)
-        LM_T(LmtHttpRequest, ("Found jsonRequest of type %d, method '%s' - index %d (%s)", request, method.c_str(), ix, jsonRequest[ix].parseVector[0].path.c_str()));
+      {
+        LM_T(LmtHttpRequest, ("Found jsonRequest of type %d, method '%s' - index %d (%s)",
+              request, method.c_str(), ix, jsonRequest[ix].parseVector[0].path.c_str()));
+      }
+
       return &jsonRequest[ix];
     }
   }
@@ -128,11 +136,20 @@ static JsonRequest* jsonRequestGet(RequestType request, std::string method)
 }
 
 
+
 /* ****************************************************************************
 *
-* jsonTreat - 
+* jsonTreat -
 */
-std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parseDataP, RequestType request, const std::string& payloadWord, JsonRequest** reqPP)
+std::string jsonTreat
+(
+  const char*         content,
+  ConnectionInfo*     ciP,
+  ParseData*          parseDataP,
+  RequestType         request,
+  const std::string&  payloadWord,
+  JsonRequest**       reqPP
+)
 {
   std::string   res   = "OK";
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
@@ -143,15 +160,23 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
 
   if (reqP == NULL)
   {
-    std::string errorReply = restErrorReplyGet(ciP, ciP->outFormat, "", requestType(request), SccBadRequest,
-                                               std::string("Sorry, no request treating object found for RequestType '") + requestType(request) + "'");
+    std::string errorReply =
+      restErrorReplyGet(ciP,
+                        ciP->outFormat,
+                        "",
+                        requestType(request),
+                        SccBadRequest,
+                        std::string("Sorry, no request treating object found for RequestType '") +
+                        requestType(request) + "'");
 
     LM_W(("Bad Input (no request treating object found for RequestType %d (%s))", request, requestType(request)));
     return errorReply;
   }
 
   if (reqPP != NULL)
+  {
     *reqPP = reqP;
+  }
 
   LM_T(LmtParse, ("Treating '%s' request", reqP->keyword.c_str()));
 
@@ -161,15 +186,27 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
   {
     res = jsonParse(ciP, content, reqP->keyword, reqP->parseVector, parseDataP);
   }
-  catch (std::exception &e)
+  catch (const std::exception &e)
   {
-    std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Parse Error: ") + e.what());
+    std::string errorReply  = restErrorReplyGet(ciP,
+                                                ciP->outFormat,
+                                                "",
+                                                reqP->keyword,
+                                                SccBadRequest,
+                                                std::string("JSON Parse Error: ") + e.what());
+
     LM_W(("Bad Input (JSON Parse Error: %s)", e.what()));
     return errorReply;
   }
   catch (...)
   {
-    std::string errorReply  = restErrorReplyGet(ciP, ciP->outFormat, "", reqP->keyword, SccBadRequest, std::string("JSON Generic Error"));
+    std::string errorReply  = restErrorReplyGet(ciP,
+                                                ciP->outFormat,
+                                                "",
+                                                reqP->keyword,
+                                                SccBadRequest,
+                                                std::string("JSON Generic Error"));
+
     LM_W(("Bad Input (JSON parse generic error)"));
     return errorReply;
   }
@@ -180,20 +217,26 @@ std::string jsonTreat(const char* content, ConnectionInfo* ciP, ParseData* parse
     ciP->httpStatusCode = SccBadRequest;
 
     std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", payloadWord, ciP->httpStatusCode, res);
-    return answer; 
+    return answer;
   }
 
   if (ciP->inCompoundValue == true)
+  {
     orion::compoundValueEnd(ciP, parseDataP);
+  }
   if ((lmTraceIsSet(LmtCompoundValueShow)) && (ciP->compoundValueP != NULL))
+  {
     ciP->compoundValueP->shortShow("after parse: ");
+  }
 
   reqP->present(parseDataP);
 
   LM_T(LmtParseCheck, ("Calling check for JSON parsed tree (%s)", ciP->payloadWord));
   res = reqP->check(parseDataP, ciP);
   if (res != "OK")
+  {
     LM_W(("Bad Input (%s: %s)", reqP->keyword.c_str(), res.c_str()));
+  }
 
   reqP->present(parseDataP);
 

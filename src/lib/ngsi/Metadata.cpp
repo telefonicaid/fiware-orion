@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <stdio.h>
+#include <string>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -35,8 +36,8 @@
 
 /* ****************************************************************************
 *
-* Metadata::Metadata - 
-*/ 
+* Metadata::Metadata -
+*/
 Metadata::Metadata()
 {
   name  = "";
@@ -48,11 +49,11 @@ Metadata::Metadata()
 
 /* ****************************************************************************
 *
-* Metadata::Metadata - 
+* Metadata::Metadata -
 *
 * FIXME P9: Copy also the Association!
-*  
-*/ 
+*
+*/
 Metadata::Metadata(Metadata* mP)
 {
   LM_T(LmtClone, ("'cloning' a Metadata"));
@@ -66,8 +67,8 @@ Metadata::Metadata(Metadata* mP)
 
 /* ****************************************************************************
 *
-* Metadata::Metadata - 
-*/ 
+* Metadata::Metadata -
+*/
 Metadata::Metadata(const std::string& _name, const std::string& _type, const std::string& _value)
 {
   name  = _name;
@@ -79,12 +80,12 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
 
 /* ****************************************************************************
 *
-* Metadata::render - 
+* Metadata::render -
 */
 std::string Metadata::render(Format format, const std::string& indent, bool comma)
 {
   std::string out     = "";
-  std::string tag  = "contextMetadata";
+  std::string tag     = "contextMetadata";
   std::string xValue  = value;
 
   out += startTag(indent, tag, tag, format, false, false);
@@ -92,7 +93,9 @@ std::string Metadata::render(Format format, const std::string& indent, bool comm
   out += valueTag(indent + "  ", "type", type, format, true);
 
   if (type == "Association")
+  {
     xValue = std::string("\n") + association.render(format, indent + "  ", false);
+  }
 
   out += valueTag(indent + "  ", "value", xValue, format, false, (type == "Association"));
   out += endTag(indent, tag, format, comma);
@@ -104,18 +107,31 @@ std::string Metadata::render(Format format, const std::string& indent, bool comm
 
 /* ****************************************************************************
 *
-* Metadata::check - 
+* Metadata::check -
 */
-std::string Metadata::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string Metadata::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (name == "")
+  {
     return "missing metadata name";
+  }
 
   if ((value == "") && (type != "Association"))
+  {
     return "missing metadata value";
+  }
 
   if (type == "Association")
+  {
      return association.check(requestType, format, indent, predetectedError, counter);
+  }
 
   return "OK";
 }
@@ -124,7 +140,7 @@ std::string Metadata::check(RequestType requestType, Format format, const std::s
 
 /* ****************************************************************************
 *
-* Metadata::present - 
+* Metadata::present -
 */
 void Metadata::present(const std::string& metadataType, int ix, const std::string& indent)
 {
@@ -138,9 +154,23 @@ void Metadata::present(const std::string& metadataType, int ix, const std::strin
 
 /* ****************************************************************************
 *
-* release - 
+* release -
 */
 void Metadata::release(void)
 {
-   association.release();
+  association.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* fill - 
+*/
+void Metadata::fill(const struct Metadata& md)
+{
+  name        = md.name;
+  type        = md.type;
+  value       = md.value;
+  association = md.association;
 }

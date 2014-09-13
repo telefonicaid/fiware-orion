@@ -41,7 +41,13 @@
 *
 * GET /ngsi10/contextEntities/{entityID}/attributes/{attributeName}/{valueID}
 */
-std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string getAttributeValueInstance
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   QueryContextRequest      request;
   QueryContextResponse     response;
@@ -59,16 +65,17 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
 
   if (response.contextElementResponseVector.size() == 0)
   {
-     car.statusCode.fill(SccContextElementNotFound, std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
+     car.statusCode.fill(SccContextElementNotFound,
+                         std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
   }
   else
   {
     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
     ContextAttributeVector cav = cerP->contextElement.contextAttributeVector;
 
-    // FIXME P4: as long as mongoQueryContext() signature is based on NGSI standard operations and that 
-    // standard queryContext doesn't allow specify metadata for attributes (note that it uses xs:string, 
-    // not full fledge attribute types), we cannot pass the ID to mongoBackend so we need to do the for loop 
+    // FIXME P4: as long as mongoQueryContext() signature is based on NGSI standard operations and that
+    // standard queryContext doesn't allow specify metadata for attributes (note that it uses xs:string,
+    // not full fledge attribute types), we cannot pass the ID to mongoBackend so we need to do the for loop
     // to grep the right attribute among all the ones returned by mongoQueryContext. However, this involves
     // a suboptimal query at mongoBackend, which could be improved passing it the ID as a new parameter to
     // mongoQueryContext() (although breaking the design principle about mongo*() functions follow the NGSI
@@ -83,7 +90,8 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
 
     if (cav.size() > 0 && car.contextAttributeVector.size() == 0)
     {
-       car.statusCode.fill(SccContextElementNotFound, std::string("Attribute-ValueID pair: '") + attributeName + "-" + valueID + "'");
+      car.statusCode.fill(SccContextElementNotFound,
+                          std::string("Attribute-ValueID pair: '") + attributeName + "-" + valueID + "'");
     }
     else
     {
@@ -92,5 +100,6 @@ std::string getAttributeValueInstance(ConnectionInfo* ciP, int components, std::
   }
 
   request.release();
+
   return car.render(ciP, AttributeValueInstance, "");
 }

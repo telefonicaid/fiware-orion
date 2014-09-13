@@ -25,8 +25,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "xmlParse/XmlNode.h"
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -44,7 +42,7 @@
 
 /* ****************************************************************************
 *
-* entityId - 
+* entityId -
 */
 static int entityId(xml_node<>* node, ParseData* reqData)
 {
@@ -57,7 +55,7 @@ static int entityId(xml_node<>* node, ParseData* reqData)
 
   if (es != "OK")
     reqData->errorString = es;
-  
+
   return 0;
 }
 
@@ -65,7 +63,7 @@ static int entityId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* entityIdId - 
+* entityIdId -
 */
 static int entityIdId(xml_node<>* node, ParseData* reqData)
 {
@@ -80,7 +78,7 @@ static int entityIdId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* attribute - 
+* attribute -
 */
 static int attribute(xml_node<>* node, ParseData* reqData)
 {
@@ -95,7 +93,7 @@ static int attribute(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* restriction - 
+* restriction -
 */
 static int restriction(xml_node<>* node, ParseData* reqData)
 {
@@ -109,7 +107,7 @@ static int restriction(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* attributeExpression - 
+* attributeExpression -
 */
 static int attributeExpression(xml_node<>* node, ParseData* reqData)
 {
@@ -123,7 +121,7 @@ static int attributeExpression(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* operationScope - 
+* operationScope -
 */
 static int operationScope(xml_node<>* node, ParseData* reqData)
 {
@@ -140,7 +138,7 @@ static int operationScope(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scopeType - 
+* scopeType -
 */
 static int scopeType(xml_node<>* node, ParseData* reqData)
 {
@@ -153,7 +151,7 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scopeValue - 
+* scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
@@ -166,7 +164,7 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* duration - 
+* duration -
 */
 static int duration(xml_node<>* node, ParseData* reqData)
 {
@@ -179,7 +177,7 @@ static int duration(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* subscriptionId - 
+* subscriptionId -
 */
 static int subscriptionId(xml_node<>* node, ParseData* reqData)
 {
@@ -192,7 +190,7 @@ static int subscriptionId(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucasInit - 
+* ucasInit -
 */
 void ucasInit(ParseData* reqData)
 {
@@ -209,7 +207,7 @@ void ucasInit(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucasRelease - 
+* ucasRelease -
 */
 void ucasRelease(ParseData* reqData)
 {
@@ -220,11 +218,15 @@ void ucasRelease(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* ucasCheck - 
+* ucasCheck -
 */
 std::string ucasCheck(ParseData* reqData, ConnectionInfo* ciP)
 {
-   return reqData->ucas.res.check(UpdateContextAvailabilitySubscription, ciP->outFormat, "", reqData->errorString, 0);
+  return reqData->ucas.res.check(UpdateContextAvailabilitySubscription,
+                                 ciP->outFormat,
+                                 "",
+                                 reqData->errorString,
+                                 0);
 }
 
 
@@ -232,7 +234,7 @@ std::string ucasCheck(ParseData* reqData, ConnectionInfo* ciP)
 #define PRINTF printf
 /* ****************************************************************************
 *
-* ucasPresent - 
+* ucasPresent -
 */
 void ucasPresent(ParseData* reqData)
 {
@@ -247,29 +249,30 @@ void ucasPresent(ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scrParseVector - 
+* scrParseVector -
 */
-XmlNode ucasParseVector[] = 
+#define UCAS "/updateContextAvailabilitySubscriptionRequest"
+XmlNode ucasParseVector[] =
 {
-  { "/updateContextAvailabilitySubscriptionRequest",                                             nullTreat             },
+  { "/updateContextAvailabilitySubscriptionRequest",      nullTreat            },
 
-  { "/updateContextAvailabilitySubscriptionRequest/entityIdList",                                nullTreat             },
-  { "/updateContextAvailabilitySubscriptionRequest/entityIdList/entityId",                       entityId              },
-  { "/updateContextAvailabilitySubscriptionRequest/entityIdList/entityId/id",                    entityIdId            },
+  { UCAS "/entityIdList",                                 nullTreat            },
+  { UCAS "/entityIdList/entityId",                        entityId             },
+  { UCAS "/entityIdList/entityId/id",                     entityIdId           },
 
-  { "/updateContextAvailabilitySubscriptionRequest/attributeList",                               nullTreat             },
-  { "/updateContextAvailabilitySubscriptionRequest/attributeList/attribute",                     attribute             },
+  { UCAS "/attributeList",                                nullTreat            },
+  { UCAS "/attributeList/attribute",                      attribute            },
 
-  { "/updateContextAvailabilitySubscriptionRequest/duration",                                    duration              },
-  
-  { "/updateContextAvailabilitySubscriptionRequest/restriction",                                  restriction          },
-  { "/updateContextAvailabilitySubscriptionRequest/restriction/attributeExpression",              attributeExpression  },
-  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope",                            nullTreat            },
-  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope",             operationScope       },
-  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeType",   scopeType            },
-  { "/updateContextAvailabilitySubscriptionRequest/restriction/scope/operationScope/scopeValue",  scopeValue           },
+  { UCAS "/duration",                                     duration             },
 
-  { "/updateContextAvailabilitySubscriptionRequest/subscriptionId",                               subscriptionId       },
-  
+  { UCAS "/restriction",                                  restriction          },
+  { UCAS "/restriction/attributeExpression",              attributeExpression  },
+  { UCAS "/restriction/scope",                            nullTreat            },
+  { UCAS "/restriction/scope/operationScope",             operationScope       },
+  { UCAS "/restriction/scope/operationScope/scopeType",   scopeType            },
+  { UCAS "/restriction/scope/operationScope/scopeValue",  scopeValue           },
+
+  { UCAS "/subscriptionId",                               subscriptionId       },
+
   { "LAST", NULL }
 };

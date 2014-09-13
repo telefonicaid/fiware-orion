@@ -23,6 +23,7 @@
 * Author: Ken Zangelin
 */
 #include <stdio.h>
+#include <string>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -82,10 +83,17 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 *
 * ContextAttribute::ContextAttribute - 
 */
-ContextAttribute::ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value)
+ContextAttribute::ContextAttribute
+(
+  const std::string&  _name,
+  const std::string&  _type,
+  const std::string&  _value
+)
 {
   LM_T(LmtClone, ("Creating a ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
-                  _name.c_str(), _type.c_str(), _value.c_str()));
+                  _name.c_str(),
+                  _type.c_str(),
+                  _value.c_str()));
 
   name                  = _name;
   type                  = _type;
@@ -170,7 +178,7 @@ std::string ContextAttribute::renderAsJsonObject(ConnectionInfo* ciP, const std:
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"), 
+    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
                     value, ciP->outFormat, commaAfterContextValue);
   }
   else
@@ -179,7 +187,7 @@ std::string ContextAttribute::renderAsJsonObject(ConnectionInfo* ciP, const std:
 
     if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
     {
-      isCompoundVector = true;    
+      isCompoundVector = true;
     }
 
     out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
@@ -234,7 +242,7 @@ std::string ContextAttribute::render(ConnectionInfo* ciP, const std::string& ind
 
     if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
     {
-      isCompoundVector = true;    
+      isCompoundVector = true;
     }
 
     out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
@@ -254,7 +262,14 @@ std::string ContextAttribute::render(ConnectionInfo* ciP, const std::string& ind
 *
 * ContextAttribute::check - 
 */
-std::string ContextAttribute::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string ContextAttribute::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   if (name == "")
   {

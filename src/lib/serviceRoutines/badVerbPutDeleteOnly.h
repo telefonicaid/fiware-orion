@@ -1,5 +1,5 @@
-#ifndef BAD_VERB_PUT_DELETE_ONLY_H
-#define BAD_VERB_PUT_DELETE_ONLY_H
+#ifndef SRC_LIB_SERVICEROUTINES_BADVERBPUTDELETEONLY_H_
+#define SRC_LIB_SERVICEROUTINES_BADVERBPUTDELETEONLY_H_
 
 /*
 *
@@ -38,7 +38,13 @@
 *
 * badVerbPutDeleteOnly - 
 */
-extern std::string badVerbPutDeleteOnly(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string badVerbPutDeleteOnly
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_BADVERBPUTDELETEONLY_H_
 

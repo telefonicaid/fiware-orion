@@ -1,5 +1,5 @@
-#ifndef UPDATE_CONTEXT_ELEMENT_RESPONSE_H
-#define UPDATE_CONTEXT_ELEMENT_RESPONSE_H
+#ifndef SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTRESPONSE_H_
+#define SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTRESPONSE_H_
 
 /*
 *
@@ -46,15 +46,19 @@
 */
 typedef struct UpdateContextElementResponse
 {
-  ContextAttributeResponseVector   contextAttributeResponseVector; // Optional, but mandatory if success
-  StatusCode                       errorCode;                      // Optional, but mandatory if failure
+  ContextAttributeResponseVector   contextAttributeResponseVector;  // Optional, but mandatory if success
+  StatusCode                       errorCode;                       // Optional, but mandatory if failure
 
   UpdateContextElementResponse();
 
-  std::string render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
-  void        present();
-  void        release();
+  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
+  void         present();
+  void         release();
+  std::string  check(ConnectionInfo*     ciP,
+                     RequestType         requestType,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } UpdateContextElementResponse;
 
-#endif
+#endif  // SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTRESPONSE_H_

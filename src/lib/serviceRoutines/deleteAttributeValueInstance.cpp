@@ -42,7 +42,13 @@
 *
 * DELETE /ngsi10/contextEntities/{entityID}/attributes/{attributeName}/{valueID}
 */
-std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string deleteAttributeValueInstance
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   UpdateContextRequest            request;
   UpdateContextResponse           response;
@@ -54,7 +60,7 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
   ContextElement*                 ceP           = new ContextElement();
 
   attributeP->metadataVector.push_back(mP);
-  
+
   ceP->entityId.fill(entityId, "", "false");
   ceP->attributeDomainName.set("");
   ceP->contextAttributeVector.push_back(attributeP);
@@ -64,24 +70,37 @@ std::string deleteAttributeValueInstance(ConnectionInfo* ciP, int components, st
 
   response.errorCode.code = SccNone;
   ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV);
-  
+
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)
-    statusCode.fill(SccContextElementNotFound, std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
+  {
+    statusCode.fill(SccContextElementNotFound,
+                    std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
+  }
   else if (response.contextElementResponseVector.size() == 1)
   {
      ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
 
     if (response.errorCode.code != SccNone)
+    {
       statusCode.fill(&response.errorCode);
+    }
     else if (cerP->statusCode.code != SccNone)
+    {
       statusCode.fill(&cerP->statusCode);
+    }
     else
+    {
       statusCode.fill(SccOk);
+    }
   }
   else
-    statusCode.fill(SccReceiverInternalError, "More than one response from deleteAttributeValueInstance::mongoUpdateContext");
+  {
+    statusCode.fill(SccReceiverInternalError,
+                    "More than one response from deleteAttributeValueInstance::mongoUpdateContext");
+  }
 
   request.release();
+
   return statusCode.render(ciP->outFormat, "", false, false);
 }

@@ -100,10 +100,10 @@ static std::string entityIdId(const std::string& path, const std::string& value,
 */
 static std::string entityIdType(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-   parseDataP->ncr.cerP->contextElement.entityId.type = value;
-   LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->ncr.cerP->contextElement.entityId.type.c_str()));
+  parseDataP->ncr.cerP->contextElement.entityId.type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", parseDataP->ncr.cerP->contextElement.entityId.type.c_str()));
 
-   return "OK";
+  return "OK";
 }
 
 
@@ -118,8 +118,9 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
   parseDataP->ncr.cerP->contextElement.entityId.isPattern = value;
 
   if (!isTrue(value) && !isFalse(value))
+  {
     return "invalid isPattern (boolean) value for entity: '" + value + "'";
-
+  }
 
   return "OK";
 }
@@ -213,7 +214,7 @@ static std::string statusCodeCode(const std::string& path, const std::string& va
 static std::string statusCodeReasonPhrase(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a statusCode reasonPhrase: '%s'", value.c_str()));
-  parseDataP->ncr.cerP->statusCode.reasonPhrase = value; // OK - parsing step reading reasonPhrase
+  parseDataP->ncr.cerP->statusCode.reasonPhrase = value;  // OK - parsing step reading reasonPhrase
   return "OK";
 }
 
@@ -337,50 +338,49 @@ static std::string domainMetadataValue(const std::string& path, const std::strin
 }
 
 
-
+#define CELEM "/contextResponses/contextResponse/contextElement"
 /* ****************************************************************************
 *
 * ncrParseVector -
 */
 JsonNode jsonNcrParseVector[] =
 {
-   { "/subscriptionId",                           subscriptionId         },
-   { "/originator",                               originator             },
+  { "/subscriptionId",                                            subscriptionId           },
+  { "/originator",                                                originator               },
 
-   { "/contextResponses",                                           jsonNullTreat          },
-   { "/contextResponses/contextResponse",                           contextResponse        },
-   { "/contextResponses/contextResponse/contextElement",            jsonNullTreat          },
-   { "/contextResponses/contextResponse/contextElement/id",         entityIdId             },
-   { "/contextResponses/contextResponse/contextElement/type",       entityIdType           },
-   { "/contextResponses/contextResponse/contextElement/isPattern",  entityIdIsPattern      },
+  { "/contextResponses",                                          jsonNullTreat            },
+  { "/contextResponses/contextResponse",                          contextResponse          },
+  { CELEM,                                                        jsonNullTreat            },
+  { CELEM "/id",                                                  entityIdId               },
+  { CELEM "/type",                                                entityIdType             },
+  { CELEM "/isPattern",                                           entityIdIsPattern        },
 
-   { "/contextResponses/contextResponse/contextElement/attributeDomainName",  attributeDomainName      },
+  { CELEM "/attributeDomainName",                                 attributeDomainName      },
 
-   { "/contextResponses/contextResponse/contextElement/attributes",                 jsonNullTreat          },
-   { "/contextResponses/contextResponse/contextElement/attributes/attribute",       attribute              },
-   { "/contextResponses/contextResponse/contextElement/attributes/attribute/name",  attributeName          },
-   { "/contextResponses/contextResponse/contextElement/attributes/attribute/type",  attributeType          },
-   { "/contextResponses/contextResponse/contextElement/attributes/attribute/value", attributeValue         },
+  { CELEM "/attributes",                                          jsonNullTreat            },
+  { CELEM "/attributes/attribute",                                attribute                },
+  { CELEM "/attributes/attribute/name",                           attributeName            },
+  { CELEM "/attributes/attribute/type",                           attributeType            },
+  { CELEM "/attributes/attribute/value",                          attributeValue           },
 
-   { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas",                 jsonNullTreat            },
-   { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas/metadata",        attributeMetadata        },
-   { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas/metadata/name",   attributeMetadataName    },
-   { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas/metadata/type",   attributeMetadataType    },
-   { "/contextResponses/contextResponse/contextElement/attributes/attribute/metadatas/metadata/value",  attributeMetadataValue   },
+  { CELEM "/attributes/attribute/metadatas",                      jsonNullTreat            },
+  { CELEM "/attributes/attribute/metadatas/metadata",             attributeMetadata        },
+  { CELEM "/attributes/attribute/metadatas/metadata/name",        attributeMetadataName    },
+  { CELEM "/attributes/attribute/metadatas/metadata/type",        attributeMetadataType    },
+  { CELEM "/attributes/attribute/metadatas/metadata/value",       attributeMetadataValue   },
 
-   { "/contextResponses/contextResponse/contextElement/metadatas",                 jsonNullTreat         },
-   { "/contextResponses/contextResponse/contextElement/metadatas/metadata",        domainMetadata        },
-   { "/contextResponses/contextResponse/contextElement/metadatas/metadata/name",   domainMetadataName    },
-   { "/contextResponses/contextResponse/contextElement/metadatas/metadata/type",   domainMetadataType    },
-   { "/contextResponses/contextResponse/contextElement/metadatas/metadata/value",  domainMetadataValue   },
+  { CELEM "/metadatas",                                           jsonNullTreat            },
+  { CELEM "/metadatas/metadata",                                  domainMetadata           },
+  { CELEM "/metadatas/metadata/name",                             domainMetadataName       },
+  { CELEM "/metadatas/metadata/type",                             domainMetadataType       },
+  { CELEM "/metadatas/metadata/value",                            domainMetadataValue      },
 
+  { "/contextResponses/contextResponse/statusCode",               jsonNullTreat            },
+  { "/contextResponses/contextResponse/statusCode/code",          statusCodeCode           },
+  { "/contextResponses/contextResponse/statusCode/reasonPhrase",  statusCodeReasonPhrase   },
+  { "/contextResponses/contextResponse/statusCode/details",       statusCodeDetails        },
 
-   { "/contextResponses/contextResponse/statusCode",                 jsonNullTreat          },
-   { "/contextResponses/contextResponse/statusCode/code",            statusCodeCode         },
-   { "/contextResponses/contextResponse/statusCode/reasonPhrase",    statusCodeReasonPhrase },
-   { "/contextResponses/contextResponse/statusCode/details",         statusCodeDetails      },
-
-   { "LAST", NULL }
+  { "LAST", NULL }
 };
 
 

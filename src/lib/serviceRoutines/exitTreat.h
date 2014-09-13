@@ -1,5 +1,5 @@
-#ifndef EXIT_TREAT_H
-#define EXIT_TREAT_H
+#ifndef SRC_LIB_SERVICEROUTINES_EXITTREAT_H_
+#define SRC_LIB_SERVICEROUTINES_EXITTREAT_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * exitTreat - 
 */
-extern std::string exitTreat(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string exitTreat
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_EXITTREAT_H_

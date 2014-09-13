@@ -1,5 +1,5 @@
-#ifndef XML_QUERY_CONTEXT_REQUEST_H
-#define XML_QUERY_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_XMLPARSE_XMLQUERYCONTEXTREQUEST_H_
+#define SRC_LIB_XMLPARSE_XMLQUERYCONTEXTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string qcrCheck(ParseData* reqData, ConnectionInfo* ciP);
 */
 extern void qcrPresent(ParseData* reqData);
 
-#endif
+#endif  // SRC_LIB_XMLPARSE_XMLQUERYCONTEXTREQUEST_H_

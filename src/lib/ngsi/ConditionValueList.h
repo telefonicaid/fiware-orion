@@ -1,5 +1,5 @@
-#ifndef CONDITION_VALUE_LIST_H
-#define CONDITION_VALUE_LIST_H
+#ifndef SRC_LIB_NGSI_CONDITIONVALUELIST_H_
+#define SRC_LIB_NGSI_CONDITIONVALUELIST_H_
 
 /*
 *
@@ -36,19 +36,24 @@
 
 /* ****************************************************************************
 *
-* ConditionValueList - 
+* ConditionValueList -
 */
 typedef struct ConditionValueList
 {
   std::vector<std::string>  vec;
 
   std::string  render(Format format, const std::string& indent, bool comma);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent);
   void         release(void);
   void         push_back(const std::string& attributeName);
   unsigned int size(void);
   std::string  get(int ix);
+
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } ConditionValueList;
 
-#endif
+#endif  // SRC_LIB_NGSI_CONDITIONVALUELIST_H_

@@ -1,5 +1,5 @@
-#ifndef JSON_QUERY_CONTEXT_REQUEST_H
-#define JSON_QUERY_CONTEXT_REQUEST_H
+#ifndef SRC_LIB_JSONPARSE_JSONQUERYCONTEXTREQUEST_H_
+#define SRC_LIB_JSONPARSE_JSONQUERYCONTEXTREQUEST_H_
 
 /*
 *
@@ -70,4 +70,4 @@ extern std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 */
 extern void jsonQcrPresent(ParseData* reqDataP);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONQUERYCONTEXTREQUEST_H_

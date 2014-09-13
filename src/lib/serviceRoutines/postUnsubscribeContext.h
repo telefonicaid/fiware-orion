@@ -1,5 +1,5 @@
-#ifndef POST_UNSUBSCRIBE_CONTEXT_H
-#define POST_UNSUBSCRIBE_CONTEXT_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTUNSUBSCRIBECONTEXT_H_
+#define SRC_LIB_SERVICEROUTINES_POSTUNSUBSCRIBECONTEXT_H_
 
 /*
 *
@@ -37,6 +37,12 @@
 *
 * postUnsubscribeContext - 
 */
-extern std::string postUnsubscribeContext(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP);
+extern std::string postUnsubscribeContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTUNSUBSCRIBECONTEXT_H_

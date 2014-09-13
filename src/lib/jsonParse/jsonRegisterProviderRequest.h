@@ -1,5 +1,5 @@
-#ifndef JSON_REGISTER_PROVIDER_REQUEST_H
-#define JSON_REGISTER_PROVIDER_REQUEST_H
+#ifndef SRC_LIB_JSONPARSE_JSONREGISTERPROVIDERREQUEST_H_
+#define SRC_LIB_JSONPARSE_JSONREGISTERPROVIDERREQUEST_H_
 
 /*
 *
@@ -69,4 +69,4 @@ extern std::string jsonRprCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 */
 extern void jsonRprPresent(ParseData* reqDataP);
 
-#endif
+#endif  // SRC_LIB_JSONPARSE_JSONREGISTERPROVIDERREQUEST_H_

@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::render - 
+* NotifyConditionVector::render -
 */
 std::string NotifyConditionVector::render(Format format, const std::string& indent, bool comma)
 {
@@ -42,11 +42,15 @@ std::string NotifyConditionVector::render(Format format, const std::string& inde
   std::string tag = "notifyConditions";
 
   if (vec.size() == 0)
+  {
     return "";
+  }
 
   out += startTag(indent, tag, tag, format, true, true);
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     out += vec[ix]->render(format, indent + "  ", ix != vec.size() - 1);
+  }
   out += endTag(indent, tag, format, comma, true);
 
   return out;
@@ -56,16 +60,25 @@ std::string NotifyConditionVector::render(Format format, const std::string& inde
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::check - 
+* NotifyConditionVector::check -
 */
-std::string NotifyConditionVector::check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter)
+std::string NotifyConditionVector::check
+(
+  RequestType         requestType,
+  Format              format,
+  const std::string&  indent,
+  const std::string&  predetectedError,
+  int                 counter
+)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
     if ((res = vec[ix]->check(requestType, format, indent, predetectedError, counter)) != "OK")
+    {
       return res;
+    }
   }
 
   return "OK";
@@ -75,21 +88,23 @@ std::string NotifyConditionVector::check(RequestType requestType, Format format,
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::present - 
+* NotifyConditionVector::present -
 */
 void NotifyConditionVector::present(const std::string& indent)
 {
-  PRINTF("%lu NotifyConditions", (unsigned long) vec.size());
+  PRINTF("%lu NotifyConditions", (uint64_t) vec.size());
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
     vec[ix]->present(indent, ix);
+  }
 }
 
 
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::push_back - 
+* NotifyConditionVector::push_back -
 */
 void NotifyConditionVector::push_back(NotifyCondition* item)
 {
@@ -100,7 +115,7 @@ void NotifyConditionVector::push_back(NotifyCondition* item)
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::get - 
+* NotifyConditionVector::get -
 */
 NotifyCondition* NotifyConditionVector::get(int ix)
 {
@@ -111,7 +126,7 @@ NotifyCondition* NotifyConditionVector::get(int ix)
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::size - 
+* NotifyConditionVector::size -
 */
 unsigned int NotifyConditionVector::size(void)
 {
@@ -122,7 +137,7 @@ unsigned int NotifyConditionVector::size(void)
 
 /* ****************************************************************************
 *
-* NotifyConditionVector::release - 
+* NotifyConditionVector::release -
 */
 void NotifyConditionVector::release(void)
 {

@@ -1,5 +1,5 @@
-#ifndef THROTTLING_H
-#define THROTTLING_H
+#ifndef SRC_LIB_NGSI_THROTTLING_H_
+#define SRC_LIB_NGSI_THROTTLING_H_
 
 /*
 *
@@ -25,6 +25,7 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdint.h>
 #include <string>
 
 #include "common/Format.h"
@@ -39,16 +40,22 @@
 typedef struct Throttling
 {
   std::string   string;
-  long long     seconds;
+  int64_t       seconds;
 
   Throttling();
   void         set(const std::string& value);
   std::string  get(void);
   bool         isEmpty(void);
   std::string  render(Format format, const std::string& indent, bool comma);
-  std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
-  long long    parse(void);
+
+  std::string  check(RequestType requestType,
+                     Format format,
+                     const std::string& indent,
+                     const std::string& predetectedError,
+                     int counter);
+
+  int64_t      parse(void);
   void         present(const std::string& indent);
 } Throttling;
 
-#endif
+#endif  // SRC_LIB_NGSI_THROTTLING_H_
