@@ -70,7 +70,7 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
 ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("proxyCoap: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl boost_thread53 boost_system53 pthread)
+  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl boost_thread boost_system pthread)
 ELSE()
   MESSAGE("proxyCoap: Other DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread-mt)
