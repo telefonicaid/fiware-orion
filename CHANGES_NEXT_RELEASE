@@ -4,3 +4,4 @@
 - Add: support for MongoDB replica sets (using the new -rplSet CLI parameter) (Issue #493)
 - Add: alternative rendering of ContextAttribute for JSON (Issue #490)
 - Fix: each send is now considered a separate transaction (Issue #478)
+- Fix: lseek after each write in log file in order to work with logrotate truncate (Issue #411)
