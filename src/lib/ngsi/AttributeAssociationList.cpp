@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string>
 
+#include "logMsg/logMsg.h"
 #include "common/Format.h"
 #include "common/tag.h"
 #include "common/globals.h"
@@ -143,6 +144,7 @@ void AttributeAssociationList::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
+    LM_M(("Registration Metadatas: releasing AttributeAssociation at %p", vec[ix])); 
     delete vec[ix];
   }
 

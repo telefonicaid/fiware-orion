@@ -98,6 +98,7 @@ void ContextRegistrationResponseVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
+    LM_M(("Registration Metadatas: releasing ContextRegistrationResponse at %p", vec[ix]));
     vec[ix]->release();
     delete(vec[ix]);
   }

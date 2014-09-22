@@ -150,6 +150,8 @@ static bool associationsQuery
         std::string tgtEnType = STR_FIELD(r.getField(ASSOC_TARGET_ENT).embeddedObject(), ASSOC_ENT_TYPE);
 
         Metadata* md = new Metadata(name, "Association");
+        LM_M(("Registration Metadatas: allocated Association Metadata at %p", md));
+
         md->association.entityAssociation.source.fill(srcEnId, srcEnType, "false");
         md->association.entityAssociation.target.fill(tgtEnId, tgtEnType, "false");
         
@@ -158,6 +160,7 @@ static bool associationsQuery
             std::string srcAttr = STR_FIELD(attrs[ix].embeddedObject(), ASSOC_ATTRS_SOURCE);
             std::string tgtAttr = STR_FIELD(attrs[ix].embeddedObject(), ASSOC_ATTRS_TARGET);
             AttributeAssociation* attrAssoc = new AttributeAssociation();
+            LM_M(("Registration Metadatas: created AttributeAssociation at %p", attrAssoc));
             attrAssoc->source = srcAttr;
             attrAssoc->target = tgtAttr;
             md->association.attributeAssociationList.push_back(attrAssoc);
@@ -195,8 +198,9 @@ static HttpStatusCode associationsDiscoverContextAvailability
     std::string err;
     if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details))
     {
-        responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
-        return SccOk;
+       // mdV.release();
+       responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
+       return SccOk;
     }
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
@@ -231,6 +235,7 @@ static HttpStatusCode associationsDiscoverContextAvailability
         if (!registrationsQuery(enV, attrL, &crrV, &err, tenant))
         {
             responseP->errorCode.fill(SccReceiverInternalError, err);
+            // mdV.release();
             return SccOk;
         }
 
@@ -242,14 +247,17 @@ static HttpStatusCode associationsDiscoverContextAvailability
 
     if (responseP->responseVector.size() == 0)
     {
+      // mdV.release();
       responseP->errorCode.fill(SccContextElementNotFound, "Could not query association with combination of entity/attribute");
       LM_RE(SccOk, (responseP->errorCode.details.c_str()));
     }
 
-    /* Set association metadata as final ContextRegistrationResponse*/
+    /* Set association metadata as final ContextRegistrationResponse */
     ContextRegistrationResponse* crrMd = new ContextRegistrationResponse();
+    LM_M(("Registration Metadatas: Created new ContextRegistrationResponse at %p", crrMd));
     crrMd->contextRegistration.providingApplication.set("http://www.fi-ware.eu/NGSI/association");
     crrMd->contextRegistration.registrationMetadataVector = mdV;
+    LM_M(("Registration Metadatas: %d", crrMd->contextRegistration.registrationMetadataVector.size()));
     responseP->responseVector.push_back(crrMd);
 
     return SccOk;
