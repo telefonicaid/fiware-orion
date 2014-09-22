@@ -171,12 +171,10 @@ void MetadataVector::release(void)
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     LM_T(LmtRelease, ("Releasing Metadata %d", ix));
-    LM_M(("Registration Metadatas: releasing metadata %d at %p", ix, vec[ix])); 
     vec[ix]->release();
     delete vec[ix];
   }
 
-  LM_M(("Registration Metadatas: clearing metadata vector")); 
   vec.clear();
 }
 
