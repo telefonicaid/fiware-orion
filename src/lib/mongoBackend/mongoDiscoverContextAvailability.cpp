@@ -195,6 +195,7 @@ static HttpStatusCode associationsDiscoverContextAvailability
     std::string err;
     if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details))
     {
+        mdV.release();
         responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
         return SccOk;
     }
@@ -231,6 +232,7 @@ static HttpStatusCode associationsDiscoverContextAvailability
         if (!registrationsQuery(enV, attrL, &crrV, &err, tenant))
         {
             responseP->errorCode.fill(SccReceiverInternalError, err);
+            mdV.release();
             return SccOk;
         }
 
@@ -242,11 +244,12 @@ static HttpStatusCode associationsDiscoverContextAvailability
 
     if (responseP->responseVector.size() == 0)
     {
+      mdV.release();
       responseP->errorCode.fill(SccContextElementNotFound, "Could not query association with combination of entity/attribute");
       LM_RE(SccOk, (responseP->errorCode.details.c_str()));
     }
 
-    /* Set association metadata as final ContextRegistrationResponse*/
+    /* Set association metadata as final ContextRegistrationResponse */
     ContextRegistrationResponse* crrMd = new ContextRegistrationResponse();
     crrMd->contextRegistration.providingApplication.set("http://www.fi-ware.eu/NGSI/association");
     crrMd->contextRegistration.registrationMetadataVector = mdV;
