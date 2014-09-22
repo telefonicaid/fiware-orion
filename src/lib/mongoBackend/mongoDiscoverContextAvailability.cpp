@@ -150,7 +150,6 @@ static bool associationsQuery
         std::string tgtEnType = STR_FIELD(r.getField(ASSOC_TARGET_ENT).embeddedObject(), ASSOC_ENT_TYPE);
 
         Metadata* md = new Metadata(name, "Association");
-
         md->association.entityAssociation.source.fill(srcEnId, srcEnType, "false");
         md->association.entityAssociation.target.fill(tgtEnId, tgtEnType, "false");
         
@@ -196,9 +195,9 @@ static HttpStatusCode associationsDiscoverContextAvailability
     std::string err;
     if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details))
     {
-       mdV.release();
-       responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
-       return SccOk;
+        mdV.release();
+        responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
+        return SccOk;
     }
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
