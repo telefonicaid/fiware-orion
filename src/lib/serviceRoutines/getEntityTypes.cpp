@@ -63,19 +63,33 @@ std::string getEntityTypes(ConnectionInfo* ciP, int components, std::vector<std:
   EntityTypesResponse response;
 
 #if 0
-   mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV);
+  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV);
 #else
   //
   // mongoEntityTypes is not implemented
   // Instead, I create a response by hand, to test the render method
   //
-  response.typeV.push_back("Name of Type 1");
-  response.typeV.push_back("Name of Type 2");
-  response.typeV.push_back("Name of Type 3");
-  response.typeV.push_back("Name of Type 4");
+  
+  TypeEntity* te1 = new TypeEntity("Type 1");
+//  TypeEntity* te2 = new TypeEntity("Type 2");
+//  TypeEntity* te3 = new TypeEntity("Type 3");
+  
+  te1->contextAttributeVector.push_back(new ContextAttribute("A1", "at1", ""));
+
+//  te2->contextAttributeVector.push_back(new ContextAttribute("A1", "at1", ""));
+//  te2->contextAttributeVector.push_back(new ContextAttribute("A2", "at2", ""));
+
+//  te3->contextAttributeVector.push_back(new ContextAttribute("A1", "at1", ""));
+//  te3->contextAttributeVector.push_back(new ContextAttribute("A2", "at2", ""));
+//  te3->contextAttributeVector.push_back(new ContextAttribute("A3", "at3", ""));
+
+  response.typeEntityVector.push_back(te1);
+//  response.typeEntityVector.push_back(te2);
+//  response.typeEntityVector.push_back(te3);
 #endif
 
-  std::string rendered = response.render(ciP->outFormat, "");
+  response.statusCode.fill(SccOk);
+  std::string rendered = response.render(ciP, "");
   response.release();
 
   return rendered;

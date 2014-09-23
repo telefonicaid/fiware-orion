@@ -70,7 +70,7 @@ typedef struct ContextAttributeVector
   std::string        render(ConnectionInfo*     ciP,
                             RequestType         requestType,
                             const std::string&  indent,
-                            bool comma = false);
+                            bool                comma = false);
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

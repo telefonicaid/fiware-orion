@@ -207,7 +207,12 @@ std::string ContextAttribute::renderAsJsonObject(ConnectionInfo* ciP, const std:
 *
 * render - 
 */
-std::string ContextAttribute::render(ConnectionInfo* ciP, const std::string& indent, bool comma)
+std::string ContextAttribute::render
+(
+  ConnectionInfo*     ciP,
+  const std::string&  indent,
+  bool                comma
+)
 {
   std::string  out                    = "";
   std::string  xmlTag                 = "contextAttribute";

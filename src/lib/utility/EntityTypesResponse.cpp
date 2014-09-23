@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
+#include "rest/uriParamNames.h"
 #include "utility/EntityTypesResponse.h"
 
 
@@ -38,37 +39,28 @@
 *
 * EntityTypesResponse::render - 
 */
-std::string EntityTypesResponse::render(Format format, const std::string& indent)
+std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string out                 = "";
   std::string tag                 = "entityTypesResponse";
-  std::string xmlEntityTypesTag   = "entityTypesFound";
-  std::string jsonEntityTypesTag  = "typesFound";
-  std::string xmlTypesVectorTag   = "entityTypes";
-  std::string jsonTypesVectorTag  = "types";
-  std::string noOfTypes;
-  char        noOfTypesV[32];
-  bool        commaAfterNoOfTypes = typeV.size() != 0;
+  
+  LM_M(("URI_PARAM_PAGINATION_DETAILS: '%s'", ciP->uriParam[URI_PARAM_PAGINATION_DETAILS].c_str()));
 
-  snprintf(noOfTypesV, sizeof(noOfTypesV), "%lu", typeV.size());
-  noOfTypes = noOfTypesV;
-
-  out += startTag(indent, tag, format, false);
-  out += valueTag(indent + "  ", xmlEntityTypesTag, jsonEntityTypesTag, noOfTypes, format, commaAfterNoOfTypes);
-
-  if (typeV.size() > 0)
+  if (ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] == "on")
   {
-    out += startTag(indent + "  ", xmlTypesVectorTag, jsonTypesVectorTag, format, true, true);
+    char noOf[16];
 
-    for (unsigned int ix = 0; ix < typeV.size(); ++ix)
-    {
-      out += valueTag(indent + "    ", "entityType", "", typeV[ix], format, (ix < typeV.size() - 1), false);
-    }
-
-    out += endTag(indent + "  ", xmlTypesVectorTag, format, false, true);
+    LM_M(("URI_PARAM_PAGINATION_DETAILS == 'on'"));
+    snprintf(noOf, sizeof(noOf), "%d", typeEntityVector.size());
+    statusCode.details = noOf;
   }
 
-  out += endTag(indent, tag, format, false);
+  out += startTag(indent, tag, ciP->outFormat, false);
+
+  if (typeEntityVector.size() > 0)
+    out += typeEntityVector.render(ciP, indent, true); // Always comma as StatusCode comes after typeEntityVector
+
+  out += statusCode.render(ciP->outFormat, indent + "  ");
 
   return out;
 }
@@ -81,27 +73,26 @@ std::string EntityTypesResponse::render(Format format, const std::string& indent
 */
 std::string EntityTypesResponse::check
 (
-  RequestType         requestType,
-  Format              format,
+  ConnectionInfo*     ciP,
   const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  const std::string&  predetectedError
 )
 {
+  std::string res;
+
   if (predetectedError != "")
   {
-    return predetectedError;
+    statusCode.fill(SccBadRequest, predetectedError);
   }
-
-  for (unsigned int ix = 0; ix < typeV.size(); ++ix)
+  else if ((res = typeEntityVector.check(ciP, indent, predetectedError)) != "OK")
   {
-    if (typeV[ix] == "")
-    {
-      return "Empty type name";
-    }
+    LM_W(("Bad Input (%s)", res.c_str()));
+    statusCode.fill(SccBadRequest, res);
   }
+  else
+    return "OK";
 
-  return "OK";
+  return render(ciP, "");
 }
 
 
@@ -112,34 +103,10 @@ std::string EntityTypesResponse::check
 */
 void EntityTypesResponse::present(const std::string& indent)
 {
-  PRINTF("%s%lu types:\n", indent.c_str(), (unsigned long) typeV.size());
+  PRINTF("%s%d EntityTypesResponses:\n", indent.c_str(), typeEntityVector.size());
 
-  for (unsigned int ix = 0; ix < typeV.size(); ++ix)
-  {
-    PRINTF("%s  %s\n", indent.c_str(), typeV[ix].c_str());
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypesResponse::push_back - 
-*/
-void EntityTypesResponse::push_back(const std::string& item)
-{
-  typeV.push_back(item);
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypesResponse::size - 
-*/
-unsigned int EntityTypesResponse::size(void)
-{
-  return typeV.size();
+  typeEntityVector.present(indent + "  ");
+  statusCode.present(indent + "  ");
 }
 
 
@@ -150,5 +117,7 @@ unsigned int EntityTypesResponse::size(void)
 */
 void EntityTypesResponse::release(void)
 {
-  typeV.clear();
+  typeEntityVector.release();
+  statusCode.release();
 }
+
