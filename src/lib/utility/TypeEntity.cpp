@@ -68,11 +68,10 @@ std::string TypeEntity::render
   std::string  out            = "";
   std::string  xmlTag         = "entityType";
   std::string  jsonTag        = type;
-  bool         commaAfter    = contextAttributeVector.size() != 0;
 
   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
-  out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", commaAfter);
-  out += endTag(indent, xmlTag, ciP->outFormat, false, false);
+  out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false);
+  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
 
   return out;
 }

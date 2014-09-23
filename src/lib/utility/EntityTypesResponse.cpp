@@ -58,9 +58,11 @@ std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& 
   out += startTag(indent, tag, ciP->outFormat, false);
 
   if (typeEntityVector.size() > 0)
-    out += typeEntityVector.render(ciP, indent, true); // Always comma as StatusCode comes after typeEntityVector
+    out += typeEntityVector.render(ciP, indent + "  ", true); // Always comma as StatusCode comes after typeEntityVector
 
   out += statusCode.render(ciP->outFormat, indent + "  ");
+
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }
