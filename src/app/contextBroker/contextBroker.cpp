@@ -443,6 +443,22 @@ PaArgument paArgs[] =
 #define SCS_COMPS_MULTI    4, { "*", "ngsi10",  "contextSubscriptions", "*" }
 #define SCS_PUT_WORD       "updateContextSubscriptionRequest"
 
+
+
+//
+// New Convenience Operations
+//
+#define ET                 EntityTypes
+#define ET_COMPS           2, { "v1", "contextEntityTypes" }
+
+#define AFET               AttributesForEntityType
+#define AFET_COMPS         4, { "v1", "contextEntityTypes", "*", "attr" }
+
+
+
+//
+//
+//
 #define LOG                LogRequest
 #define LOGT_COMPS         2, { "log", "trace"            }
 #define LOGTL_COMPS        3, { "log", "trace",      "*"  }
@@ -675,7 +691,15 @@ PaArgument paArgs[] =
                                                                                                       \
   { "PUT",    SCS,   SCS_COMPS_MULTI,   SCS_PUT_WORD,     putSubscriptionConvOp                    }, \
   { "DELETE", SCS,   SCS_COMPS_MULTI,   "",               deleteSubscriptionConvOp                 }, \
-  { "*",      SCS,   SCS_COMPS_MULTI,   "",               badVerbPutDeleteOnly                      }
+  { "*",      SCS,   SCS_COMPS_MULTI,   "",               badVerbPutDeleteOnly                     }
+
+
+
+#define NEW_CONVENIENCE_OPERATIONS                                                                    \
+  { "GET",    ET,    ET_COMPS,         "",                getEntityTypes                           }, \
+  { "GET",    AFET,  AFET_COMPS,       "",                getAttributesForEntityType               }
+
+
 
 
 /* *****************************************************************************
@@ -736,7 +760,7 @@ PaArgument paArgs[] =
 * restServiceMTenant - services for BROKER (ngsi9/10) and tenants 
 *
 * This service vector (configuration) is used if the broker is started with
-* the the -multiservice option (but not the -ngsi9 option)
+* the -multiservice option (but not the -ngsi9 option)
 */
 RestService restServiceMTenant[] =
 {
@@ -776,6 +800,7 @@ RestService restServiceV[] =
   NGSI10_STANDARD_REQUESTS,
   NGSI9_CONVENIENCE_OPERATIONS,
   NGSI10_CONVENIENCE_OPERATIONS,
+  NEW_CONVENIENCE_OPERATIONS,
   LOG_REQUESTS,
   VERSION_REQUESTS,
   STAT_REQUESTS,

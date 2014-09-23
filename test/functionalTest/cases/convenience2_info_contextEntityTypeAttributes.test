@@ -24,38 +24,22 @@
 Convenience2 contextEntityTypeAttributes test
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -multiservice url
+brokerStart CB 0-255 IPV4
 --SHELL--
-echo "1. Listing of Entity Type Attributes, without tenant. Response in XML"
-url="/info/contextEntityTypes/xxx/attr"
-orionCurl --url "$url"
+echo "1. Listing of Entity Type Attributes. Response in XML"
+orionCurl --url /v1/contextEntityTypes/xxx/attr
 echo
 echo
 
 
-echo "2. Listing of Entity Type Attributes, with tenant TTT, Response in XML"
-url="/TTT/info/contextEntityTypes/xxx/attr"
-orionCurl --url "$url"
-echo
-echo
-
-
-echo "3. Listing of Entity Type Attributes, without tenant. Response in JSON"
-url="/info/contextEntityTypes/xxx/attr"
-orionCurl --url "$url" --json
-echo
-echo
-
-
-echo "4. Listing of Entity Type Attributes, with tenant TTT, Response in JSON"
-url="/TTT/info/contextEntityTypes/xxx/attr"
-orionCurl --url "$url" --json
+echo "2. Listing of Entity Type Attributes. Response in JSON"
+orionCurl --url /v1/contextEntityTypes/xxx/attr --json
 echo
 echo
 
 
 --REGEXPECT--
-1. Listing of Entity Type Attributes, without tenant. Response in XML
+1. Listing of Entity Type Attributes. Response in XML
 HTTP/1.1 200 OK
 Content-Length: 289
 Content-Type: application/xml
@@ -73,42 +57,7 @@ Date: REGEX(.*)
 </entityTypeAttributesResponse>
 
 
-2. Listing of Entity Type Attributes, with tenant TTT, Response in XML
-HTTP/1.1 200 OK
-Content-Length: 289
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<entityTypeAttributesResponse>
-  <attributesFound>4</attributesFound>
-  <attributes>
-    <attribute>Attribute 1</attribute>
-    <attribute>Attribute 2</attribute>
-    <attribute>Attribute 3</attribute>
-    <attribute>Attribute 4</attribute>
-  </attributes>
-</entityTypeAttributesResponse>
-
-
-3. Listing of Entity Type Attributes, without tenant. Response in JSON
-HTTP/1.1 200 OK
-Content-Length: 129
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "attributes": [
-        "Attribute 1", 
-        "Attribute 2", 
-        "Attribute 3", 
-        "Attribute 4"
-    ], 
-    "attributesFound": "4"
-}
-
-
-4. Listing of Entity Type Attributes, with tenant TTT, Response in JSON
+2. Listing of Entity Type Attributes. Response in JSON
 HTTP/1.1 200 OK
 Content-Length: 129
 Content-Type: application/json

@@ -24,38 +24,24 @@
 Convenience2 contextEntityTypes test
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -multiservice url
+brokerStart CB 0-255 IPV4
 --SHELL--
-echo "1. Listing of Entity Types, without tenant. Response in XML"
-url="/info/contextEntityTypes"
-orionCurl --url "$url"
+
+
+echo "1. Listing of Entity Types. Response in XML"
+orionCurl --url /v1/contextEntityTypes
 echo
 echo
 
 
-echo "2. Listing of Entity Types, with tenant TTT, Response in XML"
-url="/TTT/info/contextEntityTypes"
-orionCurl --url "$url"
-echo
-echo
-
-
-echo "3. Listing of Entity Types, without tenant. Response in JSON"
-url="/info/contextEntityTypes"
-orionCurl --url "$url" --json
-echo
-echo
-
-
-echo "4. Listing of Entity Types, with tenant TTT, Response in JSON"
-url="/TTT/info/contextEntityTypes"
-orionCurl --url "$url" --json
+echo "2. Listing of Entity Types. Response in JSON"
+orionCurl --url /v1/contextEntityTypes --json
 echo
 echo
 
 
 --REGEXPECT--
-1. Listing of Entity Types, without tenant. Response in XML
+1. Listing of Entity Types. Response in XML
 HTTP/1.1 200 OK
 Content-Length: 295
 Content-Type: application/xml
@@ -73,25 +59,7 @@ Date: REGEX(.*)
 </entityTypesResponse>
 
 
-2. Listing of Entity Types, with tenant TTT, Response in XML
-HTTP/1.1 200 OK
-Content-Length: 295
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<entityTypesResponse>
-  <entityTypesFound>4</entityTypesFound>
-  <entityTypes>
-    <entityType>Name of Type 1</entityType>
-    <entityType>Name of Type 2</entityType>
-    <entityType>Name of Type 3</entityType>
-    <entityType>Name of Type 4</entityType>
-  </entityTypes>
-</entityTypesResponse>
-
-
-3. Listing of Entity Types, without tenant. Response in JSON
+2. Listing of Entity Types. Response in JSON
 HTTP/1.1 200 OK
 Content-Length: 131
 Content-Type: application/json
@@ -102,23 +70,6 @@ Date: REGEX(.*)
         "Name of Type 1", 
         "Name of Type 2", 
         "Name of Type 3", 
-        "Name of Type 4"
-    ], 
-    "typesFound": "4"
-}
-
-
-4. Listing of Entity Types, with tenant TTT, Response in JSON
-HTTP/1.1 200 OK
-Content-Length: 131
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "types": [
-        "Name of Type 1",
-        "Name of Type 2",
-        "Name of Type 3",
         "Name of Type 4"
     ], 
     "typesFound": "4"
