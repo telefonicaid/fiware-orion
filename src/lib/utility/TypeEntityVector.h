@@ -50,6 +50,7 @@ class TypeEntityVector
   void          release(void);
   std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
   std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
+  std::string   renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
 
   TypeEntity*   operator[](unsigned int ix)
   {

@@ -70,22 +70,17 @@ std::string getEntityTypes(ConnectionInfo* ciP, int components, std::vector<std:
   // Instead, I create a response by hand, to test the render method
   //
   
-  TypeEntity* te1 = new TypeEntity("Type 1");
-//  TypeEntity* te2 = new TypeEntity("Type 2");
-//  TypeEntity* te3 = new TypeEntity("Type 3");
+  TypeEntity* room = new TypeEntity("Room");
+  TypeEntity* car  = new TypeEntity("Car");
   
-  te1->contextAttributeVector.push_back(new ContextAttribute("A1", "at1", ""));
+  room->contextAttributeVector.push_back(new ContextAttribute("temperature", "celsius", ""));
+  room->contextAttributeVector.push_back(new ContextAttribute("pressure",    "mmHg",    ""));
 
-//  te2->contextAttributeVector.push_back(new ContextAttribute("A1", "at1", ""));
-//  te2->contextAttributeVector.push_back(new ContextAttribute("A2", "at2", ""));
+  car->contextAttributeVector.push_back(new ContextAttribute("temperature", "celsius", ""));
+  car->contextAttributeVector.push_back(new ContextAttribute("pressure",    "mmHg",    ""));
 
-//  te3->contextAttributeVector.push_back(new ContextAttribute("A1", "at1", ""));
-//  te3->contextAttributeVector.push_back(new ContextAttribute("A2", "at2", ""));
-//  te3->contextAttributeVector.push_back(new ContextAttribute("A3", "at3", ""));
-
-  response.typeEntityVector.push_back(te1);
-//  response.typeEntityVector.push_back(te2);
-//  response.typeEntityVector.push_back(te3);
+  response.typeEntityVector.push_back(room);
+  response.typeEntityVector.push_back(car);
 #endif
 
   response.statusCode.fill(SccOk);

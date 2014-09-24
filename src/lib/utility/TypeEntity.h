@@ -38,25 +38,19 @@
 */
 class TypeEntity
 {
-  std::string              type;
 public:
+  std::string              type;
   ContextAttributeVector   contextAttributeVector;
 
  public:
   TypeEntity();
   TypeEntity(std::string _type);
 
-  std::string              check(ConnectionInfo*      ciP,
-                                 const std::string&   indent,
-                                 const std::string&   predetectedError,
-                                 int                  counter);
-
-  std::string              render(ConnectionInfo*     ciP,
-                                  const std::string&  indent,
-                                  bool                comma = false);
-
-  void                     present(const std::string& indent);
-  void                     release(void);
+  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
+  std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
+  std::string   renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
+  void          present(const std::string& indent);
+  void          release(void);
 };
 
 #endif  // SRC_LIB_UTILITY_TYPEENTITY_H_

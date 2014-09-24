@@ -29,13 +29,37 @@ brokerStart CB 0-255 IPV4
 
 
 echo "1. Listing of Entity Types. Response in XML"
-orionCurl --url /v1/contextEntityTypes
+orionCurl --url '/v1/contextTypes'
 echo
 echo
 
 
-echo "2. Listing of Entity Types. Response in JSON"
-orionCurl --url /v1/contextEntityTypes --json
+echo "2. Listing of Entity Types. Response in XML, with details=on"
+orionCurl --url '/v1/contextTypes?details=on'
+echo
+echo
+
+
+echo "3. Listing of Entity Types. Response in JSON"
+orionCurl --url '/v1/contextTypes' --json # --noPayloadCheck
+echo
+echo
+
+
+echo "4. Listing of Entity Types. Response in JSON, with details=on"
+orionCurl --url '/v1/contextTypes?details=on' --json # --noPayloadCheck
+echo
+echo
+
+
+echo "5. Listing of Entity Types. Response in Object-JSON"
+orionCurl --url '/v1/contextTypes?attributesFormat=object' --json # --noPayloadCheck
+echo
+echo
+
+
+echo "6. Listing of Entity Types. Response in Object-JSON, with details=on"
+orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on' --json # --noPayloadCheck
 echo
 echo
 
@@ -43,36 +67,274 @@ echo
 --REGEXPECT--
 1. Listing of Entity Types. Response in XML
 HTTP/1.1 200 OK
-Content-Length: 295
+Content-Length: 1035
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <entityTypesResponse>
-  <entityTypesFound>4</entityTypesFound>
-  <entityTypes>
-    <entityType>Name of Type 1</entityType>
-    <entityType>Name of Type 2</entityType>
-    <entityType>Name of Type 3</entityType>
-    <entityType>Name of Type 4</entityType>
-  </entityTypes>
+  <typeEntities>
+    <entityType>
+      <name>Room</name>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>celsius</type>
+          <contextValue/>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>mmHg</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+    </entityType>
+    <entityType>
+      <name>Car</name>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>celsius</type>
+          <contextValue/>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>mmHg</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+    </entityType>
+  </typeEntities>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
 </entityTypesResponse>
 
 
-2. Listing of Entity Types. Response in JSON
+2. Listing of Entity Types. Response in XML, with details=on
 HTTP/1.1 200 OK
-Content-Length: 131
+Content-Length: 1060
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<entityTypesResponse>
+  <typeEntities>
+    <entityType>
+      <name>Room</name>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>celsius</type>
+          <contextValue/>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>mmHg</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+    </entityType>
+    <entityType>
+      <name>Car</name>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>celsius</type>
+          <contextValue/>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>mmHg</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+    </entityType>
+  </typeEntities>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+    <details>2</details>
+  </statusCode>
+</entityTypesResponse>
+
+
+3. Listing of Entity Types. Response in JSON
+HTTP/1.1 200 OK
+Content-Length: 642
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }, 
     "types": [
-        "Name of Type 1", 
-        "Name of Type 2", 
-        "Name of Type 3", 
-        "Name of Type 4"
-    ], 
-    "typesFound": "4"
+        {
+            "attributes": [
+                {
+                    "name": "temperature", 
+                    "type": "celsius", 
+                    "value": ""
+                }, 
+                {
+                    "name": "pressure", 
+                    "type": "mmHg", 
+                    "value": ""
+                }
+            ], 
+            "name": "Room"
+        }, 
+        {
+            "attributes": [
+                {
+                    "name": "temperature", 
+                    "type": "celsius", 
+                    "value": ""
+                }, 
+                {
+                    "name": "pressure", 
+                    "type": "mmHg", 
+                    "value": ""
+                }
+            ], 
+            "name": "Car"
+        }
+    ]
+}
+
+
+4. Listing of Entity Types. Response in JSON, with details=on
+HTTP/1.1 200 OK
+Content-Length: 663
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "details": "2", 
+        "reasonPhrase": "OK"
+    }, 
+    "types": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature", 
+                    "type": "celsius", 
+                    "value": ""
+                }, 
+                {
+                    "name": "pressure", 
+                    "type": "mmHg", 
+                    "value": ""
+                }
+            ], 
+            "name": "Room"
+        }, 
+        {
+            "attributes": [
+                {
+                    "name": "temperature", 
+                    "type": "celsius", 
+                    "value": ""
+                }, 
+                {
+                    "name": "pressure", 
+                    "type": "mmHg", 
+                    "value": ""
+                }
+            ], 
+            "name": "Car"
+        }
+    ]
+}
+
+
+5. Listing of Entity Types. Response in Object-JSON
+HTTP/1.1 200 OK
+Content-Length: 570
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }, 
+    "types": [
+        {
+            "attributes": {
+                "pressure": {
+                    "type": "mmHg", 
+                    "value": ""
+                }, 
+                "temperature": {
+                    "type": "celsius", 
+                    "value": ""
+                }
+            }, 
+            "name": "Room"
+        }, 
+        {
+            "attributes": {
+                "pressure": {
+                    "type": "mmHg", 
+                    "value": ""
+                }, 
+                "temperature": {
+                    "type": "celsius", 
+                    "value": ""
+                }
+            }, 
+            "name": "Car"
+        }
+    ]
+}
+
+
+6. Listing of Entity Types. Response in Object-JSON, with details=on
+HTTP/1.1 200 OK
+Content-Length: 591
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "details": "2", 
+        "reasonPhrase": "OK"
+    }, 
+    "types": [
+        {
+            "attributes": {
+                "pressure": {
+                    "type": "mmHg", 
+                    "value": ""
+                }, 
+                "temperature": {
+                    "type": "celsius", 
+                    "value": ""
+                }
+            }, 
+            "name": "Room"
+        }, 
+        {
+            "attributes": {
+                "pressure": {
+                    "type": "mmHg", 
+                    "value": ""
+                }, 
+                "temperature": {
+                    "type": "celsius", 
+                    "value": ""
+                }
+            }, 
+            "name": "Car"
+        }
+    ]
 }
 
 

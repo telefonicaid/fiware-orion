@@ -449,10 +449,10 @@ PaArgument paArgs[] =
 // New Convenience Operations
 //
 #define ET                 EntityTypes
-#define ET_COMPS           2, { "v1", "contextEntityTypes" }
+#define ET_COMPS           2, { "v1", "contextTypes" }
 
 #define AFET               AttributesForEntityType
-#define AFET_COMPS         4, { "v1", "contextEntityTypes", "*", "attr" }
+#define AFET_COMPS         3, { "v1", "contextTypes", "*" }
 
 
 
@@ -1292,9 +1292,9 @@ int main(int argC, char* argV[])
   //
   char* x = (char*) malloc(100000);
   snprintf(x, sizeof(x), "A hundred thousand bytes lost here");
-  LM_M(("x: '%s'", x));
+  LM_M(("x: '%s'", x));  // Outdeffed
   x = (char*) "LOST";
-  LM_M(("x: '%s'", x));
+  LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
   RestService* rsP = restServiceV;

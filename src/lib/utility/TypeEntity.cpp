@@ -58,6 +58,29 @@ TypeEntity::TypeEntity(std::string  _type)
 *
 * TypeEntity::render - 
 */
+std::string TypeEntity::renderAsJsonObject
+(
+  ConnectionInfo*     ciP,
+  const std::string&  indent,
+  bool                comma
+)
+{
+  std::string  out            = "";
+  std::string  jsonTag        = type;
+
+  out += startTag(indent, jsonTag, ciP->outFormat, false, false);
+  out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false);
+  out += endTag(indent, "", ciP->outFormat, comma, false);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* TypeEntity::render - 
+*/
 std::string TypeEntity::render
 (
   ConnectionInfo*     ciP,
@@ -69,7 +92,9 @@ std::string TypeEntity::render
   std::string  xmlTag         = "entityType";
   std::string  jsonTag        = type;
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+
+  out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
   out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false);
   out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
 
@@ -86,8 +111,7 @@ std::string TypeEntity::check
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  const std::string&  predetectedError
 )
 {
   if (predetectedError != "")

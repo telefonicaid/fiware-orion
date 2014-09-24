@@ -37,6 +37,28 @@
 
 /* ****************************************************************************
 *
+* EntityTypesResponse::renderAsJsonObject - 
+*/
+std::string EntityTypesResponse::renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent)
+{
+  std::string out                 = "";
+
+  out += startTag(indent, "", ciP->outFormat, false);
+
+  if (typeEntityVector.size() > 0)
+    out += typeEntityVector.render(ciP, indent + "  ", true); // Always comma as StatusCode comes after typeEntityVector
+
+  out += statusCode.render(ciP->outFormat, indent + "  ");
+
+  out += endTag(indent, "", ciP->outFormat);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * EntityTypesResponse::render - 
 */
 std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& indent)
@@ -44,17 +66,19 @@ std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& 
   std::string out                 = "";
   std::string tag                 = "entityTypesResponse";
   
-  LM_M(("URI_PARAM_PAGINATION_DETAILS: '%s'", ciP->uriParam[URI_PARAM_PAGINATION_DETAILS].c_str()));
-
   if (ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] == "on")
   {
     char noOf[16];
 
-    LM_M(("URI_PARAM_PAGINATION_DETAILS == 'on'"));
     snprintf(noOf, sizeof(noOf), "%d", typeEntityVector.size());
     statusCode.details = noOf;
   }
 
+  if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
+  {
+    return renderAsJsonObject(ciP, indent);
+  }
+  
   out += startTag(indent, tag, ciP->outFormat, false);
 
   if (typeEntityVector.size() > 0)

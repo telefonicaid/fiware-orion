@@ -52,6 +52,38 @@ TypeEntityVector::TypeEntityVector()
 
 /* ****************************************************************************
 *
+* TypeEntityVector::renderJsonObject - 
+*/
+std::string TypeEntityVector::renderAsJsonObject
+(
+  ConnectionInfo*     ciP,
+  const std::string&  indent,
+  bool                comma
+)
+{
+  std::string out      = "";
+  std::string jsonTag  = "types";
+  std::string xmlTag   = "";
+
+  if (vec.size() > 0)
+  {
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+    
+    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    {
+      // out += valueTag(indent + "  ", "name", vec[ix]->type, ciP->outFormat, true);
+      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
+    }
+    out += endTag(indent, "", ciP->outFormat, comma, true);
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * TypeEntityVector::render - 
 */
 std::string TypeEntityVector::render
@@ -65,9 +97,15 @@ std::string TypeEntityVector::render
   std::string xmlTag   = "typeEntities";
   std::string jsonTag  = "types";
 
+  if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
+  {
+    return renderAsJsonObject(ciP, indent, comma);
+  }
+  
   if (vec.size() > 0)
   {
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
+    
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
@@ -95,8 +133,10 @@ std::string TypeEntityVector::check
   {
     std::string res;
 
-    if ((res = vec[ix]->check(ciP, indent, predetectedError, 0)) != "OK")
-      return res;
+    if ((res = vec[ix]->check(ciP, indent, predetectedError)) != "OK")
+    {
+     return res;
+    }
   }
 
   return "OK";
