@@ -42,6 +42,8 @@ std::string EntityTypesAttributesResponse::render(Format format, const std::stri
 {
   std::string out                           = "";
   std::string tag                           = "entityTypeAttributesResponse";
+
+  // FIXME P5: Look over the names of the tags for XML and JSON
   std::string xmlEntityTypesAttributesTag   = "attributesFound";
   std::string jsonEntityTypesAttributesTag  = "attributesFound";
   std::string xmlTypesVectorTag             = "attributes";

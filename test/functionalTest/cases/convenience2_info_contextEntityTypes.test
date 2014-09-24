@@ -41,25 +41,25 @@ echo
 
 
 echo "3. Listing of Entity Types. Response in JSON"
-orionCurl --url '/v1/contextTypes' --json # --noPayloadCheck
+orionCurl --url '/v1/contextTypes' --json
 echo
 echo
 
 
 echo "4. Listing of Entity Types. Response in JSON, with details=on"
-orionCurl --url '/v1/contextTypes?details=on' --json # --noPayloadCheck
+orionCurl --url '/v1/contextTypes?details=on' --json
 echo
 echo
 
 
 echo "5. Listing of Entity Types. Response in Object-JSON"
-orionCurl --url '/v1/contextTypes?attributesFormat=object' --json # --noPayloadCheck
+orionCurl --url '/v1/contextTypes?attributesFormat=object' --json
 echo
 echo
 
 
 echo "6. Listing of Entity Types. Response in Object-JSON, with details=on"
-orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on' --json # --noPayloadCheck
+orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on' --json
 echo
 echo
 
