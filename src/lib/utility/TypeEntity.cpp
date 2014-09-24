@@ -28,6 +28,7 @@
 
 #include "common/tag.h"
 #include "ngsi/Request.h"
+#include "rest/uriParamNames.h"
 #include "utility/TypeEntity.h"
 
 
@@ -94,8 +95,16 @@ std::string TypeEntity::render
 
   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
 
-  out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
-  out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false);
+  if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true")
+  {
+    out += valueTag(indent  + "  ", "name", type, ciP->outFormat, false);
+  }
+  else
+  {
+    out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
+    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false);
+  }
+
   out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
 
   return out;

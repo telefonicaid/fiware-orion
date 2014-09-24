@@ -40,26 +40,43 @@ echo
 echo
 
 
-echo "3. Listing of Entity Types. Response in JSON"
+echo "3. Listing of Entity Types. Response in XML, with details=on and collapse=true"
+orionCurl --url '/v1/contextTypes?details=on&collapse=true'
+echo
+echo
+
+echo "4. Listing of Entity Types. Response in JSON"
 orionCurl --url '/v1/contextTypes' --json
 echo
 echo
 
 
-echo "4. Listing of Entity Types. Response in JSON, with details=on"
+echo "5. Listing of Entity Types. Response in JSON, with details=on"
 orionCurl --url '/v1/contextTypes?details=on' --json
 echo
 echo
 
 
-echo "5. Listing of Entity Types. Response in Object-JSON"
+echo "6. Listing of Entity Types. Response in JSON, with details=on and collapse=true"
+orionCurl --url '/v1/contextTypes?details=on&collapse=true' --json
+echo
+echo
+
+
+echo "7. Listing of Entity Types. Response in Object-JSON"
 orionCurl --url '/v1/contextTypes?attributesFormat=object' --json
 echo
 echo
 
 
-echo "6. Listing of Entity Types. Response in Object-JSON, with details=on"
+echo "8. Listing of Entity Types. Response in Object-JSON, with details=on"
 orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on' --json
+echo
+echo
+
+
+echo "9. Listing of Entity Types. Response in Object-JSON, with details=on and collapse=true"
+orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on&collapse=true' --json
 echo
 echo
 
@@ -160,7 +177,31 @@ Date: REGEX(.*)
 </entityTypesResponse>
 
 
-3. Listing of Entity Types. Response in JSON
+3. Listing of Entity Types. Response in XML, with details=on and collapse=true
+HTTP/1.1 200 OK
+Content-Length: 310
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<entityTypesResponse>
+  <typeEntities>
+    <entityType>
+      <name>Room</name>
+    </entityType>
+    <entityType>
+      <name>Car</name>
+    </entityType>
+  </typeEntities>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+    <details>2</details>
+  </statusCode>
+</entityTypesResponse>
+
+
+4. Listing of Entity Types. Response in JSON
 HTTP/1.1 200 OK
 Content-Length: 642
 Content-Type: application/json
@@ -206,7 +247,7 @@ Date: REGEX(.*)
 }
 
 
-4. Listing of Entity Types. Response in JSON, with details=on
+5. Listing of Entity Types. Response in JSON, with details=on
 HTTP/1.1 200 OK
 Content-Length: 663
 Content-Type: application/json
@@ -253,7 +294,30 @@ Date: REGEX(.*)
 }
 
 
-5. Listing of Entity Types. Response in Object-JSON
+6. Listing of Entity Types. Response in JSON, with details=on and collapse=true
+HTTP/1.1 200 OK
+Content-Length: 181
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "details": "2", 
+        "reasonPhrase": "OK"
+    }, 
+    "types": [
+        {
+            "name": "Room"
+        }, 
+        {
+            "name": "Car"
+        }
+    ]
+}
+
+
+7. Listing of Entity Types. Response in Object-JSON
 HTTP/1.1 200 OK
 Content-Length: 570
 Content-Type: application/json
@@ -295,7 +359,7 @@ Date: REGEX(.*)
 }
 
 
-6. Listing of Entity Types. Response in Object-JSON, with details=on
+8. Listing of Entity Types. Response in Object-JSON, with details=on
 HTTP/1.1 200 OK
 Content-Length: 591
 Content-Type: application/json
@@ -332,6 +396,29 @@ Date: REGEX(.*)
                     "value": ""
                 }
             }, 
+            "name": "Car"
+        }
+    ]
+}
+
+
+9. Listing of Entity Types. Response in Object-JSON, with details=on and collapse=true
+HTTP/1.1 200 OK
+Content-Length: 181
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "details": "2", 
+        "reasonPhrase": "OK"
+    }, 
+    "types": [
+        {
+            "name": "Room"
+        }, 
+        {
             "name": "Car"
         }
     ]

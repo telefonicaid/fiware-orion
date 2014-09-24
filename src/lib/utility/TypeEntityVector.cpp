@@ -71,7 +71,6 @@ std::string TypeEntityVector::renderAsJsonObject
     
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      // out += valueTag(indent + "  ", "name", vec[ix]->type, ciP->outFormat, true);
       out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
     }
     out += endTag(indent, "", ciP->outFormat, comma, true);
