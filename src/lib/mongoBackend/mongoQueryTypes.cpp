@@ -44,10 +44,10 @@ HttpStatusCode mongoEntityTypes
   std::map<std::string, std::string>&   uriParams
 )
 {
-  int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  int         limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-  std::string detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  unsigned int offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+  unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+  std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+  bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
   LM_T(LmtMongo, ("Query Entity Types"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
@@ -117,13 +117,22 @@ HttpStatusCode mongoEntityTypes
       return SccOk;
   }
 
-  /* Process query result */
+  /* Processing result to build response*/
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> typesArray = result.getField("result").Array();
 
   for (unsigned int ix = 0; ix < typesArray.size(); ++ix)
   {
+    if (ix < offset)
+    {
+      continue;
+    }
+    if (ix >= offset + limit)
+    {
+      break;
+    }
+
     BSONObj iType = typesArray[ix].embeddedObject();
     TypeEntity* type = new TypeEntity(iType.getStringField("_id"));
     std::vector<BSONElement> attrsArray = iType.getField("attrs").Array();
@@ -136,9 +145,27 @@ HttpStatusCode mongoEntityTypes
     }
 
     responseP->typeEntityVector.push_back(type);
+
   }
 
-  responseP->statusCode.fill(SccOk);
+  if (responseP->typeEntityVector.size() > 0)
+  {
+    responseP->statusCode.fill(SccOk);
+  }
+  else
+  {
+    if (details)
+    {
+      char details[256];
+
+      snprintf(details, sizeof(details), "Number of types: %d. Offset is %d", (int) typesArray.size(), offset);
+      responseP->statusCode.fill(SccContextElementNotFound, details);
+    }
+    else
+    {
+      responseP->statusCode.fill(SccContextElementNotFound);
+    }
+  }
 
   reqSemGive(__FUNCTION__, "query entity types request");
 
