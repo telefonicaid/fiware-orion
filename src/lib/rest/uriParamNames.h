@@ -36,7 +36,7 @@
 #define URI_PARAM_PAGINATION_OFFSET   "offset"
 #define URI_PARAM_PAGINATION_LIMIT    "limit"
 #define URI_PARAM_PAGINATION_DETAILS  "details"
-#define URI_PARAM_ENTITY_TYPE         "collapse"
+#define URI_PARAM_COLLAPSE            "collapse"
 
 
 
