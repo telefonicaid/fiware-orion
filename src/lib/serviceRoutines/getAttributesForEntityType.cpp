@@ -31,6 +31,7 @@
 #include "rest/uriParamNames.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
 
+#include "mongoBackend/mongoQueryTypes.h"
 
 
 /* ****************************************************************************
@@ -82,8 +83,8 @@ std::string getAttributesForEntityType
   EntityTypesAttributesResponse  response;
   std::string                    entityType = (ciP->tenantFromUrl != "")? compV[3] : compV[2];
 
-#if 0
-  mongoAttributesForEntityType(&response, ciP->tenant, ciP->servicePathV, entityType);
+#if 1
+  mongoAttributesForEntityType(entityType, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 #else
   //
   // mongoAttributesForEntityType is not implemented
