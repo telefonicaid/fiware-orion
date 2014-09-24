@@ -29,10 +29,8 @@
 
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/mongoQueryContext.h"
-#include "ngsi/EntityId.h"
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "mongoBackend/mongoQueryTypes.h"
+#include "utility/EntityTypesResponse.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -40,76 +38,14 @@
 *
 * Tests
 *
-* Note that these tests are similar in structure to the ones in DiscoverContextAvailability,
-* due to both operations behaves quite similar regarding entities and attributes matching
+* - queryAllType (*)
+* - queryGivenType
+* - monboDbQueryFail
 *
-* With pagination:
-*
-* - paginationDetails
-* - paginationAll
-* - paginationOnlyFirst
-* - paginationOnlySecond
-* - paginationRange
-* - paginationNonExisting
-* - paginationNonExistingOverlap
-* - paginationNonExistingDetails
-*
-* With servicePath:
-*
-* - queryWithServicePathEntPatternType_2levels
-* - queryWithServicePathEntPatternType_1level
-* - queryWithServicePathEntPatternType_0levels
-* - queryWithServicePathEntPatternType_1levelbis
-* - queryWithIdenticalEntitiesButDifferentServicePath_case1
-* - queryWithIdenticalEntitiesButDifferentServicePath_case2
-* - queryWithIdenticalEntitiesButDifferentServicePath_case3
-* - queryWithIdenticalEntitiesButDifferentServicePath_case4
-* - queryWithServicePathEntPatternNoType_2levels
-* - queryWithServicePathEntPatternNoType_1level
-* - queryWithServicePathEntPatternNoType_0levels
-* - queryWithServicePathEntPatternNoType_1levelbis
-* - queryWithServicePathEntNoPatternTypeFail
-* - queryWithServicePathEntNoPatternTypeOk
-* - queryWithServicePathEntNoPatternNoType
-* - queryWithSeveralServicePaths
-*
-* With isPattern=false:
-*
-* - query1Ent0Attr
-* - query1Ent1Attr
-* - query1Ent1AttrSameName
-* - queryNEnt0Attr
-* - queryNEnt1AttrSingle
-* - queryNEnt1AttrMulti
-* - queryNEntNAttr
-* - query1Ent0AttrFail
-* - query1Ent1AttrFail
-* - query1EntWA0AttrFail
-* - query1EntWA1Attr
-* - queryNEntWA0Attr
-* - queryNEntWA1Attr
-* - queryNoType
-* - queryIdMetadata
-* - queryCustomMetadata
-*
-* (N=2 without loss of generality)
-* (WA = Without Attributes)
-*
-* With isPattern=true:
-*
-* - queryPattern0Attr
-* - queryPattern1AttrSingle
-* - queryPattern1AttrMulti
-* - queryPatternNAttr
-* - queryPatternFail
-* - queryMixPatternAndNotPattern
-* - queryNoTypePattern
-* - queryIdMetadataPattern
-* - queryCustomMetadataPattern
-*
-* Simulating fails in MongoDB connection:
-*
-* - mongoDbQueryFail
+* (*) FIXME: currently mongoBackend doesn't interprets collapse parameter (considering
+* that the "collapse prunning" is done at render layer). However, if in the future
+* we change this operation, a new case has to be added to test that mongoBackend honour
+* the collapse parameter.
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
 * mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
@@ -131,60 +67,69 @@ static void prepareDatabase(void) {
 
   DBClientBase* connection = getMongoConnection();
 
-  /* We create the following entities:
+  /* We create the following entities (value is not meaniful)
    *
-   * - E1:
-   *     A1: val1
-   *     A2: val2
-   * - E2
-   *     A2: val2bis
-   *     A3: val3
-   * - E4
-   *     (no attrs)
-   * - E1*
-   *     A1: val1bis
-   *     A1*: val1bis2
-   * - E1**
-   *     A1: val1bis1
+   * - Type Car:
+   *     Car1: pos, temp, plate
+   *     Car2: pos, plate(*), fuel
+   *     Car3: pos, colour
+   * - Type Room:
+   *     Room1: pos, temp
+   *     Room2: pos, humidity
+   * - Type Lamp:
+   *     Lamp1: battery, status
    *
-   * (*) Means that entity/type is using same name but different type. This is included to check that type is
-   *     taken into account.
-   * (**)same name but without type
+   * (*) Diferent type in the attribute
    */
 
-  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
+  BSONObj en1 = BSON("_id" << BSON("id" << "Car1" << "type" << "Car") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2")
+                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "1") <<
+                        BSON("name" << "temp" << "type" << "temp_T" << "value" << "2") <<
+                        BSON("name" << "plate" << "type" << "plate_T" << "value" << "3")
                         )
                     );
 
-  BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
+  BSONObj en2 = BSON("_id" << BSON("id" << "Car2" << "type" << "Car") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2bis") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "val3")
+                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "4") <<
+                        BSON("name" << "plate" << "type" << "plate_T2" << "value" << "5") <<
+                        BSON("name" << "fuel" << "type" << "fuel_T" << "value" << "6")
                         )
                     );
 
-  BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T4") <<
-                     "attrs" << BSONArray()
-                    );
-
-  BSONObj en5 = BSON("_id" << BSON("id" << "E1" << "type" << "T1bis") <<
+  BSONObj en3 = BSON("_id" << BSON("id" << "Car3" << "type" << "Car") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1bis") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "val1bis2")
+                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "7") <<
+                        BSON("name" << "colour" << "type" << "colour_T" << "value" << "8")
                         )
                     );
 
-  BSONObj en6 = BSON("_id" << BSON("id" << "E1") <<
+  BSONObj en4 = BSON("_id" << BSON("id" << "Room1" << "type" << "Room") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1bis1")
+                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "9") <<
+                        BSON("name" << "temp" << "type" << "temp_T" << "value" << "10")
                         )
                     );
+
+  BSONObj en5 = BSON("_id" << BSON("id" << "Room2" << "type" << "Room") <<
+                     "attrs" << BSON_ARRAY(
+                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "11") <<
+                        BSON("name" << "humidity" << "type" << "humidity_T" << "value" << "12")
+                        )
+                    );
+
+  BSONObj en6 = BSON("_id" << BSON("id" << "Lamp1" << "type" << "Lamp") <<
+                     "attrs" << BSON_ARRAY(
+                        BSON("name" << "battery" << "type" << "battery_T" << "value" << "13") <<
+                        BSON("name" << "status" << "type" << "status_T" << "value" << "14")
+                        )
+                    );
+
 
   connection->insert(ENTITIES_COLL, en1);
   connection->insert(ENTITIES_COLL, en2);
+  connection->insert(ENTITIES_COLL, en3);
   connection->insert(ENTITIES_COLL, en4);
   connection->insert(ENTITIES_COLL, en5);
   connection->insert(ENTITIES_COLL, en6);
@@ -193,402 +138,116 @@ static void prepareDatabase(void) {
 
 /* ****************************************************************************
 *
-* prepareDatabasePatternTrue -
-*
-* This is a variant of populateDatabase function in which all entities have the same type,
-* to ease test for isPattern=true cases
-*/
-static void prepareDatabasePatternTrue(void) {
-
-  /* Set database */
-  setupDatabase();
-
-  DBClientBase* connection = getMongoConnection();
-
-  /* We create the following entities:
-   *
-   * - E1:
-   *     A1: val1
-   *     A2: val2
-   * - E2
-   *     A2: val2bis
-   *     A3: val3
-   * - E1*:
-   *     A4: val4
-   *     A5: val5
-   * - E4
-   *     (no attrs)
-   * - E2**
-   *     A2: val2bis1
-   */
-
-  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2")
-                        )
-                    );
-
-  BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2bis") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "val3")
-                        )
-                    );
-
-  BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T") <<
-                     "attrs" << BSONArray()
-                    );
-
-  BSONObj en5 = BSON("_id" << BSON("id" << "E1" << "type" << "Tbis") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A4" << "type" << "TA4" << "value" << "val4") <<
-                        BSON("name" << "A5" << "type" << "TA5" << "value" << "val5")
-                        )
-                    );
-
-  BSONObj en6 = BSON("_id" << BSON("id" << "E2") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2bis1")
-                        )
-                    );
-
-  connection->insert(ENTITIES_COLL, en1);
-  connection->insert(ENTITIES_COLL, en2);
-  connection->insert(ENTITIES_COLL, en4);
-  connection->insert(ENTITIES_COLL, en5);
-  connection->insert(ENTITIES_COLL, en6);
-
-}
-
-/* ****************************************************************************
-*
-* prepareDatabaseWithAttributeIds -
-*
-* This function is called before every test, to populate some information in the
-* entities collection.
-*/
-static void prepareDatabaseWithAttributeIds(void) {
-
-    /* Start with the base entities */
-    prepareDatabase();
-
-    /* Add some entities with metadata ID */
-
-    DBClientBase* connection = getMongoConnection();
-    BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "A" << "id" << "ID1") <<
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "B" << "id" << "ID2") <<
-                          BSON("name" << "A1" << "type" << "TA11" << "value" << "C") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "D")
-                          )
-                      );
-
-    BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "E" << "id" << "ID1") <<
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "F" << "id" << "ID2") <<
-                          BSON("name" << "A1" << "type" << "TA11" << "value" << "G") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "H")
-                          )
-                      );
-
-    connection->insert(ENTITIES_COLL, en1);
-    connection->insert(ENTITIES_COLL, en2);
-
-}
-
-/* ****************************************************************************
-*
-* prepareDatabaseWithAttributeCustomMetadata -
-*
-* This function is called before every test, to populate some information in the
-* entities collection.
-*/
-static void prepareDatabaseWithCustomMetadata(void) {
-
-    /* Start with the base entities */
-    prepareDatabase();
-
-    /* Add some entities with metadata ID */
-
-    DBClientBase* connection = getMongoConnection();
-    BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "A" <<
-                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "1") <<
-                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << "2")
-                                                 )
-                               ) <<
-                          BSON("name" << "A1" << "type" << "TA11" << "value" << "B" <<
-                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "3") <<
-                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << "4")
-                                                 )
-                               ) <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "C" <<
-                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "5") <<
-                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << "6")
-                                                 )
-                               )
-                          )
-                      );
-
-    BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                           BSON("name" << "A1" << "type" << "TA1" << "value" << "D" <<
-                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "7") <<
-                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "8")
-                                                  )
-                                ) <<
-                           BSON("name" << "A1" << "type" << "TA11" << "value" << "E" <<
-                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "9") <<
-                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "10")
-                                                  )
-                                ) <<
-                           BSON("name" << "A2" << "type" << "TA2" << "value" << "F" <<
-                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "11") <<
-                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "12")
-                                                  )
-                                )
-                          )
-                      );
-
-    connection->insert(ENTITIES_COLL, en1);
-    connection->insert(ENTITIES_COLL, en2);
-}
-
-/* ****************************************************************************
-*
-* prepareDatabaseWithServicePath -
+* queryAllTypes -
 *
 */
-static void prepareDatabaseWithServicePath(const std::string modifier)
-{
-  /* Set database */
-  setupDatabase();
-
-  DBClientBase* connection = getMongoConnection();
-
-  /* We create the following entities:
-   *
-   * - E1:  { Type: T, ServicePath: /home,        Attribute: { A1, a1  } }
-   * - E2:  { Type: T, ServicePath: /home/kz,     Attribute: { A1, a2  } }
-   * - E3:  { Type: T, ServicePath: /home/fg,     Attribute: { A1, a3  } }
-   * - E4:  { Type: T, ServicePath: /home/kz/e4,  Attribute: { A1, a4  } }
-   * - E5:  { Type: T, ServicePath: /home/kz/e5,  Attribute: { A1, a5  } }
-   * - E6:  { Type: T, ServicePath: /home/fg/e6,  Attribute: { A1, a6  } }
-   * - E7:  { Type: T, ServicePath: /home2,       Attribute: { A1, a7  } }
-   * - E8:  { Type: T, ServicePath: /home2/kz,    Attribute: { A1, a8  } }
-   * - E9:  { Type: T, ServicePath: "",           Attribute: { A1, a9  } }
-   * - E10: { Type: T, ServicePath: NO,           Attribute: { A1, a10 } }
-   * - E11: { Type: T, ServicePath: /home3/e11,   Attribute: { A1, a11 } }
-   * - E12: { Type: T, ServicePath: /home3/e12,   Attribute: { A1, a12 } }
-   * - E13: { Type: T, ServicePath: /home3/e13,   Attribute: { A1, a13 } }
-   *
-   */
-
-  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T" << "servicePath" << "/home")       << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a1")));
-  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T" << "servicePath" << "/home/kz")    << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a2")));
-  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T" << "servicePath" << "/home/fg")    << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a3")));
-  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T" << "servicePath" << "/home/kz/e4") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a4")));
-  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T" << "servicePath" << "/home/kz/e5") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a5")));
-  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T" << "servicePath" << "/home/fg/e6") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a6")));
-  BSONObj e07 = BSON("_id" << BSON("id" << "E7"  << "type" << "T" << "servicePath" << "/home2")      << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a7")));
-  BSONObj e08 = BSON("_id" << BSON("id" << "E8"  << "type" << "T" << "servicePath" << "/home2/kz")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a8")));
-  BSONObj e09 = BSON("_id" << BSON("id" << "E9"  << "type" << "T" << "servicePath" << "")            << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a9")));
-  BSONObj e10 = BSON("_id" << BSON("id" << "E10" << "type" << "T")                                   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a10")));
-
-  BSONObj e11 = BSON("_id" << BSON("id" << "E11" << "type" << "T" << "servicePath" << "/home3/e11")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a11")));
-  BSONObj e12 = BSON("_id" << BSON("id" << "E12" << "type" << "T" << "servicePath" << "/home3/e12")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a12")));
-  BSONObj e13 = BSON("_id" << BSON("id" << "E13" << "type" << "T" << "servicePath" << "/home3/e13")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a13")));
-
-  connection->insert(ENTITIES_COLL, e01);
-  connection->insert(ENTITIES_COLL, e02);
-  connection->insert(ENTITIES_COLL, e03);
-  connection->insert(ENTITIES_COLL, e04);
-  connection->insert(ENTITIES_COLL, e05);
-  connection->insert(ENTITIES_COLL, e06);
-  connection->insert(ENTITIES_COLL, e07);
-  connection->insert(ENTITIES_COLL, e08);
-  connection->insert(ENTITIES_COLL, e09);
-  connection->insert(ENTITIES_COLL, e10);
-  connection->insert(ENTITIES_COLL, e11);
-  connection->insert(ENTITIES_COLL, e12);
-  connection->insert(ENTITIES_COLL, e13);
-
-  if (modifier == "")
-    return;
-
-  if (modifier == "patternNoType")
-  {
-    BSONObj e = BSON("_id" << BSON("id" << "E" << "type" << "OOO" << "servicePath" << "/home/kz/123")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ae_1")));
-    connection->insert(ENTITIES_COLL, e);
-  }
-  else if (modifier == "noPatternNoType")
-  {
-    BSONObj e = BSON("_id" << BSON("id" << "E3" << "type" << "OOO" << "servicePath" << "/home/fg/124")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ae_2")));
-    connection->insert(ENTITIES_COLL, e);
-  }
-  else if (modifier == "IdenticalEntitiesButDifferentServicePaths")
-  {
-    BSONObj ie1 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/01")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_01")));
-    BSONObj ie2 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/02")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_02")));
-    BSONObj ie3 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/03")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_03")));
-
-    connection->insert(ENTITIES_COLL, ie1);
-    connection->insert(ENTITIES_COLL, ie2);
-    connection->insert(ENTITIES_COLL, ie3);
-  }
-}
-
-/* ****************************************************************************
-*
-* prepareDatabaseWithServicePath -
-*
-*/
-static void prepareDatabaseForPagination(void)
-{
-  /* Set database */
-  setupDatabase();
-
-  DBClientBase* connection = getMongoConnection();
-
-  /* We create the following entities:
-   *
-   * - E1:  { Type: T, Attribute: { A1, a1  } }
-   * - E2:  { Type: T, Attribute: { A1, a2  } }
-   * - E3:  { Type: T, Attribute: { A1, a3  } }
-   * - E4:  { Type: T, Attribute: { A1, a4  } }
-   * - E5:  { Type: T, Attribute: { A1, a5  } }
-   * - E6:  { Type: T, Attribute: { A1, a6  } }
-   *
-   */
-
-  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a1")));
-  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a2")));
-  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a3")));
-  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a4")));
-  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a5")));
-  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a6")));
-
-  connection->insert(ENTITIES_COLL, e01);
-  connection->insert(ENTITIES_COLL, e02);
-  connection->insert(ENTITIES_COLL, e03);
-  connection->insert(ENTITIES_COLL, e04);
-  connection->insert(ENTITIES_COLL, e05);
-  connection->insert(ENTITIES_COLL, e06);
-}
-
-/* ****************************************************************************
-*
-* paginationDetails -
-*
-*/
-TEST(mongoQueryTypes, paginationDetails)
+TEST(mongoQueryTypes, queryAllType)
 {
     HttpStatusCode         ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+    EntityTypesResponse     res;
 
     utInit();
 
     /* Prepare database */
-    prepareDatabaseForPagination();
-
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E.*", "T", "true");
-    req.entityIdVector.push_back(&en);
-    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+    prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+    ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccOk, res.errorCode.code);
-    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
-    EXPECT_EQ("Count: 6", res.errorCode.details);
+    EXPECT_EQ(SccOk, res.statusCode.code);
+    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
+    EXPECT_EQ("", res.statusCode.details);
 
-    ASSERT_EQ(6, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    ASSERT_EQ(3, res.typeEntityVector.size());
 
-    /* Context Element response # 2 */
-    EXPECT_EQ("E2", RES_CER(1).entityId.id);
-    EXPECT_EQ("T", RES_CER(1).entityId.type);
-    EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("a2", RES_CER_ATTR(1, 0)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+    /* Type # 1 */
+    EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
+    ASSERT_EQ(6, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
-    /* Context Element response # 3 */
-    EXPECT_EQ("E3", RES_CER(2).entityId.id);
-    EXPECT_EQ("T", RES_CER(2).entityId.type);
-    EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-    EXPECT_EQ("a3", RES_CER_ATTR(2, 0)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
+    EXPECT_EQ("fuel", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->name);
+    EXPECT_EQ("fuel_T", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->metadataVector.size());
 
-    /* Context Element response # 4 */
-    EXPECT_EQ("E4", RES_CER(3).entityId.id);
-    EXPECT_EQ("T", RES_CER(3).entityId.type);
-    EXPECT_EQ("false", RES_CER(3).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
-    EXPECT_EQ("a4", RES_CER_ATTR(3, 0)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
+    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->name);
+    EXPECT_EQ("plate_T", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->metadataVector.size());
 
-    /* Context Element response # 5 */
-    EXPECT_EQ("E5", RES_CER(4).entityId.id);
-    EXPECT_EQ("T", RES_CER(4).entityId.type);
-    EXPECT_EQ("false", RES_CER(4).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(4).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(4, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(4, 0)->type);
-    EXPECT_EQ("a5", RES_CER_ATTR(4, 0)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(4).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(4).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(4).details.size());
+    EXPECT_EQ("temp", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->name);
+    EXPECT_EQ("temp_T", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->metadataVector.size());
 
-    /* Context Element response # 6 */
-    EXPECT_EQ("E6", RES_CER(5).entityId.id);
-    EXPECT_EQ("T", RES_CER(5).entityId.type);
-    EXPECT_EQ("false", RES_CER(5).entityId.isPattern);
-    ASSERT_EQ(1, RES_CER(5).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(5, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(5, 0)->type);
-    EXPECT_EQ("a6", RES_CER_ATTR(5, 0)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(5).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(5).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(5).details.size());
+    EXPECT_EQ("colour", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->name);
+    EXPECT_EQ("colour_T", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->metadataVector.size());
+
+    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->name);
+    EXPECT_EQ("plate_T2", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->metadataVector.size());
+
+    EXPECT_EQ("pos", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->name);
+    EXPECT_EQ("pos_T", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->metadataVector.size());
+
+    /* Type # 2 */
+    EXPECT_EQ("Lamp", res.typeEntityVector.get(1)->type);
+    ASSERT_EQ(2, res.typeEntityVector.get(1)->contextAttributeVector.size());
+
+    EXPECT_EQ("status", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->name);
+    EXPECT_EQ("status_T", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->metadataVector.size());
+
+    EXPECT_EQ("battery", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->name);
+    EXPECT_EQ("battery_T", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->metadataVector.size());
+
+    /* Type # 3 */
+    EXPECT_EQ("Room", res.typeEntityVector.get(2)->type);
+    ASSERT_EQ(3, res.typeEntityVector.get(2)->contextAttributeVector.size());
+
+    EXPECT_EQ("humidity", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->name);
+    EXPECT_EQ("humidity_T", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(0)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(0)->metadataVector.size());
+
+    EXPECT_EQ("temp", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->name);
+    EXPECT_EQ("temp_T", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(1)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(1)->metadataVector.size());
+
+    EXPECT_EQ("pos", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->name);
+    EXPECT_EQ("pos_T", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->type);
+    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->value);
+    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(2)->compoundValueP);
+    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(2)->metadataVector.size());
 
     /* Release connection */
     mongoDisconnect();
 
     utExit();
 }
+
+#if 0
 
 /* ****************************************************************************
 *
@@ -3630,3 +3289,4 @@ TEST(mongoQueryTypes, mongoDbQueryFail)
     delete connectionMock;
 }
 
+#endif

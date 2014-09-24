@@ -219,6 +219,13 @@ extern void setAssociationsCollectionName(std::string name);
 
 /*****************************************************************************
 *
+* composeDatabaseName -
+*
+*/
+extern std::string composeDatabaseName(std::string tenant);
+
+/*****************************************************************************
+*
 * getEntitiesCollectionName -
 */
 extern std::string getEntitiesCollectionName(std::string tenant);

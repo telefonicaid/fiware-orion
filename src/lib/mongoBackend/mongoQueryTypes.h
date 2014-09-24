@@ -38,7 +38,7 @@
 */
 extern HttpStatusCode mongoEntityTypes
 (
-  EntityTypesResponse*                  requestP,
+  EntityTypesResponse*                  responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams
@@ -51,7 +51,7 @@ extern HttpStatusCode mongoEntityTypes
 extern HttpStatusCode mongoAttributesForEntityType
 (
   std::string                           entityType,
-  EntityTypesAttributesResponse*        requestP,
+  EntityTypesAttributesResponse*        responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams
