@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
+#include "rest/uriParamNames.h"
 #include "utility/EntityTypesAttributesResponse.h"
 
 
@@ -38,39 +39,25 @@
 *
 * EntityTypesAttributesResponse::render - 
 */
-std::string EntityTypesAttributesResponse::render(Format format, const std::string& indent)
+std::string EntityTypesAttributesResponse::render(ConnectionInfo* ciP, const std::string& indent)
 {
-  std::string out                           = "";
-  std::string tag                           = "entityTypeAttributesResponse";
-
-  // FIXME P5: Look over the names of the tags for XML and JSON
-  std::string xmlEntityTypesAttributesTag   = "attributesFound";
-  std::string jsonEntityTypesAttributesTag  = "attributesFound";
-  std::string xmlTypesVectorTag             = "attributes";
-  std::string jsonTypesVectorTag            = "attributes";
-  std::string noOfAttributes;
-  char        noOfAttributesV[32];
-  bool        commaAfterNoOfTypes           = attributeV.size() != 0;
-
-  snprintf(noOfAttributesV, sizeof(noOfAttributesV), "%lu", attributeV.size());
-  noOfAttributes = noOfAttributesV;
-
-  out += startTag(indent, tag, format, false);
-  out += valueTag(indent + "  ", xmlEntityTypesAttributesTag, jsonEntityTypesAttributesTag, noOfAttributes, format, commaAfterNoOfTypes);
-
-  if (attributeV.size() > 0)
+  std::string out                 = "";
+  std::string tag                 = "entityTypeAttributesResponse";
+  
+  if (ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] == "on")
   {
-    out += startTag(indent + "  ", xmlTypesVectorTag, jsonTypesVectorTag, format, true, true);
+    char noOf[16];
 
-    for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
-    {
-      out += valueTag(indent + "    ", "attribute", "", attributeV[ix], format, (ix < attributeV.size() - 1), false);
-    }
-
-    out += endTag(indent + "  ", xmlTypesVectorTag, format, false, true);
+    snprintf(noOf, sizeof(noOf), "%d", entityType.contextAttributeVector.size());
+    statusCode.details = noOf;
   }
 
-  out += endTag(indent, tag, format, false);
+  out += startTag(indent, tag, ciP->outFormat, false);
+
+  out += entityType.render(ciP, indent + "  ", true, true); // Always comma as StatusCode comes after entityType
+  out += statusCode.render(ciP->outFormat, indent + "  ");
+
+  out += endTag(indent, tag, ciP->outFormat);
 
   return out;
 }
@@ -83,27 +70,26 @@ std::string EntityTypesAttributesResponse::render(Format format, const std::stri
 */
 std::string EntityTypesAttributesResponse::check
 (
-  RequestType         requestType,
-  Format              format,
+  ConnectionInfo*     ciP,
   const std::string&  indent,
-  const std::string&  predetectedError,
-  int                 counter
+  const std::string&  predetectedError
 )
 {
+  std::string res;
+
   if (predetectedError != "")
   {
-    return predetectedError;
+    statusCode.fill(SccBadRequest, predetectedError);
   }
-
-  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  else if ((res = entityType.check(ciP, indent, predetectedError)) != "OK")
   {
-    if (attributeV[ix] == "")
-    {
-      return "Empty type name";
-    }
+    LM_W(("Bad Input (%s)", res.c_str()));
+    statusCode.fill(SccBadRequest, res);
   }
+  else
+    return "OK";
 
-  return "OK";
+  return render(ciP, "");
 }
 
 
@@ -114,34 +100,9 @@ std::string EntityTypesAttributesResponse::check
 */
 void EntityTypesAttributesResponse::present(const std::string& indent)
 {
-  PRINTF("%s%lu types:\n", indent.c_str(), (unsigned long) attributeV.size());
-
-  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
-  {
-    PRINTF("%s  %s\n", indent.c_str(), attributeV[ix].c_str());
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypesAttributesResponse::push_back - 
-*/
-void EntityTypesAttributesResponse::push_back(const std::string& item)
-{
-  attributeV.push_back(item);
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityTypesAttributesResponse::size - 
-*/
-unsigned int EntityTypesAttributesResponse::size(void)
-{
-  return attributeV.size();
+  PRINTF("%sEntityTypesAttributesResponse:\n", indent.c_str());
+  entityType.present("indent + "  "");
+  statusCode.present("indent + "  "");
 }
 
 
@@ -152,5 +113,6 @@ unsigned int EntityTypesAttributesResponse::size(void)
 */
 void EntityTypesAttributesResponse::release(void)
 {
-  attributeV.clear();
+  entityType.release();
+  statusCode.release();
 }

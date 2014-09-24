@@ -30,6 +30,8 @@
 
 #include "common/Format.h"
 #include "ngsi/Request.h"
+#include "ngsi/StatusCode.h"
+#include "utility/TypeEntity.h"
 
 
 
@@ -40,15 +42,13 @@
 class EntityTypesAttributesResponse
 {
 public:
-  std::vector<std::string> attributeV;
+  TypeEntity    entityType;
+  StatusCode    statusCode;
 
-  std::string   render(Format format, const std::string& indent);
-  std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+  std::string   render(ConnectionInfo* ciP, const std::string& indent);
+  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);
-  void          push_back(const std::string& item);
-  unsigned int  size(void);
-  std::string   operator[](unsigned int ix)       { if (ix < attributeV.size()) return attributeV[ix]; else return ""; }
 };
 
 #endif  // SRC_LIB_UTILITY_ENTITYTYPESATTRIBUTESRESPONSE_H_

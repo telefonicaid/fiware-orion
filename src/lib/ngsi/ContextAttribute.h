@@ -45,6 +45,8 @@ typedef struct ContextAttribute
   std::string     name;            // Mandatory
   std::string     type;            // Optional
   std::string     value;           // Optional (FI-WARE changes - MANDATORY in OMA spec)
+                                   //          Especially for the new convops, value is NOT mandapory
+                                   //          E.g. /v1/contextTypes
   MetadataVector  metadataVector;  // Optional
 
   std::string                typeFromXmlAttribute;
@@ -59,8 +61,8 @@ typedef struct ContextAttribute
   std::string  getId();
   std::string  getLocation();
 
-  std::string  render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
-  std::string  renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma);
+  std::string  render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool omitValue = false);
+  std::string  renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma, bool omitValue = false);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(void);

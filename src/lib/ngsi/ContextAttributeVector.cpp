@@ -77,7 +77,8 @@ std::string ContextAttributeVector::render
   ConnectionInfo*     ciP,
   RequestType         request,
   const std::string&  indent,
-  bool                comma
+  bool                comma,
+  bool                omitValue
 )
 {
   std::string out      = "";
@@ -132,7 +133,7 @@ std::string ContextAttributeVector::render
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
+      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1, omitValue);
     }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
   }
@@ -141,7 +142,7 @@ std::string ContextAttributeVector::render
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
+      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1, omitValue);
     }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
   }

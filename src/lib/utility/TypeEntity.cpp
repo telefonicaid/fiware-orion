@@ -70,7 +70,7 @@ std::string TypeEntity::renderAsJsonObject
   std::string  jsonTag        = type;
 
   out += startTag(indent, jsonTag, ciP->outFormat, false, false);
-  out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false);
+  out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true);
   out += endTag(indent, "", ciP->outFormat, comma, false);
 
   return out;
@@ -86,14 +86,22 @@ std::string TypeEntity::render
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
-  bool                comma
+  bool                comma,
+  bool                typeNameBefore
 )
 {
   std::string  out            = "";
   std::string  xmlTag         = "entityType";
   std::string  jsonTag        = type;
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  if (typeNameBefore == true)
+  {
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+  }
+  else
+  {
+   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  }
 
   if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true")
   {
@@ -101,8 +109,11 @@ std::string TypeEntity::render
   }
   else
   {
-    out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
-    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false);
+    if (typeNameBefore == false)
+    {
+      out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
+    }
+    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true);
   }
 
   out += endTag(indent, xmlTag, ciP->outFormat, comma, false);

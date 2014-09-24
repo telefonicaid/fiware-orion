@@ -63,7 +63,7 @@ std::string getEntityTypes(ConnectionInfo* ciP, int components, std::vector<std:
   EntityTypesResponse response;
 
 #if 0
-  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV);
+  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParams);
 #else
   //
   // mongoEntityTypes is not implemented

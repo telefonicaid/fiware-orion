@@ -167,19 +167,29 @@ std::string ContextAttribute::getLocation()
 *
 * renderAsJsonObject - 
 */
-std::string ContextAttribute::renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma)
+std::string ContextAttribute::renderAsJsonObject
+(
+  ConnectionInfo*     ciP,
+  const std::string&  indent,
+  bool                comma,
+  bool                omitValue
+)
 {
   std::string  out                    = "";
   std::string  jsonTag                = name;
   bool         commaAfterContextValue = metadataVector.size() != 0;
+  bool         commaAfterType         = !omitValue || commaAfterContextValue;
 
   out += startTag(indent, "", jsonTag, ciP->outFormat, false, true);
-  out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, true);
+  out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, commaAfterType);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                    value, ciP->outFormat, commaAfterContextValue);
+    if (omitValue == false)
+    {
+      out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                      value, ciP->outFormat, commaAfterContextValue);
+    }
   }
   else
   {
@@ -195,7 +205,11 @@ std::string ContextAttribute::renderAsJsonObject(ConnectionInfo* ciP, const std:
     out += endTag(indent + "  ", "contextValue", ciP->outFormat, commaAfterContextValue, isCompoundVector);
   }
 
-  out += metadataVector.render(ciP->outFormat, indent + "  ", false);
+  if (omitValue == false)
+  {
+    out += metadataVector.render(ciP->outFormat, indent + "  ", false);
+  }
+
   out += endTag(indent, "", ciP->outFormat, comma);
 
   return out;
@@ -211,35 +225,35 @@ std::string ContextAttribute::render
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
-  bool                comma
+  bool                comma,
+  bool                omitValue
 )
 {
   std::string  out                    = "";
   std::string  xmlTag                 = "contextAttribute";
   std::string  jsonTag                = "attribute";
   bool         commaAfterContextValue = metadataVector.size() != 0;
+  bool         commaAfterType         = !omitValue || commaAfterContextValue;
+  bool         commaAfterName         = commaAfterType || (type != "");
 
   metadataVector.tagSet("metadata");
 
   if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
   {
-    return renderAsJsonObject(ciP, indent, comma);
+    return renderAsJsonObject(ciP, indent, comma, omitValue);
   }
 
-
-  //
-  // About JSON commas:
-  // contextValue is MANDATORY, so up to that field, all will wear the JSON comma
-  // contextValue itself has a comma if metadataVector is rendered
-  //
   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
-  out += valueTag(indent + "  ", "name",         name,  ciP->outFormat, true);
-  out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, true);
+  out += valueTag(indent + "  ", "name",         name,  ciP->outFormat, commaAfterName);
+  out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, commaAfterType);
 
   if (compoundValueP == NULL)
   {
-    out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                    value, ciP->outFormat, commaAfterContextValue);
+    if (omitValue == false)
+    {
+      out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                      value, ciP->outFormat, commaAfterContextValue);
+    }
   }
   else
   {

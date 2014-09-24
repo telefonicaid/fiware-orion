@@ -26,14 +26,16 @@ Convenience2 contextEntityTypeAttributes test
 dbInit CB
 brokerStart CB 0-255 IPV4
 --SHELL--
+
+
 echo "1. Listing of Entity Type Attributes. Response in XML"
-orionCurl --url /v1/contextTypes/xxx
+orionCurl --url /v1/contextTypes/EntityType
 echo
 echo
 
 
 echo "2. Listing of Entity Type Attributes. Response in JSON"
-orionCurl --url /v1/contextTypes/xxx --json
+orionCurl --url /v1/contextTypes/EntityType --json # --noPayloadCheck
 echo
 echo
 
@@ -41,36 +43,54 @@ echo
 --REGEXPECT--
 1. Listing of Entity Type Attributes. Response in XML
 HTTP/1.1 200 OK
-Content-Length: 289
+Content-Length: 457
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <entityTypeAttributesResponse>
-  <attributesFound>4</attributesFound>
-  <attributes>
-    <attribute>Attribute 1</attribute>
-    <attribute>Attribute 2</attribute>
-    <attribute>Attribute 3</attribute>
-    <attribute>Attribute 4</attribute>
-  </attributes>
+  <entityType>
+    <contextAttributeList>
+      <contextAttribute>
+        <name>temperature</name>
+        <type>celsius</type>
+      </contextAttribute>
+      <contextAttribute>
+        <name>pressure</name>
+        <type>mmHg</type>
+      </contextAttribute>
+    </contextAttributeList>
+  </entityType>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
 </entityTypeAttributesResponse>
 
 
 2. Listing of Entity Type Attributes. Response in JSON
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 269
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attributes": [
-        "Attribute 1", 
-        "Attribute 2", 
-        "Attribute 3", 
-        "Attribute 4"
-    ], 
-    "attributesFound": "4"
+    "EntityType": {
+        "attributes": [
+            {
+                "name": "temperature", 
+                "type": "celsius"
+            }, 
+            {
+                "name": "pressure", 
+                "type": "mmHg"
+            }
+        ]
+    }, 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
 }
 
 

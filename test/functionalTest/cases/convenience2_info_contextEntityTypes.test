@@ -46,37 +46,37 @@ echo
 echo
 
 echo "4. Listing of Entity Types. Response in JSON"
-orionCurl --url '/v1/contextTypes' --json
+orionCurl --url '/v1/contextTypes' --json # --noPayloadCheck
 echo
 echo
 
 
 echo "5. Listing of Entity Types. Response in JSON, with details=on"
-orionCurl --url '/v1/contextTypes?details=on' --json
+orionCurl --url '/v1/contextTypes?details=on' --json # --noPayloadCheck
 echo
 echo
 
 
 echo "6. Listing of Entity Types. Response in JSON, with details=on and collapse=true"
-orionCurl --url '/v1/contextTypes?details=on&collapse=true' --json
+orionCurl --url '/v1/contextTypes?details=on&collapse=true' --json  # --noPayloadCheck
 echo
 echo
 
 
 echo "7. Listing of Entity Types. Response in Object-JSON"
-orionCurl --url '/v1/contextTypes?attributesFormat=object' --json
+orionCurl --url '/v1/contextTypes?attributesFormat=object' --json # --noPayloadCheck
 echo
 echo
 
 
 echo "8. Listing of Entity Types. Response in Object-JSON, with details=on"
-orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on' --json
+orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on' --json # --noPayloadCheck
 echo
 echo
 
 
 echo "9. Listing of Entity Types. Response in Object-JSON, with details=on and collapse=true"
-orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on&collapse=true' --json
+orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on&collapse=true' --json  # --noPayloadCheck
 echo
 echo
 
@@ -84,7 +84,7 @@ echo
 --REGEXPECT--
 1. Listing of Entity Types. Response in XML
 HTTP/1.1 200 OK
-Content-Length: 1035
+Content-Length: 875
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -97,12 +97,10 @@ Date: REGEX(.*)
         <contextAttribute>
           <name>temperature</name>
           <type>celsius</type>
-          <contextValue/>
         </contextAttribute>
         <contextAttribute>
           <name>pressure</name>
           <type>mmHg</type>
-          <contextValue/>
         </contextAttribute>
       </contextAttributeList>
     </entityType>
@@ -112,12 +110,10 @@ Date: REGEX(.*)
         <contextAttribute>
           <name>temperature</name>
           <type>celsius</type>
-          <contextValue/>
         </contextAttribute>
         <contextAttribute>
           <name>pressure</name>
           <type>mmHg</type>
-          <contextValue/>
         </contextAttribute>
       </contextAttributeList>
     </entityType>
@@ -131,7 +127,7 @@ Date: REGEX(.*)
 
 2. Listing of Entity Types. Response in XML, with details=on
 HTTP/1.1 200 OK
-Content-Length: 1060
+Content-Length: 900
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -144,12 +140,10 @@ Date: REGEX(.*)
         <contextAttribute>
           <name>temperature</name>
           <type>celsius</type>
-          <contextValue/>
         </contextAttribute>
         <contextAttribute>
           <name>pressure</name>
           <type>mmHg</type>
-          <contextValue/>
         </contextAttribute>
       </contextAttributeList>
     </entityType>
@@ -159,12 +153,10 @@ Date: REGEX(.*)
         <contextAttribute>
           <name>temperature</name>
           <type>celsius</type>
-          <contextValue/>
         </contextAttribute>
         <contextAttribute>
           <name>pressure</name>
           <type>mmHg</type>
-          <contextValue/>
         </contextAttribute>
       </contextAttributeList>
     </entityType>
@@ -203,7 +195,7 @@ Date: REGEX(.*)
 
 4. Listing of Entity Types. Response in JSON
 HTTP/1.1 200 OK
-Content-Length: 642
+Content-Length: 546
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -217,13 +209,11 @@ Date: REGEX(.*)
             "attributes": [
                 {
                     "name": "temperature", 
-                    "type": "celsius", 
-                    "value": ""
+                    "type": "celsius"
                 }, 
                 {
                     "name": "pressure", 
-                    "type": "mmHg", 
-                    "value": ""
+                    "type": "mmHg"
                 }
             ], 
             "name": "Room"
@@ -232,13 +222,11 @@ Date: REGEX(.*)
             "attributes": [
                 {
                     "name": "temperature", 
-                    "type": "celsius", 
-                    "value": ""
+                    "type": "celsius"
                 }, 
                 {
                     "name": "pressure", 
-                    "type": "mmHg", 
-                    "value": ""
+                    "type": "mmHg"
                 }
             ], 
             "name": "Car"
@@ -249,7 +237,7 @@ Date: REGEX(.*)
 
 5. Listing of Entity Types. Response in JSON, with details=on
 HTTP/1.1 200 OK
-Content-Length: 663
+Content-Length: 567
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -264,13 +252,11 @@ Date: REGEX(.*)
             "attributes": [
                 {
                     "name": "temperature", 
-                    "type": "celsius", 
-                    "value": ""
+                    "type": "celsius"
                 }, 
                 {
                     "name": "pressure", 
-                    "type": "mmHg", 
-                    "value": ""
+                    "type": "mmHg"
                 }
             ], 
             "name": "Room"
@@ -279,13 +265,11 @@ Date: REGEX(.*)
             "attributes": [
                 {
                     "name": "temperature", 
-                    "type": "celsius", 
-                    "value": ""
+                    "type": "celsius"
                 }, 
                 {
                     "name": "pressure", 
-                    "type": "mmHg", 
-                    "value": ""
+                    "type": "mmHg"
                 }
             ], 
             "name": "Car"
@@ -319,7 +303,7 @@ Date: REGEX(.*)
 
 7. Listing of Entity Types. Response in Object-JSON
 HTTP/1.1 200 OK
-Content-Length: 570
+Content-Length: 474
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -332,12 +316,10 @@ Date: REGEX(.*)
         {
             "attributes": {
                 "pressure": {
-                    "type": "mmHg", 
-                    "value": ""
+                    "type": "mmHg"
                 }, 
                 "temperature": {
-                    "type": "celsius", 
-                    "value": ""
+                    "type": "celsius"
                 }
             }, 
             "name": "Room"
@@ -345,12 +327,10 @@ Date: REGEX(.*)
         {
             "attributes": {
                 "pressure": {
-                    "type": "mmHg", 
-                    "value": ""
+                    "type": "mmHg"
                 }, 
                 "temperature": {
-                    "type": "celsius", 
-                    "value": ""
+                    "type": "celsius"
                 }
             }, 
             "name": "Car"
@@ -361,7 +341,7 @@ Date: REGEX(.*)
 
 8. Listing of Entity Types. Response in Object-JSON, with details=on
 HTTP/1.1 200 OK
-Content-Length: 591
+Content-Length: 495
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -375,12 +355,10 @@ Date: REGEX(.*)
         {
             "attributes": {
                 "pressure": {
-                    "type": "mmHg", 
-                    "value": ""
+                    "type": "mmHg"
                 }, 
                 "temperature": {
-                    "type": "celsius", 
-                    "value": ""
+                    "type": "celsius"
                 }
             }, 
             "name": "Room"
@@ -388,12 +366,10 @@ Date: REGEX(.*)
         {
             "attributes": {
                 "pressure": {
-                    "type": "mmHg", 
-                    "value": ""
+                    "type": "mmHg"
                 }, 
                 "temperature": {
-                    "type": "celsius", 
-                    "value": ""
+                    "type": "celsius"
                 }
             }, 
             "name": "Car"
