@@ -38,13 +38,12 @@
 */
 class TypeEntity
 {
-public:
+ public:
   std::string              type;
   ContextAttributeVector   contextAttributeVector;
 
- public:
   TypeEntity();
-  TypeEntity(std::string _type);
+  explicit TypeEntity(std::string _type);
 
   std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
   std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool typeNameBefore = false);

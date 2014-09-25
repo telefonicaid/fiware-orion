@@ -41,7 +41,7 @@
 */
 class EntityTypesAttributesResponse
 {
-public:
+ public:
   TypeEntity    entityType;
   StatusCode    statusCode;
 

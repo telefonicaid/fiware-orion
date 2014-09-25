@@ -63,4 +63,4 @@ class TypeEntityVector
   }
 };
 
-#endif  //  SRC_LIB_UTILITY_TYPEENTITYVECTOR_H_
+#endif  // SRC_LIB_UTILITY_TYPEENTITYVECTOR_H_

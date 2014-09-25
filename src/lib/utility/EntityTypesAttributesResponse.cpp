@@ -37,13 +37,13 @@
 
 /* ****************************************************************************
 *
-* EntityTypesAttributesResponse::render - 
+* EntityTypesAttributesResponse::render -
 */
 std::string EntityTypesAttributesResponse::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string out                 = "";
   std::string tag                 = "entityTypeAttributesResponse";
-  
+
   if (ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] == "on")
   {
     char noOf[16];
@@ -54,7 +54,7 @@ std::string EntityTypesAttributesResponse::render(ConnectionInfo* ciP, const std
 
   out += startTag(indent, tag, ciP->outFormat, false);
 
-  out += entityType.render(ciP, indent + "  ", true, true); // Always comma as StatusCode comes after entityType
+  out += entityType.render(ciP, indent + "  ", true, true);
   out += statusCode.render(ciP->outFormat, indent + "  ");
 
   out += endTag(indent, tag, ciP->outFormat);
@@ -66,7 +66,7 @@ std::string EntityTypesAttributesResponse::render(ConnectionInfo* ciP, const std
 
 /* ****************************************************************************
 *
-* EntityTypesAttributesResponse::check - 
+* EntityTypesAttributesResponse::check -
 */
 std::string EntityTypesAttributesResponse::check
 (
@@ -96,7 +96,7 @@ std::string EntityTypesAttributesResponse::check
 
 /* ****************************************************************************
 *
-* EntityTypesAttributesResponse::present - 
+* EntityTypesAttributesResponse::present -
 */
 void EntityTypesAttributesResponse::present(const std::string& indent)
 {
@@ -109,7 +109,7 @@ void EntityTypesAttributesResponse::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* EntityTypesAttributesResponse::release - 
+* EntityTypesAttributesResponse::release -
 */
 void EntityTypesAttributesResponse::release(void)
 {

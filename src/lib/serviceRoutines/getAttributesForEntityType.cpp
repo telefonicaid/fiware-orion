@@ -83,7 +83,7 @@ std::string getAttributesForEntityType
   EntityTypesAttributesResponse  response;
   std::string                    entityTypeName = (ciP->tenantFromUrl != "")? compV[3] : compV[2];
 
-#if 1
+#if 0
   mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 #else
   //

@@ -58,21 +58,27 @@
 *   ]
 * }
 */
-std::string getEntityTypes(ConnectionInfo* ciP, int components, std::vector<std::string>& compV, ParseData* parseDataP)
+std::string getEntityTypes
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
   EntityTypesResponse response;
 
-#if 1
+#if 0
   mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 #else
   //
   // mongoEntityTypes is not implemented
   // Instead, I create a response by hand, to test the render method
   //
-  
+
   TypeEntity* room = new TypeEntity("Room");
   TypeEntity* car  = new TypeEntity("Car");
-  
+
   room->contextAttributeVector.push_back(new ContextAttribute("temperature", "celsius", ""));
   room->contextAttributeVector.push_back(new ContextAttribute("pressure",    "mmHg",    ""));
 
