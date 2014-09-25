@@ -31,6 +31,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryTypes.h"
 #include "orionTypes/EntityTypesResponse.h"
+#include "orionTypes/EntityTypeAttributesResponse.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -826,7 +827,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingDetails)
 TEST(mongoQueryTypes, queryGivenTypeBasic)
 {
     HttpStatusCode                ms;
-    EntityTypesAttributesResponse res;
+    EntityTypeAttributesResponse  res;
 
     utInit();
 
@@ -900,8 +901,8 @@ TEST(mongoQueryTypes, queryGivenTypeBasic)
 */
 TEST(mongoQueryTypes, queryGivenTypePaginationDetails)
 {
-    HttpStatusCode                ms;
-    EntityTypesAttributesResponse res;
+    HttpStatusCode               ms;
+    EntityTypeAttributesResponse res;
 
     utInit();
 
@@ -977,8 +978,8 @@ TEST(mongoQueryTypes, queryGivenTypePaginationDetails)
 */
 TEST(mongoQueryTypes, queryGivenTypePaginationAll)
 {
-    HttpStatusCode                ms;
-    EntityTypesAttributesResponse res;
+    HttpStatusCode               ms;
+    EntityTypeAttributesResponse res;
 
     utInit();
 
@@ -1054,8 +1055,8 @@ TEST(mongoQueryTypes, queryGivenTypePaginationAll)
 */
 TEST(mongoQueryTypes, queryGivenTypePaginationOnlyFirst)
 {
-    HttpStatusCode                ms;
-    EntityTypesAttributesResponse res;
+    HttpStatusCode               ms;
+    EntityTypeAttributesResponse res;
 
     utInit();
 
@@ -1096,8 +1097,8 @@ TEST(mongoQueryTypes, queryGivenTypePaginationOnlyFirst)
 */
 TEST(mongoQueryTypes, queryGivenTypePaginationOnlySecond)
 {
-    HttpStatusCode                ms;
-    EntityTypesAttributesResponse res;
+    HttpStatusCode               ms;
+    EntityTypeAttributesResponse res;
 
     utInit();
 
@@ -1139,8 +1140,8 @@ TEST(mongoQueryTypes, queryGivenTypePaginationOnlySecond)
 */
 TEST(mongoQueryTypes, queryGivenTypePaginationRange)
 {
-    HttpStatusCode                ms;
-    EntityTypesAttributesResponse res;
+    HttpStatusCode               ms;
+    EntityTypeAttributesResponse res;
 
     utInit();
 
@@ -1196,8 +1197,8 @@ TEST(mongoQueryTypes, queryGivenTypePaginationRange)
 */
 TEST(mongoQueryTypes, queryGivenTypePaginationNonExisting)
 {
-    HttpStatusCode                ms;
-    EntityTypesAttributesResponse res;
+    HttpStatusCode               ms;
+    EntityTypeAttributesResponse res;
 
     utInit();
 
@@ -1232,8 +1233,8 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExisting)
 */
 TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingOverlap)
 {
-    HttpStatusCode                ms;
-    EntityTypesAttributesResponse res;
+    HttpStatusCode               ms;
+    EntityTypeAttributesResponse res;
 
     utInit();
 
@@ -1282,8 +1283,8 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingOverlap)
 */
 TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingDetails)
 {
-    HttpStatusCode                ms;
-    EntityTypesAttributesResponse res;
+    HttpStatusCode               ms;
+    EntityTypeAttributesResponse res;
 
     utInit();
 
