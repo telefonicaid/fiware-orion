@@ -52,7 +52,7 @@ HttpStatusCode mongoEntityTypes
   LM_T(LmtMongo, ("Query Entity Types"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
-  reqSemTake(__FUNCTION__, "query entity types request");
+  reqSemTake(__FUNCTION__, "query types request");
 
   DBClientBase* connection = getMongoConnection();
 
@@ -102,7 +102,7 @@ HttpStatusCode mongoEntityTypes
               " - exception: " + e.what();
 
       LM_E(("Database Error (%s)", err.c_str()));
-      reqSemGive(__FUNCTION__, "query entity types request");
+      reqSemGive(__FUNCTION__, "query types request");
       return SccOk;
   }
   catch (...)
@@ -113,7 +113,7 @@ HttpStatusCode mongoEntityTypes
               " - exception: " + "generic";
 
       LM_E(("Database Error (%s)", err.c_str()));
-      reqSemGive(__FUNCTION__, "query entity types request");
+      reqSemGive(__FUNCTION__, "query types request");
       return SccOk;
   }
 
@@ -124,6 +124,15 @@ HttpStatusCode mongoEntityTypes
 
   for (unsigned int ix = 0; ix < typesArray.size(); ++ix)
   {
+    /* Another strategy to implement pagination is to use the $skip and $limit operators in the
+     * aggregation framework. However, doing so, we don't know the total number of results, which can
+     * be needed in the case of details=on (using that approach, we need to do two queries: one to get
+     * the cound and other to get the actual results with $skip and $limit, in the same "transaction" to
+     * avoid incoherence between boths if some entity type is created or deleted in the process).
+     *
+     * However, considering that the number of types will be small compared with the number of entities,
+     * the current approach seems to be ok
+     */
     if (ix < offset)
     {
       continue;
@@ -167,7 +176,7 @@ HttpStatusCode mongoEntityTypes
     }
   }
 
-  reqSemGive(__FUNCTION__, "query entity types request");
+  reqSemGive(__FUNCTION__, "query types request");
 
   return SccOk;
 
@@ -186,7 +195,128 @@ HttpStatusCode mongoAttributesForEntityType
   std::map<std::string, std::string>&   uriParams
 )
 {
-  // TODO
+  unsigned int offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+  unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+  std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+  bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+
+  LM_T(LmtMongo, ("Query Types Attribute for <%s>", entityType.c_str()));
+  LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
+
+  reqSemTake(__FUNCTION__, "query types attributes request");
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* Compose query based on this aggregation command:
+   *
+   * db.runCommand({aggregate: "entities",
+   *                pipeline: [ {$match: { "_id.type": "TYPE" } },
+   *                            {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
+   *                            {$unwind: "$attrs"},
+   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
+   *                            {$sort: {_attrs.name: 1, attrs.type: 1} }
+   *                          ]
+   *                })
+   *
+   */
+
+  // FIXME: unhardwire literals that depend on collection names and fields
+  BSONObj result;
+  BSONObj cmd = BSON("aggregate" << "entities" <<
+                     "pipeline" << BSON_ARRAY(
+                                              BSON("$match" << BSON("$_id.type" << entityType)) <<
+                                              BSON("$project" << BSON("_id" << 1 << "attrs.name" << 1 << "attrs.type" << 1)) <<
+                                              BSON("$unwind" << "$attrs") <<
+                                              BSON("$group" << BSON("_id" << "$_id.type" << "attrs" << BSON("$addToSet" << "$attrs"))) <<
+                                              BSON("$sort" << BSON("attrs.name" << 1 << "attrs.type" << 1))
+                                             )
+                    );
+
+  mongoSemTake(__FUNCTION__, "aggregation command");
+
+  LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
+  try
+  {
+
+    connection->runCommand(composeDatabaseName(tenant).c_str(), cmd, result);
+    mongoSemGive(__FUNCTION__, "aggregation command");
+    LM_I(("Database Operation Successful (%s)", cmd.toString().c_str()));
+  }
+  catch (const DBException& e)
+  {
+      mongoSemGive(__FUNCTION__, "aggregation command");
+      std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
+              " - command: " + cmd.toString() +
+              " - exception: " + e.what();
+
+      LM_E(("Database Error (%s)", err.c_str()));
+      reqSemGive(__FUNCTION__, "query types request");
+      return SccOk;
+  }
+  catch (...)
+  {
+      mongoSemGive(__FUNCTION__, "aggregation command");
+      std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
+              " - command: " + cmd.toString() +
+              " - exception: " + "generic";
+
+      LM_E(("Database Error (%s)", err.c_str()));
+      reqSemGive(__FUNCTION__, "query types request");
+      return SccOk;
+  }
+
+  /* Processing result to build response*/
+  LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
+
+  /* By construction, the result array always either 0 or 1 element (for the given type) */
+  std::vector<BSONElement> typesArray = result.getField("result").Array();
+  std::vector<BSONElement> attrsArray;
+  if (typesArray.size() > 0)
+  {
+
+    BSONObj typeInfo = typesArray[0].embeddedObject();
+    attrsArray = typeInfo.getField("attrs").Array();
+
+    for (unsigned int ix = 0; ix < attrsArray.size(); ++ix)
+    {
+      if (ix < offset)
+      {
+        continue;
+      }
+      if (ix >= offset + limit)
+      {
+        break;
+      }
+
+      BSONObj jAttr = attrsArray[ix].embeddedObject();
+      ContextAttribute* ca = new ContextAttribute(jAttr.getStringField(ENT_ATTRS_NAME), jAttr.getStringField(ENT_ATTRS_TYPE));
+
+      responseP->entityType.contextAttributeVector.push_back(ca);
+
+    }
+  }
+
+  if (responseP->entityType.contextAttributeVector.size() > 0)
+  {
+    responseP->statusCode.fill(SccOk);
+  }
+  else
+  {
+    if (details)
+    {
+      char details[256];
+
+      snprintf(details, sizeof(details), "Number of attributes: %d. Offset is %d", (int) attrsArray.size(), offset);
+      responseP->statusCode.fill(SccContextElementNotFound, details);
+    }
+    else
+    {
+      responseP->statusCode.fill(SccContextElementNotFound);
+    }
+  }
+
+  reqSemGive(__FUNCTION__, "query types request");
+
   return SccOk;
 }
 
