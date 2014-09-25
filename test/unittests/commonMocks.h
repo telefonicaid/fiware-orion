@@ -71,8 +71,6 @@ public:
     MOCK_METHOD3(remove, void(const string &ns, Query q, bool justOne));
     MOCK_METHOD5(runCommand, bool(const string &dbname, const BSONObj& cmd, BSONObj &info, int options, const AuthenticationTable* auth));
 
-    //int options=0, const AuthenticationTable* auth = NULL
-
     /* We can not directly mock a method that returns auto_ptr<T>, so we are using the workaround described in
      * http://stackoverflow.com/questions/7616475/can-google-mock-a-method-with-a-smart-pointer-return-type */
     virtual auto_ptr<DBClientCursor> query(const string &ns, Query query, int nToReturn, int nToSkip, const BSONObj *fieldsToReturn, int queryOptions, int batchSize)
@@ -107,12 +105,6 @@ public:
     {
         return DBClientConnection::runCommand(dbname, cmd, info, options, auth);
     }
-
-    /*virtual bool runCommand(const string &dbname,
-                            const BSONObj& cmd,
-                            BSONObj &info,
-                            int options=0,
-                            const AuthenticationTable* auth=NULL);*/
 
 };
 

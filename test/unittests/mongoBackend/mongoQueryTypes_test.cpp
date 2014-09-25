@@ -60,9 +60,9 @@
 * - queryGivenTypePaginationNonExistingDetails
 *
 * - queryAllDbException
-* - queryAllDbExceptionGeneric
+* - queryAllGenericException
 * - queryGivenTypeDbException
-* - queryGivenTypeDbExceptionGeneric
+* - queryGivenTypeGenericException
 *
 * (*) FIXME: currently mongoBackend doesn't interprets collapse parameter (considering
 * that the "collapse prunning" is done at render layer). However, if in the future
@@ -853,7 +853,43 @@ TEST(mongoQueryTypes, queryAllDbException)
             "exception: boom!!", res.statusCode.details);
   EXPECT_EQ(0,res.typeEntityVector.size());
 
-  // exception: boom!!
+  utExit();
+
+}
+
+/* ****************************************************************************
+*
+* queryAllGenericException -
+*
+*/
+TEST(mongoQueryTypes, queryAllGenericException)
+{
+  HttpStatusCode         ms;
+  EntityTypesResponse    res;
+
+  /* Prepare mock */
+  const std::exception e;
+  DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
+  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+      .WillByDefault(Throw(e));
+
+  utInit();
+
+  /* Set MongoDB connection */
+  mongoConnect(connectionMock);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
+  EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+  EXPECT_EQ("database: unittest - "
+            "command: { aggregate: \"entities\", pipeline: [ { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $sort: { _id: 1 } } ] } - "
+            "exception: generic", res.statusCode.details);
+  EXPECT_EQ(0,res.typeEntityVector.size());
 
   utExit();
 
@@ -1352,50 +1388,78 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingDetails)
     utExit();
 }
 
-#if 0
+/* ****************************************************************************
+*
+* queryGivenTypeDbException -
+*
+*/
+TEST(mongoQueryTypes, queryGiveyTypeDbException)
+{
+  HttpStatusCode               ms;
+  EntityTypeAttributesResponse res;
+
+  /* Prepare mock */
+  const DBException e = DBException("boom!!", 33);
+  DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
+  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+      .WillByDefault(Throw(e));
+
+  utInit();
+
+  /* Set MongoDB connection */
+  mongoConnect(connectionMock);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
+  EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+  EXPECT_EQ("database: unittest - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\" } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id.name: 1, _id.type: 1 } } ] } - "
+            "exception: boom!!", res.statusCode.details);
+  EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
+
+  utExit();
+
+}
 
 /* ****************************************************************************
 *
-* mongoDbQueryFail -
+* queryGyvenTypeGenericException -
 *
 */
-TEST(mongoQueryTypes, mongoDbQueryFail)
+TEST(mongoQueryTypes, queryGyvenTypeGenericException)
 {
-    HttpStatusCode         ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
+  HttpStatusCode               ms;
+  EntityTypeAttributesResponse res;
 
-    /* Prepare mock */
-    const DBException e = DBException("boom!!", 33);
-    DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, _query(_,_,_,_,_,_,_))
-            .WillByDefault(Throw(e));
+  /* Prepare mock */
+  const std::exception e;
+  DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
+  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+      .WillByDefault(Throw(e));
 
-    /* Set MongoDB connection */
-    mongoConnect(connectionMock);
+  utInit();
 
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1", "false");
-    req.entityIdVector.push_back(&en);
+  /* Set MongoDB connection */
+  mongoConnect(connectionMock);
 
-    /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+  /* Invoke the function in mongoBackend library */
+  ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
 
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
-    EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.entities - "
-              "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T1\" } ], _id.servicePath: { $exists: false } }, orderby: { creDate: 1 } } - "
-              "exception: boom!!", res.errorCode.details);
-    EXPECT_EQ(0,res.contextElementResponseVector.size());
+  EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
+  EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+  EXPECT_EQ("database: unittest - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\" } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id.name: 1, _id.type: 1 } } ] } - "
+            "exception: generic", res.statusCode.details);
+  EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
 
-    /* Release dynamic memory used by response (mongoBackend allocates it) */
-    res.contextElementResponseVector.release();
+  utExit();
 
-    /* Release mock */
-    delete connectionMock;
 }
-
-#endif
