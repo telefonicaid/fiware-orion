@@ -39,20 +39,29 @@
 * Tests
 *
 * - queryAllTypeBasic (*)
-* - queryAllpaginationDetails (*)
-* - queryAllpaginationAll (*)
-* - queryAllpaginationOnlyFirst (*)
-* - queryAllpaginationOnlySecond (*)
-* - queryAllpaginationRange (*)
-* - queryAllpaginationNonExisting (*)
-* - queryAllpaginationNonExistingOverlap (*)
-* - queryAllpaginationNonExistingDetails (*)
+* - queryAllPaginationDetails (*)
+* - queryAllPaginationAll (*)
+* - queryAllPaginationOnlyFirst (*)
+* - queryAllPaginationOnlySecond (*)
+* - queryAllPaginationRange (*)
+* - queryAllPaginationNonExisting (*)
+* - queryAllPaginationNonExistingOverlap (*)
+* - queryAllPaginationNonExistingDetails (*)
 *
-* - queryGivenType
+* - queryGivenTypeBasic
+* - queryGivenTypePaginationDetails
+* - queryGivenTypePaginationAll
+* - queryGivenTypePaginationOnlyFirst
+* - queryGivenTypePaginationOnlySecond
+* - queryGivenTypePaginationRange
+* - queryGivenTypePaginationNonExisting
+* - queryGivenTypePaginationNonExistingOverlap
+* - queryGivenTypePaginationNonExistingDetails
 *
 * - queryAllDbException
-* - queryAllDbExcpetionGeneric
-* - queryGivenTypeDbFail
+* - queryAllDbExceptionGeneric
+* - queryGivenTypeDbException
+* - queryGivenTypeDbExceptionGeneric
 *
 * (*) FIXME: currently mongoBackend doesn't interprets collapse parameter (considering
 * that the "collapse prunning" is done at render layer). However, if in the future
@@ -261,10 +270,10 @@ TEST(mongoQueryTypes, queryAllType)
 
 /* ****************************************************************************
 *
-* queryAllpaginationDetails -
+* queryAllPaginationDetails -
 *
 */
-TEST(mongoQueryTypes, queryAllpaginationDetails)
+TEST(mongoQueryTypes, queryAllPaginationDetails)
 {
     HttpStatusCode         ms;
     EntityTypesResponse     res;
@@ -275,6 +284,8 @@ TEST(mongoQueryTypes, queryAllpaginationDetails)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+    /* Using default offset/limit */
     ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
 
     /* Check response is as expected */
@@ -282,7 +293,7 @@ TEST(mongoQueryTypes, queryAllpaginationDetails)
 
     EXPECT_EQ(SccOk, res.statusCode.code);
     EXPECT_EQ("OK", res.statusCode.reasonPhrase);
-    EXPECT_EQ("", res.statusCode.details);
+    EXPECT_EQ("Count: 3", res.statusCode.details);
 
     ASSERT_EQ(3, res.typeEntityVector.size());
 
@@ -371,10 +382,10 @@ TEST(mongoQueryTypes, queryAllpaginationDetails)
 }
 /* ****************************************************************************
 *
-* queryAllpaginationAll -
+* queryAllPaginationAll -
 *
 */
-TEST(mongoQueryTypes, queryAllpaginationAll)
+TEST(mongoQueryTypes, queryAllPaginationAll)
 {
     HttpStatusCode         ms;
     EntityTypesResponse     res;
@@ -483,10 +494,10 @@ TEST(mongoQueryTypes, queryAllpaginationAll)
 }
 /* ****************************************************************************
 *
-* queryAllpaginationOnlyFirst -
+* queryAllPaginationOnlyFirst -
 *
 */
-TEST(mongoQueryTypes, queryAllpaginationOnlyFirst)
+TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
 {
     HttpStatusCode         ms;
     EntityTypesResponse     res;
@@ -557,10 +568,10 @@ TEST(mongoQueryTypes, queryAllpaginationOnlyFirst)
 }
 /* ****************************************************************************
 *
-* queryAllpaginationOnlySecond -
+* queryAllPaginationOnlySecond -
 *
 */
-TEST(mongoQueryTypes, queryAllpaginationOnlySecond)
+TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
 {
     HttpStatusCode         ms;
     EntityTypesResponse     res;
@@ -608,10 +619,10 @@ TEST(mongoQueryTypes, queryAllpaginationOnlySecond)
 }
 /* ****************************************************************************
 *
-* queryAllpaginationRange -
+* queryAllPaginationRange -
 *
 */
-TEST(mongoQueryTypes, queryAllpaginationRange)
+TEST(mongoQueryTypes, queryAllPaginationRange)
 {
     HttpStatusCode         ms;
     EntityTypesResponse     res;
@@ -681,10 +692,10 @@ TEST(mongoQueryTypes, queryAllpaginationRange)
 }
 /* ****************************************************************************
 *
-* queryAllpaginationNonExisting -
+* queryAllPaginationNonExisting -
 *
 */
-TEST(mongoQueryTypes, queryAllpaginationNonExisting)
+TEST(mongoQueryTypes, queryAllPaginationNonExisting)
 {
     HttpStatusCode         ms;
     EntityTypesResponse     res;
@@ -716,10 +727,10 @@ TEST(mongoQueryTypes, queryAllpaginationNonExisting)
 }
 /* ****************************************************************************
 *
-* queryAllpaginationNonExistingOverlap -
+* queryAllPaginationNonExistingOverlap -
 *
 */
-TEST(mongoQueryTypes, queryAllpaginationNonExistingOverlap)
+TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
 {
     HttpStatusCode         ms;
     EntityTypesResponse     res;
@@ -733,7 +744,6 @@ TEST(mongoQueryTypes, queryAllpaginationNonExistingOverlap)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
     uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
     uriParams[URI_PARAM_PAGINATION_LIMIT]  = "4";
-
     ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
 
     /* Check response is as expected */
@@ -774,10 +784,10 @@ TEST(mongoQueryTypes, queryAllpaginationNonExistingOverlap)
 }
 /* ****************************************************************************
 *
-* queryAllpaginationNonExistingDetails -
+* queryAllPaginationNonExistingDetails -
 *
 */
-TEST(mongoQueryTypes, queryAllpaginationNonExistingDetails)
+TEST(mongoQueryTypes, queryAllPaginationNonExistingDetails)
 {
     HttpStatusCode         ms;
     EntityTypesResponse     res;
@@ -810,10 +820,10 @@ TEST(mongoQueryTypes, queryAllpaginationNonExistingDetails)
 
 /* ****************************************************************************
 *
-* queryGivenType -
+* queryGivenTypeBasic -
 *
 */
-TEST(mongoQueryTypes, queryGivenType)
+TEST(mongoQueryTypes, queryGivenTypeBasic)
 {
     HttpStatusCode                ms;
     EntityTypesAttributesResponse res;
@@ -824,7 +834,7 @@ TEST(mongoQueryTypes, queryGivenType)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoAttributesForEntityType("Room", &res, "", servicePathVector, uriParams);
+    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -876,6 +886,424 @@ TEST(mongoQueryTypes, queryGivenType)
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(5)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(5)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(5)->metadataVector.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* queryGivenTypePaginationDetails -
+*
+*/
+TEST(mongoQueryTypes, queryGivenTypePaginationDetails)
+{
+    HttpStatusCode                ms;
+    EntityTypesAttributesResponse res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+    /* Using default offset/limit */
+    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.statusCode.code);
+    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
+    EXPECT_EQ("Count: 6", res.statusCode.details);
+
+    ASSERT_EQ(6, res.entityType.contextAttributeVector.size());
+
+    /* Type # 1 */
+    EXPECT_EQ("colour", res.entityType.contextAttributeVector.get(0)->name);
+    EXPECT_EQ("colour_T", res.entityType.contextAttributeVector.get(0)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(0)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
+
+    /* Type 2 */
+    EXPECT_EQ("fuel", res.entityType.contextAttributeVector.get(1)->name);
+    EXPECT_EQ("fuel_T", res.entityType.contextAttributeVector.get(1)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(1)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(1)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(1)->metadataVector.size());
+
+    /* Type 3 */
+    EXPECT_EQ("plate", res.entityType.contextAttributeVector.get(2)->name);
+    EXPECT_EQ("plate_T", res.entityType.contextAttributeVector.get(2)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(2)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(2)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(2)->metadataVector.size());
+
+    /* Type 4 */
+    EXPECT_EQ("plate", res.entityType.contextAttributeVector.get(3)->name);
+    EXPECT_EQ("plate_T2", res.entityType.contextAttributeVector.get(3)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(3)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(3)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(3)->metadataVector.size());
+
+    /* Type 5 */
+    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(4)->name);
+    EXPECT_EQ("pos_T", res.entityType.contextAttributeVector.get(4)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(4)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(4)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(4)->metadataVector.size());
+
+    /* Type 6 */
+    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(5)->name);
+    EXPECT_EQ("temp_T", res.entityType.contextAttributeVector.get(5)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(5)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(5)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(5)->metadataVector.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* queryGivenTypePaginationAll -
+*
+*/
+TEST(mongoQueryTypes, queryGivenTypePaginationAll)
+{
+    HttpStatusCode                ms;
+    EntityTypesAttributesResponse res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+    /* Using default offset/limit */
+    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.statusCode.code);
+    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
+    EXPECT_EQ("", res.statusCode.details);
+
+    ASSERT_EQ(6, res.entityType.contextAttributeVector.size());
+
+    /* Type # 1 */
+    EXPECT_EQ("colour", res.entityType.contextAttributeVector.get(0)->name);
+    EXPECT_EQ("colour_T", res.entityType.contextAttributeVector.get(0)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(0)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
+
+    /* Type 2 */
+    EXPECT_EQ("fuel", res.entityType.contextAttributeVector.get(1)->name);
+    EXPECT_EQ("fuel_T", res.entityType.contextAttributeVector.get(1)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(1)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(1)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(1)->metadataVector.size());
+
+    /* Type 3 */
+    EXPECT_EQ("plate", res.entityType.contextAttributeVector.get(2)->name);
+    EXPECT_EQ("plate_T", res.entityType.contextAttributeVector.get(2)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(2)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(2)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(2)->metadataVector.size());
+
+    /* Type 4 */
+    EXPECT_EQ("plate", res.entityType.contextAttributeVector.get(3)->name);
+    EXPECT_EQ("plate_T2", res.entityType.contextAttributeVector.get(3)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(3)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(3)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(3)->metadataVector.size());
+
+    /* Type 5 */
+    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(4)->name);
+    EXPECT_EQ("pos_T", res.entityType.contextAttributeVector.get(4)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(4)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(4)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(4)->metadataVector.size());
+
+    /* Type 6 */
+    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(5)->name);
+    EXPECT_EQ("temp_T", res.entityType.contextAttributeVector.get(5)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(5)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(5)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(5)->metadataVector.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* queryGivenTypePaginationOnlyFirst -
+*
+*/
+TEST(mongoQueryTypes, queryGivenTypePaginationOnlyFirst)
+{
+    HttpStatusCode                ms;
+    EntityTypesAttributesResponse res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+    uriParams[URI_PARAM_PAGINATION_LIMIT] = "1";
+    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.statusCode.code);
+    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
+    EXPECT_EQ("", res.statusCode.details);
+
+    ASSERT_EQ(1, res.entityType.contextAttributeVector.size());
+
+    /* Type # 1 */
+    EXPECT_EQ("colour", res.entityType.contextAttributeVector.get(0)->name);
+    EXPECT_EQ("colour_T", res.entityType.contextAttributeVector.get(0)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(0)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* queryGivenTypePaginationOnlySecond -
+*
+*/
+TEST(mongoQueryTypes, queryGivenTypePaginationOnlySecond)
+{
+    HttpStatusCode                ms;
+    EntityTypesAttributesResponse res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+    uriParams[URI_PARAM_PAGINATION_OFFSET] = "1";
+    uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
+    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.statusCode.code);
+    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
+    EXPECT_EQ("", res.statusCode.details);
+
+    ASSERT_EQ(1, res.entityType.contextAttributeVector.size());
+
+    /* Type 1 */
+    EXPECT_EQ("fuel", res.entityType.contextAttributeVector.get(0)->name);
+    EXPECT_EQ("fuel_T", res.entityType.contextAttributeVector.get(0)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(0)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* queryGivenTypePaginationRange -
+*
+*/
+TEST(mongoQueryTypes, queryGivenTypePaginationRange)
+{
+    HttpStatusCode                ms;
+    EntityTypesAttributesResponse res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+    uriParams[URI_PARAM_PAGINATION_OFFSET] = "2";
+    uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
+    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.statusCode.code);
+    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
+    EXPECT_EQ("", res.statusCode.details);
+
+    ASSERT_EQ(3, res.entityType.contextAttributeVector.size());
+
+    /* Type 3 */
+    EXPECT_EQ("plate", res.entityType.contextAttributeVector.get(0)->name);
+    EXPECT_EQ("plate_T", res.entityType.contextAttributeVector.get(0)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(0)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
+
+    /* Type 4 */
+    EXPECT_EQ("plate", res.entityType.contextAttributeVector.get(1)->name);
+    EXPECT_EQ("plate_T2", res.entityType.contextAttributeVector.get(1)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(1)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(1)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(1)->metadataVector.size());
+
+    /* Type 5 */
+    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(2)->name);
+    EXPECT_EQ("pos_T", res.entityType.contextAttributeVector.get(2)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(2)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(2)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(2)->metadataVector.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* queryGivenTypePaginationNonExisting -
+*
+*/
+TEST(mongoQueryTypes, queryGivenTypePaginationNonExisting)
+{
+    HttpStatusCode                ms;
+    EntityTypesAttributesResponse res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+    uriParams[URI_PARAM_PAGINATION_OFFSET] = "7";
+    uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
+    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccContextElementNotFound, res.statusCode.code);
+    EXPECT_EQ("No context element found", res.statusCode.reasonPhrase);
+    EXPECT_EQ("", res.statusCode.details);
+
+    ASSERT_EQ(0, res.entityType.contextAttributeVector.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* queryGivenTypePaginationNonExistingOverlap -
+*
+*/
+TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingOverlap)
+{
+    HttpStatusCode                ms;
+    EntityTypesAttributesResponse res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
+    uriParams[URI_PARAM_PAGINATION_OFFSET] = "4";
+    uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
+    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.statusCode.code);
+    EXPECT_EQ("OK", res.statusCode.reasonPhrase);
+    EXPECT_EQ("", res.statusCode.details);
+
+    ASSERT_EQ(2, res.entityType.contextAttributeVector.size());
+
+    /* Type 1 */
+    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(0)->name);
+    EXPECT_EQ("pos_T", res.entityType.contextAttributeVector.get(0)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(0)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
+
+    /* Type 2 */
+    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(1)->name);
+    EXPECT_EQ("temp_T", res.entityType.contextAttributeVector.get(1)->type);
+    EXPECT_EQ("", res.entityType.contextAttributeVector.get(1)->value);
+    EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(1)->compoundValueP);
+    EXPECT_EQ(0, res.entityType.contextAttributeVector.get(1)->metadataVector.size());
+
+    /* Release connection */
+    mongoDisconnect();
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* queryGivenTypePaginationNonExistingDetails -
+*
+*/
+TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingDetails)
+{
+    HttpStatusCode                ms;
+    EntityTypesAttributesResponse res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabase();
+
+    /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
+    uriParams[URI_PARAM_PAGINATION_OFFSET] = "7";
+    uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
+    ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccContextElementNotFound, res.statusCode.code);
+    EXPECT_EQ("No context element found", res.statusCode.reasonPhrase);
+    EXPECT_EQ("Number of attributes: 6. Offset is 7", res.statusCode.details);
+
+    ASSERT_EQ(0, res.entityType.contextAttributeVector.size());
 
     /* Release connection */
     mongoDisconnect();

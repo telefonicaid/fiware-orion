@@ -120,9 +120,9 @@ HttpStatusCode mongoEntityTypes
   /* Processing result to build response*/
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> typesArray = result.getField("result").Array();
+  std::vector<BSONElement> resultsArray = result.getField("result").Array();
 
-  for (unsigned int ix = 0; ix < typesArray.size(); ++ix)
+  for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
   {
     /* Another strategy to implement pagination is to use the $skip and $limit operators in the
      * aggregation framework. However, doing so, we don't know the total number of results, which can
@@ -142,9 +142,9 @@ HttpStatusCode mongoEntityTypes
       break;
     }
 
-    BSONObj iType = typesArray[ix].embeddedObject();
-    TypeEntity* type = new TypeEntity(iType.getStringField("_id"));
-    std::vector<BSONElement> attrsArray = iType.getField("attrs").Array();
+    BSONObj resultItem = resultsArray[ix].embeddedObject();
+    TypeEntity* type = new TypeEntity(resultItem.getStringField("_id"));
+    std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
 
     for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
     {
@@ -157,18 +157,25 @@ HttpStatusCode mongoEntityTypes
 
   }
 
+  char detailsMsg[256];
   if (responseP->typeEntityVector.size() > 0)
   {
-    responseP->statusCode.fill(SccOk);
+    if (details)
+    {
+      snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) resultsArray.size());
+      responseP->statusCode.fill(SccOk, detailsMsg);
+    }
+    else
+    {
+      responseP->statusCode.fill(SccOk);
+    }
   }
   else
   {
     if (details)
-    {
-      char details[256];
-
-      snprintf(details, sizeof(details), "Number of types: %d. Offset is %d", (int) typesArray.size(), offset);
-      responseP->statusCode.fill(SccContextElementNotFound, details);
+    {      
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of types: %d. Offset is %d", (int) resultsArray.size(), offset);
+      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else
     {
@@ -214,7 +221,9 @@ HttpStatusCode mongoAttributesForEntityType
    *                            {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
    *                            {$unwind: "$attrs"},
    *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
-   *                            {$sort: {_attrs.name: 1, attrs.type: 1} }
+   *                            {$unwind: "$attrs"},
+   *                            {$group: {_id: "$attrs" }},
+   *                            {$sort: {_id.name: 1, _id.type: 1} }
    *                          ]
    *                })
    *
@@ -224,11 +233,13 @@ HttpStatusCode mongoAttributesForEntityType
   BSONObj result;
   BSONObj cmd = BSON("aggregate" << "entities" <<
                      "pipeline" << BSON_ARRAY(
-                                              BSON("$match" << BSON("$_id.type" << entityType)) <<
+                                              BSON("$match" << BSON("_id.type" << entityType)) <<
                                               BSON("$project" << BSON("_id" << 1 << "attrs.name" << 1 << "attrs.type" << 1)) <<
                                               BSON("$unwind" << "$attrs") <<
                                               BSON("$group" << BSON("_id" << "$_id.type" << "attrs" << BSON("$addToSet" << "$attrs"))) <<
-                                              BSON("$sort" << BSON("attrs.name" << 1 << "attrs.type" << 1))
+                                              BSON("$unwind" << "$attrs") <<
+                                              BSON("$group" << BSON("_id" << "$attrs")) <<
+                                              BSON("$sort" << BSON("_id.name" << 1 << "_id.type" << 1))
                                              )
                     );
 
@@ -268,46 +279,46 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response*/
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  /* By construction, the result array always either 0 or 1 element (for the given type) */
-  std::vector<BSONElement> typesArray = result.getField("result").Array();
-  std::vector<BSONElement> attrsArray;
-  if (typesArray.size() > 0)
+  std::vector<BSONElement> resultsArray = result.getField("result").Array();
+
+  for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
   {
 
-    BSONObj typeInfo = typesArray[0].embeddedObject();
-    attrsArray = typeInfo.getField("attrs").Array();
-
-    for (unsigned int ix = 0; ix < attrsArray.size(); ++ix)
+    /* See comment above in the other method regarding this strategy to implement pagination */
+    if (ix < offset)
     {
-      if (ix < offset)
-      {
-        continue;
-      }
-      if (ix >= offset + limit)
-      {
-        break;
-      }
-
-      BSONObj jAttr = attrsArray[ix].embeddedObject();
-      ContextAttribute* ca = new ContextAttribute(jAttr.getStringField(ENT_ATTRS_NAME), jAttr.getStringField(ENT_ATTRS_TYPE));
-
-      responseP->entityType.contextAttributeVector.push_back(ca);
-
+      continue;
     }
+    if (ix >= offset + limit)
+    {
+      break;
+    }
+
+    BSONObj resultItem = resultsArray[ix].embeddedObject().getField("_id").embeddedObject();
+    ContextAttribute* ca = new ContextAttribute(resultItem.getStringField(ENT_ATTRS_NAME), resultItem.getStringField(ENT_ATTRS_TYPE));
+    responseP->entityType.contextAttributeVector.push_back(ca);
+
   }
 
+  char detailsMsg[256];
   if (responseP->entityType.contextAttributeVector.size() > 0)
   {
-    responseP->statusCode.fill(SccOk);
+    if (details)
+    {
+      snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) resultsArray.size());
+      responseP->statusCode.fill(SccOk, detailsMsg);
+    }
+    else
+    {
+      responseP->statusCode.fill(SccOk);
+    }
   }
   else
   {
     if (details)
     {
-      char details[256];
-
-      snprintf(details, sizeof(details), "Number of attributes: %d. Offset is %d", (int) attrsArray.size(), offset);
-      responseP->statusCode.fill(SccContextElementNotFound, details);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %d. Offset is %d", (int) resultsArray.size(), offset);
+      responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else
     {
