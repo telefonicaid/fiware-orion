@@ -102,6 +102,7 @@ HttpStatusCode mongoEntityTypes
               " - exception: " + e.what();
 
       LM_E(("Database Error (%s)", err.c_str()));
+      responseP->statusCode.fill(SccReceiverInternalError, err);
       reqSemGive(__FUNCTION__, "query types request");
       return SccOk;
   }
@@ -113,6 +114,7 @@ HttpStatusCode mongoEntityTypes
               " - exception: " + "generic";
 
       LM_E(("Database Error (%s)", err.c_str()));
+      responseP->statusCode.fill(SccReceiverInternalError, err);
       reqSemGive(__FUNCTION__, "query types request");
       return SccOk;
   }
@@ -261,6 +263,7 @@ HttpStatusCode mongoAttributesForEntityType
               " - exception: " + e.what();
 
       LM_E(("Database Error (%s)", err.c_str()));
+      responseP->statusCode.fill(SccReceiverInternalError, err);
       reqSemGive(__FUNCTION__, "query types request");
       return SccOk;
   }
@@ -272,6 +275,7 @@ HttpStatusCode mongoAttributesForEntityType
               " - exception: " + "generic";
 
       LM_E(("Database Error (%s)", err.c_str()));
+      responseP->statusCode.fill(SccReceiverInternalError, err);
       reqSemGive(__FUNCTION__, "query types request");
       return SccOk;
   }

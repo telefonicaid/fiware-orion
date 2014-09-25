@@ -27,6 +27,7 @@
 */
 #include "gmock/gmock.h"
 #include "mongo/client/dbclient.h"
+#include "mongo/client/authentication_table.h"
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 
@@ -59,6 +60,8 @@ public:
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_update));
         ON_CALL(*this, _query(_,_,_,_,_,_,_))
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_query));
+        ON_CALL(*this, runCommand(_,_,_,_,_))
+                .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_runCommand));
     }
 
     MOCK_METHOD5(count, unsigned long long(const string &ns, const BSONObj &query, int options, int limit, int skip));
@@ -66,6 +69,9 @@ public:
     MOCK_METHOD3(insert, void(const string &ns, BSONObj obj, int flags));
     MOCK_METHOD5(update, void(const string &ns, Query query, BSONObj obj, bool upsert, bool multi));
     MOCK_METHOD3(remove, void(const string &ns, Query q, bool justOne));
+    MOCK_METHOD5(runCommand, bool(const string &dbname, const BSONObj& cmd, BSONObj &info, int options, const AuthenticationTable* auth));
+
+    //int options=0, const AuthenticationTable* auth = NULL
 
     /* We can not directly mock a method that returns auto_ptr<T>, so we are using the workaround described in
      * http://stackoverflow.com/questions/7616475/can-google-mock-a-method-with-a-smart-pointer-return-type */
@@ -97,6 +103,16 @@ public:
         auto_ptr<DBClientCursor> cursor = DBClientConnection::query(ns, query, nToReturn, nToSkip, fieldsToReturn, queryOptions, batchSize);
         return cursor.get();
     }
+    bool parent_runCommand(const string &dbname, const BSONObj& cmd,BSONObj &info, int options, const AuthenticationTable* auth)
+    {
+        return DBClientConnection::runCommand(dbname, cmd, info, options, auth);
+    }
+
+    /*virtual bool runCommand(const string &dbname,
+                            const BSONObj& cmd,
+                            BSONObj &info,
+                            int options=0,
+                            const AuthenticationTable* auth=NULL);*/
 
 };
 

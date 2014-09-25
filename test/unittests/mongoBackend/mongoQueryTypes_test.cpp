@@ -166,7 +166,7 @@ static void prepareDatabase(void) {
 TEST(mongoQueryTypes, queryAllType)
 {
     HttpStatusCode         ms;
-    EntityTypesResponse     res;
+    EntityTypesResponse    res;
 
     utInit();
 
@@ -277,7 +277,7 @@ TEST(mongoQueryTypes, queryAllType)
 TEST(mongoQueryTypes, queryAllPaginationDetails)
 {
     HttpStatusCode         ms;
-    EntityTypesResponse     res;
+    EntityTypesResponse    res;
 
     utInit();
 
@@ -389,7 +389,7 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
 TEST(mongoQueryTypes, queryAllPaginationAll)
 {
     HttpStatusCode         ms;
-    EntityTypesResponse     res;
+    EntityTypesResponse    res;
 
     utInit();
 
@@ -501,7 +501,7 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
 TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
 {
     HttpStatusCode         ms;
-    EntityTypesResponse     res;
+    EntityTypesResponse    res;
 
     utInit();
 
@@ -575,7 +575,7 @@ TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
 TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
 {
     HttpStatusCode         ms;
-    EntityTypesResponse     res;
+    EntityTypesResponse    res;
 
     utInit();
 
@@ -626,7 +626,7 @@ TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
 TEST(mongoQueryTypes, queryAllPaginationRange)
 {
     HttpStatusCode         ms;
-    EntityTypesResponse     res;
+    EntityTypesResponse    res;
 
     utInit();
 
@@ -699,7 +699,7 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
 TEST(mongoQueryTypes, queryAllPaginationNonExisting)
 {
     HttpStatusCode         ms;
-    EntityTypesResponse     res;
+    EntityTypesResponse    res;
 
     utInit();
 
@@ -734,7 +734,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExisting)
 TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
 {
     HttpStatusCode         ms;
-    EntityTypesResponse     res;
+    EntityTypesResponse    res;
 
     utInit();
 
@@ -791,7 +791,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
 TEST(mongoQueryTypes, queryAllPaginationNonExistingDetails)
 {
     HttpStatusCode         ms;
-    EntityTypesResponse     res;
+    EntityTypesResponse    res;
 
     utInit();
 
@@ -817,6 +817,46 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingDetails)
     mongoDisconnect();
 
     utExit();
+}
+
+/* ****************************************************************************
+*
+* queryAllDbException -
+*
+*/
+TEST(mongoQueryTypes, queryAllDbException)
+{
+  HttpStatusCode         ms;
+  EntityTypesResponse    res;
+
+  /* Prepare mock */
+  const DBException e = DBException("boom!!", 33);
+  DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
+  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+      .WillByDefault(Throw(e));
+
+  utInit();
+
+  /* Set MongoDB connection */
+  mongoConnect(connectionMock);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
+  EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
+  EXPECT_EQ("database: unittest - "
+            "command: { aggregate: \"entities\", pipeline: [ { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $sort: { _id: 1 } } ] } - "
+            "exception: boom!!", res.statusCode.details);
+  EXPECT_EQ(0,res.typeEntityVector.size());
+
+  // exception: boom!!
+
+  utExit();
+
 }
 
 /* ****************************************************************************
