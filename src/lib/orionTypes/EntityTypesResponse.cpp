@@ -31,13 +31,13 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
-#include "utility/EntityTypesResponse.h"
+#include "orionTypes/EntityTypesResponse.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::renderAsJsonObject - 
+* EntityTypesResponse::renderAsJsonObject -
 */
 std::string EntityTypesResponse::renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent)
 {
@@ -59,13 +59,13 @@ std::string EntityTypesResponse::renderAsJsonObject(ConnectionInfo* ciP, const s
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::render - 
+* EntityTypesResponse::render -
 */
 std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string out                 = "";
   std::string tag                 = "entityTypesResponse";
-  
+
   if (ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] == "on")
   {
     char noOf[16];
@@ -78,7 +78,7 @@ std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& 
   {
     return renderAsJsonObject(ciP, indent);
   }
-  
+
   out += startTag(indent, tag, ciP->outFormat, false);
 
   if (typeEntityVector.size() > 0)
@@ -95,7 +95,7 @@ std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& 
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::check - 
+* EntityTypesResponse::check -
 */
 std::string EntityTypesResponse::check
 (
@@ -125,7 +125,7 @@ std::string EntityTypesResponse::check
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::present - 
+* EntityTypesResponse::present -
 */
 void EntityTypesResponse::present(const std::string& indent)
 {
@@ -139,7 +139,7 @@ void EntityTypesResponse::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::release - 
+* EntityTypesResponse::release -
 */
 void EntityTypesResponse::release(void)
 {

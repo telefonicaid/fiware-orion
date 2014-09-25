@@ -31,19 +31,19 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
-#include "utility/EntityTypesAttributesResponse.h"
+#include "orionTypes/EntityTypeAttributesResponse.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityTypesAttributesResponse::render - 
+* EntityTypeAttributesResponse::render -
 */
-std::string EntityTypesAttributesResponse::render(ConnectionInfo* ciP, const std::string& indent)
+std::string EntityTypeAttributesResponse::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string out                 = "";
   std::string tag                 = "entityTypeAttributesResponse";
-  
+
   if (ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] == "on")
   {
     char noOf[16];
@@ -54,7 +54,7 @@ std::string EntityTypesAttributesResponse::render(ConnectionInfo* ciP, const std
 
   out += startTag(indent, tag, ciP->outFormat, false);
 
-  out += entityType.render(ciP, indent + "  ", true, true); // Always comma as StatusCode comes after entityType
+  out += entityType.render(ciP, indent + "  ", true, true);
   out += statusCode.render(ciP->outFormat, indent + "  ");
 
   out += endTag(indent, tag, ciP->outFormat);
@@ -66,9 +66,9 @@ std::string EntityTypesAttributesResponse::render(ConnectionInfo* ciP, const std
 
 /* ****************************************************************************
 *
-* EntityTypesAttributesResponse::check - 
+* EntityTypeAttributesResponse::check -
 */
-std::string EntityTypesAttributesResponse::check
+std::string EntityTypeAttributesResponse::check
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
@@ -96,11 +96,11 @@ std::string EntityTypesAttributesResponse::check
 
 /* ****************************************************************************
 *
-* EntityTypesAttributesResponse::present - 
+* EntityTypeAttributesResponse::present -
 */
-void EntityTypesAttributesResponse::present(const std::string& indent)
+void EntityTypeAttributesResponse::present(const std::string& indent)
 {
-  PRINTF("%sEntityTypesAttributesResponse:\n", indent.c_str());
+  PRINTF("%sEntityTypeAttributesResponse:\n", indent.c_str());
   entityType.present("indent + "  "");
   statusCode.present("indent + "  "");
 }
@@ -109,9 +109,9 @@ void EntityTypesAttributesResponse::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* EntityTypesAttributesResponse::release - 
+* EntityTypeAttributesResponse::release -
 */
-void EntityTypesAttributesResponse::release(void)
+void EntityTypeAttributesResponse::release(void)
 {
   entityType.release();
   statusCode.release();

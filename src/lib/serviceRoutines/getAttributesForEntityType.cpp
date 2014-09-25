@@ -27,7 +27,7 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "utility/EntityTypesAttributesResponse.h"
+#include "orionTypes/EntityTypeAttributesResponse.h"
 #include "rest/uriParamNames.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
 
@@ -38,39 +38,6 @@
 *
 * getAttributesForEntityType -
 *
-* Response in XML
-* <entityTypeAttributesResponse>
-*   <attributesfound>4</attributesfound>
-*   <attributes>
-*     <attribute>Name of Attr 1</attribute>
-*     <attribute>Name of Attr 2</attribute>
-*     <attribute>Name of Attr 3</attribute>
-*     <attribute>Name of Attr 4</attribute>
-*   </attributes>
-* </entityTypeAttributesResponse>
-*
-* AND, when returning also the attribute-type:
-* <entityTypeAttributesResponse>
-*   <attributesfound>4</attributesfound>
-*   <attributes>
-*     <attribute>
-*       <name>Name of Attr 1</name>
-*       <type>Type of Attr 1</type>
-*     </attribute>
-*   </attributes>
-* </entityTypeAttributesResponse>
-*
-* Response in JSON?
-* {
-*   "attributesFound" : 4,
-*   "attributes" : [
-*     "Name of Attribute 1",
-*     "Name of Attribute 2",
-*     "Name of Attribute 3",
-*     "Name of Attribute 4"
-*   ]
-* }
-*
 */
 std::string getAttributesForEntityType
 (
@@ -80,10 +47,10 @@ std::string getAttributesForEntityType
   ParseData*                 parseDataP
 )
 {
-  EntityTypesAttributesResponse  response;
-  std::string                    entityTypeName = (ciP->tenantFromUrl != "")? compV[3] : compV[2];
+  EntityTypeAttributesResponse  response;
+  std::string                   entityTypeName = (ciP->tenantFromUrl != "")? compV[3] : compV[2];
 
-#if 1
+#ifndef DEBUG_kz
   mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 #else
   //

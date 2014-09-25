@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_TYPEENTITY_H_
-#define SRC_LIB_UTILITY_TYPEENTITY_H_
+#ifndef SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
+#define SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
 
 /*
 *
@@ -26,31 +26,30 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "ngsi/ContextAttributeVector.h"
-#include "rest/ConnectionInfo.h"
+#include "common/Format.h"
+#include "ngsi/Request.h"
+#include "ngsi/StatusCode.h"
+#include "orionTypes/TypeEntityVector.h"
 
 
 
 /* ****************************************************************************
 *
-* TypeEntity - 
+* EntityTypesResponse - 
 */
-class TypeEntity
+class EntityTypesResponse
 {
-public:
-  std::string              type;
-  ContextAttributeVector   contextAttributeVector;
-
  public:
-  TypeEntity();
-  TypeEntity(std::string _type);
+  TypeEntityVector  typeEntityVector;
+  StatusCode        statusCode;
 
-  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
-  std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool typeNameBefore = false);
-  std::string   renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
-  void          present(const std::string& indent);
-  void          release(void);
+  std::string       render(ConnectionInfo* ciP, const std::string& indent);
+  std::string       renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent);
+  std::string       check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
+  void              present(const std::string& indent);
+  void              release(void);
 };
 
-#endif  // SRC_LIB_UTILITY_TYPEENTITY_H_
+#endif  // SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_

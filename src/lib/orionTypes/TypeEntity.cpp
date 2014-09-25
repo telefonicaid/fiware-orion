@@ -29,13 +29,13 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
-#include "utility/TypeEntity.h"
+#include "orionTypes/TypeEntity.h"
 
 
 
 /* ****************************************************************************
 *
-* TypeEntity::TypeEntity - 
+* TypeEntity::TypeEntity -
 */
 TypeEntity::TypeEntity()
 {
@@ -46,7 +46,7 @@ TypeEntity::TypeEntity()
 
 /* ****************************************************************************
 *
-* TypeEntity::TypeEntity - 
+* TypeEntity::TypeEntity -
 */
 TypeEntity::TypeEntity(std::string  _type)
 {
@@ -57,7 +57,7 @@ TypeEntity::TypeEntity(std::string  _type)
 
 /* ****************************************************************************
 *
-* TypeEntity::render - 
+* TypeEntity::render -
 */
 std::string TypeEntity::renderAsJsonObject
 (
@@ -80,7 +80,7 @@ std::string TypeEntity::renderAsJsonObject
 
 /* ****************************************************************************
 *
-* TypeEntity::render - 
+* TypeEntity::render -
 */
 std::string TypeEntity::render
 (
@@ -100,7 +100,7 @@ std::string TypeEntity::render
   }
   else
   {
-   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
   }
 
   if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true")
@@ -125,7 +125,7 @@ std::string TypeEntity::render
 
 /* ****************************************************************************
 *
-* TypeEntity::check - 
+* TypeEntity::check -
 */
 std::string TypeEntity::check
 (
@@ -142,7 +142,7 @@ std::string TypeEntity::check
   {
     return "Empty Type";
   }
-  
+
   return contextAttributeVector.check(EntityTypes, ciP->outFormat, indent, "", 0);
 }
 
@@ -162,7 +162,7 @@ void TypeEntity::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* TypeEntity::release - 
+* TypeEntity::release -
 */
 void TypeEntity::release(void)
 {

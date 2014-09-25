@@ -83,7 +83,7 @@
 #include "common/Timer.h"
 #include "common/compileInfo.h"
 
-#include "utility/EntityTypesResponse.h"
+#include "orionTypes/EntityTypesResponse.h"
 
 #include "serviceRoutines/logTraceTreat.h"
 

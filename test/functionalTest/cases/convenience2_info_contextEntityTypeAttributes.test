@@ -34,8 +34,32 @@ echo
 echo
 
 
-echo "2. Listing of Entity Type Attributes. Response in JSON"
+echo "2. Listing of Entity Type Attributes. Response in XML, details=on"
+orionCurl --url /v1/contextTypes/EntityType?details=on
+echo
+echo
+
+
+echo "3. Listing of Entity Type Attributes. Response in JSON"
 orionCurl --url /v1/contextTypes/EntityType --json # --noPayloadCheck
+echo
+echo
+
+
+echo "4. Listing of Entity Type Attributes. Response in JSON, details=on"
+orionCurl --url /v1/contextTypes/EntityType?details=on --json
+echo
+echo
+
+
+echo "5. Listing of Entity Type Attributes. Response in Object-JSON"
+orionCurl --url /v1/contextTypes/EntityType?attributesFormat=object --json # --noPayloadCheck
+echo
+echo
+
+
+echo "6. Listing of Entity Type Attributes. Response in Object-JSON, details=on"
+orionCurl --url '/v1/contextTypes/EntityType?attributesFormat=object&details=on' --json
 echo
 echo
 
@@ -68,7 +92,35 @@ Date: REGEX(.*)
 </entityTypeAttributesResponse>
 
 
-2. Listing of Entity Type Attributes. Response in JSON
+2. Listing of Entity Type Attributes. Response in XML, details=on
+HTTP/1.1 200 OK
+Content-Length: 482
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<entityTypeAttributesResponse>
+  <entityType>
+    <contextAttributeList>
+      <contextAttribute>
+        <name>temperature</name>
+        <type>celsius</type>
+      </contextAttribute>
+      <contextAttribute>
+        <name>pressure</name>
+        <type>mmHg</type>
+      </contextAttribute>
+    </contextAttributeList>
+  </entityType>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+    <details>2</details>
+  </statusCode>
+</entityTypeAttributesResponse>
+
+
+3. Listing of Entity Type Attributes. Response in JSON
 HTTP/1.1 200 OK
 Content-Length: 269
 Content-Type: application/json
@@ -89,6 +141,82 @@ Date: REGEX(.*)
     }, 
     "statusCode": {
         "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+4. Listing of Entity Type Attributes. Response in JSON, details=on
+HTTP/1.1 200 OK
+Content-Length: 290
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "EntityType": {
+        "attributes": [
+            {
+                "name": "temperature", 
+                "type": "celsius"
+            }, 
+            {
+                "name": "pressure", 
+                "type": "mmHg"
+            }
+        ]
+    }, 
+    "statusCode": {
+        "code": "200", 
+        "details": "2", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+5. Listing of Entity Type Attributes. Response in Object-JSON
+HTTP/1.1 200 OK
+Content-Length: 237
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "EntityType": {
+        "attributes": {
+            "pressure": {
+                "type": "mmHg"
+            }, 
+            "temperature": {
+                "type": "celsius"
+            }
+        }
+    }, 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+6. Listing of Entity Type Attributes. Response in Object-JSON, details=on
+HTTP/1.1 200 OK
+Content-Length: 258
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "EntityType": {
+        "attributes": {
+            "pressure": {
+                "type": "mmHg"
+            }, 
+            "temperature": {
+                "type": "celsius"
+            }
+        }
+    }, 
+    "statusCode": {
+        "code": "200", 
+        "details": "2", 
         "reasonPhrase": "OK"
     }
 }

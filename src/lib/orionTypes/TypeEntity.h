@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
-#define SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
+#ifndef SRC_LIB_UTILITY_TYPEENTITY_H_
+#define SRC_LIB_UTILITY_TYPEENTITY_H_
 
 /*
 *
@@ -26,30 +26,30 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "utility/TypeEntityVector.h"
+#include "ngsi/ContextAttributeVector.h"
+#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityTypesResponse - 
+* TypeEntity - 
 */
-class EntityTypesResponse
+class TypeEntity
 {
  public:
-  TypeEntityVector  typeEntityVector;
-  StatusCode        statusCode;
+  std::string              type;
+  ContextAttributeVector   contextAttributeVector;
 
-  std::string       render(ConnectionInfo* ciP, const std::string& indent);
-  std::string       renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent);
-  std::string       check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
-  void              present(const std::string& indent);
-  void              release(void);
+  TypeEntity();
+  explicit TypeEntity(std::string _type);
+
+  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
+  std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool typeNameBefore = false);
+  std::string   renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
+  void          present(const std::string& indent);
+  void          release(void);
 };
 
-#endif  // SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
+#endif  // SRC_LIB_UTILITY_TYPEENTITY_H_

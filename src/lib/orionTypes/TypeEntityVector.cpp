@@ -34,14 +34,14 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
-#include "utility/TypeEntity.h"
-#include "utility/TypeEntityVector.h"
+#include "orionTypes/TypeEntity.h"
+#include "orionTypes/TypeEntityVector.h"
 
 
 
 /* ****************************************************************************
 *
-* TypeEntityVector::TypeEntityVector - 
+* TypeEntityVector::TypeEntityVector -
 */
 TypeEntityVector::TypeEntityVector()
 {
@@ -52,7 +52,7 @@ TypeEntityVector::TypeEntityVector()
 
 /* ****************************************************************************
 *
-* TypeEntityVector::renderJsonObject - 
+* TypeEntityVector::renderJsonObject -
 */
 std::string TypeEntityVector::renderAsJsonObject
 (
@@ -68,7 +68,7 @@ std::string TypeEntityVector::renderAsJsonObject
   if (vec.size() > 0)
   {
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
-    
+
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
@@ -83,7 +83,7 @@ std::string TypeEntityVector::renderAsJsonObject
 
 /* ****************************************************************************
 *
-* TypeEntityVector::render - 
+* TypeEntityVector::render -
 */
 std::string TypeEntityVector::render
 (
@@ -100,11 +100,11 @@ std::string TypeEntityVector::render
   {
     return renderAsJsonObject(ciP, indent, comma);
   }
-  
+
   if (vec.size() > 0)
   {
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
-    
+
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
@@ -119,7 +119,7 @@ std::string TypeEntityVector::render
 
 /* ****************************************************************************
 *
-* TypeEntityVector::check - 
+* TypeEntityVector::check -
 */
 std::string TypeEntityVector::check
 (
@@ -145,7 +145,7 @@ std::string TypeEntityVector::check
 
 /* ****************************************************************************
 *
-* TypeEntityVector::present - 
+* TypeEntityVector::present -
 */
 void TypeEntityVector::present(const std::string& indent)
 {
@@ -161,7 +161,7 @@ void TypeEntityVector::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* TypeEntityVector::push_back - 
+* TypeEntityVector::push_back -
 */
 void TypeEntityVector::push_back(TypeEntity* item)
 {
@@ -172,7 +172,7 @@ void TypeEntityVector::push_back(TypeEntity* item)
 
 /* ****************************************************************************
 *
-* TypeEntityVector::get - 
+* TypeEntityVector::get -
 */
 TypeEntity* TypeEntityVector::get(unsigned int ix)
 {
@@ -185,7 +185,7 @@ TypeEntity* TypeEntityVector::get(unsigned int ix)
 
 /* ****************************************************************************
 *
-* TypeEntityVector::size - 
+* TypeEntityVector::size -
 */
 unsigned int TypeEntityVector::size(void)
 {

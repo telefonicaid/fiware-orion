@@ -40,7 +40,6 @@ SET (STATIC_LIBS
     ngsi9
     ngsi10
     ngsi
-    utility
     parse
     orionTypes
     common
