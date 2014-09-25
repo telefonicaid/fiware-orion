@@ -158,6 +158,21 @@ static void prepareDatabase(void) {
 
 }
 
+ContextAttribute* getAttr(ContextAttributeVector& caV, std::string name, std::string type = "")
+{
+  for (unsigned int ix = 0; ix < caV.size() ; ix++)
+  {
+    if (caV.get(ix)->name == name)
+    {
+      if (type == "" || caV.get(ix)->type == type)
+      {
+        return caV.get(ix);
+      }
+    }
+  }
+  return NULL;
+}
+
 /* ****************************************************************************
 *
 * queryAllTypes -
@@ -184,84 +199,96 @@ TEST(mongoQueryTypes, queryAllType)
     EXPECT_EQ("", res.statusCode.details);
 
     ASSERT_EQ(3, res.typeEntityVector.size());
+    ContextAttribute* ca;
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
     ASSERT_EQ(6, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
-    EXPECT_EQ("fuel", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("fuel_T", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
+    EXPECT_EQ("fuel", ca->name);
+    EXPECT_EQ("fuel_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("plate_T", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
+    EXPECT_EQ("plate", ca->name);
+    EXPECT_EQ("plate_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("temp", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->name);
-    EXPECT_EQ("temp_T", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "temp");
+    EXPECT_EQ("temp", ca->name);
+    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("colour", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->name);
-    EXPECT_EQ("colour_T", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "colour");
+    EXPECT_EQ("colour", ca->name);
+    EXPECT_EQ("colour_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->name);
-    EXPECT_EQ("plate_T2", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T2");
+    EXPECT_EQ("plate", ca->name);
+    EXPECT_EQ("plate_T2", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("pos", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->name);
-    EXPECT_EQ("pos_T", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "pos");
+    EXPECT_EQ("pos", ca->name);
+    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Type # 2 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(1)->type);
     ASSERT_EQ(2, res.typeEntityVector.get(1)->contextAttributeVector.size());
 
-    EXPECT_EQ("status", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("status_T", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "status");
+    EXPECT_EQ("status", ca->name);
+    EXPECT_EQ("status_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("battery", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("battery_T", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "battery");
+    EXPECT_EQ("battery", ca->name);
+    EXPECT_EQ("battery_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Type # 3 */
     EXPECT_EQ("Room", res.typeEntityVector.get(2)->type);
     ASSERT_EQ(3, res.typeEntityVector.get(2)->contextAttributeVector.size());
 
-    EXPECT_EQ("humidity", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("humidity_T", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "humidity");
+    EXPECT_EQ("humidity", ca->name);
+    EXPECT_EQ("humidity_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("temp", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("temp_T", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "temp");
+    EXPECT_EQ("temp", ca->name);
+    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("pos", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->name);
-    EXPECT_EQ("pos_T", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(2)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(2)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "pos");
+    EXPECT_EQ("pos", ca->name);
+    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
     mongoDisconnect();
@@ -297,84 +324,96 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
     EXPECT_EQ("Count: 3", res.statusCode.details);
 
     ASSERT_EQ(3, res.typeEntityVector.size());
+    ContextAttribute* ca;
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
     ASSERT_EQ(6, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
-    EXPECT_EQ("fuel", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("fuel_T", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
+    EXPECT_EQ("fuel", ca->name);
+    EXPECT_EQ("fuel_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("plate_T", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
+    EXPECT_EQ("plate", ca->name);
+    EXPECT_EQ("plate_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("temp", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->name);
-    EXPECT_EQ("temp_T", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "temp");
+    EXPECT_EQ("temp", ca->name);
+    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("colour", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->name);
-    EXPECT_EQ("colour_T", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "colour");
+    EXPECT_EQ("colour", ca->name);
+    EXPECT_EQ("colour_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->name);
-    EXPECT_EQ("plate_T2", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T2");
+    EXPECT_EQ("plate", ca->name);
+    EXPECT_EQ("plate_T2", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("pos", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->name);
-    EXPECT_EQ("pos_T", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "pos");
+    EXPECT_EQ("pos", ca->name);
+    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Type # 2 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(1)->type);
     ASSERT_EQ(2, res.typeEntityVector.get(1)->contextAttributeVector.size());
 
-    EXPECT_EQ("status", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("status_T", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "status");
+    EXPECT_EQ("status", ca->name);
+    EXPECT_EQ("status_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("battery", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("battery_T", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "battery");
+    EXPECT_EQ("battery", ca->name);
+    EXPECT_EQ("battery_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Type # 3 */
     EXPECT_EQ("Room", res.typeEntityVector.get(2)->type);
     ASSERT_EQ(3, res.typeEntityVector.get(2)->contextAttributeVector.size());
 
-    EXPECT_EQ("humidity", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("humidity_T", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "humidity");
+    EXPECT_EQ("humidity", ca->name);
+    EXPECT_EQ("humidity_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("temp", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("temp_T", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "temp");
+    EXPECT_EQ("temp", ca->name);
+    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("pos", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->name);
-    EXPECT_EQ("pos_T", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(2)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(2)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "pos");
+    EXPECT_EQ("pos", ca->name);
+    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
     mongoDisconnect();
@@ -409,84 +448,96 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
     EXPECT_EQ("", res.statusCode.details);
 
     ASSERT_EQ(3, res.typeEntityVector.size());
+    ContextAttribute* ca;
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
     ASSERT_EQ(6, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
-    EXPECT_EQ("fuel", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("fuel_T", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
+    EXPECT_EQ("fuel", ca->name);
+    EXPECT_EQ("fuel_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("plate_T", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
+    EXPECT_EQ("plate", ca->name);
+    EXPECT_EQ("plate_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("temp", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->name);
-    EXPECT_EQ("temp_T", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "temp");
+    EXPECT_EQ("temp", ca->name);
+    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("colour", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->name);
-    EXPECT_EQ("colour_T", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "colour");
+    EXPECT_EQ("colour", ca->name);
+    EXPECT_EQ("colour_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->name);
-    EXPECT_EQ("plate_T2", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T2");
+    EXPECT_EQ("plate", ca->name);
+    EXPECT_EQ("plate_T2", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("pos", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->name);
-    EXPECT_EQ("pos_T", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "pos");
+    EXPECT_EQ("pos", ca->name);
+    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Type # 2 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(1)->type);
     ASSERT_EQ(2, res.typeEntityVector.get(1)->contextAttributeVector.size());
 
-    EXPECT_EQ("status", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("status_T", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "status");
+    EXPECT_EQ("status", ca->name);
+    EXPECT_EQ("status_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("battery", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("battery_T", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "battery");
+    EXPECT_EQ("battery", ca->name);
+    EXPECT_EQ("battery_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Type # 3 */
     EXPECT_EQ("Room", res.typeEntityVector.get(2)->type);
     ASSERT_EQ(3, res.typeEntityVector.get(2)->contextAttributeVector.size());
 
-    EXPECT_EQ("humidity", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("humidity_T", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "humidity");
+    EXPECT_EQ("humidity", ca->name);
+    EXPECT_EQ("humidity_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("temp", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("temp_T", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "temp");
+    EXPECT_EQ("temp", ca->name);
+    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("pos", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->name);
-    EXPECT_EQ("pos_T", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(2)->contextAttributeVector.get(2)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(2)->contextAttributeVector.get(2)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(2)->contextAttributeVector.get(2)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "pos");
+    EXPECT_EQ("pos", ca->name);
+    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
     mongoDisconnect();
@@ -521,46 +572,53 @@ TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
     EXPECT_EQ("", res.statusCode.details);
 
     ASSERT_EQ(1, res.typeEntityVector.size());
+    ContextAttribute* ca;
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
     ASSERT_EQ(6, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
-    EXPECT_EQ("fuel", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("fuel_T", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
+    EXPECT_EQ("fuel", ca->name);
+    EXPECT_EQ("fuel_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("plate_T", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
+    EXPECT_EQ("plate", ca->name);
+    EXPECT_EQ("plate_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("temp", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->name);
-    EXPECT_EQ("temp_T", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "temp");
+    EXPECT_EQ("temp", ca->name);
+    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("colour", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->name);
-    EXPECT_EQ("colour_T", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(3)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(3)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "colour");
+    EXPECT_EQ("colour", ca->name);
+    EXPECT_EQ("colour_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("plate", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->name);
-    EXPECT_EQ("plate_T2", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(4)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(4)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T2");
+    EXPECT_EQ("plate", ca->name);
+    EXPECT_EQ("plate_T2", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("pos", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->name);
-    EXPECT_EQ("pos_T", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(5)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(5)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "pos");
+    EXPECT_EQ("pos", ca->name);
+    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
     mongoDisconnect();
@@ -596,22 +654,25 @@ TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
     EXPECT_EQ("", res.statusCode.details);
 
     ASSERT_EQ(1, res.typeEntityVector.size());
+    ContextAttribute* ca;
 
     /* Type # 2 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(0)->type);
     ASSERT_EQ(2, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
-    EXPECT_EQ("status", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("status_T", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "status");
+    EXPECT_EQ("status", ca->name);
+    EXPECT_EQ("status_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("battery", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("battery_T", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "battery");
+    EXPECT_EQ("battery", ca->name);
+    EXPECT_EQ("battery_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
     mongoDisconnect();
@@ -647,44 +708,50 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
     EXPECT_EQ("", res.statusCode.details);
 
     ASSERT_EQ(2, res.typeEntityVector.size());
+    ContextAttribute* ca;
 
     /* Type # 1 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(0)->type);
     ASSERT_EQ(2, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
-    EXPECT_EQ("status", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("status_T", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "status");
+    EXPECT_EQ("status", ca->name);
+    EXPECT_EQ("status_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("battery", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("battery_T", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "battery");
+    EXPECT_EQ("battery", ca->name);
+    EXPECT_EQ("battery_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Type # 2 */
     EXPECT_EQ("Room", res.typeEntityVector.get(1)->type);
     ASSERT_EQ(3, res.typeEntityVector.get(1)->contextAttributeVector.size());
 
-    EXPECT_EQ("humidity", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("humidity_T", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "humidity");
+    EXPECT_EQ("humidity", ca->name);
+    EXPECT_EQ("humidity_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("temp", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("temp_T", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "temp");
+    EXPECT_EQ("temp", ca->name);
+    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("pos", res.typeEntityVector.get(1)->contextAttributeVector.get(2)->name);
-    EXPECT_EQ("pos_T", res.typeEntityVector.get(1)->contextAttributeVector.get(2)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(1)->contextAttributeVector.get(2)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(1)->contextAttributeVector.get(2)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(1)->contextAttributeVector.get(2)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "pos");
+    EXPECT_EQ("pos", ca->name);
+    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
     mongoDisconnect();
@@ -755,28 +822,32 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
     EXPECT_EQ("", res.statusCode.details);
 
     ASSERT_EQ(1, res.typeEntityVector.size());
+    ContextAttribute* ca;
 
     /* Type # 1 */
     EXPECT_EQ("Room", res.typeEntityVector.get(0)->type);
     ASSERT_EQ(3, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
-    EXPECT_EQ("humidity", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->name);
-    EXPECT_EQ("humidity_T", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(0)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(0)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "humidity");
+    EXPECT_EQ("humidity", ca->name);
+    EXPECT_EQ("humidity_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("temp", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->name);
-    EXPECT_EQ("temp_T", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(1)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(1)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "temp");
+    EXPECT_EQ("temp", ca->name);
+    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
-    EXPECT_EQ("pos", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->name);
-    EXPECT_EQ("pos_T", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->type);
-    EXPECT_EQ("", res.typeEntityVector.get(0)->contextAttributeVector.get(2)->value);
-    EXPECT_EQ(NULL, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->compoundValueP);
-    EXPECT_EQ(0, res.typeEntityVector.get(0)->contextAttributeVector.get(2)->metadataVector.size());
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "pos");
+    EXPECT_EQ("pos", ca->name);
+    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->value);
+    EXPECT_EQ(NULL, ca->compoundValueP);
+    EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
     mongoDisconnect();
