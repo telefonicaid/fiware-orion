@@ -73,13 +73,12 @@ HttpStatusCode mongoEntityTypes
    *
    */
 
-  // FIXME: unhardwire literals that depend on collection names and fields
   BSONObj result;
-  BSONObj cmd = BSON("aggregate" << "entities" <<
+  BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
-                                              BSON("$project" << BSON("_id" << 1 << "attrs.name" << 1 << "attrs.type" << 1)) <<
-                                              BSON("$unwind" << "$attrs") <<
-                                              BSON("$group" << BSON("_id" << "$_id.type" << "attrs" << BSON("$addToSet" << "$attrs"))) <<
+                                              BSON("$project" << BSON("_id" << 1 << C_ATTR_NAME << 1 << C_ATTR_TYPE << 1)) <<
+                                              BSON("$unwind" << S_ATTRS) <<
+                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRS))) <<
                                               BSON("$sort" << BSON("_id" << 1))
                                              )
                     );
@@ -231,17 +230,16 @@ HttpStatusCode mongoAttributesForEntityType
    *
    */
 
-  // FIXME: unhardwire literals that depend on collection names and fields
   BSONObj result;
-  BSONObj cmd = BSON("aggregate" << "entities" <<
+  BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
-                                              BSON("$match" << BSON("_id.type" << entityType)) <<
-                                              BSON("$project" << BSON("_id" << 1 << "attrs.name" << 1 << "attrs.type" << 1)) <<
-                                              BSON("$unwind" << "$attrs") <<
-                                              BSON("$group" << BSON("_id" << "$_id.type" << "attrs" << BSON("$addToSet" << "$attrs"))) <<
-                                              BSON("$unwind" << "$attrs") <<
-                                              BSON("$group" << BSON("_id" << "$attrs")) <<
-                                              BSON("$sort" << BSON("_id.name" << 1 << "_id.type" << 1))
+                                              BSON("$match" << BSON(C_ID_ENTITY << entityType)) <<
+                                              BSON("$project" << BSON("_id" << 1 << C_ATTR_NAME << 1 << C_ATTR_TYPE << 1)) <<
+                                              BSON("$unwind" << S_ATTRS) <<
+                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRS))) <<
+                                              BSON("$unwind" << S_ATTRS) <<
+                                              BSON("$group" << BSON("_id" << S_ATTRS)) <<
+                                              BSON("$sort" << BSON(C_ID_NAME << 1 << C_ID_TYPE << 1))
                                              )
                     );
 
