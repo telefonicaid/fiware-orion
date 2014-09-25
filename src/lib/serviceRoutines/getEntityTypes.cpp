@@ -30,7 +30,7 @@
 #include "utility/EntityTypesResponse.h"
 #include "serviceRoutines/getEntityTypes.h"
 
-
+#include "mongoBackend/mongoQueryTypes.h"
 
 /* ****************************************************************************
 *
@@ -62,8 +62,8 @@ std::string getEntityTypes(ConnectionInfo* ciP, int components, std::vector<std:
 {
   EntityTypesResponse response;
 
-#if 0
-  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParams);
+#if 1
+  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 #else
   //
   // mongoEntityTypes is not implemented
