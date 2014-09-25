@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
-#define SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
+#ifndef SRC_LIB_UTILITY_TYPEENTITYVECTOR_H_
+#define SRC_LIB_UTILITY_TYPEENTITYVECTOR_H_
 
 /*
 *
@@ -28,28 +28,39 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "utility/TypeEntityVector.h"
+#include "orionTypes/TypeEntity.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityTypesResponse - 
+* TypeEntityVector - 
 */
-class EntityTypesResponse
+class TypeEntityVector
 {
- public:
-  TypeEntityVector  typeEntityVector;
-  StatusCode        statusCode;
+  std::vector<TypeEntity*> vec;
 
-  std::string       render(ConnectionInfo* ciP, const std::string& indent);
-  std::string       renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent);
-  std::string       check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
-  void              present(const std::string& indent);
-  void              release(void);
+ public:
+  TypeEntityVector();
+
+  void          present(const std::string& indent);
+  void          push_back(TypeEntity* item);
+  unsigned int  size(void);
+  TypeEntity*   get(unsigned int ix);
+  void          release(void);
+  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
+  std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
+  std::string   renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma = false);
+
+  TypeEntity*   operator[](unsigned int ix)
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;
+  }
 };
 
-#endif  // SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
+#endif  // SRC_LIB_UTILITY_TYPEENTITYVECTOR_H_

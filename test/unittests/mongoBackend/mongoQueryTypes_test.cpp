@@ -30,7 +30,7 @@
 #include "common/globals.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryTypes.h"
-#include "utility/EntityTypesResponse.h"
+#include "orionTypes/EntityTypesResponse.h"
 
 #include "mongo/client/dbclient.h"
 

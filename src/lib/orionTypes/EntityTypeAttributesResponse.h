@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_ENTITYTYPESATTRIBUTESRESPONSE_H_
-#define SRC_LIB_UTILITY_ENTITYTYPESATTRIBUTESRESPONSE_H_
+#ifndef SRC_LIB_UTILITY_ENTITYTYPEATTRIBUTESRESPONSE_H_
+#define SRC_LIB_UTILITY_ENTITYTYPEATTRIBUTESRESPONSE_H_
 
 /*
 *
@@ -31,15 +31,15 @@
 #include "common/Format.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
-#include "utility/TypeEntity.h"
+#include "orionTypes/TypeEntity.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityTypesAttributesResponse - 
+* EntityTypeAttributesResponse - 
 */
-class EntityTypesAttributesResponse
+class EntityTypeAttributesResponse
 {
  public:
   TypeEntity    entityType;
@@ -51,4 +51,4 @@ class EntityTypesAttributesResponse
   void          release(void);
 };
 
-#endif  // SRC_LIB_UTILITY_ENTITYTYPESATTRIBUTESRESPONSE_H_
+#endif  // SRC_LIB_UTILITY_ENTITYTYPEATTRIBUTESRESPONSE_H_

@@ -29,8 +29,8 @@
 #include <string>
 #include <map>
 
-#include "utility/EntityTypesResponse.h"
-#include "utility/EntityTypesAttributesResponse.h"
+#include "orionTypes/EntityTypesResponse.h"
+#include "orionTypes/EntityTypeAttributesResponse.h"
 
 /* ****************************************************************************
 *
@@ -51,7 +51,7 @@ extern HttpStatusCode mongoEntityTypes
 extern HttpStatusCode mongoAttributesForEntityType
 (
   std::string                           entityType,
-  EntityTypesAttributesResponse*        responseP,
+  EntityTypeAttributesResponse*         responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams

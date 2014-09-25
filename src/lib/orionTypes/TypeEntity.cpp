@@ -29,7 +29,7 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
-#include "utility/TypeEntity.h"
+#include "orionTypes/TypeEntity.h"
 
 
 

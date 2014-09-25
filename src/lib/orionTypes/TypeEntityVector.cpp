@@ -34,8 +34,8 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
-#include "utility/TypeEntity.h"
-#include "utility/TypeEntityVector.h"
+#include "orionTypes/TypeEntity.h"
+#include "orionTypes/TypeEntityVector.h"
 
 
 

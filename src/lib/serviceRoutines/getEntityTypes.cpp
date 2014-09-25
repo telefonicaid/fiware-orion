@@ -27,7 +27,7 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "utility/EntityTypesResponse.h"
+#include "orionTypes/EntityTypesResponse.h"
 #include "serviceRoutines/getEntityTypes.h"
 
 #include "mongoBackend/mongoQueryTypes.h"
@@ -68,7 +68,7 @@ std::string getEntityTypes
 {
   EntityTypesResponse response;
 
-#if 0
+#ifndef DEBUG_kz
   mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 #else
   //

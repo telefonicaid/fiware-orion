@@ -31,7 +31,7 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
-#include "utility/EntityTypesResponse.h"
+#include "orionTypes/EntityTypesResponse.h"
 
 
 
