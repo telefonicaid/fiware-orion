@@ -4,3 +4,5 @@
 - Add: support for MongoDB replica sets (using the new -rplSet CLI parameter) (Issue #493)
 - Add: alternative rendering of ContextAttribute for JSON (Issue #490)
 - Fix: each send is now considered a separate transaction (Issue #478)
+- Add: new API operation to get all existing types (Issue #519)
+- Add: new API operation to get all attributes (union set) of a given type (Issue #519)
