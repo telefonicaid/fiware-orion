@@ -57,7 +57,7 @@ TypeEntity::TypeEntity(std::string  _type)
 
 /* ****************************************************************************
 *
-* TypeEntity::render -
+* TypeEntity::renderAsJsonObject -
 */
 std::string TypeEntity::renderAsJsonObject
 (
@@ -81,6 +81,12 @@ std::string TypeEntity::renderAsJsonObject
 /* ****************************************************************************
 *
 * TypeEntity::render -
+*
+* This method is used by:
+*   o TypeEntityVector
+*   o EntityTypeAttributesResponse
+*
+* 'typeNameBefore' is set to TRUE when called from EntityTypeAttributesResponse
 */
 std::string TypeEntity::render
 (
@@ -94,29 +100,27 @@ std::string TypeEntity::render
   std::string  xmlTag         = "entityType";
   std::string  jsonTag        = "type";
 
-  if (typeNameBefore == true)
+  if ((typeNameBefore == true) && (ciP->outFormat == JSON))
   {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+    out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
+    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", true, true);
   }
   else
   {
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
-  }
 
-  if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true")
-  {
-    out += valueTag(indent  + "  ", "name", type, ciP->outFormat, false);
-  }
-  else
-  {
-    if (typeNameBefore == false)
+    if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true")
+    {
+      out += valueTag(indent  + "  ", "name", type, ciP->outFormat, false);
+    }
+    else
     {
       out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
+      out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true);
     }
-    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true);
-  }
 
-  out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+    out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+  }
 
   return out;
 }

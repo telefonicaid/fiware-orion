@@ -76,7 +76,7 @@ echo
 
 
 echo "4. Listing of Entity Type Attributes. Response in JSON, details=on"
-orionCurl --url /v1/contextTypes/Room?details=on --json
+orionCurl --url /v1/contextTypes/Room?details=on --json # --noPayloadCheck
 echo
 echo
 
@@ -88,7 +88,7 @@ echo
 
 
 echo "6. Listing of Entity Type Attributes. Response in Object-JSON, details=on"
-orionCurl --url '/v1/contextTypes/Room?attributesFormat=object&details=on' --json
+orionCurl --url '/v1/contextTypes/Room?attributesFormat=object&details=on' --json # --noPayloadCheck
 echo
 echo
 
@@ -132,13 +132,14 @@ Date: REGEX(.*)
 
 1. Listing of Entity Type Attributes. Response in XML
 HTTP/1.1 200 OK
-Content-Length: 457
+Content-Length: 479
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <entityTypeAttributesResponse>
   <entityType>
+    <name>Room</name>
     <contextAttributeList>
       <contextAttribute>
         <name>pressure</name>
@@ -159,13 +160,14 @@ Date: REGEX(.*)
 
 2. Listing of Entity Type Attributes. Response in XML, details=on
 HTTP/1.1 200 OK
-Content-Length: 489
+Content-Length: 511
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <entityTypeAttributesResponse>
   <entityType>
+    <name>Room</name>
     <contextAttributeList>
       <contextAttribute>
         <name>pressure</name>
@@ -187,102 +189,98 @@ Date: REGEX(.*)
 
 3. Listing of Entity Type Attributes. Response in JSON
 HTTP/1.1 200 OK
-Content-Length: 263
+Content-Length: 267
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "attributes": [
+        {
+            "name": "pressure", 
+            "type": "mmHg"
+        }, 
+        {
+            "name": "temperature", 
+            "type": "celsius"
+        }
+    ], 
+    "name": "Room", 
     "statusCode": {
         "code": "200", 
         "reasonPhrase": "OK"
-    }, 
-    "type": {
-        "attributes": [
-            {
-                "name": "pressure", 
-                "type": "mmHg"
-            }, 
-            {
-                "name": "temperature", 
-                "type": "celsius"
-            }
-        ]
     }
 }
 
 
 4. Listing of Entity Type Attributes. Response in JSON, details=on
 HTTP/1.1 200 OK
-Content-Length: 291
+Content-Length: 295
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "attributes": [
+        {
+            "name": "pressure", 
+            "type": "mmHg"
+        }, 
+        {
+            "name": "temperature", 
+            "type": "celsius"
+        }
+    ], 
+    "name": "Room", 
     "statusCode": {
         "code": "200", 
         "details": "Count: 2", 
         "reasonPhrase": "OK"
-    }, 
-    "type": {
-        "attributes": [
-            {
-                "name": "pressure", 
-                "type": "mmHg"
-            }, 
-            {
-                "name": "temperature", 
-                "type": "celsius"
-            }
-        ]
     }
 }
 
 
 5. Listing of Entity Type Attributes. Response in Object-JSON
 HTTP/1.1 200 OK
-Content-Length: 231
+Content-Length: 235
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "attributes": {
+        "pressure": {
+            "type": "mmHg"
+        }, 
+        "temperature": {
+            "type": "celsius"
+        }
+    }, 
+    "name": "Room", 
     "statusCode": {
         "code": "200", 
         "reasonPhrase": "OK"
-    }, 
-    "type": {
-        "attributes": {
-            "pressure": {
-                "type": "mmHg"
-            }, 
-            "temperature": {
-                "type": "celsius"
-            }
-        }
     }
 }
 
 
 6. Listing of Entity Type Attributes. Response in Object-JSON, details=on
 HTTP/1.1 200 OK
-Content-Length: 259
+Content-Length: 263
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "attributes": {
+        "pressure": {
+            "type": "mmHg"
+        }, 
+        "temperature": {
+            "type": "celsius"
+        }
+    }, 
+    "name": "Room", 
     "statusCode": {
         "code": "200", 
         "details": "Count: 2", 
         "reasonPhrase": "OK"
-    }, 
-    "type": {
-        "attributes": {
-            "pressure": {
-                "type": "mmHg"
-            }, 
-            "temperature": {
-                "type": "celsius"
-            }
-        }
     }
 }
 
