@@ -200,6 +200,9 @@ HttpStatusCode mongoAttributesForEntityType
   std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
   bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
+  // Setting the name of the entity type for the response
+  responseP->entityType.type = entityType;
+
   LM_T(LmtMongo, ("Query Types Attribute for <%s>", entityType.c_str()));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 

@@ -96,13 +96,14 @@ std::string TypeEntityVector::render
   std::string xmlTag   = "typeEntities";
   std::string jsonTag  = "types";
 
-  if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
-  {
-    return renderAsJsonObject(ciP, indent, comma);
-  }
 
   if (vec.size() > 0)
   {
+    if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
+    {
+      return renderAsJsonObject(ciP, indent, comma);
+    }
+
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
 
     for (unsigned int ix = 0; ix < vec.size(); ++ix)

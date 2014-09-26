@@ -35,28 +35,6 @@
 /* ****************************************************************************
 *
 * getEntityTypes - 
-*
-* Response in XML:
-* <entityTypesResponse>
-*   <entityTypesFound>4</entityTypesFound>
-*   <entityTypes>
-*     <entityType>Name of Type 1</entityType>
-*     <entityType>Name of Type 2</entityType>
-*     <entityType>Name of Type 3</entityType>
-*     <entityType>Name of Type 4</entityType>
-*   <entityTypes>
-* </entityTypesResponse>
-*
-* Response in JSON:
-* {
-*   "typesFound" : 4,
-*   "types" : [
-*     "Name of Type 1",
-*     "Name of Type 2",
-*     "Name of Type 3",
-*     "Name of Type 4"
-*   ]
-* }
 */
 std::string getEntityTypes
 (
@@ -68,28 +46,9 @@ std::string getEntityTypes
 {
   EntityTypesResponse response;
 
-#ifndef DEBUG_kz
-  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-#else
-  //
-  // mongoEntityTypes is not implemented
-  // Instead, I create a response by hand, to test the render method
-  //
-
-  TypeEntity* room = new TypeEntity("Room");
-  TypeEntity* car  = new TypeEntity("Car");
-
-  room->contextAttributeVector.push_back(new ContextAttribute("temperature", "celsius", ""));
-  room->contextAttributeVector.push_back(new ContextAttribute("pressure",    "mmHg",    ""));
-
-  car->contextAttributeVector.push_back(new ContextAttribute("temperature", "celsius", ""));
-  car->contextAttributeVector.push_back(new ContextAttribute("pressure",    "mmHg",    ""));
-
-  response.typeEntityVector.push_back(room);
-  response.typeEntityVector.push_back(car);
-#endif
-
   response.statusCode.fill(SccOk);
+  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+
   std::string rendered = response.render(ciP, "");
   response.release();
 

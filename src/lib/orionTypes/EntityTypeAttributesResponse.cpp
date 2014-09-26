@@ -44,14 +44,7 @@ std::string EntityTypeAttributesResponse::render(ConnectionInfo* ciP, const std:
   std::string out                 = "";
   std::string tag                 = "entityTypeAttributesResponse";
 
-  if (ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] == "on")
-  {
-    char noOf[16];
-
-    snprintf(noOf, sizeof(noOf), "%d", entityType.contextAttributeVector.size());
-    statusCode.details = noOf;
-  }
-
+  
   out += startTag(indent, tag, ciP->outFormat, false);
 
   out += entityType.render(ciP, indent + "  ", true, true);

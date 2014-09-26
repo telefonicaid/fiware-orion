@@ -215,7 +215,7 @@ TEST(mongoQueryTypes, queryAllType)
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T");
     EXPECT_EQ("plate", ca->name);
     EXPECT_EQ("plate_T", ca->type);
     EXPECT_EQ("", ca->value);
@@ -340,7 +340,7 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T");
     EXPECT_EQ("plate", ca->name);
     EXPECT_EQ("plate_T", ca->type);
     EXPECT_EQ("", ca->value);
@@ -465,7 +465,7 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T");
     EXPECT_EQ("plate", ca->name);
     EXPECT_EQ("plate_T", ca->type);
     EXPECT_EQ("", ca->value);
@@ -590,7 +590,7 @@ TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T");
     EXPECT_EQ("plate", ca->name);
     EXPECT_EQ("plate_T", ca->type);
     EXPECT_EQ("", ca->value);

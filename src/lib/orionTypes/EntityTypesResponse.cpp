@@ -66,14 +66,6 @@ std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& 
   std::string out                 = "";
   std::string tag                 = "entityTypesResponse";
 
-  if (ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] == "on")
-  {
-    char noOf[16];
-
-    snprintf(noOf, sizeof(noOf), "%d", typeEntityVector.size());
-    statusCode.details = noOf;
-  }
-
   if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
   {
     return renderAsJsonObject(ciP, indent);

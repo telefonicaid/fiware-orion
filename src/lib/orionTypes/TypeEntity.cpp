@@ -92,7 +92,7 @@ std::string TypeEntity::render
 {
   std::string  out            = "";
   std::string  xmlTag         = "entityType";
-  std::string  jsonTag        = type;
+  std::string  jsonTag        = "type";
 
   if (typeNameBefore == true)
   {

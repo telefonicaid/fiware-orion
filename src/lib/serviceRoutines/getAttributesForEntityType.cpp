@@ -37,7 +37,6 @@
 /* ****************************************************************************
 *
 * getAttributesForEntityType -
-*
 */
 std::string getAttributesForEntityType
 (
@@ -50,19 +49,9 @@ std::string getAttributesForEntityType
   EntityTypeAttributesResponse  response;
   std::string                   entityTypeName = (ciP->tenantFromUrl != "")? compV[3] : compV[2];
 
-#ifndef DEBUG_kz
-  mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-#else
-  //
-  // mongoAttributesForEntityType is not implemented
-  // Instead, I create a response by hand, to test the render method
-  //
-  response.entityType.type = entityTypeName;
-  response.entityType.contextAttributeVector.push_back(new ContextAttribute("temperature", "celsius", ""));
-  response.entityType.contextAttributeVector.push_back(new ContextAttribute("pressure",    "mmHg",    ""));
-#endif
-
   response.statusCode.fill(SccOk);
+  mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+
   std::string rendered = response.render(ciP, "");
   response.release();
 

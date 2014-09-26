@@ -27,6 +27,34 @@ dbInit CB
 brokerStart CB 0-255 IPV4
 --SHELL--
 
+echo "0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>celsius</type>
+          <contextValue>0</contextValue>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>mmHg</type>
+          <contextValue>0</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url '/ngsi10/updateContext' --payload "$payload"
+echo
+echo
+
 
 echo "1. Listing of Entity Types. Response in XML"
 orionCurl --url '/v1/contextTypes'
@@ -82,9 +110,45 @@ echo
 
 
 --REGEXPECT--
+0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
+HTTP/1.1 200 OK
+Content-Length: 810
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>celsius</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>mmHg</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
 1. Listing of Entity Types. Response in XML
 HTTP/1.1 200 OK
-Content-Length: 875
+Content-Length: 522
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -93,19 +157,6 @@ Date: REGEX(.*)
   <typeEntities>
     <entityType>
       <name>Room</name>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>celsius</type>
-        </contextAttribute>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>mmHg</type>
-        </contextAttribute>
-      </contextAttributeList>
-    </entityType>
-    <entityType>
-      <name>Car</name>
       <contextAttributeList>
         <contextAttribute>
           <name>temperature</name>
@@ -127,7 +178,7 @@ Date: REGEX(.*)
 
 2. Listing of Entity Types. Response in XML, with details=on
 HTTP/1.1 200 OK
-Content-Length: 900
+Content-Length: 554
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -147,31 +198,18 @@ Date: REGEX(.*)
         </contextAttribute>
       </contextAttributeList>
     </entityType>
-    <entityType>
-      <name>Car</name>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>celsius</type>
-        </contextAttribute>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>mmHg</type>
-        </contextAttribute>
-      </contextAttributeList>
-    </entityType>
   </typeEntities>
   <statusCode>
     <code>200</code>
     <reasonPhrase>OK</reasonPhrase>
-    <details>2</details>
+    <details>Count: 1</details>
   </statusCode>
 </entityTypesResponse>
 
 
 3. Listing of Entity Types. Response in XML, with details=on and collapse=true
 HTTP/1.1 200 OK
-Content-Length: 310
+Content-Length: 259
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -181,21 +219,18 @@ Date: REGEX(.*)
     <entityType>
       <name>Room</name>
     </entityType>
-    <entityType>
-      <name>Car</name>
-    </entityType>
   </typeEntities>
   <statusCode>
     <code>200</code>
     <reasonPhrase>OK</reasonPhrase>
-    <details>2</details>
+    <details>Count: 1</details>
   </statusCode>
 </entityTypesResponse>
 
 
 4. Listing of Entity Types. Response in JSON
 HTTP/1.1 200 OK
-Content-Length: 546
+Content-Length: 319
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -217,19 +252,6 @@ Date: REGEX(.*)
                 }
             ], 
             "name": "Room"
-        }, 
-        {
-            "attributes": [
-                {
-                    "name": "temperature", 
-                    "type": "celsius"
-                }, 
-                {
-                    "name": "pressure", 
-                    "type": "mmHg"
-                }
-            ], 
-            "name": "Car"
         }
     ]
 }
@@ -237,14 +259,14 @@ Date: REGEX(.*)
 
 5. Listing of Entity Types. Response in JSON, with details=on
 HTTP/1.1 200 OK
-Content-Length: 567
+Content-Length: 347
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "200", 
-        "details": "2", 
+        "details": "Count: 1", 
         "reasonPhrase": "OK"
     }, 
     "types": [
@@ -260,19 +282,6 @@ Date: REGEX(.*)
                 }
             ], 
             "name": "Room"
-        }, 
-        {
-            "attributes": [
-                {
-                    "name": "temperature", 
-                    "type": "celsius"
-                }, 
-                {
-                    "name": "pressure", 
-                    "type": "mmHg"
-                }
-            ], 
-            "name": "Car"
         }
     ]
 }
@@ -280,22 +289,19 @@ Date: REGEX(.*)
 
 6. Listing of Entity Types. Response in JSON, with details=on and collapse=true
 HTTP/1.1 200 OK
-Content-Length: 181
+Content-Length: 154
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "200", 
-        "details": "2", 
+        "details": "Count: 1", 
         "reasonPhrase": "OK"
     }, 
     "types": [
         {
             "name": "Room"
-        }, 
-        {
-            "name": "Car"
         }
     ]
 }
@@ -303,7 +309,7 @@ Date: REGEX(.*)
 
 7. Listing of Entity Types. Response in Object-JSON
 HTTP/1.1 200 OK
-Content-Length: 474
+Content-Length: 283
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -323,17 +329,6 @@ Date: REGEX(.*)
                 }
             }, 
             "name": "Room"
-        }, 
-        {
-            "attributes": {
-                "pressure": {
-                    "type": "mmHg"
-                }, 
-                "temperature": {
-                    "type": "celsius"
-                }
-            }, 
-            "name": "Car"
         }
     ]
 }
@@ -341,14 +336,14 @@ Date: REGEX(.*)
 
 8. Listing of Entity Types. Response in Object-JSON, with details=on
 HTTP/1.1 200 OK
-Content-Length: 495
+Content-Length: 311
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "200", 
-        "details": "2", 
+        "details": "Count: 1", 
         "reasonPhrase": "OK"
     }, 
     "types": [
@@ -362,17 +357,6 @@ Date: REGEX(.*)
                 }
             }, 
             "name": "Room"
-        }, 
-        {
-            "attributes": {
-                "pressure": {
-                    "type": "mmHg"
-                }, 
-                "temperature": {
-                    "type": "celsius"
-                }
-            }, 
-            "name": "Car"
         }
     ]
 }
@@ -380,22 +364,19 @@ Date: REGEX(.*)
 
 9. Listing of Entity Types. Response in Object-JSON, with details=on and collapse=true
 HTTP/1.1 200 OK
-Content-Length: 181
+Content-Length: 154
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "200", 
-        "details": "2", 
+        "details": "Count: 1", 
         "reasonPhrase": "OK"
     }, 
     "types": [
         {
             "name": "Room"
-        }, 
-        {
-            "name": "Car"
         }
     ]
 }
