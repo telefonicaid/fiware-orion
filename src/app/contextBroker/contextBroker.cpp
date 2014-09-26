@@ -1084,11 +1084,11 @@ static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName
   }
 
   setDbPrefix(dbName);
-  setEntitiesCollectionName("entities");
-  setRegistrationsCollectionName("registrations");
-  setSubscribeContextCollectionName("csubs");
-  setSubscribeContextAvailabilityCollectionName("casubs");
-  setAssociationsCollectionName("associations");
+  setEntitiesCollectionName(COL_ENTITIES);
+  setRegistrationsCollectionName(COL_REGISTRATIONS);
+  setSubscribeContextCollectionName(COL_CSUBS);
+  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
+  setAssociationsCollectionName(COL_ASSOCIATIONS);
 
   //
   // Note that index creation operation is idempotent.

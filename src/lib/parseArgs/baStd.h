@@ -32,20 +32,6 @@
 
 /* ****************************************************************************
 *
-* useful macros
-*/
-#ifndef MIN
-#  define MIN(a, b)     ((a) < (b)? (a) : (b))
-#endif
-
-#ifndef MAX
-#  define MAX(a, b)     ((a) > (b)? (a) : (b))
-#endif
-
-
-
-/* ****************************************************************************
-*
 * BA_VEC_SIZE - size of vector
 */
 #define BA_VEC_SIZE(v)   (sizeof(v) / sizeof(v[0]))
