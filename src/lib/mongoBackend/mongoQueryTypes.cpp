@@ -66,7 +66,7 @@ HttpStatusCode mongoEntityTypes
    *                          ]
    *                })
    *
-   * FIXME: in the future, we can interpret the collapse parameter at this layer. If collapse=true so we don't need attributes, the
+   * FIXME P6: in the future, we can interpret the collapse parameter at this layer. If collapse=true so we don't need attributes, the
    * following command can be used:
    *
    * db.runCommand({aggregate: "entities", pipeline: [ {$group: {_id: "$_id.type"} }]})
@@ -83,9 +83,9 @@ HttpStatusCode mongoEntityTypes
                                              )
                     );
 
-  mongoSemTake(__FUNCTION__, "aggregation command");
-
   LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
+
+  mongoSemTake(__FUNCTION__, "aggregation command");  
   try
   {
 
@@ -123,28 +123,20 @@ HttpStatusCode mongoEntityTypes
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
 
-  for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
+  /* Another strategy to implement pagination is to use the $skip and $limit operators in the
+   * aggregation framework. However, doing so, we don't know the total number of results, which can
+   * be needed in the case of details=on (using that approach, we need to do two queries: one to get
+   * the count and other to get the actual results with $skip and $limit, in the same "transaction" to
+   * avoid incoherence between both if some entity type is created or deleted in the process).
+   *
+   * However, considering that the number of types will be small compared with the number of entities,
+   * the current approach seems to be ok
+   */
+  for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    /* Another strategy to implement pagination is to use the $skip and $limit operators in the
-     * aggregation framework. However, doing so, we don't know the total number of results, which can
-     * be needed in the case of details=on (using that approach, we need to do two queries: one to get
-     * the cound and other to get the actual results with $skip and $limit, in the same "transaction" to
-     * avoid incoherence between boths if some entity type is created or deleted in the process).
-     *
-     * However, considering that the number of types will be small compared with the number of entities,
-     * the current approach seems to be ok
-     */
-    if (ix < offset)
-    {
-      continue;
-    }
-    if (ix >= offset + limit)
-    {
-      break;
-    }
 
-    BSONObj resultItem = resultsArray[ix].embeddedObject();
-    TypeEntity* type = new TypeEntity(resultItem.getStringField("_id"));
+    BSONObj                  resultItem = resultsArray[ix].embeddedObject();
+    TypeEntity*              type       = new TypeEntity(resultItem.getStringField("_id"));
     std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
 
     for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
@@ -243,9 +235,9 @@ HttpStatusCode mongoAttributesForEntityType
                                              )
                     );
 
-  mongoSemTake(__FUNCTION__, "aggregation command");
-
   LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
+
+  mongoSemTake(__FUNCTION__, "aggregation command"); 
   try
   {
 
@@ -283,23 +275,12 @@ HttpStatusCode mongoAttributesForEntityType
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
 
-  for (unsigned int ix = 0; ix < resultsArray.size(); ++ix)
+  /* See comment above in the other method regarding this strategy to implement pagination */
+  for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-
-    /* See comment above in the other method regarding this strategy to implement pagination */
-    if (ix < offset)
-    {
-      continue;
-    }
-    if (ix >= offset + limit)
-    {
-      break;
-    }
-
-    BSONObj resultItem = resultsArray[ix].embeddedObject().getField("_id").embeddedObject();
-    ContextAttribute* ca = new ContextAttribute(resultItem.getStringField(ENT_ATTRS_NAME), resultItem.getStringField(ENT_ATTRS_TYPE));
+    BSONObj           resultItem = resultsArray[ix].embeddedObject().getField("_id").embeddedObject();
+    ContextAttribute* ca         = new ContextAttribute(resultItem.getStringField(ENT_ATTRS_NAME), resultItem.getStringField(ENT_ATTRS_TYPE));
     responseP->entityType.contextAttributeVector.push_back(ca);
-
   }
 
   char detailsMsg[256];

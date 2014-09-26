@@ -170,7 +170,10 @@ ContextAttribute* getAttr(ContextAttributeVector& caV, std::string name, std::st
       }
     }
   }
-  return NULL;
+  /* Usually (i.e. in no-test code) we should return NULL. However, it helps to debug to use
+   * a ContextAttribute value with crazy values */
+  ContextAttribute* ca = new ContextAttribute("error", "error_T");
+  return ca;
 }
 
 /* ****************************************************************************
@@ -420,6 +423,7 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
 
     utExit();
 }
+
 /* ****************************************************************************
 *
 * queryAllPaginationAll -
@@ -544,6 +548,7 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
 
     utExit();
 }
+
 /* ****************************************************************************
 *
 * queryAllPaginationOnlyFirst -
@@ -625,6 +630,7 @@ TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
 
     utExit();
 }
+
 /* ****************************************************************************
 *
 * queryAllPaginationOnlySecond -
@@ -679,6 +685,7 @@ TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
 
     utExit();
 }
+
 /* ****************************************************************************
 *
 * queryAllPaginationRange -
@@ -758,6 +765,7 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
 
     utExit();
 }
+
 /* ****************************************************************************
 *
 * queryAllPaginationNonExisting -
@@ -793,6 +801,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExisting)
 
     utExit();
 }
+
 /* ****************************************************************************
 *
 * queryAllPaginationNonExistingOverlap -
@@ -854,6 +863,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
 
     utExit();
 }
+
 /* ****************************************************************************
 *
 * queryAllPaginationNonExistingDetails -
@@ -1508,10 +1518,10 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
 
 /* ****************************************************************************
 *
-* queryGyvenTypeGenericException -
+* queryGivenTypeGenericException -
 *
 */
-TEST(mongoQueryTypes, queryGyvenTypeGenericException)
+TEST(mongoQueryTypes, queryGivenTypeGenericException)
 {
   HttpStatusCode               ms;
   EntityTypeAttributesResponse res;
