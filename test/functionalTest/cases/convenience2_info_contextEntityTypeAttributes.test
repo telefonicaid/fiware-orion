@@ -28,6 +28,35 @@ brokerStart CB 0-255 IPV4
 --SHELL--
 
 
+echo "0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>celsius</type>
+          <contextValue>0</contextValue>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>mmHg</type>
+          <contextValue>0</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url '/ngsi10/updateContext' --payload "$payload"
+echo
+echo
+
+
 echo "1. Listing of Entity Type Attributes. Response in XML"
 orionCurl --url /v1/contextTypes/EntityType
 echo
@@ -65,6 +94,42 @@ echo
 
 
 --REGEXPECT--
+0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
+HTTP/1.1 200 OK
+Content-Length: 810
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>celsius</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>mmHg</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
 1. Listing of Entity Type Attributes. Response in XML
 HTTP/1.1 200 OK
 Content-Length: 457
