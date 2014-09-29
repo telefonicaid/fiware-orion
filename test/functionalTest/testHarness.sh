@@ -522,7 +522,7 @@ function partExecute()
     grep '^#SORT_START$' $dirname/$filename.regexpect > /dev/null 2>&1
     if [ $? == 0 ]
     then
-      blockSortDiff.sh --referenceFile $dirname/$filename.regexpect --brokerOutputFile $dirname/$filename.out > $dirname/$filename.blockSortDiff.out
+      $SCRIPT_HOME/blockSortDiff.sh --referenceFile $dirname/$filename.regexpect --brokerOutputFile $dirname/$filename.out > $dirname/$filename.blockSortDiff.out
       exitCode=$?
       blockDiff='yes'
     else

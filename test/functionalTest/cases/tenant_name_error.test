@@ -24,7 +24,7 @@
 Erroneous tenant url names
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPV4 -multiservice url
+brokerStart CB 0 IPV4 -multiservice
 
 --SHELL--
 
@@ -80,34 +80,25 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 
 # 1. OK
 echo "1: ++++++++++"
-orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "_kzg0123456789012345"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --httpTenant "_kzg0123456789012345"
 echo
 echo
 
 
 # 2. Long tenant name
 echo "2: ++++++++++"
-orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "kz12345678901234567890"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --httpTenant "kz12345678901234567890"
 echo
 echo
 
 
 # 3. Bad character in tenant name"
 echo "3: ++++++++++"
-orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "kz+fg"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --httpTenant "kz+fg"
 echo
 echo
 
 
-# 4. Reserved name in tenant name
-echo "4: ++++++++++"
-orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "log"
-echo
-echo
-
-# 5. Reserved name (strange case) in tenant name
-echo "5: ++++++++++"
-orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "log"
 --REGEXPECT--
 1: ++++++++++
 HTTP/1.1 200 OK
@@ -124,7 +115,7 @@ Date: REGEX(.*)
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 254
+Content-Length: 272
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -132,13 +123,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
+  <details>tenant 'kz12345678901234567890' not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 254
+Content-Length: 255
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -146,35 +137,9 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
+  <details>tenant 'kz+fg' not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
-4: ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 254
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
-</orionError>
-
-
-5: ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 254
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
-</orionError>
 --TEARDOWN--
 brokerStop CB

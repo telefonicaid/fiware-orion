@@ -47,7 +47,7 @@ std::string getAttributesForEntityType
 )
 {
   EntityTypeAttributesResponse  response;
-  std::string                   entityTypeName = (ciP->tenantFromUrl != "")? compV[3] : compV[2];
+  std::string                   entityTypeName = compV[2];
 
   response.statusCode.fill(SccOk);
   mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);

@@ -183,7 +183,7 @@ bool            useOnlyIPv6;
 char            httpsKeyFile[1024];
 char            httpsCertFile[1024];
 bool            https;
-char            mtenant[32];
+bool            mtenant;
 char            rush[256];
 
 
@@ -215,7 +215,7 @@ char            rush[256];
 #define HTTPSKEYFILE_DESC   "private server key file (for https)"
 #define HTTPSCERTFILE_DESC  "certificate key file (for https)"
 #define RUSH_DESC           "rush host (IP:port)"
-#define MULTISERVICE_DESC   "service multi tenancy mode (off|url|header)"
+#define MULTISERVICE_DESC   "service multi tenancy mode"
 
 
 
@@ -248,7 +248,7 @@ PaArgument paArgs[] =
   { "-cert",         httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
 
   { "-rush",         rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
-  { "-multiservice", mtenant,       "MULTI_SERVICE",  PaString, PaOpt, _i "off",   PaNL,   PaNL,  MULTISERVICE_DESC  },
+  { "-multiservice", &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
 
   PA_END_OF_ARGS
@@ -289,27 +289,21 @@ PaArgument paArgs[] =
 #define NCAR               NotifyContextAvailability
 
 #define RCR_COMPS          2, {      "ngsi9",  "registerContext" }
-#define RCR_COMPS_MULTI    3, { "*", "ngsi9",  "registerContext" }
 #define RCR_POST_WORD      "registerContextRequest"
 
 #define DCAR_COMPS         2, {      "ngsi9",  "discoverContextAvailability" }
-#define DCAR_COMPS_MULTI   3, { "*", "ngsi9",  "discoverContextAvailability" }
 #define DCAR_POST_WORD     "discoverContextAvailabilityRequest"
 
 #define SCAR_COMPS         2, {      "ngsi9",  "subscribeContextAvailability" }
-#define SCAR_COMPS_MULTI   3, { "*", "ngsi9",  "subscribeContextAvailability" }
 #define SCAR_POST_WORD     "subscribeContextAvailabilityRequest"
 
 #define UCAR_COMPS         2, {      "ngsi9",  "unsubscribeContextAvailability" }
-#define UCAR_COMPS_MULTI   3, { "*", "ngsi9",  "unsubscribeContextAvailability" }
 #define UCAR_POST_WORD     "unsubscribeContextAvailabilityRequest"
 
 #define UCAS_COMPS         2, {      "ngsi9",  "updateContextAvailabilitySubscription" }
-#define UCAS_COMPS_MULTI   3, { "*", "ngsi9",  "updateContextAvailabilitySubscription" }
 #define UCAS_POST_WORD     "updateContextAvailabilitySubscriptionRequest"
 
 #define NCAR_COMPS         2, {      "ngsi9",  "notifyContextAvailability" }
-#define NCAR_COMPS_MULTI   3, { "*", "ngsi9",  "notifyContextAvailability" }
 #define NCAR_POST_WORD     "notifyContextAvailabilityRequest"
 
 
@@ -325,27 +319,21 @@ PaArgument paArgs[] =
 #define NCR           NotifyContext
 
 #define UPCR_COMPS         2, {      "ngsi10",  "updateContext" }
-#define UPCR_COMPS_MULTI   3, { "*", "ngsi10",  "updateContext" }
 #define UPCR_POST_WORD     "updateContextRequest"
 
 #define QCR_COMPS          2, {      "ngsi10",  "queryContext" }
-#define QCR_COMPS_MULTI    3, { "*", "ngsi10",  "queryContext" }
 #define QCR_POST_WORD      "queryContextRequest"
 
 #define SCR_COMPS          2, {      "ngsi10",  "subscribeContext" }
-#define SCR_COMPS_MULTI    3, { "*", "ngsi10",  "subscribeContext" }
 #define SCR_POST_WORD      "subscribeContextRequest"
 
 #define UCSR_COMPS         2, {      "ngsi10",  "updateContextSubscription" }
-#define UCSR_COMPS_MULTI   3, { "*", "ngsi10",  "updateContextSubscription" }
 #define UCSR_POST_WORD     "updateContextSubscriptionRequest"
 
 #define UNCR_COMPS         2, {      "ngsi10",  "unsubscribeContext" }
-#define UNCR_COMPS_MULTI   3, { "*", "ngsi10",  "unsubscribeContext" }
 #define UNCR_POST_WORD     "unsubscribeContextRequest"
 
 #define NCR_COMPS          2, {      "ngsi10",  "notifyContext" }
-#define NCR_COMPS_MULTI    3, { "*", "ngsi10",  "notifyContext" }
 #define NCR_POST_WORD      "notifyContextRequest"
 
 
@@ -354,42 +342,34 @@ PaArgument paArgs[] =
 //
 #define CE                 ContextEntitiesByEntityId
 #define CE_COMPS           3, {      "ngsi9",  "contextEntities", "*" }
-#define CE_COMPS_MULTI     4, { "*", "ngsi9",  "contextEntities", "*" }
 #define CE_POST_WORD       "registerProviderRequest"
 
 #define CEA                ContextEntityAttributes
 #define CEA_COMPS          4, {      "ngsi9",  "contextEntities", "*", "attributes" }
-#define CEA_COMPS_MULTI    5, { "*", "ngsi9",  "contextEntities", "*", "attributes" }
 #define CEA_POST_WORD      "registerProviderRequest"
 
 #define CEAA               EntityByIdAttributeByName
 #define CEAA_COMPS         5, {      "ngsi9",  "contextEntities", "*", "attributes", "*" }
-#define CEAA_COMPS_MULTI   6, { "*", "ngsi9",  "contextEntities", "*", "attributes", "*" }
 #define CEAA_POST_WORD     "registerProviderRequest"
 
 #define CT                 ContextEntityTypes
 #define CT_COMPS           3, {      "ngsi9",  "contextEntityTypes", "*" }
-#define CT_COMPS_MULTI     4, { "*", "ngsi9",  "contextEntityTypes", "*" }
 #define CT_POST_WORD       "registerProviderRequest"
 
 #define CTA                ContextEntityTypeAttributeContainer
 #define CTA_COMPS          4, {      "ngsi9",  "contextEntityTypes", "*", "attributes" }
-#define CTA_COMPS_MULTI    5, { "*", "ngsi9",  "contextEntityTypes", "*", "attributes" }
 #define CTA_POST_WORD      "registerProviderRequest"
 
 #define CTAA               ContextEntityTypeAttribute
 #define CTAA_COMPS         5, {      "ngsi9",  "contextEntityTypes", "*", "attributes", "*" }
-#define CTAA_COMPS_MULTI   6, { "*", "ngsi9",  "contextEntityTypes", "*", "attributes", "*" }
 #define CTAA_POST_WORD     "registerProviderRequest"
 
 #define SCA                SubscribeContextAvailability
 #define SCA_COMPS          2, {      "ngsi9",  "contextAvailabilitySubscriptions" }
-#define SCA_COMPS_MULTI    3, { "*", "ngsi9",  "contextAvailabilitySubscriptions" }
 #define SCA_POST_WORD      "subscribeContextAvailabilityRequest"
 
 #define SCAS               Ngsi9SubscriptionsConvOp
 #define SCAS_COMPS         3, {      "ngsi9",  "contextAvailabilitySubscriptions", "*" }
-#define SCAS_COMPS_MULTI   4, { "*", "ngsi9",  "contextAvailabilitySubscriptions", "*" }
 #define SCAS_PUT_WORD      "updateContextAvailabilitySubscriptionRequest"
 
 
@@ -399,48 +379,39 @@ PaArgument paArgs[] =
 //
 #define ICE                IndividualContextEntity
 #define ICE_COMPS           3, {      "ngsi10",  "contextEntities", "*" }
-#define ICE_COMPS_MULTI     4, { "*", "ngsi10",  "contextEntities", "*" }
 #define ICE_POST_WORD       "appendContextElementRequest"
 #define ICE_PUT_WORD        "updateContextElementRequest"
 
 #define ICEA               IndividualContextEntityAttributes
 #define ICEA_COMPS         4, {      "ngsi10",  "contextEntities", "*", "attributes" }
-#define ICEA_COMPS_MULTI   5, { "*", "ngsi10",  "contextEntities", "*", "attributes" }
 #define ICEA_POST_WORD     "appendContextElementRequest"
 #define ICEA_PUT_WORD      "updateContextElementRequest"
 
 #define ICEAA              IndividualContextEntityAttribute
 #define ICEAA_COMPS        5, {      "ngsi10",  "contextEntities", "*", "attributes", "*" }
-#define ICEAA_COMPS_MULTI  6, { "*", "ngsi10",  "contextEntities", "*", "attributes", "*" }
 // FIXME P10: funny having updateContextAttributeRequest for both ... Error in NEC-SPEC?
 #define ICEAA_POST_WORD    "updateContextAttributeRequest"
 #define ICEAA_PUT_WORD     "updateContextAttributeRequest"
 
 #define AVI                AttributeValueInstance
 #define AVI_COMPS          6, {      "ngsi10",  "contextEntities", "*", "attributes", "*", "*" }
-#define AVI_COMPS_MULTI    7, { "*", "ngsi10",  "contextEntities", "*", "attributes", "*", "*" }
 #define AVI_PUT_WORD       "updateContextAttributeRequest"
 
 #define CET                Ngsi10ContextEntityTypes
 #define CET_COMPS          3, {      "ngsi10",  "contextEntityTypes", "*" }
-#define CET_COMPS_MULTI    4, { "*", "ngsi10",  "contextEntityTypes", "*" }
 
 #define CETA               Ngsi10ContextEntityTypesAttributeContainer
 #define CETA_COMPS         4, {      "ngsi10",  "contextEntityTypes", "*", "attributes" }
-#define CETA_COMPS_MULTI   5, { "*", "ngsi10",  "contextEntityTypes", "*", "attributes" }
 
 #define CETAA              Ngsi10ContextEntityTypesAttribute
 #define CETAA_COMPS        5, {      "ngsi10",  "contextEntityTypes", "*", "attributes", "*" }
-#define CETAA_COMPS_MULTI  6, { "*", "ngsi10",  "contextEntityTypes", "*", "attributes", "*" }
 
 #define SC                 SubscribeContext
 #define SC_COMPS           2, {      "ngsi10",  "contextSubscriptions" }
-#define SC_COMPS_MULTI     3, { "*", "ngsi10",  "contextSubscriptions" }
 #define SC_POST_WORD       "subscribeContextRequest"
 
 #define SCS                Ngsi10SubscriptionsConvOp
 #define SCS_COMPS          3, {      "ngsi10",  "contextSubscriptions", "*" }
-#define SCS_COMPS_MULTI    4, { "*", "ngsi10",  "contextSubscriptions", "*" }
 #define SCS_PUT_WORD       "updateContextSubscriptionRequest"
 
 
@@ -501,21 +472,6 @@ PaArgument paArgs[] =
 
 
 
-#define NGSI9_STANDARD_REQUESTS_WITH_TENANT                                                           \
-  { "POST",   RCR,   RCR_COMPS_MULTI,   RCR_POST_WORD,   postRegisterContext                       }, \
-  { "*",      RCR,   RCR_COMPS_MULTI,   RCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   DCAR,  DCAR_COMPS_MULTI,  DCAR_POST_WORD,  postDiscoverContextAvailability           }, \
-  { "*",      DCAR,  DCAR_COMPS_MULTI,  DCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   SCAR,  SCAR_COMPS_MULTI,  SCAR_POST_WORD,  postSubscribeContextAvailability          }, \
-  { "*",      SCAR,  SCAR_COMPS_MULTI,  SCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAR,  UCAR_COMPS_MULTI,  UCAR_POST_WORD,  postUnsubscribeContextAvailability        }, \
-  { "*",      UCAR,  UCAR_COMPS_MULTI,  UCAR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UCAS,  UCAS_COMPS_MULTI,  UCAS_POST_WORD,  postUpdateContextAvailabilitySubscription }, \
-  { "*",      UCAS,  UCAS_COMPS_MULTI,  UCAS_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCAR,  NCAR_COMPS_MULTI,  NCAR_POST_WORD,  postNotifyContextAvailability             }, \
-  { "*",      NCAR,  NCAR_COMPS_MULTI,  NCAR_POST_WORD,  badVerbPostOnly                           }
-
-
 #define NGSI10_STANDARD_REQUESTS                                                                      \
   { "POST",   UPCR,  UPCR_COMPS,        UPCR_POST_WORD,  postUpdateContext                         }, \
   { "*",      UPCR,  UPCR_COMPS,        UPCR_POST_WORD,  badVerbPostOnly                           }, \
@@ -530,20 +486,6 @@ PaArgument paArgs[] =
   { "POST",   NCR,   NCR_COMPS,         NCR_POST_WORD,   postNotifyContext                         }, \
   { "*",      NCR,   NCR_COMPS,         NCR_POST_WORD,   badVerbPostOnly                           }
 
-
-#define NGSI10_STANDARD_REQUESTS_WITH_TENANT                                                          \
-  { "POST",   UPCR,  UPCR_COMPS_MULTI,  UPCR_POST_WORD,  postUpdateContext                         }, \
-  { "*",      UPCR,  UPCR_COMPS_MULTI,  UPCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   QCR,   QCR_COMPS_MULTI,   QCR_POST_WORD,   postQueryContext                          }, \
-  { "*",      QCR,   QCR_COMPS_MULTI,   QCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   SCR,   SCR_COMPS_MULTI,   SCR_POST_WORD,   postSubscribeContext                      }, \
-  { "*",      SCR,   SCR_COMPS_MULTI,   SCR_POST_WORD,   badVerbPostOnly                           }, \
-  { "POST",   UCSR,  UCSR_COMPS_MULTI,  UCSR_POST_WORD,  postUpdateContextSubscription             }, \
-  { "*",      UCSR,  UCSR_COMPS_MULTI,  UCSR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   UNCR,  UNCR_COMPS_MULTI,  UNCR_POST_WORD,  postUnsubscribeContext                    }, \
-  { "*",      UNCR,  UNCR_COMPS_MULTI,  UNCR_POST_WORD,  badVerbPostOnly                           }, \
-  { "POST",   NCR,   NCR_COMPS_MULTI,   NCR_POST_WORD,   postNotifyContext                         }, \
-  { "*",      NCR,   NCR_COMPS_MULTI,   NCR_POST_WORD,   badVerbPostOnly                           }
 
 
 #define NGSI9_CONVENIENCE_OPERATIONS                                                                  \
@@ -578,38 +520,6 @@ PaArgument paArgs[] =
   { "DELETE", SCAS,  SCAS_COMPS,        "",              deleteAvailabilitySubscriptionConvOp      }, \
   { "*",      SCAS,  SCAS_COMPS,        "",              badVerbPutDeleteOnly                      }
 
-
-#define NGSI9_CONVENIENCE_OPERATIONS_WITH_TENANT                                                      \
-  { "GET",    CE,    CE_COMPS_MULTI,    "",              getContextEntitiesByEntityId              }, \
-  { "POST",   CE,    CE_COMPS_MULTI,    CE_POST_WORD,    postContextEntitiesByEntityId             }, \
-  { "*",      CE,    CE_COMPS_MULTI,    "",              badVerbGetPostOnly                        }, \
-                                                                                                      \
-  { "GET",    CEA,   CEA_COMPS_MULTI,   "",              getContextEntityAttributes                }, \
-  { "POST",   CEA,   CEA_COMPS_MULTI,   CEA_POST_WORD,   postContextEntityAttributes               }, \
-  { "*",      CEA,   CEA_COMPS_MULTI,   "",              badVerbGetPostOnly                        }, \
-                                                                                                      \
-  { "GET",    CEAA,  CEAA_COMPS_MULTI,  "",              getEntityByIdAttributeByName              }, \
-  { "POST",   CEAA,  CEAA_COMPS_MULTI,  CEAA_POST_WORD,  postEntityByIdAttributeByName             }, \
-  { "*",      CEAA,  CEAA_COMPS_MULTI,  "",              badVerbGetPostOnly                        }, \
-                                                                                                      \
-  { "GET",    CT,    CT_COMPS_MULTI,    "",              getContextEntityTypes                     }, \
-  { "POST",   CT,    CT_COMPS_MULTI,    CT_POST_WORD,    postContextEntityTypes                    }, \
-  { "*",      CT,    CT_COMPS_MULTI,    "",              badVerbGetPostOnly                        }, \
-                                                                                                      \
-  { "GET",    CTA,   CTA_COMPS_MULTI,   "",              getContextEntityTypes                     }, \
-  { "POST",   CTA,   CTA_COMPS_MULTI,   CTA_POST_WORD,   postContextEntityTypes                    }, \
-  { "*",      CTA,   CTA_COMPS_MULTI,   "",              badVerbGetPostOnly                        }, \
-                                                                                                      \
-  { "GET",    CTAA,  CTAA_COMPS_MULTI,  "",              getContextEntityTypeAttribute             }, \
-  { "POST",   CTAA,  CTAA_COMPS_MULTI,  CTAA_POST_WORD,  postContextEntityTypeAttribute            }, \
-  { "*",      CTAA,  CTAA_COMPS_MULTI,  "",              badVerbGetPostOnly                        }, \
-                                                                                                      \
-  { "POST",   SCA,   SCA_COMPS_MULTI,   SCA_POST_WORD,   postSubscribeContextAvailability          }, \
-  { "*",      SCA,   SCA_COMPS_MULTI,   "",              badVerbPostOnly                           }, \
-                                                                                                      \
-  { "PUT",    SCAS,  SCAS_COMPS_MULTI,  SCAS_PUT_WORD,   putAvailabilitySubscriptionConvOp         }, \
-  { "DELETE", SCAS,  SCAS_COMPS_MULTI,  "",              deleteAvailabilitySubscriptionConvOp      }, \
-  { "*",      SCAS,  SCAS_COMPS_MULTI,  "",              badVerbPutDeleteOnly                      }
 
 
 #define NGSI10_CONVENIENCE_OPERATIONS                                                                 \
@@ -656,48 +566,6 @@ PaArgument paArgs[] =
   { "*",      ET,    ET_COMPS,         "",                badVerbGetOnly                           }, \
   { "GET",    AFET,  AFET_COMPS,       "",                getAttributesForEntityType               }, \
   { "*",      AFET,  AFET_COMPS,       "",                badVerbGetOnly                           }
-
-
-#define NGSI10_CONVENIENCE_OPERATIONS_WITH_TENANT                                                     \
-  { "GET",    ICE,   ICE_COMPS_MULTI,   "",              getIndividualContextEntity                }, \
-  { "PUT",    ICE,   ICE_COMPS_MULTI,   ICE_PUT_WORD,    putIndividualContextEntity                }, \
-  { "POST",   ICE,   ICE_COMPS_MULTI,   ICE_POST_WORD,   postIndividualContextEntity               }, \
-  { "DELETE", ICE,   ICE_COMPS_MULTI,   "",              deleteIndividualContextEntity             }, \
-  { "*",      ICE,   ICE_COMPS_MULTI,   "",              badVerbAllFour                            }, \
-                                                                                                      \
-  { "GET",    ICEA,  ICEA_COMPS_MULTI,  "",              getIndividualContextEntityAttributes      }, \
-  { "PUT",    ICEA,  ICEA_COMPS_MULTI,  ICEA_PUT_WORD,   putIndividualContextEntityAttributes      }, \
-  { "POST",   ICEA,  ICEA_COMPS_MULTI,  ICEA_POST_WORD,  postIndividualContextEntityAttributes     }, \
-  { "DELETE", ICEA,  ICEA_COMPS_MULTI,  "",              deleteIndividualContextEntityAttributes   }, \
-  { "*",      ICEA,  ICEA_COMPS_MULTI,  "",              badVerbAllFour                            }, \
-                                                                                                      \
-  { "GET",    ICEAA, ICEAA_COMPS_MULTI, "",              getIndividualContextEntityAttribute       }, \
-  { "PUT",    ICEAA, ICEAA_COMPS_MULTI, ICEAA_PUT_WORD,  putIndividualContextEntityAttribute       }, \
-  { "POST",   ICEAA, ICEAA_COMPS_MULTI, ICEAA_POST_WORD, postIndividualContextEntityAttribute      }, \
-  { "DELETE", ICEAA, ICEAA_COMPS_MULTI, "",              deleteIndividualContextEntityAttribute    }, \
-  { "*",      ICEAA, ICEAA_COMPS_MULTI, "",              badVerbGetPostDeleteOnly                  }, \
-                                                                                                      \
-  { "GET",    AVI,   AVI_COMPS_MULTI,   "",               getAttributeValueInstance                }, \
-  { "PUT",    AVI,   AVI_COMPS_MULTI,   AVI_PUT_WORD,     putAttributeValueInstance                }, \
-  { "DELETE", AVI,   AVI_COMPS_MULTI,   "",               deleteAttributeValueInstance             }, \
-  { "*",      AVI,   AVI_COMPS_MULTI,   "",               badVerbGetPutDeleteOnly                  }, \
-                                                                                                      \
-  { "GET",    CET,   CET_COMPS_MULTI,   "",               getNgsi10ContextEntityTypes              }, \
-  { "*",      CET,   CET_COMPS_MULTI,   "",               badVerbGetOnly                           }, \
-                                                                                                      \
-  { "GET",    CETA,  CETA_COMPS_MULTI,  "",               getNgsi10ContextEntityTypes              }, \
-  { "*",      CETA,  CETA_COMPS_MULTI,  "",               badVerbGetOnly                           }, \
-                                                                                                      \
-  { "GET",    CETAA, CETAA_COMPS_MULTI, "",               getNgsi10ContextEntityTypesAttribute     }, \
-  { "*",      CETAA, CETAA_COMPS_MULTI, "",               badVerbGetOnly                           }, \
-                                                                                                      \
-  { "POST",   SC,    SC_COMPS_MULTI,    SC_POST_WORD,     postSubscribeContext                     }, \
-  { "*",      SC,    SC_COMPS_MULTI,    "",               badVerbPostOnly                          }, \
-                                                                                                      \
-  { "PUT",    SCS,   SCS_COMPS_MULTI,   SCS_PUT_WORD,     putSubscriptionConvOp                    }, \
-  { "DELETE", SCS,   SCS_COMPS_MULTI,   "",               deleteSubscriptionConvOp                 }, \
-  { "*",      SCS,   SCS_COMPS_MULTI,   "",               badVerbPutDeleteOnly                     }
-
 
 
 
@@ -756,42 +624,9 @@ PaArgument paArgs[] =
 
 /* ****************************************************************************
 *
-* restServiceMTenant - services for BROKER (ngsi9/10) and tenants 
+* restServiceV - services for BROKER (ngsi9/10)
 *
-* This service vector (configuration) is used if the broker is started with
-* the -multiservice option (but not the -ngsi9 option)
-*/
-RestService restServiceMTenant[] =
-{
-  NGSI9_STANDARD_REQUESTS,
-  NGSI9_STANDARD_REQUESTS_WITH_TENANT,
-  NGSI9_CONVENIENCE_OPERATIONS,
-  NGSI9_CONVENIENCE_OPERATIONS_WITH_TENANT,
-  NGSI10_STANDARD_REQUESTS,
-  NGSI10_STANDARD_REQUESTS_WITH_TENANT,
-  NGSI10_CONVENIENCE_OPERATIONS,
-  NGSI10_CONVENIENCE_OPERATIONS_WITH_TENANT,
-  LOG_REQUESTS,
-  VERSION_REQUESTS,
-  STAT_REQUESTS,
-
-#ifdef DEBUG
-  EXIT_REQUESTS,
-  LEAK_REQUESTS,
-#endif
-
-  INVALID_REQUESTS,
-  END_REQUEST
-};
-
-
-
-/* ****************************************************************************
-*
-* restServiceV - services for BROKER (ngsi9/10) without tenants
-*
-* This is the default service vector, that is used if the broker is started without
-* the -ngsi9 and -multiservice options
+* This is the default service vector, that is used if the broker is started without the -ngsi9 option
 */
 RestService restServiceV[] =
 {
@@ -816,7 +651,7 @@ RestService restServiceV[] =
 
 /* ****************************************************************************
 *
-* restServiceNgsi9 - services for CONF MAN without tenants
+* restServiceNgsi9 - services for CONF MAN
 *
 * This service vector (configuration) is used if the broker is started as
 * CONFIGURATION MANAGER (using the -ngsi9 option) and without using the
@@ -826,35 +661,6 @@ RestService restServiceNgsi9[] =
 {
   NGSI9_STANDARD_REQUESTS,   // FIXME P10:  NCAR is added here, is that OK?
   NGSI9_CONVENIENCE_OPERATIONS,
-  LOG_REQUESTS,
-  VERSION_REQUESTS,
-  STAT_REQUESTS,
-
-#ifdef DEBUG
-  EXIT_REQUESTS,
-  LEAK_REQUESTS,
-#endif
-
-  INVALID_REQUESTS,
-  END_REQUEST
-};
-
-
-
-/* ****************************************************************************
-*
-* restServiceNgsi9MTenant - services for CONF MAN with tenants
-*
-* This service vector (configuration) is used if the broker is started as
-* CONFIGURATION MANAGER (using the -ngsi9 option) and also with the
-* -multiservice option.
-*/
-RestService restServiceNgsi9MTenant[] =
-{
-  NGSI9_STANDARD_REQUESTS,  // FIXME P10:  NCAR is added here, is that OK?
-  NGSI9_STANDARD_REQUESTS_WITH_TENANT,
-  NGSI9_CONVENIENCE_OPERATIONS,
-  NGSI9_CONVENIENCE_OPERATIONS_WITH_TENANT,
   LOG_REQUESTS,
   VERSION_REQUESTS,
   STAT_REQUESTS,
@@ -1065,9 +871,7 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 */
 static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd)
 {
-  std::string multitenant = mtenant;
-
-  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, multitenant != "off"))
+  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -1095,7 +899,7 @@ static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName
   // only the first operation will succeed, all other operations will have no effect."
   //
   ensureLocationIndex("");
-  if (multitenant != "off")
+  if (mtenant)
   {
     /* We get tenant database names and apply ensure the location index in each one */
     std::vector<std::string> orionDbs;
@@ -1255,12 +1059,6 @@ int main(int argC, char* argV[])
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
   LM_I(("Orion Context Broker is running"));
 
-  std::string multitenant = mtenant;
-  if ((multitenant != "off") && (multitenant != "header") && (multitenant != "url"))
-  {
-    LM_X(1, ("Fatal Error (bad value for -multiservice ['%s']. Allowed values: 'off', 'header' and 'url')", mtenant));
-  }
-
   if (useOnlyIPv6 && useOnlyIPv4)
   {
     LM_X(1, ("Fatal Error (-ipv4 and -ipv6 can not be activated at the same time. They are incompatible)"));
@@ -1295,19 +1093,22 @@ int main(int argC, char* argV[])
   LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
-  RestService* rsP = restServiceV;
-  if      (ngsi9Only  && multitenant == "url") rsP = restServiceNgsi9MTenant;
-  else if (!ngsi9Only && multitenant == "url") rsP = restServiceMTenant;
-  else if (ngsi9Only)                          rsP = restServiceNgsi9;
-
+  RestService* rsP       = (ngsi9Only == true)? restServiceNgsi9 : restServiceV;
   IpVersion    ipVersion = IPDUAL;
-  if      (useOnlyIPv4)    ipVersion = IPV4;
-  else if (useOnlyIPv6)    ipVersion = IPV6;
+
+  if (useOnlyIPv4)
+  {
+    ipVersion = IPV4;
+  }
+  else if (useOnlyIPv6)
+  {
+    ipVersion = IPV6;
+  }
 
   pidFile();
   orionInit(orionExit, ORION_VERSION);
   mongoInit(dbHost, rplSet, dbName, user, pwd);
-  contextBrokerInit(ngsi9Only, dbName, multitenant != "off");
+  contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 
   if (rush[0] != 0)
