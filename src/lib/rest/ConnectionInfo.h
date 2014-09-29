@@ -127,7 +127,6 @@ public:
   std::string                method;
   std::string                version;
   std::string                charset;
-  std::string                tenantFromUrl;
   std::string                tenantFromHttpHeader;
   std::string                tenant;
   std::string                servicePath;

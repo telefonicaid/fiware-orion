@@ -26,7 +26,7 @@ HTTP-Tenant subscribe and update
 dbInit CB
 dbInit ${CB_DATABASE_NAME}-t_01
 dbInit ${CB_DATABASE_NAME}-t_02
-brokerStart CB 0-255 IPV4 -multiservice header
+brokerStart CB 0-255 IPV4 -multiservice
 accumulatorStart 
 accumulatorStart 127.0.0.1 $LISTENER2_PORT
 

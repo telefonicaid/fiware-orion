@@ -24,7 +24,7 @@
 tenant names with upper and lowercase letters in HTTP header
 --SHELL-INIT--
 dbInit testharness-case
-brokerStart CB 0 IPV4 -multiservice url
+brokerStart CB 0 IPV4 -multiservice
 
 --SHELL--
 

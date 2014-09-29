@@ -85,21 +85,7 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
 */
 static std::string tenantCheck(const std::string& tenant)
 {
-  const char* ctenant = tenant.c_str();
-
-  if ((strcasecmp(ctenant, "ngsi9")       == 0) ||
-      (strcasecmp(ctenant, "ngsi10")      == 0) ||
-      (strcasecmp(ctenant, "log")         == 0) ||
-      (strcasecmp(ctenant, "version")     == 0) ||
-      (strcasecmp(ctenant, "statistics")  == 0) ||
-      (strcasecmp(ctenant, "leak")        == 0) ||
-      (strcasecmp(ctenant, "exit")        == 0))
-  {
-    LM_W(("Bad Input (tenant name coincides with Orion reserved name: '%s')", tenant.c_str()));
-    return "tenant name coincides with Orion reserved name";
-  }
-
-  char* name = (char*) tenant.c_str();
+  char*        name    = (char*) tenant.c_str();
 
   if (strlen(name) > 20)
   {
@@ -199,19 +185,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     statisticsUpdate(serviceV[ix].request, ciP->inFormat);
 
     // Tenant to connectionInfo
-    if (serviceV[ix].compV[0] == "*")
-    {
-      char tenant[128];
-      LM_T(LmtTenant, ("URL tenant: '%s'", compV[0].c_str()));
-      ciP->tenantFromUrl = strToLower(tenant, compV[0].c_str(), sizeof(tenant));
-    }
-
-    if (multitenant == "url")
-      ciP->tenant = ciP->tenantFromUrl;
-    else if (multitenant == "header")
-      ciP->tenant = ciP->tenantFromHttpHeader;
-    else // multitenant == "off"
-      ciP->tenant = "";
+    ciP->tenant = ciP->tenantFromHttpHeader;
 
     //
     // A tenant string must not be longer that 20 characters and may only contain
@@ -220,7 +194,10 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     std::string result;
     if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
-      OrionError   error(SccBadRequest, "tenant format not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)");
+      OrionError   error(SccBadRequest,
+                         std::string("tenant '") + ciP->tenant + "' not accepted (a tenant string must not be longer that 20 characters" +
+                         " and may only contain underscores and alphanumeric characters)");
+
       std::string  response = error.render(ciP->outFormat, "");
 
       LM_W(("Bad Input (%s)", error.details.c_str()));

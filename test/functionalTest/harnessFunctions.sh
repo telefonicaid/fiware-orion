@@ -503,7 +503,6 @@ function dbInsertEntity()
 #   --out         (output payload  (default: xml => application/xml, If 'json': application/json)
 #   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides) 
 #   --httpTenant  <tenant>         (tenant in HTTP header)
-#   --urlTenant   <tenant>         (tenant in URL)
 #   --servicePath <path>           (Service Path in HTTP header)
 #   --urlParams   <params>         (URI parameters 'in' URL-string)
 #   --verbose                      
@@ -525,7 +524,6 @@ function orionCurl()
   _json=""
   _httpTenant=""
   _servicePath=""
-  _urlTenant=""
   _urlParams=''
   _xtra=''
   _verbose='off'
@@ -543,7 +541,6 @@ function orionCurl()
     elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json;
     elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
-    elif [ "$1" == "--urlTenant" ]; then       _urlTenant="$2"; shift;
     elif [ "$1" == "--urlParams" ]; then       _urlParams=$2; shift;
     elif [ "$1" == "--verbose" ]; then         _verbose=on;
     elif [ "$1" == "--debug" ]; then           _debug=on;
@@ -605,12 +602,8 @@ function orionCurl()
 
   if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
   #if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
-  if [ "$_urlTenant" != "" ]
-  then
-    _URL=$_host:$_port/$_urlTenant$_url
-  else
-    _URL=$_host:$_port$_url
-  fi
+
+  _URL=$_host:$_port$_url
   
   if [ "$_urlParams" != "" ]
   then
@@ -625,8 +618,10 @@ function orionCurl()
 #   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD ${_HTTP_TENANT} --header \"Expect:\" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\"  $_BUILTINS --header "service-path: $_servicePath" $_xtra"
 #   echo '==============================================================================================================================================================='   
   
-  # FIXME: This should 'if' be refactored: if we use the $_HTTP_TENANT variable
-  # within curl it will not render correctly. We have to find another way.
+  #
+  # FIXME P2: This 'if' should be refactored: if we use the $_HTTP_TENANT variable within curl,
+  #           it will not render correctly. We have to find another way.
+  #
   if [ "$_httpTenant" != "" ]
   then
      if [ "$_servicePath" != "" ]
@@ -689,7 +684,6 @@ function orionCurl()
 #   --out         (output payload  (default: xml => application/xml, If 'json': application/json)
 #   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides)
 #   --httpTenant  <tenant>         (tenant in HTTP header)
-#   --urlTenant   <tenant>         (tenant in URL)
 #   --servicePath <path>           (Service Path in HTTP header)
 #
 # Any parameters are sent as is to 'curl'
@@ -709,7 +703,6 @@ function coapCurl()
   _json=""
   _httpTenant=""
   _servicePath=""
-  _urlTenant=""
   _xtra=''
 
   while [ "$#" != 0 ]
@@ -724,7 +717,6 @@ function coapCurl()
     elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json;
     elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
-    elif [ "$1" == "--urlTenant" ]; then       _urlTenant="$2"; shift;
     else                                       _xtra="$_xtra $1"; shift;
     fi
 
@@ -763,12 +755,7 @@ function coapCurl()
   if [ "$_outFormat" != "" ]; then  _ACCEPT="-A $_outFormat";        fi
   if [ "$_method" != "" ];    then  _METHOD=' -m '$_method;          fi
 
-  if [ "$_urlTenant" != "" ]
-  then
-    _URL="coap://$_host:$_port/$_urlTenant$_url"
-  else
-    _URL="coap://$_host:$_port$_url"
-  fi
+  _URL="coap://$_host:$_port$_url"
 
   #   usage: coap-client [-A type...] [-t type] [-b [num,]size] [-B seconds] [-e text]
   #                   [-g group] [-m method] [-N] [-o file] [-P addr[:port]] [-p port]

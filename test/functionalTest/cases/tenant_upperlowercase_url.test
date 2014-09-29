@@ -24,7 +24,7 @@
 tenant names with upper and lowercase letters in URL
 --SHELL-INIT--
 dbInit testharness-case
-brokerStart CB 0 IPV4 -multiservice url
+brokerStart CB 0 IPV4 -multiservice
 
 --SHELL--
 
@@ -45,21 +45,21 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 
 # 1. Registering an entity with tenant in upper-case
 echo "1: ++++++++++"
-orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "CASE"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --httpTenant "CASE"
 echo
 echo
 
 
 # 2. Registering another entity with same tenant but in mixed-case
 echo "2: ++++++++++"
-orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "Case"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --httpTenant "Case"
 echo
 echo
 
 
 # 3. Registering another entity with same tenant but in lower-case
 echo "3: ++++++++++"
-orionCurl --url "/NGSI9/registerContext" --payload "$payload" --urlTenant "case"
+orionCurl --url "/NGSI9/registerContext" --payload "$payload" --httpTenant "case"
 echo
 echo
 
@@ -73,21 +73,21 @@ payload='<?xml version="1.0"?>
   </entityIdList>
 </discoverContextAvailabilityRequest>'
 echo "4: ++++++++++"
-orionCurl --url /ngsi9/discoverContextAvailability --payload "$payload" --urlTenant "CASE"
+orionCurl --url /ngsi9/discoverContextAvailability --payload "$payload" --httpTenant "CASE"
 echo
 echo
 
 
 # 5. Discovering all three registrations with tenant in mixed-case
 echo "5: ++++++++++"
-orionCurl --url /ngsi9/discoverContextAvailability --payload "$payload" --urlTenant "Case"
+orionCurl --url /ngsi9/discoverContextAvailability --payload "$payload" --httpTenant "Case"
 echo
 echo
 
 
 # 6. Discovering all three registrations with tenant in lower-case
 echo "6: ++++++++++"
-orionCurl --url /ngsi9/discoverContextAvailability --payload "$payload" --urlTenant "case"
+orionCurl --url /ngsi9/discoverContextAvailability --payload "$payload" --httpTenant "case"
 
 
 --REGEXPECT--

@@ -25,7 +25,7 @@ Tenant as HTTP header in Notification
 --SHELL-INIT--
 dbInit CB
 accumulatorStart localhost $LISTENER_PORT
-brokerStart CB 30,60,185 IPV4 -multiservice url
+brokerStart CB 30,60,185 IPV4 -multiservice
 
 --SHELL--
 echo "1. Subscribe to changes in  E/att" # reference will never be reached as it stops in the accumulator
@@ -52,7 +52,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-orionCurl --url "$url" --payload "$payload" --urlTenant "kz"
+orionCurl --url "$url" --payload "$payload" --httpTenant "kz"
 echo
 echo
 
@@ -78,7 +78,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --urlTenant "kz"
+orionCurl --url "$url" --payload "$payload" --httpTenant "kz"
 echo
 echo
 

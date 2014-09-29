@@ -75,7 +75,7 @@ static bool                      acceptTextXml         = false;
 static char                      bindIp[MAX_LEN_IP]    = "0.0.0.0";
 static char                      bindIPv6[MAX_LEN_IP]  = "::";
 IpVersion                        ipVersionUsed         = IPDUAL;
-std::string                      multitenant           = "off";
+bool                             multitenant           = false;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = 0;
 static MHD_Daemon*               mhdDaemon             = NULL;
@@ -877,11 +877,12 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
 *           See Issue #256
 */
 void restInit
-(RestService*        _restServiceV,
+(
+  RestService*        _restServiceV,
   IpVersion           _ipVersion,
   const char*         _bindAddress,
   unsigned short      _port,
-  const std::string&  _multitenant,
+  bool                _multitenant,
   const std::string&  _rushHost,
   unsigned short      _rushPort,
   const char*         _httpsKey,
