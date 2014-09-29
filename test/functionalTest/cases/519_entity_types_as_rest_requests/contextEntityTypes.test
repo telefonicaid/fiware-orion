@@ -86,25 +86,25 @@ echo
 
 
 echo "6. Listing of Entity Types. Response in JSON, with details=on and collapse=true"
-orionCurl --url '/v1/contextTypes?details=on&collapse=true' --json  # --noPayloadCheck
+orionCurl --url '/v1/contextTypes?details=on&collapse=true' --json  
 echo
 echo
 
 
 echo "7. Listing of Entity Types. Response in Object-JSON"
-orionCurl --url '/v1/contextTypes?attributesFormat=object' --json # --noPayloadCheck
+orionCurl --url '/v1/contextTypes?attributesFormat=object' --json 
 echo
 echo
 
 
 echo "8. Listing of Entity Types. Response in Object-JSON, with details=on"
-orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on' --json # --noPayloadCheck
+orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on' --json 
 echo
 echo
 
 
 echo "9. Listing of Entity Types. Response in Object-JSON, with details=on and collapse=true"
-orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on&collapse=true' --json  # --noPayloadCheck
+orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on&collapse=true' --json  
 echo
 echo
 
