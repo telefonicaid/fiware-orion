@@ -47,6 +47,14 @@
 using namespace mongo;
 
 /*****************************************************************************
+* Constant string for collections names */
+#define COL_ENTITIES       "entities"
+#define COL_REGISTRATIONS  "registrations"
+#define COL_CSUBS          "csubs"
+#define COL_CASUBS         "casubs"
+#define COL_ASSOCIATIONS   "associations"
+
+/*****************************************************************************
 * Constant string for field names in collection (first characters
 * are the code name: REG_, ENT_, ASUB_, CSUB_, ASSOC_ */
 
@@ -216,6 +224,13 @@ extern void setSubscribeContextAvailabilityCollectionName(std::string name);
 * setAssociationsCollectionName -
 */
 extern void setAssociationsCollectionName(std::string name);
+
+/*****************************************************************************
+*
+* composeDatabaseName -
+*
+*/
+extern std::string composeDatabaseName(std::string tenant);
 
 /*****************************************************************************
 *
