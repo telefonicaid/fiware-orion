@@ -6,3 +6,4 @@
 - Fix: each send is now considered a separate transaction (Issue #478)
 - Add: new API operation to retreive all existing context entity types (Issue #519)
 - Add: new API operation to retreive all attributes (union set) of a given context entity type (Issue #519)
+- Fix: lseek after each write in log file in order to work with logrotate truncate (Issue #411)

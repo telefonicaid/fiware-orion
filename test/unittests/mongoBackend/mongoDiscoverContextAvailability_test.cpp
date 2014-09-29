@@ -84,6 +84,7 @@
 * Test with associations
 *
 * - sourceAssociations
+* - sourceAssociationsFails
 * - targetAssoications
 *
 * Simulating fails in MongoDB connection:

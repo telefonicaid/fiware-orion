@@ -194,8 +194,8 @@ std::string postUpdateContext
     // 6. Replace the ContextElementResponse that was "Found" with the info in the UpdateContextResponse
     //
     cerP->contextElement.release();
-    cerP->contextElement.fill(provUpcrsP->contextElementResponseVector[ix]->contextElement);
-    cerP->statusCode.fill(&provUpcrsP->contextElementResponseVector[ix]->statusCode);
+    cerP->contextElement.fill(provUpcrsP->contextElementResponseVector[0]->contextElement);
+    cerP->statusCode.fill(&provUpcrsP->contextElementResponseVector[0]->statusCode);
 
     if (cerP->statusCode.details == "")
     {
