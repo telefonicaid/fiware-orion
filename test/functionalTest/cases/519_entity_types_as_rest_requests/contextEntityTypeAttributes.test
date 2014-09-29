@@ -109,6 +109,7 @@ Date: REGEX(.*)
           <id>ConferenceRoom</id>
         </entityId>
         <contextAttributeList>
+#SORT_START
           <contextAttribute>
             <name>temperature</name>
             <type>celsius</type>
@@ -119,6 +120,7 @@ Date: REGEX(.*)
             <type>mmHg</type>
             <contextValue/>
           </contextAttribute>
+#SORT_END
         </contextAttributeList>
       </contextElement>
       <statusCode>
@@ -141,6 +143,7 @@ Date: REGEX(.*)
   <entityType>
     <name>Room</name>
     <contextAttributeList>
+#SORT_START
       <contextAttribute>
         <name>pressure</name>
         <type>mmHg</type>
@@ -149,6 +152,7 @@ Date: REGEX(.*)
         <name>temperature</name>
         <type>celsius</type>
       </contextAttribute>
+#SORT_END
     </contextAttributeList>
   </entityType>
   <statusCode>
@@ -169,6 +173,7 @@ Date: REGEX(.*)
   <entityType>
     <name>Room</name>
     <contextAttributeList>
+#SORT_START
       <contextAttribute>
         <name>pressure</name>
         <type>mmHg</type>
@@ -177,6 +182,7 @@ Date: REGEX(.*)
         <name>temperature</name>
         <type>celsius</type>
       </contextAttribute>
+#SORT_END
     </contextAttributeList>
   </entityType>
   <statusCode>
@@ -195,6 +201,7 @@ Date: REGEX(.*)
 
 {
     "attributes": [
+#SORT_START
         {
             "name": "pressure", 
             "type": "mmHg"
@@ -203,6 +210,7 @@ Date: REGEX(.*)
             "name": "temperature", 
             "type": "celsius"
         }
+#SORT_END
     ], 
     "name": "Room", 
     "statusCode": {
@@ -220,6 +228,7 @@ Date: REGEX(.*)
 
 {
     "attributes": [
+#SORT_START
         {
             "name": "pressure", 
             "type": "mmHg"
@@ -228,6 +237,7 @@ Date: REGEX(.*)
             "name": "temperature", 
             "type": "celsius"
         }
+#SORT_END
     ], 
     "name": "Room", 
     "statusCode": {
@@ -246,12 +256,14 @@ Date: REGEX(.*)
 
 {
     "attributes": {
+#SORT_START
         "pressure": {
             "type": "mmHg"
         }, 
         "temperature": {
             "type": "celsius"
         }
+#SORT_END
     }, 
     "name": "Room", 
     "statusCode": {
@@ -269,12 +281,14 @@ Date: REGEX(.*)
 
 {
     "attributes": {
+#SORT_START
         "pressure": {
             "type": "mmHg"
         }, 
         "temperature": {
             "type": "celsius"
         }
+#SORT_END
     }, 
     "name": "Room", 
     "statusCode": {

@@ -446,7 +446,7 @@ PaArgument paArgs[] =
 
 
 //
-// New Convenience Operations
+// TID Convenience Operations
 //
 #define ET                 EntityTypes
 #define ET_COMPS           2, { "v1", "contextTypes" }
@@ -650,7 +650,12 @@ PaArgument paArgs[] =
                                                                                                       \
   { "PUT",    SCS,   SCS_COMPS,         SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
   { "DELETE", SCS,   SCS_COMPS,         "",              deleteSubscriptionConvOp                  }, \
-  { "*",      SCS,   SCS_COMPS,         "",              badVerbPutDeleteOnly                      }
+  { "*",      SCS,   SCS_COMPS,         "",              badVerbPutDeleteOnly                      }, \
+                                                                                                      \
+  { "GET",    ET,    ET_COMPS,         "",                getEntityTypes                           }, \
+  { "*",      ET,    ET_COMPS,         "",                badVerbGetOnly                           }, \
+  { "GET",    AFET,  AFET_COMPS,       "",                getAttributesForEntityType               }, \
+  { "*",      AFET,  AFET_COMPS,       "",                badVerbGetOnly                           }
 
 
 #define NGSI10_CONVENIENCE_OPERATIONS_WITH_TENANT                                                     \
@@ -692,12 +697,6 @@ PaArgument paArgs[] =
   { "PUT",    SCS,   SCS_COMPS_MULTI,   SCS_PUT_WORD,     putSubscriptionConvOp                    }, \
   { "DELETE", SCS,   SCS_COMPS_MULTI,   "",               deleteSubscriptionConvOp                 }, \
   { "*",      SCS,   SCS_COMPS_MULTI,   "",               badVerbPutDeleteOnly                     }
-
-
-
-#define NEW_CONVENIENCE_OPERATIONS                                                                    \
-  { "GET",    ET,    ET_COMPS,         "",                getEntityTypes                           }, \
-  { "GET",    AFET,  AFET_COMPS,       "",                getAttributesForEntityType               }
 
 
 
@@ -800,7 +799,6 @@ RestService restServiceV[] =
   NGSI10_STANDARD_REQUESTS,
   NGSI9_CONVENIENCE_OPERATIONS,
   NGSI10_CONVENIENCE_OPERATIONS,
-  NEW_CONVENIENCE_OPERATIONS,
   LOG_REQUESTS,
   VERSION_REQUESTS,
   STAT_REQUESTS,
