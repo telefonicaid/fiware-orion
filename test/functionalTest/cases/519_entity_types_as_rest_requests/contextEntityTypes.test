@@ -74,13 +74,13 @@ echo
 echo
 
 echo "4. Listing of Entity Types. Response in JSON"
-orionCurl --url '/v1/contextTypes' --json # --noPayloadCheck
+orionCurl --url '/v1/contextTypes' --json 
 echo
 echo
 
 
 echo "5. Listing of Entity Types. Response in JSON, with details=on"
-orionCurl --url '/v1/contextTypes?details=on' --json # --noPayloadCheck
+orionCurl --url '/v1/contextTypes?details=on' --json 
 echo
 echo
 
