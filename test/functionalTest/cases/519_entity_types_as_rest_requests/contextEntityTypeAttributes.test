@@ -70,7 +70,7 @@ echo
 
 
 echo "3. Listing of Entity Type Attributes. Response in JSON"
-orionCurl --url /v1/contextTypes/Room --json # --noPayloadCheck
+orionCurl --url /v1/contextTypes/Room --json 
 echo
 echo
 
