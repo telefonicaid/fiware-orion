@@ -76,19 +76,19 @@ echo
 
 
 echo "4. Listing of Entity Type Attributes. Response in JSON, details=on"
-orionCurl --url /v1/contextTypes/Room?details=on --json # --noPayloadCheck
+orionCurl --url /v1/contextTypes/Room?details=on --json 
 echo
 echo
 
 
 echo "5. Listing of Entity Type Attributes. Response in Object-JSON"
-orionCurl --url /v1/contextTypes/Room?attributesFormat=object --json # --noPayloadCheck
+orionCurl --url /v1/contextTypes/Room?attributesFormat=object --json 
 echo
 echo
 
 
 echo "6. Listing of Entity Type Attributes. Response in Object-JSON, details=on"
-orionCurl --url '/v1/contextTypes/Room?attributesFormat=object&details=on' --json # --noPayloadCheck
+orionCurl --url '/v1/contextTypes/Room?attributesFormat=object&details=on' --json 
 echo
 echo
 
