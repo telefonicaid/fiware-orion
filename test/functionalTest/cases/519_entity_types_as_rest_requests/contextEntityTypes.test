@@ -192,6 +192,7 @@ Date: REGEX(.*)
     <entityType>
       <name>Room</name>
       <contextAttributeList>
+#SORT_START
         <contextAttribute>
           <name>temperature</name>
           <type>celsius</type>
@@ -200,6 +201,7 @@ Date: REGEX(.*)
           <name>pressure</name>
           <type>mmHg</type>
         </contextAttribute>
+#SORT_END
       </contextAttributeList>
     </entityType>
   </typeEntities>
@@ -242,21 +244,21 @@ Date: REGEX(.*)
     "statusCode": {
         "code": "200", 
         "reasonPhrase": "OK"
-    }, 
+    },
     "types": [
         {
             "attributes": [
 #SORT_START
                 {
-                    "name": "temperature", 
+                    "name": "temperature",
                     "type": "celsius"
-                }, 
+                },
                 {
-                    "name": "pressure", 
+                    "name": "pressure",
                     "type": "mmHg"
                 }
 #SORT_END
-            ], 
+            ],
             "name": "Room"
         }
     ]
@@ -271,24 +273,24 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
-        "details": "Count: 1", 
+        "code": "200",
+        "details": "Count: 1",
         "reasonPhrase": "OK"
-    }, 
+    },
     "types": [
         {
             "attributes": [
 #SORT_START
                 {
-                    "name": "temperature", 
+                    "name": "temperature",
                     "type": "celsius"
-                }, 
+                },
                 {
-                    "name": "pressure", 
+                    "name": "pressure",
                     "type": "mmHg"
                 }
 #SORT_END
-            ], 
+            ],
             "name": "Room"
         }
     ]
@@ -303,10 +305,10 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
-        "details": "Count: 1", 
+        "code": "200",
+        "details": "Count: 1",
         "reasonPhrase": "OK"
-    }, 
+    },
     "types": [
         {
             "name": "Room"
@@ -323,21 +325,21 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
-    }, 
+    },
     "types": [
         {
             "attributes": {
 #SORT_START
                 "pressure": {
                     "type": "mmHg"
-                }, 
+                },
                 "temperature": {
                     "type": "celsius"
                 }
 #SORT_END
-            }, 
+            },
             "name": "Room"
         }
     ]
@@ -352,22 +354,22 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
-        "details": "Count: 1", 
+        "code": "200",
+        "details": "Count: 1",
         "reasonPhrase": "OK"
-    }, 
+    },
     "types": [
         {
             "attributes": {
 #SORT_START
                 "pressure": {
                     "type": "mmHg"
-                }, 
+                },
                 "temperature": {
                     "type": "celsius"
                 }
 #SORT_END
-            }, 
+            },
             "name": "Room"
         }
     ]
@@ -382,10 +384,10 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
-        "details": "Count: 1", 
+        "code": "200",
+        "details": "Count: 1",
         "reasonPhrase": "OK"
-    }, 
+    },
     "types": [
         {
             "name": "Room"
