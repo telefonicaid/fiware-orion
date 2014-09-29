@@ -1,5 +1,5 @@
-#ifndef URI_PARAM_NAMES_H
-#define URI_PARAM_NAMES_H
+#ifndef SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
+#define SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
 
 /*
 *
@@ -25,33 +25,31 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
+#include "common/Format.h"
+#include "ngsi/Request.h"
+#include "ngsi/StatusCode.h"
+#include "orionTypes/TypeEntityVector.h"
 
 
 
 /* ****************************************************************************
 *
-* Names of the URI parameters
+* EntityTypesResponse - 
 */
-#define URI_PARAM_NOTIFY_FORMAT       "notifyFormat"
-#define URI_PARAM_PAGINATION_OFFSET   "offset"
-#define URI_PARAM_PAGINATION_LIMIT    "limit"
-#define URI_PARAM_PAGINATION_DETAILS  "details"
-#define URI_PARAM_COLLAPSE            "collapse"
+class EntityTypesResponse
+{
+ public:
+  TypeEntityVector  typeEntityVector;
+  StatusCode        statusCode;
 
+  std::string       render(ConnectionInfo* ciP, const std::string& indent);
+  std::string       renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent);
+  std::string       check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
+  void              present(const std::string& indent);
+  void              release(void);
+};
 
-
-/* ****************************************************************************
-*
-* Values for URI parameters
-*/
-#define DEFAULT_PAGINATION_OFFSET       "0"
-#define DEFAULT_PAGINATION_OFFSET_INT   0
-
-#define DEFAULT_PAGINATION_LIMIT        "20"
-#define DEFAULT_PAGINATION_LIMIT_INT    20
-#define MAX_PAGINATION_LIMIT            "1000"
-
-#define DEFAULT_PARAM_NOTIFY_FORMAT     ""
-#define DEFAULT_PAGINATION_DETAILS      "off"
-
-#endif
+#endif  // SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_

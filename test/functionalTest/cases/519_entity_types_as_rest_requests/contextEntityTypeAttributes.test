@@ -1,0 +1,303 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Convenience2 contextEntityTypeAttributes test
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0-255 IPV4
+--SHELL--
+
+
+echo "0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>celsius</type>
+          <contextValue>0</contextValue>
+        </contextAttribute>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>mmHg</type>
+          <contextValue>0</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url '/ngsi10/updateContext' --payload "$payload"
+echo
+echo
+
+
+echo "1. Listing of Entity Type Attributes. Response in XML"
+orionCurl --url /v1/contextTypes/Room
+echo
+echo
+
+
+echo "2. Listing of Entity Type Attributes. Response in XML, details=on"
+orionCurl --url /v1/contextTypes/Room?details=on
+echo
+echo
+
+
+echo "3. Listing of Entity Type Attributes. Response in JSON"
+orionCurl --url /v1/contextTypes/Room --json 
+echo
+echo
+
+
+echo "4. Listing of Entity Type Attributes. Response in JSON, details=on"
+orionCurl --url /v1/contextTypes/Room?details=on --json 
+echo
+echo
+
+
+echo "5. Listing of Entity Type Attributes. Response in Object-JSON"
+orionCurl --url /v1/contextTypes/Room?attributesFormat=object --json 
+echo
+echo
+
+
+echo "6. Listing of Entity Type Attributes. Response in Object-JSON, details=on"
+orionCurl --url '/v1/contextTypes/Room?attributesFormat=object&details=on' --json 
+echo
+echo
+
+
+--REGEXPECT--
+0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
+HTTP/1.1 200 OK
+Content-Length: 810
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>ConferenceRoom</id>
+        </entityId>
+        <contextAttributeList>
+#SORT_START
+          <contextAttribute>
+            <name>temperature</name>
+            <type>celsius</type>
+            <contextValue/>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>mmHg</type>
+            <contextValue/>
+          </contextAttribute>
+#SORT_END
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+
+
+1. Listing of Entity Type Attributes. Response in XML
+HTTP/1.1 200 OK
+Content-Length: 479
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<entityTypeAttributesResponse>
+  <entityType>
+    <name>Room</name>
+    <contextAttributeList>
+#SORT_START
+      <contextAttribute>
+        <name>pressure</name>
+        <type>mmHg</type>
+      </contextAttribute>
+      <contextAttribute>
+        <name>temperature</name>
+        <type>celsius</type>
+      </contextAttribute>
+#SORT_END
+    </contextAttributeList>
+  </entityType>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</entityTypeAttributesResponse>
+
+
+2. Listing of Entity Type Attributes. Response in XML, details=on
+HTTP/1.1 200 OK
+Content-Length: 511
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<entityTypeAttributesResponse>
+  <entityType>
+    <name>Room</name>
+    <contextAttributeList>
+#SORT_START
+      <contextAttribute>
+        <name>pressure</name>
+        <type>mmHg</type>
+      </contextAttribute>
+      <contextAttribute>
+        <name>temperature</name>
+        <type>celsius</type>
+      </contextAttribute>
+#SORT_END
+    </contextAttributeList>
+  </entityType>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+    <details>Count: 2</details>
+  </statusCode>
+</entityTypeAttributesResponse>
+
+
+3. Listing of Entity Type Attributes. Response in JSON
+HTTP/1.1 200 OK
+Content-Length: 267
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": [
+#SORT_START
+        {
+            "name": "pressure", 
+            "type": "mmHg"
+        }, 
+        {
+            "name": "temperature", 
+            "type": "celsius"
+        }
+#SORT_END
+    ], 
+    "name": "Room", 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+4. Listing of Entity Type Attributes. Response in JSON, details=on
+HTTP/1.1 200 OK
+Content-Length: 295
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": [
+#SORT_START
+        {
+            "name": "pressure", 
+            "type": "mmHg"
+        }, 
+        {
+            "name": "temperature", 
+            "type": "celsius"
+        }
+#SORT_END
+    ], 
+    "name": "Room", 
+    "statusCode": {
+        "code": "200", 
+        "details": "Count: 2", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+5. Listing of Entity Type Attributes. Response in Object-JSON
+HTTP/1.1 200 OK
+Content-Length: 235
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": {
+#SORT_START
+        "pressure": {
+            "type": "mmHg"
+        }, 
+        "temperature": {
+            "type": "celsius"
+        }
+#SORT_END
+    }, 
+    "name": "Room", 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+6. Listing of Entity Type Attributes. Response in Object-JSON, details=on
+HTTP/1.1 200 OK
+Content-Length: 263
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": {
+#SORT_START
+        "pressure": {
+            "type": "mmHg"
+        }, 
+        "temperature": {
+            "type": "celsius"
+        }
+#SORT_END
+    }, 
+    "name": "Room", 
+    "statusCode": {
+        "code": "200", 
+        "details": "Count: 2", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
