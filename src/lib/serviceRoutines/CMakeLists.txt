@@ -80,6 +80,8 @@ statisticsTreat.cpp
 getAttributeValueInstance.cpp
 putAttributeValueInstance.cpp
 deleteAttributeValueInstance.cpp
+getEntityTypes.cpp
+getAttributesForEntityType.cpp
 )
 
 SET (HEADERS
@@ -132,6 +134,8 @@ badRequest.h
 postNotifyContext.h
 postNotifyContextAvailability.h
 statisticsTreat.h
+getEntityTypes.h
+getAttributesForEntityType.h
 )
 
 

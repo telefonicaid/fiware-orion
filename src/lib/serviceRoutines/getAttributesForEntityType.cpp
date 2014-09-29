@@ -1,6 +1,3 @@
-#ifndef URI_PARAM_NAMES_H
-#define URI_PARAM_NAMES_H
-
 /*
 *
 * Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,33 +22,38 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
 
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+#include "orionTypes/EntityTypeAttributesResponse.h"
+#include "rest/uriParamNames.h"
+#include "serviceRoutines/getAttributesForEntityType.h"
 
-
-/* ****************************************************************************
-*
-* Names of the URI parameters
-*/
-#define URI_PARAM_NOTIFY_FORMAT       "notifyFormat"
-#define URI_PARAM_PAGINATION_OFFSET   "offset"
-#define URI_PARAM_PAGINATION_LIMIT    "limit"
-#define URI_PARAM_PAGINATION_DETAILS  "details"
-#define URI_PARAM_COLLAPSE            "collapse"
-
+#include "mongoBackend/mongoQueryTypes.h"
 
 
 /* ****************************************************************************
 *
-* Values for URI parameters
+* getAttributesForEntityType -
 */
-#define DEFAULT_PAGINATION_OFFSET       "0"
-#define DEFAULT_PAGINATION_OFFSET_INT   0
+std::string getAttributesForEntityType
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
+{
+  EntityTypeAttributesResponse  response;
+  std::string                   entityTypeName = compV[2];
 
-#define DEFAULT_PAGINATION_LIMIT        "20"
-#define DEFAULT_PAGINATION_LIMIT_INT    20
-#define MAX_PAGINATION_LIMIT            "1000"
+  response.statusCode.fill(SccOk);
+  mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
-#define DEFAULT_PARAM_NOTIFY_FORMAT     ""
-#define DEFAULT_PAGINATION_DETAILS      "off"
+  std::string rendered = response.render(ciP, "");
+  response.release();
 
-#endif
+  return rendered;
+}

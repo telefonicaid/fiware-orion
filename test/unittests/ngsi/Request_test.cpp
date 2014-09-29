@@ -91,7 +91,14 @@ TEST(Request, requestType)
 
     { RtSubscribeResponse,                         "SubscribeResponse"                                      },
     { RtSubscribeError,                            "SubscribeError"                                         },
+
+    { EntityTypes,                                 "EntityTypes"                                            },
+    { AttributesForEntityType,                     "AttributesForEntityType"                                },
+    { RtEntityTypesResponse,                       "EntityTypesResponse"                                    },
+    { RtAttributesForEntityTypeResponse,           "AttributesForEntityTypeResponse"                        },
+
     { InvalidRequest,                              "InvalidRequest"                                         },
+
   };
 
   for (unsigned int ix = 0; ix < sizeof(req) / sizeof(req[0]); ++ix)

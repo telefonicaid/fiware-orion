@@ -38,6 +38,7 @@ SET (SOURCES
     mongoConfManOperations.cpp
     mongoNotifyContext.cpp
     mongoNotifyContextAvailability.cpp
+    mongoQueryTypes.cpp
 )
 
 SET (HEADERS
@@ -58,6 +59,7 @@ SET (HEADERS
     mongoConfManOperations.h
     mongoNotifyContext.h
     mongoNotifyContextAvailability.h
+    mongoQueryTypes.h
 )
 
 

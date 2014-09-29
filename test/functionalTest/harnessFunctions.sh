@@ -528,6 +528,7 @@ function orionCurl()
   _xtra=''
   _verbose='off'
   _debug='off'
+  _noPayloadCheck='off'
 
   while [ "$#" != 0 ]
   do
@@ -544,6 +545,7 @@ function orionCurl()
     elif [ "$1" == "--urlParams" ]; then       _urlParams=$2; shift;
     elif [ "$1" == "--verbose" ]; then         _verbose=on;
     elif [ "$1" == "--debug" ]; then           _debug=on;
+    elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck=on;
     else                                       _xtra="$_xtra $1"; shift;
     fi
 
@@ -649,21 +651,26 @@ function orionCurl()
   sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out
   
   #
-  # Print and beautify response body (IF ANY)
+  # Print and beautify response body, if any  (and if option --noPayloadCheck hasn't been set)
   #
-  if [ "$_response" != "" ]
+  if [ "$_noPayloadCheck" == "on" ]
   then
-    if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
+    echo $_response
+  else
+    if [ "$_response" != "" ]
     then
-      vMsg Running xmllint tool for $_response
-      echo $_response | xmllint --format -
-    elif [ "$_outFormat" == application/json ]
-    then
-      vMsg Running python tool for $_response
-      echo $_response | python -mjson.tool
-    else
-      vMsg Running xmllint tool for $_response
-      echo $_response | xmllint --format -
+      if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
+      then
+        vMsg Running xmllint tool for $_response
+        echo $_response | xmllint --format -
+      elif [ "$_outFormat" == application/json ]
+      then
+        vMsg Running python tool for $_response
+        echo $_response | python -mjson.tool
+      else
+        vMsg Running xmllint tool for $_response
+        echo $_response | xmllint --format -
+      fi
     fi
   fi
 }

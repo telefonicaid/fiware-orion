@@ -361,6 +361,9 @@ function fileCleanup()
     rm $filename.valgrind.stop.out  2> /dev/null
     rm $filename.out                2> /dev/null
     rm $filename.regexpect          2> /dev/null
+    rm $filename.out.sorted         2> /dev/null
+    rm $filename.regexpect.sorted   2> /dev/null
+    rm $filename.blockSortDiff.out  2> /dev/null
     rm $filename.diff               2> /dev/null
 
     cd $olddir
@@ -510,16 +513,35 @@ function partExecute()
   #
   if [ "$what" == "shell" ]
   then
-    mv $dirname/$filename.$what.stdout $dirname/$filename.out # We are used to this name ...
-    $DIFF -r $dirname/$filename.regexpect -i $dirname/$filename.out > $dirname/$filename.diff
-    exitCode=$?
+    mv $dirname/$filename.$what.stdout $dirname/$filename.out # We are very much used to this name ...
+
+    #
+    # Special sorted diff or normal REGEX diff ?
+    #
+    blockDiff='no'
+    grep '^#SORT_START$' $dirname/$filename.regexpect > /dev/null 2>&1
+    if [ $? == 0 ]
+    then
+      $SCRIPT_HOME/blockSortDiff.sh --referenceFile $dirname/$filename.regexpect --brokerOutputFile $dirname/$filename.out > $dirname/$filename.blockSortDiff.out
+      exitCode=$?
+      blockDiff='yes'
+    else
+      $DIFF -r $dirname/$filename.regexpect -i $dirname/$filename.out > $dirname/$filename.diff
+      exitCode=$?
+    fi
+
     if [ "$exitCode" != "0" ]
     then
       exitFunction 9 ".out and .regexpect differ" $path "($path) output not as expected" $dirname/$filename.diff
       if [ "$CB_DIFF_TOOL" != "" ]
       then
         endDate=$(date)
-        $CB_DIFF_TOOL $dirname/$filename.regexpect $dirname/$filename.out
+        if [ $blockDiff == 'yes' ]
+        then
+          $CB_DIFF_TOOL $dirname/$filename.regexpect.sorted $dirname/$filename.out.sorted
+        else
+          $CB_DIFF_TOOL $dirname/$filename.regexpect $dirname/$filename.out
+        fi
       fi
       partExecuteResult=9
       return

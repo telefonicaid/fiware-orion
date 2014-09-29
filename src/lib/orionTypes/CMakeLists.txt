@@ -22,11 +22,18 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     areas.cpp
-
+    TypeEntity.cpp
+    TypeEntityVector.cpp
+    EntityTypesResponse.cpp
+    EntityTypeAttributesResponse.cpp
 )
 
 SET (HEADERS
     areas.h
+    TypeEntity.h
+    TypeEntityVector.h
+    EntityTypesResponse.h
+    EntityTypeAttributesResponse.h
 )
 
 

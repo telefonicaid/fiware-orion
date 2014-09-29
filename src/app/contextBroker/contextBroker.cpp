@@ -83,15 +83,21 @@
 #include "common/Timer.h"
 #include "common/compileInfo.h"
 
+#include "orionTypes/EntityTypesResponse.h"
+
 #include "serviceRoutines/logTraceTreat.h"
 
 #include "ngsi/ParseData.h"
 #include "ngsiNotify/onTimeIntervalThread.h"
 
+#include "serviceRoutines/getEntityTypes.h"
+#include "serviceRoutines/getAttributesForEntityType.h"
+
 #include "serviceRoutines/versionTreat.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "serviceRoutines/exitTreat.h"
 #include "serviceRoutines/leakTreat.h"
+
 #include "serviceRoutines/postDiscoverContextAvailability.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/postRegisterContext.h"
@@ -408,6 +414,22 @@ PaArgument paArgs[] =
 #define SCS_COMPS          3, {      "ngsi10",  "contextSubscriptions", "*" }
 #define SCS_PUT_WORD       "updateContextSubscriptionRequest"
 
+
+
+//
+// TID Convenience Operations
+//
+#define ET                 EntityTypes
+#define ET_COMPS           2, { "v1", "contextTypes" }
+
+#define AFET               AttributesForEntityType
+#define AFET_COMPS         3, { "v1", "contextTypes", "*" }
+
+
+
+//
+//
+//
 #define LOG                LogRequest
 #define LOGT_COMPS         2, { "log", "trace"            }
 #define LOGTL_COMPS        3, { "log", "trace",      "*"  }
@@ -538,7 +560,12 @@ PaArgument paArgs[] =
                                                                                                       \
   { "PUT",    SCS,   SCS_COMPS,         SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
   { "DELETE", SCS,   SCS_COMPS,         "",              deleteSubscriptionConvOp                  }, \
-  { "*",      SCS,   SCS_COMPS,         "",              badVerbPutDeleteOnly                      }
+  { "*",      SCS,   SCS_COMPS,         "",              badVerbPutDeleteOnly                      }, \
+                                                                                                      \
+  { "GET",    ET,    ET_COMPS,         "",                getEntityTypes                           }, \
+  { "*",      ET,    ET_COMPS,         "",                badVerbGetOnly                           }, \
+  { "GET",    AFET,  AFET_COMPS,       "",                getAttributesForEntityType               }, \
+  { "*",      AFET,  AFET_COMPS,       "",                badVerbGetOnly                           }
 
 
 
@@ -859,11 +886,11 @@ static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName
   }
 
   setDbPrefix(dbName);
-  setEntitiesCollectionName("entities");
-  setRegistrationsCollectionName("registrations");
-  setSubscribeContextCollectionName("csubs");
-  setSubscribeContextAvailabilityCollectionName("casubs");
-  setAssociationsCollectionName("associations");
+  setEntitiesCollectionName(COL_ENTITIES);
+  setRegistrationsCollectionName(COL_REGISTRATIONS);
+  setSubscribeContextCollectionName(COL_CSUBS);
+  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
+  setAssociationsCollectionName(COL_ASSOCIATIONS);
 
   //
   // Note that index creation operation is idempotent.
@@ -1061,9 +1088,9 @@ int main(int argC, char* argV[])
   //
   char* x = (char*) malloc(100000);
   snprintf(x, sizeof(x), "A hundred thousand bytes lost here");
-  LM_M(("x: '%s'", x));
+  LM_M(("x: '%s'", x));  // Outdeffed
   x = (char*) "LOST";
-  LM_M(("x: '%s'", x));
+  LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
   RestService* rsP       = (ngsi9Only == true)? restServiceNgsi9 : restServiceV;

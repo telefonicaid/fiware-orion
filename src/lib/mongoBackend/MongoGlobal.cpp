@@ -347,7 +347,7 @@ void setSubscribeContextAvailabilityCollectionName(std::string name) {
 *
 * setAssociationsCollectionName -
 */
-extern void setAssociationsCollectionName(std::string name) {
+void setAssociationsCollectionName(std::string name) {
     assocationsCollectionName = name;
 }
 
@@ -358,14 +358,26 @@ extern void setAssociationsCollectionName(std::string name) {
 * Common helper function for composing collection names
 */
 static std::string composeCollectionName(std::string tenant, std::string colName) {
+  return composeDatabaseName(tenant) + "." + colName;
+}
+
+/*****************************************************************************
+*
+* composeDatabaseName -
+*
+* Common helper function for composing database names
+*/
+std::string composeDatabaseName(std::string tenant) {
     std::string result;
-    if (tenant == "") {
-        result = dbPrefix + "." + colName;
+    if (tenant == "")
+    {
+        result = dbPrefix;
     }
-    else {
+    else
+    {
         /* Note that we can not use "." as database delimiter. A database cannot contain this
          * character, http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Database-Names-for-Unix-and-Linux-Systems */
-        result = dbPrefix + "-" + tenant + "." + colName;
+        result = dbPrefix + "-" + tenant;
     }
     return result;
 }
