@@ -53,6 +53,11 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
     ContextSubscriptionInfo csi;
     if (mongoGetContextSubscriptionInfo(params->subId, &csi, &err, tenant) != SccOk)
     {
+      //
+      // FIXME P6: mongoGetContextSubscriptionInfo ALWAYS returns SccOk
+      //           If it didn't we would have a leak right here, as mongoGetContextSubscriptionInfo
+      //           allocates entities and pushes them to 'csi', which is lost leaving this function.
+      //
       LM_E(("Database Error (error invoking mongoGetContextSubscriptionInfo"));
       return;
     }
