@@ -179,6 +179,19 @@ rm -rf  /usr/share/contextBroker
 
 
 %changelog
+* Wed Oct 01 2014 Fermin Galan <fermin@tid.es> 0.15.0-1 (FIWARE-3.5.3-1)
+- Add: context providers basic functionality (Issue #499)
+- Add: alternative rendering of ContextAttribute for JSON (Issue #490)
+- Add: new API operation to retreive all existing context entity types (Issue #519)
+- Add: new API operation to retreive all attributes (union set) of a given context entity type (Issue #519)
+- Add: support for associations in JSON (Issue #334).
+- Add: support for MongoDB replica sets (using the new -rplSet CLI parameter) (Issue #493)
+- Fix: Associations now return error messages when appropiate (Issue #334).
+- Fix: each send is now considered a separate transaction (Issue #478)
+- Fix: lseek after each write in log file in order to work with logrotate truncate (Issue #411)
+- Fix: made the broker not support URL-based multiservice (tenants) anymore (Issue #522)
+- Fix: removed all the code related to URL-tenants (Issue #522)
+
 * Fri Aug 01 2014 Fermin Galan <fermin@tid.es> 0.14.1-1 (FIWARE-3.5.1-1)
 - Fix:  errors in JSON rendering for '/statistics' and '/version' fixed (Issue #428).
 - Fix:  using same location attribute in UPDATE fails (issue http://stackoverflow.com/questions/24431177/ge-orion-context-broker-when-we-make-an-update-of-the-entity-does-not-allow-us)
