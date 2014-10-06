@@ -454,6 +454,8 @@ PaArgument paArgs[] =
 #define AFET               AttributesForEntityType
 #define AFET_COMPS_V1      3, { "v1", "contextTypes", "*" }
 
+#define ACE                AllContextEntities
+#define ACE_COMPS_V1       2, { "v1", "contextEntities" }
 
 
 //
@@ -710,10 +712,10 @@ PaArgument paArgs[] =
   { "DELETE", SCS,   SCS_COMPS_V1,           "",              deleteSubscriptionConvOp                  }, \
   { "*",      SCS,   SCS_COMPS_V1,           "",              badVerbPutDeleteOnly                      }, \
                                                                                                            \
-  { "GET",    ET,    ET_COMPS_V1,            "",                getEntityTypes                          }, \
-  { "*",      ET,    ET_COMPS_V1,            "",                badVerbGetOnly                          }, \
-  { "GET",    AFET,  AFET_COMPS_V1,          "",                getAttributesForEntityType              }, \
-  { "*",      AFET,  AFET_COMPS_V1,          "",                badVerbGetOnly                          }
+  { "GET",    ET,    ET_COMPS_V1,            "",              getEntityTypes                            }, \
+  { "*",      ET,    ET_COMPS_V1,            "",              badVerbGetOnly                            }, \
+  { "GET",    AFET,  AFET_COMPS_V1,          "",              getAttributesForEntityType                }, \
+  { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }
 
 
 
