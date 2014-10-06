@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>

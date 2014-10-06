@@ -50,7 +50,7 @@ std::string postContextEntityTypes
   ParseData*                 parseDataP
 )
 {
-  std::string  entityType    = compV[2];
+  std::string  entityType    = (compV[0] == "v1")? compV[3] : compV[2];
 
   // Transform RegisterProviderRequest into RegisterContextRequest
   parseDataP->rcr.res.fill(parseDataP->rpr.res, "", entityType, "");

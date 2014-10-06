@@ -45,7 +45,7 @@ std::string deleteAvailabilitySubscriptionConvOp
 )
 {
   UnsubscribeContextAvailabilityRequest*  ucarP          = &parseDataP->ucar.res;
-  std::string                             subscriptionId = compV[2];
+  std::string                             subscriptionId = (compV[0] == "v1")? compV[3] : compV[2];
 
   ucarP->subscriptionId = subscriptionId;
 

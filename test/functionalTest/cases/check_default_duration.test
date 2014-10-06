@@ -27,7 +27,6 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/NGSI9/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -52,13 +51,12 @@ payload='<?xml version="1.0"?>
     </contextRegistrationList>
     <registrationId></registrationId>
   </registerContextRequest>'
-orionCurl --url "$url" --payload "${payload}"
+orionCurl --url "/v1/registry/registerContext" --payload "${payload}"
 
 REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
-
 echo "++++++++++++++++++++"
 
-url="/NGSI9/discoverContextAvailability"
+
 payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -74,7 +72,7 @@ payload='<?xml version="1.0"?>
       <attribute>pressure</attribute>
     </attributeList>
   </discoverContextAvailabilityRequest>'
-orionCurl --url "$url" --payload "${payload}"
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload "${payload}"
 
 --REGEXPECT--
 HTTP/1.1 200 OK
