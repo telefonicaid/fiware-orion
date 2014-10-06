@@ -1,11 +1,1 @@
-- Add: context providers basic functionality (Issue #499)
-- Add: support for associations in JSON (Issue #334).
-- Fix: Associations now return error messages when appropiate (Issue #334).
-- Add: support for MongoDB replica sets (using the new -rplSet CLI parameter) (Issue #493)
-- Add: alternative rendering of ContextAttribute for JSON (Issue #490)
-- Fix: each send is now considered a separate transaction (Issue #478)
-- Add: new API operation to retreive all existing context entity types (Issue #519)
-- Add: new API operation to retreive all attributes (union set) of a given context entity type (Issue #519)
-- Fix: lseek after each write in log file in order to work with logrotate truncate (Issue #411)
-- Fix: made the broker not support URL-based multiservice (tenants) anymore (Issue #522)
-- Fix: removed all the code related to URL-tenants (Issue #522)
+- Add: Adding alternative (preferred) URLs: '/ngsi10' => '/v1' AND '/ngsi9' => '/v1/registry' (Issue #559)
