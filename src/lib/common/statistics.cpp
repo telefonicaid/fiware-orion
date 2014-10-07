@@ -22,7 +22,6 @@
 *
 * Author: Ken Zangelin
 */
-#include "logMsg/logMsg.h"
 #include "common/statistics.h"
 #include "ngsi/Request.h"
 
@@ -126,9 +125,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
   {
     ++noOfJsonRequests;
   }
-
-
-  LM_M(("In statisticsUpdate: request == %d (%s)", request, requestType(request)));
 
   switch (request)
   {
