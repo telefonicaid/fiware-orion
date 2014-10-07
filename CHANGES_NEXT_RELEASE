@@ -1,1 +1,2 @@
 - Add: Adding alternative (preferred) URLs: '/ngsi10' => '/v1' AND '/ngsi9' => '/v1/registry' (Issue #559)
+- Add: New convenience operation '/v1/contextEntities' - to get a list of ALL existing entities (Issue #563)
