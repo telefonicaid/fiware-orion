@@ -117,6 +117,8 @@ std::string statisticsTreat
     noOfNgsi10ContextEntityTypesAttribute           = -1;
     noOfNgsi10SubscriptionsConvOp                   = -1;
 
+    noOfAllContextEntitiesRequests                  = -1;
+
     noOfLogRequests                                 = -1;
     noOfVersionRequests                             = -1;
     noOfExitRequests                                = -1;
@@ -311,6 +313,11 @@ std::string statisticsTreat
     out += TAG_ADD("subscriptionsNgsi10ConvOp", noOfNgsi10SubscriptionsConvOp);
   }
 
+
+  if (noOfAllContextEntitiesRequests != -1)
+  {
+    out += TAG_ADD("allContextEntitiesRequests", noOfAllContextEntitiesRequests);
+  }
 
   if (noOfLogRequests != -1)
   {

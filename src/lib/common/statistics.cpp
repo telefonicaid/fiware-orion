@@ -22,6 +22,7 @@
 *
 * Author: Ken Zangelin
 */
+#include "logMsg/logMsg.h"
 #include "common/statistics.h"
 #include "ngsi/Request.h"
 
@@ -84,6 +85,8 @@ int noOfUpdateContextElement                             = -1;
 int noOfAppendContextElement                             = -1;
 int noOfUpdateContextAttribute                           = -1;
 
+int noOfAllContextEntitiesRequests                       = -1;
+
 int noOfLogRequests                                      = -1;
 int noOfVersionRequests                                  = -1;
 int noOfExitRequests                                     = -1;
@@ -125,6 +128,8 @@ void statisticsUpdate(RequestType request, Format inFormat)
   }
 
 
+  LM_M(("In statisticsUpdate: request == %d (%s)", request, requestType(request)));
+
   switch (request)
   {
   case RegisterContext:                                  ++noOfRegistrations; break;
@@ -162,6 +167,8 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case Ngsi10ContextEntityTypesAttributeContainer:       ++noOfNgsi10ContextEntityTypesAttributeContainer; break;
   case Ngsi10ContextEntityTypesAttribute:                ++noOfNgsi10ContextEntityTypesAttribute; break;
   case Ngsi10SubscriptionsConvOp:                        ++noOfNgsi10SubscriptionsConvOp; break;
+
+  case AllContextEntities:                               ++noOfAllContextEntitiesRequests; break;
 
   case LogRequest:                                       ++noOfLogRequests; break;
   case VersionRequest:                                   ++noOfVersionRequests; break;

@@ -92,6 +92,7 @@
 
 #include "serviceRoutines/getEntityTypes.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
+#include "serviceRoutines/getAllContextEntities.h"
 
 #include "serviceRoutines/versionTreat.h"
 #include "serviceRoutines/statisticsTreat.h"
@@ -715,7 +716,10 @@ PaArgument paArgs[] =
   { "GET",    ET,    ET_COMPS_V1,            "",              getEntityTypes                            }, \
   { "*",      ET,    ET_COMPS_V1,            "",              badVerbGetOnly                            }, \
   { "GET",    AFET,  AFET_COMPS_V1,          "",              getAttributesForEntityType                }, \
-  { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }
+  { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
+                                                                                                           \
+  { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
+  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }
 
 
 
