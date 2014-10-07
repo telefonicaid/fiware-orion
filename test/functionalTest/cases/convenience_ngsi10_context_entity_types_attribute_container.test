@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience /v1 Context Entity Types Attribute Container
+Convenience NGSI10 Context Entity Types Attribute Container
 --SHELL-INIT--
 dbInit CB
 brokerStart CB

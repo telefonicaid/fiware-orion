@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-/v1 Convenience PUT Attribute Value Instance
+NGSI10 Convenience PUT Attribute Value Instance
 --SHELL-INIT--
 dbInit CB
 brokerStart CB

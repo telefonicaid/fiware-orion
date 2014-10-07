@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-/v1 Convenience Subscriptions
+NGSI10 Convenience Subscriptions
 --SHELL-INIT--
 dbInit CB
 brokerStart CB

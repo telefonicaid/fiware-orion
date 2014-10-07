@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience /v1 Context Entity Types
+Convenience NGSI10 Context Entity Types
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
