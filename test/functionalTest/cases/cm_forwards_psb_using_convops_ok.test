@@ -29,7 +29,7 @@ brokerStart CM 0-255
 
 --SHELL--
 # Do a NGSI10 request to check that the CM does not accept NGSI10 requests
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -47,7 +47,7 @@ orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
 echo "1: ++++++++++++++++++++"
 
 # Do initial registration in the CM
-url="/NGSI9/contextEntities/ConferenceRoom"
+url="/v1/registry/contextEntities/ConferenceRoom"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -72,7 +72,7 @@ REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk
 echo "2: ++++++++++++++++++++"
 
 # Check the registration in CM 
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -86,7 +86,7 @@ orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
 echo "3: ++++++++++++++++++++"
 
 # Check the registration in PSB
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -100,7 +100,7 @@ orionCurl --url "$url" --payload "${payload}"
 echo "4: ++++++++++++++++++++"
 
 # Update registration in CM
-url="/NGSI9/contextEntities/MyCar"
+url="/v1/registry/contextEntities/MyCar"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerProviderRequest>
   <metadata>
@@ -124,7 +124,7 @@ orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
 echo "5: ++++++++++++++++++++"
 
 # Check the registration in CM
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -138,7 +138,7 @@ orionCurl --url "$url" --payload "${payload}" --port ${CM_PORT}
 echo "6: ++++++++++++++++++++"
 
 # Check the registration in PSB
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -174,7 +174,7 @@ fi
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 158
+Content-Length: 147
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -182,7 +182,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>ngsi10 service '/NGSI10/queryContext' not found</details>
+  <details>service '/v1/queryContext' not found</details>
 </orionError>
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK

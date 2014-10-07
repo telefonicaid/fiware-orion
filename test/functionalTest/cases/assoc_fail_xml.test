@@ -29,7 +29,7 @@ brokerStart CB
 --SHELL--
 echo "++++++ Register new entities - HOUSES"
 
-orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
+orionCurl --url "/v1/registry/registerContext" --payload '<?xml version="1.0"?>
 <registerContextRequest>
   <contextRegistrationList>
     <contextRegistration>
@@ -59,7 +59,7 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
 # ********************************************************************************
 echo "++++++ Register new entities - SENSORS"
 
-orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
+orionCurl --url "/v1/registry/registerContext" --payload '<?xml version="1.0"?>
 <registerContextRequest>
   <contextRegistrationList>
     <contextRegistration>
@@ -89,7 +89,7 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
 # ********************************************************************************
 echo "++++++ Create two associations"
 
-orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
+orionCurl --url "/v1/registry/registerContext" --payload '<?xml version="1.0"?>
 <registerContextRequest>
   <contextRegistrationList>
     <contextRegistration>
@@ -144,7 +144,7 @@ orionCurl --url "/NGSI9/registerContext" --payload '<?xml version="1.0"?>
 # ********************************************************************************
 echo "++++++ Query an non existing association for an existing entity"
 
-orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload '<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
   <entityIdList>
     <entityId type="House" isPattern="false">
@@ -166,7 +166,7 @@ orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1
 # ********************************************************************************
 echo "++++++ Query association OK"
 
-orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload '<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
   <entityIdList>
     <entityId type="House" isPattern="false">
@@ -188,7 +188,7 @@ orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1
 # ********************************************************************************
 echo "++++++ Query an association for a non existing entity"
 
-orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload '<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
   <entityIdList>
     <entityId type="House" isPattern="false">
@@ -210,7 +210,7 @@ orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1
 # ********************************************************************************
 echo "++++++ Query an association for a non existing attribute"
 
-orionCurl --url "/NGSI9/discoverContextAvailability" --payload '<?xml version="1.0"?>
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload '<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
   <entityIdList>
     <entityId type="House" isPattern="false">

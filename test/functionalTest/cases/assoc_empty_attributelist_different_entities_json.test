@@ -29,7 +29,7 @@ brokerStart CB
 --SHELL--
 echo "++++++ Register new entities - HOUSES"
 
-orionCurl --json --url "/NGSI9/registerContext" --payload '{
+orionCurl --json --url "/v1/registry/registerContext" --payload '{
   "contextRegistrations": [
     {
       "entities": [
@@ -68,7 +68,7 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
 # ********************************************************************************
 echo "++++++ Register new entities - SENSORS"
 
-orionCurl --json --url "/NGSI9/registerContext" --payload '{
+orionCurl --json --url "/v1/registry/registerContext" --payload '{
   "contextRegistrations": [
     {
       "entities": [
@@ -107,7 +107,7 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
 # ********************************************************************************
 echo "++++++ Create associations"
 
-orionCurl --json --url "/NGSI9/registerContext" --payload '{
+orionCurl --json --url "/v1/registry/registerContext" --payload '{
   "contextRegistrations": [
     {
       "metadatas": [
@@ -165,7 +165,7 @@ orionCurl --json --url "/NGSI9/registerContext" --payload '{
 # ********************************************************************************
 echo "++++++ Query an association with empty attribute list, two entities"
 
-orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
+orionCurl --json --url "/v1/registry/discoverContextAvailability" --payload '{
   "entities": [
     {
       "type": "House",
@@ -186,7 +186,7 @@ orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
 # ********************************************************************************
 echo "++++++ Query an association with no attribute list, two entities"
 
-orionCurl --json --url "/NGSI9/discoverContextAvailability" --payload '{
+orionCurl --json --url "/v1/registry/discoverContextAvailability" --payload '{
   "entities": [
     {
       "type": "House",

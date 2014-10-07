@@ -48,10 +48,6 @@ std::string postSubscribeContextAvailability
   SubscribeContextAvailabilityResponse  scar;
   std::string                           answer;
 
-  // FIXME P6: at the moment, we assume that notifications are sent in the same format that the one
-  // used to do the subscription, so we are passing ciP->inFormat. This is just an heuristic, the client could want
-  // for example to use XML in the subscription message but wants notifications in JSON. We need a more
-  // flexible approach, to be implemented
   ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->inFormat, ciP->tenant);
   answer = scar.render(SubscribeContextAvailability, ciP->outFormat, "");
 

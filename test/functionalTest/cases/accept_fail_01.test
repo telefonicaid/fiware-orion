@@ -29,7 +29,7 @@ brokerStart CB
 --SHELL--
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
   <entityIdList>

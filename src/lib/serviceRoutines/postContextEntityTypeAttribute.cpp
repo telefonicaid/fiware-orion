@@ -50,8 +50,8 @@ std::string postContextEntityTypeAttribute
   ParseData*                 parseDataP
 )
 {
-  std::string  entityIdType   = compV[2];
-  std::string  attributeName  = compV[4];
+  std::string  entityIdType   = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string  attributeName  = (compV[0] == "v1")? compV[5] : compV[4];
 
   // Transform RegisterProviderRequest into RegisterContextRequest
   parseDataP->rcr.res.fill(parseDataP->rpr.res, "", entityIdType, attributeName);
