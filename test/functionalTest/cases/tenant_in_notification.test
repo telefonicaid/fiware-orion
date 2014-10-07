@@ -30,7 +30,7 @@ brokerStart CB 30,60,185 IPV4 -multiservice
 --SHELL--
 echo "1. Subscribe to changes in  E/att" # reference will never be reached as it stops in the accumulator
 echo "+++++++++++++++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -59,7 +59,7 @@ echo
 
 echo "2. Update/Append E/att"
 echo "++++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>

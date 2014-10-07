@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-url="/NGSI10/contextEntities/EVector"
+url="/v1/contextEntities/EVector"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -55,7 +55,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++ query for vector compound in XML ++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Convenience NGSI10 Context Entity Types Attribute Container
+Convenience /v1 Context Entity Types Attribute Container
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -30,11 +30,11 @@ brokerStart CB
 
 # query for all entities of type "Room"
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes"
+orionCurl --url "/v1/contextEntityTypes/Room/attributes"
 
 # Add an entity of type Room, with one attribute: 'temperature'
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -63,15 +63,15 @@ orionCurl --url "$url" --payload "$payload"
 
 # query for all entities of type "Room"
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes"
+orionCurl --url "/v1/contextEntityTypes/Room/attributes"
 
 # query for all entities of type "Room2"
 echo "4: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room2/attributes"
+orionCurl --url "/v1/contextEntityTypes/Room2/attributes"
 
 # DELETE is not allowed
 echo "5: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes" -X "DELETE" 
+orionCurl --url "/v1/contextEntityTypes/Room/attributes" -X "DELETE" 
 
 --REGEXPECT--
 1: ++++++++++++++++++++

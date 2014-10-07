@@ -30,7 +30,7 @@ accumulatorStart
 
 --SHELL--
 
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -59,7 +59,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk
 echo
 
 echo "1: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -92,7 +92,7 @@ echo
 
 
 echo "2: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -123,7 +123,7 @@ mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_i
 echo
 
 echo "3: ++++++++++++++++++++"
-url=/NGSI10/updateContextSubscription
+url=/v1/updateContextSubscription
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
@@ -141,7 +141,7 @@ echo
 sleep 10
 
 echo "4: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -174,7 +174,7 @@ echo
 
 
 echo "5: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -206,7 +206,7 @@ echo
 echo "6: ++++++++++++++++++++"
 # Wait - sleep >6s to reset the throttling interval
 sleep 10
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -233,7 +233,7 @@ echo
 
 
 echo "7: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -257,7 +257,7 @@ echo
 
 
 echo "8: ++++++++++++++++++++"
-url=/NGSI10/unsubscribeContext
+url=/v1/unsubscribeContext
 payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>
@@ -267,7 +267,7 @@ echo
 
 
 echo "9: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ Registration +++++"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -83,7 +83,7 @@ orionCurl --url "$url" --payload "${payload}"
 echo "+++++ Registration Done +++++"
 
 echo "+++++ Discovery +++++"
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>

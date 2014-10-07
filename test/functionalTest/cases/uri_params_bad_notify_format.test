@@ -32,7 +32,7 @@ brokerStart CB
 
 echo "Trying to ask for HTML as Notification Format"
 echo "============================================="
-url="/NGSI10/subscribeContext?notifyFormat=HTML"
+url="/v1/subscribeContext?notifyFormat=HTML"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>

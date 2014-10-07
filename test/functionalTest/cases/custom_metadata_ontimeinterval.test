@@ -28,7 +28,7 @@ accumulatorStart
 
 --SHELL--
 echo "=== 1. Create ONTIMEINTERVAL subscription"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='{
     "entities": [
         {
@@ -56,7 +56,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 sleep 0.5
 
 echo "=== 2. Create an entity with metadata"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {
@@ -92,7 +92,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 sleep 1
 
 echo "=== 3. Change the value"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {
@@ -128,7 +128,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 sleep 1
 
 echo "=== 4. Change the metadata"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {
@@ -164,7 +164,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 sleep 1
 
 echo "=== 5. Change both value and metadata"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {

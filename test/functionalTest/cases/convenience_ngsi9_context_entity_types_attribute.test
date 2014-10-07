@@ -29,10 +29,10 @@ brokerStart CB
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextEntityTypes/Room/attributes/temperature"
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature"
 
 echo "1: ++++++++++++++++++++"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
 <registerContextRequest>
   <contextRegistrationList>
@@ -66,15 +66,15 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextEntityTypes/Room/attributes/temperature"
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature"
 
 # DELETE is not allowed
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
+orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
 
 # PUT is not allowed
 echo "4: ++++++++++++++++++++"
-url="/NGSI9/contextEntityTypes/Room/attributes/temperature"
+url="/v1/registry/contextEntityTypes/Room/attributes/temperature"
 payload='<registerProviderRequest>
   <metadata>
     <contextMetadata>

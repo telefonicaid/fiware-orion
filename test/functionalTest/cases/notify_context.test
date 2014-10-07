@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -54,7 +54,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/notifyContext"
+url="/v1/notifyContext"
 payload='<?xml version="1.0"?>
 <notifyContextRequest>
   <subscriptionId>51307b66f481db11bf860001</subscriptionId>
@@ -83,7 +83,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0"?><queryContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">

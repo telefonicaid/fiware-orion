@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++++++++++++++++++++++"
-url="/ngsi10/subscribeContext"
+url="/v1/subscribeContext"
 payload='{
   "entities" : [
     {

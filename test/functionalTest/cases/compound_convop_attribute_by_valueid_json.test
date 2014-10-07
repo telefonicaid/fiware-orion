@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-url="/NGSI10/contextEntities/EVector"
+url="/v1/contextEntities/EVector"
 payload='{
   "attributes": [
     {
@@ -74,7 +74,7 @@ payload='{
 orionCurl --url "$url" --payload "$payload" --json
 
 echo "2: +++++++++ create object compound +++++++++++"
-url="/NGSI10/contextEntities/EObject"
+url="/v1/contextEntities/EObject"
 payload='{
   "attributes": [
     {
@@ -118,16 +118,16 @@ payload='{
 orionCurl --url "$url" --payload "$payload" --json
 
 echo "3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EVector/attributes/att/ground" --json
+orionCurl --url "/v1/contextEntities/EVector/attributes/att/ground" --json
 
 echo "4: ++++++++++ query for vector compound by valueID 'wall' ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EVector/attributes/att/wall" --json
+orionCurl --url "/v1/contextEntities/EVector/attributes/att/wall" --json
 
 echo "5: ++++++++++ query for object compound by valueID 'ground' ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EObject/attributes/att/ground" --json
+orionCurl --url "/v1/contextEntities/EObject/attributes/att/ground" --json
 
 echo "6: ++++++++++ query for object compound by valueID 'wall' ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EObject/attributes/att/wall" --json
+orionCurl --url "/v1/contextEntities/EObject/attributes/att/wall" --json
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++

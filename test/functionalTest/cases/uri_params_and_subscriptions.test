@@ -33,7 +33,7 @@ accumulatorStart localhost $LISTENER_PORT
 
 echo "1. Subscribe to E/attr1 giving notifyFormat=XML"
 echo "==============================================="
-url="/NGSI10/subscribeContext?notifyFormat=XML"
+url="/v1/subscribeContext?notifyFormat=XML"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -62,7 +62,7 @@ echo
 
 echo "2. Subscribe to E/attr2 giving notifyFormat=JSON"
 echo "================================================"
-url="/NGSI10/subscribeContext?notifyFormat=JSON"
+url="/v1/subscribeContext?notifyFormat=JSON"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -91,7 +91,7 @@ echo
 
 echo "3. Subscribe to E/attr3 without notifyFormat and with Accept=application/xml"
 echo "============================================================================"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -119,7 +119,7 @@ echo
 
 echo "4. Subscribe to E/attr4 without notifyFormat and with Accept=application/json"
 echo "============================================================================="
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -166,7 +166,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
@@ -189,7 +189,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
@@ -212,7 +212,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 orionCurl --url "$url" --payload "$payload"
 echo
 echo
@@ -235,7 +235,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 orionCurl --url "$url" --payload "$payload"
 echo
 echo

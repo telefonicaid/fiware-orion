@@ -28,7 +28,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -42,7 +42,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 </queryContextRequest>'
 
 echo "0.0: Add an Entity with UpdateContext:APPEND"
-(curl localhost:${CB_PORT}/NGSI10/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
+(curl localhost:${CB_PORT}/v1/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>

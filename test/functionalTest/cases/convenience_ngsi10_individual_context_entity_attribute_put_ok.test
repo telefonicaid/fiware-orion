@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. create entity +++++"
-url="/NGSI10/contextEntities/Room1"
+url="/v1/contextEntities/Room1"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -53,7 +53,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. put an entity with type +++++"
-url="/NGSI10/contextEntities/Room1/attributes/temperature"
+url="/v1/contextEntities/Room1/attributes/temperature"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextAttributeRequest>
   <type>centigrade</type>
@@ -62,10 +62,10 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 echo "+++++ 3. query +++++"
-orionCurl --url "/ngsi10/contextEntities/Room1"
+orionCurl --url "/v1/contextEntities/Room1"
 
 echo "+++++ 4. put an entity without type +++++"
-url="/NGSI10/contextEntities/Room1/attributes/temperature" 
+url="/v1/contextEntities/Room1/attributes/temperature" 
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextAttributeRequest>
   <contextValue>31</contextValue>
@@ -73,20 +73,20 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 echo "+++++ 5. query again +++++"
-orionCurl --url "/ngsi10/contextEntities/Room1"
+orionCurl --url "/v1/contextEntities/Room1"
 
 echo "+++++ 6. update without type (JSON) +++++"
-url="/NGSI10/contextEntities/Room1/attributes/temperature" 
+url="/v1/contextEntities/Room1/attributes/temperature" 
 payload='{
   "value": "39"
 }'
 orionCurl --url "$url" --payload "$payload" -X "PUT" --json
 
 echo "+++++ 7. query (JSON) +++++"
-orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature" --json
+orionCurl --url "/v1/contextEntities/Room1/attributes/temperature" --json
 
 echo "+++++ 8. update with type (JSON) +++++"
-url="/NGSI10/contextEntities/Room1/attributes/temperature" 
+url="/v1/contextEntities/Room1/attributes/temperature" 
 payload='{
   "type": "Fahrenheit",
   "value": "99"
@@ -94,7 +94,7 @@ payload='{
 orionCurl --url "$url" --payload "$payload" -X "PUT" --json
 
 echo "+++++ 9. query (JSON) +++++"
-orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature" --json
+orionCurl --url "/v1/contextEntities/Room1/attributes/temperature" --json
 
 --REGEXPECT--
 +++++ 1. create entity +++++

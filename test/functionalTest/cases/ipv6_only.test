@@ -36,7 +36,7 @@ echo exit code: $?
 
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -65,7 +65,7 @@ orionCurl --url "$url" --payload "$payload" --host "[::1]" -g
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "3: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

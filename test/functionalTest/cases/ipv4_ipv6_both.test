@@ -37,7 +37,7 @@ echo "2: ++++++++++++++++++++"
 orionCurl --url "/version" --host "127.0.0.1" -g 2> /dev/null
 
 echo "3: ++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -67,7 +67,7 @@ awk -F '<' '{print $1}' | grep -v '^$' )
 orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
 
 echo "4: ++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -96,7 +96,7 @@ SUB_ID_V4=$(echo "$SUB_OUT" | grep subscriptionId | awk -F '>' '{print $2}' | aw
 orionCurl --url "$url" --payload "$payload" --host "127.0.0.1" -g 2> /dev/null
 
 echo "5: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

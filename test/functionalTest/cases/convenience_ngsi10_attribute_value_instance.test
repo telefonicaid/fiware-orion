@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-NGSI10 Convenience PUT Attribute Value Instance
+/v1 Convenience PUT Attribute Value Instance
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -29,7 +29,7 @@ brokerStart CB
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes/A1/left
+url=/v1/contextEntities/E01/attributes/A1/left
 payload='<updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
@@ -44,11 +44,11 @@ payload='<updateContextAttributeRequest>
 orionCurl -X "PUT" --url "$url" --payload "${payload}" 
 
 echo "1: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes/A1/left
+url=/v1/contextEntities/E01/attributes/A1/left
 orionCurl --url "$url"
 
 echo "2: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes
+url=/v1/contextEntities/E01/attributes
 payload='<appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -69,7 +69,7 @@ payload='<appendContextElementRequest>
 orionCurl --url "$url" --payload "${payload}"
 
 echo "3: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes/A1/left
+url=/v1/contextEntities/E01/attributes/A1/left
 payload='<updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
@@ -84,11 +84,11 @@ payload='<updateContextAttributeRequest>
 orionCurl --url "$url" --payload "${payload}" -X "PUT"
 
 echo "4: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes/A1/left
+url=/v1/contextEntities/E01/attributes/A1/left
 orionCurl --url "$url"
 
 echo "5: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes/A1/left
+url=/v1/contextEntities/E01/attributes/A1/left
 payload='<updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
@@ -103,7 +103,7 @@ payload='<updateContextAttributeRequest>
 orionCurl --url "$url" --payload "${payload}"
 
 echo "6: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes/A1/right
+url=/v1/contextEntities/E01/attributes/A1/right
 payload='<updateContextAttributeRequest>
   <type>Room</type>
   <contextValue>10</contextValue>
@@ -118,15 +118,15 @@ payload='<updateContextAttributeRequest>
 orionCurl --url "$url" --payload "${payload}" -X "PUT"
 
 echo "7: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes/A1/right
+url=/v1/contextEntities/E01/attributes/A1/right
 orionCurl --url "$url" -X "DELETE"
 
 echo "8: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes/A1/left
+url=/v1/contextEntities/E01/attributes/A1/left
 orionCurl --url "$url" -X "DELETE"
 
 echo "9: ++++++++++++++++++++"
-url=/ngsi10/contextEntities/E01/attributes/A1/left
+url=/v1/contextEntities/E01/attributes/A1/left
 orionCurl --url "$url"
 
 --REGEXPECT--

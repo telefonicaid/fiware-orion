@@ -27,7 +27,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -49,7 +49,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "1: ++++++++++++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -64,7 +64,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -79,7 +79,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>

@@ -28,7 +28,7 @@ brokerStart CB 0-255
 brokerStart CM 0-255
 
 --SHELL--
-# Do a NGSI10 request to check that the CM does not accept NGSI10 requests
+# Do a /v1 request to check that the CM does not accept /v1 requests
 url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>

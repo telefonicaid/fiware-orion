@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ Point A +++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -62,7 +62,7 @@ echo
 
 
 echo "2: +++++++++ Point B +++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -95,7 +95,7 @@ echo
 
 
 echo "3: +++++++++ Point C +++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -128,7 +128,7 @@ echo
 
 
 echo "4: ++++++++++ Rectangle in: A, B ++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -174,7 +174,7 @@ echo
 
 
 echo "5: ++++++++++ Rectangle in: B, C ++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -220,7 +220,7 @@ echo
 
 
 echo "6: ++++++++++ Triangle in: A ++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -262,7 +262,7 @@ echo
 
 
 echo "7: ++++++++++ Rectangle out: A ++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -309,7 +309,7 @@ echo
 
 
 echo "8: ++++++++++ Triangle out: B, C ++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>

@@ -24,10 +24,10 @@
 # What to test:
 #
 # One convenience operation for each of the 4 special types used in conv ops:
-#  o AppendContextElementResponse    (POST /ngsi10/contextEntities/*/attributes)
-#  o ContextElementResponse          (GET /ngsi10/contextEntities/*)
-#  o UpdateContextElementResponse    (PUT /ngsi10/contextEntities/*)
-#  o ContextAttributeResponse        (GET /ngsi10/contextEntities/*/attributes/*)
+#  o AppendContextElementResponse    (POST /v1/contextEntities/*/attributes)
+#  o ContextElementResponse          (GET /v1/contextEntities/*)
+#  o UpdateContextElementResponse    (PUT /v1/contextEntities/*)
+#  o ContextAttributeResponse        (GET /v1/contextEntities/*/attributes/*)
 #
 
 --NAME--
@@ -37,8 +37,8 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "1. Create E1/A1 using conv op POST /ngsi10/contextEntities/E1/attributes"
-url="/ngsi10/contextEntities/E1/attributes"
+echo "1. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes"
+url="/v1/contextEntities/E1/attributes"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -54,20 +54,20 @@ echo
 echo
 
 
-echo "2. query E1/A1 using conv op GET /ngsi10/contextEntities/E1 (with attributesFormat=object)"
-url="/ngsi10/contextEntities/E1"
+echo "2. query E1/A1 using conv op GET /v1/contextEntities/E1 (with attributesFormat=object)"
+url="/v1/contextEntities/E1"
 orionCurl --url "$url" --urlParams attributesFormat=object --out json
 echo
 echo
 
-echo "3. query E1/A1 using conv op GET /ngsi10/contextEntities/E1 (without attributesFormat=object)"
+echo "3. query E1/A1 using conv op GET /v1/contextEntities/E1 (without attributesFormat=object)"
 orionCurl --url "$url" --out json
 echo
 echo
 
 
-echo "4. Update E1/A1 using conv op PUT /ngsi10/contextEntities/E1/attributes"
-url="/ngsi10/contextEntities/E1"
+echo "4. Update E1/A1 using conv op PUT /v1/contextEntities/E1/attributes"
+url="/v1/contextEntities/E1"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -84,22 +84,22 @@ echo
 echo
 
 
-echo "5. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (with attributesFormat=object)"
-url="/ngsi10/contextEntities/E1/attributes/A1"
+echo "5. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (with attributesFormat=object)"
+url="/v1/contextEntities/E1/attributes/A1"
 orionCurl --url "$url" --urlParams attributesFormat=object --out json
 echo
 echo
 
 
-echo "6. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (without attributesFormat=object)"
-url="/ngsi10/contextEntities/E1/attributes/A1"
+echo "6. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (without attributesFormat=object)"
+url="/v1/contextEntities/E1/attributes/A1"
 orionCurl --url "$url" --out json
 echo
 echo
 
 
 --REGEXPECT--
-1. Create E1/A1 using conv op POST /ngsi10/contextEntities/E1/attributes
+1. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes
 HTTP/1.1 200 OK
 Content-Length: 239
 Content-Type: application/json
@@ -123,7 +123,7 @@ Date: REGEX(.*)
 }
 
 
-2. query E1/A1 using conv op GET /ngsi10/contextEntities/E1 (with attributesFormat=object)
+2. query E1/A1 using conv op GET /v1/contextEntities/E1 (with attributesFormat=object)
 HTTP/1.1 200 OK
 Content-Length: 259
 Content-Type: application/json
@@ -148,7 +148,7 @@ Date: REGEX(.*)
 }
 
 
-3. query E1/A1 using conv op GET /ngsi10/contextEntities/E1 (without attributesFormat=object)
+3. query E1/A1 using conv op GET /v1/contextEntities/E1 (without attributesFormat=object)
 HTTP/1.1 200 OK
 Content-Length: 275
 Content-Type: application/json
@@ -174,7 +174,7 @@ Date: REGEX(.*)
 }
 
 
-4. Update E1/A1 using conv op PUT /ngsi10/contextEntities/E1/attributes
+4. Update E1/A1 using conv op PUT /v1/contextEntities/E1/attributes
 HTTP/1.1 200 OK
 Content-Length: 239
 Content-Type: application/json
@@ -198,7 +198,7 @@ Date: REGEX(.*)
 }
 
 
-5. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (with attributesFormat=object)
+5. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (with attributesFormat=object)
 HTTP/1.1 200 OK
 Content-Length: 160
 Content-Type: application/json
@@ -218,7 +218,7 @@ Date: REGEX(.*)
 }
 
 
-6. query E1/A1 using conv op GET /ngsi10/contextEntities/E1/attributes/A1 (without attributesFormat=object)
+6. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (without attributesFormat=object)
 HTTP/1.1 200 OK
 Content-Length: 174
 Content-Type: application/json

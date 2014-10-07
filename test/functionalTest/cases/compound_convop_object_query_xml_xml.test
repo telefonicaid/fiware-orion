@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create object compound +++++++++++"
-url="/NGSI10/contextEntities/EObject"
+url="/v1/contextEntities/EObject"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -51,7 +51,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++ query for object compound in XML ++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>

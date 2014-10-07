@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-NGSI10 Convenience Subscriptions
+/v1 Convenience Subscriptions
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -29,7 +29,7 @@ brokerStart CB
 --SHELL--
 # 1. Create a subscription
 echo "1: ++++++++++++++++++++"
-url="/NGSI10/contextSubscriptions"
+url="/v1/contextSubscriptions"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -59,7 +59,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk
 
 # 2. Update the subscription
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/contextSubscriptions/$SUB_ID" 
+url="/v1/contextSubscriptions/$SUB_ID" 
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
@@ -70,11 +70,11 @@ orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 # 3. Delete the subscription
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextSubscriptions/$SUB_ID" -X "DELETE"
+orionCurl --url "/v1/contextSubscriptions/$SUB_ID" -X "DELETE"
 
 # 4. Bad verb
 echo "4: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextSubscriptions/$SUB_ID" -X "DELETE2"
+orionCurl --url "/v1/contextSubscriptions/$SUB_ID" -X "DELETE2"
 
 echo "5: ++++++++++++++++++++"
 --REGEXPECT--

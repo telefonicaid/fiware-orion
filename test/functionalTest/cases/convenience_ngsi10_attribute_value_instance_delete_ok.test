@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. creating base entity +++++"
-url="/NGSI10/contextEntities/Room1"
+url="/v1/contextEntities/Room1"
 payload='{
   "attributes" : [
   {
@@ -61,10 +61,10 @@ payload='{
 orionCurl --url "$url" --payload "$payload" --json
 
 echo "+++++ 2. delete an attribute by valueID +++++"
-orionCurl --url "/ngsi10/contextEntities/Room1/attributes/temperature/ground" -X "DELETE" --json
+orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground" -X "DELETE" --json
 
 echo "+++++ 3. lookup the entity +++++"
-orionCurl --url "/NGSI10/contextEntities/Room1" --json
+orionCurl --url "/v1/contextEntities/Room1" --json
 
 --REGEXPECT--
 +++++ 1. creating base entity +++++

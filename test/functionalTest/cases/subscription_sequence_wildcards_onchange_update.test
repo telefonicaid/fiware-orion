@@ -29,7 +29,7 @@ accumulatorStart
 
 --SHELL--
 
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -62,7 +62,7 @@ echo
 sleep 1
 
 echo "1: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -89,7 +89,7 @@ echo
 sleep 0.5s
 
 echo "2: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -116,7 +116,7 @@ echo
 sleep 0.5s
 
 echo "3: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -143,7 +143,7 @@ echo
 sleep 0.5s
 
 echo "4: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -167,7 +167,7 @@ echo
 
 
 echo "5: ++++++++++++++++++++"
-url=/NGSI10/unsubscribeContext
+url=/v1/unsubscribeContext
 payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>

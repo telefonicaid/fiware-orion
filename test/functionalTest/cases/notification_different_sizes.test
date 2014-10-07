@@ -39,7 +39,7 @@ dbInsertEntity testharness E4 840000
 --SHELL--
 
 # Close to the static buffer limit (~19 KB)
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -65,7 +65,7 @@ echo
 sleep 1
 echo "1: ++++++++++++++++++++"
 # Passing the static buffer limit (~21 KB)
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -92,7 +92,7 @@ echo
 sleep 1
 echo "2: ++++++++++++++++++++"
 # Close to the dynamic buffer limit (~7.9 MB)
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -119,7 +119,7 @@ echo
 sleep 1
 echo "3: ++++++++++++++++++++"
 # Passing the dynamic buffer limit, causing an error (~8.1 MB)
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>

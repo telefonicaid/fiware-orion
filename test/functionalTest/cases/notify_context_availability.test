@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-url="/NGSI9/notifyContextAvailability"
+url="/v1/registry/notifyContextAvailability"
 payload='<?xml version="1.0"?>
 <notifyContextAvailabilityRequest>
   <subscriptionId>51307b66f481db11bf860001</subscriptionId>
@@ -60,7 +60,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>

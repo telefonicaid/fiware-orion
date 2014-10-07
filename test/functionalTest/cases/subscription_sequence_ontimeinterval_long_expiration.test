@@ -29,7 +29,7 @@ accumulatorStart
 
 --SHELL--
 
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -57,7 +57,7 @@ sleep 0.5s
 
 #Subscribe for a LONG period of time (99 years - should give overflow in an int)
 echo "1: ++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
