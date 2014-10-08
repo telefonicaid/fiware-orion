@@ -28,7 +28,6 @@ brokerStart CB
 
 --SHELL--
 
-url=/v1/registry/registerContext
 curl localhost:${CB_PORT}/v1/registry/registerContext --header "Content-Length: 0" -X POST 2> /dev/null | xmllint --format -
 
 --REGEXPECT--
