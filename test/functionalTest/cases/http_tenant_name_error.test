@@ -77,7 +77,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <registrationId></registrationId>
   </registerContextRequest>'
 
-URL="/NGSI9/registerContext"
+URL="/v1/registry/registerContext"
 
 # 1. OK
 echo "1: ++++++++++"

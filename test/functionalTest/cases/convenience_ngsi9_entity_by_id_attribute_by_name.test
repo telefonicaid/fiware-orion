@@ -29,10 +29,10 @@ brokerStart CB
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextEntities/entity01/attributes/attr01"
+orionCurl --url "/v1/registry/contextEntities/entity01/attributes/attr01"
 
 echo "1: ++++++++++++++++++++"
-url="/NGSI9/contextEntities/entity01/attributes/attr01"
+url="/v1/registry/contextEntities/entity01/attributes/attr01"
 payload='<?xml version="1.0"?>
 <registerProviderRequest>
   <metadata>
@@ -53,7 +53,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextEntities/entity01/attributes/attr01"
+orionCurl --url "/v1/registry/contextEntities/entity01/attributes/attr01"
 
 --REGEXPECT--
 0: ++++++++++++++++++++

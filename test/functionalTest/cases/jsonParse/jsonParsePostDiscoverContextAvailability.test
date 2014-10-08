@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ Starting +++++++++++++++"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='{
   "contextRegistrations": [
     {
@@ -74,7 +74,7 @@ orionCurl --url ${url} --payload "${payload}" --json
 
 echo "+++++ Registration 1 Done +++++++++++++++"
 
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='{
   "entities": [
     {
@@ -111,7 +111,7 @@ orionCurl --url ${url} --payload "${payload}" --json
 echo "+++++ Discovery 1 Done +++++++++++++++"
 echo "+++++ Register 2: two attributes in vector +++++++++++++++"
 
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='{
   "contextRegistrations": [
     {
@@ -164,7 +164,7 @@ orionCurl --url ${url} --payload "${payload}" --json
 
 echo "+++++ Registration 2 Done +++++++++++++++"
 
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='{
   "entities": [
     {

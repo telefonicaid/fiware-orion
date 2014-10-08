@@ -31,7 +31,7 @@ brokerStart CB 0-255 IPV4 -multiservice
 --SHELL--
 echo "1. Register entity E with HTTP-Tenant t_01"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -61,7 +61,7 @@ echo
 
 echo "2. Register entity E with HTTP-Tenant t_02"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -91,7 +91,7 @@ echo
 
 echo "3. Discover entity E with HTTP-Tenant t_01"
 echo "++++++++++++++++++++++++++++++++++++++++++++"
-url="/ngsi9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <discoverContextAvailabilityRequest>
   <entityIdList>
@@ -107,7 +107,7 @@ echo
 
 echo "4. Discover entity E with HTTP-Tenant t_02"
 echo "++++++++++++++++++++++++++++++++++++++++++++"
-url="/ngsi9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <discoverContextAvailabilityRequest>
   <entityIdList>

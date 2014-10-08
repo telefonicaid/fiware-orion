@@ -27,7 +27,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/NGSI10/unsubscribeContext"
+url="/v1/unsubscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>
@@ -36,7 +36,7 @@ orionCurl --url "$url" --payload "${payload}"
 
 echo "2: ***********************************"
 
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -82,7 +82,7 @@ orionCurl --url "$url" --payload "${payload}"
 subscriptionId=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "3: ***********************************"
-url="/NGSI10/unsubscribeContext"
+url="/v1/unsubscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$subscriptionId'</subscriptionId>

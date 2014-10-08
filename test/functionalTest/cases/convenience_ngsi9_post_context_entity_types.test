@@ -29,7 +29,7 @@ brokerStart CB
 --SHELL--
 
 echo "0: ++++++++++++++++++++"
-url="/NGSI9/contextEntityTypes/Room"
+url="/v1/registry/contextEntityTypes/Room"
 payload='<registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -51,7 +51,7 @@ orionCurl --url "$url" --payload "$payload"
 REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$')
 
 echo "1: ++++++++++++++++++++"
-url="/NGSI9/contextEntityTypes/Room"
+url="/v1/registry/contextEntityTypes/Room"
 payload='<registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -72,7 +72,7 @@ payload='<registerProviderRequest>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI9/contextEntityTypes/Room"
+url="/v1/registry/contextEntityTypes/Room"
 payload='<registerProviderRequest>
   <metadata>
     <contextMetadata>
@@ -93,7 +93,7 @@ payload='<registerProviderRequest>
 orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextEntityTypes/Room"
+orionCurl --url "/v1/registry/contextEntityTypes/Room"
 
 --REGEXPECT--
 0: ++++++++++++++++++++

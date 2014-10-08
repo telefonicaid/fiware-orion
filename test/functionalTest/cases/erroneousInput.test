@@ -31,7 +31,7 @@ brokerStart CB
 echo "0: ++++++++++++++++++++"
 orionCurl --url "/NGSI8/contextEntities/entity01"
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/nothingAtAll"
+orionCurl --url "/v1/registry/nothingAtAll"
 
 --REGEXPECT--
 0: ++++++++++++++++++++
@@ -56,7 +56,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>ngsi9 service '/NGSI9/nothingAtAll' not found</details>
+  <details>service '/v1/registry/nothingAtAll' not found</details>
 </orionError>
 --TEARDOWN--
 brokerStop CB

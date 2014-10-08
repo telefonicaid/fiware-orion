@@ -52,7 +52,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url '/ngsi10/updateContext' --payload "$payload"
+orionCurl --url '/v1/updateContext' --payload "$payload"
 echo
 echo
 

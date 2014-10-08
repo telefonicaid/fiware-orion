@@ -27,7 +27,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -59,7 +59,7 @@ REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk
 echo "1: ++++++++++++++++++++"
 
 # Do a discover context availability just after the registration (it works)
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>
@@ -80,7 +80,7 @@ echo "2: ++++++++++++++++++++"
 
 # Do a discover context availability passed the expiration period (no result)
 sleep 6s
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0"?>
   <discoverContextAvailabilityRequest>
     <entityIdList>

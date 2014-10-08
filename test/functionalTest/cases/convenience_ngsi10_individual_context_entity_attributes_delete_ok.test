@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. create an entity +++++"
-url="/NGSI10/contextEntities/entity01"
+url="/v1/contextEntities/entity01"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -44,13 +44,13 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. lookup the entity +++++"
-orionCurl --url "/NGSI10/contextEntities/entity01"
+orionCurl --url "/v1/contextEntities/entity01"
 
 echo "+++++ 3. delete the entity +++++"
-orionCurl --url "/NGSI10/contextEntities/entity01/attributes" -X "DELETE"
+orionCurl --url "/v1/contextEntities/entity01/attributes" -X "DELETE"
 
 echo "+++++ 4. lookup the entity, but nothing found, as the entity has been just deleted +++++"
-orionCurl --url "/NGSI10/contextEntities/entity01"
+orionCurl --url "/v1/contextEntities/entity01"
 
 --REGEXPECT--
 +++++ 1. create an entity +++++

@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 echo "0: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -60,7 +60,7 @@ orionCurl --url "$url" --payload "$payload"
 
 echo "1: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

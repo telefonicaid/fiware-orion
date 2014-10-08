@@ -29,7 +29,7 @@ brokerStart CB 0-1
 --SHELL--
 #   5. ok:  contextValue is a vector with one item
 echo "5: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

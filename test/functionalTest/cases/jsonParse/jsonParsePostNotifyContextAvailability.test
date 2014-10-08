@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: ***********************************"
-url="/NGSI9/notifyContextAvailability"
+url="/v1/registry/notifyContextAvailability"
 payload='{
   "subscriptionId": "012345678901234567890123",
   "contextRegistrationResponses": [

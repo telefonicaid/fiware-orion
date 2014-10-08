@@ -30,7 +30,7 @@ accumulatorStart
 
 --SHELL--
 
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -54,7 +54,7 @@ echo
 
 
 echo "1: ++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -84,7 +84,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk
 sleep 5
 
 echo "2: ++++++++++++++++++++"
-url=/NGSI10/updateContextSubscription
+url=/v1/updateContextSubscription
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>PT10M</duration>
@@ -104,7 +104,7 @@ orionCurl --url "$url" --payload "$payload"
 sleep 9
 
 echo "3: ++++++++++++++++++++"
-url=/NGSI10/updateContextSubscription
+url=/v1/updateContextSubscription
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>PT10M</duration>
@@ -127,7 +127,7 @@ sleep 21
 
 
 echo "4: ++++++++++++++++++++"
-url=/NGSI10/updateContextSubscription
+url=/v1/updateContextSubscription
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>PT10M</duration>
@@ -147,7 +147,7 @@ orionCurl --url "$url" --payload "$payload"
 sleep 5
 
 echo "5: ++++++++++++++++++++"
-url=/NGSI10/updateContextSubscription
+url=/v1/updateContextSubscription
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
@@ -167,7 +167,7 @@ orionCurl --url "$url" --payload "$payload"
 sleep 26
 
 echo "6: ++++++++++++++++++++"
-url=/NGSI10/updateContextSubscription
+url=/v1/updateContextSubscription
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
@@ -186,7 +186,7 @@ echo Notification count from mongo:
 mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "7: ++++++++++++++++++++"
-url=/NGSI10/unsubscribeContext
+url=/v1/unsubscribeContext
 payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>

@@ -27,73 +27,73 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url='/NGSI9/registerContext'
+url='/v1/registry/registerContext'
 payload='<?xml version="1.0"?>
 <discoverContextAvailabilityRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "1: ++++++++++++++++++++"
 
-url='/NGSI9/discoverContextAvailability'
+url='/v1/registry/discoverContextAvailability'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "2: ++++++++++++++++++++"
 
-url='/NGSI9/subscribeContextAvailability'
+url='/v1/registry/subscribeContextAvailability'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "3: ++++++++++++++++++++"
 
-url='/NGSI9/updateContextAvailabilitySubscription'
+url='/v1/registry/updateContextAvailabilitySubscription'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "4: ++++++++++++++++++++"
 
-url='/NGSI9/unsubscribeContextAvailability'
+url='/v1/registry/unsubscribeContextAvailability'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "5: ++++++++++++++++++++"
 
-url='/NGSI10/queryContext'
+url='/v1/queryContext'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "6: ++++++++++++++++++++"
 
-url='/NGSI10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "7: ++++++++++++++++++++"
 
-url='/NGSI10/subscribeContext'
+url='/v1/subscribeContext'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "8: ++++++++++++++++++++"
 
-url='/NGSI10/updateContextSubscription'
+url='/v1/updateContextSubscription'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "9: ++++++++++++++++++++"
 
-url='/NGSI10/unsubscribeContext'
+url='/v1/unsubscribeContext'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "10: ++++++++++++++++++++"
 
-url='/NGSI9/notSupportedRequest'
+url='/v1/registry/notSupportedRequest'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
 echo "11: ++++++++++++++++++++"
 
-url='/NGSI10/notSupportedRequest'
+url='/v1/notSupportedRequest'
 payload='<?xml version="1.0"?>
 <registerContextRequest/>'
 orionCurl --url "$url" --payload "${payload}"
@@ -265,11 +265,11 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>ngsi9 service '/NGSI9/notSupportedRequest' not found</details>
+  <details>service '/v1/registry/notSupportedRequest' not found</details>
 </orionError>
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 165
+Content-Length: 154
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -277,7 +277,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>ngsi10 service '/NGSI10/notSupportedRequest' not found</details>
+  <details>service '/v1/notSupportedRequest' not found</details>
 </orionError>
 12: ++++++++++++++++++++
 HTTP/1.1 200 OK

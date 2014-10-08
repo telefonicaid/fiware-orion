@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-url="/NGSI10/contextEntities/EVector"
+url="/v1/contextEntities/EVector"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -55,7 +55,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: +++++++++ create object compound +++++++++++"
-url="/NGSI10/contextEntities/EObject"
+url="/v1/contextEntities/EObject"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -78,16 +78,16 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++ query for vector compound in XML convop ++++++++++"
-orionCurl --url "/ngsi10/contextEntities/EVector"
+orionCurl --url "/v1/contextEntities/EVector"
 
 echo "4: ++++++++++ query for object compound in XML convop ++++++++++"
-orionCurl --url "/ngsi10/contextEntities/EObject"
+orionCurl --url "/v1/contextEntities/EObject"
 
 echo "5: ++++++++++ query for vector compound in JSON convop ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EVector" --json
+orionCurl --url "/v1/contextEntities/EVector" --json
 
 echo "6: ++++++++++ query for object compound in JSON convop ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EObject" --json
+orionCurl --url "/v1/contextEntities/EObject" --json
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++

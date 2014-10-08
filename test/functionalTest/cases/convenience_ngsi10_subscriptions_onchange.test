@@ -28,7 +28,7 @@ brokerStart CB
 accumulatorStart
 
 --SHELL--
-url="/NGSI10/contextSubscriptions"
+url="/v1/contextSubscriptions"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -59,7 +59,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk
 echo SUB_ID: $SUB_ID > /tmp/SUB_ID
 
 echo "1: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -89,7 +89,7 @@ orionCurl --url "$url" --payload "$payload"
 mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -119,7 +119,7 @@ orionCurl --url "$url" --payload "$payload"
 mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "3: ++++++++++++++++++++"
-url="/NGSI10/contextSubscriptions/${SUB_ID}"
+url="/v1/contextSubscriptions/${SUB_ID}"
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P1Y</duration>
@@ -136,7 +136,7 @@ echo "4: ++++++++++++++++++++"
 #Wait sleep >6s to reset the throttling interval
 sleep 10
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -166,7 +166,7 @@ orionCurl --url "$url" --payload "$payload"
 mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "5: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -196,7 +196,7 @@ echo "6: ++++++++++++++++++++"
 #Wait sleep >6s to reset the throttling interval
 sleep 10
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -221,7 +221,7 @@ orionCurl --url "$url" --payload "$payload"
 mongoCmd ${CB_DATABASE_NAME} "db.csubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_id: 0, count: 1})"
 
 echo "7: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -244,10 +244,10 @@ orionCurl --url "$url" --payload "$payload"
 
 echo "8: ++++++++++++++++++++"
 echo SUB_ID: ${SUB_ID} >> /tmp/SUB_ID
-orionCurl --url "/NGSI10/contextSubscriptions/${SUB_ID}" -X "DELETE"
+orionCurl --url "/v1/contextSubscriptions/${SUB_ID}" -X "DELETE"
 
 echo "9: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

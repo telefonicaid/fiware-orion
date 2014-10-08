@@ -28,7 +28,7 @@ brokerStart CB
 accumulatorStart
 
 --SHELL--
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -51,7 +51,7 @@ orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "1: ++++++++++++++++++++"
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -74,7 +74,7 @@ orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -107,7 +107,7 @@ echo
 sleep 11
 
 echo "3: ++++++++++++++++++++"
-url=/NGSI10/unsubscribeContext
+url=/v1/unsubscribeContext
 payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>
