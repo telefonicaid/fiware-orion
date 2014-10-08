@@ -157,26 +157,35 @@ Using these interfaces, clients can do several operations:
 %files -n %{name}-fiware
 
 %preun
-/etc/init.d/%{name} stop
-/sbin/chkconfig --del %{name}
+if [ "$1" == "0" ]; then
+  /etc/init.d/%{name} stop
+  /sbin/chkconfig --del %{name}
+fi
 
 %preun tests
 
 %preun -n %{name}-fiware
-/etc/init.d/%{name} stop
-/sbin/chkconfig --del %{name}
+if [ "$1" == "0" ]; then
+  /etc/init.d/%{name} stop
+  /sbin/chkconfig --del %{name}
+fi
 
 %postun 
-rm -rf  /usr/share/contextBroker
-/usr/sbin/userdel -f %{owner}
+if [ "$1" == "0" ]; then
+  rm -rf  /usr/share/contextBroker
+  /usr/sbin/userdel -f %{owner}
+fi
 
 %postun tests
-rm -rf  /usr/share/contextBroker/tests
+if [ "$1" == "0" ]; then
+  rm -rf  /usr/share/contextBroker/tests
+fi
 
 %postun -n %{name}-fiware
-rm -rf  /usr/share/contextBroker
-/usr/sbin/userdel -f %{owner}
-
+if [ "$1" == "0" ]; then
+  rm -rf  /usr/share/contextBroker
+  /usr/sbin/userdel -f %{owner}
+fi
 
 %changelog
 * Wed Oct 01 2014 Fermin Galan <fermin@tid.es> 0.15.0-1 (FIWARE-3.5.3-1)
