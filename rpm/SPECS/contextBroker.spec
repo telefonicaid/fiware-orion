@@ -157,7 +157,7 @@ Using these interfaces, clients can do several operations:
 %files -n %{name}-fiware
 
 %preun
-if [ $1 = 0 ]; then
+if [ "$1" == "0" ]; then
   /etc/init.d/%{name} stop
   /sbin/chkconfig --del %{name}
 fi
@@ -165,24 +165,24 @@ fi
 %preun tests
 
 %preun -n %{name}-fiware
-if [ $1 = 0 ]; then
+if [ "$1" == "0" ]; then
   /etc/init.d/%{name} stop
   /sbin/chkconfig --del %{name}
 fi
 
 %postun 
-if [ $1 = 0 ]; then
+if [ "$1" == "0" ]; then
   rm -rf  /usr/share/contextBroker
   /usr/sbin/userdel -f %{owner}
 fi
 
 %postun tests
-if [ $1 = 0 ]; then
+if [ "$1" == "0" ]; then
   rm -rf  /usr/share/contextBroker/tests
 fi
 
 %postun -n %{name}-fiware
-if [ $1 = 0 ]; then
+if [ "$1" == "0" ]; then
   rm -rf  /usr/share/contextBroker
   /usr/sbin/userdel -f %{owner}
 fi
