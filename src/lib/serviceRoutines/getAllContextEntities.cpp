@@ -48,8 +48,12 @@ std::string getAllContextEntities
 {
   QueryContextRequest*  reqP = &parseDataP->qcr.res;
   EntityId*             eP   = new EntityId(".*", "", "true");
+  std::string           res;
 
   reqP->entityIdVector.push_back(eP);
 
-  return postQueryContext(ciP, components, compV, parseDataP);
+  res = postQueryContext(ciP, components, compV, parseDataP);
+  delete eP;
+
+  return res;
 }
