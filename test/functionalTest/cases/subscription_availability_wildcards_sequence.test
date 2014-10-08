@@ -28,7 +28,7 @@ brokerStart CB
 accumulatorStart
 
 --SHELL--
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -57,7 +57,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "${payload}"
 
 echo "1: ++++++++++++++++++++"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -86,7 +86,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "${payload}"
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI9/subscribeContextAvailability"
+url="/v1/registry/subscribeContextAvailability"
 payload='<?xml version="1.0"?>
 <subscribeContextAvailabilityRequest>
         <entityIdList>
@@ -106,7 +106,7 @@ orionCurl --url "$url" --payload "${payload}"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "3: ++++++++++++++++++++"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -132,7 +132,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "${payload}"
 
 echo "4: ++++++++++++++++++++"
-url="/NGSI9/updateContextAvailabilitySubscription"
+url="/v1/registry/updateContextAvailabilitySubscription"
 payload='<?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionRequest>
         <entityIdList>
@@ -151,7 +151,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "${payload}"
 
 echo "5: ++++++++++++++++++++"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -177,7 +177,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "${payload}"
 
 echo "6: ++++++++++++++++++++"
-url="/NGSI9/unsubscribeContextAvailability"
+url="/v1/registry/unsubscribeContextAvailability"
 payload='<?xml version="1.0"?>
 <unsubscribeContextAvailabilityRequest>
         <subscriptionId>'$SUB_ID'</subscriptionId>

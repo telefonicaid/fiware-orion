@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "0: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
   "contextElements": [
   {
@@ -57,7 +57,7 @@ payload='{
 orionCurl --url "$url" --payload "$payload" --json
 
 echo "1: ++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='{
     "entities": [
         {
@@ -99,7 +99,7 @@ payload='{
 orionCurl --url "$url" --payload "$payload" --json
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='{
     "entities": [
         {

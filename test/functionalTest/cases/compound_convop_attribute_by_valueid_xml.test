@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-url="/NGSI10/contextEntities/EVector"
+url="/v1/contextEntities/EVector"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -87,7 +87,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: +++++++++ create object compound +++++++++++"
-url="/NGSI10/contextEntities/EObject"
+url="/v1/contextEntities/EObject"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -138,16 +138,16 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EVector/attributes/A/ground"
+orionCurl --url "/v1/contextEntities/EVector/attributes/A/ground"
 
 echo "4: ++++++++++ query for vector compound by valueID 'wall' ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EVector/attributes/A/wall"
+orionCurl --url "/v1/contextEntities/EVector/attributes/A/wall"
 
 echo "5: ++++++++++ query for object compound by valueID 'ground' ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EObject/attributes/A/ground"
+orionCurl --url "/v1/contextEntities/EObject/attributes/A/ground"
 
 echo "6: ++++++++++ query for object compound by valueID 'wall' ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EObject/attributes/A/wall"
+orionCurl --url "/v1/contextEntities/EObject/attributes/A/wall"
 
 
 --REGEXPECT--

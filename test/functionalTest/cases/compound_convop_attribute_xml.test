@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-url="/NGSI10/contextEntities/EVector"
+url="/v1/contextEntities/EVector"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -87,7 +87,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "2: +++++++++ create object compound +++++++++++"
-url="/NGSI10/contextEntities/EObject"
+url="/v1/contextEntities/EObject"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -138,10 +138,10 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++ query for vector compound by attribute ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EVector/attributes/att"
+orionCurl --url "/v1/contextEntities/EVector/attributes/att"
 
 echo "4: ++++++++++ query for object compound by attribute ++++++++++"
-orionCurl --url "/NGSI10/contextEntities/EVector/attributes/att"
+orionCurl --url "/v1/contextEntities/EVector/attributes/att"
 
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++

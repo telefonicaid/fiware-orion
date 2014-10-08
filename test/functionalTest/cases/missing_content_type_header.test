@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -41,7 +41,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload" --in " "
 
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -56,7 +56,7 @@ orionCurl --url "$url" --payload "$payload" --in "application/x-www-form-encoded
 
 echo "3: ++++++++++++++++++++"
 # Check that the ending "; charset=..." works (for XML)
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -71,7 +71,7 @@ orionCurl --url "$url" --payload "$payload" --in "application/xml; charset=UTF-8
 
 echo "4: ++++++++++++++++++++"
 # Check that the ending "; charset=..." works (for JSON)
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='{
   "entities": [
     {

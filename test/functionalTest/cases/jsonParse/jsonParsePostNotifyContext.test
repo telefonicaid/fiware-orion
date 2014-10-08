@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: ***********************************"
-url="/NGSI10/notifyContext"
+url="/v1/notifyContext"
 payload='{
   "subscriptionId": "012345678901234567890123",
   "originator": "http://localhost/test",

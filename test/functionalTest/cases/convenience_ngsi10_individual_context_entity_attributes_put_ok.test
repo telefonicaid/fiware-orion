@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. Create an entity +++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -56,7 +56,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. add to the entity +++++"
-url="/NGSI10/contextEntities/entity01/attributes"
+url="/v1/contextEntities/entity01/attributes"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>

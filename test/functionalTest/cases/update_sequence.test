@@ -27,7 +27,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -49,7 +49,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "1: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -83,7 +83,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "2: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -105,7 +105,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "3: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -139,7 +139,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "4: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -161,7 +161,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "5: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -183,7 +183,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "6: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -217,7 +217,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "7: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -239,7 +239,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "8: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -261,7 +261,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "9: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -283,7 +283,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "10: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -305,7 +305,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "11: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -327,7 +327,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "12: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -349,7 +349,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "13: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -383,7 +383,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "14: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -405,7 +405,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "15: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -432,7 +432,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "16: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -459,7 +459,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 echo "17: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>

@@ -27,7 +27,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/NGSI10/notifyContext"
+url="/v1/notifyContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <notifyContextRequest>
   <subscriptionId>012345678901234567890123</subscriptionId>

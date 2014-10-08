@@ -27,7 +27,7 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/ngsi10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
   <registerContextRequest>
     <contextRegistrationList>

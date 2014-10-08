@@ -29,7 +29,7 @@ brokerStart CB 0-1
 --SHELL--
 #   7. err: contextValue is a vector with five items + one item with a bad name
 echo "7: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

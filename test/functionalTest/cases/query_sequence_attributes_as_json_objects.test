@@ -38,7 +38,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: Append entity E1 with two different attributes A1 and A2"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -67,7 +67,7 @@ echo
 echo
 
 echo "2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -85,7 +85,7 @@ echo
 echo
 
 echo "3. Append entity E2 with two attributes with identical names 'A3', but different meta IDs"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -128,7 +128,7 @@ echo
 echo
 
 echo "4. Normal Query for the entity E2 for attribute A3 - both attributes are returned"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
@@ -145,7 +145,7 @@ echo
 echo
 
 echo "5. JsonAttributeObjectQuery Query for the entity E2 for attribute A3 - only one attribute is returned"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>

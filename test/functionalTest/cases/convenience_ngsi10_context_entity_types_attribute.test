@@ -30,11 +30,11 @@ brokerStart CB
 
 # query for all entities of type "Room"
 echo "1: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/temperature"
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature"
 
 # Add an entity of type Room, with one attribute: 'temperature'
 echo "2: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -63,11 +63,11 @@ orionCurl --url "$url" --payload "$payload"
 
 # query for all entities of type "Room", attribute 'temperature'
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/temperature"
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature"
 
 # Add another attribute for entity ConferenceRoom - 'pressure'
 echo "4: ++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<updateContextRequest>
   <contextElementList>
     <contextElement>
@@ -96,19 +96,19 @@ orionCurl --url "$url" --payload "$payload"
 
 # Now, query again for entities of type "Room", attribute 'temperature', making sure attribute 'pressure' isn't found
 echo "5: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/temperature"
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature"
 
 # And, query for entities of type "Room", attribute 'pressure' ...
 echo "6: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/pressure"
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/pressure"
 
 # query for all entities of type "Room2", attribute 'temperature'
 echo "7: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room2/attributes/temperature"
+orionCurl --url "/v1/contextEntityTypes/Room2/attributes/temperature"
 
 # DELETE is not allowed
 echo "8: ++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
+orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
 
 --REGEXPECT--
 1: ++++++++++++++++++++

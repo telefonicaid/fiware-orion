@@ -33,7 +33,7 @@ brokerStart CB 0-255 IPV4 "$extraParams"
 # Register a Sensor of temperature
 #
 echo "+++ 1: Register a Sensor of temperature"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
 <registerContextRequest>
   <contextRegistrationList>
@@ -63,7 +63,7 @@ echo
 # Discovery
 #
 echo "+++ 2: Discover the Sensor of temperature"
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='<?xml version="1.0"?>
 <discoverContextAvailabilityRequest>
   <entityIdList>

@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: Append entity E1 with two different attributes A1 and A2, with compound values"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -67,7 +67,7 @@ echo
 echo
 
 echo "2. JsonAttributeObjectQuery for the entity E1 for attributes A1 and A2, with compound values"
-url="/NGSI10/queryContext"
+url="/v1/queryContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>

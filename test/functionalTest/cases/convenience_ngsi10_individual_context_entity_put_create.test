@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. put an entity +++++"
-url="/NGSI10/contextEntities/entity01"
+url="/v1/contextEntities/entity01"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -49,7 +49,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 echo "+++++ 2. create the entity +++++"
-url="/NGSI10/contextEntities/entity01"
+url="/v1/contextEntities/entity01"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -69,7 +69,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 3. put an entity +++++"
-url="/NGSI10/contextEntities/entity01"
+url="/v1/contextEntities/entity01"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>

@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++ create vector compound +++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {

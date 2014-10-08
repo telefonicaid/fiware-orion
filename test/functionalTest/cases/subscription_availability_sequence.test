@@ -30,7 +30,7 @@ accumulatorStart
 
 --SHELL--
 
-url=/NGSI9/registerContext
+url=/v1/registry/registerContext
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -58,7 +58,7 @@ echo
 
 
 echo "1: ++++++++++++++++++++"
-SUB_OUT=$((curl localhost:${CB_PORT}/NGSI9/subscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
+SUB_OUT=$((curl localhost:${CB_PORT}/v1/registry/subscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- 2> /dev/null | xmllint --format -) <<EOF
 <?xml version="1.0"?>
 <subscribeContextAvailabilityRequest>
   <entityIdList>
@@ -87,7 +87,7 @@ mongoCmd ${CB_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_
 echo
 
 echo "2: ++++++++++++++++++++"
-url=/NGSI9/registerContext
+url=/v1/registry/registerContext
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -118,7 +118,7 @@ mongoCmd ${CB_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_
 echo
 
 echo "3: ++++++++++++++++++++"
-url=/NGSI9/registerContext
+url=/v1/registry/registerContext
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -145,7 +145,7 @@ orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "4: ++++++++++++++++++++"
-url=/NGSI9/updateContextAvailabilitySubscription
+url=/v1/registry/updateContextAvailabilitySubscription
 payload='<?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionRequest>
   <entityIdList>
@@ -173,7 +173,7 @@ echo
 
 
 echo "5: ++++++++++++++++++++"
-url=/NGSI9/registerContext
+url=/v1/registry/registerContext
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -202,7 +202,7 @@ echo
 
 
 echo "6: ++++++++++++++++++++"
-url=/NGSI9/registerContext
+url=/v1/registry/registerContext
 payload='<?xml version="1.0"?>
 <registerContextRequest>
   <contextRegistrationList>
@@ -234,7 +234,7 @@ mongoCmd ${CB_DATABASE_NAME} "db.casubs.findOne({_id: ObjectId(\"$SUB_ID\")}, {_
 echo
 
 echo "7: ++++++++++++++++++++"
-url=/NGSI9/unsubscribeContextAvailability
+url=/v1/registry/unsubscribeContextAvailability
 payload='<?xml version="1.0"?>
 <unsubscribeContextAvailabilityRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>
@@ -244,7 +244,7 @@ orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "8: ++++++++++++++++++++"
-url=/NGSI9/unsubscribeContextAvailability
+url=/v1/registry/unsubscribeContextAvailability
 payload='<?xml version="1.0"?>
 <unsubscribeContextAvailabilityRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>
@@ -254,7 +254,7 @@ orionCurl --url "$url" --payload "$payload"
 echo
 
 echo "9: ++++++++++++++++++++"
-url=/NGSI9/registerContext
+url=/v1/registry/registerContext
 payload='<?xml version="1.0"?>
 <registerContextRequest>
   <contextRegistrationList>

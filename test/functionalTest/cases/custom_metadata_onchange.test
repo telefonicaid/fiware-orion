@@ -29,7 +29,7 @@ accumulatorStart 127.0.0.1 "$LISTENER_PORT"
 
 --SHELL--
 echo "=== 1. Create ONCHANGE subscription"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='{
     "entities": [
         {
@@ -56,7 +56,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 2. Create an entity with metadata (a notification with metadata is sent)"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {
@@ -90,7 +90,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 3. Change the value (a notification with metadata is sent)"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {
@@ -124,7 +124,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 4. Change the metadata (a notification with metadata is sent)"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {
@@ -158,7 +158,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 5. Change both value and metadata (a notification with metadata is sent)"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {
@@ -192,7 +192,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== 6. Update without changes (no notification is sent)"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='{
     "contextElements": [
         {

@@ -29,7 +29,7 @@ brokerStart CB
 --SHELL--
 # 1. Create a subscription
 echo "1: ++++++++++++++++++++"
-url="/ngsi9/contextAvailabilitySubscriptions"
+url="/v1/registry/contextAvailabilitySubscriptions"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextAvailabilityRequest>
   <entityIdList>
@@ -54,7 +54,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk
 
 # 2. Update the subscription
 echo "2: ++++++++++++++++++++"
-url="/NGSI9/contextAvailabilitySubscriptions/$SUB_ID"
+url="/v1/registry/contextAvailabilitySubscriptions/$SUB_ID"
 payload='<?xml version="1.0"?>
 <updateContextAvailabilitySubscriptionRequest>
 	<entityIdList>
@@ -85,11 +85,11 @@ orionCurl --url "$url" --payload "$payload" -X "PUT"
 
 # 3. Delete the subscription
 echo "3: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE"
+orionCurl --url "/v1/registry/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE"
 
 # 4. Bad verb
 echo "4: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE2"
+orionCurl --url "/v1/registry/contextAvailabilitySubscriptions/$SUB_ID" -X "DELETE2"
 
 echo "5: ++++++++++++++++++++"
 --REGEXPECT--

@@ -28,19 +28,19 @@ brokerStart CB
 
 --SHELL--
 echo "1: +++++++++++++++++++++++++++++"
-orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature/foo/bar" --json
+orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/foo/bar" --json
 
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 186
+Content-Length: 182
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orionError": {
         "code": "400", 
-        "details": "Service not recognized: /NGSI10/contextEntities/Room1/attributes/temperature/foo/bar", 
+        "details": "Service not recognized: /v1/contextEntities/Room1/attributes/temperature/foo/bar", 
         "reasonPhrase": "Bad Request"
     }
 }

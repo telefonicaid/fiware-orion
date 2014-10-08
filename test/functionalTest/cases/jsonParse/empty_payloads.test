@@ -27,40 +27,40 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-orionCurl --url "/NGSI9/registerContext" --payload "{}" --json
+orionCurl --url "/v1/registry/registerContext" --payload "{}" --json
 echo "1: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI9/discoverContextAvailability" --payload "{}" --json
+orionCurl --url "/v1/registry/discoverContextAvailability" --payload "{}" --json
 echo "2: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI9/subscribeContextAvailability" --payload "{}" --json
+orionCurl --url "/v1/registry/subscribeContextAvailability" --payload "{}" --json
 echo "3: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI9/updateContextAvailabilitySubscription" --payload "{}" --json
+orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "{}" --json
 echo "4: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI9/unsubscribeContextAvailability" --payload "{}" --json
+orionCurl --url "/v1/registry/unsubscribeContextAvailability" --payload "{}" --json
 echo "5: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI10/queryContext" --payload "{}" --json
+orionCurl --url "/v1/queryContext" --payload "{}" --json
 echo "6: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI10/updateContext" --payload "{}" --json
+orionCurl --url "/v1/updateContext" --payload "{}" --json
 echo "7: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI10/subscribeContext" --payload "{}" --json
+orionCurl --url "/v1/subscribeContext" --payload "{}" --json
 echo "8: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI10/updateContextSubscription" --payload "{}" --json
+orionCurl --url "/v1/updateContextSubscription" --payload "{}" --json
 echo "9: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI10/unsubscribeContext" --payload "{}" --json
+orionCurl --url "/v1/unsubscribeContext" --payload "{}" --json
 echo "10: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI9/notSupportedRequest" --payload "{}" --json
+orionCurl --url "/v1/registry/notSupportedRequest" --payload "{}" --json
 echo "11: ++++++++++++++++++++"
 
-orionCurl --url "/NGSI10/notSupportedRequest" --payload "{}" --json
+orionCurl --url "/v1/notSupportedRequest" --payload "{}" --json
 echo "12: ++++++++++++++++++++"
 
 orionCurl --url "/notSupportedRequest" --payload "{}" --json
@@ -211,20 +211,20 @@ Date: REGEX(.*)
 {
     "orionError": {
         "code": "400",
-        "details": "ngsi9 service '/NGSI9/notSupportedRequest' not found",
+        "details": "service '/v1/registry/notSupportedRequest' not found",
         "reasonPhrase": "Bad Request"
     }
 }
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 156
+Content-Length: 145
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orionError": {
         "code": "400",
-        "details": "ngsi10 service '/NGSI10/notSupportedRequest' not found",
+        "details": "service '/v1/notSupportedRequest' not found",
         "reasonPhrase": "Bad Request"
     }
 }

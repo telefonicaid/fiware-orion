@@ -29,7 +29,7 @@ brokerStart CB 0-1
 --SHELL--
 #   4. err: Two items with same name in struct 's1' + 's2' + 's1'
 echo "4: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

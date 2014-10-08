@@ -28,14 +28,14 @@ brokerStart CB
 
 --SHELL--
 echo "1: ***********************************"
-url="/NGSI10/unsubscribeContext"
+url="/v1/unsubscribeContext"
 payload='{
   "subscriptionId": "012345678901234567890123"
 }'
 orionCurl --url ${url} --payload "${payload}" --json
 
 echo "2: ***********************************"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='{
   "entities": [
     {
@@ -87,7 +87,7 @@ orionCurl --url ${url} --payload "${payload}" --json
 subscriptionId=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 
 echo "3: ***********************************"
-url="/NGSI10/unsubscribeContext"
+url="/v1/unsubscribeContext"
 payload='{
   "subscriptionId": "'${subscriptionId}'"
 }'

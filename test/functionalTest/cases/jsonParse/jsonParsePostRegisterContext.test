@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: ***********************************"
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='{
   "contextRegistrations": [
     {
