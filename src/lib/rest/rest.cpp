@@ -204,7 +204,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
   else if (strcasecmp(key.c_str(), "fiware-service") == 0)  headerP->tenant         = value;
-  else if (strcasecmp(key.c_str(), "service-path") == 0)
+  else if (strcasecmp(key.c_str(), "fiware-servicepath") == 0)
   {
     headerP->servicePath         = value;
     headerP->servicePathReceived = true;

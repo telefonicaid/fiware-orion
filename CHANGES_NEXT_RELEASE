@@ -1,2 +1,4 @@
 - Add: Adding alternative (preferred) URLs: '/ngsi10' => '/v1' AND '/ngsi9' => '/v1/registry' (Issue #559)
 - Add: New convenience operation '/v1/contextEntities' - to get a list of ALL existing entities (Issue #563)
+- Fix: Upgrading from a previous package caused orion user to disappear.
+- Fix: change service path HTTP header name: 'ServicePath' -> 'Fiware-ServicePath' (Issue #541)
