@@ -29,7 +29,7 @@ accumulatorStart
 
 --SHELL--
 
-url="/NGSI9/registerContext"
+url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
     <contextRegistrationList>
@@ -56,7 +56,7 @@ orionCurl --url "$url" --payload "$payload"
 
 echo "1: ++++++++++++++++++++"
 #Subscribe for 5 seconds
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -83,7 +83,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk
 
 echo "2: ++++++++++++++++++++"
 #Do an update inmediatelly after the subscription: notification is generated
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -107,7 +107,7 @@ orionCurl --url "$url" --payload "$payload"
 echo "3: ++++++++++++++++++++"
 #Do an update after subscription expiration: notification is not generated
 sleep 6s
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

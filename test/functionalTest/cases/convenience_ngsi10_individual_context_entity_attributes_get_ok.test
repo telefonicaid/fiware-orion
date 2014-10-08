@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. create an entity +++++"
-url="/NGSI10/contextEntities/entity01"
+url="/v1/contextEntities/entity01"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -44,7 +44,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "+++++ 2. lookup the entity +++++"
-orionCurl --url "/NGSI10/contextEntities/entity01/attributes" -X "GET"
+orionCurl --url "/v1/contextEntities/entity01/attributes" -X "GET"
 
 --REGEXPECT--
 +++++ 1. create an entity +++++

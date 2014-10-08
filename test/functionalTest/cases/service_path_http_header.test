@@ -38,35 +38,35 @@ payload='<?xml version="1.0"?>
 
 
 echo "+++++ 0. OK"
-orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath /h012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath /h012345678/h1/h2/h3/h4/h5/h6/h7/h8/h9
 echo
 
 echo "+++++ 1. Path-Component more than 10 chars" 
-orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath /h0123456789
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath /h0123456789
 echo
 
 
 echo "+++++ 2. Too many levels in path"
-orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath /h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath /h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11
 echo
 
 echo "+++++ 3: bad char in component"
-orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath '/h-1/h2/h3/h4/h5/h6/h7/h8/h9/h9'
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/h-1/h2/h3/h4/h5/h6/h7/h8/h9/h9'
 echo
 
 echo "+++++ 4: service path must start with a '/'"
-orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath 'X'
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath 'X'
 echo
 
 echo "+++++ 5: four service paths"
-orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4'
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4'
 echo
 echo "+++++ 6: service paths from log file"
 grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
 echo
 
 echo "+++++ 7: eleven service paths"
-orionCurl --url /NGSI10/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4, /home/kz/5, /home/kz/6, /home/kz/7, /home/kz/88, /home/kz/9, /home/kz/10, /home/kz/11'
+orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4, /home/kz/5, /home/kz/6, /home/kz/7, /home/kz/88, /home/kz/9, /home/kz/10, /home/kz/11'
 echo
 --REGEXPECT--
 +++++ 0. OK

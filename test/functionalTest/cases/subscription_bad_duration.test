@@ -30,7 +30,7 @@ brokerStart CB
 # Bad duration 1
 #INVALID_XML
 echo "1: ++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -57,7 +57,7 @@ orionCurl --url "$url" --payload "${payload}"
 echo "2: ++++++++++++++++++++"
 # Bad duration 2
 #INVALID_XML
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>

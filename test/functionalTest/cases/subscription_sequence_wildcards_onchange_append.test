@@ -29,7 +29,7 @@ accumulatorStart
 
 --SHELL--
 
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -57,7 +57,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk
 
 echo "1: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -83,7 +83,7 @@ echo "2: ++++++++++++++++++++"
 # to avoid a race condition in the order of notifications
 sleep 0.5s
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -109,7 +109,7 @@ echo "3: ++++++++++++++++++++"
 # to avoid a race condition in the order of notifications
 sleep 0.5s
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -135,7 +135,7 @@ echo "4: ++++++++++++++++++++"
 # to avoid a race condition in the order of notifications
 sleep 0.5s
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -158,7 +158,7 @@ orionCurl --url "$url" --payload "$payload"
 
 echo "5: ++++++++++++++++++++"
 
-url="/NGSI10/unsubscribeContext"
+url="/v1/unsubscribeContext"
 payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>
@@ -167,7 +167,7 @@ orionCurl --url "$url" --payload "$payload"
 
 echo "6: ++++++++++++++++++++"
 
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

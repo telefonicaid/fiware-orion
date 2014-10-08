@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. post an attribute to a non-existing entity +++++"
-url="/NGSI10/contextEntities/entity01/attributes/attr01"
+url="/v1/contextEntities/entity01/attributes/attr01"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextAttributeRequest>
   <type>Room</type>

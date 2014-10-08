@@ -27,9 +27,9 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-# Make a registration using conv op /NGSI9/contextEntities/ENTITY_ID
+# Make a registration using conv op /v1/registry/contextEntities/ENTITY_ID
 echo "1: ++++++++++++++++++++"
-url="/NGSI9/contextEntities/ENTITY_ID"
+url="/v1/registry/contextEntities/ENTITY_ID"
 payload='{
   "metadatas" : [
     {
@@ -52,7 +52,7 @@ REG_ID=$(echo "$_response" | grep -Po '(?<="registrationId" : ")[^"]*')
 
 # Make a discovery to see that the registration went OK
 echo "2: ++++++++++++++++++++"
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='{
     "entities": [
         {
@@ -66,7 +66,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 
 # Modify the first registration
 echo "3: ++++++++++++++++++++"
-url="/NGSI9/contextEntities/ENTITY_ID"
+url="/v1/registry/contextEntities/ENTITY_ID"
 payload='{
   "metadatas" : [
     {
@@ -88,7 +88,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 
 # Now discover that very registration again to see the change
 echo "4: ++++++++++++++++++++"
-url="/NGSI9/discoverContextAvailability"
+url="/v1/registry/discoverContextAvailability"
 payload='{
     "entities": [
         {
@@ -102,18 +102,18 @@ orionCurl --url "$url" --payload "${payload}" --json
 
 # Now try the GET method
 echo "5: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextEntities/ENTITY_ID" --json
+orionCurl --url "/v1/registry/contextEntities/ENTITY_ID" --json
 
 # And a GET that fails
 echo "6: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextEntities/ENTITY_ID2" --json
+orionCurl --url "/v1/registry/contextEntities/ENTITY_ID2" --json
 
 # DELETE and PUT should give errors
 echo "7: ++++++++++++++++++++"
-orionCurl --url "/NGSI9/contextEntities/ENTITY_ID" -X "DELETE" --json
+orionCurl --url "/v1/registry/contextEntities/ENTITY_ID" -X "DELETE" --json
 
 echo "8: ++++++++++++++++++++"
-url="/NGSI9/contextEntities/ENTITY_ID"
+url="/v1/registry/contextEntities/ENTITY_ID"
 payload='{
   "metadatas" : [
     {

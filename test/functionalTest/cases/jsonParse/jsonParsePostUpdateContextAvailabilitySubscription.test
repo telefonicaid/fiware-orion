@@ -28,7 +28,7 @@ brokerStart CB
 
 --SHELL--
 echo "1: ***********************************"
-url="/NGSI9/updateContextAvailabilitySubscription"
+url="/v1/registry/updateContextAvailabilitySubscription"
 payload='{
   "entities": [
     {
@@ -67,7 +67,7 @@ orionCurl --url ${url} --payload "${payload}" --json
 
 echo "2: ***********************************"
 
-url="/NGSI9/subscribeContextAvailability"
+url="/v1/registry/subscribeContextAvailability"
 payload='{
   "entities": [
     {
@@ -108,7 +108,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4}')
 
 echo "3: ***********************************"
 
-url="/NGSI9/updateContextAvailabilitySubscription"
+url="/v1/registry/updateContextAvailabilitySubscription"
 payload='{
   "entities": [
     {

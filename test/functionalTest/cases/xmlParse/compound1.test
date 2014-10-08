@@ -30,7 +30,7 @@ brokerStart CB 0-1
 #   1. err: unknown path
 #INVALID_XML
 echo "1: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

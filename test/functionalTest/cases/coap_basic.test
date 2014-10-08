@@ -37,7 +37,7 @@ brokerStart CB
 #fi
 
 echo "+++++++ Create entity +++++++++"
-url="/ngsi10/contextEntities/Room1"
+url="/v1/contextEntities/Room1"
 payload='{
     "attributes": [
         {
@@ -50,10 +50,10 @@ payload='{
 coapCurl --url "$url" --payload "$payload" --json -X post # --noPayloadCheck
 
 echo "+++++++ Query +++++++++"
-coapCurl --url "/ngsi10/contextEntities/Room1" --json
+coapCurl --url "/v1/contextEntities/Room1" --json
 
 echo "+++++++ Update +++++++++"
-url="/ngsi10/contextEntities/Room1"
+url="/v1/contextEntities/Room1"
 payload='{
     "attributes": [
         {
@@ -66,7 +66,7 @@ payload='{
 coapCurl --url "$url" --payload "$payload" --json -X put
 
 echo "+++++++ Query +++++++++"
-coapCurl --url "/ngsi10/contextEntities/Room1" --json
+coapCurl --url "/v1/contextEntities/Room1" --json
 
 --REGEXPECT--
 +++++++ Create entity +++++++++

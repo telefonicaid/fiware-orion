@@ -48,9 +48,9 @@ std::string getContextEntityTypeAttribute
   ParseData*                 parseDataP
 )
 {
-  std::string                          entityType     = compV[2];
-  std::string                          attributeName  = compV[4];
-  DiscoverContextAvailabilityRequest*  requestP = &parseDataP->dcar.res;
+  std::string                          entityType     = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string                          attributeName  = (compV[0] == "v1")? compV[5] : compV[4];
+  DiscoverContextAvailabilityRequest*  requestP       = &parseDataP->dcar.res;
   EntityId                             entityId(".*", entityType, "true");
 
   LM_T(LmtConvenience,

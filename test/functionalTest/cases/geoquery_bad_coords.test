@@ -29,7 +29,7 @@ brokerStart CB
 
 echo "1: +++++++++ Update/Append +++++++++++"
 # Create entities corresponding to the three cities
-url=/NGSI10/updateContext
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -61,7 +61,7 @@ echo
 
 echo "2: ++++++++++ OK Query ++++++++++"
 # query according to issue #461
-url=/NGSI10/queryContext
+url=/v1/queryContext
 payload='{
   "entities": [
     {
@@ -94,7 +94,7 @@ echo
 echo
 
 echo "3: ++++++++++ Query with invalid latitude ++++++++++"
-url=/NGSI10/queryContext
+url=/v1/queryContext
 payload='{
   "entities": [
     {
@@ -128,7 +128,7 @@ echo
 
 
 echo "4: ++++++++++ Query with invalid longitude ++++++++++"
-url=/NGSI10/queryContext
+url=/v1/queryContext
 payload='{
   "entities": [
     {

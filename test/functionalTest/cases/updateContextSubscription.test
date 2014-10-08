@@ -21,13 +21,13 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Check subscriptionId in error for /NGSI10/updateContextSubscription
+Check subscriptionId in error for /v1/updateContextSubscription
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/NGSI10/updateContextSubscription"
+url="/v1/updateContextSubscription"
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
   <duration>P50Y</duration>

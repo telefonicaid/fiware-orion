@@ -29,7 +29,7 @@ brokerStart CB
 --SHELL--
 # 1. Compound contextValue without vector
 echo "1: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -70,7 +70,7 @@ orionCurl --url "$url" --payload "${payload}"
 
 # 2. Compound contextValue with vector
 echo "2: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -111,7 +111,7 @@ orionCurl --url "$url" --payload "${payload}"
 
 # 3. Compound contextValue with vector but one of the items have an incorrect tagname
 echo "3: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -153,7 +153,7 @@ orionCurl --url "$url" --payload "${payload}"
 # 4. Compound contextValue with vector but two type-attributes
 #INVALID_XML
 echo "4: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -194,7 +194,7 @@ orionCurl --url "$url" --payload "${payload}"
 
 # 5. Compound contextValue with vector but type-attribute with value != 'vector'
 echo "5: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -235,7 +235,7 @@ orionCurl --url "$url" --payload "${payload}"
 
 # 6. Compound contextValue with vector but with unknown attribute
 echo "6: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -276,7 +276,7 @@ orionCurl --url "$url" --payload "${payload}"
 
 # 7. Compound contextValue with vector and contextValue as a vector
 echo "7: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -303,7 +303,7 @@ orionCurl --url "$url" --payload "${payload}"
 
 # 8. Compound contextValue with struct that has two fields with the same name
 echo "8: +++++++++++++++++++++++++++++++++"
-url='/ngsi10/updateContext'
+url='/v1/updateContext'
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>

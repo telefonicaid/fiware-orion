@@ -88,10 +88,11 @@ typedef enum RequestType
   RtSubscribeResponse,
   RtSubscribeError,
 
-  EntityTypes,
+  EntityTypes = 61,
   AttributesForEntityType,
   RtEntityTypesResponse,
   RtAttributesForEntityTypeResponse,
+  AllContextEntities,
 
   InvalidRequest
 } RequestType;

@@ -49,7 +49,7 @@ std::string getContextEntitiesByEntityId
   ParseData*                 parseDataP
 )
 {
-  std::string                          entityId = compV[2];
+  std::string                          entityId = (compV[0] == "v1")? compV[3] : compV[2];
   std::string                          answer;
   DiscoverContextAvailabilityResponse  response;
 

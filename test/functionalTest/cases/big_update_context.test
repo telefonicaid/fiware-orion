@@ -21,13 +21,13 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Big request for /NGSI10/updateContext
+Big request for updateContext
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="utf-8" ?>
 <updateContextRequest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <contextElementList>

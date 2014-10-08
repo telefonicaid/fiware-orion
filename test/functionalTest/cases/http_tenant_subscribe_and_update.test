@@ -34,7 +34,7 @@ accumulatorStart 127.0.0.1 $LISTENER2_PORT
 
 echo "1. Make a subscription for E/att on tenant t_01"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -60,7 +60,7 @@ echo
 
 echo "2. Make a subscription for E/att on tenant t_02"
 echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-url="/NGSI10/subscribeContext"
+url="/v1/subscribeContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
   <entityIdList>
@@ -86,7 +86,7 @@ echo
 
 echo "3. Update t_01/E/att"
 echo "++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -111,7 +111,7 @@ echo
 
 echo "4. Update t_02/E/att"
 echo "++++++++++++++++++++"
-url="/NGSI10/updateContext"
+url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>

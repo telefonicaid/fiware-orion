@@ -29,7 +29,7 @@ brokerStart CB
 
 --SHELL--
 echo "+++++ 1. creating base entity +++++"
-url="/NGSI10/contextEntities/Room1"
+url="/v1/contextEntities/Room1"
 payload='{
   "attributes" : [
   {
@@ -61,13 +61,13 @@ payload='{
 orionCurl --url "$url" --payload "$payload" --json
 
 echo "+++++ 2. lookup the entity +++++"
-orionCurl --url "/NGSI10/contextEntities/Room1" --json
+orionCurl --url "/v1/contextEntities/Room1" --json
 
 echo "+++++ 3. lookup an attribute by valueID in JSON +++++"
-orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature/ground" --json
+orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/ground" --json
 
 echo "+++++ 4. lookup an attribute by the other valueID in XML +++++"
-orionCurl --url "/NGSI10/contextEntities/Room1/attributes/temperature/wall"
+orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/wall"
 
 --REGEXPECT--
 +++++ 1. creating base entity +++++
