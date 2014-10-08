@@ -25,16 +25,10 @@ Coap Basic interaction
 --SHELL-INIT--
 
 dbInit CB
-proxyCoapStart -t0-255 -vvvvv
 brokerStart CB
+proxyCoapStart
 
 --SHELL--
-
-#if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
-#then
-#  echo sleeping 11
-#  sleep 11
-#fi
 
 echo "+++++++ Create entity +++++++++"
 url="/v1/contextEntities/Room1"
@@ -47,7 +41,7 @@ payload='{
         }
     ]
 }'
-coapCurl --url "$url" --payload "$payload" --json -X post # --noPayloadCheck
+coapCurl --url "$url" --payload "$payload" --json -X post
 
 echo "+++++++ Query +++++++++"
 coapCurl --url "/v1/contextEntities/Room1" --json
