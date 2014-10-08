@@ -110,6 +110,17 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
         }
     }
 
+    //
+    // FIXME P3: mongoGetContextSubscriptionInfo allocates an EntityId and pushes it to
+    //           csi. Here that entity is released, but this is running in a separate thread.
+    //           Sometimes, when the broker is killed, this thread is inside the mongoGetContextSubscriptionInfo
+    //           and the new entityId is considered a memory leak by valgrind.
+    //           This is no mempry leak, Everything is under control, but as Jenkins complains about a leak,
+    //           it is annoying.
+    //           What we need to do is to make the broker die in a more controlled manner, making the threads
+    //           exit and wait for them to exit, before the broker itself exits.
+    //           This should be done when receiving an /exit (only valid for DEBUG compilations).
+    //
     csi.release();
 }
 
