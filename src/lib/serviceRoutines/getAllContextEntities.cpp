@@ -29,6 +29,7 @@
 #include "ngsi/EntityId.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 #include "serviceRoutines/getAllContextEntities.h"
 #include "serviceRoutines/postQueryContext.h"
 
@@ -49,6 +50,11 @@ std::string getAllContextEntities
   QueryContextRequest*  reqP = &parseDataP->qcr.res;
   EntityId*             eP   = new EntityId(".*", "", "true");
   std::string           res;
+
+  if (ciP->uriParam[URI_PARAM_TYPE] != "")
+  {
+    eP->type = ciP->uriParam[URI_PARAM_TYPE];
+  }
 
   reqP->entityIdVector.push_back(eP);
 
