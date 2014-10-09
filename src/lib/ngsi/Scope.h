@@ -52,8 +52,10 @@ using namespace orion;
 */
 typedef struct Scope
 {
-  std::string  type;    // Mandatory
-  std::string  value;   // Mandatory
+  std::string  type;     // Mandatory
+  std::string  value;    // Mandatory
+
+  std::string  oper;     // Optional - used for filters
 
   orion::AreaType     areaType;
   orion::Circle       circle;
