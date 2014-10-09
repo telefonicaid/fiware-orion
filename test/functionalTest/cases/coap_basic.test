@@ -27,7 +27,9 @@ Coap Basic interaction
 dbInit CB
 brokerStart CB
 proxyCoapStart
+
 --SHELL--
+
 echo "+++++++ Create entity +++++++++"
 url="/v1/contextEntities/Room1"
 payload='{
