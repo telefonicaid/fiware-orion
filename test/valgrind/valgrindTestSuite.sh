@@ -32,6 +32,20 @@
 
 # -----------------------------------------------------------------------------
 #
+# FUNC_TEST_RUNNING_UNDER_VALGRIND - 
+#
+# This env var is set to "true" so that the harness tests will know whether they are
+# running under the valgrund test suite.
+# Running under valgrind, everything goes a lotr slower and sleps have to be inserted.
+# We don't want these sleeps for regular harness tests, so this variable is used to
+# distinguish between the two cases.
+#
+export FUNC_TEST_RUNNING_UNDER_VALGRIND="true"
+
+
+
+# -----------------------------------------------------------------------------
+#
 # CB_TEST_PORT is used by cbTest.sh as default port
 #
 export CB_TEST_PORT=9999
@@ -372,7 +386,7 @@ function failedTest()
 {
   if [ "$3" != "0" ]
   then
-    echo "FAILED (lost: $3). Check $1 for clues"
+    echo "FAILED (lost: $3). Check $2.valgrind.out for clues"
   fi
 
   testFailures=$testFailures+1
@@ -495,7 +509,7 @@ then
         mv /tmp/accumulator_$LISTENER_PORT       $vtest.accumulator_$LISTENER_PORT
         mv /tmp/accumulator_$LISTENER2_PORT      $vtest.accumulator_$LISTENER2_PORT
 
-        failedTest "test/valgrind/$vtest.*" $vtest 0
+        failedTest "$vtest.valgrind.out" $vtest 0
       else
         fileCleanup $vtest
 
@@ -565,6 +579,7 @@ then
 
     if [ "$dryrun" == "off" ]
     then
+      detailForOkString=''
       vMsg "------------------------------------------------"
       vMsg running harnessTest.sh with $file in $(pwd)
       vMsg "------------------------------------------------"
@@ -574,7 +589,7 @@ then
       then
         mv /tmp/testHarness         test/functionalTest/cases/$directory/$htest.harness.out
         cp /tmp/contextBroker.log   test/functionalTest/cases/$directory/$htest.contextBroker.log
-        echo -n " FAILURE! functional test ended with error code $status"
+        detailForOkString=" (functional test exit code: $status)"
         harnessErrorV[$harnessErrors]="$file"
         harnessErrors=$harnessErrors+1
         # No exit here - sometimes harness tests fail under valgrind ...
@@ -582,7 +597,7 @@ then
 
       if [ ! -f /tmp/valgrind.out ]
       then
-        echo " FAILURE! No valgrind output for functional test $file"
+        echo " FAILURE! (no valgrind output for functional test $file)"
         exit 3
       fi
 
@@ -601,7 +616,7 @@ then
     then
       failedTest "test/functionalTest/cases/$htest.valgrind.*" $htest $lost
     else
-      echo $okString
+      echo $okString $detailForOkString
     fi
 
   done
@@ -636,8 +651,8 @@ then
 
   while [ $ix -ne $harnessErrors ]
   do
-    ix=$ix+1
     echo "  " ${harnessErrorV[$ix]}
+    ix=$ix+1
   done
 
   echo "---------------------------------------"

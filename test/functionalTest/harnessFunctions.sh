@@ -692,6 +692,7 @@ function orionCurl()
 #   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides)
 #   --httpTenant  <tenant>         (tenant in HTTP header)
 #   --servicePath <path>           (Service Path in HTTP header)
+#   --noPayloadCheck               (skip paylosd check filter)
 #
 # Any parameters are sent as is to 'curl'
 #
@@ -711,6 +712,7 @@ function coapCurl()
   _httpTenant=""
   _servicePath=""
   _xtra=''
+  _noPayloadCheck='off'
 
   while [ "$#" != 0 ]
   do
@@ -724,6 +726,7 @@ function coapCurl()
     elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json;
     elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
+    elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck=on;
     else                                       _xtra="$_xtra $1"; shift;
     fi
 
@@ -828,17 +831,22 @@ function coapCurl()
   #
   # Print and beautify response body (IF ANY)
   #
-  if [ "$_response" != "" ]
+  if [ "$_noPayloadCheck" == "on" ]
   then
-    if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
+    echo $_response
+  else
+    if [ "$_response" != "" ]
     then
-      echo $_response | xmllint --format -
-    elif [ "$_outFormat" == application/json ]
-    then
-      vMsg "JSON check for:" $_response
-      echo $_response | python -mjson.tool
-    else
-      echo $_response | xmllint --format -
+      if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
+      then
+        echo $_response | xmllint --format -
+      elif [ "$_outFormat" == application/json ]
+      then
+        vMsg "JSON check for:" $_response
+        echo $_response | python -mjson.tool
+      else
+        echo $_response | xmllint --format -
+      fi
     fi
   fi
 }
