@@ -52,7 +52,9 @@ std::string getAllContextEntities
   std::string           res;
 
   if (ciP->uriParam[URI_PARAM_TYPE] != "")
+  {
     eP->type = ciP->uriParam[URI_PARAM_TYPE];
+  }
 
   reqP->entityIdVector.push_back(eP);
 
