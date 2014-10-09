@@ -55,6 +55,7 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
     {
       //
       // FIXME P6: mongoGetContextSubscriptionInfo ALWAYS returns SccOk
+      //           github issue #575.
       //           If it didn't we would have a leak right here, as mongoGetContextSubscriptionInfo
       //           allocates entities and pushes them to 'csi', which is lost leaving this function.
       //
@@ -111,8 +112,9 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
     }
 
     //
-    // FIXME P3: mongoGetContextSubscriptionInfo allocates an EntityId and pushes it to
-    //           csi. Here that entity is released, but this is running in a separate thread.
+    // FIXME P3: mongoGetContextSubscriptionInfo allocates an EntityId and pushes it to csi.
+    //           github issue #576.
+    //           Here that entity is released, but this is running in a separate thread.
     //           Sometimes, when the broker is killed, this thread is inside the mongoGetContextSubscriptionInfo
     //           and the new entityId is considered a memory leak by valgrind.
     //           This is no mempry leak, Everything is under control, but as Jenkins complains about a leak,
