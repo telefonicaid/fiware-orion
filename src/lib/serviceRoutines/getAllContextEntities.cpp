@@ -50,9 +50,6 @@ std::string getAllContextEntities
   EntityId*             eP   = new EntityId(".*", "", "true");
   std::string           res;
 
-  LM_M(("uriParam[type]:   '%s'", ciP->uriParam["type"].c_str()));
-  LM_M(("uriParam[!empty]: '%s'", ciP->uriParam["!empty"].c_str()));
-
   reqP->entityIdVector.push_back(eP);
 
   res = postQueryContext(ciP, components, compV, parseDataP);
