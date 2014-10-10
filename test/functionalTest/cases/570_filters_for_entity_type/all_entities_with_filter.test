@@ -35,9 +35,9 @@ brokerStart CB
 # 3. APPEND entity E2, type T2 with attribute A2
 # 4. APPEND entity E3, type T3 with attribute A3
 # 5. APPEND entity E4, type T3 with attribute A4
-# 6. Query all entities using convop /v1/contextEntities?type=T1
-# 7. Query all entities using convop /v1/contextEntities?type=T2
-# 8. Query all entities using convop /v1/contextEntities?type=T3
+# 6. Query all entities using convop /v1/contextEntities?entity::type=T1
+# 7. Query all entities using convop /v1/contextEntities?entity::type=T2
+# 8. Query all entities using convop /v1/contextEntities?entity::type=T3
 #
 
 echo "0. Query all entities using convop /v1/contextEntities"
@@ -172,23 +172,23 @@ echo
 echo
 
 
-echo "6. Query all entities using convop /v1/contextEntities?type=T1"
-echo "=============================================================="
-orionCurl --url /v1/contextEntities?type=T1
+echo "6. Query all entities using convop /v1/contextEntities?entity::type=T1"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities?entity::type=T1
 echo
 echo
 
 
-echo "7. Query all entities using convop /v1/contextEntities?type=T2"
-echo "=============================================================="
-orionCurl --url /v1/contextEntities?type=T2
+echo "7. Query all entities using convop /v1/contextEntities?entity::type=T2"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities?entity::type=T2
 echo
 echo
 
 
-echo "8. Query all entities using convop /v1/contextEntities?type=T3"
-echo "=============================================================="
-orionCurl --url /v1/contextEntities?type=T3
+echo "8. Query all entities using convop /v1/contextEntities?entity::type=T3"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities?entity::type=T3
 echo
 echo
 
@@ -370,8 +370,8 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-6. Query all entities using convop /v1/contextEntities?type=T1
-==============================================================
+6. Query all entities using convop /v1/contextEntities?entity::type=T1
+======================================================================
 HTTP/1.1 200 OK
 Content-Length: 618
 Content-Type: application/xml
@@ -402,8 +402,8 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-7. Query all entities using convop /v1/contextEntities?type=T2
-==============================================================
+7. Query all entities using convop /v1/contextEntities?entity::type=T2
+======================================================================
 HTTP/1.1 200 OK
 Content-Length: 618
 Content-Type: application/xml
@@ -434,8 +434,8 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-8. Query all entities using convop /v1/contextEntities?type=T3
-==============================================================
+8. Query all entities using convop /v1/contextEntities?entity::type=T3
+======================================================================
 HTTP/1.1 200 OK
 Content-Length: 1140
 Content-Type: application/xml

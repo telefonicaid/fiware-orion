@@ -214,6 +214,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
+    LM_M(("This is where I must add the FIWARE::Filter::Existence if URI_PARAM_NOT_EXIST == type"));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     if (reqP != NULL)

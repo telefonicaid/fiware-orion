@@ -2,6 +2,5 @@
 - Add: New convenience operation '/v1/contextEntities' - to get a list of ALL existing entities (Issue #563)
 - Fix: Upgrading from a previous package caused the orion user to disappear.
 - Fix: Change service path HTTP header name: 'ServicePath' -> 'Fiware-ServicePath' (Issue #541)
-- Add: New URI parameter 'type' for /v1/contextEntities, to filter by type (Issue #570)
-- Add: New URI parameter '!exist=type' for /v1/contextEntities, to filter entities whose type is empty (Issue #570)
-       
+- Add: New conv op URI parameter 'entity::type' to filter by type (Issue #570)
+- Add: New URI parameter '!exist=entity::type' to filter entities whose type is empty (Issue #570)
