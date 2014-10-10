@@ -49,7 +49,6 @@ std::string getAllContextEntities
 {
   QueryContextRequest*  reqP   = &parseDataP->qcr.res;
   EntityId*             eP     = new EntityId(".*", "", "true");
-  Scope*                scopeP = NULL;
   std::string           res;
 
   if (ciP->uriParam[URI_PARAM_TYPE] != "")
@@ -57,24 +56,13 @@ std::string getAllContextEntities
     eP->type = ciP->uriParam[URI_PARAM_TYPE];
   }
 
-  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == "type")
-  {
-    scopeP = new Scope("FIWARE::Filter::Existence", "type");
-    
-    scopeP->oper = "Not";
-
-    reqP->restriction.scopeVector.push_back(scopeP);
-  }
-
   reqP->entityIdVector.push_back(eP);
+
+  // Temporal debug
+  reqP->present("");
 
   res = postQueryContext(ciP, components, compV, parseDataP);
   delete eP;
-
-  if (scopeP != NULL)
-  {
-    reqP->restriction.scopeVector.release();
-  }
 
   return res;
 }

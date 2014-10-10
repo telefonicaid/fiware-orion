@@ -38,6 +38,7 @@
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
+#include "rest/uriParamNames.h"
 #include "ngsi/ParseData.h"
 
 
@@ -105,6 +106,95 @@ static std::string tenantCheck(const std::string& tenant)
   }
 
   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* commonFilters - 
+*/
+static void commonFilters
+(
+  ConnectionInfo*   ciP,
+  ParseData*        parseDataP,
+  RestService*      serviceP
+)
+{
+  LM_M(("IN"));
+
+  //
+  // 1. ?!exist=entity::type
+  //
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == "entity::type")
+  {
+    Restriction* restrictionP = NULL;
+
+    LM_M(("Got a '%s'", URI_PARAM_NOT_EXIST));
+
+    //
+    // Lookup the restriction of the correct parseData, where to add the new scope.
+    //
+    if (serviceP->request == EntityTypes)
+      restrictionP = &parseDataP->qcr.res.restriction;
+    else if (serviceP->request == AllContextEntities)
+      restrictionP = &parseDataP->qcr.res.restriction;
+
+    if (restrictionP == NULL)
+    {
+      // There are two possibilities to be here:
+      //   1. A filter given for a request NOT SUPPORTING the filter
+      //   2. The restrictionP-lookup is MISSING (not implemented)
+      //
+      // Either way, we just silently return.
+      //
+      LM_M(("Unimplemented filter '%s' for request '%s'", URI_PARAM_NOT_EXIST, requestType(serviceP->request)));
+      return;
+    }
+
+    Scope* scopeP  = new Scope("FIWARE::Filter::Existence", "entity::type");
+    scopeP->oper   = "Not";
+    restrictionP->scopeVector.push_back(scopeP);
+    LM_M(("Added a scope for '%s'", URI_PARAM_NOT_EXIST));
+  }
+
+
+
+  //
+  // 2. ?exist=entity::type
+  //
+  if (ciP->uriParam[URI_PARAM_EXIST] == "entity::type")
+  {
+    Restriction* restrictionP = NULL;
+
+    LM_M(("Got a '%s'", URI_PARAM_EXIST));
+
+    //
+    // Lookup the restriction of the correct parseData, where to add the new scope.
+    //
+    if (serviceP->request == EntityTypes)
+      restrictionP = &parseDataP->qcr.res.restriction;
+    else if (serviceP->request == AllContextEntities)
+      restrictionP = &parseDataP->qcr.res.restriction;
+
+    if (restrictionP == NULL)
+    {
+      // There are two possibilities to be here:
+      //   1. A filter given for a request NOT SUPPORTING the filter
+      //   2. The restrictionP-lookup is MISSING (not implemented)
+      //
+      // Either way, we just silently return.
+      //
+      LM_M(("Unimplemented filter '%s' for request '%s'", URI_PARAM_EXIST, requestType(serviceP->request)));
+      return;
+    }
+
+    Scope*  scopeP  = new Scope("FIWARE::Filter::Existence", "entity::type");
+    restrictionP->scopeVector.push_back(scopeP);
+    LM_M(("Added a scope for '%s'", URI_PARAM_EXIST));
+  }
+
+  LM_M(("FROM"));
 }
 
 
@@ -214,7 +304,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     }
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
-    LM_M(("This is where I must add the FIWARE::Filter::Existence if URI_PARAM_NOT_EXIST == type"));
+    commonFilters(ciP, &parseData, &serviceV[ix]);
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
 
     if (reqP != NULL)

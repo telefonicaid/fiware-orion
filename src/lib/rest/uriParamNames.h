@@ -39,6 +39,7 @@
 #define URI_PARAM_COLLAPSE            "collapse"
 #define URI_PARAM_TYPE                "entity::type"
 #define URI_PARAM_NOT_EXIST           "!exist"
+#define URI_PARAM_EXIST               "exist"
 
 
 
