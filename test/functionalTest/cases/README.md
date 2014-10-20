@@ -4,4 +4,4 @@ Subdirectories can be classified in 3 groups:
 
 * The ones with "ngsi10" substring in the name, corresponding to NGSI10 functionality.
 * The ones with "ngsi9" substring in the name, corresponding to  NGSI9 functionality.
-* The ones without "ngsi10" or "ngsi9" in the name, corresponding to functionality not directly related with NGSI9 or NGSI10, because it is orthogonal (i.e. applicable to both) or has nothing to do with it (e.g. CLI tests).
+* The ones without "ngsi10" or "ngsi9" in the name, corresponding to functionalities not directly related to NGSI9 or NGSI10, because they are orthogonal (i.e. applicable to both) or are not related to NGSI (e.g. CLI tests).
