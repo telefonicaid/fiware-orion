@@ -4,3 +4,4 @@
 - Fix: Change service path HTTP header name: 'ServicePath' -> 'Fiware-ServicePath' (Issue #541)
 - Add: New conv op URI parameter 'entity::type' to filter by type (Issue #570)
 - Add: New URI parameter '!exist=entity::type' to filter entities whose type is empty (Issue #570)
+- Add: scopeType FIWARE::Filter::Existence (only with value "entity::type" in this version)(Issue #570)
