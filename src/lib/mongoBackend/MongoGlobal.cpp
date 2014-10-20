@@ -741,7 +741,7 @@ static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElem
 *
 * Returns true if a location was found, false otherwise
 */
-static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
+/*static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 
     unsigned int geoScopes = 0;
     for (unsigned int ix = 0; ix < scoV.size(); ++ix) {
@@ -788,10 +788,10 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
                     }
                     vertex.append(BSON_ARRAY(lon << lat));
                 }
-                /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
+                / MongoDB query API needs to "close" the polygon with the same point that the initial point *
                 vertex.append(BSON_ARRAY(lon0 << lat0));
 
-                /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
+                / Note that MongoDB query API uses an ugly "double array" structure for coordinates *
                 geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
 
                 inverted = sco->polygon.inverted();
@@ -816,6 +816,72 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
     }
 
     return (geoScopes > 0);
+}*/
+
+/* *****************************************************************************
+*
+* processAreaScope -
+*
+* Returns true if areaQuery was filled, false otherwise
+*
+*/
+static bool processAreaScope(Scope* scoP, BSONObj &areaQuery) {
+
+  if (!mongoLocationCapable())
+  {
+    LM_W(("Bad Input (location scope was found but your MongoDB version doesn't support it. Please upgrade MongoDB server to 2.4 or newer)"));
+    return false;
+  }
+
+  bool inverted = false;
+
+  BSONObj geoWithin;
+  if (scoP->areaType == orion::CircleType)
+  {
+    double radians = scoP->circle.radius() / EARTH_RADIUS_METERS;
+    geoWithin = BSON("$centerSphere" << BSON_ARRAY(BSON_ARRAY(scoP->circle.center.longitude() << scoP->circle.center.latitude()) << radians ));
+    inverted = scoP->circle.inverted();
+  }
+  else if (scoP->areaType== orion::PolygonType)
+  {
+    BSONArrayBuilder vertex;
+    double lat0 = 0;
+    double lon0 = 0;
+
+    for (unsigned int jx = 0; jx < scoP->polygon.vertexList.size() ; ++jx)
+    {
+      double lat = scoP->polygon.vertexList[jx]->latitude();
+      double lon = scoP->polygon.vertexList[jx]->longitude();
+
+      if (jx == 0)
+      {
+        lat0 = lat;
+        lon0 = lon;
+      }
+      vertex.append(BSON_ARRAY(lon << lat));
+    }
+    /* MongoDB query API needs to "close" the polygon with the same point that the initial point */
+    vertex.append(BSON_ARRAY(lon0 << lat0));
+
+    /* Note that MongoDB query API uses an ugly "double array" structure for coordinates */
+    geoWithin = BSON("$geometry" << BSON("type" << "Polygon" << "coordinates" << BSON_ARRAY(vertex.arr())));
+
+    inverted = scoP->polygon.inverted();
+  }
+  else
+  {
+    LM_W(("Bad Input (unknown area type)"));
+    return false;
+  }
+
+  if (inverted) {
+    areaQuery = BSON("$not" << BSON("$geoWithin" << geoWithin));
+  }
+  else {
+    areaQuery = BSON("$geoWithin" << geoWithin);
+  }
+
+  return true;
 }
 
 /* *****************************************************************************
@@ -823,14 +889,14 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
 * processFilterScopes -
 *
 */
-static void processFilterScopes(ScopeVector& scoV, std::vector<BSONObj> &filters)
+/*static void processFilterScopes(ScopeVector& scoV, std::vector<BSONObj> &filters)
 {
   std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
 
   for (unsigned int ix = 0; ix < scoV.size(); ++ix)
   {
     Scope* sco = scoV.get(ix);
-    if (sco->type == SCOPE_FILTER_EXIST)
+    if (sco->type == SCOPE_FILTER_EXISTENCE)
     {
       if (sco->value == SCOPE_VALUE_ENTITY_TYPE)
       {
@@ -838,24 +904,45 @@ static void processFilterScopes(ScopeVector& scoV, std::vector<BSONObj> &filters
         BSONObj b = sco->oper == SCOPE_OPERATOR_NOT ?
                     BSON(entityTypeString << BSON("$exists" << false)) :
                     BSON(entityTypeString << BSON("$exists" << true));
-        /*BSONObj b;
-        if (sco->oper == SCOPE_OPERATOR_NOT)
-        {
-          b = BSON("_id." + ENT_ENTITY_TYPE << BSON("$exists" << false));
-        }
-        else
-        {
-          b = BSON("_id." + ENT_ENTITY_TYPE << BSON("$exists" << true))
-        }*/
         filters.push_back(b);
       }
       else
       {
-        LM_W(("Bad Input (unknown value for %s filter: '%s'", SCOPE_FILTER_EXIST, sco->value.c_str()));
+        LM_W(("Bad Input (unknown value for %s filter: '%s'", SCOPE_FILTER_EXISTENCE, sco->value.c_str()));
       }
 
     }
   }
+}*/
+
+/* *****************************************************************************
+*
+* addFilterScopes -
+*
+*/
+static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
+{
+  std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
+
+  if (scoP->type == SCOPE_FILTER_EXISTENCE)
+  {
+    if (scoP->value == SCOPE_VALUE_ENTITY_TYPE)
+    {
+      BSONObj b = scoP->oper == SCOPE_OPERATOR_NOT ?
+            BSON(entityTypeString << BSON("$exists" << false)) :
+            BSON(entityTypeString << BSON("$exists" << true));
+      filters.push_back(b);
+    }
+    else
+    {
+      LM_W(("Bad Input (unknown value for %s filter: '%s'", SCOPE_FILTER_EXISTENCE, scoP->value.c_str()));
+    }
+  }
+  else
+  {
+    LM_W(("Bad Input (unknown filter type '%s'", scoP->type.c_str()));
+  }
+
 }
 
 /* ****************************************************************************
@@ -933,20 +1020,58 @@ bool entitiesQuery
         finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
     }
 
-    /* Part 4: geo-location */
-    BSONObj areaQuery;
+    /* Part 5: scopes */
+    std::vector<BSONObj> filters;
+    unsigned int geoScopes = 0;
+    for (unsigned int ix = 0; ix < res.scopeVector.size(); ++ix)
+    {
+      Scope* sco = res.scopeVector.get(ix);
+      if (sco->type.find(SCOPE_FILTER) == 0)
+      {
+        addFilterScope(sco, filters);
+      }
+      else if (sco->type == FIWARE_LOCATION)
+      {
+        geoScopes++;
+        if (geoScopes > 1)
+        {
+          LM_W(("Bad Input (current version supports only one area scope, extra geoScope is ignored"));
+        }
+        else
+        {
+          BSONObj areaQuery;
+          if (processAreaScope(sco, areaQuery))
+          {
+            std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
+            finalQuery.append(locCoords, areaQuery);
+          }
+        }
+      }
+      else
+      {
+        LM_W(("Bad Input (unknown scope type '%s', ignoring)", sco->type.c_str()));
+      }
+    }
+
+    for (unsigned int ix = 0; ix < filters.size(); ++ix)
+    {
+      finalQuery.appendElements(filters[ix]);
+    }
+
+    /* Part 4: scopes */
+    /*BSONObj areaQuery;
     if (processAreaScope(res.scopeVector, areaQuery)) {
        std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
        finalQuery.append(locCoords, areaQuery);
     }    
 
-    /* Part 5: filters */
+    / Part 5: filters *
     std::vector<BSONObj> filters;
     processFilterScopes(res.scopeVector, filters);
     for (unsigned int ix = 0; ix < filters.size(); ++ix)
     {
       finalQuery.appendElements(filters[ix]);
-    }
+    }*/
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 

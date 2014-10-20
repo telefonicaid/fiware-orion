@@ -44,7 +44,8 @@ using namespace orion;
 #define SCOPE_VALUE_ASSOC_TARGET   "TARGETS"
 #define SCOPE_VALUE_ASSOC_ALL      "ALL"
 
-#define SCOPE_FILTER_EXIST         "FIWARE::Filter::Existence"
+#define SCOPE_FILTER               "FIWARE::Filter"
+#define SCOPE_FILTER_EXISTENCE     SCOPE_FILTER "::Existence"
 #define SCOPE_OPERATOR_NOT         "not"
 #define SCOPE_VALUE_ENTITY_TYPE    "entity::type"
 
