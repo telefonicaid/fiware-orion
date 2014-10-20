@@ -210,14 +210,14 @@ Date: REGEX(.*)
 02. GET /v1/contextEntities/type/T1/id/E1 and see it fail
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 316
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
-    <entityId type="" isPattern="false">
+    <entityId type="T1" isPattern="false">
       <id>E1</id>
     </entityId>
   </contextElement>
@@ -286,14 +286,14 @@ Date: REGEX(.*)
 05. GET /v1/contextEntities/type/T1/id/E1 OK
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 450
+Content-Length: 452
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
-    <entityId type="" isPattern="false">
+    <entityId type="T1" isPattern="false">
       <id>E1</id>
     </entityId>
     <contextAttributeList>
@@ -391,14 +391,14 @@ Date: REGEX(.*)
 08. GET /v1/contextEntities/type/T1/id/E1 OK
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 450
+Content-Length: 452
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
-    <entityId type="" isPattern="false">
+    <entityId type="T1" isPattern="false">
       <id>E1</id>
     </entityId>
     <contextAttributeList>
@@ -419,14 +419,14 @@ Date: REGEX(.*)
 09. GET /v1/contextEntities/type/T2/id/E1 OK
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 450
+Content-Length: 452
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
-    <entityId type="" isPattern="false">
+    <entityId type="T2" isPattern="false">
       <id>E1</id>
     </entityId>
     <contextAttributeList>
@@ -476,14 +476,14 @@ Date: REGEX(.*)
 12. GET /v1/contextEntities/type/T1/id/E1 and see it fail
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 314
+Content-Length: 316
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
-    <entityId type="" isPattern="false">
+    <entityId type="T1" isPattern="false">
       <id>E1</id>
     </entityId>
   </contextElement>
@@ -498,14 +498,14 @@ Date: REGEX(.*)
 13. GET /v1/contextEntities/type/T2/id/E1 OK
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 450
+Content-Length: 452
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
-    <entityId type="" isPattern="false">
+    <entityId type="T2" isPattern="false">
       <id>E1</id>
     </entityId>
     <contextAttributeList>
