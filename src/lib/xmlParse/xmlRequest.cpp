@@ -137,9 +137,8 @@ static XmlRequest xmlRequest[] =
   { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextvailabilitySubscriptionRequest",  FUNCS(ucas)  },
 
   { AllEntitiesWithTypeAndId,              "PUT",  "updateContextElementRequest",                  FUNCS(ucer)  },
-  { AllEntitiesWithTypeAndId,              "*",    "updateContextElementRequest",                  FUNCS(ucer)  },
   { AllEntitiesWithTypeAndId,              "POST", "appendContextElementRequest",                  FUNCS(acer)  },
-  { AllEntitiesWithTypeAndId,              "*",    "appendContextElementRequest",                  FUNCS(acer)  },
+  { AllEntitiesWithTypeAndId,              "*",    "",                                             FUNCS(ucer)  },
 
   // Responses
   { RegisterResponse,                      "POST", "registerContextResponse",                      FUNCS(rcrs)  },

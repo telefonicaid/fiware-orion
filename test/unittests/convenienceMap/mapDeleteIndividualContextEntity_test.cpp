@@ -87,7 +87,7 @@ TEST(mapDeleteIndividualContextEntity, notFound)
 
   prepareDatabase("ID", "TYPE");
 
-  mapDeleteIndividualContextEntity(id, &sc, &ci);
+  mapDeleteIndividualContextEntity(id, "", &sc, &ci);
 
   EXPECT_EQ(SccContextElementNotFound, sc.code);
   EXPECT_STREQ("No context element found", sc.reasonPhrase.c_str());
@@ -116,7 +116,7 @@ TEST(mapDeleteIndividualContextEntity, ok)
 
   StatusCode     sc;
 
-  mapDeleteIndividualContextEntity(id, &sc, &ci);
+  mapDeleteIndividualContextEntity(id, "", &sc, &ci);
   EXPECT_EQ(200, sc.code);
   EXPECT_STREQ("OK", sc.reasonPhrase.c_str());
   EXPECT_STREQ("", sc.details.c_str());

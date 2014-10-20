@@ -90,18 +90,18 @@ TEST(mapPutIndividualContextEntity, updateOkAndError)
   request.attributeDomainName.set("ad");
 
   // OK
-  ms = mapPutIndividualContextEntity("MPICE", &request, &response, &ci);
+  ms = mapPutIndividualContextEntity("MPICE", "", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(200, response.errorCode.code);
 
   // Not found
-  ms = mapPutIndividualContextEntity("MPICE2", &request, &response, &ci);
+  ms = mapPutIndividualContextEntity("MPICE2", "", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(404, response.errorCode.code);
 
   // Cleanup
   StatusCode sCode;
-  mapDeleteIndividualContextEntity("MPICE", &sCode, &ci);
+  mapDeleteIndividualContextEntity("MPICE", "", &sCode, &ci);
 
   utExit();
 }

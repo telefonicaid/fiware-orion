@@ -79,10 +79,10 @@ TEST(mapGetIndividualContextEntity, notFoundThenFound)
 
   prepareDatabase("E1", "Room");
 
-  ms = mapGetIndividualContextEntity("NotFound", &response, &ci);
+  ms = mapGetIndividualContextEntity("NotFound", "", &response, &ci);
   EXPECT_EQ(ms, SccOk);
 
-  ms = mapGetIndividualContextEntity("E1", &response, &ci);
+  ms = mapGetIndividualContextEntity("E1", "", &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_STREQ("E1", response.contextElement.entityId.id.c_str());
 

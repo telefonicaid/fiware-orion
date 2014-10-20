@@ -25,7 +25,7 @@
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0-255
 
 --SHELL--
 
@@ -38,10 +38,13 @@ brokerStart CB
 # 06. POST /v1/contextEntities/type/T2/id/E1 OK
 # 07. GET /v1/contextEntities and see E1 and E2
 # 08. GET /v1/contextEntities/type/T1/id/E1 and see E1 only
-# 09. DELETE /v1/contextEntities/type/T1/id/E1 OK
-# 10. DELETE /v1/contextEntities/type/T1/id/E1 and see it fail
-# 11. GET /v1/contextEntities/type/T1/id/E1 and see it fail
-#
+# 09. GET /v1/contextEntities/type/T1/id/E1 and see E2 only
+# 10. DELETE /v1/contextEntities/type/T1/id/E1 OK
+# 11. DELETE /v1/contextEntities/type/T1/id/E1 and see it fail
+# 12. GET /v1/contextEntities/type/T1/id/E1 and see it fail
+# 13. GET /v1/contextEntities/type/T2/id/E1 OK
+# 14. NOP /v1/contextEntities/type/T2/id/E1 and see it fail
+
 
 
 echo "01. PUT /v1/contextEntities/type/T1/id/E1 and see it fail"
@@ -65,6 +68,123 @@ echo
 echo "02. GET /v1/contextEntities/type/T1/id/E1 and see it fail"
 echo "========================================================="
 orionCurl --url /v1/contextEntities/type/T1/id/E1
+echo
+echo
+
+
+echo "03. POST /v1/contextEntities/type/T1/id/E1 OK"
+echo "============================================="
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>degree</type>
+      <contextValue>1</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>'
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" -X "POST"
+echo
+echo
+
+
+echo "04. PUT /v1/contextEntities/type/T1/id/E1 OK"
+echo "============================================"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>degree</type>
+      <contextValue>2</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>'
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" -X "PUT"
+echo
+echo
+
+
+echo "05. GET /v1/contextEntities/type/T1/id/E1 OK"
+echo "============================================"
+orionCurl --url /v1/contextEntities/type/T1/id/E1
+echo
+echo
+
+
+echo "06. POST /v1/contextEntities/type/T2/id/E1 OK"
+echo "============================================="
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A2</name>
+      <type>degree</type>
+      <contextValue>1</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>'
+orionCurl --url /v1/contextEntities/type/T2/id/E1 --payload "${payload}" -X "POST"
+echo
+echo
+
+
+echo "07. GET /v1/contextEntities and see E1 and E2"
+echo "============================================="
+orionCurl --url /v1/contextEntities
+echo
+echo
+
+
+
+echo "08. GET /v1/contextEntities/type/T1/id/E1 OK"
+echo "============================================"
+orionCurl --url /v1/contextEntities/type/T1/id/E1
+echo
+echo
+
+echo "09. GET /v1/contextEntities/type/T2/id/E1 OK"
+echo "============================================"
+orionCurl --url /v1/contextEntities/type/T2/id/E1
+echo
+echo
+
+
+echo "10. DELETE /v1/contextEntities/type/T1/id/E1 OK"
+echo "==============================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1 -X DELETE
+echo
+echo
+
+
+echo "11. DELETE /v1/contextEntities/type/T1/id/E1 and see it fail"
+echo "============================================================"
+orionCurl --url /v1/contextEntities/type/T1/id/E1 -X DELETE
+echo
+echo
+
+
+echo "12. GET /v1/contextEntities/type/T1/id/E1 and see it fail"
+echo "========================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1
+echo
+echo
+
+
+echo "13. GET /v1/contextEntities/type/T2/id/E1 OK"
+echo "============================================"
+orionCurl --url /v1/contextEntities/type/T2/id/E1
+echo
+echo
+
+
+echo "14. NOP /v1/contextEntities/type/T2/id/E1 and see it fail"
+echo "========================================================="
+orionCurl --url /v1/contextEntities/type/T2/id/E1 -X NOP
 echo
 echo
 
@@ -107,6 +227,309 @@ Date: REGEX(.*)
     <details>Entity id: 'E1'</details>
   </statusCode>
 </contextElementResponse>
+
+
+03. POST /v1/contextEntities/type/T1/id/E1 OK
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 489
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>degree</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
+
+
+04. PUT /v1/contextEntities/type/T1/id/E1 OK
+============================================
+HTTP/1.1 200 OK
+Content-Length: 489
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>degree</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</updateContextElementResponse>
+
+
+05. GET /v1/contextEntities/type/T1/id/E1 OK
+============================================
+HTTP/1.1 200 OK
+Content-Length: 450
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>E1</id>
+    </entityId>
+    <contextAttributeList>
+      <contextAttribute>
+        <name>A1</name>
+        <type>degree</type>
+        <contextValue>2</contextValue>
+      </contextAttribute>
+    </contextAttributeList>
+  </contextElement>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextElementResponse>
+
+
+06. POST /v1/contextEntities/type/T2/id/E1 OK
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 489
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A2</name>
+          <type>degree</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
+
+
+07. GET /v1/contextEntities and see E1 and E2
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 1144
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T1" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>degree</type>
+            <contextValue>2</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T2" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A2</name>
+            <type>degree</type>
+            <contextValue>1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+08. GET /v1/contextEntities/type/T1/id/E1 OK
+============================================
+HTTP/1.1 200 OK
+Content-Length: 450
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>E1</id>
+    </entityId>
+    <contextAttributeList>
+      <contextAttribute>
+        <name>A1</name>
+        <type>degree</type>
+        <contextValue>2</contextValue>
+      </contextAttribute>
+    </contextAttributeList>
+  </contextElement>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextElementResponse>
+
+
+09. GET /v1/contextEntities/type/T2/id/E1 OK
+============================================
+HTTP/1.1 200 OK
+Content-Length: 450
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>E1</id>
+    </entityId>
+    <contextAttributeList>
+      <contextAttribute>
+        <name>A2</name>
+        <type>degree</type>
+        <contextValue>1</contextValue>
+      </contextAttribute>
+    </contextAttributeList>
+  </contextElement>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextElementResponse>
+
+
+10. DELETE /v1/contextEntities/type/T1/id/E1 OK
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
+</statusCode>
+
+
+11. DELETE /v1/contextEntities/type/T1/id/E1 and see it fail
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 126
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<statusCode>
+  <code>404</code>
+  <reasonPhrase>No context element found</reasonPhrase>
+  <details>E1</details>
+</statusCode>
+
+
+12. GET /v1/contextEntities/type/T1/id/E1 and see it fail
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </contextElement>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Entity id: 'E1'</details>
+  </statusCode>
+</contextElementResponse>
+
+
+13. GET /v1/contextEntities/type/T2/id/E1 OK
+============================================
+HTTP/1.1 200 OK
+Content-Length: 450
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>E1</id>
+    </entityId>
+    <contextAttributeList>
+      <contextAttribute>
+        <name>A2</name>
+        <type>degree</type>
+        <contextValue>1</contextValue>
+      </contextAttribute>
+    </contextAttributeList>
+  </contextElement>
+  <statusCode>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
+  </statusCode>
+</contextElementResponse>
+
+
+14. NOP /v1/contextEntities/type/T2/id/E1 and see it fail
+=========================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET, PUT, DELETE
+Date: REGEX(.*)
+
 
 
 --TEARDOWN--
