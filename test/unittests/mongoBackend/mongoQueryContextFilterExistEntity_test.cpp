@@ -158,8 +158,52 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
 */
 TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
 {
-  //TBD
-  EXPECT_EQ(1,0);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "", "false");
+  req.entityIdVector.push_back(&en);
+
+  /* Define filter scope */
+  Scope sc;
+  sc.type = "FIWARE::Filter::Existence";
+  sc.value = "entity::type";
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
 }
 
 /* ****************************************************************************
@@ -169,6 +213,51 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
 */
 TEST(mongoQueryContextExistEntity, entityTypeFilterNotExist)
 {
-  //TBD
-  EXPECT_EQ(1,0);
+  HttpStatusCode         ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  utInit();
+
+  /* Prepare database */
+  prepareDatabase();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "", "false");
+  req.entityIdVector.push_back(&en);
+
+  /* Define filter scope */
+  Scope sc;
+  sc.type = "FIWARE::Filter::Existence";
+  sc.oper = "not";
+  sc.value = "entity::type";
+  req.restriction.scopeVector.push_back(&sc);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("val1b", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
 }

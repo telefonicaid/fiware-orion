@@ -818,6 +818,46 @@ static bool processAreaScope(ScopeVector& scoV, BSONObj &areaQuery) {
     return (geoScopes > 0);
 }
 
+/* *****************************************************************************
+*
+* processFilterScopes -
+*
+*/
+static void processFilterScopes(ScopeVector& scoV, std::vector<BSONObj> &filters)
+{
+  std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
+
+  for (unsigned int ix = 0; ix < scoV.size(); ++ix)
+  {
+    Scope* sco = scoV.get(ix);
+    if (sco->type == SCOPE_FILTER_EXIST)
+    {
+      if (sco->value == SCOPE_VALUE_ENTITY_TYPE)
+      {
+
+        BSONObj b = sco->oper == SCOPE_OPERATOR_NOT ?
+                    BSON(entityTypeString << BSON("$exists" << false)) :
+                    BSON(entityTypeString << BSON("$exists" << true));
+        /*BSONObj b;
+        if (sco->oper == SCOPE_OPERATOR_NOT)
+        {
+          b = BSON("_id." + ENT_ENTITY_TYPE << BSON("$exists" << false));
+        }
+        else
+        {
+          b = BSON("_id." + ENT_ENTITY_TYPE << BSON("$exists" << true))
+        }*/
+        filters.push_back(b);
+      }
+      else
+      {
+        LM_W(("Bad Input (unknown value for %s filter: '%s'", SCOPE_FILTER_EXIST, sco->value.c_str()));
+      }
+
+    }
+  }
+}
+
 /* ****************************************************************************
 *
 * entitiesQuery -
@@ -898,6 +938,14 @@ bool entitiesQuery
     if (processAreaScope(res.scopeVector, areaQuery)) {
        std::string locCoords = ENT_LOCATION "." ENT_LOCATION_COORDS;
        finalQuery.append(locCoords, areaQuery);
+    }    
+
+    /* Part 5: filters */
+    std::vector<BSONObj> filters;
+    processFilterScopes(res.scopeVector, filters);
+    for (unsigned int ix = 0; ix < filters.size(); ++ix)
+    {
+      finalQuery.appendElements(filters[ix]);
     }
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
