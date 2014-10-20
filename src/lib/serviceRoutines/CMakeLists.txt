@@ -83,6 +83,10 @@ deleteAttributeValueInstance.cpp
 getEntityTypes.cpp
 getAttributesForEntityType.cpp
 getAllContextEntities.cpp
+getAllEntitiesWithTypeAndId.cpp
+postAllEntitiesWithTypeAndId.cpp
+putAllEntitiesWithTypeAndId.cpp
+deleteAllEntitiesWithTypeAndId.cpp
 )
 
 SET (HEADERS

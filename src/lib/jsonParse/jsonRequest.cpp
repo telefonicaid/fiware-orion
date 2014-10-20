@@ -87,27 +87,34 @@ static JsonRequest jsonRequest[] =
   { UpdateContextSubscription,             "POST", "updateContextSubscriptionRequest",              FUNCS(Ucsr)  },
 
   // Convenience
-  { ContextEntityAttributes,               "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
-  { ContextEntityAttributes,               "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
-  { ContextEntityTypeAttributeContainer,   "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
-  { ContextEntityTypeAttributeContainer,   "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
   { ContextEntitiesByEntityId,             "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
   { ContextEntitiesByEntityId,             "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
   { EntityByIdAttributeByName,             "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
   { EntityByIdAttributeByName,             "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
-  { ContextEntityTypes,                    "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
-  { ContextEntityTypes,                    "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityAttributes,               "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityAttributes,               "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityTypeAttributeContainer,   "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityTypeAttributeContainer,   "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
   { ContextEntityTypeAttribute,            "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
   { ContextEntityTypeAttribute,            "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
-  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
+
   { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                   FUNCS(Ucer)  },
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
+
+  { ContextEntityTypes,                    "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
+  { ContextEntityTypes,                    "*",    "registerProviderRequest",                       FUNCS(Rpr)   },
+  { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextAvailabilitySubscriptionRequest",  FUNCS(Ucas)  },
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                 FUNCS(Upcar) },
   { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                 FUNCS(Upcar) },
   { IndividualContextEntityAttributes,     "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
   { IndividualContextEntityAttributes,     "PUT",  "updateContextElementRequest",                   FUNCS(Ucer)  },
   { AttributeValueInstance,                "PUT",  "updateContextAttributeRequest",                 FUNCS(Upcar) },
-  { Ngsi10SubscriptionsConvOp,             "PUT",  "updateContextSubscriptionRequest",              FUNCS(Ucsr)  }
+  { Ngsi10SubscriptionsConvOp,             "PUT",  "updateContextSubscriptionRequest",              FUNCS(Ucsr)  },
+
+  { AllEntitiesWithTypeAndId,              "PUT",  "updateContextElementRequest",                   FUNCS(Ucer)  },
+  { AllEntitiesWithTypeAndId,              "*",    "updateContextElementRequest",                   FUNCS(Ucer)  },
+  { AllEntitiesWithTypeAndId,              "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
+  { AllEntitiesWithTypeAndId,              "*",    "appendContextElementRequest",                   FUNCS(Acer)  }
 };
 
 

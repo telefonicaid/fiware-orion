@@ -46,6 +46,7 @@
 HttpStatusCode mapGetIndividualContextEntity
 (
   const std::string&       entityId,
+  const std::string&       entityType,
   ContextElementResponse*  response,
   ConnectionInfo*          ciP
 )
@@ -53,7 +54,7 @@ HttpStatusCode mapGetIndividualContextEntity
   HttpStatusCode        ms;
   QueryContextRequest   qcRequest;
   QueryContextResponse  qcResponse;
-  EntityId              entity(entityId, "", "false");
+  EntityId              entity(entityId, entityType, "false");
 
   // Here I fill in the 'query' entityId for the response
   response->contextElement.entityId.fill(entityId, "", "false");

@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -28,19 +28,20 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapGetIndividualContextEntity.h"
 #include "ngsi/ParseData.h"
-#include "ngsi/ContextElementResponse.h"
+#include "ngsi/EntityId.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/getIndividualContextEntity.h"
+#include "convenience/UpdateContextElementResponse.h"
+#include "convenienceMap/mapPutIndividualContextEntity.h"
+#include "serviceRoutines/putAllEntitiesWithTypeAndId.h"
 
 
 
 /* ****************************************************************************
 *
-* getIndividualContextEntity -
+* putAllEntitiesWithTypeAndId - 
 */
-std::string getIndividualContextEntity
+extern std::string putAllEntitiesWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -48,13 +49,13 @@ std::string getIndividualContextEntity
   ParseData*                 parseDataP
 )
 {
-  std::string             answer;
-  std::string             entityId = compV[2];
-  ContextElementResponse  response;
+  std::string                   enType = compV[3];
+  std::string                   enId   = compV[5];
+  std::string                   answer;
+  UpdateContextElementResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
-
-  ciP->httpStatusCode = mapGetIndividualContextEntity(entityId, "", &response, ciP);
+  LM_T(LmtConvenience, ("CONVENIENCE: got a 'PUT' request for entityId '%s', type '%s'", enId.c_str(), enType.c_str()));
+  ciP->httpStatusCode = mapPutIndividualContextEntity(enId, enType, &parseDataP->ucer.res, &response, ciP);
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 

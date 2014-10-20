@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -28,19 +28,20 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapGetIndividualContextEntity.h"
 #include "ngsi/ParseData.h"
-#include "ngsi/ContextElementResponse.h"
+#include "ngsi/EntityId.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/getIndividualContextEntity.h"
+#include "convenience/AppendContextElementResponse.h"
+#include "convenienceMap/mapPostIndividualContextEntity.h"
+#include "serviceRoutines/postAllEntitiesWithTypeAndId.h"
 
 
 
 /* ****************************************************************************
 *
-* getIndividualContextEntity -
+* postAllEntitiesWithTypeAndId - 
 */
-std::string getIndividualContextEntity
+extern std::string postAllEntitiesWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -48,13 +49,17 @@ std::string getIndividualContextEntity
   ParseData*                 parseDataP
 )
 {
-  std::string             answer;
-  std::string             entityId = compV[2];
-  ContextElementResponse  response;
+  std::string                   enType = compV[3];
+  std::string                   enId   = compV[5];
+  std::string                   answer;
+  AppendContextElementResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
+  // FIXME P1: AttributeDomainName skipped
+  // FIXME P1: domainMetadataVector skipped
 
-  ciP->httpStatusCode = mapGetIndividualContextEntity(entityId, "", &response, ciP);
+  LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s', type '%s'", enId.c_str(), enType.c_str()));
+
+  ciP->httpStatusCode = mapPostIndividualContextEntity(enId, enType, &parseDataP->acer.res, &response, ciP);
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 

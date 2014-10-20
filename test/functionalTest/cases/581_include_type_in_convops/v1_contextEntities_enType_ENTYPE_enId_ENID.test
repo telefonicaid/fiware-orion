@@ -1,0 +1,113 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+/v1/contextEntities ALL Entities with TYPE and ID
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. PUT /v1/contextEntities/type/T1/id/E1 and see it fail
+# 02. GET /v1/contextEntities/type/T1/id/E1 and see it fail
+# 03. POST /v1/contextEntities/type/T1/id/E1 OK
+# 04. PUT /v1/contextEntities/type/T1/id/E1 OK
+# 05. GET /v1/contextEntities/type/T1/id/E1 OK
+# 06. POST /v1/contextEntities/type/T2/id/E1 OK
+# 07. GET /v1/contextEntities and see E1 and E2
+# 08. GET /v1/contextEntities/type/T1/id/E1 and see E1 only
+# 09. DELETE /v1/contextEntities/type/T1/id/E1 OK
+# 10. DELETE /v1/contextEntities/type/T1/id/E1 and see it fail
+# 11. GET /v1/contextEntities/type/T1/id/E1 and see it fail
+#
+
+
+echo "01. PUT /v1/contextEntities/type/T1/id/E1 and see it fail"
+echo "========================================================="
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>degree</type>
+      <contextValue>1</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>'
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" -X "PUT"
+echo
+echo
+
+
+echo "02. GET /v1/contextEntities/type/T1/id/E1 and see it fail"
+echo "========================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1
+echo
+echo
+
+
+--REGEXPECT--
+01. PUT /v1/contextEntities/type/T1/id/E1 and see it fail
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 197
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextElementResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>E1</details>
+  </errorCode>
+</updateContextElementResponse>
+
+
+02. GET /v1/contextEntities/type/T1/id/E1 and see it fail
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<contextElementResponse>
+  <contextElement>
+    <entityId type="" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </contextElement>
+  <statusCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>Entity id: 'E1'</details>
+  </statusCode>
+</contextElementResponse>
+
+
+--TEARDOWN--
+brokerStop CB
