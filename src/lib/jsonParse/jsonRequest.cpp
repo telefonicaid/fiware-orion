@@ -112,10 +112,10 @@ static JsonRequest jsonRequest[] =
   { Ngsi10SubscriptionsConvOp,             "PUT",  "updateContextSubscriptionRequest",              FUNCS(Ucsr)  },
 
   { AllEntitiesWithTypeAndId,              "PUT",  "updateContextElementRequest",                   FUNCS(Ucer)  },
-  { AllEntitiesWithTypeAndId,              "*",    "updateContextElementRequest",                   FUNCS(Ucer)  },
   { AllEntitiesWithTypeAndId,              "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
-  { AllEntitiesWithTypeAndId,              "*",    "appendContextElementRequest",                   FUNCS(Acer)  }
+  { AllEntitiesWithTypeAndId,              "*",    "",                                              FUNCS(Ucer)  }
 };
+
 
 
 /* ****************************************************************************
