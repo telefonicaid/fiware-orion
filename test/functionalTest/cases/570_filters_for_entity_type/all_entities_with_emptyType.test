@@ -202,6 +202,56 @@ echo
 echo
 
 
+echo "9. Query for Entities with type EMPTY using std operation"
+echo "========================================================="
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "isPattern": "true",
+      "id": ".*"
+    }
+  ],
+  "restriction": {
+    "scopes": [
+      {
+        "type": "FIWARE::Filter::Existence",
+        "operator": "not",
+        "value": "entity::type"
+      }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Query for Entities with type NOT EMPTY using std operation"
+echo "=============================================================="
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "isPattern": "true",
+      "id": ".*"
+    }
+  ],
+  "restriction": {
+    "scopes": [
+      {
+        "type": "FIWARE::Filter::Existence",
+        "operator": "nop",
+        "value": "entity::type"
+      }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
 --REGEXPECT--
 1. APPEND entity E1, type T1 with attribute A1
 ==============================================
@@ -531,6 +581,103 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
+9. Query for Entities with type EMPTY using std operation
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 728
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "A2T", 
+                        "value": "a1"
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": ""
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A4", 
+                        "type": "A4T", 
+                        "value": "a1"
+                    }
+                ], 
+                "id": "E4", 
+                "isPattern": "false", 
+                "type": ""
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+10. Query for Entities with type NOT EMPTY using std operation
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 732
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "A1T", 
+                        "value": "a1"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3", 
+                        "type": "A3T", 
+                        "value": "a1"
+                    }
+                ], 
+                "id": "E3", 
+                "isPattern": "false", 
+                "type": "T3"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
 --TEARDOWN--
 brokerStop CB
-
