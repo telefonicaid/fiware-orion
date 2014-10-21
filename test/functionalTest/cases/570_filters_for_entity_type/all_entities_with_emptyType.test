@@ -25,7 +25,7 @@
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0
+brokerStart CB 0-255
 
 --SHELL--
 
@@ -36,6 +36,8 @@ brokerStart CB 0
 # 4. Update/APPEND entity E4, WITHOUT TYPE and with attribute A4
 # 5. Query for Entities with type EMPTY
 # 6. Query for Entities with type NOT EMPTY
+# 7. Query for Entities with type EMPTY using std operation
+# 8. Query for Entities with type NOT EMPTY using std operation
 #
 
 echo "1. APPEND entity E1, type T1 with attribute A1"
@@ -139,15 +141,63 @@ echo
 
 
 echo "5. Query for Entities with type EMPTY"
-echo "========================================="
+echo "====================================="
 orionCurl --url /v1/contextEntities?!exist=entity::type
 echo
 echo
 
 
 echo "6. Query for Entities with type NOT EMPTY"
-echo "====================================="
+echo "========================================="
 orionCurl --url /v1/contextEntities?exist=entity::type
+echo
+echo
+
+
+echo "7. Query for Entities with type EMPTY using std operation"
+echo "========================================================="
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="" isPattern="true">
+      <id>.*</id>
+    </entityId>
+  </entityIdList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE::Filter::Existence</scopeType>
+        <scopeOperator>not</scopeOperator>
+        <scopeValue>entity::type</scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>'
+orionCurl --url /v1/queryContext --payload "$payload"
+echo
+echo
+
+
+echo "8. Query for Entities with type NOT EMPTY using std operation"
+echo "============================================================="
+payload='<?xml version="1.0"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="" isPattern="true">
+      <id>.*</id>
+    </entityId>
+  </entityIdList>
+  <restriction>
+    <scope>
+      <operationScope>
+        <scopeType>FIWARE::Filter::Existence</scopeType>
+        <scopeOperator>nop</scopeOperator>
+        <scopeValue>entity::type</scopeValue>
+      </operationScope>
+    </scope>
+  </restriction>
+</queryContextRequest>'
+orionCurl --url /v1/queryContext --payload "$payload"
 echo
 echo
 
@@ -282,7 +332,7 @@ Date: REGEX(.*)
 
 
 5. Query for Entities with type EMPTY
-=========================================
+=====================================
 HTTP/1.1 200 OK
 Content-Length: 1136
 Content-Type: application/xml
@@ -332,7 +382,107 @@ Date: REGEX(.*)
 
 
 6. Query for Entities with type NOT EMPTY
-=====================================
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 1140
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T1" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>A1T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T3" isPattern="false">
+          <id>E3</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A3</name>
+            <type>A3T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+7. Query for Entities with type EMPTY using std operation
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 1136
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="" isPattern="false">
+          <id>E2</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A2</name>
+            <type>A2T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="" isPattern="false">
+          <id>E4</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A4</name>
+            <type>A4T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+8. Query for Entities with type NOT EMPTY using std operation
+=============================================================
 HTTP/1.1 200 OK
 Content-Length: 1140
 Content-Type: application/xml
