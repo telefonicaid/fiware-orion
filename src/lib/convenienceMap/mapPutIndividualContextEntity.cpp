@@ -46,6 +46,7 @@
 HttpStatusCode mapPutIndividualContextEntity
 (
   const std::string&             entityId,
+  const std::string&             entityType,
   UpdateContextElementRequest*   ucerP,
   UpdateContextElementResponse*  response,
   ConnectionInfo*                ciP
@@ -56,7 +57,7 @@ HttpStatusCode mapPutIndividualContextEntity
   UpdateContextResponse   ucResponse;
   ContextElement          ce;
 
-  ce.entityId.fill(entityId, "", "false");
+  ce.entityId.fill(entityId, entityType, "false");
   ce.attributeDomainName    = ucerP->attributeDomainName;
   ce.contextAttributeVector = ucerP->contextAttributeVector;
 

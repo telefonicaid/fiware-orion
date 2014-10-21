@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITY_H_
-#define SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITY_H_
-
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,24 +23,41 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "mongoBackend/MongoGlobal.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "convenienceMap/mapGetIndividualContextEntity.h"
+#include "ngsi/ParseData.h"
 #include "ngsi/ContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpStatusCode.h"
+#include "serviceRoutines/getAllEntitiesWithTypeAndId.h"
 
 
 
 /* ****************************************************************************
 *
-* mapGetIndividualContextEntity - 
+* getAllEntitiesWithTypeAndId - 
 */
-extern HttpStatusCode mapGetIndividualContextEntity
+extern std::string getAllEntitiesWithTypeAndId
 (
-  const std::string&       entityId,
-  const std::string&       entityType,
-  ContextElementResponse*  response,
-  ConnectionInfo*          ciP
-);
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
+{
+  std::string             answer;
+  std::string             enType = compV[3];
+  std::string             enId   = compV[5];
+  ContextElementResponse  response;
 
-#endif  // SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITY_H_
+  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with type='%s', and id='%s'", enType.c_str(), enId.c_str()));
+
+  ciP->httpStatusCode = mapGetIndividualContextEntity(enId, enType, &response, ciP);
+  answer = response.render(ciP, IndividualContextEntity, "");
+  response.release();
+
+  return answer;
+}

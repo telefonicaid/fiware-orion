@@ -88,6 +88,7 @@ const char* requestType(RequestType rt)
   case EntityTypes:                                      return "EntityTypes";
   case AttributesForEntityType:                          return "AttributesForEntityType";
   case AllContextEntities:                               return "AllContextEntities";
+  case AllEntitiesWithTypeAndId:                         return "AllEntitiesWithTypeAndId";
   }
 
   return "";

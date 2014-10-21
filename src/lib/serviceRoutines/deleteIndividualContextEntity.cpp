@@ -58,7 +58,7 @@ std::string deleteIndividualContextEntity
   }
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s'", entityId.c_str()));
-  ciP->httpStatusCode = mapDeleteIndividualContextEntity(entityId, &response, ciP);
+  ciP->httpStatusCode = mapDeleteIndividualContextEntity(entityId, "", &response, ciP);
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
 

@@ -148,6 +148,10 @@
 #include "serviceRoutines/getAttributeValueInstance.h"
 #include "serviceRoutines/putAttributeValueInstance.h"
 #include "serviceRoutines/deleteAttributeValueInstance.h"
+#include "serviceRoutines/getAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/postAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/putAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/deleteAllEntitiesWithTypeAndId.h"
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -458,6 +462,10 @@ PaArgument paArgs[] =
 #define ACE                AllContextEntities
 #define ACE_COMPS_V1       2, { "v1", "contextEntities" }
 
+#define ACET               AllEntitiesWithTypeAndId
+#define ACET_COMPS_V1      6, { "v1", "contextEntities", "type", "*", "id", "*" }
+#define ACET_POST_WORD     "appendContextElementRequest"
+#define ACET_PUT_WORD      "updateContextElementRequest"
 
 //
 // Log, version, statistics ...
@@ -719,7 +727,13 @@ PaArgument paArgs[] =
   { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
                                                                                                            \
   { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
-  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }
+  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }, \
+                                                                                                           \
+  { "GET",    ACET,  ACET_COMPS_V1,          "",              getAllEntitiesWithTypeAndId               }, \
+  { "POST",   ACET,  ACET_COMPS_V1,          ACET_POST_WORD,  postAllEntitiesWithTypeAndId              }, \
+  { "PUT",    ACET,  ACET_COMPS_V1,          ACET_PUT_WORD,   putAllEntitiesWithTypeAndId               }, \
+  { "DELETE", ACET,  ACET_COMPS_V1,          "",              deleteAllEntitiesWithTypeAndId            }, \
+  { "*",      ACET,  ACET_COMPS_V1,          "",              badVerbAllFour                            }
 
 
 

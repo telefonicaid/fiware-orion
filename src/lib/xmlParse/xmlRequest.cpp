@@ -136,6 +136,10 @@ static XmlRequest xmlRequest[] =
   { Ngsi9SubscriptionsConvOp,              "POST", "subscribeContextAvailabilityRequest",          FUNCS(scar)  },
   { Ngsi9SubscriptionsConvOp,              "PUT",  "updateContextvailabilitySubscriptionRequest",  FUNCS(ucas)  },
 
+  { AllEntitiesWithTypeAndId,              "PUT",  "updateContextElementRequest",                  FUNCS(ucer)  },
+  { AllEntitiesWithTypeAndId,              "POST", "appendContextElementRequest",                  FUNCS(acer)  },
+  { AllEntitiesWithTypeAndId,              "*",    "",                                             FUNCS(ucer)  },
+
   // Responses
   { RegisterResponse,                      "POST", "registerContextResponse",                      FUNCS(rcrs)  },
   { RtQueryContextResponse,                "POST", "queryContextResponse",                         FUNCS(qcrs)  },
@@ -145,7 +149,7 @@ static XmlRequest xmlRequest[] =
   { LogRequest,                            "*", "", NULL, NULL, NULL, NULL, NULL },
   { VersionRequest,                        "*", "", NULL, NULL, NULL, NULL, NULL },
   { ExitRequest,                           "*", "", NULL, NULL, NULL, NULL, NULL },
-  { InvalidRequest,                        "*", "", NULL, NULL, NULL, NULL, NULL },
+  { InvalidRequest,                        "*", "", NULL, NULL, NULL, NULL, NULL }
 };
 
 

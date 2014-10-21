@@ -46,6 +46,7 @@
 HttpStatusCode mapGetIndividualContextEntity
 (
   const std::string&       entityId,
+  const std::string&       entityType,
   ContextElementResponse*  response,
   ConnectionInfo*          ciP
 )
@@ -53,7 +54,7 @@ HttpStatusCode mapGetIndividualContextEntity
   HttpStatusCode        ms;
   QueryContextRequest   qcRequest;
   QueryContextResponse  qcResponse;
-  EntityId              entity(entityId, "", "false");
+  EntityId              entity(entityId, entityType, "false");
 
   // Here I fill in the 'query' entityId for the response
   response->contextElement.entityId.fill(entityId, "", "false");
@@ -63,7 +64,7 @@ HttpStatusCode mapGetIndividualContextEntity
 
   if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
   {
-    // Here I fill in statusCode for the response
+    response->contextElement.entityId.fill(entityId, entityType, "false");
     response->statusCode.fill(SccContextElementNotFound, std::string("Entity id: '") + entityId + "'");
     LM_W(("Bad Input (entityId '%s' not found)", entityId.c_str()));
     return ms;
@@ -72,6 +73,7 @@ HttpStatusCode mapGetIndividualContextEntity
   ContextElementResponse*         cerP  = qcResponse.contextElementResponseVector[0];
   std::vector<ContextAttribute*>  attrV = cerP->contextElement.contextAttributeVector.vec;
 
+  response->contextElement.entityId.fill(&cerP->contextElement.entityId);
   for (unsigned int ix = 0; ix < attrV.size() ; ++ix)
   {
     ContextAttribute* ca = new ContextAttribute(attrV[ix]);
