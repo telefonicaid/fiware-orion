@@ -64,6 +64,7 @@ function usage()
   echo "$sfile [-u (usage)]"
   echo "$empty [-v (verbose)]"
   echo "$empty [--filter <test filter>]"
+  echo "$empty [--match <string for test to match>]"
   echo "$empty [--keep (don't remove output files)]"
   echo "$empty [--dryrun (don't execute any tests)]"
   echo "$empty [--dir <directory>]"
@@ -153,6 +154,7 @@ dryrun=off
 keep=off
 stopOnError=off
 testFilter=${TEST_FILTER:-"*.test"}
+match=""
 dir=$SCRIPT_HOME/cases
 dirOrFile=""
 dirGiven=no
@@ -168,6 +170,7 @@ do
   elif [ "$1" == "--keep" ];        then keep=on;
   elif [ "$1" == "--stopOnError" ]; then stopOnError=on;
   elif [ "$1" == "--filter" ];      then testFilter="$2"; filterGiven=yes; shift;
+  elif [ "$1" == "--match" ];       then match="$2"; shift;
   elif [ "$1" == "--dir" ];         then dir="$2"; dirGiven=yes; shift;
   elif [ "$1" == "--no-duration" ]; then showDuration=off;
   else
@@ -313,7 +316,13 @@ date >> /tmp/orionFuncTestLog
 # Preparations - number of test cases
 #
 vMsg find in $(pwd), filter: $testFilter
-fileList=$(find . -name "$testFilter" | sort | sed 's/^.\///')
+if [ "$match" == "" ]
+then
+  fileList=$(find . -name "$testFilter" | sort | sed 's/^.\///')
+else
+  fileList=$(find . -name "$testFilter" | grep "$match" | sort | sed 's/^.\///')
+fi
+
 typeset -i noOfTests
 typeset -i testNo
 
@@ -668,8 +677,11 @@ do
   startDate=$(date)
   start=$(date --date="$startDate" +%s)
   endDate=""
-  runTest $testFile
-  
+  if [ "$dryrun" == "off" ]
+  then
+    runTest $testFile
+  fi
+
   if [ "$endDate" == "" ]  # Could have been set in 'partExecute'
   then
     endDate=$(date)
