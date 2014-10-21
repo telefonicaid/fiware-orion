@@ -21,11 +21,11 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-/v1/ ALL Entities with !empty=type and empty=type
+/v1/ ALL Entities with !exist=type and exist=type
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0
 
 --SHELL--
 
@@ -34,8 +34,8 @@ brokerStart CB
 # 2. Update/APPEND entity E2, WITHOUT TYPE and with attribute A2
 # 3. Update/APPEND entity E3, type T3 with attribute A4
 # 4. Update/APPEND entity E4, WITHOUT TYPE and with attribute A4
-# 5. Query for Entities with type NOT EMPTY
-# 6. Query for Entities with type EMPTY
+# 5. Query for Entities with type EMPTY
+# 6. Query for Entities with type NOT EMPTY
 #
 
 echo "1. APPEND entity E1, type T1 with attribute A1"
@@ -138,16 +138,16 @@ echo
 echo
 
 
-echo "5. Query for Entities with type NOT EMPTY"
+echo "5. Query for Entities with type EMPTY"
 echo "========================================="
-orionCurl --url /v1/contextEntities?!empty=type
+orionCurl --url /v1/contextEntities?!exist=entity::type
 echo
 echo
 
 
-echo "6. Query for Entities with type EMPTY"
+echo "6. Query for Entities with type NOT EMPTY"
 echo "====================================="
-orionCurl --url /v1/contextEntities?empty=type
+orionCurl --url /v1/contextEntities?exist=entity::type
 echo
 echo
 
@@ -281,60 +281,10 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-5. Query for Entities with type NOT EMPTY
+5. Query for Entities with type EMPTY
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T1" isPattern="false">
-          <id>E1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A1</name>
-            <type>A1T</type>
-            <contextValue>a1</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T3" isPattern="false">
-          <id>E3</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A2</name>
-            <type>A2T</type>
-            <contextValue>a1</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-
-
-6. Query for Entities with type EMPTY
-=====================================
-HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 1136
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -368,6 +318,56 @@ Date: REGEX(.*)
           <contextAttribute>
             <name>A4</name>
             <type>A4T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+
+6. Query for Entities with type NOT EMPTY
+=====================================
+HTTP/1.1 200 OK
+Content-Length: 1140
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T1" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>A1T</type>
+            <contextValue>a1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T3" isPattern="false">
+          <id>E3</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A3</name>
+            <type>A3T</type>
             <contextValue>a1</contextValue>
           </contextAttribute>
         </contextAttributeList>

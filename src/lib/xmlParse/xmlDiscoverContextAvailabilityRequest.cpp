@@ -151,6 +151,20 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
+* scopeOperator -
+*/
+static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
+  reqDataP->dcar.scopeP->oper = node->value();
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqDataP)
@@ -230,21 +244,22 @@ void dcarPresent(ParseData* reqDataP)
 */
 XmlNode dcarParseVector[] =
 {
-  { "/discoverContextAvailabilityRequest",                                             nullTreat            },
+  { "/discoverContextAvailabilityRequest",                                                nullTreat           },
 
-  { "/discoverContextAvailabilityRequest/entityIdList",                                nullTreat            },
-  { "/discoverContextAvailabilityRequest/entityIdList/entityId",                       entityId             },
-  { "/discoverContextAvailabilityRequest/entityIdList/entityId/id",                    entityIdId           },
+  { "/discoverContextAvailabilityRequest/entityIdList",                                   nullTreat           },
+  { "/discoverContextAvailabilityRequest/entityIdList/entityId",                          entityId            },
+  { "/discoverContextAvailabilityRequest/entityIdList/entityId/id",                       entityIdId          },
 
-  { "/discoverContextAvailabilityRequest/attributeList",                               nullTreat            },
-  { "/discoverContextAvailabilityRequest/attributeList/attribute",                     attribute            },
+  { "/discoverContextAvailabilityRequest/attributeList",                                  nullTreat           },
+  { "/discoverContextAvailabilityRequest/attributeList/attribute",                        attribute           },
 
-  { "/discoverContextAvailabilityRequest/restriction",                                 restriction          },
-  { "/discoverContextAvailabilityRequest/restriction/attributeExpression",             attributeExpression  },
-  { "/discoverContextAvailabilityRequest/restriction/scope",                           nullTreat            },
-  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope",            operationScope       },
-  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeType",  scopeType            },
-  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue", scopeValue           },
+  { "/discoverContextAvailabilityRequest/restriction",                                    restriction         },
+  { "/discoverContextAvailabilityRequest/restriction/attributeExpression",                attributeExpression },
+  { "/discoverContextAvailabilityRequest/restriction/scope",                              nullTreat           },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope",               operationScope      },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeType",     scopeType           },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue",    scopeValue          },
+  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeOperator", scopeOperator       },
 
   { "LAST", NULL }
 };

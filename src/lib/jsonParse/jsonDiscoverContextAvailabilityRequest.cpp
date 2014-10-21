@@ -201,6 +201,20 @@ static std::string scopeType(const std::string& path, const std::string& value, 
 
 /* ****************************************************************************
 *
+* scopeOperator - 
+*/
+static std::string scopeOperator(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  reqDataP->dcar.scopeP->oper = value;
+  LM_T(LmtParse, ("Set scope 'operator' to '%s' for a scope", reqDataP->dcar.scopeP->oper.c_str()));
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * scopeValue - 
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
@@ -281,21 +295,22 @@ void jsonDcarPresent(ParseData* reqDataP)
 */
 JsonNode jsonDcarParseVector[] =
 {
-  { "/entities",                         jsonNullTreat         },
-  { "/entities/entity",                  entityId              },
-  { "/entities/entity/id",               entityIdId            },
-  { "/entities/entity/type",             entityIdType          },
-  { "/entities/entity/isPattern",        entityIdIsPattern     },
+  { "/entities",                          jsonNullTreat         },
+  { "/entities/entity",                   entityId              },
+  { "/entities/entity/id",                entityIdId            },
+  { "/entities/entity/type",              entityIdType          },
+  { "/entities/entity/isPattern",         entityIdIsPattern     },
 
-  { "/attributes",                       attributeList         },
-  { "/attributes/attribute",             attribute             },
+  { "/attributes",                        attributeList         },
+  { "/attributes/attribute",              attribute             },
 
-  { "/restriction",                      restriction           },
-  { "/restriction/attributeExpression",  attributeExpression   },
-  { "/restriction/scopes",               jsonNullTreat         },
-  { "/restriction/scopes/scope",         operationScope        },
-  { "/restriction/scopes/scope/type",    scopeType             },
-  { "/restriction/scopes/scope/value",   scopeValue            },
+  { "/restriction",                       restriction           },
+  { "/restriction/attributeExpression",   attributeExpression   },
+  { "/restriction/scopes",                jsonNullTreat         },
+  { "/restriction/scopes/scope",          operationScope        },
+  { "/restriction/scopes/scope/type",     scopeType             },
+  { "/restriction/scopes/scope/operator", scopeOperator         },
+  { "/restriction/scopes/scope/value",    scopeValue            },
 
   { "LAST", NULL }
 };
