@@ -6,6 +6,9 @@
 - Add: New scopeType FIWARE::Filter::Existence (only with value "entity::type" in this version)
 - Add: New payload field for 'operationScope' under 'restriction': 'operator' for JSON and 'scopeOperator' for XML
        This new payload field is for operators on filters, such as NOT, GREATER-THAN, etc. Default value (if omitted) is EQUAL.
+- Fix: A few fixes of the bug 'no entity::type' in response (Issue #585)
+       Fixed for convop '/v1/contestEntities/<entity::id>'
 
-Saved for Next PR:
+Saved for other PRs:
   - Add: New conv op URI parameter 'entity::type=TYPE' to filter by type (Issue #570)
+  - Fix: Issue #585 fixed for convops '/v1/contestEntities/type/<entity::type>/id/<entity::id>'
