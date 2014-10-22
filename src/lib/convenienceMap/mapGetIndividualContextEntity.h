@@ -36,11 +36,25 @@
 
 /* ****************************************************************************
 *
+* EntityTypeInfo - entity::type empty, not empty OR both 
+*/
+typedef enum EntityTypeInfo
+{
+  EntityTypeEmptyOrNotEmpty,
+  EntityTypeEmpty,
+  EntityTypeNotEmpty
+} EntityTypeInfo;
+
+
+
+/* ****************************************************************************
+*
 * mapGetIndividualContextEntity - 
 */
 extern HttpStatusCode mapGetIndividualContextEntity
 (
   const std::string&       entityId,
+  EntityTypeInfo           typeInfo,
   ContextElementResponse*  response,
   ConnectionInfo*          ciP
 );
