@@ -37,7 +37,8 @@
 *
 * FIWARE_LOCATION - 
 */
-#define FIWARE_LOCATION "FIWARE_Location"
+#define FIWARE_LOCATION             "FIWARE::Location"
+#define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 
 
 

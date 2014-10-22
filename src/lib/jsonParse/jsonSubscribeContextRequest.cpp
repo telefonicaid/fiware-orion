@@ -240,10 +240,10 @@ static std::string scopeOperator(const std::string& path, const std::string& val
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
-  if (parseDataP->scr.scopeP->type == FIWARE_LOCATION)
+  if (parseDataP->scr.scopeP->type == FIWARE_LOCATION || parseDataP->scr.scopeP->type == FIWARE_LOCATION_DEPRECATED)
   {
     //
-    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // If the scope type is 'FIWARE_Location' (or its deprecated variant), then the value of this scope is stored in 'circle' or 'polygon'.
     // The field 'value' is not used as more complexity is needed.
     // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
     // instead 'circle' or 'polygon' should be used.
