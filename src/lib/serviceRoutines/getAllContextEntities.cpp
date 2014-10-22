@@ -58,9 +58,6 @@ std::string getAllContextEntities
 
   reqP->entityIdVector.push_back(eP);
 
-  // Temporal debug
-  reqP->present("");
-
   res = postQueryContext(ciP, components, compV, parseDataP);
   delete eP;
 

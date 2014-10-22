@@ -30,14 +30,16 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 1. Update/APPEND entity E1, type T1 with attribute A1
-# 2. Update/APPEND entity E2, WITHOUT TYPE and with attribute A2
-# 3. Update/APPEND entity E3, type T3 with attribute A4
-# 4. Update/APPEND entity E4, WITHOUT TYPE and with attribute A4
-# 5. Query for Entities with type EMPTY
-# 6. Query for Entities with type NOT EMPTY
-# 7. Query for Entities with type EMPTY using std operation
-# 8. Query for Entities with type NOT EMPTY using std operation
+#  1. Update/APPEND entity E1, type T1 with attribute A1
+#  2. Update/APPEND entity E2, WITHOUT TYPE and with attribute A2
+#  3. Update/APPEND entity E3, type T3 with attribute A4
+#  4. Update/APPEND entity E4, WITHOUT TYPE and with attribute A4
+#  5. Query for Entities with type EMPTY
+#  6. Query for Entities with type NOT EMPTY
+#  7. Query for Entities with type EMPTY using std operation (XML)
+#  8. Query for Entities with type NOT EMPTY using std operation (XML)
+#  9. Query for Entities with type EMPTY using std operation (JSON)
+# 10. Query for Entities with type NOT EMPTY using std operation (JSON)
 #
 
 echo "1. APPEND entity E1, type T1 with attribute A1"
