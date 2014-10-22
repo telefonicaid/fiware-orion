@@ -662,14 +662,14 @@ Date: REGEX(.*)
 6. GET /ngsi10/contextEntities/EID
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 450
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
-    <entityId type="" isPattern="false">
+    <entityId type="T" isPattern="false">
       <id>EID</id>
     </entityId>
     <contextAttributeList>

@@ -49,12 +49,23 @@ std::string getIndividualContextEntity
 )
 {
   std::string             answer;
-  std::string             entityId = compV[2];
+  std::string             entityId  = compV[2];
+  EntityTypeInfo          typeInfo  = EntityTypeEmptyOrNotEmpty;
   ContextElementResponse  response;
 
   LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
 
-  ciP->httpStatusCode = mapGetIndividualContextEntity(entityId, &response, ciP);
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+
+  ciP->httpStatusCode = mapGetIndividualContextEntity(entityId, typeInfo, &response, ciP);
+
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 

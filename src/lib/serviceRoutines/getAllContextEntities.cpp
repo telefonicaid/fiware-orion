@@ -47,8 +47,8 @@ std::string getAllContextEntities
   ParseData*                 parseDataP
 )
 {
-  QueryContextRequest*  reqP = &parseDataP->qcr.res;
-  EntityId*             eP   = new EntityId(".*", "", "true");
+  QueryContextRequest*  reqP   = &parseDataP->qcr.res;
+  EntityId*             eP     = new EntityId(".*", "", "true");
   std::string           res;
 
   if (ciP->uriParam[URI_PARAM_TYPE] != "")
