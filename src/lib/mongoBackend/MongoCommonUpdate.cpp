@@ -848,13 +848,13 @@ static bool addTriggeredSubscriptions(std::string entityId,
             long long throttling       = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
             long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? sub.getIntField(CSUB_LASTNOTIFICATION) : -1;
 
-            TriggeredSubscription* trgs = new TriggeredSubscription(throttling,
+            TriggeredSubscription* trigs = new TriggeredSubscription(throttling,
                                                                     lastNotification,
                                                                     sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
                                                                     STR_FIELD(sub, CSUB_REFERENCE),
                                                                     subToAttributeList(sub));
 
-            subs->insert(std::pair<string, TriggeredSubscription*>(subIdStr, trgs));
+            subs->insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
         }
     }
 
@@ -876,6 +876,8 @@ static bool processSubscriptions(const EntityId*                           enP,
     DBClientBase* connection = getMongoConnection();
 
     /* For each one of the subscriptions in the map, send notification */
+    bool ret = true;
+    *err = "";
     for (std::map<string, TriggeredSubscription*>::iterator it = subs->begin(); it != subs->end(); ++it) {
 
         std::string  mapSubId        = it->first;
@@ -918,22 +920,18 @@ static bool processSubscriptions(const EntityId*                           enP,
             catch (const DBException &e)
             {
                 mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
-                *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
+                *err += std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + e.what();
-                enV.release();
-                trigs->attrL.release();
                 LM_E(("Database Error (%s)", err->c_str()));
-                return false;
+                ret = false;
             }
             catch (...)
             {
                 mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
-                *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
+                *err += std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + "generic";
-                enV.release();
-                trigs->attrL.release();
                 LM_E(("Database Error (%s)", err->c_str()));
-                return false;
+                ret = false;
             }
         }
 
@@ -944,7 +942,7 @@ static bool processSubscriptions(const EntityId*                           enP,
         delete it->second;
     }
 
-    return true;
+    return ret;
 }
 
 
@@ -1576,6 +1574,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         if (!processContextAttributeVector(ceP, action, &subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
+            releaseTriggeredSubscriptions(subsToNotify);
             continue;
         }
 
@@ -1648,6 +1647,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
             responseP->contextElementResponseVector.push_back(cerP);
             LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
+            releaseTriggeredSubscriptions(subsToNotify);
             continue;
         }
         catch (...)
@@ -1661,6 +1661,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
             responseP->contextElementResponseVector.push_back(cerP);
             LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
+            releaseTriggeredSubscriptions(subsToNotify);
             continue;
         }
 

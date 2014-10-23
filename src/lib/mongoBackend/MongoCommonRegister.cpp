@@ -35,6 +35,8 @@
 
 #include "mongoBackend/MongoGlobal.h"
 
+#include "mongoBackend/TriggeredSubscription.h"
+
 using std::string;
 using std::map;
 using std::auto_ptr;
@@ -122,19 +124,22 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
 * mongoUpdateContext.cpp, so maybe it makes to factorize it.
 *
 */
-static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool processSubscriptions(EntityIdVector triggerEntitiesV,
+                                 map<string, TriggeredSubscription*>* subs,
+                                 std::string* err,
+                                 std::string tenant)
+{
 
-    DBClientBase* connection = getMongoConnection();
+    //DBClientBase* connection = getMongoConnection();
 
     /* For each one of the subscriptions in the map, send notification */
     bool ret = true;
-    for (std::map<string, BSONObj*>::iterator it = subs->begin(); it != subs->end(); ++it) {
+    for (std::map<string, TriggeredSubscription*>::iterator it = subs->begin(); it != subs->end(); ++it) {
 
-        //FIXME P8: see issue #371
-        //BSONObj sub = *(it->second);
-        std::string mapSubId = it->first;
-        BSONObj     sub;
+        std::string mapSubId         = it->first;
+        TriggeredSubscription* trigs = it->second;
 
+        /*
         try
         {
            mongoSemTake(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
@@ -150,18 +155,20 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
            return false;
         }
 
-        LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
+        LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));        
 
         OID subId = sub.getField("_id").OID();
+        */
 
         /* Build attribute list vector */
-        AttributeList attrL = subToAttributeList(sub);
+        //AttributeList attrL = subToAttributeList(sub);
 
         /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
-        Format format = sub.hasField(CASUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CASUB_FORMAT)) : XML;
+        //Format format = sub.hasField(CASUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CASUB_FORMAT)) : XML;
 
         /* Send notification */
-        if (!processAvailabilitySubscription(triggerEntitiesV, attrL, subId.str(), STR_FIELD(sub, CSUB_REFERENCE), format, tenant))
+        //if (!processAvailabilitySubscription(triggerEntitiesV, attrL, subId.str(), STR_FIELD(sub, CSUB_REFERENCE), format, tenant))
+        if (!processAvailabilitySubscription(triggerEntitiesV, trigs->attrL, mapSubId, trigs->reference, trigs->format, tenant))
         {
           LM_T(LmtMongo, ("Notification failure"));
           ret = false;
@@ -169,7 +176,7 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
 
         /* Release object created dynamically (including the value in the map created by
          * addTriggeredSubscriptions */
-        attrL.release();
+        trigs->attrL.release();
         delete it->second;
     }
 
@@ -181,7 +188,10 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV, map<string, BS
 * addTriggeredSubscriptions
 *
 */
-static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool addTriggeredSubscriptions(ContextRegistration cr,
+                                      map<string, TriggeredSubscription*>* subs,
+                                      std::string* err,
+                                      std::string tenant) {
 
     DBClientBase* connection = getMongoConnection();
 
@@ -322,8 +332,13 @@ static bool addTriggeredSubscriptions(ContextRegistration cr, map<string, BSONOb
         std::string subIdStr = sub.getField("_id").OID().str();
 
         if (subs->count(subIdStr) == 0) {
-            LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
-            subs->insert(std::pair<string, BSONObj*>(subIdStr, new BSONObj(sub)));
+            LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));            
+
+            TriggeredSubscription* trigs = new TriggeredSubscription(sub.hasField(CASUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CASUB_FORMAT)) : XML,
+                                                                     STR_FIELD(sub, CASUB_REFERENCE),
+                                                                     subToAttributeList(sub));
+
+            subs->insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
         }
     }
 
@@ -373,7 +388,7 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
 
     /* We accumulate the subscriptions in a map. The key of the map is the string representing
      * subscription id */
-    std::map<string, BSONObj*> subsToNotify;
+    std::map<string, TriggeredSubscription*> subsToNotify;
 
     /* This vector is used to define which entities to include in notifications */
     EntityIdVector triggerEntitiesV;
@@ -458,6 +473,7 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
                                   " - exception: " + e.what());
 
         LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+        releaseTriggeredSubscriptions(subsToNotify);
         return SccOk;
     }
     catch (...)
@@ -469,6 +485,7 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
                                   " - exception: " + "generic");
 
         LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+        releaseTriggeredSubscriptions(subsToNotify);
         return SccOk;
     }
 

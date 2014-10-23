@@ -44,6 +44,23 @@ TriggeredSubscription::TriggeredSubscription(long long          _throttling,
   attrL            = _attrL;
 }
 
+/* ****************************************************************************
+*
+* TriggeredSubscription::TriggeredSubscription -
+*
+* Constructor without throttling (for NGSI9 subscriptions)
+*/
+TriggeredSubscription::TriggeredSubscription(Format             _format,
+                                             const std::string& _reference,
+                                             AttributeList      _attrL)
+{
+  throttling       = -1;
+  lastNotification = -1;
+  format           = _format;
+  reference        = _reference;
+  attrL            = _attrL;
+}
+
 
 /* ****************************************************************************
 *
