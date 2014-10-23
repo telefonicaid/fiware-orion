@@ -8,7 +8,7 @@
        This new payload field is for operators on filters, such as NOT, GREATER-THAN, etc. Default value (if omitted) is EQUAL.
 - Fix: A few fixes of the bug 'no entity::type' in response (Issue #585)
        Fixed for convop '/v1/contestEntities/<entity::id>'
-- Fix: 'FIWARE_Location' scope type changes to 'FIWARE::Location' (alghouth the old one is still supported)
+- Fix: 'FIWARE_Location' scope type changed to 'FIWARE::Location' (although the old one is still supported)
 
 Saved for other PRs:
   - Add: New conv op URI parameter 'entity::type=TYPE' to filter by type (Issue #570)
