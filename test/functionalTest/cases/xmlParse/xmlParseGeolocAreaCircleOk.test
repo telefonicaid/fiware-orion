@@ -67,7 +67,7 @@ qcr='<?xml version="1.0" encoding="UTF-8"?>
     <attributeExpression>Attribute Expression</attributeExpression>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <radius>10</radius>
@@ -109,7 +109,7 @@ scr='<?xml version="1.0" encoding="UTF-8"?>
         <scopeValue>sval2</scopeValue>
       </operationScope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <radius>11</radius>
@@ -145,7 +145,7 @@ ucsr='<?xml version="1.0" encoding="UTF-8"?>
         <scopeValue>sv1</scopeValue>
       </operationScope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <radius>12</radius>

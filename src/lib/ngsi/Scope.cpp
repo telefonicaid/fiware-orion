@@ -93,7 +93,7 @@ std::string Scope::check
   int                 counter
 )
 {
-  if (type == "FIWARE_Location")
+  if (type == FIWARE_LOCATION || type == FIWARE_LOCATION_DEPRECATED)
   {
     if (areaType == orion::CircleType)
     {

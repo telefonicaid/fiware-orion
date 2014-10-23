@@ -140,6 +140,7 @@ static void commonFilters
       restrictionP = &parseDataP->qcr.res.restriction;
     }
 
+
     if (restrictionP == NULL)
     {
       // There are two possibilities to be here:

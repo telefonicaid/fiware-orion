@@ -236,7 +236,7 @@ Date: REGEX(.*)
 }
 === 2. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 905
+Content-Length: 909
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -280,7 +280,7 @@ Date: REGEX(.*)
         ],
         "id": "Room1",
         "isPattern": "false",
-        "type": ""
+        "type": "Room"
     },
     "statusCode": {
         "code": "200",
@@ -329,7 +329,7 @@ Date: REGEX(.*)
 }
 === 4. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 1021
+Content-Length: 1025
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -378,7 +378,7 @@ Date: REGEX(.*)
         ],
         "id": "Room1",
         "isPattern": "false",
-        "type": ""
+        "type": "Room"
     },
     "statusCode": {
         "code": "200",
@@ -427,7 +427,7 @@ Date: REGEX(.*)
 }
 === 6. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 1391
+Content-Length: 1395
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -493,7 +493,7 @@ Date: REGEX(.*)
         ],
         "id": "Room1",
         "isPattern": "false",
-        "type": ""
+        "type": "Room"
     },
     "statusCode": {
         "code": "200",
@@ -530,7 +530,7 @@ Date: REGEX(.*)
 }
 === 8. Query the entity
 HTTP/1.1 200 OK
-Content-Length: 903
+Content-Length: 907
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -574,7 +574,7 @@ Date: REGEX(.*)
         ],
         "id": "Room1",
         "isPattern": "false",
-        "type": ""
+        "type": "Room"
     },
     "statusCode": {
         "code": "200",

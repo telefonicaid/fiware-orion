@@ -73,7 +73,7 @@ payload='{
   "restriction": {
     "scopes": [
       {
-        "type" : "FIWARE_Location",
+        "type" : "FIWARE::Location",
         "value" : {
           "polygon": {
             "vertices": [
@@ -106,7 +106,7 @@ payload='{
   "restriction": {
     "scopes": [
       {
-        "type" : "FIWARE_Location",
+        "type" : "FIWARE::Location",
         "value" : {
           "polygon": {
             "vertices": [
@@ -140,7 +140,7 @@ payload='{
   "restriction": {
     "scopes": [
       {
-        "type" : "FIWARE_Location",
+        "type" : "FIWARE::Location",
         "value" : {
           "polygon": {
             "vertices": [

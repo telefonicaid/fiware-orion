@@ -916,7 +916,7 @@ bool entitiesQuery
       {
         addFilterScope(sco, filters);
       }
-      else if (sco->type == FIWARE_LOCATION)
+      else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED)
       {
         geoScopes++;
         if (geoScopes > 1)

@@ -364,14 +364,14 @@ Date: REGEX(.*)
 }
 7: ++++++++++ query for vector compound in XML convop ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 774
+Content-Length: 775
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
-    <entityId type="" isPattern="false">
+    <entityId type="T" isPattern="false">
       <id>EVector</id>
     </entityId>
     <contextAttributeList>
@@ -402,14 +402,14 @@ Date: REGEX(.*)
 </contextElementResponse>
 8: ++++++++++ query for object compound in XML convop ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 640
+Content-Length: 641
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextElementResponse>
   <contextElement>
-    <entityId type="" isPattern="false">
+    <entityId type="T" isPattern="false">
       <id>EObject</id>
     </entityId>
     <contextAttributeList>
@@ -436,7 +436,7 @@ Date: REGEX(.*)
 </contextElementResponse>
 9: ++++++++++ query for vector compound in JSON convop ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 489
+Content-Length: 490
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -464,7 +464,7 @@ Date: REGEX(.*)
         ], 
         "id": "EVector", 
         "isPattern": "false", 
-        "type": ""
+        "type": "T"
     }, 
     "statusCode": {
         "code": "200", 
@@ -473,7 +473,7 @@ Date: REGEX(.*)
 }
 10: ++++++++++ query for object compound in JSON convop ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 436
+Content-Length: 437
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -497,7 +497,7 @@ Date: REGEX(.*)
         ], 
         "id": "EObject", 
         "isPattern": "false", 
-        "type": ""
+        "type": "T"
     }, 
     "statusCode": {
         "code": "200", 
