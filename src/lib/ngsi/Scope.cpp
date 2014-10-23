@@ -93,7 +93,7 @@ std::string Scope::check
   int                 counter
 )
 {
-  if (type == "FIWARE_Location")
+  if (type == FIWARE_LOCATION || type == FIWARE_LOCATION_DEPRECATED)
   {
     if (areaType == orion::CircleType)
     {
@@ -221,7 +221,10 @@ void Scope::present(const std::string& indent, int ix)
     PRINTF("%sScope %d:\n",    indent.c_str(), ix);
   }
 
-  PRINTF("%s  Type:     %s\n", indent.c_str(), type.c_str());
+  PRINTF("%s  Type:     '%s'\n", indent.c_str(), type.c_str());
+  
+  if (oper != "")
+    PRINTF("%s  Operator: '%s'\n", indent.c_str(), oper.c_str());
 
   if (areaType == orion::NoArea)
   {

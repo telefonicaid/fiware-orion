@@ -132,7 +132,7 @@ payload='{
     "restriction": {
         "scopes": [
             {
-                "type" : "FIWARE_Location",
+                "type" : "FIWARE::Location",
                 "value" : {
                   "circle": {
                     "centerLatitude": "40.418889",
@@ -160,7 +160,7 @@ payload='{
     "restriction": {
         "scopes": [
             {
-                "type" : "FIWARE_Location",
+                "type" : "FIWARE::Location",
                 "value" : {
                   "circle": {
                     "centerLatitude": "40.418889",
@@ -188,7 +188,7 @@ payload='{
   "restriction": {
     "scopes": [
     {
-      "type" : "FIWARE_Location",
+      "type" : "FIWARE::Location",
       "value" : {
         "circle": {
           "centerLatitude": "40.418889",

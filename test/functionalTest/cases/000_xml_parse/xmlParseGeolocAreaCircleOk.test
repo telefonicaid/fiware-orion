@@ -67,11 +67,7 @@ qcr='<?xml version="1.0" encoding="UTF-8"?>
     <attributeExpression>Attribute Expression</attributeExpression>
     <scope>
       <operationScope>
-        <scopeType>st1</scopeType>
-        <scopeValue>sv1</scopeValue>
-      </operationScope>
-      <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <radius>10</radius>
@@ -80,10 +76,6 @@ qcr='<?xml version="1.0" encoding="UTF-8"?>
             <inverted>0</inverted>
           </circle>
         </scopeValue>
-      </operationScope>
-      <operationScope>
-        <scopeType>st2</scopeType>
-        <scopeValue>sv2</scopeValue>
       </operationScope>
     </scope>
   </restriction>
@@ -117,7 +109,7 @@ scr='<?xml version="1.0" encoding="UTF-8"?>
         <scopeValue>sval2</scopeValue>
       </operationScope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <radius>11</radius>
@@ -153,7 +145,7 @@ ucsr='<?xml version="1.0" encoding="UTF-8"?>
         <scopeValue>sv1</scopeValue>
       </operationScope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <radius>12</radius>
@@ -228,31 +220,10 @@ echo '6: +++++++++++++++++++++++++++++++++++++'
 </updateContextResponse>
 3: +++++++++++++++++++++++++++++++++++++
 <queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>entity01</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>11</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+  </errorCode>
 </queryContextResponse>
 4: +++++++++++++++++++++++++++++++++++++
 <subscribeContextResponse>

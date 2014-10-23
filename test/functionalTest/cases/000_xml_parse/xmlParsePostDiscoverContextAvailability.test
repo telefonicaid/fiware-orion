@@ -98,6 +98,15 @@ payload='<?xml version="1.0"?>
       <attribute>temperature</attribute>
       <attribute>pressure</attribute>
     </attributeList>
+    <restriction>
+      <scope>
+        <operationScope>
+          <scopeType>FIWARE::Filter::Existence</scopeType>
+          <scopeOperator>not</scopeOperator>
+          <scopeValue>entity::type</scopeValue>
+        </operationScope>
+      </scope>
+    </restriction>
   </discoverContextAvailabilityRequest>'
 orionCurl --url "$url" --payload "${payload}"
 
