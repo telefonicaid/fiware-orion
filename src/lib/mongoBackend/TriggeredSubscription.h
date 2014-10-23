@@ -38,7 +38,7 @@
 * csubs collection is not efficient, so we use only the needed fields-
 *
 */
-class TriggeredSubscripion
+class TriggeredSubscription
 {
  public:
   std::string throttling;
@@ -46,7 +46,7 @@ class TriggeredSubscripion
   std::string format;
   std::string reference;
 
-  TriggeredSubscripion(const std::string&  _throttling,
+  TriggeredSubscription(const std::string&  _throttling,
                        const std::string&  _lastNotification,
                        const std::string&  _format,
                        const std::string&  _reference);
