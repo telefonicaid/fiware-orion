@@ -33,6 +33,7 @@
 #include "common/string.h"
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/TriggeredSubscription.h"
 
 using std::string;
 using std::map;
@@ -839,6 +840,8 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
             // FIXME P8: see issue #371
             // subs->insert(std::pair<string, BSONObj*>(subIdStr, new BSONObj(sub)));
+
+            //TriggeredSubscripion* trgs = new TriggeredSubscripion();
 
             subs->insert(std::pair<string, BSONObj*>(subIdStr, NULL));
         }
