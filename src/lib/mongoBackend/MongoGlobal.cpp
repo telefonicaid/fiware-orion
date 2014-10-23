@@ -1691,4 +1691,5 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
   {
       delete it->second;
   }
+  subs.clear();
 }

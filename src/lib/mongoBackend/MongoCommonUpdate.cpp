@@ -942,6 +942,7 @@ static bool processSubscriptions(const EntityId*                           enP,
         delete it->second;
     }
 
+    subs.clear();
     return ret;
 }
 

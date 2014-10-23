@@ -150,6 +150,7 @@ static bool processSubscriptions(EntityIdVector                       triggerEnt
         delete it->second;
     }
 
+    subs.clear();
     return ret;
 }
 
