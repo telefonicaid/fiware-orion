@@ -2,3 +2,4 @@
 - Add: New convenience operation '/v1/contextEntities' - to get a list of ALL existing entities (Issue #563)
 - Fix: Upgrading from a previous package caused orion user to disappear.
 - Fix: change service path HTTP header name: 'ServicePath' -> 'Fiware-ServicePath' (Issue #541)
+- Fix: avoid unneeded additional query on csubs/casubs collections to get details of ONCHANGE triggered subscription when processing updateContext (Issue #371)

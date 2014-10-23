@@ -844,8 +844,6 @@ static bool addTriggeredSubscriptions(std::string entityId,
 
         if (subs->count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
-            // FIXME P8: see issue #371
-            // subs->insert(std::pair<string, BSONObj*>(subIdStr, new BSONObj(sub)));
 
             long long throttling       = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
             long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? sub.getIntField(CSUB_LASTNOTIFICATION) : -1;
@@ -880,42 +878,9 @@ static bool processSubscriptions(const EntityId*                           enP,
     /* For each one of the subscriptions in the map, send notification */
     for (std::map<string, TriggeredSubscription*>::iterator it = subs->begin(); it != subs->end(); ++it) {
 
-        //FIXME P8: see issue #371
-        //BSONObj sub = *(it->second);
-
         std::string  mapSubId        = it->first;
         TriggeredSubscription* trigs = it->second;
 
-        /*
-        try
-        {
-           mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
-           sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(mapSubId)));
-           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
-           LM_I(("Database Operation Successful (findOne %s)", mapSubId.c_str()));
-        }
-        catch (...)
-        {
-           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
-           LM_E(("Database Error ('findOne tenant=%s, id=%s', 'exception during findOne of collection '%s''", tenant.c_str(), mapSubId.c_str(), getSubscribeContextCollectionName(tenant).c_str()));
-
-           *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str();
-           return false;
-        }
-
-        LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
-        OID subId = sub.getField("_id").OID();
-        */
-
-        /* Check that throttling is not blocking notication */
-        /*if (sub.hasField(CSUB_THROTTLING) && sub.hasField(CSUB_LASTNOTIFICATION)) {
-            long long current = getCurrentTime();
-            long long sinceLastNotification = current - sub.getIntField(CSUB_LASTNOTIFICATION);
-            if (sub.getField(CSUB_THROTTLING).numberLong() > sinceLastNotification) {
-                LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
-                continue;
-            }
-        }*/
         if (trigs->throttling != 1 && trigs->lastNotification != 1)
         {
           long long current = getCurrentTime();
@@ -930,23 +895,13 @@ static bool processSubscriptions(const EntityId*                           enP,
         EntityIdVector enV;
         enV.push_back(new EntityId(enP->id, enP->type, enP->isPattern));
 
-        /* Build attribute list vector */
-        //AttributeList attrL = subToAttributeList(sub);
-
-        /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
-        //Format format = sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML;
-
         /* Send notification */
         if (processOnChangeCondition(enV, trigs->attrL, NULL,
-                                     //subId.str(),
                                      mapSubId,
-                                     //STR_FIELD(sub, CSUB_REFERENCE),
                                      trigs->reference,
-                                     //format,
                                      trigs->format,
                                      tenant)) {
 
-            //BSONObj query = BSON("_id" << subId);
             BSONObj query = BSON("_id" << OID(mapSubId));
             BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
             try
@@ -966,7 +921,6 @@ static bool processSubscriptions(const EntityId*                           enP,
                 *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + e.what();
                 enV.release();
-                //attrL.release();
                 trigs->attrL.release();
                 LM_E(("Database Error (%s)", err->c_str()));
                 return false;
@@ -977,7 +931,6 @@ static bool processSubscriptions(const EntityId*                           enP,
                 *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + "generic";
                 enV.release();
-                //attrL.release();
                 trigs->attrL.release();
                 LM_E(("Database Error (%s)", err->c_str()));
                 return false;
@@ -986,10 +939,8 @@ static bool processSubscriptions(const EntityId*                           enP,
 
         /* Release object created dynamically (including the value in the map created by
          * addTriggeredSubscriptions */
-        //attrL.release();
         trigs->attrL.release();
         enV.release();
-        // delete it->second; FIXME P8: see issue #371
         delete it->second;
     }
 
@@ -1244,21 +1195,6 @@ static bool processContextAttributeVector (ContextElement*                      
               return false;
             }
         }
-
-#if 0
-        /* DEBUG (see issue #371) */
-        int ix = 0;
-        for (std::map<string, BSONObj*>::iterator it = subsToNotify.begin(); it != subsToNotify.end(); ++it) {
-            BSONObj b = *(it->second);
-            if (b.isEmpty()) {
-                LM_T(LmtMongo, ("DEBUG afterTriggeredsubs [%d]: <empty>", ix));
-            }
-            else {
-                LM_T(LmtMongo, ("DEBUG afterTriggeredsubs [%d]: %s", ix, b.toString().c_str()));
-            }
-            ix++;
-        }
-#endif
 
     }
 
@@ -1727,21 +1663,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
             continue;
         }
-
-#if 0
-        /* DEBUG (see issue #371) */
-        int ix = 0;
-        for (std::map<string, BSONObj*>::iterator it = subsToNotify.begin(); it != subsToNotify.end(); ++it) {
-            BSONObj b = *(it->second);
-            if (b.isEmpty()) {
-                LM_T(LmtMongo, ("DEBUG before addTriggeredSubscriptions [%d]: <empty>", ix));
-            }
-            else {
-                LM_T(LmtMongo, ("DEBUG before addTriggeredSubscriptions [%d]: %s", ix, b.toString().c_str() ));
-            }
-            ix++;
-        }
-#endif
 
         /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations */
