@@ -9,7 +9,7 @@
 - Fix: A few fixes of the bug 'no entity::type' in response (Issue #585)
        Fixed for convop '/v1/contestEntities/<entity::id>'
 - Fix: 'FIWARE_Location' scope type changed to 'FIWARE::Location' (although the old one is still supported)
+- Add: New conv op URI parameter 'entity::type=TYPE' to filter by type, for /v1/contextEntities and /v1/contextEntities/<EID> (Issue #570)
 
 Saved for other PRs:
-  - Add: New conv op URI parameter 'entity::type=TYPE' to filter by type (Issue #570)
   - Fix: Issue #585 fixed for convops '/v1/contestEntities/type/<entity::type>/id/<entity::id>'
