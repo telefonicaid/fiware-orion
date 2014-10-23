@@ -55,6 +55,15 @@ echo "1: ++++++++++++++++++++"
 # to avoid a race condition in the order of notifications
 sleep 0.5s
 
+#
+# We need more sleep if running under valgrind :-)
+#
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  sleep 2
+fi
+
+
 #Subscribe for 5 seconds
 url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
