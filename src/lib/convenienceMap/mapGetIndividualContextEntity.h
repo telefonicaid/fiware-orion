@@ -54,6 +54,7 @@ typedef enum EntityTypeInfo
 extern HttpStatusCode mapGetIndividualContextEntity
 (
   const std::string&       entityId,
+  const std::string&       entityType,
   EntityTypeInfo           typeInfo,
   ContextElementResponse*  response,
   ConnectionInfo*          ciP
