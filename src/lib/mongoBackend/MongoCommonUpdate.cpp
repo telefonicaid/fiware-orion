@@ -736,7 +736,13 @@ static bool deleteAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 * addTriggeredSubscriptions
 *
 */
-static bool addTriggeredSubscriptions(std::string entityId, std::string entityType, std::string attr, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool addTriggeredSubscriptions(std::string entityId,
+                                      std::string entityType,
+                                      std::string attr,
+                                      std::map<string, TriggeredSubscription*>* subs,
+                                      std::string* err,
+                                      std::string tenant)
+{
 
     DBClientBase* connection = getMongoConnection();
 
@@ -841,9 +847,16 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
             // FIXME P8: see issue #371
             // subs->insert(std::pair<string, BSONObj*>(subIdStr, new BSONObj(sub)));
 
-            //TriggeredSubscripion* trgs = new TriggeredSubscripion();
+            long long throttling       = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
+            long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? sub.getIntField(CSUB_LASTNOTIFICATION) : -1;
 
-            subs->insert(std::pair<string, BSONObj*>(subIdStr, NULL));
+            TriggeredSubscription* trgs = new TriggeredSubscription(throttling,
+                                                                    lastNotification,
+                                                                    sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
+                                                                    STR_FIELD(sub, CSUB_REFERENCE),
+                                                                    subToAttributeList(sub));
+
+            subs->insert(std::pair<string, TriggeredSubscription*>(subIdStr, trgs));
         }
     }
 
@@ -856,19 +869,24 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 * processSubscriptions
 *
 */
-static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool processSubscriptions(const EntityId*                           enP,
+                                 std::map<string, TriggeredSubscription*>* subs,
+                                 std::string*                              err,
+                                 std::string                               tenant)
+{
 
     DBClientBase* connection = getMongoConnection();
 
     /* For each one of the subscriptions in the map, send notification */
-    for (std::map<string, BSONObj*>::iterator it = subs->begin(); it != subs->end(); ++it) {
+    for (std::map<string, TriggeredSubscription*>::iterator it = subs->begin(); it != subs->end(); ++it) {
 
         //FIXME P8: see issue #371
         //BSONObj sub = *(it->second);
 
-        std::string  mapSubId = it->first;
-        BSONObj      sub;
+        std::string  mapSubId        = it->first;
+        TriggeredSubscription* trigs = it->second;
 
+        /*
         try
         {
            mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
@@ -887,15 +905,25 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
 
         LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
         OID subId = sub.getField("_id").OID();
+        */
 
         /* Check that throttling is not blocking notication */
-        if (sub.hasField(CSUB_THROTTLING) && sub.hasField(CSUB_LASTNOTIFICATION)) {
+        /*if (sub.hasField(CSUB_THROTTLING) && sub.hasField(CSUB_LASTNOTIFICATION)) {
             long long current = getCurrentTime();
             long long sinceLastNotification = current - sub.getIntField(CSUB_LASTNOTIFICATION);
             if (sub.getField(CSUB_THROTTLING).numberLong() > sinceLastNotification) {
                 LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
                 continue;
             }
+        }*/
+        if (trigs->throttling != 1 && trigs->lastNotification != 1)
+        {
+          long long current = getCurrentTime();
+          long long sinceLastNotification = current - trigs->lastNotification;
+          if (trigs->throttling > sinceLastNotification) {
+            LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
+            continue;
+          }
         }
 
         /* Build entities vector */
@@ -903,19 +931,23 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
         enV.push_back(new EntityId(enP->id, enP->type, enP->isPattern));
 
         /* Build attribute list vector */
-        AttributeList attrL = subToAttributeList(sub);
+        //AttributeList attrL = subToAttributeList(sub);
 
         /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
-        Format format = sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML;
+        //Format format = sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML;
 
         /* Send notification */
-        if (processOnChangeCondition(enV, attrL, NULL,
-                                     subId.str(),
-                                     STR_FIELD(sub, CSUB_REFERENCE),
-                                     format,
+        if (processOnChangeCondition(enV, trigs->attrL, NULL,
+                                     //subId.str(),
+                                     mapSubId,
+                                     //STR_FIELD(sub, CSUB_REFERENCE),
+                                     trigs->reference,
+                                     //format,
+                                     trigs->format,
                                      tenant)) {
 
-            BSONObj query = BSON("_id" << subId);
+            //BSONObj query = BSON("_id" << subId);
+            BSONObj query = BSON("_id" << OID(mapSubId));
             BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
             try
             {
@@ -934,7 +966,8 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
                 *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + e.what();
                 enV.release();
-                attrL.release();
+                //attrL.release();
+                trigs->attrL.release();
                 LM_E(("Database Error (%s)", err->c_str()));
                 return false;
             }
@@ -944,7 +977,8 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
                 *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + "generic";
                 enV.release();
-                attrL.release();
+                //attrL.release();
+                trigs->attrL.release();
                 LM_E(("Database Error (%s)", err->c_str()));
                 return false;
             }
@@ -952,9 +986,11 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
 
         /* Release object created dynamically (including the value in the map created by
          * addTriggeredSubscriptions */
-        attrL.release();
+        //attrL.release();
+        trigs->attrL.release();
         enV.release();
         // delete it->second; FIXME P8: see issue #371
+        delete it->second;
     }
 
     return true;
@@ -1034,15 +1070,15 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 * Returns true if entity was actually modified, false otherwise (including fail cases)
 *
 */
-static bool processContextAttributeVector (ContextElement*               ceP,
-                                           std::string                   action,
-                                           std::map<string, BSONObj*>*   subsToNotify,
-                                           BSONObj&                      attrs,
-                                           ContextElementResponse*       cerP,
-                                           std::string&                  locAttr,
-                                           double&                       coordLat,
-                                           double&                       coordLong,
-                                           std::string                   tenant)
+static bool processContextAttributeVector (ContextElement*                            ceP,
+                                           std::string                                action,
+                                           std::map<string, TriggeredSubscription*>*  subsToNotify,
+                                           BSONObj&                                   attrs,
+                                           ContextElementResponse*                    cerP,
+                                           std::string&                               locAttr,
+                                           double&                                    coordLat,
+                                           double&                                    coordLong,
+                                           std::string                                tenant)
 {
 
     EntityId*   eP         = &cerP->contextElement.entityId;
@@ -1584,7 +1620,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
         /* We accumulate the subscriptions in a map. The key of the map is the string representing
          * subscription id */
-        std::map<string, BSONObj*> subsToNotify;
+        std::map<string, TriggeredSubscription*> subsToNotify;
 
         /* Is the entity using location? In that case, we fill the locAttr, coordLat and coordLong attributes with that information, otherwise
          * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
@@ -1796,7 +1832,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
           cerP->statusCode.fill(SccOk);
           
           /* Successful creation: send potential notifications */
-          std::map<string, BSONObj*> subsToNotify;
+          std::map<string, TriggeredSubscription*> subsToNotify;
           for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
           {
             std::string err;

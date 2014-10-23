@@ -24,21 +24,24 @@
 */
 
 #include <string>
+#include <sstream>
 #include "mongoBackend/TriggeredSubscription.h"
 
 /* ****************************************************************************
 *
 * TriggeredSubscription::TriggeredSubscription -
 */
-TriggeredSubscription::TriggeredSubscription(const std::string&  _throttling,
-                                             const std::string&  _lastNotification,
-                                             const std::string&  _format,
-                                             const std::string&  _reference)
+TriggeredSubscription::TriggeredSubscription(long long          _throttling,
+                                             long long          _lastNotification,
+                                             Format             _format,
+                                             const std::string& _reference,
+                                             AttributeList      _attrL)
 {
   throttling       = _throttling;
   lastNotification = _lastNotification;
   format           = _format;
   reference        = _reference;
+  attrL            = _attrL;
 }
 
 
@@ -48,10 +51,8 @@ TriggeredSubscription::TriggeredSubscription(const std::string&  _throttling,
 */
 std::string TriggeredSubscription::toString(const std::string& delimiter)
 {
-  std::string s;
-
-  //s = id + delimiter + type;
-
-  return s;
+  std::stringstream ss;
+  ss << throttling << delimiter << lastNotification << delimiter << formatToString(format) << delimiter << reference;
+  return ss.str();
 }
 

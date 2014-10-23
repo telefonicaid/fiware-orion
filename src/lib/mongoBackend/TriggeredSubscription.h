@@ -27,6 +27,8 @@
 */
 
 #include <string>
+#include "common/Format.h"
+#include "ngsi/AttributeList.h"
 
 /* ****************************************************************************
 *
@@ -41,15 +43,17 @@
 class TriggeredSubscription
 {
  public:
-  std::string throttling;
-  std::string lastNotification;
-  std::string format;
-  std::string reference;
+  long long     throttling;
+  long long     lastNotification;
+  Format        format;
+  std::string   reference;
+  AttributeList attrL;
 
-  TriggeredSubscription(const std::string&  _throttling,
-                       const std::string&  _lastNotification,
-                       const std::string&  _format,
-                       const std::string&  _reference);
+  TriggeredSubscription(long long          _throttling,
+                        long long          _lastNotification,
+                        Format             _format,
+                        const std::string& _reference,
+                        AttributeList      _attrL);
 
   std::string toString(const std::string& delimiter);
 
