@@ -164,6 +164,20 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
+* scopeOperator -
+*/
+static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
+  reqDataP->ucas.scopeP->oper = node->value();
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * duration -
 */
 static int duration(xml_node<>* node, ParseData* reqData)
@@ -254,25 +268,26 @@ void ucasPresent(ParseData* reqData)
 #define UCAS "/updateContextAvailabilitySubscriptionRequest"
 XmlNode ucasParseVector[] =
 {
-  { "/updateContextAvailabilitySubscriptionRequest",      nullTreat            },
+  { "/updateContextAvailabilitySubscriptionRequest",        nullTreat            },
 
-  { UCAS "/entityIdList",                                 nullTreat            },
-  { UCAS "/entityIdList/entityId",                        entityId             },
-  { UCAS "/entityIdList/entityId/id",                     entityIdId           },
+  { UCAS "/entityIdList",                                   nullTreat            },
+  { UCAS "/entityIdList/entityId",                          entityId             },
+  { UCAS "/entityIdList/entityId/id",                       entityIdId           },
 
-  { UCAS "/attributeList",                                nullTreat            },
-  { UCAS "/attributeList/attribute",                      attribute            },
+  { UCAS "/attributeList",                                  nullTreat            },
+  { UCAS "/attributeList/attribute",                        attribute            },
 
-  { UCAS "/duration",                                     duration             },
+  { UCAS "/duration",                                       duration             },
 
-  { UCAS "/restriction",                                  restriction          },
-  { UCAS "/restriction/attributeExpression",              attributeExpression  },
-  { UCAS "/restriction/scope",                            nullTreat            },
-  { UCAS "/restriction/scope/operationScope",             operationScope       },
-  { UCAS "/restriction/scope/operationScope/scopeType",   scopeType            },
-  { UCAS "/restriction/scope/operationScope/scopeValue",  scopeValue           },
+  { UCAS "/restriction",                                    restriction          },
+  { UCAS "/restriction/attributeExpression",                attributeExpression  },
+  { UCAS "/restriction/scope",                              nullTreat            },
+  { UCAS "/restriction/scope/operationScope",               operationScope       },
+  { UCAS "/restriction/scope/operationScope/scopeType",     scopeType            },
+  { UCAS "/restriction/scope/operationScope/scopeOperator", scopeOperator        },
+  { UCAS "/restriction/scope/operationScope/scopeValue",    scopeValue           },
 
-  { UCAS "/subscriptionId",                               subscriptionId       },
+  { UCAS "/subscriptionId",                                 subscriptionId       },
 
   { "LAST", NULL }
 };

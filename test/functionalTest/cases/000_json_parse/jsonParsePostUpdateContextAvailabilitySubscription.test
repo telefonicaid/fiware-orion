@@ -53,6 +53,7 @@ payload='{
     "scopes": [
       {
         "type" : "st1",
+        "operator": "op1",
         "value" : "1"
       },
       {
