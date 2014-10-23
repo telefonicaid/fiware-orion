@@ -130,8 +130,6 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV,
                                  std::string tenant)
 {
 
-    //DBClientBase* connection = getMongoConnection();
-
     /* For each one of the subscriptions in the map, send notification */
     bool ret = true;
     for (std::map<string, TriggeredSubscription*>::iterator it = subs->begin(); it != subs->end(); ++it) {
@@ -139,35 +137,7 @@ static bool processSubscriptions(EntityIdVector triggerEntitiesV,
         std::string mapSubId         = it->first;
         TriggeredSubscription* trigs = it->second;
 
-        /*
-        try
-        {
-           mongoSemTake(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
-           sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << OID(mapSubId)));
-           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection");
-           LM_I(("Database Operation Successful (_id: %s)", mapSubId.c_str()));
-        }
-        catch (...)
-        {
-           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextAvailabilityCollection (mongo generic exception)");
-           *err = "Generic Exception from mongo";
-           LM_E(("Database Error ('findOne id=%s in %s', '%s')", mapSubId.c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), "generic error"));
-           return false;
-        }
-
-        LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));        
-
-        OID subId = sub.getField("_id").OID();
-        */
-
-        /* Build attribute list vector */
-        //AttributeList attrL = subToAttributeList(sub);
-
-        /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
-        //Format format = sub.hasField(CASUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CASUB_FORMAT)) : XML;
-
         /* Send notification */
-        //if (!processAvailabilitySubscription(triggerEntitiesV, attrL, subId.str(), STR_FIELD(sub, CSUB_REFERENCE), format, tenant))
         if (!processAvailabilitySubscription(triggerEntitiesV, trigs->attrL, mapSubId, trigs->reference, trigs->format, tenant))
         {
           LM_T(LmtMongo, ("Notification failure"));
