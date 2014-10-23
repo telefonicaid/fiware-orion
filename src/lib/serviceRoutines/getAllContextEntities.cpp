@@ -51,10 +51,7 @@ std::string getAllContextEntities
   EntityId*             eP     = new EntityId(".*", "", "true");
   std::string           res;
 
-  if (ciP->uriParam[URI_PARAM_TYPE] != "")
-  {
-    eP->type = ciP->uriParam[URI_PARAM_TYPE];
-  }
+  eP->type = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
   reqP->entityIdVector.push_back(eP);
 
