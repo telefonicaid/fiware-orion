@@ -75,7 +75,7 @@ payload='{
     "restriction": {
         "scopes": [
             {
-                "type" : "FIWARE_Location",
+                "type" : "FIWARE::Location",
                 "value" : {
                   "circle": {
                     "centerLatitude": "40",
@@ -117,7 +117,7 @@ payload='{
     "restriction": {
         "scopes": [
             {
-                "type" : "FIWARE_Location",
+                "type" : "FIWARE::Location",
                 "value" : {
                   "polygon": {
                     "vertices": [

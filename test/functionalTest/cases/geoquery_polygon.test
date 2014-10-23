@@ -141,7 +141,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <polygon>
             <vertexList>
@@ -187,7 +187,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <polygon>
             <vertexList>
@@ -233,7 +233,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <polygon>
             <vertexList>
@@ -275,7 +275,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <polygon>
             <vertexList>
@@ -322,7 +322,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <polygon>
             <vertexList>
