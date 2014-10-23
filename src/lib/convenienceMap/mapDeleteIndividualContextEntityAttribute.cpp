@@ -43,6 +43,7 @@
 HttpStatusCode mapDeleteIndividualContextEntityAttribute
 (
   const std::string&  entityId,
+  const std::string&  entityType,
   const std::string&  attributeName,
   StatusCode*         response,
   ConnectionInfo*     ciP
@@ -54,7 +55,7 @@ HttpStatusCode mapDeleteIndividualContextEntityAttribute
   ContextElement         ce;
   ContextAttribute       contextAttribute(attributeName, "", "");
 
-  ce.entityId.fill(entityId, "", "false");
+  ce.entityId.fill(entityId, entityType, "false");
   ce.contextAttributeVector.push_back(&contextAttribute);
   ucRequest.updateActionType.set("Delete");
 

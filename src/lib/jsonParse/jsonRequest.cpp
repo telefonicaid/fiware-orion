@@ -113,7 +113,10 @@ static JsonRequest jsonRequest[] =
 
   { AllEntitiesWithTypeAndId,              "PUT",  "updateContextElementRequest",                   FUNCS(Ucer)  },
   { AllEntitiesWithTypeAndId,              "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
-  { AllEntitiesWithTypeAndId,              "*",    "",                                              FUNCS(Ucer)  }
+  { AllEntitiesWithTypeAndId,              "*",    "",                                              FUNCS(Ucer)  },
+
+  { IndividualContextEntityAttributeWithTypeAndId, "POST", "updateContextAttributeRequest",         FUNCS(Upcar) },
+  { IndividualContextEntityAttributeWithTypeAndId, "PUT",  "updateContextAttributeRequest",         FUNCS(Upcar) }
 };
 
 

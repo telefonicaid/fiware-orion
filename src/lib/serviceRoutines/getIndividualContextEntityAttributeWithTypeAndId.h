@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_SERVICEROUTINES_GETINDIVIDUALCONTEXTENTITYATTRIBUTEWITHTYPEANDID_H_
+#define SRC_LIB_SERVICEROUTINES_GETINDIVIDUALCONTEXTENTITYATTRIBUTEWITHTYPEANDID_H_
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,42 +28,21 @@
 #include <string>
 #include <vector>
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "convenienceMap/mapDeleteIndividualContextEntityAttribute.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteIndividualContextEntityAttribute - 
+* getIndividualContextEntityAttributeWithTypeAndId - 
 */
-std::string deleteIndividualContextEntityAttribute
+extern std::string getIndividualContextEntityAttributeWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP
-)
-{
-  std::string  answer;
-  std::string  entityId      = "unknown entityId";
-  std::string  attributeName = "unknown attributeName";
-  StatusCode   response;
+);
 
-  if (compV.size() > 2)   entityId      = compV[2];
-  if (compV.size() > 4)   attributeName = compV[4];
-
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s'", entityId.c_str()));
-
-  ciP->httpStatusCode = mapDeleteIndividualContextEntityAttribute(entityId, "", attributeName, &response, ciP);
-  answer = response.render(ciP->outFormat, "", false, false);
-  response.release();
-
-  return answer;
-}
+#endif  // SRC_LIB_SERVICEROUTINES_GETINDIVIDUALCONTEXTENTITYATTRIBUTEWITHTYPEANDID_H_

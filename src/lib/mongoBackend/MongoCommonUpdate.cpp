@@ -1444,12 +1444,14 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     /* Getting the entity in the request (helpful in other places) */
     EntityId* enP = &ceP->entityId;
 
+    LM_M(("Here"));
     /* Not supporting isPattern = true currently */
     if (isTrue(enP->isPattern)) {
         buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
         return;
     }
 
+    LM_M(("Here"));
     /* Check that UPDATE or APPEND is not used with attributes with empty value */
     if (strcasecmp(action.c_str(), "update") == 0 || strcasecmp(action.c_str(), "append") == 0) {
         for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
@@ -1463,11 +1465,13 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                                       " - entity: (" + enP->toString(true) + ")" +
                                       " - offending attribute: " + aP->toString() +
                                       " - empty attribute not allowed in APPEND or UPDATE");
+                LM_M(("Here"));
                 return;
             }
         }
     }
 
+    LM_M(("Here"));
     /* Find entities (could be several, in the case of no type or isPattern=true) */
     const std::string  idString          = "_id." ENT_ENTITY_ID;
     const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
@@ -1487,6 +1491,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
     else
     {
+      LM_M(("Here"));
       LM_T(LmtServicePath, ("Updating entity '%s' for Service Path: '%s', action '%s'", ceP->entityId.id.c_str(), servicePathV[0].c_str(), action.c_str()));
       char               path[MAX_SERVICE_NAME_LEN];
       slashEscape(servicePathV[0].c_str(), path, sizeof(path));
@@ -1502,6 +1507,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     try
     {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
+        LM_M(("Here"));
         mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
         cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
 
@@ -1539,6 +1545,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
 
 
+    LM_M(("Here"));
     //
     // Going through the list of found entities.
     // As ServicePath cannot be modified, inside this loop nothing will be done

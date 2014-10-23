@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -28,19 +28,19 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapDeleteIndividualContextEntityAttribute.h"
+#include "convenienceMap/mapPostIndividualContextEntityAttribute.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
+#include "serviceRoutines/postIndividualContextEntityAttribute.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteIndividualContextEntityAttribute - 
+* postIndividualContextEntityAttributeWithTypeAndId - 
 */
-std::string deleteIndividualContextEntityAttribute
+std::string postIndividualContextEntityAttributeWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -49,18 +49,21 @@ std::string deleteIndividualContextEntityAttribute
 )
 {
   std::string  answer;
-  std::string  entityId      = "unknown entityId";
-  std::string  attributeName = "unknown attributeName";
+  std::string  entityType    = compV[3];
+  std::string  entityId      = compV[5];
+  std::string  attributeName = compV[7];
   StatusCode   response;
 
-  if (compV.size() > 2)   entityId      = compV[2];
-  if (compV.size() > 4)   attributeName = compV[4];
+  LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s', type '%s' and attribute '%s'",
+                        entityId.c_str(), entityType.c_str(), attributeName.c_str()));
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s'", entityId.c_str()));
-
-  ciP->httpStatusCode = mapDeleteIndividualContextEntityAttribute(entityId, "", attributeName, &response, ciP);
+  ciP->httpStatusCode = mapPostIndividualContextEntityAttribute(entityId,
+                                                                entityType,
+                                                                attributeName,
+                                                                &parseDataP->upcar.res,
+                                                                &response,
+                                                                ciP);
   answer = response.render(ciP->outFormat, "", false, false);
-  response.release();
 
   return answer;
 }

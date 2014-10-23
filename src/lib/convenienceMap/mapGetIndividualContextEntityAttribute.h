@@ -41,6 +41,7 @@
 extern HttpStatusCode mapGetIndividualContextEntityAttribute
 (
   const std::string&         entityId,
+  const std::string&         entityType,
   const std::string&         attributeName,
   ContextAttributeResponse*  response,
   ConnectionInfo*            ciP

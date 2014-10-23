@@ -43,6 +43,7 @@
 HttpStatusCode mapPostIndividualContextEntityAttribute
 (
   const std::string&              entityId,
+  const std::string&              entityType,
   const std::string&              attributeName,
   UpdateContextAttributeRequest*  request,
   StatusCode*                     response,
@@ -53,16 +54,19 @@ HttpStatusCode mapPostIndividualContextEntityAttribute
   UpdateContextRequest   ucRequest;
   UpdateContextResponse  ucResponse;
   ContextElement         ce;
-  ContextAttribute       attribute(attributeName, "", "");
+  ContextAttribute       attribute(attributeName, request->type, request->contextValue);
 
-  ce.entityId.fill(entityId, "", "false");
+  ce.entityId.fill(entityId, entityType, "false");
   ce.contextAttributeVector.push_back(&attribute);
+
+  attribute.metadataVector.fill(&request->metadataVector);
 
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Append");
 
+  LM_M(("Calling mongoUpdateContext(APPEND for Entity '%s'/'%s', Attribute '%s'", entityId.c_str(), entityType.c_str(), attributeName.c_str()));
   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
-
+  LM_M(("mongoUpdateContext responds with %d", ms));
   response->fill(SccOk);
 
   return ms;
