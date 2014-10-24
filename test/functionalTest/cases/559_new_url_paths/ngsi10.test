@@ -40,7 +40,7 @@ payload='<?xml version="1.0"?>
       <contextAttributeList>
         <contextAttribute>
           <name>A1</name>
-          <type>A1T</type>
+          <type></type>
           <contextValue>a1</contextValue>
         </contextAttribute>
       </contextAttributeList>
@@ -171,7 +171,7 @@ payload='<?xml version="1.0"?>
   <contextAttributeList>
     <contextAttribute>
       <name>A1</name>
-      <type>A1T</type>
+      <type></type>
       <contextValue>10</contextValue>
     </contextAttribute>
   </contextAttributeList>
@@ -188,7 +188,7 @@ payload='<?xml version="1.0"?>
   <contextAttributeList>
     <contextAttribute>
       <name>A1</name>
-      <type>A1T</type>
+      <type></type>
       <contextValue>10</contextValue>
     </contextAttribute>
   </contextAttributeList>
@@ -228,7 +228,7 @@ payload='<?xml version="1.0"?>
   <contextAttributeList>
     <contextAttribute>
       <name>A1</name>
-      <type>A1T</type>
+      <type></type>
       <contextValue>10</contextValue>
     </contextAttribute>
   </contextAttributeList>
@@ -245,7 +245,7 @@ payload='<?xml version="1.0"?>
   <contextAttributeList>
     <contextAttribute>
       <name>A1</name>
-      <type>A1T</type>
+      <type></type>
       <contextValue>10</contextValue>
     </contextAttribute>
   </contextAttributeList>
@@ -280,7 +280,7 @@ echo
 echo "8. PUT /ngsi10/contextEntities/EID/attributes/A1"
 echo "================================================"
 payload='<updateContextAttributeRequest>
-  <type>T</type>
+  <type></type>
   <contextValue>10</contextValue>
   <metadata>
     <contextMetadata>
@@ -305,7 +305,7 @@ echo
 echo "8. POST /ngsi10/contextEntities/EID/attributes/A1"
 echo "================================================="
 payload='<updateContextAttributeRequest>
-  <type>T</type>
+  <type></type>
   <contextValue>10</contextValue>
   <metadata>
     <contextMetadata>
@@ -348,10 +348,10 @@ echo
 echo
 
 
-echo "9. PUT /ngsi10/contextEntities/EID/attributes/A1/left"
+echo "9. PUT /ngsi10/contextEntities/EID2/attributes/A1/left"
 echo "=========================================================="
 payload='<updateContextAttributeRequest>
-  <type>T</type>
+  <type></type>
   <contextValue>10</contextValue>
   <metadata>
     <contextMetadata>
@@ -361,19 +361,19 @@ payload='<updateContextAttributeRequest>
     </contextMetadata>
   </metadata>
 </updateContextAttributeRequest>'
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left --payload "${payload}" -X PUT
+orionCurl --url /ngsi10/contextEntities/EID2/attributes/A1/left --payload "${payload}" -X PUT
 echo
 echo
 
 
-echo "9. DELETE /ngsi10/contextEntities/EID/attributes/A1/left"
+echo "9. DELETE /ngsi10/contextEntities/EID2/attributes/A1/left"
 echo "============================================================="
-orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left -X DELETE
+orionCurl --url /ngsi10/contextEntities/EID2/attributes/A1/left -X DELETE
 echo
 echo
 
 
-echo "9. NOP /ngsi10/contextEntities/EID/attributes/A1/left"
+echo "9. NOP /ngsi10/contextEntities/EID2/attributes/A1/left"
 echo "=========================================================="
 orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left -X NOP
 echo
@@ -504,7 +504,7 @@ echo
 1. POST /ngsi10/updateContext
 =============================
 HTTP/1.1 200 OK
-Content-Length: 618
+Content-Length: 615
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -519,7 +519,7 @@ Date: REGEX(.*)
         <contextAttributeList>
           <contextAttribute>
             <name>A1</name>
-            <type>A1T</type>
+            <type/>
             <contextValue/>
           </contextAttribute>
         </contextAttributeList>
@@ -545,7 +545,7 @@ Date: REGEX(.*)
 2. POST /ngsi10/queryContext
 ============================
 HTTP/1.1 200 OK
-Content-Length: 618
+Content-Length: 615
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -560,7 +560,7 @@ Date: REGEX(.*)
         <contextAttributeList>
           <contextAttribute>
             <name>A1</name>
-            <type>A1T</type>
+            <type/>
             <contextValue>a1</contextValue>
           </contextAttribute>
         </contextAttributeList>
@@ -662,7 +662,7 @@ Date: REGEX(.*)
 6. GET /ngsi10/contextEntities/EID
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 450
+Content-Length: 447
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -675,7 +675,7 @@ Date: REGEX(.*)
     <contextAttributeList>
       <contextAttribute>
         <name>A1</name>
-        <type>A1T</type>
+        <type/>
         <contextValue>a1</contextValue>
       </contextAttribute>
     </contextAttributeList>
@@ -690,7 +690,7 @@ Date: REGEX(.*)
 6. PUT /ngsi10/contextEntities/EID
 =================================
 HTTP/1.1 200 OK
-Content-Length: 486
+Content-Length: 483
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -701,7 +701,7 @@ Date: REGEX(.*)
       <contextAttributeList>
         <contextAttribute>
           <name>A1</name>
-          <type>A1T</type>
+          <type/>
           <contextValue/>
         </contextAttribute>
       </contextAttributeList>
@@ -717,7 +717,7 @@ Date: REGEX(.*)
 6. POST /ngsi10/contextEntities/EID
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 486
+Content-Length: 483
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -728,7 +728,7 @@ Date: REGEX(.*)
       <contextAttributeList>
         <contextAttribute>
           <name>A1</name>
-          <type>A1T</type>
+          <type/>
           <contextValue/>
         </contextAttribute>
       </contextAttributeList>
@@ -812,7 +812,7 @@ Date: REGEX(.*)
 7. POST /ngsi10/contextEntities/EID/attributes
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 486
+Content-Length: 483
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -823,7 +823,7 @@ Date: REGEX(.*)
       <contextAttributeList>
         <contextAttribute>
           <name>A1</name>
-          <type>A1T</type>
+          <type/>
           <contextValue/>
         </contextAttribute>
       </contextAttributeList>
@@ -880,14 +880,15 @@ Date: REGEX(.*)
 8. PUT /ngsi10/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 80
+Content-Length: 127
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>200</code>
-  <reasonPhrase>OK</reasonPhrase>
+  <code>404</code>
+  <reasonPhrase>No context element found</reasonPhrase>
+  <details>EID</details>
 </statusCode>
 
 
@@ -926,17 +927,29 @@ Date: REGEX(.*)
 8. GET /ngsi10/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 253
+Content-Length: 495
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextAttributeResponse>
-  <contextAttributeList/>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type/>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
   <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: 'EID'</details>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextAttributeResponse>
 
@@ -944,15 +957,15 @@ Date: REGEX(.*)
 8. DELETE /ngsi10/contextEntities/EID/attributes/A1
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 220
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>EID</details>
+  <code>472</code>
+  <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
+  <details>action: DELETE - entity: (EID, ) - offending attribute: A1 - attribute not found</details>
 </statusCode>
 
 
@@ -968,25 +981,37 @@ Date: REGEX(.*)
 9. GET /ngsi10/contextEntities/EID/attributes/A1/left
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 495
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextAttributeResponse>
-  <contextAttributeList/>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type/>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
   <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity-Attribute pair: 'EID-A1'</details>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextAttributeResponse>
 
 
-9. PUT /ngsi10/contextEntities/EID/attributes/A1/left
+9. PUT /ngsi10/contextEntities/EID2/attributes/A1/left
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 128
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -994,14 +1019,14 @@ Date: REGEX(.*)
 <statusCode>
   <code>404</code>
   <reasonPhrase>No context element found</reasonPhrase>
-  <details>EID</details>
+  <details>EID2</details>
 </statusCode>
 
 
-9. DELETE /ngsi10/contextEntities/EID/attributes/A1/left
+9. DELETE /ngsi10/contextEntities/EID2/attributes/A1/left
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 128
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -1009,11 +1034,11 @@ Date: REGEX(.*)
 <statusCode>
   <code>404</code>
   <reasonPhrase>No context element found</reasonPhrase>
-  <details>EID</details>
+  <details>EID2</details>
 </statusCode>
 
 
-9. NOP /ngsi10/contextEntities/EID/attributes/A1/left
+9. NOP /ngsi10/contextEntities/EID2/attributes/A1/left
 ==========================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0

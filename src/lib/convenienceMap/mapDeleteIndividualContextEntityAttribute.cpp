@@ -61,12 +61,20 @@ HttpStatusCode mapDeleteIndividualContextEntityAttribute
 
   ucRequest.contextElementVector.push_back(&ce);
 
+  ucResponse.errorCode.code = SccOk;
   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
 
-  if (ms == SccOk)
-  {
-    *response = ucResponse.contextElementResponseVector.get(0)->statusCode;
-  }
+  //
+  // Only one contextAttribute in request contextAttributeVector, so there will be only one 
+  // item in ucResponse.contextElementResponseVector.
+  // Completely safe to respond with ucResponse.contextElementResponseVector[0].
+  // However, if there is a general error in ucResponse.errorCode, we should pick that
+  // response instead.
+  //
+  if (ucResponse.errorCode.code != SccOk)
+    *response = ucResponse.errorCode;
+  else
+    *response = ucResponse.contextElementResponseVector[0]->statusCode;
 
   return ms;
 }

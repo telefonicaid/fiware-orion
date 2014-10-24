@@ -31,6 +31,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ContextElementResponse.h"
+#include "ngsi/StatusCode.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "rest/ConnectionInfo.h"
@@ -45,6 +46,7 @@
 HttpStatusCode mapPutIndividualContextEntityAttribute
 (
   const std::string&              entityId,
+  const std::string&              entityType,
   const std::string&              attributeName,
   UpdateContextAttributeRequest*  request,
   StatusCode*                     response,
@@ -57,15 +59,19 @@ HttpStatusCode mapPutIndividualContextEntityAttribute
   ContextElement         ce;
   ContextAttribute       attribute(attributeName, request->type, request->contextValue);
 
-  ce.entityId.fill(entityId, "", "false");
+  ce.entityId.fill(entityId, entityType, "false");
   ce.contextAttributeVector.push_back(&attribute);
 
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Update");
 
+  ucResponse.errorCode.fill(SccOk);
   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
 
-  response->fill(SccOk);
+  //
+  // Filling response with the StatusCode of the first ContextElementResponse
+  //
+  response->fill(&ucResponse.contextElementResponseVector[0]->statusCode);
 
   return ms;
 }

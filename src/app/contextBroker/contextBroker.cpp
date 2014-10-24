@@ -154,6 +154,7 @@
 #include "serviceRoutines/deleteAllEntitiesWithTypeAndId.h"
 #include "serviceRoutines/getIndividualContextEntityAttributeWithTypeAndId.h"
 #include "serviceRoutines/postIndividualContextEntityAttributeWithTypeAndId.h"
+#include "serviceRoutines/putIndividualContextEntityAttributeWithTypeAndId.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttributeWithTypeAndId.h"
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
@@ -746,9 +747,9 @@ PaArgument paArgs[] =
   { "*",      ACET,  ACET_COMPS_V1,          "",              badVerbAllFour                            }, \
                                                                                                            \
   { "GET",    ICEAAT,  ICEAAT_COMPS_V1,      "",               getIndividualContextEntityAttributeWithTypeAndId    }, \
-  { "POST",   ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_POST_WORD, postIndividualContextEntityAttributeWithTypeAndId    }, \
-/*{ "PUT",    ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_PUT_WORD,  putIndividualContextEntityAttributeWithTypeAndId   },*/ \
-  { "DELETE", ICEAAT,  ICEAAT_COMPS_V1,      "",               deleteIndividualContextEntityAttributeWithTypeAndId },  \
+  { "POST",   ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_POST_WORD, postIndividualContextEntityAttributeWithTypeAndId   }, \
+  { "PUT",    ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_PUT_WORD,  putIndividualContextEntityAttributeWithTypeAndId    }, \
+  { "DELETE", ICEAAT,  ICEAAT_COMPS_V1,      "",               deleteIndividualContextEntityAttributeWithTypeAndId }, \
   { "*",      ICEAAT,  ICEAAT_COMPS_V1,      "",               badVerbAllFour                                      }
 
 

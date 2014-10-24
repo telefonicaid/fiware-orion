@@ -55,13 +55,32 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
 * (and used from) a global place, maybe as part as the class-refactoring within
 * EntityId or Attribute class methods.
 */
-static bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2) {
-    if (type2 == "") {
-        return ((name1 == name2) && (id1 == id2));
-    }
-    else {
-        return ((name1 == name2) && (type1 == type2) && (id1 == id2));
-    }
+static bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2)
+{
+#if 0
+  //
+  // FIXME P9: The identity of an attribute is formed by the name and the type of the attribute.
+  //           [ if both are equal, then the metadata named 'ID' is used to distinguish ].
+  //           Now, there is a convop 'DELETE /v1/contextEntities/type/TYPE/id/ID/attribute/ATTR_NAME'
+  //           that doesn't work because of this. We don't have the type of the attribute, so we can't
+  //           find it for removal.
+  //
+  //           With this outdeffed 'if' below, the problem is fixed, but, the fix also provokes five
+  //           errors in unit tests ...
+  //           We need to decide what to do about this.
+  //
+  if ((id2 == "") && (type2 == ""))
+  {
+    return (name1 == name2);
+  }
+  else 
+#endif
+  if (type2 == "")
+  {
+    return ((name1 == name2) && (id1 == id2));
+  }
+
+  return ((name1 == name2) && (type1 == type2) && (id1 == id2));
 }
 
 /* ****************************************************************************
@@ -1148,7 +1167,8 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: APPEND") +
                                       " - entity: (" + eP->toString() + ")" +
-                                      " - offending attribute: " + targetAttr->toString());
+                                      " - offending attribute: " + targetAttr->toString() + 
+                                      " - attribute can not be appended");
                 return false;
             }
         }
@@ -1181,7 +1201,8 @@ static bool processContextAttributeVector (ContextElement*               ceP,
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: DELETE") +
                                       " - entity: (" + eP->toString() + ")" +
-                                      " - offending attribute: " + targetAttr->toString());
+                                      " - offending attribute: " + targetAttr->toString() + 
+                                      " - attribute not found");
                 return false;
 
             }
@@ -1444,14 +1465,12 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     /* Getting the entity in the request (helpful in other places) */
     EntityId* enP = &ceP->entityId;
 
-    LM_M(("Here"));
     /* Not supporting isPattern = true currently */
     if (isTrue(enP->isPattern)) {
         buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
         return;
     }
 
-    LM_M(("Here"));
     /* Check that UPDATE or APPEND is not used with attributes with empty value */
     if (strcasecmp(action.c_str(), "update") == 0 || strcasecmp(action.c_str(), "append") == 0) {
         for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
@@ -1465,13 +1484,11 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
                                       " - entity: (" + enP->toString(true) + ")" +
                                       " - offending attribute: " + aP->toString() +
                                       " - empty attribute not allowed in APPEND or UPDATE");
-                LM_M(("Here"));
                 return;
             }
         }
     }
 
-    LM_M(("Here"));
     /* Find entities (could be several, in the case of no type or isPattern=true) */
     const std::string  idString          = "_id." ENT_ENTITY_ID;
     const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
@@ -1491,7 +1508,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
     else
     {
-      LM_M(("Here"));
       LM_T(LmtServicePath, ("Updating entity '%s' for Service Path: '%s', action '%s'", ceP->entityId.id.c_str(), servicePathV[0].c_str(), action.c_str()));
       char               path[MAX_SERVICE_NAME_LEN];
       slashEscape(servicePathV[0].c_str(), path, sizeof(path));
@@ -1507,7 +1523,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     try
     {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
-        LM_M(("Here"));
         mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
         cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
 
@@ -1545,7 +1560,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
     }
 
 
-    LM_M(("Here"));
     //
     // Going through the list of found entities.
     // As ServicePath cannot be modified, inside this loop nothing will be done
@@ -1722,7 +1736,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         responseP->contextElementResponseVector.push_back(cerP);
     }
     LM_T(LmtServicePath, ("Docs found: %d", docs));
-
 
 
     /*

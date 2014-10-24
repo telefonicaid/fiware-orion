@@ -90,6 +90,7 @@ deleteAllEntitiesWithTypeAndId.cpp
 getIndividualContextEntityAttributeWithTypeAndId.cpp
 deleteIndividualContextEntityAttributeWithTypeAndId.cpp
 postIndividualContextEntityAttributeWithTypeAndId.cpp
+putIndividualContextEntityAttributeWithTypeAndId.cpp
 )
 
 SET (HEADERS
@@ -148,6 +149,7 @@ getAllContextEntities.h
 getIndividualContextEntityAttributeWithTypeAndId.h
 deleteIndividualContextEntityAttributeWithTypeAndId.h
 postIndividualContextEntityAttributeWithTypeAndId.cpp
+putIndividualContextEntityAttributeWithTypeAndId.cpp
 )
 
 

@@ -94,13 +94,9 @@ TEST(mapPostIndividualContextEntityAttribute, notFoundThenFound)
   ci.servicePathV.push_back("");
   ms = mapPostIndividualContextEntityAttribute("MPICE", "", "A1", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
-  EXPECT_EQ(200, response.code);
+  EXPECT_EQ(SccInvalidParameter, response.code);
 
   ms = mapPostIndividualContextEntityAttribute("MPICE2", "", "A9", &request, &response, &ci);
   EXPECT_EQ(SccOk, ms);
-
-  // FIXME P9:  Why is there a 200 OK here?
-  //            To be removed when the convenienceMap library is removed.
-  //            See issue #117
-  EXPECT_EQ(200, response.code);
+  EXPECT_EQ(SccInvalidParameter, response.code);
 }

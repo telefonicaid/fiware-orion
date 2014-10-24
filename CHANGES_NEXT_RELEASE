@@ -4,3 +4,6 @@
 - Fix: change service path HTTP header name: 'ServicePath' -> 'Fiware-ServicePath' (Issue #541)
 - Fix: Some convenience operations responsed always with empty type (Issue #585)
 - Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id>
+- Fix: More detailed error responses for some convenience operations:
+       - POST/DELETE /v1/contextEntities/EID/attribute/ATTR_NAME
+       - POST/DELETE /v1/contextEntities/type/TYPE/id/ID/attributes/ATTR_NAME

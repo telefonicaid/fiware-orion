@@ -840,7 +840,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 10: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 777
+Content-Length: 799
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -863,14 +863,14 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: DELETE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
+        <details>action: DELETE - entity: (OfficeRoom, Room) - offending attribute: pressure - attribute not found</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 777
+Content-Length: 799
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -893,7 +893,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: DELETE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
+        <details>action: DELETE - entity: (OfficeRoom, Room) - offending attribute: pressure - attribute not found</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

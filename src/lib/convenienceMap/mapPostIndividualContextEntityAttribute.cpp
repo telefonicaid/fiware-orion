@@ -64,10 +64,20 @@ HttpStatusCode mapPostIndividualContextEntityAttribute
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Append");
 
-  LM_M(("Calling mongoUpdateContext(APPEND for Entity '%s'/'%s', Attribute '%s'", entityId.c_str(), entityType.c_str(), attributeName.c_str()));
+  ucResponse.errorCode.fill(SccOk);
   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
-  LM_M(("mongoUpdateContext responds with %d", ms));
-  response->fill(SccOk);
+
+  //
+  // Only one contextAttribute in request contextAttributeVector, so there will be only one 
+  // item in ucResponse.contextElementResponseVector.
+  // Completely safe to respond with ucResponse.contextElementResponseVector[0].
+  // However, if there is a general error in ucResponse.errorCode, we should pick that
+  // response instead.
+  //
+  if (ucResponse.errorCode.code != SccOk)
+    response->fill(&ucResponse.errorCode);
+  else
+    response->fill(&ucResponse.contextElementResponseVector[0]->statusCode);
 
   return ms;
 }

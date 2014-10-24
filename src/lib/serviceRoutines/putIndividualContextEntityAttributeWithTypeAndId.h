@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
-#define SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
+#ifndef SRC_LIB_SERVICEROUTINES_PUTINDIVIDUALCONTEXTENTITYATTRIBUTEWITHTYPEANDID_H_
+#define SRC_LIB_SERVICEROUTINES_PUTINDIVIDUALCONTEXTENTITYATTRIBUTEWITHTYPEANDID_H_
 
 /*
 *
-* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,29 +23,26 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: TID Developer
+* Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "convenience/UpdateContextAttributeRequest.h"
-#include "mongoBackend/MongoGlobal.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpStatusCode.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* mapPutIndividualContextEntityAttributes - 
+* putIndividualContextEntityAttributeWithTypeAndId - 
 */
-extern HttpStatusCode mapPutIndividualContextEntityAttribute
+extern std::string putIndividualContextEntityAttributeWithTypeAndId
 (
-  const std::string&              entityId,
-  const std::string&              entityType,
-  const std::string&              attributeName,
-  UpdateContextAttributeRequest*  request,
-  StatusCode*                     response,
-  ConnectionInfo*                 ciP
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 );
 
-#endif  // SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITYATTRIBUTE_H_
+#endif  // SRC_LIB_SERVICEROUTINES_PUTINDIVIDUALCONTEXTENTITYATTRIBUTEWITHTYPEANDID_H_

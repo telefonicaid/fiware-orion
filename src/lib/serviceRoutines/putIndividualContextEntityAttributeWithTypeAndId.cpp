@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * fermin at tid dot es
 *
-* Author: TID Developer
+* Author: Ken Zangelin
 */
 #include <string>
 #include <vector>
@@ -28,9 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenience/UpdateContextElementResponse.h"
 #include "convenienceMap/mapPutIndividualContextEntityAttribute.h"
 #include "ngsi/ParseData.h"
+#include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 
@@ -38,9 +38,9 @@
 
 /* ****************************************************************************
 *
-* putIndividualContextEntityAttribute -
+* putIndividualContextEntityAttributeWithTypeAndId - 
 */
-std::string putIndividualContextEntityAttribute
+std::string putIndividualContextEntityAttributeWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -49,21 +49,21 @@ std::string putIndividualContextEntityAttribute
 )
 {
   std::string  answer;
-  std::string  entityId      = compV[2];
-  std::string  attributeName = compV[4];
+  std::string  entityType    = compV[3];
+  std::string  entityId      = compV[5];
+  std::string  attributeName = compV[7];
   StatusCode   response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'PUT' request for entityId '%s'", entityId.c_str()));
+  LM_T(LmtConvenience, ("CONVENIENCE: got a 'PUT' request for entityId '%s', type '%s' and attribute '%s'",
+                        entityId.c_str(), entityType.c_str(), attributeName.c_str()));
 
   ciP->httpStatusCode = mapPutIndividualContextEntityAttribute(entityId,
-                                                               "",
+                                                               entityType,
                                                                attributeName,
                                                                &parseDataP->upcar.res,
                                                                &response,
                                                                ciP);
-
   answer = response.render(ciP->outFormat, "", false, false);
-  response.release();
 
   return answer;
 }
