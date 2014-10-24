@@ -199,6 +199,29 @@ static void commonFilters
 
 /* ****************************************************************************
 *
+* filterRelease - 
+*/
+static void filterRelease(ParseData* parseDataP, RequestType request)
+{
+  Restriction* restrictionP = NULL;
+
+  if (request == EntityTypes)
+  {
+    restrictionP = &parseDataP->qcr.res.restriction;
+  }
+  else if (request == AllContextEntities)
+  {
+    restrictionP = &parseDataP->qcr.res.restriction;
+  }
+
+  if (restrictionP != NULL)
+    restrictionP->release();
+}
+
+
+
+/* ****************************************************************************
+*
 * restService - 
 */
 std::string restService(ConnectionInfo* ciP, RestService* serviceV)
@@ -324,6 +347,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     commonFilters(ciP, &parseData, &serviceV[ix]);
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
+    filterRelease(&parseData, serviceV[ix].request);
 
     if (reqP != NULL)
     {
