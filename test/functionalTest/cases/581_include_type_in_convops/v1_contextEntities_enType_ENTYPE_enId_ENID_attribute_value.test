@@ -34,9 +34,14 @@ brokerStart CB 0-255
 # 02. POST /v1/contextEntities/type/T1/id/E1/attributes/A1 with A1=12 in payload
 # 03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
 # 04. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
-# 05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail
-# 06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail
-#
+# 05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail
+# 06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail
+# 07. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail
+# 08. POST /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+# 09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+# 10. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+# 11. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+# 12. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1/12
 #
 # NOTE/FIXME P9
 #   The attributes used must have an empty type for this test to work.
@@ -58,7 +63,7 @@ echo "02. POST /v1/contextEntities/type/T1/id/E1/attributes/A1 with metaId=12 in
 echo "=================================================================================="
 payload='{
   "type": "",
-  "value": "44",
+  "value": "2",
   "metadatas": [
     {
       "name": "ID",
@@ -85,15 +90,90 @@ orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json -X DEL
 echo
 echo
 
-echo "05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail"
-echo "======================================================================"
+echo "05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail"
+echo "=========================================================================="
 orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
 echo
 echo
 
-echo "06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail"
-echo "========================================================================="
+echo "06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail"
+echo "============================================================================="
 orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json -X DELETE
+echo
+echo
+
+
+echo "07. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail"
+echo "=========================================================================="
+payload='{
+  "type": "",
+  "value": "7",
+  "metadatas": [
+    {
+      "name": "ID",
+      "type": "string",
+      "value": "12"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "08. POST /v1/contextEntities/type/T1/id/E1/attributes/A1/12"
+echo "=========================================================="
+payload='{
+  "type": "",
+  "value": "8",
+  "metadatas": [
+    {
+      "name": "ID",
+      "type": "string",
+      "value": "12"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --payload "$payload" --json
+echo
+echo
+
+
+echo "09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK"
+echo "============================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
+echo
+echo
+
+
+echo "10. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK"
+echo "============================================================="
+payload='{
+  "type": "",
+  "value": "10",
+  "metadatas": [
+    {
+      "name": "ID",
+      "type": "string",
+      "value": "12"
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "11. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK"
+echo "============================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
+echo
+echo
+
+
+echo "12. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1/12"
+echo "=========================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json -X NOP
 echo
 echo
 
@@ -131,7 +211,7 @@ Date: REGEX(.*)
 03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 299
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -147,7 +227,7 @@ Date: REGEX(.*)
             ], 
             "name": "A1", 
             "type": "", 
-            "value": "44"
+            "value": "2"
         }
     ], 
     "statusCode": {
@@ -170,8 +250,8 @@ Date: REGEX(.*)
 }
 
 
-05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail
-======================================================================
+05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail
+==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 145
 Content-Type: application/json
@@ -186,8 +266,8 @@ Date: REGEX(.*)
 }
 
 
-06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail
-=========================================================================
+06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail
+=============================================================================
 HTTP/1.1 200 OK
 Content-Length: 183
 Content-Type: application/json
@@ -198,6 +278,113 @@ Date: REGEX(.*)
     "details": "action: DELETE - entity: (E1, T1) - offending attribute: A1 - attribute not found", 
     "reasonPhrase": "request parameter is invalid/not allowed"
 }
+
+
+07. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 161
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "472", 
+    "details": "action: UPDATE - entity: (E1, T1) - offending attribute: A1", 
+    "reasonPhrase": "request parameter is invalid/not allowed"
+}
+
+
+08. POST /v1/contextEntities/type/T1/id/E1/attributes/A1/12
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 299
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": [
+        {
+            "metadatas": [
+                {
+                    "name": "ID", 
+                    "type": "string", 
+                    "value": "12"
+                }
+            ], 
+            "name": "A1", 
+            "type": "", 
+            "value": "8"
+        }
+    ], 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+10. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+11. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 300
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attributes": [
+        {
+            "metadatas": [
+                {
+                    "name": "ID", 
+                    "type": "string", 
+                    "value": "12"
+                }
+            ], 
+            "name": "A1", 
+            "type": "", 
+            "value": "10"
+        }
+    ], 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+12. NOP /v1/contextEntities/type/T1/id/E1/attributes/A1/12
+==========================================================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET, PUT, DELETE
+Date: REGEX(.*)
+
 
 
 --TEARDOWN--
