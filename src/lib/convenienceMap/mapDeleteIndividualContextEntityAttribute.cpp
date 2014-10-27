@@ -72,9 +72,13 @@ HttpStatusCode mapDeleteIndividualContextEntityAttribute
   // response instead.
   //
   if (ucResponse.errorCode.code != SccOk)
+  {
     *response = ucResponse.errorCode;
+  }
   else
+  {
     *response = ucResponse.contextElementResponseVector[0]->statusCode;
+  }
 
   return ms;
 }

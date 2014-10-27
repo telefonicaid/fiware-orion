@@ -75,9 +75,13 @@ HttpStatusCode mapPostIndividualContextEntityAttribute
   // response instead.
   //
   if (ucResponse.errorCode.code != SccOk)
+  {
     response->fill(&ucResponse.errorCode);
+  }
   else
+  {
     response->fill(&ucResponse.contextElementResponseVector[0]->statusCode);
+  }
 
   return ms;
 }
