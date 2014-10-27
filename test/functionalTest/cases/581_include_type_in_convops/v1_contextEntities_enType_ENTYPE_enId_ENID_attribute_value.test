@@ -33,6 +33,9 @@ brokerStart CB 0-255
 # 01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail
 # 02. POST /v1/contextEntities/type/T1/id/E1/attributes/A1 with A1=12 in payload
 # 03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+# 04. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+# 05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail
+# 06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail
 #
 #
 # NOTE/FIXME P9
@@ -72,6 +75,25 @@ echo
 echo "03. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK"
 echo "============================================================="
 orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
+echo
+echo
+
+
+echo "04. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK"
+echo "================================================================"
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json -X DELETE
+echo
+echo
+
+echo "05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail"
+echo "======================================================================"
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json
+echo
+echo
+
+echo "06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail"
+echo "========================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/12 --json -X DELETE
 echo
 echo
 
@@ -131,6 +153,51 @@ Date: REGEX(.*)
     "statusCode": {
         "code": "200", 
         "reasonPhrase": "OK"
+    }
+}
+
+
+04. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 OK
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "404", 
+        "details": "Entity-Attribute pair: 'E1-A1'", 
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail
+=========================================================================
+HTTP/1.1 200 OK
+Content-Length: 145
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "404", 
+        "details": "Entity-Attribute pair: 'E1-A1'", 
+        "reasonPhrase": "No context element found"
     }
 }
 
