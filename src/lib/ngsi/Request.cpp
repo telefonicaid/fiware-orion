@@ -61,6 +61,7 @@ const char* requestType(RequestType rt)
   case IndividualContextEntity:                     return "IndividualContextEntity";
   case IndividualContextEntityAttributes:           return "IndividualContextEntityAttributes";
   case AttributeValueInstance:                      return "AttributeValueInstance";
+  case AttributeValueInstanceWithTypeAndId:         return "AttributeValueInstanceWithTypeAndId";
   case IndividualContextEntityAttribute:            return "IndividualContextEntityAttribute";
   case IndividualContextEntityAttributeWithTypeAndId:  return "IndividualContextEntityAttributeWithTypeAndId";
   case UpdateContextElement:                        return "UpdateContextElement";

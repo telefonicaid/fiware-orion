@@ -156,6 +156,10 @@
 #include "serviceRoutines/postIndividualContextEntityAttributeWithTypeAndId.h"
 #include "serviceRoutines/putIndividualContextEntityAttributeWithTypeAndId.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttributeWithTypeAndId.h"
+#include "serviceRoutines/getAttributeValueInstanceWithTypeAndId.h"
+#include "serviceRoutines/deleteAttributeValueInstanceWithTypeAndId.h"
+#include "serviceRoutines/postAttributeValueInstanceWithTypeAndId.h"
+#include "serviceRoutines/putAttributeValueInstanceWithTypeAndId.h"
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -476,6 +480,10 @@ PaArgument paArgs[] =
 #define ICEAAT_POST_WORD    "updateContextAttributeRequest"
 #define ICEAAT_PUT_WORD     "updateContextAttributeRequest"
 
+#define AVIT                AttributeValueInstanceWithTypeAndId
+#define AVIT_COMPS_V1       9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*" }
+#define AVIT_PUT_WORD       "updateContextAttributeRequest"
+#define AVIT_POST_WORD      "updateContextAttributeRequest"
 
 
 //
@@ -750,7 +758,13 @@ PaArgument paArgs[] =
   { "POST",   ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_POST_WORD, postIndividualContextEntityAttributeWithTypeAndId   }, \
   { "PUT",    ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_PUT_WORD,  putIndividualContextEntityAttributeWithTypeAndId    }, \
   { "DELETE", ICEAAT,  ICEAAT_COMPS_V1,      "",               deleteIndividualContextEntityAttributeWithTypeAndId }, \
-  { "*",      ICEAAT,  ICEAAT_COMPS_V1,      "",               badVerbAllFour                                      }
+  { "*",      ICEAAT,  ICEAAT_COMPS_V1,      "",               badVerbAllFour                                      }, \
+                                                                                                                      \
+  { "GET",    AVIT,    AVIT_COMPS_V1,        "",               getAttributeValueInstanceWithTypeAndId              }, \
+  { "POST",   AVIT,    AVIT_COMPS_V1,        AVIT_POST_WORD,   postAttributeValueInstanceWithTypeAndId             }, \
+  { "PUT",    AVIT,    AVIT_COMPS_V1,        AVIT_PUT_WORD,    putAttributeValueInstanceWithTypeAndId              }, \
+  { "DELETE", AVIT,    AVIT_COMPS_V1,        "",               deleteAttributeValueInstanceWithTypeAndId           }, \
+  { "*",      AVIT,    AVIT_COMPS_V1,        "",               badVerbAllFour                                      }
 
 
 
