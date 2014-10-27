@@ -189,16 +189,14 @@ Date: REGEX(.*)
 06. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A1/12 see it fail
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 183
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "statusCode": {
-        "code": "404", 
-        "details": "Entity-Attribute pair: 'E1-A1'", 
-        "reasonPhrase": "No context element found"
-    }
+    "code": "472", 
+    "details": "action: DELETE - entity: (E1, T1) - offending attribute: A1 - attribute not found", 
+    "reasonPhrase": "request parameter is invalid/not allowed"
 }
 
 

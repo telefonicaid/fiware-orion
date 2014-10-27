@@ -157,6 +157,7 @@
 #include "serviceRoutines/putIndividualContextEntityAttributeWithTypeAndId.h"
 #include "serviceRoutines/deleteIndividualContextEntityAttributeWithTypeAndId.h"
 #include "serviceRoutines/getAttributeValueInstanceWithTypeAndId.h"
+#include "serviceRoutines/deleteAttributeValueInstanceWithTypeAndId.h"
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -757,9 +758,9 @@ PaArgument paArgs[] =
   { "*",      ICEAAT,  ICEAAT_COMPS_V1,      "",               badVerbAllFour                                      }, \
                                                                                                                       \
   { "GET",    AVIT,    AVIT_COMPS_V1,        "",               getAttributeValueInstanceWithTypeAndId              }, \
-/*  { "POST",   AVIT,    AVIT_COMPS_V1,        AVIT_POST_WORD,   postAttributeValueInstanceWithTypeAndId             }, \
-  { "PUT",    AVIT,    AVIT_COMPS_V1,        AVIT_PUT_WORD,    putAttributeValueInstanceWithTypeAndId              }, \
-  { "DELETE", AVIT,    AVIT_COMPS_V1,        "",               deleteAttributeValueInstanceWithTypeAndId           }, */ \
+/*  { "POST",   AVIT,    AVIT_COMPS_V1,        AVIT_POST_WORD,   postAttributeValueInstanceWithTypeAndId           }, */ \
+/*  { "PUT",    AVIT,    AVIT_COMPS_V1,        AVIT_PUT_WORD,    putAttributeValueInstanceWithTypeAndId            }, */ \
+  { "DELETE", AVIT,    AVIT_COMPS_V1,        "",               deleteAttributeValueInstanceWithTypeAndId           }, \
   { "*",      AVIT,    AVIT_COMPS_V1,        "",               badVerbAllFour                                      }
 
 
