@@ -73,7 +73,6 @@ int noOfNgsi9SubscriptionsConvOp                         = -1;
 
 int noOfIndividualContextEntity                          = -1;
 int noOfIndividualContextEntityAttributes                = -1;
-int noOfIndividualContextEntityAttributeWithTypeAndId    = -1;
 int noOfIndividualContextEntityAttribute                 = -1;
 int noOfAttributeValueInstance                           = -1;
 int noOfNgsi10ContextEntityTypes                         = -1;
@@ -87,6 +86,8 @@ int noOfUpdateContextAttribute                           = -1;
 
 int noOfAllContextEntitiesRequests                       = -1;
 int noOfAllEntitiesWithTypeAndIdRequests                 = -1;
+int noOfIndividualContextEntityAttributeWithTypeAndId    = -1;
+int noOfAttributeValueInstanceWithTypeAndId              = -1;
 
 int noOfLogRequests                                      = -1;
 int noOfVersionRequests                                  = -1;
@@ -154,7 +155,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case ContextEntityTypeAttribute:                       ++noOfContextEntityTypeAttribute; break;
   case IndividualContextEntity:                          ++noOfIndividualContextEntity; break;
   case IndividualContextEntityAttributes:                ++noOfIndividualContextEntityAttributes; break;
-  case IndividualContextEntityAttributeWithTypeAndId:    ++noOfIndividualContextEntityAttributeWithTypeAndId; break;
   case AttributeValueInstance:                           ++noOfAttributeValueInstance; break;
   case IndividualContextEntityAttribute:                 ++noOfIndividualContextEntityAttribute; break;
   case Ngsi9SubscriptionsConvOp:                         ++noOfNgsi9SubscriptionsConvOp; break;
@@ -169,6 +169,8 @@ void statisticsUpdate(RequestType request, Format inFormat)
 
   case AllContextEntities:                               ++noOfAllContextEntitiesRequests; break;
   case AllEntitiesWithTypeAndId:                         ++noOfAllEntitiesWithTypeAndIdRequests; break;
+  case IndividualContextEntityAttributeWithTypeAndId:    ++noOfIndividualContextEntityAttributeWithTypeAndId; break;
+  case AttributeValueInstanceWithTypeAndId:              ++noOfAttributeValueInstanceWithTypeAndId; break;
 
   case LogRequest:                                       ++noOfLogRequests; break;
   case VersionRequest:                                   ++noOfVersionRequests; break;

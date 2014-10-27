@@ -70,6 +70,7 @@ typedef enum RequestType
   IndividualContextEntityAttribute,
   IndividualContextEntityAttributeWithTypeAndId,
   AttributeValueInstance,
+  AttributeValueInstanceWithTypeAndId,
   Ngsi10ContextEntityTypes,
   Ngsi10ContextEntityTypesAttributeContainer,
   Ngsi10ContextEntityTypesAttribute,
