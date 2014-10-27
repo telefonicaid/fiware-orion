@@ -152,6 +152,10 @@
 #include "serviceRoutines/postAllEntitiesWithTypeAndId.h"
 #include "serviceRoutines/putAllEntitiesWithTypeAndId.h"
 #include "serviceRoutines/deleteAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/getIndividualContextEntityAttributeWithTypeAndId.h"
+#include "serviceRoutines/postIndividualContextEntityAttributeWithTypeAndId.h"
+#include "serviceRoutines/putIndividualContextEntityAttributeWithTypeAndId.h"
+#include "serviceRoutines/deleteIndividualContextEntityAttributeWithTypeAndId.h"
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -467,6 +471,13 @@ PaArgument paArgs[] =
 #define ACET_POST_WORD     "appendContextElementRequest"
 #define ACET_PUT_WORD      "updateContextElementRequest"
 
+#define ICEAAT              IndividualContextEntityAttributeWithTypeAndId
+#define ICEAAT_COMPS_V1     8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*" }
+#define ICEAAT_POST_WORD    "updateContextAttributeRequest"
+#define ICEAAT_PUT_WORD     "updateContextAttributeRequest"
+
+
+
 //
 // Log, version, statistics ...
 //
@@ -733,7 +744,14 @@ PaArgument paArgs[] =
   { "POST",   ACET,  ACET_COMPS_V1,          ACET_POST_WORD,  postAllEntitiesWithTypeAndId              }, \
   { "PUT",    ACET,  ACET_COMPS_V1,          ACET_PUT_WORD,   putAllEntitiesWithTypeAndId               }, \
   { "DELETE", ACET,  ACET_COMPS_V1,          "",              deleteAllEntitiesWithTypeAndId            }, \
-  { "*",      ACET,  ACET_COMPS_V1,          "",              badVerbAllFour                            }
+  { "*",      ACET,  ACET_COMPS_V1,          "",              badVerbAllFour                            }, \
+                                                                                                           \
+  { "GET",    ICEAAT,  ICEAAT_COMPS_V1,      "",               getIndividualContextEntityAttributeWithTypeAndId    }, \
+  { "POST",   ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_POST_WORD, postIndividualContextEntityAttributeWithTypeAndId   }, \
+  { "PUT",    ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_PUT_WORD,  putIndividualContextEntityAttributeWithTypeAndId    }, \
+  { "DELETE", ICEAAT,  ICEAAT_COMPS_V1,      "",               deleteIndividualContextEntityAttributeWithTypeAndId }, \
+  { "*",      ICEAAT,  ICEAAT_COMPS_V1,      "",               badVerbAllFour                                      }
+
 
 
 

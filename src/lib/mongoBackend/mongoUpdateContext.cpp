@@ -67,9 +67,9 @@ HttpStatusCode mongoUpdateContext
             processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePathV);
         }
 
-        /* Note that although individual processContextElements() invokations returns MsConnectionError, this
-           error get "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
-           consider the overall mongoUpdateContext() as MsOk. */
+        /* Note that although individual processContextElements() invocations return ConnectionError, this
+           error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
+           consider the overall mongoUpdateContext() as OK. */
     }
     reqSemGive(__FUNCTION__, "ngsi10 update request");
     return SccOk;

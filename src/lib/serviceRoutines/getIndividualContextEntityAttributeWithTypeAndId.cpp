@@ -28,19 +28,19 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapDeleteIndividualContextEntityAttribute.h"
+#include "convenience/ContextAttributeResponse.h"
+#include "convenienceMap/mapGetIndividualContextEntityAttribute.h"
 #include "ngsi/ParseData.h"
-#include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
+#include "serviceRoutines/getIndividualContextEntityAttributeWithTypeAndId.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteIndividualContextEntityAttribute - 
+* getIndividualContextEntityAttributeWithTypeAndId -
 */
-std::string deleteIndividualContextEntityAttribute
+std::string getIndividualContextEntityAttributeWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -48,18 +48,16 @@ std::string deleteIndividualContextEntityAttribute
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
-  std::string  entityId      = "unknown entityId";
-  std::string  attributeName = "unknown attributeName";
-  StatusCode   response;
+  std::string               answer;
+  std::string               entityType    = compV[3];
+  std::string               entityId      = compV[5];
+  std::string               attributeName = compV[7];
+  ContextAttributeResponse  response;
 
-  if (compV.size() > 2)   entityId      = compV[2];
-  if (compV.size() > 4)   attributeName = compV[4];
+  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s'", entityId.c_str()));
-
-  ciP->httpStatusCode = mapDeleteIndividualContextEntityAttribute(entityId, "", attributeName, &response, ciP);
-  answer = response.render(ciP->outFormat, "", false, false);
+  ciP->httpStatusCode = mapGetIndividualContextEntityAttribute(entityId, entityType, attributeName, &response, ciP);
+  answer = response.render(ciP, IndividualContextEntityAttribute, "");
   response.release();
 
   return answer;

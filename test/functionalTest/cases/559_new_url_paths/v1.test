@@ -880,14 +880,15 @@ Date: REGEX(.*)
 8. PUT /v1/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 80
+Content-Length: 127
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>200</code>
-  <reasonPhrase>OK</reasonPhrase>
+  <code>404</code>
+  <reasonPhrase>No context element found</reasonPhrase>
+  <details>EID</details>
 </statusCode>
 
 
@@ -926,17 +927,29 @@ Date: REGEX(.*)
 8. GET /v1/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 253
+Content-Length: 496
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextAttributeResponse>
-  <contextAttributeList/>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>T</type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
   <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: 'EID'</details>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextAttributeResponse>
 
@@ -944,15 +957,15 @@ Date: REGEX(.*)
 8. DELETE /v1/contextEntities/EID/attributes/A1
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 220
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>EID</details>
+  <code>472</code>
+  <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
+  <details>action: DELETE - entity: (EID, ) - offending attribute: A1 - attribute not found</details>
 </statusCode>
 
 
@@ -968,17 +981,29 @@ Date: REGEX(.*)
 9. GET /v1/contextEntities/EID/attributes/A1/left
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 496
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextAttributeResponse>
-  <contextAttributeList/>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>T</type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
   <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity-Attribute pair: 'EID-A1'</details>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextAttributeResponse>
 
@@ -986,30 +1011,28 @@ Date: REGEX(.*)
 9. PUT /v1/contextEntities/EID/attributes/A1/left
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 80
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>EID</details>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 
 
 9. DELETE /v1/contextEntities/EID/attributes/A1/left
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 80
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>EID</details>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 
 

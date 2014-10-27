@@ -87,6 +87,10 @@ getAllEntitiesWithTypeAndId.cpp
 postAllEntitiesWithTypeAndId.cpp
 putAllEntitiesWithTypeAndId.cpp
 deleteAllEntitiesWithTypeAndId.cpp
+getIndividualContextEntityAttributeWithTypeAndId.cpp
+deleteIndividualContextEntityAttributeWithTypeAndId.cpp
+postIndividualContextEntityAttributeWithTypeAndId.cpp
+putIndividualContextEntityAttributeWithTypeAndId.cpp
 )
 
 SET (HEADERS
@@ -142,6 +146,10 @@ statisticsTreat.h
 getEntityTypes.h
 getAttributesForEntityType.h
 getAllContextEntities.h
+getIndividualContextEntityAttributeWithTypeAndId.h
+deleteIndividualContextEntityAttributeWithTypeAndId.h
+postIndividualContextEntityAttributeWithTypeAndId.cpp
+putIndividualContextEntityAttributeWithTypeAndId.cpp
 )
 
 

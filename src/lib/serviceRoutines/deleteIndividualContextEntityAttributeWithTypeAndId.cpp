@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -32,15 +32,15 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttribute.h"
+#include "serviceRoutines/deleteIndividualContextEntityAttributeWithTypeAndId.h"
 
 
 
 /* ****************************************************************************
 *
-* deleteIndividualContextEntityAttribute - 
+* deleteIndividualContextEntityAttributeWithTypeAndId - 
 */
-std::string deleteIndividualContextEntityAttribute
+std::string deleteIndividualContextEntityAttributeWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -49,16 +49,15 @@ std::string deleteIndividualContextEntityAttribute
 )
 {
   std::string  answer;
-  std::string  entityId      = "unknown entityId";
-  std::string  attributeName = "unknown attributeName";
+  std::string  entityType    = compV[3];
+  std::string  entityId      = compV[5];
+  std::string  attributeName = compV[7];
   StatusCode   response;
 
-  if (compV.size() > 2)   entityId      = compV[2];
-  if (compV.size() > 4)   attributeName = compV[4];
+  LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s', type '%s', attribute '%s'",
+                        entityId.c_str(), entityType.c_str(), attributeName.c_str()));
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s'", entityId.c_str()));
-
-  ciP->httpStatusCode = mapDeleteIndividualContextEntityAttribute(entityId, "", attributeName, &response, ciP);
+  ciP->httpStatusCode = mapDeleteIndividualContextEntityAttribute(entityId, entityType, attributeName, &response, ciP);
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
 
