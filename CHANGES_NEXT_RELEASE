@@ -2,6 +2,7 @@
 - Add: New convenience operation '/v1/contextEntities' - to get a list of ALL existing entities (Issue #563)
 - Fix: Upgrading from a previous package caused the orion user to disappear.
 - Fix: Change service path HTTP header name: 'ServicePath' -> 'Fiware-ServicePath' (Issue #541)
+- Fix: avoid unneeded additional query on csubs/casubs collections to get details of ONCHANGE triggered subscription when processing updateContext (Issue #371)
 - Add: New URI parameter '!exist=entity::type' to filter entities whose type is empty (Issue #570)
 - Add: New scopeType FIWARE::Filter::Existence (only with value "entity::type" in this version)
 - Add: New payload field for 'operationScope' under 'restriction': 'operator' for JSON and 'scopeOperator' for XML

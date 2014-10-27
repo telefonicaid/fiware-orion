@@ -1679,3 +1679,17 @@ void slashEscape(const char* from, char* to, unsigned int toLen)
     to[ix] = 0;
   }
 }
+
+/* ****************************************************************************
+*
+* releaseTriggeredSubscriptions -
+*
+*/
+void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>& subs)
+{
+  for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
+  {
+      delete it->second;
+  }
+  subs.clear();
+}
