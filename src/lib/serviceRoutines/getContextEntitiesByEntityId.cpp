@@ -55,7 +55,7 @@ std::string getContextEntitiesByEntityId
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'GET' request for entityId '%s'", entityId.c_str()));
 
-  ciP->httpStatusCode = mapGetContextEntitiesByEntityId(entityId, &response, ciP);
+  ciP->httpStatusCode = mapGetContextEntitiesByEntityId(entityId, "", &response, ciP);
   answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
   response.release();
 

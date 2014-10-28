@@ -95,6 +95,8 @@ getAttributeValueInstanceWithTypeAndId.cpp
 deleteAttributeValueInstanceWithTypeAndId.cpp
 postAttributeValueInstanceWithTypeAndId.cpp
 putAttributeValueInstanceWithTypeAndId.cpp
+getContextEntitiesByEntityIdAndType.cpp
+postContextEntitiesByEntityIdAndType.cpp
 )
 
 SET (HEADERS
@@ -158,6 +160,8 @@ getAttributeValueInstanceWithTypeAndId.h
 deleteAttributeValueInstanceWithTypeAndId.h
 postAttributeValueInstanceWithTypeAndId.h
 putAttributeValueInstanceWithTypeAndId.h
+getContextEntitiesByEntityIdAndType.h
+postContextEntitiesByEntityIdAndType.h
 )
 
 

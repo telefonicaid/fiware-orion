@@ -146,6 +146,8 @@ static XmlRequest xmlRequest[] =
   { AttributeValueInstanceWithTypeAndId,           "PUT",  "updateContextAttributeRequest",        FUNCS(upcar)  },
   { AttributeValueInstanceWithTypeAndId,           "POST", "updateContextAttributeRequest",        FUNCS(upcar)  },
 
+  { ContextEntitiesByEntityIdAndType,              "POST", "registerProviderRequest",              FUNCS(rpr)    },
+
   // Responses
   { RegisterResponse,                      "POST", "registerContextResponse",                      FUNCS(rcrs)  },
   { RtQueryContextResponse,                "POST", "queryContextResponse",                         FUNCS(qcrs)  },

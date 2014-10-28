@@ -86,6 +86,8 @@ extern int noOfAllContextEntitiesRequests;
 extern int noOfAllEntitiesWithTypeAndIdRequests;
 extern int noOfIndividualContextEntityAttributeWithTypeAndId;
 extern int noOfAttributeValueInstanceWithTypeAndId;
+extern int noOfContextEntitiesByEntityIdAndType;
+
 extern int noOfLogRequests;
 extern int noOfVersionRequests;
 extern int noOfExitRequests;

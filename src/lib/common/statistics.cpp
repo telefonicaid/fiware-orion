@@ -108,6 +108,8 @@ int noOfEntityTypesRequest                               = -1;
 int noOfEntityTypesResponse                              = -1;
 int noOfAttributesForEntityTypeRequest                   = -1;
 int noOfAttributesForEntityTypeResponse                  = -1;
+int noOfContextEntitiesByEntityIdAndType                 = -1;
+
 
 
 /* ****************************************************************************
@@ -171,6 +173,7 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case AllEntitiesWithTypeAndId:                         ++noOfAllEntitiesWithTypeAndIdRequests; break;
   case IndividualContextEntityAttributeWithTypeAndId:    ++noOfIndividualContextEntityAttributeWithTypeAndId; break;
   case AttributeValueInstanceWithTypeAndId:              ++noOfAttributeValueInstanceWithTypeAndId; break;
+  case ContextEntitiesByEntityIdAndType:                 ++noOfContextEntitiesByEntityIdAndType; break;
 
   case LogRequest:                                       ++noOfLogRequests; break;
   case VersionRequest:                                   ++noOfVersionRequests; break;
