@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,23 +25,25 @@
 #include <string>
 #include <vector>
 
-
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapGetContextEntitiesByEntityId.h"
-#include "ngsi/ParseData.h"
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/getContextEntitiesByEntityId.h"
+#include "ngsi/ParseData.h"
+#include "ngsi9/RegisterContextRequest.h"
+#include "serviceRoutines/postRegisterContext.h"  // instead of convenienceMap function, postRegisterContext is used
+#include "serviceRoutines/postContextEntitiesByEntityIdAndType.h"
 
 
 
 /* ****************************************************************************
 *
-* getContextEntitiesByEntityId - 
+* postContextEntitiesByEntityIdAndType - 
+*
+* Invoked by:
+*   POST /v1/registry/contextEntities/type/{type}/id/{id}
 */
-std::string getContextEntitiesByEntityId
+std::string postContextEntitiesByEntityIdAndType
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -49,15 +51,16 @@ std::string getContextEntitiesByEntityId
   ParseData*                 parseDataP
 )
 {
-  std::string                          entityId = (compV[0] == "v1")? compV[3] : compV[2];
-  std::string                          answer;
-  DiscoverContextAvailabilityResponse  response;
+  std::string  entityType = compV[4];
+  std::string  entityId   = compV[6];
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'GET' request for entityId '%s'", entityId.c_str()));
+  // Transform RegisterProviderRequest into RegisterContextRequest
+  parseDataP->rcr.res.fill(parseDataP->rpr.res, entityId, entityType, "");
 
-  ciP->httpStatusCode = mapGetContextEntitiesByEntityId(entityId, "", &response, ciP);
-  answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
-  response.release();
+  // Now call postRegisterContext (postRegisterContext doesn't use the parameters 'components' and 'compV')
+  std::string answer = postRegisterContext(ciP, components, compV, parseDataP);
+  parseDataP->rpr.res.release();
+  parseDataP->rcr.res.release();
 
   return answer;
 }

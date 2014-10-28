@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_SERVICEROUTINES_GETCONTEXTENTITIESBYENTITYIDANDTYPE_H_
+#define SRC_LIB_SERVICEROUTINES_GETCONTEXTENTITIESBYENTITYIDANDTYPE_H_
+
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,39 +28,21 @@
 #include <string>
 #include <vector>
 
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "convenienceMap/mapGetContextEntitiesByEntityId.h"
-#include "ngsi/ParseData.h"
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutines/getContextEntitiesByEntityId.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* getContextEntitiesByEntityId - 
+* getContextEntitiesByEntityIdAndType - 
 */
-std::string getContextEntitiesByEntityId
+extern std::string getContextEntitiesByEntityIdAndType
 (
   ConnectionInfo*            ciP,
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP
-)
-{
-  std::string                          entityId = (compV[0] == "v1")? compV[3] : compV[2];
-  std::string                          answer;
-  DiscoverContextAvailabilityResponse  response;
+);
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'GET' request for entityId '%s'", entityId.c_str()));
-
-  ciP->httpStatusCode = mapGetContextEntitiesByEntityId(entityId, "", &response, ciP);
-  answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
-  response.release();
-
-  return answer;
-}
+#endif  // SRC_LIB_SERVICEROUTINES_GETCONTEXTENTITIESBYENTITYIDANDTYPE_H_

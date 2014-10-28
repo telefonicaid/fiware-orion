@@ -121,7 +121,8 @@ std::string statisticsTreat
     noOfAllEntitiesWithTypeAndIdRequests              = -1;
     noOfIndividualContextEntityAttributeWithTypeAndId = -1;
     noOfAttributeValueInstanceWithTypeAndId           = -1;
-    
+    noOfContextEntitiesByEntityIdAndType              = -1;
+
     noOfLogRequests                                 = -1;
     noOfVersionRequests                             = -1;
     noOfExitRequests                                = -1;
@@ -335,6 +336,11 @@ std::string statisticsTreat
   if (noOfAttributeValueInstanceWithTypeAndId != -1)
   {
     out += TAG_ADD("attributeValueInstanceWithTypeAndId", noOfAttributeValueInstanceWithTypeAndId);
+  }
+
+  if (noOfContextEntitiesByEntityIdAndType != -1)
+  {
+    out += TAG_ADD("contextEntitiesByEntityIdAndType", noOfContextEntitiesByEntityIdAndType);
   }
 
   if (noOfLogRequests != -1)

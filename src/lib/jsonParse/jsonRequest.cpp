@@ -119,7 +119,9 @@ static JsonRequest jsonRequest[] =
   { IndividualContextEntityAttributeWithTypeAndId, "PUT",  "updateContextAttributeRequest",         FUNCS(Upcar) },
 
   { AttributeValueInstanceWithTypeAndId,           "PUT",  "updateContextAttributeRequest",         FUNCS(Upcar) },
-  { AttributeValueInstanceWithTypeAndId,           "POST", "updateContextAttributeRequest",         FUNCS(Upcar) }
+  { AttributeValueInstanceWithTypeAndId,           "POST", "updateContextAttributeRequest",         FUNCS(Upcar) },
+
+  { ContextEntitiesByEntityIdAndType,              "POST", "registerProviderRequest",               FUNCS(Rpr)   }
 };
 
 

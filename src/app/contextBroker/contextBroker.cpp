@@ -160,6 +160,8 @@
 #include "serviceRoutines/deleteAttributeValueInstanceWithTypeAndId.h"
 #include "serviceRoutines/postAttributeValueInstanceWithTypeAndId.h"
 #include "serviceRoutines/putAttributeValueInstanceWithTypeAndId.h"
+#include "serviceRoutines/getContextEntitiesByEntityIdAndType.h"
+#include "serviceRoutines/postContextEntitiesByEntityIdAndType.h"
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -485,6 +487,9 @@ PaArgument paArgs[] =
 #define AVIT_PUT_WORD       "updateContextAttributeRequest"
 #define AVIT_POST_WORD      "updateContextAttributeRequest"
 
+#define CEET                ContextEntitiesByEntityIdAndType
+#define CEET_COMPS_V1       7, { "v1", "registry", "contextEntities", "type", "*", "id", "*" }
+#define CEET_POST_WORD      "registerProviderRequest"
 
 //
 // Log, version, statistics ...
@@ -764,9 +769,11 @@ PaArgument paArgs[] =
   { "POST",   AVIT,    AVIT_COMPS_V1,        AVIT_POST_WORD,   postAttributeValueInstanceWithTypeAndId             }, \
   { "PUT",    AVIT,    AVIT_COMPS_V1,        AVIT_PUT_WORD,    putAttributeValueInstanceWithTypeAndId              }, \
   { "DELETE", AVIT,    AVIT_COMPS_V1,        "",               deleteAttributeValueInstanceWithTypeAndId           }, \
-  { "*",      AVIT,    AVIT_COMPS_V1,        "",               badVerbAllFour                                      }
-
-
+  { "*",      AVIT,    AVIT_COMPS_V1,        "",               badVerbAllFour                                      }, \
+                                                                                                                      \
+  { "GET",    CEET,    CEET_COMPS_V1,        "",               getContextEntitiesByEntityIdAndType                 }, \
+  { "POST",   CEET,    CEET_COMPS_V1,        CEET_POST_WORD,   postContextEntitiesByEntityIdAndType                }, \
+  { "*",      CEET,    CEET_COMPS_V1,        "",               badVerbAllFour                                      }
 
 
 /* *****************************************************************************

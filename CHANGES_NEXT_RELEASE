@@ -6,6 +6,7 @@
 - Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id> (Issue #581)
 - Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id>/attributes/ATTRIBUTE_NAME (Issue #581)
 - Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id>/attributes/ATTRIBUTE_NAME/META_ID_VALUE (Issue #581)
+- Add: New convenience operations POST/GET   /v1/registry/contextEntities/type/<type>/id/<id> (Issue #581)
 - Fix: More detailed error responses for some convenience operations:
        - POST/DELETE /v1/contextEntities/EID/attributes/ATTR_NAME
        - POST/DELETE /v1/contextEntities/type/TYPE/id/ID/attributes/ATTR_NAME
