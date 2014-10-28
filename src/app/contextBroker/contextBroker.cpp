@@ -781,7 +781,7 @@ PaArgument paArgs[] =
                                                                                                                       \
   { "GET",    CEET,    CEET_COMPS_V1,        "",               getContextEntitiesByEntityIdAndType                 }, \
   { "POST",   CEET,    CEET_COMPS_V1,        CEET_POST_WORD,   postContextEntitiesByEntityIdAndType                }, \
-  { "*",      CEET,    CEET_COMPS_V1,        "",               badVerbAllFour                                      }, \
+  { "*",      CEET,    CEET_COMPS_V1,        "",               badVerbGetPostOnly                                  }, \
                                                                                                                       \
   { "GET",    CEAAT,   CEAAT_COMPS_V1,       "",               getEntityByIdAttributeByNameWithTypeAndId           }, \
   { "POST",   CEAAT,   CEAAT_COMPS_V1,       CEAAT_POST_WORD,  postEntityByIdAttributeByNameWithTypeAndId          }, \

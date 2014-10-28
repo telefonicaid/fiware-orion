@@ -34,6 +34,7 @@ brokerStart CB
 # 03. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 OK
 # 04. POST /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02 with XML
 # 05. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr02 with XML
+# 06. GET /statistics
 #
 
 echo "01. GET /v1/registry/contextEntities/type/ET1/id/entity01/attributes/attr01 and see it fail"
