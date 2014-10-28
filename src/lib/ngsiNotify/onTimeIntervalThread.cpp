@@ -129,23 +129,41 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
 /* ****************************************************************************
 *
 * startOnIntervalThread -
+*
+* About pthread_setcancelstate:
+* The problem with this ontimeinterval subscription thread is that during valgrind tests,
+* the broker if started and killed and if this thread is running, it it sometimes cancelled 
+* with buffers allocated and valgrind will flag this as a memory leak.
+* Using the function pthread_setcancelstate, we can decide when the thread is cancelable and
+* thus avoid to be cancelled with memory allocated.
+* The function 'doNotification' allocates and releases its own memory buffers so if this thread
+* is never cancelled inside 'doNotification', this "false leak" should disappear.
+* 
 */
 void* startOnIntervalThread(void* p)
 {
-    OnIntervalThreadParams* params = (OnIntervalThreadParams*) p;
+  OnIntervalThreadParams* params = (OnIntervalThreadParams*) p;
+  int                     oldState;
 
-    while (true)
-    {
-        strncpy(transactionId, "N/A", sizeof(transactionId));
-        LM_T(LmtNotifier, ("ONTIMEINTERVAL thread wakes up (%s)", params->subId.c_str()));
+  pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &oldState);
 
-        // Do the work (we put this in a function as error conditions would produce an
-        // early interruption of the process)
-        doNotification(params, params->tenant);
+  while (true)
+  {
+    strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_T(LmtNotifier, ("ONTIMEINTERVAL thread wakes up (%s)", params->subId.c_str()));
 
-        // Sleeps for interval
-        sleep(params->interval);
-    }
+    // Do the work (we put this in a function as error conditions would produce an
+    // early interruption of the process)
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldState);
+    LM_M(("OnTimeInterval thread is now NOT CANCELABLE"));
+    doNotification(params, params->tenant);
+    LM_M(("OnTimeInterval thread to be CANCELABLE"));
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldState);
 
-    return NULL;
+    LM_M(("OnTimeInterval thread sleeps CANCELABLE"));
+    sleep(params->interval);
+    LM_M(("OnTimeInterval thread awakes CANCELABLE"));
+  }
+
+  return NULL;
 }
