@@ -55,7 +55,7 @@ extern std::string getAllEntitiesWithTypeAndId
 
   LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with type='%s', and id='%s'", enType.c_str(), enId.c_str()));
 
-  ciP->httpStatusCode = mapGetIndividualContextEntity(enId, enType, &response, ciP);
+  ciP->httpStatusCode = mapGetIndividualContextEntity(enId, enType, EntityTypeEmptyOrNotEmpty, &response, ciP);
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 
