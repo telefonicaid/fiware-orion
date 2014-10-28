@@ -1480,8 +1480,8 @@ void processContextElement(ContextElement*                  ceP,
     }
 
     // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
-    // Restriction is not a valid field in updateContext according to NGSI specification. In the
-    // future we may consider to modify the spec to add such Restriction and avoid this ugly "direct inyection"
+    // Restriction is not a valid field in updateContext according to the NGSI specification. In the
+    // future we may consider to modify the spec to add such Restriction and avoid this ugly "direct injection"
     // of URI filter into mongoBackend
     //
     if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
