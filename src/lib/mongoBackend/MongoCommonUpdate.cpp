@@ -1411,7 +1411,14 @@ static bool removeEntity
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
 */
-void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::vector<std::string>& servicePathV) {
+void processContextElement(ContextElement*                  ceP,
+                           UpdateContextResponse*           responseP,
+                           const std::string&               action,
+                           const std::string&               tenant,
+                           const std::vector<std::string>&  servicePathV,
+                           std::map<std::string, std::string>& uriParams    // FIXME P7: we need this to implement "restriction-based" filters
+)
+{
 
     DBClientBase* connection = getMongoConnection();
 
@@ -1468,6 +1475,18 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
       bob.appendRegex(servicePathString, servicePathValue);
 
     }
+
+    // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
+    // there Restriction is not a valid field in updateContext according with NGSI specification. In the
+    // future may we consider to modify the spec to add such Restriction and avoid this ugly "direct inyection"
+    // of URI filter into mongoBackend
+    //
+    /*if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
+    {
+      std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
+      BSONObj b = BSON(entityTypeString << BSON("$exists" << false));
+      bob.appendElements(b);
+    }*/
     
     BSONObj query = bob.obj();
 

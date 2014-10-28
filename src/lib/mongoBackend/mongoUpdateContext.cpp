@@ -65,7 +65,12 @@ HttpStatusCode mongoUpdateContext
     {
         /* Process each ContextElement */
         for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {
-            processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePathV);
+            processContextElement(requestP->contextElementVector.get(ix),
+                                  responseP,
+                                  requestP->updateActionType.get(),
+                                  tenant,
+                                  servicePathV,
+                                  uriParams);
         }
 
         /* Note that although individual processContextElements() invokations returns MsConnectionError, this
