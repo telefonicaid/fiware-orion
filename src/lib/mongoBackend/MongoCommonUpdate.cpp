@@ -1481,12 +1481,12 @@ void processContextElement(ContextElement*                  ceP,
     // future may we consider to modify the spec to add such Restriction and avoid this ugly "direct inyection"
     // of URI filter into mongoBackend
     //
-    /*if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
+    if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
     {
       std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
       BSONObj b = BSON(entityTypeString << BSON("$exists" << false));
       bob.appendElements(b);
-    }*/
+    }
     
     BSONObj query = bob.obj();
 
