@@ -162,7 +162,8 @@
 #include "serviceRoutines/putAttributeValueInstanceWithTypeAndId.h"
 #include "serviceRoutines/getContextEntitiesByEntityIdAndType.h"
 #include "serviceRoutines/postContextEntitiesByEntityIdAndType.h"
-// #include "serviceRoutines/postContextEntitiesByEntityIdAndType.h"
+#include "serviceRoutines/getEntityByIdAttributeByNameWithTypeAndId.h"
+#include "serviceRoutines/postEntityByIdAttributeByNameWithTypeAndId.h"
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -492,6 +493,12 @@ PaArgument paArgs[] =
 #define CEET_COMPS_V1       7, { "v1", "registry", "contextEntities", "type", "*", "id", "*" }
 #define CEET_POST_WORD      "registerProviderRequest"
 
+#define CEAAT               EntityByIdAttributeByNameIdAndType
+#define CEAAT_COMPS_V1      9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }
+#define CEAAT_POST_WORD     "registerProviderRequest"
+
+
+
 //
 // Log, version, statistics ...
 //
@@ -774,7 +781,12 @@ PaArgument paArgs[] =
                                                                                                                       \
   { "GET",    CEET,    CEET_COMPS_V1,        "",               getContextEntitiesByEntityIdAndType                 }, \
   { "POST",   CEET,    CEET_COMPS_V1,        CEET_POST_WORD,   postContextEntitiesByEntityIdAndType                }, \
-  { "*",      CEET,    CEET_COMPS_V1,        "",               badVerbAllFour                                      }
+  { "*",      CEET,    CEET_COMPS_V1,        "",               badVerbAllFour                                      }, \
+                                                                                                                      \
+  { "GET",    CEAAT,   CEAAT_COMPS_V1,       "",               getEntityByIdAttributeByNameWithTypeAndId           }, \
+  { "POST",   CEAAT,   CEAAT_COMPS_V1,       CEAAT_POST_WORD,  postEntityByIdAttributeByNameWithTypeAndId          }, \
+  { "*",      CEAAT,   CEAAT_COMPS_V1,       "",               badVerbGetPostOnly                                  }
+
 
 
 /* *****************************************************************************
