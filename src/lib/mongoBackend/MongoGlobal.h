@@ -284,6 +284,14 @@ extern void recoverOntimeIntervalThreads(std::string tenant);
 
 /* ****************************************************************************
 *
+* destroyAllOntimeIntervalThreads -
+*
+* This function is only to be used under harakiri mode, not for real use
+*/
+extern void destroyAllOntimeIntervalThreads(std::string tenant);
+
+/* ****************************************************************************
+*
 * includedEntity -
 */
 extern bool includedEntity(EntityId en, EntityIdVector* entityIdV);

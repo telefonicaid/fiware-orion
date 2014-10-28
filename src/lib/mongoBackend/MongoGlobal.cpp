@@ -446,64 +446,105 @@ void ensureLocationIndex(std::string tenant) {
 
 /* ****************************************************************************
 *
-* recoverOntimeIntervalThreads -
+* getOntimeIntervalsThreads -
 */
-void recoverOntimeIntervalThreads(std::string tenant) {
+static void getOntimeIntervalsThreads(std::string tenant, std::vector<BSONObj>& subs)
+{
+  /* Look for ONTIMEINTERVAL subscriptions in database */
+  std::string condType= CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
+  BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
 
-    /* Look for ONTIMEINTERVAL subscriptions in database */
-    std::string condType= CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
-    BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
+  DBClientBase* connection = getMongoConnection();
+  auto_ptr<DBClientCursor> cursor;
+  try
+  {
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
+    mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
+    cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
 
-    DBClientBase* connection = getMongoConnection();
-    auto_ptr<DBClientCursor> cursor;
-    try {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
-        cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
-
-        /*
+    /*
          * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
          * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
          * exception ourselves
          */
-        if (cursor.get() == NULL)
-        {
-            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
-        }
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
-        LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
-    }
-    catch (const DBException &e)
+    if (cursor.get() == NULL)
     {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo db exception)");
-        LM_E(("Database Error (DBException: %s)", e.what()));
-        return;
+      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
     }
-    catch (...)
-    {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo generic exception)");
-        LM_E(("Database Error (generic exception)"));
-        return;
-    }
+    mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
+    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
+  }
+  catch (const DBException &e)
+  {
+    mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo db exception)");
+    LM_E(("Database Error (DBException: %s)", e.what()));
+    return;
+  }
+  catch (...)
+  {
+    mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo generic exception)");
+    LM_E(("Database Error (generic exception)"));
+    return;
+  }
 
-    /* For each one of the subscriptions found, create threads */
-    while (cursor->more()) {
-
-        BSONObj sub = cursor->next();
-        std::string subId = sub.getField("_id").OID().str();
-
-        std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
-        for (unsigned int ix = 0; ix < condV.size(); ++ix) {
-            BSONObj condition = condV[ix].embeddedObject();
-            if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
-               int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
-               LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d (tenant %s)", subId.c_str(), interval, tenant.c_str()));
-               processOntimeIntervalCondition(subId, interval, tenant);
-            }
-        }
-    }
+  /* Store all subs in returning vector */
+  while (cursor->more())
+  {
+    subs.push_back(cursor->next());
+  }
 }
 
+/* ****************************************************************************
+*
+* recoverOntimeIntervalThreads -
+*/
+void recoverOntimeIntervalThreads(std::string tenant)
+{
+
+  /* Look for all ONTIMEINTERVAL ids on the given tenant */
+  std::vector<BSONObj> ids;
+  getOntimeIntervalsThreads(tenant, ids);
+
+  /* For each one of the subscriptions found, create threads */
+  for (unsigned int ix = 0; ix < ids.size(); ++ix)
+  {
+
+    BSONObj sub = ids[ix];
+    std::string subId = sub.getField("_id").OID().str();
+
+    std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
+    for (unsigned int ix = 0; ix < condV.size(); ++ix) {
+      BSONObj condition = condV[ix].embeddedObject();
+      if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
+        int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
+        LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d (tenant %s)", subId.c_str(), interval, tenant.c_str()));
+        processOntimeIntervalCondition(subId, interval, tenant);
+      }
+    }
+  }
+}
+
+/* ****************************************************************************
+*
+* destroyAllOntimeIntervalThreads -
+*
+* This function is only to be used under harakiri mode, not for real use
+*/
+extern void destroyAllOntimeIntervalThreads(std::string tenant)
+{
+  /* Look for all ONTIMEINTERVAL ids on the given tenant */
+  std::vector<BSONObj> ids;
+  getOntimeIntervalsThreads(tenant, ids);
+
+  /* Iterate destroying thread by thread */
+  for (unsigned int ix = 0; ix < ids.size(); ++ix)
+  {
+    BSONObj sub = ids[ix];
+    std::string subId = sub.getField("_id").OID().str();
+    notifier->destroyOntimeIntervalThreads(subId);
+  }
+
+}
 
 /* ****************************************************************************
 *
