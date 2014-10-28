@@ -1,6 +1,6 @@
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -37,9 +37,11 @@
 
 /* ****************************************************************************
 *
-* getEntityByIdAttributeByName -
+* getEntityByIdAttributeByNameWithTypeAndId -
+*
+* GET /v1/registry/contextEntities/type/{type}/id/{id}/attributes/{attrName}
 */
-std::string getEntityByIdAttributeByName
+std::string getEntityByIdAttributeByNameWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -47,15 +49,16 @@ std::string getEntityByIdAttributeByName
   ParseData*                 parseDataP
 )
 {
-  std::string                          entityId      = (compV[0] == "v1")? compV[3] : compV[2];
-  std::string                          attributeName = (compV[0] == "v1")? compV[5] : compV[4];
+  std::string                          entityType    = compV[4];
+  std::string                          entityId      = compV[6];
+  std::string                          attributeName = compV[8];
   std::string                          answer;
   DiscoverContextAvailabilityResponse  response;
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entityId '%s', attribute '%s'",
                         entityId.c_str(), attributeName.c_str()));
 
-  ciP->httpStatusCode = mapGetEntityByIdAttributeByName(entityId, "", attributeName, &response, ciP);
+  ciP->httpStatusCode = mapGetEntityByIdAttributeByName(entityId, entityType, attributeName, &response, ciP);
   answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
   response.release();
 

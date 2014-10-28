@@ -140,13 +140,14 @@ static XmlRequest xmlRequest[] =
   { AllEntitiesWithTypeAndId,              "POST", "appendContextElementRequest",                  FUNCS(acer)  },
   { AllEntitiesWithTypeAndId,              "*",    "",                                             FUNCS(ucer)  },
 
-  { IndividualContextEntityAttributeWithTypeAndId, "POST", "updateContextAttributeRequest",        FUNCS(upcar)  },
-  { IndividualContextEntityAttributeWithTypeAndId, "PUT",  "updateContextAttributeRequest",        FUNCS(upcar)  },
+  { IndividualContextEntityAttributeWithTypeAndId, "POST", "updateContextAttributeRequest",        FUNCS(upcar) },
+  { IndividualContextEntityAttributeWithTypeAndId, "PUT",  "updateContextAttributeRequest",        FUNCS(upcar) },
 
-  { AttributeValueInstanceWithTypeAndId,           "PUT",  "updateContextAttributeRequest",        FUNCS(upcar)  },
-  { AttributeValueInstanceWithTypeAndId,           "POST", "updateContextAttributeRequest",        FUNCS(upcar)  },
+  { AttributeValueInstanceWithTypeAndId,           "PUT",  "updateContextAttributeRequest",        FUNCS(upcar) },
+  { AttributeValueInstanceWithTypeAndId,           "POST", "updateContextAttributeRequest",        FUNCS(upcar) },
 
-  { ContextEntitiesByEntityIdAndType,              "POST", "registerProviderRequest",              FUNCS(rpr)    },
+  { ContextEntitiesByEntityIdAndType,              "POST", "registerProviderRequest",              FUNCS(rpr)   },
+  { EntityByIdAttributeByNameIdAndType,            "POST", "registerProviderRequest",              FUNCS(rpr)   },
 
   // Responses
   { RegisterResponse,                      "POST", "registerContextResponse",                      FUNCS(rcrs)  },

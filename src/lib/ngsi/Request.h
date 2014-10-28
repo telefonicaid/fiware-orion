@@ -97,6 +97,7 @@ typedef enum RequestType
   AllContextEntities,
   AllEntitiesWithTypeAndId,
   ContextEntitiesByEntityIdAndType,
+  EntityByIdAttributeByNameIdAndType,
 
   InvalidRequest
 } RequestType;
