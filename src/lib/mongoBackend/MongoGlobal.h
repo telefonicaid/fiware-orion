@@ -44,6 +44,8 @@
 #include "ngsiNotify/Notifier.h"
 #include "rest/uriParamNames.h"
 
+#include "mongoBackend/TriggeredSubscription.h"
+
 using namespace mongo;
 
 /*****************************************************************************
@@ -394,5 +396,12 @@ extern bool processAvailabilitySubscription(EntityIdVector enV, AttributeList at
 * Make sure 'to' is big enough!
 */
 extern void slashEscape(const char* from, char* to, unsigned int toLen);
+
+/* ****************************************************************************
+*
+* releaseTriggeredSubscriptions -
+*
+*/
+extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>& subs);
 
 #endif

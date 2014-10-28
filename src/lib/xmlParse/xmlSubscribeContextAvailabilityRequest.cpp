@@ -170,6 +170,20 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
+* scopeOperator -
+*/
+static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
+  reqDataP->scar.scopeP->oper = node->value();
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqDataP)
@@ -257,25 +271,26 @@ void scarPresent(ParseData* reqDataP)
 */
 XmlNode scarParseVector[] =
 {
-  { "/subscribeContextAvailabilityRequest",                                             nullTreat            },
+  { "/subscribeContextAvailabilityRequest",                                                nullTreat            },
 
-  { "/subscribeContextAvailabilityRequest/entityIdList",                                nullTreat            },
-  { "/subscribeContextAvailabilityRequest/entityIdList/entityId",                       entityId             },
-  { "/subscribeContextAvailabilityRequest/entityIdList/entityId/id",                    entityIdId           },
+  { "/subscribeContextAvailabilityRequest/entityIdList",                                   nullTreat            },
+  { "/subscribeContextAvailabilityRequest/entityIdList/entityId",                          entityId             },
+  { "/subscribeContextAvailabilityRequest/entityIdList/entityId/id",                       entityIdId           },
 
-  { "/subscribeContextAvailabilityRequest/attributeList",                               nullTreat            },
-  { "/subscribeContextAvailabilityRequest/attributeList/attribute",                     attribute            },
+  { "/subscribeContextAvailabilityRequest/attributeList",                                  nullTreat            },
+  { "/subscribeContextAvailabilityRequest/attributeList/attribute",                        attribute            },
 
-  { "/subscribeContextAvailabilityRequest/reference",                                   reference            },
+  { "/subscribeContextAvailabilityRequest/reference",                                      reference            },
 
-  { "/subscribeContextAvailabilityRequest/duration",                                    duration             },
+  { "/subscribeContextAvailabilityRequest/duration",                                       duration             },
 
-  { "/subscribeContextAvailabilityRequest/restriction",                                 restriction          },
-  { "/subscribeContextAvailabilityRequest/restriction/attributeExpression",             attributeExpression  },
-  { "/subscribeContextAvailabilityRequest/restriction/scope",                           nullTreat            },
-  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope",            operationScope       },
-  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeType",  scopeType            },
-  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue", scopeValue           },
+  { "/subscribeContextAvailabilityRequest/restriction",                                    restriction          },
+  { "/subscribeContextAvailabilityRequest/restriction/attributeExpression",                attributeExpression  },
+  { "/subscribeContextAvailabilityRequest/restriction/scope",                              nullTreat            },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope",               operationScope       },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeType",     scopeType            },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue",    scopeValue           },
+  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeOperator", scopeOperator        },
 
   { "LAST", NULL }
 };

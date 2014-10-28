@@ -203,9 +203,9 @@ void EntityId::present(const std::string& indent, int ix)
     PRINTF("%sEntity Id %d:\n",       indent.c_str(), ix);
   }
 
-  PRINTF("%s  Id:         %s\n", indent.c_str(), id.c_str());
-  PRINTF("%s  Type:       %s\n", indent.c_str(), type.c_str());
-  PRINTF("%s  isPattern:  %s\n", indent.c_str(), isPattern.c_str());
+  PRINTF("%s  Id:         '%s'\n", indent.c_str(), id.c_str());
+  PRINTF("%s  Type:       '%s'\n", indent.c_str(), type.c_str());
+  PRINTF("%s  isPattern:  '%s'\n", indent.c_str(), isPattern.c_str());
 }
 
 

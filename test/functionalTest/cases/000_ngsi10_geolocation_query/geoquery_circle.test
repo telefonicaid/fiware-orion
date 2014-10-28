@@ -21,27 +21,27 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Geo query test (polygon)
-
+Geo query circle
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-
 --SHELL--
-echo "1: +++++++++ Point A +++++++++++"
-url="/v1/updateContext"
+
+echo "1: +++++++++ Prepare entity for Madrid +++++++++++"
+# Create entities corresponding to the three cities
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
-      <entityId type="Point" isPattern="false">
-        <id>A</id>
+      <entityId type="City" isPattern="false">
+        <id>Madrid</id>
       </entityId>
       <contextAttributeList>
         <contextAttribute>
           <name>location</name>
           <type>coords</type>
-          <contextValue>3, 2</contextValue>
+          <contextValue>40.418889, -3.691944</contextValue>
           <metadata>
             <contextMetadata>
               <name>location</name>
@@ -55,26 +55,25 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url "$url" --payload "${payload}"
+echo
 sleep 1.1
-echo
-echo
 
-
-echo "2: +++++++++ Point B +++++++++++"
-url="/v1/updateContext"
+echo "2: +++++++++ Prepare entity for Alcobendas +++++++++++"
+# Create entities corresponding to the three cities
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
-      <entityId type="Point" isPattern="false">
-        <id>B</id>
+      <entityId type="City" isPattern="false">
+        <id>Alcobendas</id>
       </entityId>
       <contextAttributeList>
         <contextAttribute>
           <name>location</name>
           <type>coords</type>
-          <contextValue>5, 5</contextValue>
+          <contextValue>40.533333, -3.633333</contextValue>
           <metadata>
             <contextMetadata>
               <name>location</name>
@@ -88,26 +87,25 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url "$url" --payload "${payload}"
+echo
 sleep 1.1
-echo
-echo
 
-
-echo "3: +++++++++ Point C +++++++++++"
-url="/v1/updateContext"
+echo "3: +++++++++ Prepare entity for Leganes +++++++++++"
+# Create entities corresponding to the three cities
+url=/v1/updateContext
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
     <contextElement>
-      <entityId type="Point" isPattern="false">
-        <id>C</id>
+      <entityId type="City" isPattern="false">
+        <id>Leganes</id>
       </entityId>
       <contextAttributeList>
         <contextAttribute>
           <name>location</name>
           <type>coords</type>
-          <contextValue>7, 4</contextValue>
+          <contextValue>40.316667, -3.75</contextValue>
           <metadata>
             <contextMetadata>
               <name>location</name>
@@ -121,18 +119,16 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-sleep 1.1
-echo
+orionCurl --url "$url" --payload "${payload}"
 echo
 
-
-echo "4: ++++++++++ Rectangle in: A, B ++++++++++"
-url="/v1/queryContext"
+echo "4: ++++++++++ Madrid in 13.5 kms ++++++++++"
+# Query inside 13.5 kms radius from Madrid center
+url=/v1/queryContext
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-    <entityId type="Point" isPattern="true">
+    <entityId type="City" isPattern="true">
       <id>.*</id>
     </entityId>
   </entityIdList>
@@ -141,44 +137,29 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
-          <polygon>
-            <vertexList>
-              <vertex>
-                <latitude>0</latitude>
-                <longitude>0</longitude>
-              </vertex>
-              <vertex>
-                <latitude>0</latitude>
-                <longitude>6</longitude>
-              </vertex>
-              <vertex>
-                <latitude>6</latitude>
-                <longitude>6</longitude>
-              </vertex>
-              <vertex>
-                <latitude>6</latitude>
-                <longitude>0</longitude>
-              </vertex>
-            </vertexList>
-          </polygon>
+          <circle>
+            <centerLatitude>40.418889</centerLatitude>
+            <centerLongitude>-3.691944</centerLongitude>
+            <radius>13500</radius>
+          </circle>
         </scopeValue>
       </operationScope>
     </scope>
   </restriction>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo
+orionCurl --url "$url" --payload "${payload}"
 echo
 
 
-echo "5: ++++++++++ Rectangle in: B, C ++++++++++"
-url="/v1/queryContext"
+echo "5: +++++++++++ Madrid in 15 kms +++++++++"
+# Query inside 15 kms radius from Madrid center
+url=/v1/queryContext
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-    <entityId type="Point" isPattern="true">
+    <entityId type="City" isPattern="true">
       <id>.*</id>
     </entityId>
   </entityIdList>
@@ -187,44 +168,29 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
-          <polygon>
-            <vertexList>
-              <vertex>
-                <latitude>3</latitude>
-                <longitude>3</longitude>
-              </vertex>
-              <vertex>
-                <latitude>3</latitude>
-                <longitude>8</longitude>
-              </vertex>
-              <vertex>
-                <latitude>11</latitude>
-                <longitude>8</longitude>
-              </vertex>
-              <vertex>
-                <latitude>11</latitude>
-                <longitude>3</longitude>
-              </vertex>
-            </vertexList>
-          </polygon>
+          <circle>
+            <centerLatitude>40.418889</centerLatitude>
+            <centerLongitude>-3.691944</centerLongitude>
+            <radius>15000</radius>
+          </circle>
         </scopeValue>
       </operationScope>
     </scope>
   </restriction>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo
+orionCurl --url "$url" --payload "${payload}"
 echo
 
 
-echo "6: ++++++++++ Triangle in: A ++++++++++"
-url="/v1/queryContext"
+echo "6: ++++++++++++ Madrid out 13.5 kms ++++++++"
+# Query in 13.5 kms radius outside Madrid center
+url=/v1/queryContext
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
   <entityIdList>
-    <entityId type="Point" isPattern="true">
+    <entityId type="City" isPattern="true">
       <id>.*</id>
     </entityId>
   </entityIdList>
@@ -233,128 +199,26 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
-          <polygon>
-            <vertexList>
-              <vertex>
-                <latitude>0</latitude>
-                <longitude>0</longitude>
-              </vertex>
-              <vertex>
-                <latitude>0</latitude>
-                <longitude>6</longitude>
-              </vertex>
-              <vertex>
-                <latitude>6</latitude>
-                <longitude>0</longitude>
-              </vertex>
-            </vertexList>
-          </polygon>
-        </scopeValue>
-      </operationScope>
-    </scope>
-  </restriction>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo
-echo
-
-
-echo "7: ++++++++++ Rectangle out: A ++++++++++"
-url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Point" isPattern="true">
-      <id>.*</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-  </attributeList>
-  <restriction>
-    <scope>
-      <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
-        <scopeValue>
-          <polygon>
-            <vertexList>
-              <vertex>
-                <latitude>3</latitude>
-                <longitude>3</longitude>
-              </vertex>
-              <vertex>
-                <latitude>3</latitude>
-                <longitude>8</longitude>
-              </vertex>
-              <vertex>
-                <latitude>11</latitude>
-                <longitude>8</longitude>
-              </vertex>
-              <vertex>
-                <latitude>11</latitude>
-                <longitude>3</longitude>
-              </vertex>
-            </vertexList>
+          <circle>
+            <centerLatitude>40.418889</centerLatitude>
+            <centerLongitude>-3.691944</centerLongitude>
+            <radius>13500</radius>
             <inverted>true</inverted>
-          </polygon>
+          </circle>
         </scopeValue>
       </operationScope>
     </scope>
   </restriction>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url "$url" --payload "${payload}"
 echo
-echo
-
-
-echo "8: ++++++++++ Triangle out: B, C ++++++++++"
-url="/v1/queryContext"
-payload='<?xml version="1.0" encoding="UTF-8"?>
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="Point" isPattern="true">
-      <id>.*</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-  </attributeList>
-  <restriction>
-    <scope>
-      <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
-        <scopeValue>
-          <polygon>
-            <vertexList>
-              <vertex>
-                <latitude>0</latitude>
-                <longitude>0</longitude>
-              </vertex>
-              <vertex>
-                <latitude>0</latitude>
-                <longitude>6</longitude>
-              </vertex>
-              <vertex>
-                <latitude>6</latitude>
-                <longitude>0</longitude>
-              </vertex>
-            </vertexList>
-            <inverted>true</inverted>
-          </polygon>
-        </scopeValue>
-      </operationScope>
-    </scope>
-  </restriction>
-</queryContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo
-echo
-
 
 --REGEXPECT--
-1: +++++++++ Point A +++++++++++
+1: +++++++++ Prepare entity for Madrid +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 856
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -363,8 +227,8 @@ Date: REGEX(.*)
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>A</id>
+        <entityId type="City" isPattern="false">
+          <id>Madrid</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -389,10 +253,9 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-
-2: +++++++++ Point B +++++++++++
+2: +++++++++ Prepare entity for Alcobendas +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 860
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -401,8 +264,8 @@ Date: REGEX(.*)
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>B</id>
+        <entityId type="City" isPattern="false">
+          <id>Alcobendas</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -427,10 +290,9 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-
-3: +++++++++ Point C +++++++++++
+3: +++++++++ Prepare entity for Leganes +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 852
+Content-Length: 857
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -439,8 +301,8 @@ Date: REGEX(.*)
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>C</id>
+        <entityId type="City" isPattern="false">
+          <id>Leganes</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
@@ -465,10 +327,9 @@ Date: REGEX(.*)
   </contextResponseList>
 </updateContextResponse>
 
-
-4: ++++++++++ Rectangle in: A, B ++++++++++
+4: ++++++++++ Madrid in 13.5 kms ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 1612
+Content-Length: 1649
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -477,14 +338,14 @@ Date: REGEX(.*)
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>A</id>
+        <entityId type="City" isPattern="false">
+          <id>Madrid</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>3, 2</contextValue>
+            <contextValue>40.418889, -3.691944</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -502,14 +363,14 @@ Date: REGEX(.*)
     </contextElementResponse>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>B</id>
+        <entityId type="City" isPattern="false">
+          <id>Leganes</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>5, 5</contextValue>
+            <contextValue>40.316667, -3.75</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -528,10 +389,9 @@ Date: REGEX(.*)
   </contextResponseList>
 </queryContextResponse>
 
-
-5: ++++++++++ Rectangle in: B, C ++++++++++
+5: +++++++++++ Madrid in 15 kms +++++++++
 HTTP/1.1 200 OK
-Content-Length: 1612
+Content-Length: 2431
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -540,14 +400,14 @@ Date: REGEX(.*)
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>B</id>
+        <entityId type="City" isPattern="false">
+          <id>Madrid</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>5, 5</contextValue>
+            <contextValue>40.418889, -3.691944</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -565,14 +425,39 @@ Date: REGEX(.*)
     </contextElementResponse>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>C</id>
+        <entityId type="City" isPattern="false">
+          <id>Alcobendas</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>7, 4</contextValue>
+            <contextValue>40.533333, -3.633333</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>location</name>
+                <type>string</type>
+                <value>WSG84</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="City" isPattern="false">
+          <id>Leganes</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>location</name>
+            <type>coords</type>
+            <contextValue>40.316667, -3.75</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -591,10 +476,9 @@ Date: REGEX(.*)
   </contextResponseList>
 </queryContextResponse>
 
-
-6: ++++++++++ Triangle in: A ++++++++++
+6: ++++++++++++ Madrid out 13.5 kms ++++++++
 HTTP/1.1 200 OK
-Content-Length: 854
+Content-Length: 878
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -603,14 +487,14 @@ Date: REGEX(.*)
   <contextResponseList>
     <contextElementResponse>
       <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>A</id>
+        <entityId type="City" isPattern="false">
+          <id>Alcobendas</id>
         </entityId>
         <contextAttributeList>
           <contextAttribute>
             <name>location</name>
             <type>coords</type>
-            <contextValue>3, 2</contextValue>
+            <contextValue>40.533333, -3.633333</contextValue>
             <metadata>
               <contextMetadata>
                 <name>location</name>
@@ -628,108 +512,6 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-
-
-7: ++++++++++ Rectangle out: A ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 854
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>A</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>location</name>
-            <type>coords</type>
-            <contextValue>3, 2</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>location</name>
-                <type>string</type>
-                <value>WSG84</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-
-
-8: ++++++++++ Triangle out: B, C ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 1612
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>B</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>location</name>
-            <type>coords</type>
-            <contextValue>5, 5</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>location</name>
-                <type>string</type>
-                <value>WSG84</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Point" isPattern="false">
-          <id>C</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>location</name>
-            <type>coords</type>
-            <contextValue>7, 4</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>location</name>
-                <type>string</type>
-                <value>WSG84</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>
-
 
 --TEARDOWN--
 brokerStop CB

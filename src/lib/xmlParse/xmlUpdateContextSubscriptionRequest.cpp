@@ -97,14 +97,28 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
+* scopeOperator -
+*/
+static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
+  reqDataP->ucsr.scopeP->oper = node->value();
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
 * scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
-  if (reqData->ucsr.scopeP->type == FIWARE_LOCATION)
+  if (reqData->ucsr.scopeP->type == FIWARE_LOCATION || reqData->ucsr.scopeP->type == FIWARE_LOCATION)
   {
     //
-    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // If the scope type is FIWARE_LOCATION (or its deprecated variant), then the value of this scope is stored in 'circle' or 'polygon'.
     // The field 'value' is not used as more complexity is needed.
     // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
     // instead 'circle' or 'polygon' should be used.
@@ -439,6 +453,7 @@ XmlNode ucsrParseVector[] =
   { UCS RS "/scope",                             nullTreat                   },
   { UCS RS SC "/operationScope",                 operationScope              },
   { UCS RS SC OSC "/scopeType",                  scopeType                   },
+  { UCS RS SC OSC "/scopeOperator",              scopeOperator               },
   { UCS RS SC OSC "/scopeValue",                 scopeValue                  },
 
   { UCS RS SC OSC SVAL "/circle",                circle                      },

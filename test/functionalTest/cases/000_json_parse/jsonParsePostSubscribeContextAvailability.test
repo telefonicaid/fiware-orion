@@ -21,14 +21,13 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-JSON Parse Post QueryContext
+JSON Parse Post SubscribeContextAvailability
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "1: ***********************************"
-url="/v1/queryContext"
+url="/v1/registry/subscribeContextAvailability"
 payload='{
   "entities": [
     {
@@ -47,84 +46,35 @@ payload='{
     "occupancy",
     "lightstatus"
   ],
-  "restriction": {
-    "attributeExpression" : "Attribute Expression",
-    "scopes": [
+  "reference": "http://10.1.1.1:80/test/interfaceNotification",
+  "duration": "PT1M",
+  "restriction" : {
+    "attributeExpression" : "ATTR_EXPR",
+    "scopes" : [
       {
-        "type" : "st1",
-        "value" : "sv1"
+        "value" : "sv1",
+        "operator": "op1",
+        "type"  : "st1"
       },
       {
-        "type" : "st2",
-        "value" : "sv2"
+        "value" : "sv2",
+        "operator": "op2",
+        "type"  : "st2"
       }
     ]
   }
 }'
 orionCurl --url ${url} --payload "${payload}" --json
 
-echo "2: ***********************************"
-url="/v1/queryContext"
-payload='{
-  "entities": [
-    {
-      "type": "Room",
-      "isPattern": "false",
-      "id": "ConferenceRoom"
-    },
-    {
-      "type": "Room",
-      "isPattern": "false",
-      "id": "OfficeRoom"
-    }
-  ],
-  "attributes": [
-    "temperature",
-    "occupancy",
-    "lightstatus"
-  ],
-  "restriction": {
-    "attributeExpression" : "Attribute Expression",
-    "scopes": [
-      {
-        "type" : "st1",
-        "value" : "sv1"
-      },
-      {
-        "type" : "st2",
-        "value" : "sv2"
-      }
-    ]
-  }
-}'
-orionCurl --url ${url} --payload "${payload}" --json
-
-echo "3: ***********************************"
 --REGEXPECT--
-1: ***********************************
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 75
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "errorCode": {
-        "code": "404",
-        "reasonPhrase": "No context element found"
-    }
+    "duration": "PT1M",
+    "subscriptionId": "REGEX([0-9a-f]{24})"
 }
-2: ***********************************
-HTTP/1.1 200 OK
-Content-Length: 94
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "errorCode": {
-        "code": "404",
-        "reasonPhrase": "No context element found"
-    }
-}
-3: ***********************************
 --TEARDOWN--
 brokerStop CB

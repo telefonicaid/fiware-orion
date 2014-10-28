@@ -33,6 +33,10 @@
 #include "common/string.h"
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/TriggeredSubscription.h"
+
+#include "ngsi/Scope.h"
+#include "rest/uriParamNames.h"
 
 using std::string;
 using std::map;
@@ -754,7 +758,13 @@ static bool deleteAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 * addTriggeredSubscriptions
 *
 */
-static bool addTriggeredSubscriptions(std::string entityId, std::string entityType, std::string attr, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool addTriggeredSubscriptions(std::string                               entityId,
+                                      std::string                               entityType,
+                                      std::string                               attr,
+                                      std::map<string, TriggeredSubscription*>& subs,
+                                      std::string&                              err,
+                                      std::string                               tenant)
+{
 
     DBClientBase* connection = getMongoConnection();
 
@@ -832,19 +842,19 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (DBException)");
-        *err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
+        err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                " - query(): " + query.toString() +
                " - exception: " + e.what();
-        LM_E(("Database Error (%s)", err->c_str()));
+        LM_E(("Database Error (%s)", err.c_str()));
         return false;
     }
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (Generic Exception)");
-        *err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
+        err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                " - query(): " + query.toString() +
                " - exception: " + "generic";
-        LM_E(("Database Error (%s)", err->c_str()));
+        LM_E(("Database Error (%s)", err.c_str()));
         return false;
     }
 
@@ -854,12 +864,19 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
         BSONObj sub = cursor->next();
         std::string subIdStr = sub.getField("_id").OID().str();
 
-        if (subs->count(subIdStr) == 0) {
+        if (subs.count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
-            // FIXME P8: see issue #371
-            // subs->insert(std::pair<string, BSONObj*>(subIdStr, new BSONObj(sub)));
 
-            subs->insert(std::pair<string, BSONObj*>(subIdStr, NULL));
+            long long throttling       = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
+            long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? sub.getIntField(CSUB_LASTNOTIFICATION) : -1;
+
+            TriggeredSubscription* trigs = new TriggeredSubscription(throttling,
+                                                                    lastNotification,
+                                                                    sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
+                                                                    STR_FIELD(sub, CSUB_REFERENCE),
+                                                                    subToAttributeList(sub));
+
+            subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
         }
     }
 
@@ -872,66 +889,44 @@ static bool addTriggeredSubscriptions(std::string entityId, std::string entityTy
 * processSubscriptions
 *
 */
-static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* subs, std::string* err, std::string tenant) {
+static bool processSubscriptions(const EntityId*                           enP,
+                                 std::map<string, TriggeredSubscription*>& subs,
+                                 std::string&                              err,
+                                 std::string                               tenant)
+{
 
     DBClientBase* connection = getMongoConnection();
 
     /* For each one of the subscriptions in the map, send notification */
-    for (std::map<string, BSONObj*>::iterator it = subs->begin(); it != subs->end(); ++it) {
+    bool ret = true;
+    err = "";
+    for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it) {
 
-        //FIXME P8: see issue #371
-        //BSONObj sub = *(it->second);
+        std::string  mapSubId        = it->first;
+        TriggeredSubscription* trigs = it->second;
 
-        std::string  mapSubId = it->first;
-        BSONObj      sub;
-
-        try
+        if (trigs->throttling != 1 && trigs->lastNotification != 1)
         {
-           mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
-           sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(mapSubId)));
-           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
-           LM_I(("Database Operation Successful (findOne %s)", mapSubId.c_str()));
-        }
-        catch (...)
-        {
-           mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
-           LM_E(("Database Error ('findOne tenant=%s, id=%s', 'exception during findOne of collection '%s''", tenant.c_str(), mapSubId.c_str(), getSubscribeContextCollectionName(tenant).c_str()));
-
-           *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str();
-           return false;
-        }
-
-        LM_T(LmtMongo, ("retrieved document: '%s'", sub.toString().c_str()));
-        OID subId = sub.getField("_id").OID();
-
-        /* Check that throttling is not blocking notication */
-        if (sub.hasField(CSUB_THROTTLING) && sub.hasField(CSUB_LASTNOTIFICATION)) {
-            long long current = getCurrentTime();
-            long long sinceLastNotification = current - sub.getIntField(CSUB_LASTNOTIFICATION);
-            if (sub.getField(CSUB_THROTTLING).numberLong() > sinceLastNotification) {
-                LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
-                continue;
-            }
+          long long current = getCurrentTime();
+          long long sinceLastNotification = current - trigs->lastNotification;
+          if (trigs->throttling > sinceLastNotification) {
+            LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
+            continue;
+          }
         }
 
         /* Build entities vector */
         EntityIdVector enV;
         enV.push_back(new EntityId(enP->id, enP->type, enP->isPattern));
 
-        /* Build attribute list vector */
-        AttributeList attrL = subToAttributeList(sub);
-
-        /* Get format. If not found in the csubs document (it could happen in the case of updating Orion using an existing database) we use XML */
-        Format format = sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML;
-
         /* Send notification */
-        if (processOnChangeCondition(enV, attrL, NULL,
-                                     subId.str(),
-                                     STR_FIELD(sub, CSUB_REFERENCE),
-                                     format,
+        if (processOnChangeCondition(enV, trigs->attrL, NULL,
+                                     mapSubId,
+                                     trigs->reference,
+                                     trigs->format,
                                      tenant)) {
 
-            BSONObj query = BSON("_id" << subId);
+            BSONObj query = BSON("_id" << OID(mapSubId));
             BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
             try
             {
@@ -947,33 +942,30 @@ static bool processSubscriptions(const EntityId* enP, map<string, BSONObj*>* sub
             catch (const DBException &e)
             {
                 mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
-                *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
+                err += std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + e.what();
-                enV.release();
-                attrL.release();
-                LM_E(("Database Error (%s)", err->c_str()));
-                return false;
+                LM_E(("Database Error (%s)", err.c_str()));
+                ret = false;
             }
             catch (...)
             {
                 mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
-                *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
+                err += std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + "generic";
-                enV.release();
-                attrL.release();
-                LM_E(("Database Error (%s)", err->c_str()));
-                return false;
+                LM_E(("Database Error (%s)", err.c_str()));
+                ret = false;
             }
         }
 
         /* Release object created dynamically (including the value in the map created by
          * addTriggeredSubscriptions */
-        attrL.release();
+        trigs->attrL.release();
         enV.release();
-        // delete it->second; FIXME P8: see issue #371
+        delete it->second;
     }
 
-    return true;
+    subs.clear();
+    return ret;
 }
 
 
@@ -1050,15 +1042,15 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 * Returns true if entity was actually modified, false otherwise (including fail cases)
 *
 */
-static bool processContextAttributeVector (ContextElement*               ceP,
-                                           std::string                   action,
-                                           std::map<string, BSONObj*>*   subsToNotify,
-                                           BSONObj&                      attrs,
-                                           ContextElementResponse*       cerP,
-                                           std::string&                  locAttr,
-                                           double&                       coordLat,
-                                           double&                       coordLong,
-                                           std::string                   tenant)
+static bool processContextAttributeVector (ContextElement*                            ceP,
+                                           std::string                                action,
+                                           std::map<string, TriggeredSubscription*>&  subsToNotify,
+                                           BSONObj&                                   attrs,
+                                           ContextElementResponse*                    cerP,
+                                           std::string&                               locAttr,
+                                           double&                                    coordLat,
+                                           double&                                    coordLong,
+                                           std::string                                tenant)
 {
 
     EntityId*   eP         = &cerP->contextElement.entityId;
@@ -1220,27 +1212,12 @@ static bool processContextAttributeVector (ContextElement*               ceP,
          * is "bypassed" */
         if (actualUpdate) {
             std::string err;
-            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, &err, tenant))
+            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant))
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
               return false;
             }
         }
-
-#if 0
-        /* DEBUG (see issue #371) */
-        int ix = 0;
-        for (std::map<string, BSONObj*>::iterator it = subsToNotify.begin(); it != subsToNotify.end(); ++it) {
-            BSONObj b = *(it->second);
-            if (b.isEmpty()) {
-                LM_T(LmtMongo, ("DEBUG afterTriggeredsubs [%d]: <empty>", ix));
-            }
-            else {
-                LM_T(LmtMongo, ("DEBUG afterTriggeredsubs [%d]: %s", ix, b.toString().c_str()));
-            }
-            ix++;
-        }
-#endif
 
     }
 
@@ -1458,7 +1435,14 @@ static bool removeEntity
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
 */
-void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::vector<std::string>& servicePathV) {
+void processContextElement(ContextElement*                  ceP,
+                           UpdateContextResponse*           responseP,
+                           const std::string&               action,
+                           const std::string&               tenant,
+                           const std::vector<std::string>&  servicePathV,
+                           std::map<std::string, std::string>& uriParams    // FIXME P7: we need this to implement "restriction-based" filters
+)
+{
 
     DBClientBase* connection = getMongoConnection();
 
@@ -1514,6 +1498,18 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
       const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
       bob.appendRegex(servicePathString, servicePathValue);
 
+    }
+
+    // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
+    // Restriction is not a valid field in updateContext according to the NGSI specification. In the
+    // future we may consider to modify the spec to add such Restriction and avoid this ugly "direct injection"
+    // of URI filter into mongoBackend
+    //
+    if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
+    {
+      std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
+      BSONObj b = BSON(entityTypeString << BSON("$exists" << false));
+      bob.appendElements(b);
     }
     
     BSONObj query = bob.obj();
@@ -1602,7 +1598,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
         /* We accumulate the subscriptions in a map. The key of the map is the string representing
          * subscription id */
-        std::map<string, BSONObj*> subsToNotify;
+        std::map<string, TriggeredSubscription*> subsToNotify;
 
         /* Is the entity using location? In that case, we fill the locAttr, coordLat and coordLong attributes with that information, otherwise
          * we fill an empty locAttrs. Any case, processContextAttributeVector uses that information (and eventually modifies) while it
@@ -1619,9 +1615,10 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, &subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant)) {
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
+            releaseTriggeredSubscriptions(subsToNotify);
             continue;
         }
 
@@ -1694,6 +1691,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
             responseP->contextElementResponseVector.push_back(cerP);
             LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
+            releaseTriggeredSubscriptions(subsToNotify);
             continue;
         }
         catch (...)
@@ -1707,28 +1705,14 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
 
             responseP->contextElementResponseVector.push_back(cerP);
             LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
+            releaseTriggeredSubscriptions(subsToNotify);
             continue;
         }
-
-#if 0
-        /* DEBUG (see issue #371) */
-        int ix = 0;
-        for (std::map<string, BSONObj*>::iterator it = subsToNotify.begin(); it != subsToNotify.end(); ++it) {
-            BSONObj b = *(it->second);
-            if (b.isEmpty()) {
-                LM_T(LmtMongo, ("DEBUG before addTriggeredSubscriptions [%d]: <empty>", ix));
-            }
-            else {
-                LM_T(LmtMongo, ("DEBUG before addTriggeredSubscriptions [%d]: %s", ix, b.toString().c_str() ));
-            }
-            ix++;
-        }
-#endif
 
         /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
-        processSubscriptions(enP, &subsToNotify, &err, tenant);
+        processSubscriptions(enP, subsToNotify, err, tenant);
 
         /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */
@@ -1813,12 +1797,12 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
           cerP->statusCode.fill(SccOk);
           
           /* Successful creation: send potential notifications */
-          std::map<string, BSONObj*> subsToNotify;
+          std::map<string, TriggeredSubscription*> subsToNotify;
           for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
           {
             std::string err;
 
-            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, &subsToNotify, &err, tenant))
+            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, subsToNotify, err, tenant))
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
               responseP->contextElementResponseVector.push_back(cerP);
@@ -1826,7 +1810,7 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
             }
           }
 
-          processSubscriptions(enP, &subsToNotify, &errReason, tenant);
+          processSubscriptions(enP, subsToNotify, errReason, tenant);
         }
 
         responseP->contextElementResponseVector.push_back(cerP);
