@@ -60,7 +60,7 @@ HttpStatusCode mapDeleteIndividualContextEntityAttribute
 
   ucRequest.contextElementVector.push_back(&ce);
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   if (ms == SccOk)
   {
