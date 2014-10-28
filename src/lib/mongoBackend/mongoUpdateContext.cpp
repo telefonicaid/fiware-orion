@@ -49,7 +49,8 @@ HttpStatusCode mongoUpdateContext
   UpdateContextRequest*            requestP,
   UpdateContextResponse*           responseP,
   const std::string&               tenant,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  std::map<std::string, std::string>&   uriParams    // FIXME P7: we need this to implement "restriction-based" filters
 )
 {
     reqSemTake(__FUNCTION__, "ngsi10 update request");

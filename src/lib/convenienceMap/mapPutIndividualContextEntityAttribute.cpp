@@ -63,7 +63,7 @@ HttpStatusCode mapPutIndividualContextEntityAttribute
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Update");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   response->fill(SccOk);
 
