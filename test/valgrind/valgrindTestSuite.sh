@@ -271,8 +271,8 @@ function processResult()
 {
     filename=$1
     # Get info from valgrind
-    startLine1=$(grep -n "LEAK SUMMARY" $filename | awk -F: '{ print $1 }' | head -1)
-    startLine2=$(grep -n "LEAK SUMMARY" $filename | awk -F: '{ print $1 }' | tail -1)
+    startLine1=$(grep --text -n "LEAK SUMMARY" $filename | awk -F: '{ print $1 }' | head -1)
+    startLine2=$(grep --text -n "LEAK SUMMARY" $filename | awk -F: '{ print $1 }' | tail -1)
 
     if [ "$startLine1" == "" ] || [ "$startLine2" == "" ]
     then
@@ -320,7 +320,10 @@ function printTestLinePrefix()
 
   if [ $testNo -lt 10 ]
   then
-    testNoString=" "${name}" 0"${testNo}"/"${noOfTests}": "
+    testNoString=${name}"00"${testNo}"/"${noOfTests}": "
+  elif [ $testNo -lt 100 ]
+  then
+    testNoString=${name}"0"${testNo}"/"${noOfTests}": "
   else
     testNoString=${name}${testNo}"/"${noOfTests}": "
   fi
@@ -464,7 +467,7 @@ then
     printTestLinePrefix
 
     init="$testNoString $vtest ............................................................................................................................."
-    init=${init:0:100}
+    init=${init:0:120}
     echo -n $init" "
 
     typeset -i lines
@@ -517,6 +520,8 @@ then
         typeset -i headEndLine2
         processResult ${NAME}.out
       fi
+    else
+      echo "dryRun"
     fi
 
     if [ "$lost" != "0" ]
@@ -552,6 +557,7 @@ then
   do
     htest=$(basename $file | awk -F '.' '{print $1}')
     directory=$(dirname $file)
+    dir=$(basename $directory)
     file=$htest.test
 
     vMsg file: $file
@@ -559,8 +565,8 @@ then
 
     testNo=$testNo+1
     printTestLinePrefix
-    init="$testNoString $htest ............................................................................................................................."
-    init=${init:0:100}
+    init="$testNoString $dir/$htest ............................................................................................................................."
+    init=${init:0:120}
     echo -n $init" "
 
     # In the case of harness test, we check that the test is implemented checking

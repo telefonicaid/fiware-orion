@@ -60,7 +60,7 @@ sleep 0.5s
 #
 if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
 then
-  sleep 2
+  sleep 1
 fi
 
 
@@ -94,6 +94,11 @@ echo "2: ++++++++++++++++++++"
 
 #Sleep 10 seconds. Only 3 subscriptions arrive (at time 0, 2 and 4) as subscription expires at time=5s
 sleep 10s
+# Sleep one second more if running under valgrind
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  sleep 1
+fi
 
 curl localhost:${LISTENER_PORT}/dump -s -S 
 

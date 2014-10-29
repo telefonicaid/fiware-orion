@@ -221,7 +221,7 @@ Date: REGEX(.*)
 06. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: 220
+Content-Length: 22REGEX(\d)
 Content-Type: application/json
 Date: REGEX(.*)
 

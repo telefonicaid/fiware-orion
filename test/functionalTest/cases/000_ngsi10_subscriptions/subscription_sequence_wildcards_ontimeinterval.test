@@ -105,6 +105,11 @@ echo
 
 # Wait 11 seconds, so we will receive 6 notifications (t=0, t=2, t=4, t=6, t=8, t=10)
 sleep 11
+# Sleep one second more if running under valgrind
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  sleep 1
+fi
 
 echo "3: ++++++++++++++++++++"
 url=/v1/unsubscribeContext
