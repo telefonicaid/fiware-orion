@@ -56,6 +56,8 @@ TEST(postIndividualContextEntityAttribute, notFound)
   const char*    outfile     = "ngsi10.updateContextAttributeResponse.ok.valid.xml";
   std::string    out;
 
+  utInit();
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 

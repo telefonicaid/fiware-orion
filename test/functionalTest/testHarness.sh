@@ -666,8 +666,8 @@ for testFile in $fileList
 do
   if [ "$verbose" == "off" ]
   then
-    init=$testFile" ..................................................................................."
-    init=${init:0:80}
+    init=$testFile" ................................................................................................................."
+    init=${init:0:110}
     printf "%03d/%d: %s " "$testNo" "$noOfTests" "$init"
   else
     printf "Running test %03d/%d: %s\n" "$testNo" "$noOfTests" "$testFile"

@@ -43,6 +43,7 @@
 extern HttpStatusCode mapPostIndividualContextEntityAttribute
 (
   const std::string&              entityId,
+  const std::string&              entityType,
   const std::string&              attributeName,
   UpdateContextAttributeRequest*  request,
   StatusCode*                     response,

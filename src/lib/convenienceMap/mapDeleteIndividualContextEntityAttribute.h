@@ -41,6 +41,7 @@
 extern HttpStatusCode mapDeleteIndividualContextEntityAttribute
 (
   const std::string&  entityId,
+  const std::string&  entityType,
   const std::string&  attributeName,
   StatusCode*         response,
   ConnectionInfo*     ciP

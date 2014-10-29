@@ -83,6 +83,12 @@ extern int noOfNgsi10ContextEntityTypesAttributeContainer;
 extern int noOfNgsi10ContextEntityTypesAttribute;
 extern int noOfNgsi10SubscriptionsConvOp;
 extern int noOfAllContextEntitiesRequests;
+extern int noOfAllEntitiesWithTypeAndIdRequests;
+extern int noOfIndividualContextEntityAttributeWithTypeAndId;
+extern int noOfAttributeValueInstanceWithTypeAndId;
+extern int noOfContextEntitiesByEntityIdAndType;
+extern int noOfEntityByIdAttributeByNameIdAndType;
+
 extern int noOfLogRequests;
 extern int noOfVersionRequests;
 extern int noOfExitRequests;

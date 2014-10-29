@@ -148,6 +148,22 @@
 #include "serviceRoutines/getAttributeValueInstance.h"
 #include "serviceRoutines/putAttributeValueInstance.h"
 #include "serviceRoutines/deleteAttributeValueInstance.h"
+#include "serviceRoutines/getAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/postAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/putAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/deleteAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/getIndividualContextEntityAttributeWithTypeAndId.h"
+#include "serviceRoutines/postIndividualContextEntityAttributeWithTypeAndId.h"
+#include "serviceRoutines/putIndividualContextEntityAttributeWithTypeAndId.h"
+#include "serviceRoutines/deleteIndividualContextEntityAttributeWithTypeAndId.h"
+#include "serviceRoutines/getAttributeValueInstanceWithTypeAndId.h"
+#include "serviceRoutines/deleteAttributeValueInstanceWithTypeAndId.h"
+#include "serviceRoutines/postAttributeValueInstanceWithTypeAndId.h"
+#include "serviceRoutines/putAttributeValueInstanceWithTypeAndId.h"
+#include "serviceRoutines/getContextEntitiesByEntityIdAndType.h"
+#include "serviceRoutines/postContextEntitiesByEntityIdAndType.h"
+#include "serviceRoutines/getEntityByIdAttributeByNameWithTypeAndId.h"
+#include "serviceRoutines/postEntityByIdAttributeByNameWithTypeAndId.h"
 
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
@@ -458,6 +474,30 @@ PaArgument paArgs[] =
 #define ACE                AllContextEntities
 #define ACE_COMPS_V1       2, { "v1", "contextEntities" }
 
+#define ACET               AllEntitiesWithTypeAndId
+#define ACET_COMPS_V1      6, { "v1", "contextEntities", "type", "*", "id", "*" }
+#define ACET_POST_WORD     "appendContextElementRequest"
+#define ACET_PUT_WORD      "updateContextElementRequest"
+
+#define ICEAAT              IndividualContextEntityAttributeWithTypeAndId
+#define ICEAAT_COMPS_V1     8, { "v1", "contextEntities", "type", "*", "id", "*", "attributes", "*" }
+#define ICEAAT_POST_WORD    "updateContextAttributeRequest"
+#define ICEAAT_PUT_WORD     "updateContextAttributeRequest"
+
+#define AVIT                AttributeValueInstanceWithTypeAndId
+#define AVIT_COMPS_V1       9, { "v1",      "contextEntities", "type", "*", "id", "*", "attributes", "*", "*" }
+#define AVIT_PUT_WORD       "updateContextAttributeRequest"
+#define AVIT_POST_WORD      "updateContextAttributeRequest"
+
+#define CEET                ContextEntitiesByEntityIdAndType
+#define CEET_COMPS_V1       7, { "v1", "registry", "contextEntities", "type", "*", "id", "*" }
+#define CEET_POST_WORD      "registerProviderRequest"
+
+#define CEAAT               EntityByIdAttributeByNameIdAndType
+#define CEAAT_COMPS_V1      9, { "v1", "registry", "contextEntities", "type", "*", "id", "*", "attributes", "*" }
+#define CEAAT_POST_WORD     "registerProviderRequest"
+
+
 
 //
 // Log, version, statistics ...
@@ -719,7 +759,33 @@ PaArgument paArgs[] =
   { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
                                                                                                            \
   { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
-  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }
+  { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }, \
+                                                                                                           \
+  { "GET",    ACET,  ACET_COMPS_V1,          "",              getAllEntitiesWithTypeAndId               }, \
+  { "POST",   ACET,  ACET_COMPS_V1,          ACET_POST_WORD,  postAllEntitiesWithTypeAndId              }, \
+  { "PUT",    ACET,  ACET_COMPS_V1,          ACET_PUT_WORD,   putAllEntitiesWithTypeAndId               }, \
+  { "DELETE", ACET,  ACET_COMPS_V1,          "",              deleteAllEntitiesWithTypeAndId            }, \
+  { "*",      ACET,  ACET_COMPS_V1,          "",              badVerbAllFour                            }, \
+                                                                                                           \
+  { "GET",    ICEAAT,  ICEAAT_COMPS_V1,      "",               getIndividualContextEntityAttributeWithTypeAndId    }, \
+  { "POST",   ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_POST_WORD, postIndividualContextEntityAttributeWithTypeAndId   }, \
+  { "PUT",    ICEAAT,  ICEAAT_COMPS_V1,      ICEAAT_PUT_WORD,  putIndividualContextEntityAttributeWithTypeAndId    }, \
+  { "DELETE", ICEAAT,  ICEAAT_COMPS_V1,      "",               deleteIndividualContextEntityAttributeWithTypeAndId }, \
+  { "*",      ICEAAT,  ICEAAT_COMPS_V1,      "",               badVerbAllFour                                      }, \
+                                                                                                                      \
+  { "GET",    AVIT,    AVIT_COMPS_V1,        "",               getAttributeValueInstanceWithTypeAndId              }, \
+  { "POST",   AVIT,    AVIT_COMPS_V1,        AVIT_POST_WORD,   postAttributeValueInstanceWithTypeAndId             }, \
+  { "PUT",    AVIT,    AVIT_COMPS_V1,        AVIT_PUT_WORD,    putAttributeValueInstanceWithTypeAndId              }, \
+  { "DELETE", AVIT,    AVIT_COMPS_V1,        "",               deleteAttributeValueInstanceWithTypeAndId           }, \
+  { "*",      AVIT,    AVIT_COMPS_V1,        "",               badVerbAllFour                                      }, \
+                                                                                                                      \
+  { "GET",    CEET,    CEET_COMPS_V1,        "",               getContextEntitiesByEntityIdAndType                 }, \
+  { "POST",   CEET,    CEET_COMPS_V1,        CEET_POST_WORD,   postContextEntitiesByEntityIdAndType                }, \
+  { "*",      CEET,    CEET_COMPS_V1,        "",               badVerbGetPostOnly                                  }, \
+                                                                                                                      \
+  { "GET",    CEAAT,   CEAAT_COMPS_V1,       "",               getEntityByIdAttributeByNameWithTypeAndId           }, \
+  { "POST",   CEAAT,   CEAAT_COMPS_V1,       CEAAT_POST_WORD,  postEntityByIdAttributeByNameWithTypeAndId          }, \
+  { "*",      CEAAT,   CEAAT_COMPS_V1,       "",               badVerbGetPostOnly                                  }
 
 
 

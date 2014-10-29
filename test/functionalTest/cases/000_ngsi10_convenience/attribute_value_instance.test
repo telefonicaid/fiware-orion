@@ -246,7 +246,7 @@ Date: REGEX(.*)
 </statusCode>
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 198
+Content-Length: 220
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -254,7 +254,7 @@ Date: REGEX(.*)
 <statusCode>
   <code>472</code>
   <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-  <details>action: DELETE - entity: (E01, ) - offending attribute: A1</details>
+  <details>action: DELETE - entity: (E01, ) - offending attribute: A1 - attribute not found</details>
 </statusCode>
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK

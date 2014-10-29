@@ -3773,7 +3773,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(1).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(1).reasonPhrase);
-    EXPECT_EQ("action: DELETE - entity: (E1, T1bis) - offending attribute: A2", RES_CER_STATUS(1).details);
+    EXPECT_EQ("action: DELETE - entity: (E1, T1bis) - offending attribute: A2 - attribute not found", RES_CER_STATUS(1).details);
 
     /* Context Element response # 3 */
     EXPECT_EQ("E1", RES_CER(2).entityId.id);
@@ -3956,7 +3956,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(1).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(1).reasonPhrase);
-    EXPECT_EQ("action: DELETE - entity: (E1, T1bis) - offending attribute: A2", RES_CER_STATUS(1).details);
+    EXPECT_EQ("action: DELETE - entity: (E1, T1bis) - offending attribute: A2 - attribute not found", RES_CER_STATUS(1).details);
 
     /* Context Element response # 3 */
     EXPECT_EQ("E1", RES_CER(2).entityId.id);
@@ -5850,7 +5850,7 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: DELETE - entity: (E1, T1) - offending attribute: A8", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: DELETE - entity: (E1, T1) - offending attribute: A8 - attribute not found", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7281,7 +7281,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_EQ("IDX", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: (E10, T10) - offending attribute: A1", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: (E10, T10) - offending attribute: A1 - attribute can not be appended", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7492,7 +7492,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: (E10, T10) - offending attribute: A1", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: (E10, T10) - offending attribute: A1 - attribute can not be appended", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

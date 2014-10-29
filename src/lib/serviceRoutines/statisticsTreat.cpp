@@ -117,7 +117,12 @@ std::string statisticsTreat
     noOfNgsi10ContextEntityTypesAttribute           = -1;
     noOfNgsi10SubscriptionsConvOp                   = -1;
 
-    noOfAllContextEntitiesRequests                  = -1;
+    noOfAllContextEntitiesRequests                    = -1;
+    noOfAllEntitiesWithTypeAndIdRequests              = -1;
+    noOfIndividualContextEntityAttributeWithTypeAndId = -1;
+    noOfAttributeValueInstanceWithTypeAndId           = -1;
+    noOfContextEntitiesByEntityIdAndType              = -1;
+    noOfEntityByIdAttributeByNameIdAndType            = -1;
 
     noOfLogRequests                                 = -1;
     noOfVersionRequests                             = -1;
@@ -317,6 +322,31 @@ std::string statisticsTreat
   if (noOfAllContextEntitiesRequests != -1)
   {
     out += TAG_ADD("allContextEntitiesRequests", noOfAllContextEntitiesRequests);
+  }
+
+  if (noOfAllEntitiesWithTypeAndIdRequests != -1)
+  {
+    out += TAG_ADD("allContextEntitiesWithTypeAndIdRequests", noOfAllEntitiesWithTypeAndIdRequests);
+  }
+
+  if (noOfIndividualContextEntityAttributeWithTypeAndId != -1)
+  {
+    out += TAG_ADD("individualContextEntityAttributeWithTypeAndId", noOfIndividualContextEntityAttributeWithTypeAndId);
+  }
+
+  if (noOfAttributeValueInstanceWithTypeAndId != -1)
+  {
+    out += TAG_ADD("attributeValueInstanceWithTypeAndId", noOfAttributeValueInstanceWithTypeAndId);
+  }
+
+  if (noOfContextEntitiesByEntityIdAndType != -1)
+  {
+    out += TAG_ADD("contextEntitiesByEntityIdAndType", noOfContextEntitiesByEntityIdAndType);
+  }
+
+  if (noOfEntityByIdAttributeByNameIdAndType != -1)
+  {
+    out += TAG_ADD("entityByIdAttributeByNameIdAndType", noOfEntityByIdAttributeByNameIdAndType);
   }
 
   if (noOfLogRequests != -1)

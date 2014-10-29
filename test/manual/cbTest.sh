@@ -50,7 +50,7 @@ function verboseMsg()
 #
 function usage()
 {
-  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [--tenant <tenant>] [--httpTenant <tenant>] [--params <URI parameters>] [-en <entityId>] [-attr (attributeName)] [-id <reg/sub id>] [-json (in and out-format in JSON)] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] [--https] <operation> <data file>'
+  echo usage: $0 '[-host <host>] [-port <p>] [-v (verbose)] [-lint (use xmllint)] [-cop <convenience operation>] [-X <method>] [--tenant <tenant>] [--httpTenant <tenant>] [--params <URI parameters>] [-enId <entityId>] [-enType <entityType>] [-attr (attributeName)] [-id <reg/sub id>] [-json (in and out-format in JSON)] [-informat (in-format)] [-outformat (out-format)] [-table <table to debug>] [--https] <operation> <data file>'
 
   verbose=1
   verboseMsg "Operations:"
@@ -76,7 +76,7 @@ function usage()
   verboseMsg "  ce:     contextEntities/ENTITY_ID"
   verboseMsg "  cea:    contextEntities/ENTITY_ID/attributes"
   verboseMsg "  ceaa:   contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME"
-
+  verboseMsg "  acet:   v1/contextEntities/type/ENTITY_TYPE/id/ENTITY_ID"
   exit 1
 }
 
@@ -95,6 +95,7 @@ operation=""
 dataFile=""
 id=""
 entityId=""
+entityType=""
 attributeName=""
 table=""
 protocol='http'
@@ -121,7 +122,8 @@ do
   elif [ "$1" == "-port" ];        then port=$2;                        shift;
   elif [ "$1" == "-cop" ];         then convOp=$2;                      shift;
   elif [ "$1" == "-X" ];           then method=$2;                      shift;
-  elif [ "$1" == "-en" ];          then entityId=$2;                    shift;
+  elif [ "$1" == "-enId" ];        then entityId=$2;                    shift;
+  elif [ "$1" == "-enType" ];      then entityType=$2;                  shift;
   elif [ "$1" == "-attr" ];        then attributeName=$2;               shift;
   elif [ "$1" == "-id" ];          then id=$2;                          shift;
   elif [ "$1" == "-json" ];        then IN_FORMAT="Content-Type: application/json"; OUT_FORMAT="Accept: application/json";
@@ -152,6 +154,7 @@ verboseMsg port = $port
 verboseMsg convOp = $convOp
 verboseMsg method = $method
 verboseMsg entityId = $entityId
+verboseMsg entityType = $entityType
 verboseMsg attributeName = $attributeName
 verboseMsg operation = $operation
 verboseMsg dataFile = $dataFile
@@ -271,6 +274,7 @@ cop['ceaa']='NGSI9/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME'
 cop['ce10']='NGSI10/contextEntities/ENTITY_ID'
 cop['cea10']='NGSI10/contextEntities/ENTITY_ID/attributes'
 cop['ceaa10']='NGSI10/contextEntities/ENTITY_ID/attributes/ATTRIBUTE_NAME'
+cop['acet']='v1/contextEntities/type/ENTITY_TYPE/id/ENTITY_ID'
 
 
 # -----------------------------------------------------------------------------
@@ -337,6 +341,11 @@ verboseMsg "URL: '"$url"'"
 if [ "$entityId" != "" ]
 then
   url=$(echo $url | sed "s/ENTITY_ID/$entityId/g")
+fi
+
+if [ "$entityType" != "" ]
+then
+  url=$(echo $url | sed "s/ENTITY_TYPE/$entityType/g")
 fi
 
 if [ "$attributeName" != "" ]

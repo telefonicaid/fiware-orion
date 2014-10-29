@@ -61,7 +61,9 @@ const char* requestType(RequestType rt)
   case IndividualContextEntity:                     return "IndividualContextEntity";
   case IndividualContextEntityAttributes:           return "IndividualContextEntityAttributes";
   case AttributeValueInstance:                      return "AttributeValueInstance";
+  case AttributeValueInstanceWithTypeAndId:         return "AttributeValueInstanceWithTypeAndId";
   case IndividualContextEntityAttribute:            return "IndividualContextEntityAttribute";
+  case IndividualContextEntityAttributeWithTypeAndId:  return "IndividualContextEntityAttributeWithTypeAndId";
   case UpdateContextElement:                        return "UpdateContextElement";
   case AppendContextElement:                        return "AppendContextElement";
   case UpdateContextAttribute:                      return "UpdateContextAttribute";
@@ -88,6 +90,9 @@ const char* requestType(RequestType rt)
   case EntityTypes:                                      return "EntityTypes";
   case AttributesForEntityType:                          return "AttributesForEntityType";
   case AllContextEntities:                               return "AllContextEntities";
+  case AllEntitiesWithTypeAndId:                         return "AllEntitiesWithTypeAndId";
+  case ContextEntitiesByEntityIdAndType:                 return "ContextEntitiesByEntityIdAndType";
+  case EntityByIdAttributeByNameIdAndType:               return "EntityByIdAttributeByNameIdAndType";
   }
 
   return "";

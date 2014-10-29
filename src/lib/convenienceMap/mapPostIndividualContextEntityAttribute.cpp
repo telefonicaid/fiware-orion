@@ -43,6 +43,7 @@
 HttpStatusCode mapPostIndividualContextEntityAttribute
 (
   const std::string&              entityId,
+  const std::string&              entityType,
   const std::string&              attributeName,
   UpdateContextAttributeRequest*  request,
   StatusCode*                     response,
@@ -53,17 +54,34 @@ HttpStatusCode mapPostIndividualContextEntityAttribute
   UpdateContextRequest   ucRequest;
   UpdateContextResponse  ucResponse;
   ContextElement         ce;
-  ContextAttribute       attribute(attributeName, "", "");
+  ContextAttribute       attribute(attributeName, request->type, request->contextValue);
 
-  ce.entityId.fill(entityId, "", "false");
+  ce.entityId.fill(entityId, entityType, "false");
   ce.contextAttributeVector.push_back(&attribute);
+
+  attribute.metadataVector.fill(&request->metadataVector);
 
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Append");
 
+  ucResponse.errorCode.fill(SccOk);
   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
-  response->fill(SccOk);
+  //
+  // Only one contextAttribute in request contextAttributeVector, so there will be only one 
+  // item in ucResponse.contextElementResponseVector.
+  // Completely safe to respond with ucResponse.contextElementResponseVector[0].
+  // However, if there is a general error in ucResponse.errorCode, we should pick that
+  // response instead.
+  //
+  if (ucResponse.errorCode.code != SccOk)
+  {
+    response->fill(&ucResponse.errorCode);
+  }
+  else
+  {
+    response->fill(&ucResponse.contextElementResponseVector[0]->statusCode);
+  }
 
   return ms;
 }

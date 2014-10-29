@@ -79,12 +79,12 @@ TEST(mapGetIndividualContextEntityAttribute, okAndNotOk)
 
   prepareDatabase("E1", "Room");
 
-  ms = mapGetIndividualContextEntityAttribute("E1", "A1", &response, &ci);
+  ms = mapGetIndividualContextEntityAttribute("E1", "", "A1", &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccOk, response.statusCode.code);
   EXPECT_EQ("A1", response.contextAttributeVector.get(0)->name);
 
-  ms = mapGetIndividualContextEntityAttribute("NotFound", "alsoNotFound", &response, &ci);
+  ms = mapGetIndividualContextEntityAttribute("NotFound", "", "alsoNotFound", &response, &ci);
   EXPECT_EQ(SccOk, ms);
   EXPECT_EQ(SccContextElementNotFound, response.statusCode.code);
 

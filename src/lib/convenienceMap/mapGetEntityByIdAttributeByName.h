@@ -39,7 +39,8 @@
 */
 extern HttpStatusCode mapGetEntityByIdAttributeByName
 (
-  const std::string&                    id,
+  const std::string&                    entityId,
+  const std::string&                    entityType,
   const std::string&                    attributeName,
   DiscoverContextAvailabilityResponse*  response,
   ConnectionInfo*                       ciP
