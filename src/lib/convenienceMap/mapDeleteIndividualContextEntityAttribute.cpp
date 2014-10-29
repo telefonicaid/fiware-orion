@@ -43,6 +43,7 @@
 HttpStatusCode mapDeleteIndividualContextEntityAttribute
 (
   const std::string&  entityId,
+  const std::string&  entityType,
   const std::string&  attributeName,
   StatusCode*         response,
   ConnectionInfo*     ciP
@@ -54,17 +55,29 @@ HttpStatusCode mapDeleteIndividualContextEntityAttribute
   ContextElement         ce;
   ContextAttribute       contextAttribute(attributeName, "", "");
 
-  ce.entityId.fill(entityId, "", "false");
+  ce.entityId.fill(entityId, entityType, "false");
   ce.contextAttributeVector.push_back(&contextAttribute);
   ucRequest.updateActionType.set("Delete");
 
   ucRequest.contextElementVector.push_back(&ce);
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
+  ucResponse.errorCode.code = SccOk;
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
-  if (ms == SccOk)
+  //
+  // Only one contextAttribute in request contextAttributeVector, so there will be only one 
+  // item in ucResponse.contextElementResponseVector.
+  // Completely safe to respond with ucResponse.contextElementResponseVector[0].
+  // However, if there is a general error in ucResponse.errorCode, we should pick that
+  // response instead.
+  //
+  if (ucResponse.errorCode.code != SccOk)
   {
-    *response = ucResponse.contextElementResponseVector.get(0)->statusCode;
+    *response = ucResponse.errorCode;
+  }
+  else
+  {
+    *response = ucResponse.contextElementResponseVector[0]->statusCode;
   }
 
   return ms;

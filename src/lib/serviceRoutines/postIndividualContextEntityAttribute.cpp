@@ -56,6 +56,7 @@ std::string postIndividualContextEntityAttribute
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s'", entityId.c_str()));
 
   ciP->httpStatusCode = mapPostIndividualContextEntityAttribute(entityId,
+                                                                "",
                                                                 attributeName,
                                                                 &parseDataP->upcar.res,
                                                                 &response,

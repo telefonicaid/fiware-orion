@@ -42,6 +42,7 @@
 extern HttpStatusCode mapPostIndividualContextEntity
 (
   const std::string&             entityId,
+  const std::string&             entityType,
   AppendContextElementRequest*   request,
   AppendContextElementResponse*  response,
   ConnectionInfo*                ciP

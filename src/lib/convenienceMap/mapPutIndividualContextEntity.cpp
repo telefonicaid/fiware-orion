@@ -46,6 +46,7 @@
 HttpStatusCode mapPutIndividualContextEntity
 (
   const std::string&             entityId,
+  const std::string&             entityType,
   UpdateContextElementRequest*   ucerP,
   UpdateContextElementResponse*  response,
   ConnectionInfo*                ciP
@@ -56,14 +57,14 @@ HttpStatusCode mapPutIndividualContextEntity
   UpdateContextResponse   ucResponse;
   ContextElement          ce;
 
-  ce.entityId.fill(entityId, "", "false");
+  ce.entityId.fill(entityId, entityType, "false");
   ce.attributeDomainName    = ucerP->attributeDomainName;
   ce.contextAttributeVector = ucerP->contextAttributeVector;
 
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Update");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   ContextAttributeResponse* carP = new ContextAttributeResponse();
   ContextElement*           ceP  = &ucResponse.contextElementResponseVector.get(0)->contextElement;

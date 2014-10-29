@@ -2,7 +2,8 @@
 - Add: New convenience operation '/v1/contextEntities' - to get a list of ALL existing entities (Issue #563)
 - Fix: Upgrading from a previous package caused the orion user to disappear.
 - Fix: Change service path HTTP header name: 'ServicePath' -> 'Fiware-ServicePath' (Issue #541)
-- Fix: avoid unneeded additional query on csubs/casubs collections to get details of ONCHANGE triggered subscription when processing updateContext (Issue #371)
+- Fix: Avoid unneeded additional query on csubs/casubs collections to get details of ONCHANGE triggered subscription when processing updateContext (Issue #371)
+- Fix: Some convenience operations responsed always with empty type (Issue #585)
 - Add: New URI parameter '!exist=entity::type' to filter entities whose type is empty (Issue #570)
 - Add: New scopeType FIWARE::Filter::Existence (only with value "entity::type" in this version)
 - Add: New payload field for 'operationScope' under 'restriction': 'operator' for JSON and 'scopeOperator' for XML
@@ -11,6 +12,16 @@
        Fixed for convop '/v1/contestEntities/<entity::id>'
 - Fix: 'FIWARE_Location' scope type changed to 'FIWARE::Location' (although the old one is still supported)
 - Add: New conv op URI parameter 'entity::type=TYPE' to filter by type, for /v1/contextEntities and /v1/contextEntities/<EID> (Issue #570)
+- Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id> (Issue #581)
+- Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id>/attributes/ATTRIBUTE_NAME (Issue #581)
+- Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id>/attributes/ATTRIBUTE_NAME/META_ID_VALUE (Issue #581)
+- Add: New convenience operations POST/GET   /v1/registry/contextEntities/type/<type>/id/<id> (Issue #581)
+- Add: New convenience operations POST/GET   /v1/registry/contextEntities/type/<type>/id/<id>/attributes/ATTRIBUTE_NAME (Issue #581)
+- Fix: More detailed error responses for some convenience operations:
+       - POST/DELETE /v1/contextEntities/EID/attributes/ATTR_NAME
+       - POST/DELETE /v1/contextEntities/type/TYPE/id/ID/attributes/ATTR_NAME
+       Also the POST variant of these two URLs always returned 200 OK. Not anymore.
+
 
 Saved for other PRs:
   - Fix: Issue #585 fixed for convops '/v1/contestEntities/type/<entity::type>/id/<entity::id>'

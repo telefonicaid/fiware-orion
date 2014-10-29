@@ -49,7 +49,8 @@ HttpStatusCode mongoUpdateContext
   UpdateContextRequest*            requestP,
   UpdateContextResponse*           responseP,
   const std::string&               tenant,
-  const std::vector<std::string>&  servicePathV
+  const std::vector<std::string>&  servicePathV,
+  std::map<std::string, std::string>&   uriParams    // FIXME P7: we need this to implement "restriction-based" filters
 )
 {
     reqSemTake(__FUNCTION__, "ngsi10 update request");
@@ -64,12 +65,17 @@ HttpStatusCode mongoUpdateContext
     {
         /* Process each ContextElement */
         for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {
-            processContextElement(requestP->contextElementVector.get(ix), responseP, requestP->updateActionType.get(), tenant, servicePathV);
+            processContextElement(requestP->contextElementVector.get(ix),
+                                  responseP,
+                                  requestP->updateActionType.get(),
+                                  tenant,
+                                  servicePathV,
+                                  uriParams);
         }
 
-        /* Note that although individual processContextElements() invokations returns MsConnectionError, this
-           error get "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
-           consider the overall mongoUpdateContext() as MsOk. */
+        /* Note that although individual processContextElements() invocations return ConnectionError, this
+           error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
+           consider the overall mongoUpdateContext() as OK. */
     }
     reqSemGive(__FUNCTION__, "ngsi10 update request");
     return SccOk;

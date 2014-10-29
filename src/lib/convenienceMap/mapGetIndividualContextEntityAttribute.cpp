@@ -44,6 +44,7 @@
 HttpStatusCode mapGetIndividualContextEntityAttribute
 (
   const std::string&         entityId,
+  const std::string&         entityType,
   const std::string&         attributeName,
   ContextAttributeResponse*  response,
   ConnectionInfo*            ciP
@@ -52,7 +53,7 @@ HttpStatusCode mapGetIndividualContextEntityAttribute
   HttpStatusCode        ms;
   QueryContextRequest   qcRequest;
   QueryContextResponse  qcResponse;
-  EntityId              entity(entityId, "", "false");
+  EntityId              entity(entityId, entityType, "false");
 
   qcRequest.entityIdVector.push_back(&entity);
   qcRequest.attributeList.push_back(attributeName);

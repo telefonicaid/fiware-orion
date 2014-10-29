@@ -35,6 +35,9 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
+#include "ngsi/Scope.h"
+#include "rest/uriParamNames.h"
+
 using std::string;
 using std::map;
 using std::auto_ptr;
@@ -56,13 +59,32 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
 * (and used from) a global place, maybe as part as the class-refactoring within
 * EntityId or Attribute class methods.
 */
-static bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2) {
-    if (type2 == "") {
-        return ((name1 == name2) && (id1 == id2));
-    }
-    else {
-        return ((name1 == name2) && (type1 == type2) && (id1 == id2));
-    }
+static bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2)
+{
+#if 0
+  //
+  // FIXME P9: The identity of an attribute is formed by the name and the type of the attribute.
+  //           [ if both are equal, then the metadata named 'ID' is used to distinguish ].
+  //           Now, there is a convop 'DELETE /v1/contextEntities/type/TYPE/id/ID/attribute/ATTR_NAME'
+  //           that doesn't work because of this. We don't have the type of the attribute, so we can't
+  //           find it for removal.
+  //
+  //           With this outdeffed 'if' below, the problem is fixed, but, the fix also provokes five
+  //           errors in unit tests ...
+  //           We need to decide what to do about this.
+  //
+  if ((id2 == "") && (type2 == ""))
+  {
+    return (name1 == name2);
+  }
+  else 
+#endif
+  if (type2 == "")
+  {
+    return ((name1 == name2) && (id1 == id2));
+  }
+
+  return ((name1 == name2) && (type1 == type2) && (id1 == id2));
 }
 
 /* ****************************************************************************
@@ -1137,7 +1159,8 @@ static bool processContextAttributeVector (ContextElement*                      
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: APPEND") +
                                       " - entity: (" + eP->toString() + ")" +
-                                      " - offending attribute: " + targetAttr->toString());
+                                      " - offending attribute: " + targetAttr->toString() + 
+                                      " - attribute can not be appended");
                 return false;
             }
         }
@@ -1170,7 +1193,8 @@ static bool processContextAttributeVector (ContextElement*                      
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: DELETE") +
                                       " - entity: (" + eP->toString() + ")" +
-                                      " - offending attribute: " + targetAttr->toString());
+                                      " - offending attribute: " + targetAttr->toString() + 
+                                      " - attribute not found");
                 return false;
 
             }
@@ -1411,7 +1435,14 @@ static bool removeEntity
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
 */
-void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP, const std::string& action, const std::string& tenant, const std::vector<std::string>& servicePathV) {
+void processContextElement(ContextElement*                  ceP,
+                           UpdateContextResponse*           responseP,
+                           const std::string&               action,
+                           const std::string&               tenant,
+                           const std::vector<std::string>&  servicePathV,
+                           std::map<std::string, std::string>& uriParams    // FIXME P7: we need this to implement "restriction-based" filters
+)
+{
 
     DBClientBase* connection = getMongoConnection();
 
@@ -1467,6 +1498,18 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
       const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
       bob.appendRegex(servicePathString, servicePathValue);
 
+    }
+
+    // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
+    // Restriction is not a valid field in updateContext according to the NGSI specification. In the
+    // future we may consider to modify the spec to add such Restriction and avoid this ugly "direct injection"
+    // of URI filter into mongoBackend
+    //
+    if (uriParams[URI_PARAM_NOT_EXIST] == SCOPE_VALUE_ENTITY_TYPE)
+    {
+      std::string entityTypeString = std::string("_id.") + ENT_ENTITY_TYPE;
+      BSONObj b = BSON(entityTypeString << BSON("$exists" << false));
+      bob.appendElements(b);
     }
     
     BSONObj query = bob.obj();
@@ -1677,7 +1720,6 @@ void processContextElement(ContextElement* ceP, UpdateContextResponse* responseP
         responseP->contextElementResponseVector.push_back(cerP);
     }
     LM_T(LmtServicePath, ("Docs found: %d", docs));
-
 
 
     /*

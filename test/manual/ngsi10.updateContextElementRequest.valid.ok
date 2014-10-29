@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateContextElementRequest>
+  <attributeDomainName></attributeDomainName>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>degree</type>
+      <contextValue>1</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</updateContextElementRequest>

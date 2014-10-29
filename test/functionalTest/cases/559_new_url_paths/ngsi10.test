@@ -28,7 +28,7 @@ dbInit CB
 brokerStart CB
 --SHELL--
 
-echo "1. POST /ngsi10/updateContext"
+echo "1.1. POST /ngsi10/updateContext"
 echo "============================="
 payload='<?xml version="1.0"?>
 <updateContextRequest>
@@ -53,14 +53,14 @@ echo
 echo
 
 
-echo "1. NOP /ngsi10/updateContext"
+echo "1.2. NOP /ngsi10/updateContext"
 echo "============================"
 orionCurl --url /ngsi10/updateContext --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "2. POST /ngsi10/queryContext"
+echo "2.1. POST /ngsi10/queryContext"
 echo "============================"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -79,14 +79,14 @@ echo
 echo
 
 
-echo "2. NOP /ngsi10/queryContext"
+echo "2.2. NOP /ngsi10/queryContext"
 echo "==========================="
 orionCurl --url /ngsi10/queryContext --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "3. POST /ngsi10/subscribeContext"
+echo "3.1. POST /ngsi10/subscribeContext"
 echo "================================"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
@@ -105,14 +105,14 @@ echo
 echo
 
 
-echo "3. NOP /ngsi10/subscribeContext"
+echo "3.2. NOP /ngsi10/subscribeContext"
 echo "==============================="
 orionCurl --url /ngsi10/subscribeContext --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "4. POST /ngsi10/updateContextSubscription"
+echo "4.1. POST /ngsi10/updateContextSubscription"
 echo "========================================="
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
@@ -132,14 +132,14 @@ echo
 echo
 
 
-echo "4. NOP /ngsi10/updateContextSubscription"
+echo "4.2. NOP /ngsi10/updateContextSubscription"
 echo "========================================"
 orionCurl --url /ngsi10/updateContextSubscription --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "5. POST /ngsi10/unsubscribeContext"
+echo "5.1. POST /ngsi10/unsubscribeContext"
 echo "=================================="
 payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
@@ -150,21 +150,21 @@ echo
 echo
 
 
-echo "5. NOP /ngsi10/unsubscribeContext"
+echo "5.2. NOP /ngsi10/unsubscribeContext"
 echo "================================="
 orionCurl --url /ngsi10/unsubscribeContext --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "6. GET /ngsi10/contextEntities/EID"
+echo "6.1. GET /ngsi10/contextEntities/EID"
 echo "=================================="
 orionCurl --url /ngsi10/contextEntities/EID
 echo
 echo
 
 
-echo "6. PUT /ngsi10/contextEntities/EID"
+echo "6.2. PUT /ngsi10/contextEntities/EID"
 echo "================================="
 payload='<?xml version="1.0"?>
 <updateContextElementRequest>
@@ -181,7 +181,7 @@ echo
 echo
 
 
-echo "6. POST /ngsi10/contextEntities/EID"
+echo "6.3. POST /ngsi10/contextEntities/EID"
 echo "==================================="
 payload='<?xml version="1.0"?>
 <appendContextElementRequest>
@@ -198,14 +198,14 @@ echo
 echo
 
 
-echo "6. DELETE /ngsi10/contextEntities/EID"
+echo "6.4. DELETE /ngsi10/contextEntities/EID"
 echo "====================================="
 orionCurl --url /ngsi10/contextEntities/EID -X DELETE
 echo
 echo
 
 
-echo "6. NOP /ngsi10/contextEntities/EID"
+echo "6.5. NOP /ngsi10/contextEntities/EID"
 echo "=================================="
 payload='<?xml version="1.0"?>'
 orionCurl --url /ngsi10/contextEntities/EID -X NOP
@@ -214,14 +214,14 @@ echo
 
 
 
-echo "7. GET /ngsi10/contextEntities/EID/attributes"
+echo "7.1. GET /ngsi10/contextEntities/EID/attributes"
 echo "============================================="
 orionCurl --url /ngsi10/contextEntities/EID/attributes
 echo
 echo
 
 
-echo "7. PUT /ngsi10/contextEntities/EID/attributes"
+echo "7.2. PUT /ngsi10/contextEntities/EID/attributes"
 echo "============================================="
 payload='<?xml version="1.0"?>
 <updateContextElementRequest>
@@ -238,7 +238,7 @@ echo
 echo
 
 
-echo "7. POST /ngsi10/contextEntities/EID/attributes"
+echo "7.3. POST /ngsi10/contextEntities/EID/attributes"
 echo "=============================================="
 payload='<?xml version="1.0"?>
 <appendContextElementRequest>
@@ -255,14 +255,14 @@ echo
 echo
 
 
-echo "7. DELETE /ngsi10/contextEntities/EID/attributes"
+echo "7.4. DELETE /ngsi10/contextEntities/EID/attributes"
 echo "================================================"
 orionCurl --url /ngsi10/contextEntities/EID/attributes -X DELETE
 echo
 echo
 
 
-echo "7. NOP /ngsi10/contextEntities/EID/attributes"
+echo "7.5. NOP /ngsi10/contextEntities/EID/attributes"
 echo "============================================="
 orionCurl --url /ngsi10/contextEntities/EID/attributes -X NOP
 echo
@@ -270,14 +270,14 @@ echo
 
 
 
-echo "8. GET /ngsi10/contextEntities/EID/attributes/A1"
+echo "8.1. GET /ngsi10/contextEntities/EID/attributes/A1"
 echo "================================================"
 orionCurl --url /ngsi10/contextEntities/EID/attributes/A1
 echo
 echo
 
 
-echo "8. PUT /ngsi10/contextEntities/EID/attributes/A1"
+echo "8.2. PUT /ngsi10/contextEntities/EID/attributes/A1"
 echo "================================================"
 payload='<updateContextAttributeRequest>
   <type>T</type>
@@ -295,14 +295,14 @@ echo
 echo
 
 
-echo "8. GET /ngsi10/contextEntities/EID/attributes/A1"
+echo "8.3. GET /ngsi10/contextEntities/EID/attributes/A1"
 echo "================================================"
 orionCurl --url /ngsi10/contextEntities/EID/attributes/A1
 echo
 echo
 
 
-echo "8. POST /ngsi10/contextEntities/EID/attributes/A1"
+echo "8.4. POST /ngsi10/contextEntities/EID/attributes/A1"
 echo "================================================="
 payload='<updateContextAttributeRequest>
   <type>T</type>
@@ -320,35 +320,35 @@ echo
 echo
 
 
-echo "8. GET /ngsi10/contextEntities/EID/attributes/A1"
+echo "8.5. GET /ngsi10/contextEntities/EID/attributes/A1"
 echo "================================================"
 orionCurl --url /ngsi10/contextEntities/EID/attributes/A1
 echo
 echo
 
 
-echo "8. DELETE /ngsi10/contextEntities/EID/attributes/A1"
+echo "8.6. DELETE /ngsi10/contextEntities/EID/attributes/A1"
 echo "==================================================="
 orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 -X DELETE
 echo
 echo
 
 
-echo "8. NOP /ngsi10/contextEntities/EID/attributes/A1"
+echo "8.7. NOP /ngsi10/contextEntities/EID/attributes/A1"
 echo "================================================"
 orionCurl --url /ngsi10/contextEntities/EID/attributes/A1 -X NOP
 echo
 echo
 
 
-echo "9. GET /ngsi10/contextEntities/EID/attributes/A1/left"
+echo "9.1. GET /ngsi10/contextEntities/EID/attributes/A1/left"
 echo "=========================================================="
 orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left
 echo
 echo
 
 
-echo "9. PUT /ngsi10/contextEntities/EID/attributes/A1/left"
+echo "9.2. PUT /ngsi10/contextEntities/EID/attributes/A1/left"
 echo "=========================================================="
 payload='<updateContextAttributeRequest>
   <type>T</type>
@@ -366,14 +366,14 @@ echo
 echo
 
 
-echo "9. DELETE /ngsi10/contextEntities/EID/attributes/A1/left"
+echo "9.3. DELETE /ngsi10/contextEntities/EID/attributes/A1/left"
 echo "============================================================="
 orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left -X DELETE
 echo
 echo
 
 
-echo "9. NOP /ngsi10/contextEntities/EID/attributes/A1/left"
+echo "9.4. NOP /ngsi10/contextEntities/EID/attributes/A1/left"
 echo "=========================================================="
 orionCurl --url /ngsi10/contextEntities/EID/attributes/A1/left -X NOP
 echo
@@ -381,14 +381,14 @@ echo
 
 
 
-echo "10. GET /ngsi10/contextEntityTypes/T"
+echo "10.1. GET /ngsi10/contextEntityTypes/T"
 echo "==========================================="
 orionCurl --url /ngsi10/contextEntityTypes/T
 echo
 echo
 
 
-echo "10. NOP /ngsi10/contextEntityTypes/T"
+echo "10.2. NOP /ngsi10/contextEntityTypes/T"
 echo "==========================================="
 orionCurl --url /ngsi10/contextEntityTypes/T -X NOP
 echo
@@ -396,14 +396,14 @@ echo
 
 
 
-echo "11. GET /ngsi10/contextEntityTypes/typeName/attributes"
+echo "11.1. GET /ngsi10/contextEntityTypes/typeName/attributes"
 echo "======================================================"
 orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes
 echo
 echo
 
 
-echo "11. NOP /ngsi10/contextEntityTypes/typeName/attributes"
+echo "11.2. NOP /ngsi10/contextEntityTypes/typeName/attributes"
 echo "======================================================"
 orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes -X NOP
 echo
@@ -411,14 +411,14 @@ echo
 
 
 
-echo "12. GET /ngsi10/contextEntityTypes/typeName/attributes/A1"
+echo "12.1. GET /ngsi10/contextEntityTypes/typeName/attributes/A1"
 echo "========================================================="
 orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes/A1
 echo
 echo
 
 
-echo "12. NOP /ngsi10/contextEntityTypes/typeName/attributes/A1"
+echo "12.2. NOP /ngsi10/contextEntityTypes/typeName/attributes/A1"
 echo "========================================================="
 orionCurl --url /ngsi10/contextEntityTypes/typeName/attributes/A1 -X NOP
 echo
@@ -426,7 +426,7 @@ echo
 
 
 
-echo "13. POST /ngsi10/contextSubscriptions"
+echo "13.1. POST /ngsi10/contextSubscriptions"
 echo "====================================="
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
@@ -458,7 +458,7 @@ echo
 echo
 
 
-echo "13. NOP /ngsi10/contextSubscriptions"
+echo "13.2. NOP /ngsi10/contextSubscriptions"
 echo "===================================="
 orionCurl --url /ngsi10/contextSubscriptions -X NOP
 echo
@@ -466,7 +466,7 @@ echo
 
 
 
-echo "14. PUT /ngsi10/contextSubscriptions/SUB_ID"
+echo "14.1. PUT /ngsi10/contextSubscriptions/SUB_ID"
 echo "==========================================="
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
@@ -486,14 +486,14 @@ echo
 echo
 
 
-echo "14. DELETE /ngsi10/contextSubscriptions/SUB_ID"
+echo "14.2. DELETE /ngsi10/contextSubscriptions/SUB_ID"
 echo "=============================================="
 orionCurl --url /ngsi10/contextSubscriptions/$SUB_ID -X DELETE
 echo
 echo
 
 
-echo "14. NOP /ngsi10/contextSubscriptions/SUB_ID"
+echo "14.3. NOP /ngsi10/contextSubscriptions/SUB_ID"
 echo "==========================================="
 orionCurl --url /ngsi10/contextSubscriptions/SUB_ID -X NOP
 echo
@@ -501,7 +501,7 @@ echo
 
 
 --REGEXPECT--
-1. POST /ngsi10/updateContext
+1.1. POST /ngsi10/updateContext
 =============================
 HTTP/1.1 200 OK
 Content-Length: 618
@@ -533,7 +533,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-1. NOP /ngsi10/updateContext
+1.2. NOP /ngsi10/updateContext
 ============================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -542,7 +542,7 @@ Date: REGEX(.*)
 
 
 
-2. POST /ngsi10/queryContext
+2.1. POST /ngsi10/queryContext
 ============================
 HTTP/1.1 200 OK
 Content-Length: 618
@@ -574,7 +574,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-2. NOP /ngsi10/queryContext
+2.2. NOP /ngsi10/queryContext
 ===========================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -583,7 +583,7 @@ Date: REGEX(.*)
 
 
 
-3. POST /ngsi10/subscribeContext
+3.1. POST /ngsi10/subscribeContext
 ================================
 HTTP/1.1 200 OK
 Content-Length: 192
@@ -599,7 +599,7 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 
 
-3. NOP /ngsi10/subscribeContext
+3.2. NOP /ngsi10/subscribeContext
 ===============================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -608,7 +608,7 @@ Date: REGEX(.*)
 
 
 
-4. POST /ngsi10/updateContextSubscription
+4.1. POST /ngsi10/updateContextSubscription
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 211
@@ -624,7 +624,7 @@ Date: REGEX(.*)
 </updateContextSubscriptionResponse>
 
 
-4. NOP /ngsi10/updateContextSubscription
+4.2. NOP /ngsi10/updateContextSubscription
 ========================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -633,7 +633,7 @@ Date: REGEX(.*)
 
 
 
-5. POST /ngsi10/unsubscribeContext
+5.1. POST /ngsi10/unsubscribeContext
 ==================================
 HTTP/1.1 200 OK
 Content-Length: 207
@@ -650,7 +650,7 @@ Date: REGEX(.*)
 </unsubscribeContextResponse>
 
 
-5. NOP /ngsi10/unsubscribeContext
+5.2. NOP /ngsi10/unsubscribeContext
 =================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -659,7 +659,7 @@ Date: REGEX(.*)
 
 
 
-6. GET /ngsi10/contextEntities/EID
+6.1. GET /ngsi10/contextEntities/EID
 ==================================
 HTTP/1.1 200 OK
 Content-Length: 450
@@ -687,7 +687,7 @@ Date: REGEX(.*)
 </contextElementResponse>
 
 
-6. PUT /ngsi10/contextEntities/EID
+6.2. PUT /ngsi10/contextEntities/EID
 =================================
 HTTP/1.1 200 OK
 Content-Length: 486
@@ -714,7 +714,7 @@ Date: REGEX(.*)
 </updateContextElementResponse>
 
 
-6. POST /ngsi10/contextEntities/EID
+6.3. POST /ngsi10/contextEntities/EID
 ===================================
 HTTP/1.1 200 OK
 Content-Length: 486
@@ -741,7 +741,7 @@ Date: REGEX(.*)
 </appendContextElementResponse>
 
 
-6. DELETE /ngsi10/contextEntities/EID
+6.4. DELETE /ngsi10/contextEntities/EID
 =====================================
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -755,7 +755,7 @@ Date: REGEX(.*)
 </statusCode>
 
 
-6. NOP /ngsi10/contextEntities/EID
+6.5. NOP /ngsi10/contextEntities/EID
 ==================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -764,7 +764,7 @@ Date: REGEX(.*)
 
 
 
-7. GET /ngsi10/contextEntities/EID/attributes
+7.1. GET /ngsi10/contextEntities/EID/attributes
 =============================================
 HTTP/1.1 200 OK
 Content-Length: 366
@@ -787,7 +787,7 @@ Date: REGEX(.*)
 </contextElementResponse>
 
 
-7. PUT /ngsi10/contextEntities/EID/attributes
+7.2. PUT /ngsi10/contextEntities/EID/attributes
 =============================================
 HTTP/1.1 200 OK
 Content-Length: 384
@@ -809,7 +809,7 @@ Date: REGEX(.*)
 </updateContextElementResponse>
 
 
-7. POST /ngsi10/contextEntities/EID/attributes
+7.3. POST /ngsi10/contextEntities/EID/attributes
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 486
@@ -836,7 +836,7 @@ Date: REGEX(.*)
 </appendContextElementResponse>
 
 
-7. DELETE /ngsi10/contextEntities/EID/attributes
+7.4. DELETE /ngsi10/contextEntities/EID/attributes
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -850,7 +850,7 @@ Date: REGEX(.*)
 </statusCode>
 
 
-7. NOP /ngsi10/contextEntities/EID/attributes
+7.5. NOP /ngsi10/contextEntities/EID/attributes
 =============================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -859,7 +859,7 @@ Date: REGEX(.*)
 
 
 
-8. GET /ngsi10/contextEntities/EID/attributes/A1
+8.1. GET /ngsi10/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 253
@@ -877,21 +877,22 @@ Date: REGEX(.*)
 </contextAttributeResponse>
 
 
-8. PUT /ngsi10/contextEntities/EID/attributes/A1
+8.2. PUT /ngsi10/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 80
+Content-Length: 127
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>200</code>
-  <reasonPhrase>OK</reasonPhrase>
+  <code>404</code>
+  <reasonPhrase>No context element found</reasonPhrase>
+  <details>EID</details>
 </statusCode>
 
 
-8. GET /ngsi10/contextEntities/EID/attributes/A1
+8.3. GET /ngsi10/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 253
@@ -909,7 +910,7 @@ Date: REGEX(.*)
 </contextAttributeResponse>
 
 
-8. POST /ngsi10/contextEntities/EID/attributes/A1
+8.4. POST /ngsi10/contextEntities/EID/attributes/A1
 =================================================
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -923,40 +924,52 @@ Date: REGEX(.*)
 </statusCode>
 
 
-8. GET /ngsi10/contextEntities/EID/attributes/A1
+8.5. GET /ngsi10/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 253
+Content-Length: 496
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextAttributeResponse>
-  <contextAttributeList/>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>T</type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
   <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: 'EID'</details>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextAttributeResponse>
 
 
-8. DELETE /ngsi10/contextEntities/EID/attributes/A1
+8.6. DELETE /ngsi10/contextEntities/EID/attributes/A1
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 220
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>EID</details>
+  <code>472</code>
+  <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
+  <details>action: DELETE - entity: (EID, ) - offending attribute: A1 - attribute not found</details>
 </statusCode>
 
 
-8. NOP /ngsi10/contextEntities/EID/attributes/A1
+8.7. NOP /ngsi10/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -965,55 +978,65 @@ Date: REGEX(.*)
 
 
 
-9. GET /ngsi10/contextEntities/EID/attributes/A1/left
+9.1. GET /ngsi10/contextEntities/EID/attributes/A1/left
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 496
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <contextAttributeResponse>
-  <contextAttributeList/>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>T</type>
+      <contextValue>10</contextValue>
+      <metadata>
+        <contextMetadata>
+          <name>ID</name>
+          <type>string</type>
+          <value>left</value>
+        </contextMetadata>
+      </metadata>
+    </contextAttribute>
+  </contextAttributeList>
   <statusCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity-Attribute pair: 'EID-A1'</details>
+    <code>200</code>
+    <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </contextAttributeResponse>
 
 
-9. PUT /ngsi10/contextEntities/EID/attributes/A1/left
+9.2. PUT /ngsi10/contextEntities/EID/attributes/A1/left
 ==========================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 80
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>EID</details>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 
 
-9. DELETE /ngsi10/contextEntities/EID/attributes/A1/left
+9.3. DELETE /ngsi10/contextEntities/EID/attributes/A1/left
 =============================================================
 HTTP/1.1 200 OK
-Content-Length: 127
+Content-Length: 80
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>404</code>
-  <reasonPhrase>No context element found</reasonPhrase>
-  <details>EID</details>
+  <code>200</code>
+  <reasonPhrase>OK</reasonPhrase>
 </statusCode>
 
 
-9. NOP /ngsi10/contextEntities/EID/attributes/A1/left
+9.4. NOP /ngsi10/contextEntities/EID/attributes/A1/left
 ==========================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1022,7 +1045,7 @@ Date: REGEX(.*)
 
 
 
-10. GET /ngsi10/contextEntityTypes/T
+10.1. GET /ngsi10/contextEntityTypes/T
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 155
@@ -1038,7 +1061,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-10. NOP /ngsi10/contextEntityTypes/T
+10.2. NOP /ngsi10/contextEntityTypes/T
 ===========================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1047,7 +1070,7 @@ Date: REGEX(.*)
 
 
 
-11. GET /ngsi10/contextEntityTypes/typeName/attributes
+11.1. GET /ngsi10/contextEntityTypes/typeName/attributes
 ======================================================
 HTTP/1.1 200 OK
 Content-Length: 155
@@ -1063,7 +1086,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-11. NOP /ngsi10/contextEntityTypes/typeName/attributes
+11.2. NOP /ngsi10/contextEntityTypes/typeName/attributes
 ======================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1072,7 +1095,7 @@ Date: REGEX(.*)
 
 
 
-12. GET /ngsi10/contextEntityTypes/typeName/attributes/A1
+12.1. GET /ngsi10/contextEntityTypes/typeName/attributes/A1
 =========================================================
 HTTP/1.1 200 OK
 Content-Length: 155
@@ -1088,7 +1111,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-12. NOP /ngsi10/contextEntityTypes/typeName/attributes/A1
+12.2. NOP /ngsi10/contextEntityTypes/typeName/attributes/A1
 =========================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1097,7 +1120,7 @@ Date: REGEX(.*)
 
 
 
-13. POST /ngsi10/contextSubscriptions
+13.1. POST /ngsi10/contextSubscriptions
 =====================================
 HTTP/1.1 200 OK
 Content-Length: 192
@@ -1113,7 +1136,7 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 
 
-13. NOP /ngsi10/contextSubscriptions
+13.2. NOP /ngsi10/contextSubscriptions
 ====================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1122,7 +1145,7 @@ Date: REGEX(.*)
 
 
 
-14. PUT /ngsi10/contextSubscriptions/SUB_ID
+14.1. PUT /ngsi10/contextSubscriptions/SUB_ID
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 211
@@ -1138,7 +1161,7 @@ Date: REGEX(.*)
 </updateContextSubscriptionResponse>
 
 
-14. DELETE /ngsi10/contextSubscriptions/SUB_ID
+14.2. DELETE /ngsi10/contextSubscriptions/SUB_ID
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 207
@@ -1155,7 +1178,7 @@ Date: REGEX(.*)
 </unsubscribeContextResponse>
 
 
-14. NOP /ngsi10/contextSubscriptions/SUB_ID
+14.3. NOP /ngsi10/contextSubscriptions/SUB_ID
 ===========================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0

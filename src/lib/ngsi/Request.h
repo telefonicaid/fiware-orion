@@ -68,7 +68,9 @@ typedef enum RequestType
   IndividualContextEntity                = 31,
   IndividualContextEntityAttributes,
   IndividualContextEntityAttribute,
+  IndividualContextEntityAttributeWithTypeAndId,
   AttributeValueInstance,
+  AttributeValueInstanceWithTypeAndId,
   Ngsi10ContextEntityTypes,
   Ngsi10ContextEntityTypesAttributeContainer,
   Ngsi10ContextEntityTypesAttribute,
@@ -93,6 +95,9 @@ typedef enum RequestType
   RtEntityTypesResponse,
   RtAttributesForEntityTypeResponse,
   AllContextEntities,
+  AllEntitiesWithTypeAndId,
+  ContextEntitiesByEntityIdAndType,
+  EntityByIdAttributeByNameIdAndType,
 
   InvalidRequest
 } RequestType;

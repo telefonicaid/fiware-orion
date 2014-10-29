@@ -41,7 +41,13 @@
 *
 * mapDeleteIndividualContextEntity - 
 */
-HttpStatusCode mapDeleteIndividualContextEntity(const std::string& entityId, StatusCode* response, ConnectionInfo* ciP)
+HttpStatusCode mapDeleteIndividualContextEntity
+(
+  const std::string&  enId,
+  const std::string&  enType,
+  StatusCode*         response,
+  ConnectionInfo*     ciP
+)
 {
   HttpStatusCode         ms;
 
@@ -49,12 +55,12 @@ HttpStatusCode mapDeleteIndividualContextEntity(const std::string& entityId, Sta
   UpdateContextResponse  ucResponse;
   ContextElement         ce;
 
-  ce.entityId.fill(entityId, "", "false");
+  ce.entityId.fill(enId, enType, "false");
 
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Delete");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   *response = ucResponse.contextElementResponseVector.get(0)->statusCode;
 

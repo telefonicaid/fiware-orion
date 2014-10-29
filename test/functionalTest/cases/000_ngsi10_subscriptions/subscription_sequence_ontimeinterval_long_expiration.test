@@ -55,6 +55,12 @@ echo
 # to avoid race conditions in the order of notifications
 sleep 0.5s
 
+# Sleep one second more if running under valgrind
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  sleep 1
+fi
+
 #Subscribe for a LONG period of time (99 years - should give overflow in an int)
 echo "1: ++++++++++++++++++++"
 url="/v1/subscribeContext"
@@ -87,6 +93,12 @@ echo
 
 # Sleep 11 seconds. 6 subscriptions arrive (at time 0, 2, 4, 6, 8, 10) as subscription doesn't expires.
 sleep 11s
+
+# Sleep one second more if running under valgrind
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  sleep 1
+fi
 
 echo "2: ++++++++++++++++++++"
 curl localhost:${LISTENER_PORT}/dump -s -S 
