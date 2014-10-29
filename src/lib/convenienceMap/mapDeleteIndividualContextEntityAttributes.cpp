@@ -59,7 +59,7 @@ HttpStatusCode mapDeleteIndividualContextEntityAttributes
   ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Delete");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   *response = ucResponse.contextElementResponseVector.get(0)->statusCode;
 

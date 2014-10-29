@@ -62,7 +62,7 @@ HttpStatusCode mapDeleteIndividualContextEntityAttribute
   ucRequest.contextElementVector.push_back(&ce);
 
   ucResponse.errorCode.code = SccOk;
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   //
   // Only one contextAttribute in request contextAttributeVector, so there will be only one 

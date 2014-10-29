@@ -213,14 +213,28 @@ static std::string scopeType(const std::string& path, const std::string& value, 
 
 /* ****************************************************************************
 *
+* scopeOperator - 
+*/
+static std::string scopeOperator(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  reqDataP->qcr.scopeP->oper = value;
+  LM_T(LmtParse, ("Set scope 'operator' to '%s' for a scope", reqDataP->qcr.scopeP->oper.c_str()));
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * scopeValue -
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
-  if (reqDataP->qcr.scopeP->type == FIWARE_LOCATION)
+  if (reqDataP->qcr.scopeP->type == FIWARE_LOCATION || reqDataP->qcr.scopeP->type == FIWARE_LOCATION_DEPRECATED)
   {
     //
-    // If the scope type is 'FIWARE_Location', then the value of this scope is stored in 'circle' or 'polygon'.
+    // If the scope type is FIWARE_LOCATION' (or its deprecated variant), then the value of this scope is stored in 'circle' or 'polygon'.
     // The field 'value' is not used as more complexity is needed.
     // scopeP->value is here set to FIWARE_LOCATION, in an attempt to warn a future use of 'scopeP->value' when
     // instead 'circle' or 'polygon' should be used.
@@ -426,6 +440,7 @@ JsonNode jsonQcrParseVector[] =
   { "/restriction/scopes",                                                 jsonNullTreat           },
   { "/restriction/scopes/scope",                                           operationScope          },
   { "/restriction/scopes/scope/type",                                      scopeType               },
+  { "/restriction/scopes/scope/operator",                                  scopeOperator           },
   { "/restriction/scopes/scope/value",                                     scopeValue              },
 
   { "/restriction/scopes/scope/value/circle",                              circle                  },

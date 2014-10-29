@@ -21,11 +21,13 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Geo query circle
+Geo query circle - deprecated
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 --SHELL--
+# The tests in this file use FIWARE_Location (instead of FIWARE::Location), which was deprecated
+# in Orion 0.16.0
 
 echo "1: +++++++++ Prepare entity for Madrid +++++++++++"
 # Create entities corresponding to the three cities

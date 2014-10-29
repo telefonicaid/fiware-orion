@@ -31,6 +31,7 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
+#include "ngsi/Scope.h"
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
@@ -47,6 +48,7 @@ HttpStatusCode mapGetIndividualContextEntity
 (
   const std::string&       entityId,
   const std::string&       entityType,
+  EntityTypeInfo           typeInfo,
   ContextElementResponse*  response,
   ConnectionInfo*          ciP
 )
@@ -57,10 +59,21 @@ HttpStatusCode mapGetIndividualContextEntity
   EntityId              entity(entityId, entityType, "false");
 
   // Here I fill in the 'query' entityId for the response
-  response->contextElement.entityId.fill(entityId, "", "false");
-
+  response->contextElement.entityId.fill(entityId, entityType, "false");
   qcRequest.entityIdVector.push_back(&entity);
+
+  if ((typeInfo == EntityTypeEmpty) || (typeInfo == EntityTypeNotEmpty))
+  {
+    Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
+
+    scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
+      
+    qcRequest.restriction.scopeVector.push_back(scopeP);
+  }
+
   ms = mongoQueryContext(&qcRequest, &qcResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+
+  qcRequest.restriction.release();
 
   if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
   {
@@ -80,6 +93,7 @@ HttpStatusCode mapGetIndividualContextEntity
     response->contextElement.contextAttributeVector.push_back(ca);
   }
 
+  response->contextElement.entityId.type = qcResponse.contextElementResponseVector.get(0)->contextElement.entityId.type;
   response->statusCode.fill(&qcResponse.contextElementResponseVector.get(0)->statusCode);
 
   return ms;

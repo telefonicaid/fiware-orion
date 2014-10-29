@@ -46,11 +46,17 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
         /* We use 'ucr' to conform processContextElement signature but we are not doing anything with that */
         UpdateContextResponse ucr;
 
-        // FIXME P10: we need to pass an empty service path vector in order to fulfill the processContextElement signature(). To review,
+        // FIXME P10: we need to pass an empty service path vector and uriParmas in order to fulfill the processContextElement signature(). To review,
         // once we implement service path also for subscriptions/notifications
-        std::vector<std::string> servicePathV;        
+        std::vector<std::string> servicePathV;
+        std::map<std::string, std::string> uriParams;
 
-        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement, &ucr, "append", tenant, servicePathV);
+        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement,
+                              &ucr,
+                              "append",
+                              tenant,
+                              servicePathV,
+                              uriParams);
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 notification");

@@ -65,7 +65,7 @@ HttpStatusCode mapPostIndividualContextEntityAttribute
   ucRequest.updateActionType.set("Append");
 
   ucResponse.errorCode.fill(SccOk);
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   //
   // Only one contextAttribute in request contextAttributeVector, so there will be only one 

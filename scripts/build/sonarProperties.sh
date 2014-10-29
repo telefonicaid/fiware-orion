@@ -39,7 +39,7 @@ echo product.release=\"$VERSION\"
 ### LANGUAGE
 echo sonar.language=c++
 ### EXCLUSIONS
-echo sonar.exclusions=lib/parseArgs/*,lib/logMsg/*
+echo sonar.exclusions=**/lib/parseArgs/**,**/lib/logMsg/**,/usr/**
 ### TESTS 
 echo sonar.cxx.xunit.reportPath=BUILD_UNITTEST/unit_test.xml
 echo sonar.cxx.coverage.reportPath=coverage_sonar.xml

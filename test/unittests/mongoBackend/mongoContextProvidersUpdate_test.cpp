@@ -331,7 +331,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -381,7 +381,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -439,7 +439,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -495,7 +495,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -551,7 +551,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralCREs)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -603,7 +603,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralRegistrations)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -654,7 +654,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoEntity)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -706,7 +706,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -761,7 +761,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -827,7 +827,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -898,7 +898,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -979,7 +979,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1039,7 +1039,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1086,7 +1086,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrSingle)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1135,7 +1135,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrMulti)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1186,7 +1186,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNAttr)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1233,7 +1233,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1285,7 +1285,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNoType)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1337,7 +1337,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
   req.updateActionType.set("UPDATE");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);

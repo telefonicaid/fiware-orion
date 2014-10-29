@@ -21,26 +21,26 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Geo query (circle) JSON test
+Geo query test (polygon)
 
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "1. Create entity corresponding to Madrid"
+echo "1: +++++++++ Point A +++++++++++"
 url="/v1/updateContext"
 payload='{
   "contextElements": [
   {
-    "type": "City",
+    "type": "Point",
     "isPattern": "false",
-    "id": "Madrid",
+    "id": "A",
     "attributes": [
     {
       "name": "location",
       "type": "coords",
-      "value": "40.418889, -3.691944",
+      "value": "3, 2",
       "metadatas": [
         {
           "name": "location",
@@ -55,53 +55,24 @@ payload='{
   "updateAction": "APPEND"
 }'
 orionCurl --url "$url" --payload "$payload" --json
-echo
 sleep 1.1
-
-echo "2. Create entity corresponding to Alcobendas"
-url="/v1/updateContext"
-payload='{
-  "contextElements": [
-  {
-    "type": "City",
-    "isPattern": "false",
-    "id": "Alcobendas",
-    "attributes": [
-    {
-      "name": "location",
-      "type": "coords",
-      "value": "40.533333, -3.633333",
-      "metadatas": [
-        {
-          "name": "location",
-          "type": "string",
-          "value": "WSG84"
-        }
-      ]
-    }
-    ]
-  }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url "$url" --payload "$payload" --json
 echo
-sleep 1.1
+echo
 
 
-echo "3. Create entity corresponding to Leganes"
+echo "2: +++++++++ Point B +++++++++++"
 url="/v1/updateContext"
 payload='{
   "contextElements": [
   {
-    "type": "City",
+    "type": "Point",
     "isPattern": "false",
-    "id": "Leganes",
+    "id": "B",
     "attributes": [
     {
       "name": "location",
       "type": "coords",
-      "value": "40.316667, -3.75",
+      "value": "5, 5",
       "metadatas": [
         {
           "name": "location",
@@ -116,71 +87,49 @@ payload='{
   "updateAction": "APPEND"
 }'
 orionCurl --url "$url" --payload "$payload" --json
+sleep 1.1
+echo
+echo
 
 
-echo "4: ++++++++++ Madrid in 13.5 kms ++++++++++"
-# Query inside 13.5 kms radius from Madrid center
-url="/v1/queryContext"
+echo "3: +++++++++ Point C +++++++++++"
+url="/v1/updateContext"
 payload='{
-    "entities": [
+  "contextElements": [
+  {
+    "type": "Point",
+    "isPattern": "false",
+    "id": "C",
+    "attributes": [
+    {
+      "name": "location",
+      "type": "coords",
+      "value": "7, 4",
+      "metadatas": [
         {
-            "type": "City",
-            "isPattern": "true",
-            "id": ".*"
+          "name": "location",
+          "type": "string",
+          "value": "WSG84"
         }
-    ],
-    "restriction": {
-        "scopes": [
-            {
-                "type" : "FIWARE_Location",
-                "value" : {
-                  "circle": {
-                    "centerLatitude": "40.418889",
-                    "centerLongitude": "-3.691944",
-                    "radius": "13500"
-                  }
-                }
-            }
-        ]
+      ]
     }
+    ]
+  }
+  ],
+  "updateAction": "APPEND"
 }'
 orionCurl --url "$url" --payload "$payload" --json
+sleep 1.1
+echo
+echo
 
-echo "5: +++++++++++ Madrid in 15 kms +++++++++"
-# Query inside 15 kms radius from Madrid center
-url="/v1/queryContext"
-payload='{
-    "entities": [
-        {
-            "type": "City",
-            "isPattern": "true",
-            "id": ".*"
-        }
-    ],
-    "restriction": {
-        "scopes": [
-            {
-                "type" : "FIWARE_Location",
-                "value" : {
-                  "circle": {
-                    "centerLatitude": "40.418889",
-                    "centerLongitude": "-3.691944",
-                    "radius": "15000"
-                  }
-                }
-            }
-        ]
-    }
-}'
-orionCurl --url "$url" --payload "$payload" --json
 
-echo "6: ++++++++++++ Madrid out 13.5 kms ++++++++"
-# Query in 13.5 kms radius outside Madrid center
+echo "4: ++++++++++ Rectangle in: A, B ++++++++++"
 url="/v1/queryContext"
 payload='{
   "entities": [
   {
-    "type": "City",
+    "type": "Point",
     "isPattern": "true",
     "id": ".*"
   }
@@ -188,12 +137,158 @@ payload='{
   "restriction": {
     "scopes": [
     {
-      "type" : "FIWARE_Location",
+      "type" : "FIWARE::Location",
       "value" : {
-        "circle": {
-          "centerLatitude": "40.418889",
-          "centerLongitude": "-3.691944",
-          "radius": "13500",
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "5: ++++++++++ Rectangle in: B, C ++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "3",
+            "longitude": "3"
+          },
+          {
+            "latitude": "3",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "3"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "6: ++++++++++ Triangle in: A ++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ]
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "7: ++++++++++ Rectangle out: A ++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "3",
+            "longitude": "3"
+          },
+          {
+            "latitude": "3",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "8"
+          },
+          {
+            "latitude": "11",
+            "longitude": "3"
+          }
+          ],
           "inverted": "true"
         }
       }
@@ -202,9 +297,289 @@ payload='{
   }
 }'
 orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
+
+echo "8: ++++++++++ Triangle out: B, C ++++++++++"
+url="/v1/queryContext"
+payload='{
+  "entities": [
+  {
+    "type": "Point",
+    "isPattern": "true",
+    "id": ".*"
+  }
+  ],
+  "restriction": {
+    "scopes": [
+    {
+      "type" : "FIWARE::Location",
+      "value" : {
+        "polygon": {
+          "vertices": [
+          {
+            "latitude": "0",
+            "longitude": "0"
+          },
+          {
+            "latitude": "0",
+            "longitude": "6"
+          },
+          {
+            "latitude": "6",
+            "longitude": "0"
+          }
+          ],
+          "inverted": "true"
+        }
+      }
+    }
+    ]
+  }
+}'
+orionCurl --url "$url" --payload "$payload" --json
+echo
+echo
+
 
 --REGEXPECT--
-1. Create entity corresponding to Madrid
+1: +++++++++ Point A +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+2: +++++++++ Point B +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+3: +++++++++ Point C +++++++++++
+HTTP/1.1 200 OK
+Content-Length: 572
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": ""
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+4: ++++++++++ Rectangle in: A, B ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "3, 2"
+                    }
+                ],
+                "id": "A",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+5: ++++++++++ Rectangle in: B, C ++++++++++
+HTTP/1.1 200 OK
+Content-Length: 1120
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "5, 5"
+                    }
+                ],
+                "id": "B",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "location",
+                                "type": "string",
+                                "value": "WSG84"
+                            }
+                        ],
+                        "name": "location",
+                        "type": "coords",
+                        "value": "7, 4"
+                    }
+                ],
+                "id": "C",
+                "isPattern": "false",
+                "type": "Point"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+6: ++++++++++ Triangle in: A ++++++++++
 HTTP/1.1 200 OK
 Content-Length: 576
 Content-Type: application/json
@@ -225,12 +600,12 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": ""
+                        "value": "3, 2"
                     }
                 ],
-                "id": "Madrid",
+                "id": "A",
                 "isPattern": "false",
-                "type": "City"
+                "type": "Point"
             },
             "statusCode": {
                 "code": "200",
@@ -240,9 +615,10 @@ Date: REGEX(.*)
     ]
 }
 
-2. Create entity corresponding to Alcobendas
+
+7: ++++++++++ Rectangle out: A ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 580
+Content-Length: 576
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -261,12 +637,12 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": ""
+                        "value": "3, 2"
                     }
                 ],
-                "id": "Alcobendas",
+                "id": "A",
                 "isPattern": "false",
-                "type": "City"
+                "type": "Point"
             },
             "statusCode": {
                 "code": "200",
@@ -276,9 +652,10 @@ Date: REGEX(.*)
     ]
 }
 
-3. Create entity corresponding to Leganes
+
+8: ++++++++++ Triangle out: B, C ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 577
+Content-Length: 1120
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -297,47 +674,12 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": ""
+                        "value": "5, 5"
                     }
                 ],
-                "id": "Leganes",
+                "id": "B",
                 "isPattern": "false",
-                "type": "City"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-4: ++++++++++ Madrid in 13.5 kms ++++++++++
-HTTP/1.1 200 OK
-Content-Length: 1157
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "40.418889, -3.691944"
-                    }
-                ],
-                "id": "Madrid",
-                "isPattern": "false",
-                "type": "City"
+                "type": "Point"
             },
             "statusCode": {
                 "code": "200",
@@ -357,12 +699,12 @@ Date: REGEX(.*)
                         ],
                         "name": "location",
                         "type": "coords",
-                        "value": "40.316667, -3.75"
+                        "value": "7, 4"
                     }
                 ],
-                "id": "Leganes",
+                "id": "C",
                 "isPattern": "false",
-                "type": "City"
+                "type": "Point"
             },
             "statusCode": {
                 "code": "200",
@@ -371,125 +713,7 @@ Date: REGEX(.*)
         }
     ]
 }
-5: +++++++++++ Madrid in 15 kms +++++++++
-HTTP/1.1 200 OK
-Content-Length: 1725
-Content-Type: application/json
-Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "40.418889, -3.691944"
-                    }
-                ],
-                "id": "Madrid",
-                "isPattern": "false",
-                "type": "City"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "40.533333, -3.633333"
-                    }
-                ],
-                "id": "Alcobendas",
-                "isPattern": "false",
-                "type": "City"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "40.316667, -3.75"
-                    }
-                ],
-                "id": "Leganes",
-                "isPattern": "false",
-                "type": "City"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-6: ++++++++++++ Madrid out 13.5 kms ++++++++
-HTTP/1.1 200 OK
-Content-Length: 600
-Content-Type: application/json
-Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "metadatas": [
-                            {
-                                "name": "location",
-                                "type": "string",
-                                "value": "WSG84"
-                            }
-                        ],
-                        "name": "location",
-                        "type": "coords",
-                        "value": "40.533333, -3.633333"
-                    }
-                ],
-                "id": "Alcobendas",
-                "isPattern": "false",
-                "type": "City"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 --TEARDOWN--
 brokerStop CB

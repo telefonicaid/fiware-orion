@@ -75,7 +75,7 @@ payload='<?xml version="1.0"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <centerLatitude>40</centerLatitude>
@@ -116,7 +116,7 @@ payload='<?xml version="1.0"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <polygon>
             <vertexList>
