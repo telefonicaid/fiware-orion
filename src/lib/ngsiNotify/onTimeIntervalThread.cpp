@@ -155,14 +155,14 @@ void* startOnIntervalThread(void* p)
     // Do the work (we put this in a function as error conditions would produce an
     // early interruption of the process)
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldState);
-    LM_M(("OnTimeInterval thread is now NOT CANCELABLE"));
+    LM_T(LmtOntimeIntervalThreads, ("OnTimeInterval thread is now NOT CANCELABLE"));
     doNotification(params, params->tenant);
-    LM_M(("OnTimeInterval thread to be CANCELABLE"));
+    LM_T(LmtOntimeIntervalThreads, ("OnTimeInterval thread to be CANCELABLE"));
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldState);
 
-    LM_M(("OnTimeInterval thread sleeps CANCELABLE"));
+    LM_T(LmtOntimeIntervalThreads, ("OnTimeInterval thread sleeps CANCELABLE"));
     sleep(params->interval);
-    LM_M(("OnTimeInterval thread awakes CANCELABLE"));
+    LM_T(LmtOntimeIntervalThreads, ("OnTimeInterval thread awakes CANCELABLE"));
   }
 
   return NULL;
