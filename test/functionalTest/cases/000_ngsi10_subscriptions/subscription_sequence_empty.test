@@ -109,8 +109,14 @@ orionCurl --url "$url" --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "3: ++++++++++++++++++++"
-#Wait 4 seconds, so we will receive two notifications
+# Wait 4 seconds, so we will receive two notifications
 sleep 4
+
+# Sleep one second more if running under valgrind
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  sleep 1
+fi
 
 url="/v1/unsubscribeContext"
 payload='<?xml version="1.0"?>
@@ -143,8 +149,14 @@ orionCurl --url "$url" --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
 
 echo "5: ++++++++++++++++++++"
-#Wait 5 seconds, so we will receive two notifications
+# Wait 5 seconds, so we receive two notifications
 sleep 5
+
+# Sleep one second more if running under valgrind
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  sleep 1
+fi
 
 url="/v1/unsubscribeContext"
 payload='<?xml version="1.0"?>
@@ -235,7 +247,11 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 echo "10: ++++++++++++++++++++"
-#Get accumulated data
+# Get accumulated data - if running under valgrind, sleep 2 secs, to make sure the onchange notifications have time to arrive 
+if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+then
+  sleep 2
+fi
 curl localhost:${LISTENER_PORT}/dump -s -S
 
 --REGEXPECT--
