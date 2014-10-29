@@ -1042,6 +1042,16 @@ void orionExit(int code, const std::string& reason)
     LM_E(("Fatal Error (reason: %s)", reason.c_str()));
   }
 
+  //
+  // Cancel all threads to avoid false leaks in valgrind
+  //
+  std::vector<std::string> dbs;
+  getOrionDatabases(dbs);
+  for (unsigned int ix = 0; ix < dbs.size(); ++ix)
+  {
+    destroyAllOntimeIntervalThreads(dbs[ix]);
+  }
+
   exit(code);
 }
 
