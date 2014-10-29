@@ -67,6 +67,8 @@ HttpStatusCode mapPostIndividualContextEntityAttribute
   ucResponse.errorCode.fill(SccOk);
   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
+  ucRequest.release();
+
   //
   // Only one contextAttribute in request contextAttributeVector, so there will be only one 
   // item in ucResponse.contextElementResponseVector.
