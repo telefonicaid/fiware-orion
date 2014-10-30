@@ -1720,6 +1720,13 @@ void processContextElement(ContextElement*                  ceP,
         std::string err;
         processSubscriptions(enP, subsToNotify, err, tenant);
 
+        //
+        // processSubscriptions cleans up the triggered subscriptions; this call here to
+        // 'releaseTriggeredSubscriptions' is just an extra life-line.
+        // Especially it makes us have all the cleanup of the triggered subscriptions in
+        // ONE function.
+        // The memory to free is allocated in the function addTriggeredSubscriptions.
+        //
         releaseTriggeredSubscriptions(subsToNotify);
 
         /* To finish with this entity processing, add the corresponding ContextElementResponse to
