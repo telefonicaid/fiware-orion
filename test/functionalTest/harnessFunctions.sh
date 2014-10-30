@@ -277,15 +277,20 @@ function brokerStop
   fi
 
   if [ "$VALGRIND" == "" ]; then
+    echo "Killing broker" > /tmp/kz
     kill $(cat $pidFile 2> /dev/null) 2> /dev/null
     if [ -f /tmp/orion_${port}.pid ]
     then
       rm -f /tmp/orion_${port}.pid 2> /dev/null
     fi
   else
+    echo $(date) " Sending /exit/harakiri to broker" > /tmp/kz
+    
     curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
     # Waiting for valgrind to terminate (sleep 10)
+    echo $(date) " Sleeping 10 secs" >> /tmp/kz
     sleep 10
+    echo $(date) " Slept 10 secs" >> /tmp/kz
   fi
 }
 
