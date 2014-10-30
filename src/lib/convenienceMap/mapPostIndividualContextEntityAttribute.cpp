@@ -53,15 +53,15 @@ HttpStatusCode mapPostIndividualContextEntityAttribute
   HttpStatusCode         ms;
   UpdateContextRequest   ucRequest;
   UpdateContextResponse  ucResponse;
-  ContextElement         ce;
-  ContextAttribute       attribute(attributeName, request->type, request->contextValue);
+  ContextElement*        ceP = new ContextElement();
+  ContextAttribute*      attributeP = new ContextAttribute(attributeName, request->type, request->contextValue);
 
-  ce.entityId.fill(entityId, entityType, "false");
-  ce.contextAttributeVector.push_back(&attribute);
+  ceP->entityId.fill(entityId, entityType, "false");
+  ceP->contextAttributeVector.push_back(attributeP);
 
-  attribute.metadataVector.fill(&request->metadataVector);
+  attributeP->metadataVector.fill(&request->metadataVector);
 
-  ucRequest.contextElementVector.push_back(&ce);
+  ucRequest.contextElementVector.push_back(ceP);
   ucRequest.updateActionType.set("Append");
 
   ucResponse.errorCode.fill(SccOk);
