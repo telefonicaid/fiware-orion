@@ -1047,13 +1047,12 @@ void orionExit(int code, const std::string& reason)
   //
   std::vector<std::string> dbs;
   getOrionDatabases(dbs);
-  LM_M(("Cancel all threads (in %lu dbs) to avoid false leaks in valgrind", dbs.size()));
   for (unsigned int ix = 0; ix < dbs.size(); ++ix)
   {
-    LM_M(("Cancel threads for '%s'", dbs[ix].c_str()));
     destroyAllOntimeIntervalThreads(dbs[ix]);
   }
 
+  mongoDisconnect();
   exit(code);
 }
 

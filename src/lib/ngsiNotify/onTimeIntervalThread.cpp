@@ -150,19 +150,16 @@ void* startOnIntervalThread(void* p)
   while (true)
   {
     strncpy(transactionId, "N/A", sizeof(transactionId));
-    LM_T(LmtNotifier, ("ONTIMEINTERVAL thread wakes up (%s)", params->subId.c_str()));
 
+    //
     // Do the work (we put this in a function as error conditions would produce an
     // early interruption of the process)
+    //
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldState);
-    LM_T(LmtOntimeIntervalThreads, ("OnTimeInterval thread is now NOT CANCELABLE"));
     doNotification(params, params->tenant);
-    LM_T(LmtOntimeIntervalThreads, ("OnTimeInterval thread to be CANCELABLE"));
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldState);
 
-    LM_T(LmtOntimeIntervalThreads, ("OnTimeInterval thread sleeps CANCELABLE"));
     sleep(params->interval);
-    LM_T(LmtOntimeIntervalThreads, ("OnTimeInterval thread awakes CANCELABLE"));
   }
 
   return NULL;

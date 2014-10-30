@@ -869,12 +869,13 @@ static bool addTriggeredSubscriptions(std::string                               
 
             long long throttling       = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
             long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? sub.getIntField(CSUB_LASTNOTIFICATION) : -1;
+            AttributeList al           = subToAttributeList(sub);
 
             TriggeredSubscription* trigs = new TriggeredSubscription(throttling,
                                                                     lastNotification,
                                                                     sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
                                                                     STR_FIELD(sub, CSUB_REFERENCE),
-                                                                    subToAttributeList(sub));
+                                                                    al);
 
             subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
         }
@@ -900,8 +901,9 @@ static bool processSubscriptions(const EntityId*                           enP,
     /* For each one of the subscriptions in the map, send notification */
     bool ret = true;
     err = "";
-    for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it) {
 
+    for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
+    {
         std::string  mapSubId        = it->first;
         TriggeredSubscription* trigs = it->second;
 
@@ -909,8 +911,13 @@ static bool processSubscriptions(const EntityId*                           enP,
         {
           long long current = getCurrentTime();
           long long sinceLastNotification = current - trigs->lastNotification;
-          if (trigs->throttling > sinceLastNotification) {
+          if (trigs->throttling > sinceLastNotification)
+          {
             LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
+
+            trigs->attrL.release();
+            delete trigs;
+
             continue;
           }
         }
@@ -1618,6 +1625,7 @@ void processContextElement(ContextElement*                  ceP,
         if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
+
             releaseTriggeredSubscriptions(subsToNotify);
             continue;
         }
@@ -1713,6 +1721,8 @@ void processContextElement(ContextElement*                  ceP,
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
         processSubscriptions(enP, subsToNotify, err, tenant);
+
+        releaseTriggeredSubscriptions(subsToNotify);
 
         /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */

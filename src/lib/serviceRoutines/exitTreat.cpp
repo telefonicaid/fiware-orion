@@ -82,7 +82,6 @@ std::string exitTreat
   }
   else
   {
-    mongoDisconnect();
     compV.clear();
     return "DIE";
   }

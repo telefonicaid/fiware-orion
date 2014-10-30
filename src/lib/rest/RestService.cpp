@@ -40,6 +40,7 @@
 #include "rest/rest.h"
 #include "rest/uriParamNames.h"
 #include "ngsi/ParseData.h"
+#include "mongoBackend/MongoGlobal.h"  // mongoConnectionGet
 
 
 
