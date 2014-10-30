@@ -869,13 +869,12 @@ static bool addTriggeredSubscriptions(std::string                               
 
             long long throttling       = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
             long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? sub.getIntField(CSUB_LASTNOTIFICATION) : -1;
-            AttributeList al           = subToAttributeList(sub);
 
             TriggeredSubscription* trigs = new TriggeredSubscription(throttling,
                                                                     lastNotification,
                                                                     sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
                                                                     STR_FIELD(sub, CSUB_REFERENCE),
-                                                                    al);
+                                                                    subToAttributeList(sub));
 
             subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
         }
@@ -1625,7 +1624,6 @@ void processContextElement(ContextElement*                  ceP,
         if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
-
             releaseTriggeredSubscriptions(subsToNotify);
             continue;
         }

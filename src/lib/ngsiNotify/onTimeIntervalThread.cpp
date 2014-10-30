@@ -150,11 +150,10 @@ void* startOnIntervalThread(void* p)
   while (true)
   {
     strncpy(transactionId, "N/A", sizeof(transactionId));
+    LM_T(LmtNotifier, ("ONTIMEINTERVAL thread wakes up (%s)", params->subId.c_str()));
 
-    //
     // Do the work (we put this in a function as error conditions would produce an
     // early interruption of the process)
-    //
     pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, &oldState);
     doNotification(params, params->tenant);
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, &oldState);

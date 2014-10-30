@@ -1730,7 +1730,7 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
 {
   for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
-    delete it->second;
+      delete it->second;
   }
   subs.clear();
 }
