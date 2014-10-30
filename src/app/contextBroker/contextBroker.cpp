@@ -1052,6 +1052,7 @@ void orionExit(int code, const std::string& reason)
     destroyAllOntimeIntervalThreads(dbs[ix]);
   }
 
+  mongoDisconnect();
   exit(code);
 }
 

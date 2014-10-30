@@ -900,8 +900,9 @@ static bool processSubscriptions(const EntityId*                           enP,
     /* For each one of the subscriptions in the map, send notification */
     bool ret = true;
     err = "";
-    for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it) {
 
+    for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
+    {
         std::string  mapSubId        = it->first;
         TriggeredSubscription* trigs = it->second;
 
@@ -909,8 +910,13 @@ static bool processSubscriptions(const EntityId*                           enP,
         {
           long long current = getCurrentTime();
           long long sinceLastNotification = current - trigs->lastNotification;
-          if (trigs->throttling > sinceLastNotification) {
+          if (trigs->throttling > sinceLastNotification)
+          {
             LM_T(LmtMongo, ("blocked due to throttling, current time is: %l", current));
+
+            trigs->attrL.release();
+            delete trigs;
+
             continue;
           }
         }
@@ -1713,6 +1719,15 @@ void processContextElement(ContextElement*                  ceP,
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
         processSubscriptions(enP, subsToNotify, err, tenant);
+
+        //
+        // processSubscriptions cleans up the triggered subscriptions; this call here to
+        // 'releaseTriggeredSubscriptions' is just an extra life-line.
+        // Especially it makes us have all the cleanup of the triggered subscriptions in
+        // ONE function.
+        // The memory to free is allocated in the function addTriggeredSubscriptions.
+        //
+        releaseTriggeredSubscriptions(subsToNotify);
 
         /* To finish with this entity processing, add the corresponding ContextElementResponse to
          * the global response */
