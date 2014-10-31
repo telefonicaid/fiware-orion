@@ -36,11 +36,15 @@ __author__ = 'fermin'
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
 
 from flask import Flask, request, Response
-from sys import argv
+from sys import argv, exit
 from datetime import datetime
 from math import trunc
 import os
-app = Flask(__name__)
+import atexit
+
+# This function is registered to be called upon termination
+def all_done():
+    os.unlink(pidfile)
 
 # Default arguments
 port = 1028
@@ -65,6 +69,19 @@ if len(argv) > 4:
         print 'verbose mode is on'
         verbose = 1
 
+pid = str(os.getpid())
+pidfile = "/tmp/accumulator." + str(port) + ".pid"
+
+
+if os.path.isfile(pidfile):
+    print "%s already exists, exiting" % pidfile
+    exit(1)
+else:
+    file(pidfile, 'w').write(pid)
+
+atexit.register(all_done)
+
+app = Flask(__name__)
 
 @app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE'])
 def record():
@@ -149,4 +166,7 @@ t0 = ''
 times = []
 
 if __name__ == '__main__':
-    app.run(host=host, port=port, debug=True)
+    # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
+    # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
+    # use debug=True below with care :)
+    app.run(host=host, port=port)
