@@ -355,36 +355,13 @@ function accumulatorStop()
     port=${LISTENER_PORT}
   fi
 
-  apid=$(curl localhost:$port/pid -s -S 2> /dev/null)
-  if [ "$apid" != "" ]
-  then
-    kill $apid 2> /dev/null
-  fi
-
-  sleep 1
-
-  running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
-
-  if [ $running_app -ne 0 ]
-  then
-    kill $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}') 2> /dev/null
-    # Wait some time so the accumulator can finish properly
-    sleep 1
-    running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
-    if [ $running_app -ne 0 ]
-    then
-      # If the accumulator refuses to stop politely, kill the process by brute force
-      kill -9 $(ps -fe | grep accumulator-server | grep $port | awk '{print $2}') 2> /dev/null
-      sleep 1
-      running_app=$(ps -fe | grep accumulator-server | grep $port | wc -l)
-
-      if [ $running_app -ne 0 ]
-      then
-        echo "Existing accumulator-server.py is immortal, can not be killed!"
-        exit 1
-      fi
-    fi
-  fi
+  pid=$(cat /tmp/accumulator.$port.pid)
+  kill -15 $pid
+  sleep .1
+  kill -2 $pid
+  sleep .1
+  kill -9 $pid
+  rm -f /tmp/accumulator.$port.pid
 }
 
 
@@ -407,6 +384,10 @@ function accumulatorStart()
 
   accumulator-server.py $port /notify $bindIp 2> /tmp/accumulator_$port &
   echo accumulator running as PID $$
+
+  echo "------------ PS -----------------"
+  ps aux | grep accumulator
+  echo "---------------------------------"
 
   # Wait until accumulator has started or we have waited a given maximum time
   port_not_ok=1

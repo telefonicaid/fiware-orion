@@ -34,13 +34,18 @@ __author__ = 'fermin'
 #   in the past)
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
-
+#
 from flask import Flask, request, Response
 from sys import argv, exit
 from datetime import datetime
 from math import trunc
+from time import sleep
 import os
 import atexit
+import string
+import signal
+
+
 
 # This function is registered to be called upon termination
 def all_done():
@@ -69,17 +74,43 @@ if len(argv) > 4:
         print 'verbose mode is on'
         verbose = 1
 
+print "Starting"
+
 pid = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"
 
-
+#
+# If an accumulator process is already running, it is killed.
+# First using SIGTERM, then SIGINT and finally SIGKILL
+# The exception handling is needed as this process dies in case
+# a kill is issued on a non-running process ...
+#
 if os.path.isfile(pidfile):
-    print "%s already exists, exiting" % pidfile
-    exit(1)
-else:
-    file(pidfile, 'w').write(pid)
+    oldpid = file(pidfile, 'r').read()
+    opid   = string.atoi(oldpid)
+    print "PID file %s already exists, killing the process %s" % (pidfile, oldpid)
 
+    try: 
+        os.kill(opid, signal.SIGTERM);
+        sleep(0.1)
+        os.kill(opid, signal.SIGINT);
+        sleep(0.1)
+        os.kill(opid, signal.SIGKILL);
+    except:
+        print "Process %d killed" % opid
+
+
+#
+# Creating the pidfile of the currently running process
+#
+file(pidfile, 'w').write(pid)
+
+#
+# Making the function all_done being executed on exit of this process.
+# all_done removes the pidfile
+#
 atexit.register(all_done)
+
 
 app = Flask(__name__)
 
