@@ -91,11 +91,14 @@ if os.path.isfile(pidfile):
     print "PID file %s already exists, killing the process %s" % (pidfile, oldpid)
 
     try: 
+        oldstderr = sys.stderr
+        sys.stderr = open("/dev/null", "w")
         os.kill(opid, signal.SIGTERM);
         sleep(0.1)
         os.kill(opid, signal.SIGINT);
         sleep(0.1)
         os.kill(opid, signal.SIGKILL);
+        sys.stderr = oldstderr
     except:
         print "Process %d killed" % opid
 

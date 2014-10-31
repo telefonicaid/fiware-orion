@@ -356,11 +356,11 @@ function accumulatorStop()
   fi
 
   pid=$(cat /tmp/accumulator.$port.pid)
-  kill -15 $pid
+  kill -15 $pid 2> /dev/null
   sleep .1
-  kill -2 $pid
+  kill -2 $pid 2> /dev/null
   sleep .1
-  kill -9 $pid
+  kill -9 $pid 2> /dev/null
   rm -f /tmp/accumulator.$port.pid
 }
 
