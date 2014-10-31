@@ -355,13 +355,16 @@ function accumulatorStop()
     port=${LISTENER_PORT}
   fi
 
-  pid=$(cat /tmp/accumulator.$port.pid)
-  kill -15 $pid 2> /dev/null
-  sleep .1
-  kill -2 $pid 2> /dev/null
-  sleep .1
-  kill -9 $pid 2> /dev/null
-  rm -f /tmp/accumulator.$port.pid
+  pid=$(cat /tmp/accumulator.$port.pid 2> /dev/null)
+  if [ "$pid" != "" ]
+  then
+    kill -15 $pid 2> /dev/null
+    sleep .1
+    kill -2 $pid 2> /dev/null
+    sleep .1
+    kill -9 $pid 2> /dev/null
+    rm -f /tmp/accumulator.$port.pid
+  fi
 }
 
 
