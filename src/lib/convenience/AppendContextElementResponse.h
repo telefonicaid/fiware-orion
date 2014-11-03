@@ -30,6 +30,7 @@
 
 #include "common/Format.h"
 #include "convenience/ContextAttributeResponseVector.h"
+#include "ngsi/EntityId.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
 
@@ -43,9 +44,20 @@
 *           identical. They should 'merge' into ONE struct.
 *           This problem origins from an ?error? in the ngsi10 binding doc by NEC
 *           See: https://github.com/telefonicaid/fiware-orion/issues/106
+*
+* NOTE
+* The field 'entity' is:
+*   o MANDATORY for "POST /v1/contextEntities"
+*   o FORBIDDEN for "POST /v1/contextEntities/{entityId::id}"
+*
+* So, for its response (AppendContextElementResponse), the field 'entity' will be 
+* rendered if the response is for "POST /v1/contextEntities", but NOT if the
+* response is for "POST /v1/contextEntities{entityId::id}".
+* 
 */
 typedef struct AppendContextElementResponse
 {
+  EntityId                         entity;                  // See NOTE in type header above
   ContextAttributeResponseVector   contextResponseVector;   // Optional, but mandatory if success
   StatusCode                       errorCode;               // Optional, but mandatory if failure
 

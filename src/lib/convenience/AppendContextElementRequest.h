@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "common/Format.h"
+#include "ngsi/EntityId.h"
 #include "ngsi/AttributeDomainName.h"
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/MetadataVector.h"
@@ -39,9 +40,15 @@
 /* ****************************************************************************
 *
 * AppendContextElementRequest - 
+*
+* NOTE
+* The field 'entity' is:
+*   o MANDATORY for "POST /v1/contextEntities"
+*   o FORBIDDEN for "POST /v1/contextEntities/{entityId::id}"
 */
 typedef struct AppendContextElementRequest
 {
+  EntityId                   entity;                     // See NOTE in type header above
   AttributeDomainName        attributeDomainName;        // Optional
   ContextAttributeVector     contextAttributeVector;     // Optional
   MetadataVector             domainMetadataVector;       // Optional
