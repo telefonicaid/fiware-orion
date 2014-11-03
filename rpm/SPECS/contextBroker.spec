@@ -189,6 +189,27 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Nov 03 2014 Fermin Galan <fermin@tid.es> 0.16.0-1 (FIWARE-4.1.1-1)
+- Add: Adding alternative (preferred) URLs: '/ngsi10' => '/v1' AND '/ngsi9' => '/v1/registry' (Issue #559)
+- Add: New convenience operation '/v1/contextEntities' - to get a list of ALL existing entities (Issue #563)
+- Add: New scopeType FIWARE::Filter::Existence (only with value "entity::type" in this version)
+- Add: New URI parameter '!exist=entity::type' to filter entities whose type is empty (Issue #570)
+- Add: New conv op URI parameter 'entity::type=TYPE' to filter by type (Issue #570)
+- Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id> (Issue #581)
+- Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id>/attributes/ATTRIBUTE_NAME (Issue #581)
+- Add: New convenience operations PUT/POST/GET/DELETE /v1/contextEntities/type/<type>/id/<id>/attributes/ATTRIBUTE_NAME/META_ID_VALUE (Issue #581)
+- Add: New convenience operations POST/GET /v1/registry/contextEntities/type/<type>/id/<id> (Issue #581)
+- Add: New convenience operations POST/GET /v1/registry/contextEntities/type/<type>/id/<id>/attributes/ATTRIBUTE_NAME (Issue #581)
+- Fix: Upgrading from a previous RPM package caused the orion user to disappear.
+- Fix: Change service path HTTP header name: 'ServicePath' -> 'Fiware-ServicePath' (Issue #541)
+- Fix: Avoid unneeded additional query on csubs/casubs collections to get details of ONCHANGE triggered subscription when processing updateContext (Issue #371)
+- Fix: Some convenience operations responsed always with empty type (Issue #585)
+- Fix: 'FIWARE_Location' scope type changed to 'FIWARE::Location' (although the old one is still supported)
+- Fix: More detailed error responses for some convenience operations:
+       - POST/DELETE /v1/contextEntities/EID/attributes/ATTR_NAME
+       - POST/DELETE /v1/contextEntities/type/TYPE/id/ID/attributes/ATTR_NAME
+       Also the POST variant of these two URLs always returned 200 OK. Not anymore.
+
 * Wed Oct 01 2014 Fermin Galan <fermin@tid.es> 0.15.0-1 (FIWARE-3.5.3-1)
 - Add: context providers basic functionality (Issue #499)
 - Add: alternative rendering of ContextAttribute for JSON (Issue #490)
