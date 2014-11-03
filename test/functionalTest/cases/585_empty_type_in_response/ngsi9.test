@@ -34,6 +34,8 @@ brokerStart CB
 # 03. Discover with convop GET /v1/registry/contextEntities/Room/attributes/temperature
 # 04. Discover with convop GET /v1/registry/contextEntityTypes/Room
 # 05. Discover with convop GET /v1/registry/contextEntityTypes/Room/attributes/temperature
+# 06. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room
+# 07. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature
 #
 
 echo "01. Register an entity with type Room and id Room"
@@ -92,6 +94,19 @@ echo
 echo "05. Discover with convop GET /v1/registry/contextEntityTypes/Room/attributes/temperature"
 echo "========================================================================================"
 orionCurl --url /v1/registry/contextEntityTypes/Room/attributes/temperature --json
+echo
+echo
+
+echo "06. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room"
+echo "==========================================================================="
+orionCurl --url /v1/registry/contextEntities/type/Room/id/Room --json
+echo
+echo
+
+
+echo "07. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature"
+echo "=================================================================================================="
+orionCurl --url /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature --json
 echo
 echo
 
@@ -249,6 +264,69 @@ Date: REGEX(.*)
 }
 
 
+06. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 474
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "Room", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
+07. Discover with convop GET /v1/registry/contextEntities/type/Room/id/Room/attributes/temperature
+==================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 474
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "temperature", 
+                        "type": "degree"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "Room", 
+                        "isPattern": "false", 
+                        "type": "Room"
+                    }
+                ], 
+                "providingApplication": "http://localhost:1028/application"
+            }
+        }
+    ]
+}
+
+
 --TEARDOWN--
 brokerStop CB
-
