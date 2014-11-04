@@ -49,12 +49,15 @@ orionCurl --url "/v1/contextEntities/entity01/attributes" -X "GET"
 --REGEXPECT--
 +++++ 1. create an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 498
+Content-Length: 573
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>entity01</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>

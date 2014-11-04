@@ -132,7 +132,7 @@ orionCurl --url "/v1/contextEntities/EObject/attributes/att/wall" --json
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 685
+Content-Length: 745
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -143,38 +143,41 @@ Date: REGEX(.*)
                 {
                     "metadatas": [
                         {
-                            "name": "ID",
-                            "type": "string",
+                            "name": "ID", 
+                            "type": "string", 
                             "value": "ground"
                         }
                     ],
-                    "name": "att",
-                    "type": "compound",
+                    "name": "att", 
+                    "type": "compound", 
                     "value": ""
-                },
+                }, 
                 {
                     "metadatas": [
                         {
-                            "name": "ID",
-                            "type": "string",
+                            "name": "ID", 
+                            "type": "string", 
                             "value": "wall"
                         }
-                    ],
-                    "name": "att",
-                    "type": "compound",
+                    ], 
+                    "name": "att", 
+                    "type": "compound", 
                     "value": ""
                 }
-            ],
+            ], 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
-    ]
+    ],
+    "id": "EVector", 
+    "isPattern": "false", 
+    "type": ""
 }
 2: +++++++++ create object compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 685
+Content-Length: 745
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -185,34 +188,37 @@ Date: REGEX(.*)
                 {
                     "metadatas": [
                         {
-                            "name": "ID",
-                            "type": "string",
+                            "name": "ID", 
+                            "type": "string", 
                             "value": "ground"
                         }
-                    ],
-                    "name": "att",
-                    "type": "compound",
+                    ], 
+                    "name": "att", 
+                    "type": "compound", 
                     "value": ""
-                },
+                }, 
                 {
                     "metadatas": [
                         {
-                            "name": "ID",
-                            "type": "string",
+                            "name": "ID", 
+                            "type": "string", 
                             "value": "wall"
                         }
-                    ],
-                    "name": "att",
-                    "type": "compound",
+                    ], 
+                    "name": "att", 
+                    "type": "compound", 
                     "value": ""
                 }
-            ],
+            ], 
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
-    ]
+    ],
+    "id": "EObject", 
+    "isPattern": "false", 
+    "type": ""
 }
 3: ++++++++++ query for vector compound by valueID 'ground' ++++++++++
 HTTP/1.1 200 OK
@@ -225,31 +231,31 @@ Date: REGEX(.*)
         {
             "metadatas": [
                 {
-                    "name": "ID",
-                    "type": "string",
+                    "name": "ID", 
+                    "type": "string", 
                     "value": "ground"
                 }
-            ],
-            "name": "att",
-            "type": "compound",
+            ], 
+            "name": "att", 
+            "type": "compound", 
             "value": [
-                "22",
+                "22", 
                 {
                     "x": [
-                        "x1",
+                        "x1", 
                         "x2"
-                    ],
+                    ], 
                     "y": "3"
-                },
+                }, 
                 [
-                    "z1",
+                    "z1", 
                     "z2"
                 ]
             ]
         }
-    ],
+    ], 
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }
@@ -264,31 +270,31 @@ Date: REGEX(.*)
         {
             "metadatas": [
                 {
-                    "name": "ID",
-                    "type": "string",
+                    "name": "ID", 
+                    "type": "string", 
                     "value": "wall"
                 }
-            ],
-            "name": "att",
-            "type": "compound",
+            ], 
+            "name": "att", 
+            "type": "compound", 
             "value": [
-                "21",
+                "21", 
                 {
                     "a": [
-                        "a1",
+                        "a1", 
                         "a2"
-                    ],
+                    ], 
                     "b": "3"
-                },
+                }, 
                 [
-                    "c1",
+                    "c1", 
                     "z2"
                 ]
             ]
         }
-    ],
+    ], 
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }
@@ -303,27 +309,27 @@ Date: REGEX(.*)
         {
             "metadatas": [
                 {
-                    "name": "ID",
-                    "type": "string",
+                    "name": "ID", 
+                    "type": "string", 
                     "value": "ground"
                 }
-            ],
-            "name": "att",
-            "type": "compound",
+            ], 
+            "name": "att", 
+            "type": "compound", 
             "value": {
                 "x": {
-                    "x1": "a",
+                    "x1": "a", 
                     "x2": "b"
-                },
+                }, 
                 "y": [
-                    "y1",
+                    "y1", 
                     "y2"
                 ]
             }
         }
-    ],
+    ], 
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }
@@ -338,27 +344,27 @@ Date: REGEX(.*)
         {
             "metadatas": [
                 {
-                    "name": "ID",
-                    "type": "string",
+                    "name": "ID", 
+                    "type": "string", 
                     "value": "wall"
                 }
-            ],
-            "name": "att",
-            "type": "compound",
+            ], 
+            "name": "att", 
+            "type": "compound", 
             "value": {
                 "f": [
-                    "f1",
+                    "f1", 
                     "f2"
-                ],
+                ], 
                 "z": {
-                    "z1": "c",
+                    "z1": "c", 
                     "z2": "d"
                 }
             }
         }
-    ],
+    ], 
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }

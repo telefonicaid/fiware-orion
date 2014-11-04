@@ -1,2 +1,4 @@
 Add: New convop: "POST /v1/contextEntities" (Issue #613).
      Note also that AppendContextElementRequest has been added an EntityId field.
+Add: Convenience operations that respond with AppendContextElementResponse now get the
+     EntityId info included in the response.

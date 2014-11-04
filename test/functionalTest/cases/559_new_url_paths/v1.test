@@ -28,7 +28,7 @@ dbInit CB
 brokerStart CB
 --SHELL--
 
-echo "1. POST /v1/updateContext"
+echo "1.1. POST /v1/updateContext"
 echo "============================="
 payload='<?xml version="1.0"?>
 <updateContextRequest>
@@ -53,14 +53,14 @@ echo
 echo
 
 
-echo "1. NOP /v1/updateContext"
+echo "1.2. NOP /v1/updateContext"
 echo "============================"
 orionCurl --url /v1/updateContext --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "2. POST /v1/queryContext"
+echo "2.1. POST /v1/queryContext"
 echo "============================"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -79,14 +79,14 @@ echo
 echo
 
 
-echo "2. NOP /v1/queryContext"
+echo "2.2. NOP /v1/queryContext"
 echo "==========================="
 orionCurl --url /v1/queryContext --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "3. POST /v1/subscribeContext"
+echo "3.1. POST /v1/subscribeContext"
 echo "================================"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
@@ -105,14 +105,14 @@ echo
 echo
 
 
-echo "3. NOP /v1/subscribeContext"
+echo "3.2. NOP /v1/subscribeContext"
 echo "==============================="
 orionCurl --url /v1/subscribeContext --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "4. POST /v1/updateContextSubscription"
+echo "4.1. POST /v1/updateContextSubscription"
 echo "========================================="
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
@@ -132,14 +132,14 @@ echo
 echo
 
 
-echo "4. NOP /v1/updateContextSubscription"
+echo "4.2. NOP /v1/updateContextSubscription"
 echo "========================================"
 orionCurl --url /v1/updateContextSubscription --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "5. POST /v1/unsubscribeContext"
+echo "5.1. POST /v1/unsubscribeContext"
 echo "=================================="
 payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
@@ -150,21 +150,21 @@ echo
 echo
 
 
-echo "5. NOP /v1/unsubscribeContext"
+echo "5.2. NOP /v1/unsubscribeContext"
 echo "================================="
 orionCurl --url /v1/unsubscribeContext --payload "${payload}" -X NOP
 echo
 echo
 
 
-echo "6. GET /v1/contextEntities/EID"
+echo "6.1. GET /v1/contextEntities/EID"
 echo "=================================="
 orionCurl --url /v1/contextEntities/EID
 echo
 echo
 
 
-echo "6. PUT /v1/contextEntities/EID"
+echo "6.2. PUT /v1/contextEntities/EID"
 echo "================================="
 payload='<?xml version="1.0"?>
 <updateContextElementRequest>
@@ -181,7 +181,7 @@ echo
 echo
 
 
-echo "6. POST /v1/contextEntities/EID"
+echo "6.3. POST /v1/contextEntities/EID"
 echo "==================================="
 payload='<?xml version="1.0"?>
 <appendContextElementRequest>
@@ -198,14 +198,14 @@ echo
 echo
 
 
-echo "6. DELETE /v1/contextEntities/EID"
+echo "6.4. DELETE /v1/contextEntities/EID"
 echo "====================================="
 orionCurl --url /v1/contextEntities/EID -X DELETE
 echo
 echo
 
 
-echo "6. NOP /v1/contextEntities/EID"
+echo "6.5. NOP /v1/contextEntities/EID"
 echo "=================================="
 payload='<?xml version="1.0"?>'
 orionCurl --url /v1/contextEntities/EID -X NOP
@@ -214,14 +214,14 @@ echo
 
 
 
-echo "7. GET /v1/contextEntities/EID/attributes"
+echo "7.1. GET /v1/contextEntities/EID/attributes"
 echo "============================================="
 orionCurl --url /v1/contextEntities/EID/attributes
 echo
 echo
 
 
-echo "7. PUT /v1/contextEntities/EID/attributes"
+echo "7.2. PUT /v1/contextEntities/EID/attributes"
 echo "============================================="
 payload='<?xml version="1.0"?>
 <updateContextElementRequest>
@@ -238,7 +238,7 @@ echo
 echo
 
 
-echo "7. POST /v1/contextEntities/EID/attributes"
+echo "7.3. POST /v1/contextEntities/EID/attributes"
 echo "=============================================="
 payload='<?xml version="1.0"?>
 <appendContextElementRequest>
@@ -255,14 +255,14 @@ echo
 echo
 
 
-echo "7. DELETE /v1/contextEntities/EID/attributes"
+echo "7.4. DELETE /v1/contextEntities/EID/attributes"
 echo "================================================"
 orionCurl --url /v1/contextEntities/EID/attributes -X DELETE
 echo
 echo
 
 
-echo "7. NOP /v1/contextEntities/EID/attributes"
+echo "7.5. NOP /v1/contextEntities/EID/attributes"
 echo "============================================="
 orionCurl --url /v1/contextEntities/EID/attributes -X NOP
 echo
@@ -270,14 +270,14 @@ echo
 
 
 
-echo "8. GET /v1/contextEntities/EID/attributes/A1"
+echo "8.1. GET /v1/contextEntities/EID/attributes/A1"
 echo "================================================"
 orionCurl --url /v1/contextEntities/EID/attributes/A1
 echo
 echo
 
 
-echo "8. PUT /v1/contextEntities/EID/attributes/A1"
+echo "8.2. PUT /v1/contextEntities/EID/attributes/A1"
 echo "================================================"
 payload='<updateContextAttributeRequest>
   <type>T</type>
@@ -295,14 +295,14 @@ echo
 echo
 
 
-echo "8. GET /v1/contextEntities/EID/attributes/A1"
+echo "8.3. GET /v1/contextEntities/EID/attributes/A1"
 echo "================================================"
 orionCurl --url /v1/contextEntities/EID/attributes/A1
 echo
 echo
 
 
-echo "8. POST /v1/contextEntities/EID/attributes/A1"
+echo "8.4. POST /v1/contextEntities/EID/attributes/A1"
 echo "================================================="
 payload='<updateContextAttributeRequest>
   <type>T</type>
@@ -320,35 +320,35 @@ echo
 echo
 
 
-echo "8. GET /v1/contextEntities/EID/attributes/A1"
+echo "8.5. GET /v1/contextEntities/EID/attributes/A1"
 echo "================================================"
 orionCurl --url /v1/contextEntities/EID/attributes/A1
 echo
 echo
 
 
-echo "8. DELETE /v1/contextEntities/EID/attributes/A1"
+echo "8.6. DELETE /v1/contextEntities/EID/attributes/A1"
 echo "==================================================="
 orionCurl --url /v1/contextEntities/EID/attributes/A1 -X DELETE
 echo
 echo
 
 
-echo "8. NOP /v1/contextEntities/EID/attributes/A1"
+echo "8.7. NOP /v1/contextEntities/EID/attributes/A1"
 echo "================================================"
 orionCurl --url /v1/contextEntities/EID/attributes/A1 -X NOP
 echo
 echo
 
 
-echo "9. GET /v1/contextEntities/EID/attributes/A1/left"
+echo "9.1. GET /v1/contextEntities/EID/attributes/A1/left"
 echo "=========================================================="
 orionCurl --url /v1/contextEntities/EID/attributes/A1/left
 echo
 echo
 
 
-echo "9. PUT /v1/contextEntities/EID/attributes/A1/left"
+echo "9.2. PUT /v1/contextEntities/EID/attributes/A1/left"
 echo "=========================================================="
 payload='<updateContextAttributeRequest>
   <type>T</type>
@@ -366,14 +366,14 @@ echo
 echo
 
 
-echo "9. DELETE /v1/contextEntities/EID/attributes/A1/left"
+echo "9.3. DELETE /v1/contextEntities/EID/attributes/A1/left"
 echo "============================================================="
 orionCurl --url /v1/contextEntities/EID/attributes/A1/left -X DELETE
 echo
 echo
 
 
-echo "9. NOP /v1/contextEntities/EID/attributes/A1/left"
+echo "9.4. NOP /v1/contextEntities/EID/attributes/A1/left"
 echo "=========================================================="
 orionCurl --url /v1/contextEntities/EID/attributes/A1/left -X NOP
 echo
@@ -381,14 +381,14 @@ echo
 
 
 
-echo "10. GET /v1/contextEntityTypes/T"
+echo "10.1. GET /v1/contextEntityTypes/T"
 echo "==========================================="
 orionCurl --url /v1/contextEntityTypes/T
 echo
 echo
 
 
-echo "10. NOP /v1/contextEntityTypes/T"
+echo "10.2. NOP /v1/contextEntityTypes/T"
 echo "==========================================="
 orionCurl --url /v1/contextEntityTypes/T -X NOP
 echo
@@ -396,14 +396,14 @@ echo
 
 
 
-echo "11. GET /v1/contextEntityTypes/typeName/attributes"
+echo "11.1. GET /v1/contextEntityTypes/typeName/attributes"
 echo "======================================================"
 orionCurl --url /v1/contextEntityTypes/typeName/attributes
 echo
 echo
 
 
-echo "11. NOP /v1/contextEntityTypes/typeName/attributes"
+echo "11.2. NOP /v1/contextEntityTypes/typeName/attributes"
 echo "======================================================"
 orionCurl --url /v1/contextEntityTypes/typeName/attributes -X NOP
 echo
@@ -411,14 +411,14 @@ echo
 
 
 
-echo "12. GET /v1/contextEntityTypes/typeName/attributes/A1"
+echo "12.1. GET /v1/contextEntityTypes/typeName/attributes/A1"
 echo "========================================================="
 orionCurl --url /v1/contextEntityTypes/typeName/attributes/A1
 echo
 echo
 
 
-echo "12. NOP /v1/contextEntityTypes/typeName/attributes/A1"
+echo "12.2. NOP /v1/contextEntityTypes/typeName/attributes/A1"
 echo "========================================================="
 orionCurl --url /v1/contextEntityTypes/typeName/attributes/A1 -X NOP
 echo
@@ -426,7 +426,7 @@ echo
 
 
 
-echo "13. POST /v1/contextSubscriptions"
+echo "13.1. POST /v1/contextSubscriptions"
 echo "====================================="
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
@@ -458,7 +458,7 @@ echo
 echo
 
 
-echo "13. NOP /v1/contextSubscriptions"
+echo "13.2. NOP /v1/contextSubscriptions"
 echo "===================================="
 orionCurl --url /v1/contextSubscriptions -X NOP
 echo
@@ -466,7 +466,7 @@ echo
 
 
 
-echo "14. PUT /v1/contextSubscriptions/SUB_ID"
+echo "14.1. PUT /v1/contextSubscriptions/SUB_ID"
 echo "==========================================="
 payload='<?xml version="1.0"?>
 <updateContextSubscriptionRequest>
@@ -486,14 +486,14 @@ echo
 echo
 
 
-echo "14. DELETE /v1/contextSubscriptions/SUB_ID"
+echo "14.2. DELETE /v1/contextSubscriptions/SUB_ID"
 echo "=============================================="
 orionCurl --url /v1/contextSubscriptions/$SUB_ID -X DELETE
 echo
 echo
 
 
-echo "14. NOP /v1/contextSubscriptions/SUB_ID"
+echo "14.3. NOP /v1/contextSubscriptions/SUB_ID"
 echo "==========================================="
 orionCurl --url /v1/contextSubscriptions/SUB_ID -X NOP
 echo
@@ -501,7 +501,7 @@ echo
 
 
 --REGEXPECT--
-1. POST /v1/updateContext
+1.1. POST /v1/updateContext
 =============================
 HTTP/1.1 200 OK
 Content-Length: 618
@@ -533,7 +533,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-1. NOP /v1/updateContext
+1.2. NOP /v1/updateContext
 ============================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -542,7 +542,7 @@ Date: REGEX(.*)
 
 
 
-2. POST /v1/queryContext
+2.1. POST /v1/queryContext
 ============================
 HTTP/1.1 200 OK
 Content-Length: 618
@@ -574,7 +574,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-2. NOP /v1/queryContext
+2.2. NOP /v1/queryContext
 ===========================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -583,7 +583,7 @@ Date: REGEX(.*)
 
 
 
-3. POST /v1/subscribeContext
+3.1. POST /v1/subscribeContext
 ================================
 HTTP/1.1 200 OK
 Content-Length: 192
@@ -599,7 +599,7 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 
 
-3. NOP /v1/subscribeContext
+3.2. NOP /v1/subscribeContext
 ===============================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -608,7 +608,7 @@ Date: REGEX(.*)
 
 
 
-4. POST /v1/updateContextSubscription
+4.1. POST /v1/updateContextSubscription
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 211
@@ -624,7 +624,7 @@ Date: REGEX(.*)
 </updateContextSubscriptionResponse>
 
 
-4. NOP /v1/updateContextSubscription
+4.2. NOP /v1/updateContextSubscription
 ========================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -633,7 +633,7 @@ Date: REGEX(.*)
 
 
 
-5. POST /v1/unsubscribeContext
+5.1. POST /v1/unsubscribeContext
 ==================================
 HTTP/1.1 200 OK
 Content-Length: 207
@@ -650,7 +650,7 @@ Date: REGEX(.*)
 </unsubscribeContextResponse>
 
 
-5. NOP /v1/unsubscribeContext
+5.2. NOP /v1/unsubscribeContext
 =================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -659,7 +659,7 @@ Date: REGEX(.*)
 
 
 
-6. GET /v1/contextEntities/EID
+6.1. GET /v1/contextEntities/EID
 ==================================
 HTTP/1.1 200 OK
 Content-Length: 450
@@ -687,7 +687,7 @@ Date: REGEX(.*)
 </contextElementResponse>
 
 
-6. PUT /v1/contextEntities/EID
+6.2. PUT /v1/contextEntities/EID
 =================================
 HTTP/1.1 200 OK
 Content-Length: 486
@@ -714,15 +714,18 @@ Date: REGEX(.*)
 </updateContextElementResponse>
 
 
-6. POST /v1/contextEntities/EID
+6.3. POST /v1/contextEntities/EID
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 486
+Content-Length: 556
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>EID</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>
@@ -741,7 +744,7 @@ Date: REGEX(.*)
 </appendContextElementResponse>
 
 
-6. DELETE /v1/contextEntities/EID
+6.4. DELETE /v1/contextEntities/EID
 =====================================
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -755,7 +758,7 @@ Date: REGEX(.*)
 </statusCode>
 
 
-6. NOP /v1/contextEntities/EID
+6.5. NOP /v1/contextEntities/EID
 ==================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -764,7 +767,7 @@ Date: REGEX(.*)
 
 
 
-7. GET /v1/contextEntities/EID/attributes
+7.1. GET /v1/contextEntities/EID/attributes
 =============================================
 HTTP/1.1 200 OK
 Content-Length: 366
@@ -787,7 +790,7 @@ Date: REGEX(.*)
 </contextElementResponse>
 
 
-7. PUT /v1/contextEntities/EID/attributes
+7.2. PUT /v1/contextEntities/EID/attributes
 =============================================
 HTTP/1.1 200 OK
 Content-Length: 384
@@ -809,7 +812,7 @@ Date: REGEX(.*)
 </updateContextElementResponse>
 
 
-7. POST /v1/contextEntities/EID/attributes
+7.3. POST /v1/contextEntities/EID/attributes
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 486
@@ -836,7 +839,7 @@ Date: REGEX(.*)
 </appendContextElementResponse>
 
 
-7. DELETE /v1/contextEntities/EID/attributes
+7.4. DELETE /v1/contextEntities/EID/attributes
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -850,7 +853,7 @@ Date: REGEX(.*)
 </statusCode>
 
 
-7. NOP /v1/contextEntities/EID/attributes
+7.5. NOP /v1/contextEntities/EID/attributes
 =============================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -859,7 +862,7 @@ Date: REGEX(.*)
 
 
 
-8. GET /v1/contextEntities/EID/attributes/A1
+8.1. GET /v1/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 253
@@ -877,7 +880,7 @@ Date: REGEX(.*)
 </contextAttributeResponse>
 
 
-8. PUT /v1/contextEntities/EID/attributes/A1
+8.2. PUT /v1/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 127
@@ -892,7 +895,7 @@ Date: REGEX(.*)
 </statusCode>
 
 
-8. GET /v1/contextEntities/EID/attributes/A1
+8.3. GET /v1/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 253
@@ -910,7 +913,7 @@ Date: REGEX(.*)
 </contextAttributeResponse>
 
 
-8. POST /v1/contextEntities/EID/attributes/A1
+8.4. POST /v1/contextEntities/EID/attributes/A1
 =================================================
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -924,7 +927,7 @@ Date: REGEX(.*)
 </statusCode>
 
 
-8. GET /v1/contextEntities/EID/attributes/A1
+8.5. GET /v1/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 200 OK
 Content-Length: 496
@@ -954,7 +957,7 @@ Date: REGEX(.*)
 </contextAttributeResponse>
 
 
-8. DELETE /v1/contextEntities/EID/attributes/A1
+8.6. DELETE /v1/contextEntities/EID/attributes/A1
 ===================================================
 HTTP/1.1 200 OK
 Content-Length: 220
@@ -969,7 +972,7 @@ Date: REGEX(.*)
 </statusCode>
 
 
-8. NOP /v1/contextEntities/EID/attributes/A1
+8.7. NOP /v1/contextEntities/EID/attributes/A1
 ================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -978,7 +981,7 @@ Date: REGEX(.*)
 
 
 
-9. GET /v1/contextEntities/EID/attributes/A1/left
+9.1. GET /v1/contextEntities/EID/attributes/A1/left
 ==========================================================
 HTTP/1.1 200 OK
 Content-Length: 496
@@ -1008,7 +1011,7 @@ Date: REGEX(.*)
 </contextAttributeResponse>
 
 
-9. PUT /v1/contextEntities/EID/attributes/A1/left
+9.2. PUT /v1/contextEntities/EID/attributes/A1/left
 ==========================================================
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -1022,7 +1025,7 @@ Date: REGEX(.*)
 </statusCode>
 
 
-9. DELETE /v1/contextEntities/EID/attributes/A1/left
+9.3. DELETE /v1/contextEntities/EID/attributes/A1/left
 =============================================================
 HTTP/1.1 200 OK
 Content-Length: 80
@@ -1036,7 +1039,7 @@ Date: REGEX(.*)
 </statusCode>
 
 
-9. NOP /v1/contextEntities/EID/attributes/A1/left
+9.4. NOP /v1/contextEntities/EID/attributes/A1/left
 ==========================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1045,7 +1048,7 @@ Date: REGEX(.*)
 
 
 
-10. GET /v1/contextEntityTypes/T
+10.1. GET /v1/contextEntityTypes/T
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 155
@@ -1061,7 +1064,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-10. NOP /v1/contextEntityTypes/T
+10.2. NOP /v1/contextEntityTypes/T
 ===========================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1070,7 +1073,7 @@ Date: REGEX(.*)
 
 
 
-11. GET /v1/contextEntityTypes/typeName/attributes
+11.1. GET /v1/contextEntityTypes/typeName/attributes
 ======================================================
 HTTP/1.1 200 OK
 Content-Length: 155
@@ -1086,7 +1089,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-11. NOP /v1/contextEntityTypes/typeName/attributes
+11.2. NOP /v1/contextEntityTypes/typeName/attributes
 ======================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1095,7 +1098,7 @@ Date: REGEX(.*)
 
 
 
-12. GET /v1/contextEntityTypes/typeName/attributes/A1
+12.1. GET /v1/contextEntityTypes/typeName/attributes/A1
 =========================================================
 HTTP/1.1 200 OK
 Content-Length: 155
@@ -1111,7 +1114,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-12. NOP /v1/contextEntityTypes/typeName/attributes/A1
+12.2. NOP /v1/contextEntityTypes/typeName/attributes/A1
 =========================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1120,7 +1123,7 @@ Date: REGEX(.*)
 
 
 
-13. POST /v1/contextSubscriptions
+13.1. POST /v1/contextSubscriptions
 =====================================
 HTTP/1.1 200 OK
 Content-Length: 192
@@ -1136,7 +1139,7 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 
 
-13. NOP /v1/contextSubscriptions
+13.2. NOP /v1/contextSubscriptions
 ====================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
@@ -1145,7 +1148,7 @@ Date: REGEX(.*)
 
 
 
-14. PUT /v1/contextSubscriptions/SUB_ID
+14.1. PUT /v1/contextSubscriptions/SUB_ID
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 211
@@ -1161,7 +1164,7 @@ Date: REGEX(.*)
 </updateContextSubscriptionResponse>
 
 
-14. DELETE /v1/contextSubscriptions/SUB_ID
+14.2. DELETE /v1/contextSubscriptions/SUB_ID
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 207
@@ -1178,7 +1181,7 @@ Date: REGEX(.*)
 </unsubscribeContextResponse>
 
 
-14. NOP /v1/contextSubscriptions/SUB_ID
+14.3. NOP /v1/contextSubscriptions/SUB_ID
 ===========================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
