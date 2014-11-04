@@ -1,0 +1,1 @@
+Fix: Changed max-length of tenant names from 20 characters to 50 (Issue 616)
