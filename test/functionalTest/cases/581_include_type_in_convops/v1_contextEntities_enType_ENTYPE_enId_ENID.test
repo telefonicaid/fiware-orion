@@ -232,12 +232,15 @@ Date: REGEX(.*)
 03. POST /v1/contextEntities/type/T1/id/E1 OK
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 489
+Content-Length: 560
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="T1" isPattern="false">
+    <id>E1</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>
@@ -314,12 +317,15 @@ Date: REGEX(.*)
 06. POST /v1/contextEntities/type/T2/id/E1 OK
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 489
+Content-Length: 560
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="T2" isPattern="false">
+    <id>E1</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>

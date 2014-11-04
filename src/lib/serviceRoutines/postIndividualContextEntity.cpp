@@ -39,6 +39,16 @@
 /* ****************************************************************************
 *
 * postIndividualContextEntity -
+*
+* NOTE
+* This function is used for two requests:
+* o POST /v1/contextEntities  and
+* o POST /v1/contextEntities/{entityId::id}
+*
+* In the latter case, the payload (AppendContextElementRequest) cannot contain any
+* entityId data (id, type, isPattern).
+* In the first case, the entityId data of the payload is mandatory.
+* entityId::type can be empty, as always, but entityId::id MUST be filled in.
 */
 std::string postIndividualContextEntity
 (
@@ -48,13 +58,44 @@ std::string postIndividualContextEntity
   ParseData*                 parseDataP
 )
 {
-  std::string                   entityId = compV[2];
+  std::string                   entityId;
+  std::string                   entityType;
   std::string                   answer;
+  AppendContextElementRequest*  reqP       = &parseDataP->acer.res;
   AppendContextElementResponse  response;
+
+  response.entity = reqP->entity;
+
+  if (compV.size() == 3)
+  {
+    entityId   = compV[2];
+    entityType = "";
+
+    if ((reqP->entity.id != "") || (reqP->entity.type != "") || (reqP->entity.isPattern != ""))
+    {
+      LM_W(("Bad Input (unknown field)"));
+      response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
+      return response.render(ciP, IndividualContextEntity, "");
+    }
+  }
+  else if (compV.size() == 2)
+  {
+    entityId   = reqP->entity.id;
+    entityType = reqP->entity.type;
+
+    if ((entityId == "") && (entityType == ""))
+    {
+      LM_W(("Bad Input (mandatory entityId::id missing)"));
+      response.errorCode.fill(SccBadRequest, "invalid payload: mandatory entityId::id missing");
+      return response.render(ciP, IndividualContextEntity, "");
+    }
+  }
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s'", entityId.c_str()));
 
   ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, "", &parseDataP->acer.res, &response, ciP);
+
+  response.entity.fill(entityId, entityType, "false");
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 

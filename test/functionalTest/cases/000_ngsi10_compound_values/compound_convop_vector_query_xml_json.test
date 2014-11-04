@@ -70,12 +70,15 @@ orionCurl --url "$url" --payload "$payload" --json
 --REGEXPECT--
 1: +++++++++ create vector compound +++++++++++
 HTTP/1.1 200 OK
-Content-Length: 492
+Content-Length: 566
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>EVector</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>

@@ -106,12 +106,15 @@ Date: REGEX(.*)
 </updateContextElementResponse>
 +++++ 2. create the entity +++++
 HTTP/1.1 200 OK
-Content-Length: 654
+Content-Length: 729
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>entity01</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>
