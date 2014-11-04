@@ -67,6 +67,9 @@ HttpStatusCode mapPostIndividualContextEntity
 
   ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
+  // Filling the entity data for the response, to have it rendered
+  response->entity.fill(entityId, entityType, "false");
+
   ContextAttributeResponse* car                     = new ContextAttributeResponse();
   ContextElementResponse*   contextElementResponse  = ucResponse.contextElementResponseVector.get(0);
 

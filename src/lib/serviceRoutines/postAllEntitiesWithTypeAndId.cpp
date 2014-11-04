@@ -51,11 +51,19 @@ extern std::string postAllEntitiesWithTypeAndId
 {
   std::string                   enType = compV[3];
   std::string                   enId   = compV[5];
+  AppendContextElementRequest*  reqP   = &parseDataP->acer.res;
   std::string                   answer;
   AppendContextElementResponse  response;
 
   // FIXME P1: AttributeDomainName skipped
   // FIXME P1: domainMetadataVector skipped
+
+  if ((reqP->entity.id != "") || (reqP->entity.type != "") || (reqP->entity.isPattern != ""))
+  {
+    LM_W(("Bad Input (unknown field)"));
+    response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
+    return response.render(ciP, IndividualContextEntity, "");
+  }
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s', type '%s'", enId.c_str(), enType.c_str()));
 

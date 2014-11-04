@@ -473,6 +473,7 @@ PaArgument paArgs[] =
 
 #define ACE                AllContextEntities
 #define ACE_COMPS_V1       2, { "v1", "contextEntities" }
+#define ACE_POST_WORD     "appendContextElementRequest"
 
 #define ACET               AllEntitiesWithTypeAndId
 #define ACET_COMPS_V1      6, { "v1", "contextEntities", "type", "*", "id", "*" }
@@ -759,6 +760,7 @@ PaArgument paArgs[] =
   { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
                                                                                                            \
   { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
+  { "POST",   ACE,   ACE_COMPS_V1,           ACE_POST_WORD,   postIndividualContextEntity               }, \
   { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }, \
                                                                                                            \
   { "GET",    ACET,  ACET_COMPS_V1,          "",              getAllEntitiesWithTypeAndId               }, \
