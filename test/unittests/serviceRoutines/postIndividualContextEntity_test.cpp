@@ -55,7 +55,7 @@ TEST(postIndividualContextEntity, ok)
 {
   ConnectionInfo ci("/ngsi10/contextEntities/entity11",  "POST", "1.1");  
   const char*    outfile = "ngsi10.appendContextElementResponse.postIndividualContextEntity.valid.xml";
-  const char*    infile      = "ngsi10.appendContextElementRequest.ok.valid.xml";
+  const char*    infile  = "ngsi10.appendContextElementRequest.ok.valid.xml";
   std::string    out;
 
   utInit();

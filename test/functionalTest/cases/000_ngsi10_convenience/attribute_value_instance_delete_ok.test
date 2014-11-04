@@ -69,7 +69,7 @@ orionCurl --url "/v1/contextEntities/Room1" --json
 --REGEXPECT--
 +++++ 1. creating base entity +++++
 HTTP/1.1 200 OK
-Content-Length: 705
+Content-Length: 763
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -80,34 +80,37 @@ Date: REGEX(.*)
                 {
                     "metadatas": [
                         {
-                            "name": "ID",
-                            "type": "string",
+                            "name": "ID", 
+                            "type": "string", 
                             "value": "ground"
                         }
-                    ],
-                    "name": "temperature",
-                    "type": "centigrade",
+                    ], 
+                    "name": "temperature", 
+                    "type": "centigrade", 
                     "value": ""
-                },
+                }, 
                 {
                     "metadatas": [
                         {
-                            "name": "ID",
-                            "type": "string",
+                            "name": "ID", 
+                            "type": "string", 
                             "value": "wall"
                         }
-                    ],
-                    "name": "temperature",
-                    "type": "centigrade",
+                    ], 
+                    "name": "temperature", 
+                    "type": "centigrade", 
                     "value": ""
                 }
             ],
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
-    ]
+    ],
+    "id": "Room1", 
+    "isPattern": "false", 
+    "type": ""
 }
 +++++ 2. delete an attribute by valueID +++++
 HTTP/1.1 200 OK
@@ -116,7 +119,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "code": "200",
+    "code": "200", 
     "reasonPhrase": "OK"
 }
 +++++ 3. lookup the entity +++++
@@ -131,22 +134,22 @@ Date: REGEX(.*)
             {
                 "metadatas": [
                     {
-                        "name": "ID",
-                        "type": "string",
+                        "name": "ID", 
+                        "type": "string", 
                         "value": "wall"
                     }
-                ],
-                "name": "temperature",
-                "type": "centigrade",
+                ], 
+                "name": "temperature", 
+                "type": "centigrade", 
                 "value": "23.5"
             }
-        ],
-        "id": "Room1",
-        "isPattern": "false",
+        ], 
+        "id": "Room1", 
+        "isPattern": "false", 
         "type": ""
     },
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }
