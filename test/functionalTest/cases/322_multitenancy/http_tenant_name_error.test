@@ -79,16 +79,16 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 
 URL="/v1/registry/registerContext"
 
-# 1. OK
+# 1. OK (64 chars in tenant name)
 echo "1: ++++++++++"
-orionCurl --url $URL --payload "${payload}" --httpTenant "_kgz0123456789012345_kgz0123456789012345"
+orionCurl --url $URL --payload "${payload}" --httpTenant "0123456789012345678901234567890123456789012345678901234567890123"
 echo
 echo
 
 
-# 2. Long tenant name
+# 2. Long tenant name (65 chars in tenant name)
 echo "2: ++++++++++"
-orionCurl --url $URL --payload "${payload}" --httpTenant "kz12345678901234567890_kgz0123456789012345_kgz0123456789012345_kgz0123456789012345"
+orionCurl --url $URL --payload "${payload}" --httpTenant "01234567890123456789012345678901234567890123456789012345678901234"
 echo
 echo
 
