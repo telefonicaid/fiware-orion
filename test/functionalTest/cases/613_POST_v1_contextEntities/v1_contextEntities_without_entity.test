@@ -39,7 +39,12 @@ brokerStart CB
 # 07. POST /v1/contextEntities with entityId:id=EID in XML payload OK
 # 08. POST /v1/contextEntities/EID without entityId in XML payload OK
 #
+# 09. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail
+# 10. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in XML payload and see it fail
+# 11. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK
+# 12. POST /v1/contextEntities/type/T1/id/E1 without entityId in XML payload OK
 #
+
 
 echo "01. POST /v1/contextEntities without entityId in JSON payload and see it fail"
 echo "============================================================================="
@@ -185,6 +190,77 @@ echo
 echo
 
 
+echo "09. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail"
+echo "==============================================================================================="
+payload='{
+    "id": "EID",
+    "type": "ET",
+    "isPattern": "false",
+    "attributes": [
+        {    
+            "name": "A1",
+            "type": "A1T",
+            "value": "10"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"  --json
+echo
+echo
+
+
+echo "10. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in XML payload and see it fail"
+echo "=============================================================================================="
+payload='<?xml version="1.0"?>
+<appendContextElementRequest>
+  <entityId type="ET" isPattern="false">
+    <id>EID</id>
+  </entityId>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>A1T</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>'
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"
+echo
+echo
+
+echo "11. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK"
+echo "=============================================================================="
+payload='{
+    "attributes": [
+        {    
+            "name": "A1",
+            "type": "A1T",
+            "value": "10"
+        }
+    ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"  --json
+echo
+echo
+
+
+echo "12. POST /v1/contextEntities/type/T1/id/E1 without entityId in XML payload OK"
+echo "============================================================================="
+payload='<?xml version="1.0"?>
+<appendContextElementRequest>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>A1</name>
+      <type>A1T</type>
+      <contextValue>10</contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>'
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}"
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /v1/contextEntities without entityId in JSON payload and see it fail
 =============================================================================
@@ -284,7 +360,7 @@ Date: REGEX(.*)
 06. POST /v1/contextEntities/EID without entityId in JSON payload OK
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 256
+Content-Length: 312
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -303,7 +379,10 @@ Date: REGEX(.*)
                 "reasonPhrase": "OK"
             }
         }
-    ]
+    ], 
+    "id": "EID", 
+    "isPattern": "false", 
+    "type": ""
 }
 
 
@@ -340,12 +419,107 @@ Date: REGEX(.*)
 08. POST /v1/contextEntities/EID without entityId in XML payload OK
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 486
+Content-Length: 556
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>EID</id>
+  </entityId>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>A1T</type>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
+
+
+09. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in JSON payload and see it fail
+===============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 132
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "invalid payload: unknown fields", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+10. POST /v1/contextEntities/type/T1/id/E1 with entityId:id=EID in XML payload and see it fail
+==============================================================================================
+HTTP/1.1 200 OK
+Content-Length: 213
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <errorCode>
+    <code>400</code>
+    <reasonPhrase>Bad Request</reasonPhrase>
+    <details>invalid payload: unknown fields</details>
+  </errorCode>
+</appendContextElementResponse>
+
+
+11. POST /v1/contextEntities/type/T1/id/E1 without entityId in JSON payload OK
+==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 313
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1", 
+                    "type": "A1T", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "id": "E1", 
+    "isPattern": "false", 
+    "type": "T1"
+}
+
+
+12. POST /v1/contextEntities/type/T1/id/E1 without entityId in XML payload OK
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 557
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <entityId type="T1" isPattern="false">
+    <id>E1</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>

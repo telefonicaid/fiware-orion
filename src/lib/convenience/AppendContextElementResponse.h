@@ -49,10 +49,11 @@
 * The field 'entity' is:
 *   o MANDATORY for "POST /v1/contextEntities"
 *   o FORBIDDEN for "POST /v1/contextEntities/{entityId::id}"
+*   o FORBIDDEN for "POST /v1/contextEntities/type/{entityId::type}/id/{entityId::id}"
 *
 * So, for its response (AppendContextElementResponse), the field 'entity' will be 
 * rendered if the response is for "POST /v1/contextEntities", but NOT if the
-* response is for "POST /v1/contextEntities{entityId::id}".
+* response is for the other two requests.
 * 
 */
 typedef struct AppendContextElementResponse

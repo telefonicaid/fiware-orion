@@ -45,6 +45,7 @@
 * The field 'entity' is:
 *   o MANDATORY for "POST /v1/contextEntities"
 *   o FORBIDDEN for "POST /v1/contextEntities/{entityId::id}"
+*   o FORBIDDEN for "POST /v1/contextEntities/type/{entityId::type}/id/{entityId::id}"
 */
 typedef struct AppendContextElementRequest
 {

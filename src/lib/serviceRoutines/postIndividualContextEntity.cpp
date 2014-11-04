@@ -95,7 +95,7 @@ std::string postIndividualContextEntity
 
   ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, "", &parseDataP->acer.res, &response, ciP);
 
-  response.entity = reqP->entity;
+  response.entity.fill(entityId, entityType, "false");
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 
