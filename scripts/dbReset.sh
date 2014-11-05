@@ -20,17 +20,23 @@
 
 if [ "$1" == "-u" ]
 then
-  echo Usage: $0 '<database>'
+  echo Usage: $0 '<database> <database2> <databaseN>'
   exit 1
 fi
 
-db=$1
-if [ "$db" == "" ]
+if [ $# == 1 ]
 then
-  db=testharness
+  db=$1
+  if [ "$db" == "" ]
+  then
+    db=testharness
+  fi
+
+  echo 'db.dropDatabase()' | mongo $db --quiet
+else
+  while [ "$#" != 0 ]
+  do
+    echo 'db.dropDatabase()' | mongo $1 --quiet
+    shift
+  done
 fi
-
-
-mongo $db --quiet << EOF
-  db.dropDatabase()
-EOF

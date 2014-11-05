@@ -297,10 +297,24 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
     }
 
     /* For each one of the subscriptions found, add it to the map (if not already there) */
-    while (cursor->more()) {
+    while (cursor->more())
+    {
+        BSONObj     sub     = cursor->next();
+        BSONElement idField = sub.getField("_id");
 
-        BSONObj sub = cursor->next();
-        std::string subIdStr = sub.getField("_id").OID().str();
+        //
+        // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
+        //
+        // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
+        // an exception and the broker crashes. 
+        //
+        if (idField.eoo() == true)
+        {
+          LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
+          continue;
+        }
+
+        std::string subIdStr = idField.OID().str();
 
         if (subs.count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));            

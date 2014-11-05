@@ -78,16 +78,16 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <registrationId></registrationId>
   </registerContextRequest>'
 
-# 1. OK
+# 1. OK (50 chars in tenant name)
 echo "1: ++++++++++"
-orionCurl --url "/v1/registry/registerContext" --payload "$payload" --httpTenant "_kzg0123456789012345"
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --httpTenant "01234567890123456789012345678901234567890123456789"
 echo
 echo
 
 
-# 2. Long tenant name
+# 2. Long tenant name (51 chars in tenant name)
 echo "2: ++++++++++"
-orionCurl --url "/v1/registry/registerContext" --payload "$payload" --httpTenant "kz12345678901234567890"
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --httpTenant "012345678901234567890123456789012345678901234567890"
 echo
 echo
 
@@ -115,7 +115,7 @@ Date: REGEX(.*)
 
 2: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 272
+Content-Length: 252
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -123,13 +123,13 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant 'kz12345678901234567890' not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
+  <details>tenant name not accepted (a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
 3: ++++++++++
 HTTP/1.1 200 OK
-Content-Length: 255
+Content-Length: 252
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -137,7 +137,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant 'kz+fg' not accepted (a tenant string must not be longer that 20 characters and may only contain underscores and alphanumeric characters)</details>
+  <details>tenant name not accepted (a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
