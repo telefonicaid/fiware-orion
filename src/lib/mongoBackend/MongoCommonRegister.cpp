@@ -170,7 +170,8 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
     std::vector<std::string> idJsV;
     std::vector<std::string> typeJsV;
 
-    LM_M(("KZ: tenant == '%s'", tenant.c_str()));
+    const char* collectionName = getSubscribeContextAvailabilityCollectionName(tenant).c_str();
+    LM_M(("KZ: collectionName == '%s' (len: %d)", collectionName, strlen(collectionName)));
 
     for (unsigned int ix = 0; ix < cr.entityIdVector.size(); ++ix ) {
         //FIXME: take into account subscriptions with no type
@@ -299,13 +300,19 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
     }
 
     /* For each one of the subscriptions found, add it to the map (if not already there) */
-    while (cursor->more()) {
+    while (cursor->more())
+    {
+        BSONObj     sub     = cursor->next();
+        BSONElement idField = sub.getField("_id");
 
-        LM_M(("KZ: tenant == '%s'", tenant.c_str()));
-        BSONObj sub = cursor->next();
-        LM_M(("KZ: tenant == '%s'", tenant.c_str()));
-        std::string subIdStr = sub.getField("_id").OID().str();
-        LM_M(("KZ: tenant == '%s'", tenant.c_str()));
+        if (idField.eoo() == true)
+        {
+          LM_M(("KZ: _id not found - must be an error: '%s'", sub.toString().c_str()));
+          continue;
+        }
+
+
+        std::string subIdStr = idField.OID().str();
 
         if (subs.count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));            
