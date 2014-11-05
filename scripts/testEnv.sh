@@ -120,8 +120,8 @@ export ORION_DATABASE_PASSWORD=${ORION_DATABASE_PASSWORD:-orion}
 # o CP2_DATABASE_NAME      - database for second context provider
 # o CP3_DATABASE_NAME      - database for third context provider
 #
-export CB_DATABASE_NAME=${CB_DATABASE_NAME:-testharness}
-export CM_DATABASE_NAME=${CM_DATABASE_NAME:-testharness_cm}
-export CP1_DATABASE_NAME=${CP1_DATABASE_NAME:-testharness_cp1}
-export CP2_DATABASE_NAME=${CP2_DATABASE_NAME:-testharness_cp2}
-export CP3_DATABASE_NAME=${CP3_DATABASE_NAME:-testharness_cp3}
+export CB_DATABASE_NAME=${CB_DATABASE_NAME:-functest}
+export CM_DATABASE_NAME=${CM_DATABASE_NAME:-functest_cm}
+export CP1_DATABASE_NAME=${CP1_DATABASE_NAME:-functest_cp1}
+export CP2_DATABASE_NAME=${CP2_DATABASE_NAME:-functest_cp2}
+export CP3_DATABASE_NAME=${CP3_DATABASE_NAME:-functest_cp3}

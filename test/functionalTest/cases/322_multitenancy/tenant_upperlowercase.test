@@ -23,7 +23,9 @@
 --NAME--
 tenant names with upper and lowercase letters in URL
 --SHELL-INIT--
-dbInit testharness-case
+dbInit ${CB_DATABASE_NAME}-case
+dbInit ${CB_DATABASE_NAME}-Case
+dbInit ${CB_DATABASE_NAME}-CASE
 brokerStart CB 0 IPV4 -multiservice
 
 --SHELL--
