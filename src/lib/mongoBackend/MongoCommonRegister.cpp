@@ -170,9 +170,6 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
     std::vector<std::string> idJsV;
     std::vector<std::string> typeJsV;
 
-    const char* collectionName = getSubscribeContextAvailabilityCollectionName(tenant).c_str();
-    LM_M(("KZ: collectionName == '%s' (len: %d)", collectionName, strlen(collectionName)));
-
     for (unsigned int ix = 0; ix < cr.entityIdVector.size(); ++ix ) {
         //FIXME: take into account subscriptions with no type
         EntityId* enP = cr.entityIdVector.get(ix);
@@ -307,7 +304,6 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
 
         if (idField.eoo() == true)
         {
-          LM_M(("KZ: _id not found - must be an error: '%s'", sub.toString().c_str()));
           continue;
         }
 

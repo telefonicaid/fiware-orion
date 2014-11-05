@@ -97,7 +97,6 @@ static std::string tenantCheck(const std::string& tenant)
 {
   char*        name    = (char*) tenant.c_str();
 
-  LM_M(("KZ: check tenant '%s'", tenant.c_str()));
   if (strlen(name) > MAX_TENANT_NAME_LEN)
   {
     LM_W(("Bad Input (a tenant name can be max %d characters long. Length: %d)", MAX_TENANT_NAME_LEN, strlen(name)));
