@@ -872,6 +872,7 @@ static bool addTriggeredSubscriptions(std::string                               
         //
         if (idField.eoo() == true)
         {
+          LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
           continue;
         }
 
@@ -1599,6 +1600,7 @@ void processContextElement(ContextElement*                  ceP,
         //
         if (idField.eoo() == true)
         {
+          LM_E(("Database Error (error retrieving _id field in doc: %s)", r.toString().c_str()));
           continue;
         }
 

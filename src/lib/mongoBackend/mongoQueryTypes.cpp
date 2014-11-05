@@ -291,6 +291,7 @@ HttpStatusCode mongoAttributesForEntityType
     //
     if (idField.eoo() == true)
     {
+      LM_E(("Database Error (error retrieving _id field in doc: %s)", resultsArray[ix].embeddedObject().toString().c_str()));
       continue;
     }
 

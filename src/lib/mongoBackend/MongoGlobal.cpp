@@ -520,6 +520,7 @@ void recoverOntimeIntervalThreads(std::string tenant)
     //
     if (idField.eoo() == true)
     {
+      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
       continue;
     }
 
@@ -563,6 +564,7 @@ extern void destroyAllOntimeIntervalThreads(std::string tenant)
     //
     if (idField.eoo() == true)
     {
+      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
       continue;
     }
 
