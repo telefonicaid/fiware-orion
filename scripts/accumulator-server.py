@@ -34,7 +34,7 @@ __author__ = 'fermin'
 #   in the past)
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
-#
+
 from flask import Flask, request, Response
 from sys import argv, exit
 from datetime import datetime
@@ -73,8 +73,6 @@ if len(argv) > 4:
     if argv[4] == 'on':
         print 'verbose mode is on'
         verbose = 1
-
-print "Starting"
 
 pid = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"

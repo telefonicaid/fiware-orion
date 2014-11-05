@@ -388,10 +388,6 @@ function accumulatorStart()
   accumulator-server.py $port /notify $bindIp 2> /tmp/accumulator_$port &
   echo accumulator running as PID $$
 
-  echo "------------ PS -----------------"
-  ps aux | grep accumulator
-  echo "---------------------------------"
-
   # Wait until accumulator has started or we have waited a given maximum time
   port_not_ok=1
   typeset -i time
