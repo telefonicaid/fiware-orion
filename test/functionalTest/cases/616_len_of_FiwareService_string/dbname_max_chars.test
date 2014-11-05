@@ -19,33 +19,33 @@
 # fermin at tid dot es
 
 --NAME--
-Max 13 chars in db-name
+Max 10 chars in db-name
 --SHELL-INIT--
 --SHELL--
 
-echo "01. Starting broker with a -dbName of 14 chars - this must fail"
+echo "01. Starting broker with a -dbName of 11 chars - this must fail"
 echo "==============================================================="
-contextBroker -db 12345678901234 > /dev/null
+contextBroker -db 12345678901 > /dev/null
 exitCode=$?
 echo "exitCode: $exitCode"
 echo
 echo
 
 
-echo "02. Starting broker with a -dbName of 13 chars - this must work"
+echo "02. Starting broker with a -dbName of 10 chars - this must work"
 echo "==============================================================="
-contextBroker -db 1234567890123 > /dev/null
+contextBroker -db 1234567890 > /dev/null
 echo
 echo
 
 
 --REGEXPECT--
-01. Starting broker with a -dbName of 14 chars - this must fail
+01. Starting broker with a -dbName of 11 chars - this must fail
 ===============================================================
 exitCode: 1
 
 
-02. Starting broker with a -dbName of 13 chars - this must work
+02. Starting broker with a -dbName of 10 chars - this must work
 ===============================================================
 
 

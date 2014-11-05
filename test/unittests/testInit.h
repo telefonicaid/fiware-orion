@@ -30,12 +30,12 @@
 #include "ngsi10/NotifyContextRequest.h"
 
 /* Collection names used for testing */
-#define DBPREFIX "unittest"
-#define REGISTRATIONS_COLL "unittest.registrations"
-#define ENTITIES_COLL "unittest.entities"
-#define SUBSCRIBECONTEXT_COLL "unittest.csubs"
-#define SUBSCRIBECONTEXTAVAIL_COLL "unittest.casubs"
-#define ASSOCIATIONS_COLL "unittest.associations"
+#define DBPREFIX                    "unittest"
+#define REGISTRATIONS_COLL          DBPREFIX ".registrations"
+#define ENTITIES_COLL               DBPREFIX ".entities"
+#define SUBSCRIBECONTEXT_COLL       DBPREFIX ".csubs"
+#define SUBSCRIBECONTEXTAVAIL_COLL  DBPREFIX ".casubs"
+#define ASSOCIATIONS_COLL           DBPREFIX ".associations"
 
 /* Some useful macros to avoid to long and verbose lines in asserts */
 #define RES_CNTX_REG(i)         res.responseVector.get(i)->contextRegistration
