@@ -381,7 +381,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
   LM_W(("Bad Input (service '%s' not recognized)", ciP->url.c_str()));
   ciP->httpStatusCode = SccBadRequest;
-  std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("Service not recognized: ") + ciP->url);
+  std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
   restReply(ciP, answer);
 
   compV.clear();
