@@ -3,4 +3,4 @@ Add: New convop: "POST /v1/contextEntities" (Issue #613).
 Add: Convenience operations that respond with AppendContextElementResponse now get the
      EntityId info included in the response.
 Fix: Changed max-length of tenant names from 20 characters to 64.
-     Also the database name (CLI-option '-db') has been given a maximum length of 13 bytes. (Issue #616)
+     Also the database name (CLI-option '-db') has been given a maximum length of 10 bytes. (Issue #616)

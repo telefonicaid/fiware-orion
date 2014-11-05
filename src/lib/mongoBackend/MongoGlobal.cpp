@@ -509,8 +509,21 @@ void recoverOntimeIntervalThreads(std::string tenant)
   for (unsigned int ix = 0; ix < ids.size(); ++ix)
   {
 
-    BSONObj sub = ids[ix];
-    std::string subId = sub.getField("_id").OID().str();
+    BSONObj     sub     = ids[ix];
+    BSONElement idField = sub.getField("_id");
+
+    //
+    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
+    //
+    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
+    // an exception and the broker crashes. 
+    //
+    if (idField.eoo() == true)
+    {
+      continue;
+    }
+
+    std::string subId = idField.OID().str();
 
     std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
     for (unsigned int ix = 0; ix < condV.size(); ++ix) {
@@ -539,8 +552,22 @@ extern void destroyAllOntimeIntervalThreads(std::string tenant)
   /* Iterate destroying thread by thread */
   for (unsigned int ix = 0; ix < ids.size(); ++ix)
   {
-    BSONObj sub = ids[ix];
-    std::string subId = sub.getField("_id").OID().str();
+    BSONObj      sub     = ids[ix];
+    BSONElement  idField = sub.getField("_id");
+
+    //
+    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
+    //
+    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
+    // an exception and the broker crashes. 
+    //
+    if (idField.eoo() == true)
+    {
+      continue;
+    }
+
+    std::string  subId = idField.OID().str();
+
     notifier->destroyOntimeIntervalThreads(subId);
   }
 

@@ -180,6 +180,14 @@
 
 /* ****************************************************************************
 *
+* DB_NAME_MAX_LEN - max length of database name
+*/
+#define DB_NAME_MAX_LEN  10
+
+
+
+/* ****************************************************************************
+*
 * Option variables
 */
 bool            fg;
@@ -1320,9 +1328,9 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
-  if (strlen(dbName) > 13)
+  if (strlen(dbName) > DB_NAME_MAX_LEN)
   {
-    LM_X(1, ("dbName too long (max 13 characters)"));
+    LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
   }
 
   LM_I(("Orion Context Broker is running"));
