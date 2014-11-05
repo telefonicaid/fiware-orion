@@ -47,8 +47,8 @@
 *
 * Tenant name max length
 */
-#define MAX_TENANT_NAME_LEN            64
-#define MAX_TENANT_NAME_LEN_STRING    "64"
+#define MAX_TENANT_NAME_LEN            50
+#define MAX_TENANT_NAME_LEN_STRING    "50"
 
 
 
@@ -324,7 +324,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     ciP->tenant = ciP->tenantFromHttpHeader;
 
     //
-    // A tenant string must not be longer than 64 characters and may only contain
+    // A tenant string must not be longer than 50 characters and may only contain
     // underscores and alphanumeric characters.
     //
     std::string result;

@@ -1319,6 +1319,12 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  if (strlen(dbName) > 13)
+  {
+    LM_X(1, ("dbName too long (max 13 characters)"));
+  }
+
   LM_I(("Orion Context Broker is running"));
 
   if (useOnlyIPv6 && useOnlyIPv4)

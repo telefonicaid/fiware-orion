@@ -79,16 +79,16 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 
 URL="/v1/registry/registerContext"
 
-# 1. OK (64 chars in tenant name)
+# 1. OK (50 chars in tenant name)
 echo "1: ++++++++++"
-orionCurl --url $URL --payload "${payload}" --httpTenant "0123456789012345678901234567890123456789012345678901234567890123"
+orionCurl --url $URL --payload "${payload}" --httpTenant "01234567890123456789012345678901234567890123456789"
 echo
 echo
 
 
-# 2. Long tenant name (65 chars in tenant name)
+# 2. Long tenant name (51 chars in tenant name)
 echo "2: ++++++++++"
-orionCurl --url $URL --payload "${payload}" --httpTenant "01234567890123456789012345678901234567890123456789012345678901234"
+orionCurl --url $URL --payload "${payload}" --httpTenant "012345678901234567890123456789012345678901234567890"
 echo
 echo
 
@@ -100,7 +100,7 @@ echo
 echo
 
 
-# 4. No reserved names in tenant name
+# 4. There are no reserved names in tenant name
 echo "4: ++++++++++"
 orionCurl --url $URL --payload "${payload}" --httpTenant "ngsi10"
 echo
@@ -131,7 +131,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant name not accepted (a tenant string must not be longer than 64 characters and may only contain underscores and alphanumeric characters)</details>
+  <details>tenant name not accepted (a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
@@ -145,7 +145,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>tenant name not accepted (a tenant string must not be longer than 64 characters and may only contain underscores and alphanumeric characters)</details>
+  <details>tenant name not accepted (a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters)</details>
 </orionError>
 
 
