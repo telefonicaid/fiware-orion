@@ -35,6 +35,7 @@
 #include "ngsi/EntityId.h"
 #include "parse/CompoundValueNode.h"
 #include "parse/compoundValue.h"
+#include "parse/forbiddenChars.h"
 #include "rest/ConnectionInfo.h"
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlParse.h"
@@ -100,13 +101,42 @@ static bool isCompoundValuePath(const char* path)
 * If no hit is found it means that the path of the current XML node is unknown.
 * This will result in either a 'PARSE ERROR' or thatthe node is part of a Compound.
 */
-static bool treat(xml_node<>* node, const std::string& path, XmlNode* parseVector, ParseData* parseDataP)
+static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path, XmlNode* parseVector, ParseData* parseDataP)
 {
   for (unsigned int ix = 0; parseVector[ix].path != "LAST"; ++ix)
   {
     if (path == parseVector[ix].path)
     {
       int r;
+
+      //
+      // Before treating a node, a check is made that the value of the node has no forbidden
+      // characters.
+      // However, if the the node has attributes, then the values of the attributes are checked instead
+      //
+      if (node->first_attribute() == NULL)
+      {
+        if (forbiddenChars(node->value()) == true)
+        {
+          LM_E(("Found a forbidden value in '%s'", node->value()));
+          ciP->httpStatusCode = SccBadRequest;
+          ciP->answer = std::string("Illegal value for XML attribute");
+          return true;
+        }
+      }
+      else
+      {
+        for (xml_attribute<> *attr = node->first_attribute(); attr; attr = attr->next_attribute())
+        {
+          if (forbiddenChars(attr->value()) == true)
+          {
+            LM_E(("Found a forbidden value in attribute: '%s'", node->value()));
+            ciP->httpStatusCode = SccBadRequest;
+            ciP->answer = std::string("Illegal value for XML attribute");
+            return true;
+          }
+        }
+      }
 
       if ((r = parseVector[ix].treat(node, parseDataP)) != 0)
       {
@@ -189,6 +219,14 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
     }
     else  // String
     {
+      if (forbiddenChars(value.c_str()) == true)
+      {
+        LM_E(("Found a forbidden value in '%s'", value.c_str()));
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer = std::string("Illegal value for XML attribute");
+        return;
+      }
+
       containerP->add(orion::CompoundValueNode::String, name, value);
     }
   }
@@ -237,7 +275,7 @@ void xmlParse
   std::string  value            = wsStrip(node->value());
   std::string  name             = wsStrip(node->name());
   std::string  path             = fatherPath + "/" + name;
-  bool         treated          = treat(node, path, parseVector, parseDataP);
+  bool         treated          = treat(ciP, node, path, parseVector, parseDataP);
 
   if (isCompoundValuePath(path.c_str()) && (value == "") && (node->first_node() != NULL))
   {
