@@ -82,7 +82,16 @@ static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
 
-  parseDataP->upcrs.cerP->contextElement.entityId.id = node->value();
+  if (parseDataP->upcrs.cerP != NULL)
+  {
+    parseDataP->upcrs.cerP->contextElement.entityId.id = node->value();
+  }
+  else
+  {
+    LM_W(("Bad Input (XML parse error)"));
+    parseDataP->errorString = "Bad Input (XML parse error)";
+    return 1;
+  }
 
   return 0;
 }

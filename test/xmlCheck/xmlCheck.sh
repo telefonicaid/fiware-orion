@@ -141,7 +141,7 @@ function harnessFiles()
   harnessList=""
   TMP_DIR=$(mktemp -d /tmp/xmlCheck.XXXXX)
   vMsg TMP_DIR: $TMP_DIR
-  for FILE in $(find $SRC_TOP/test/testharness -name *.test)
+  for FILE in $(find $SRC_TOP/test/functionalTest/cases -name *.test)
   do
     PREFIX=$(basename ${FILE%.*})
     $SRC_TOP/test/xmlCheck/xmlExtractor.py $FILE $TMP_DIR $PREFIX
@@ -355,7 +355,7 @@ xmlFilesBadName=$(find $SRC_TOP/test -name "*.xml" | grep -v "ngsi*.valid.xml" |
 xmlFilesProcessed=0
 xmlFilesOK=0
 xmlFilesErrors=0
-harnessFilesFound=$(find $SRC_TOP/test/testharness -name "*.test" | wc -l)
+harnessFilesFound=$(find $SRC_TOP/test/functionalTest/cases -name "*.test" | wc -l)
 xmlPartsFound=$xmlPartsFound           # already taken care of by function 'harnessFiles'
 xmlPartsValid=$xmlPartsValid           # already taken care of by function 'harnessFiles'
 xmlPartsInvalid=$xmlPartsInvalid       # already taken care of by function 'harnessFiles'

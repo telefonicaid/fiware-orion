@@ -3,6 +3,6 @@
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "Bad Request",
-    "details" : "Service not recognized: /ngsi9/discoverContextAvailability"
+    "details" : "unrecognized request"
   }
 }

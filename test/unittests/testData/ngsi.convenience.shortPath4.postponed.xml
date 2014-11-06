@@ -1,5 +1,5 @@
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Service not recognized: ngsi10/nada</details>
+  <details>unrecognized request</details>
 </orionError>
