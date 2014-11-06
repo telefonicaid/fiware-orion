@@ -39,7 +39,7 @@ brokerStart CB 0-255
 # 05. XML:  Intent to query an entity with  ';' as part of a scopeType
 # 06. XML:  Intent to update an entity with '(' as part of contextAttribute::type
 # 07. XML:  Intent to update an entity with '(' as part of a value in compound contextAttribute::value
-# 08: XML:  Intent to update subscribe to an entity with ')' as part of reference
+# 08. XML:  Intent to subscribe to an entity with ')' as part of reference
 # 11. JSON: Intent to register an entity with '<' as part of entity::id
 # 12. JSON: Intent to discover an entity with '>' as part of entity::type
 # 13. JSON: Intent to register an entity with '=' as part of providingApplication
@@ -240,7 +240,7 @@ echo
 echo
 
 
-echo "08: XML:  Intent to update subscribe to an entity with ')' as part of reference"
+echo "08. XML:  Intent to subscribe to an entity with ')' as part of reference"
 echo "==============================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <subscribeContextRequest>
@@ -281,6 +281,213 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <throttling>PT1S</throttling>
 </subscribeContextRequest>'
 orionCurl --url /v1/subscribeContext --payload "$payload"
+echo
+echo
+
+
+echo "11. JSON: Intent to register an entity with '<' as part of entity::id"
+echo "====================================================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "Room",
+         "isPattern": "false",
+         "id": "Room<1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "temperature",
+        "type": "centigrade",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://mysensors.com/Rooms"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "12. JSON: Intent to discover an entity with '>' as part of entity::type"
+echo "======================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "Roo>m",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ]
+}'
+orionCurl --url /v1/registry/discoverContextAvailability --payload "$payload" --json
+echo
+echo
+
+
+echo "13. JSON: Intent to register an entity with '=' as part of providingApplication"
+echo "==============================================================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "Room",
+         "isPattern": "false",
+         "id": "Room1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "temperature",
+        "type": "centigrade",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "pa=http://mysensors.com/Rooms"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+
+echo "14. JSON: Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name"
+echo "======================================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "tempera'"'"'ture"
+  ],
+  "reference": "http://10.1.1.1:80/test/interfaceNotification",
+  "duration": "PT1M"
+}'
+orionCurl --url /v1/registry/subscribeContextAvailability --payload "$payload" --json
+echo
+echo
+
+echo "15. JSON: Intent to query an entity with  ';' as part of a scopeType"
+echo "===================================================================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature"
+  ],
+  "restriction": {
+    "attributeExpression" : "Attribute Expression",
+    "scopes": [
+      {
+        "type" : "st1;st2",
+        "value" : "sv1"
+      },
+      {
+        "type" : "st2",
+        "value" : "sv2"
+      }
+    ]
+  }
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "16. JSON: Intent to update an entity with '(' as part of contextAttribute::type"
+echo "==============================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "deg(ree",
+          "value": "20"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "17. JSON: Intent to update an entity with '(' as part of a value in compound contextAttribute::value"
+echo "===================================================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom",
+      "attributes": [
+        {
+          "name": "temperature",
+          "type": "degree",
+          "value": {
+            "x1" : "1(2",
+            "x2" : "2",
+            "x3" : "3"
+          }
+        }
+      ],
+      "attributeDomainName" : "ATTR_DOMAIN_NAME"
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "18: JSON: Intent to subscribe to an entity with ')' as part of reference"
+echo "========================================================================"
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "lightstatus"
+  ],
+  "reference": "http://10.1.1.1:80/test/interface)Notification",
+  "duration": "PT1M"
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
 echo
 echo
 
@@ -402,7 +609,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-08: XML:  Intent to update subscribe to an entity with ')' as part of reference
+08. XML:  Intent to subscribe to an entity with ')' as part of reference
 ===============================================================================
 HTTP/1.1 200 OK
 Content-Length: 254
@@ -419,6 +626,139 @@ Date: REGEX(.*)
     </errorCode>
   </subscribeError>
 </subscribeContextResponse>
+
+
+11. JSON: Intent to register an entity with '<' as part of entity::id
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 178
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "registrationId": "000000000000000000000000"
+}
+
+
+12. JSON: Intent to discover an entity with '>' as part of entity::type
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+13. JSON: Intent to register an entity with '=' as part of providingApplication
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 178
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "registrationId": "000000000000000000000000"
+}
+
+
+14. JSON: Intent to ngsi9-subscribe to an entity with ' as part of an attribute::name
+=======================================================================================
+HTTP/1.1 200 OK
+Content-Length: 178
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }, 
+    "subscriptionId": "000000000000000000000000"
+}
+
+
+15. JSON: Intent to query an entity with  ';' as part of a scopeType
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+16. JSON: Intent to update an entity with '(' as part of contextAttribute::type
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+17. JSON: Intent to update an entity with '(' as part of a value in compound contextAttribute::value
+====================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 129
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "Illegal value for JSON field", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+18: JSON: Intent to subscribe to an entity with ')' as part of reference
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 166
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeError": {
+        "errorCode": {
+            "code": "400", 
+            "details": "Illegal value for JSON field", 
+            "reasonPhrase": "Bad Request"
+        }
+    }
+}
 
 
 --TEARDOWN--
