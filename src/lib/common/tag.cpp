@@ -33,6 +33,108 @@
 
 /* ****************************************************************************
 *
+* htmlEscape - 
+*/
+char* htmlEscape(const char* s)
+{
+  int   newLen  = strlen(s) * 6 + 1;
+  char* out     = (char*) calloc(1, newLen);
+  int   sIx     = 0;
+  int   outIx   = 0;
+  
+  if (out == NULL)
+  {
+    LM_E(("Internal Error (allocating %d bytes: %s)", newLen, strerror(errno)));
+    return NULL;
+  }
+
+  while (s[sIx] != 0)
+  {
+    switch (s[sIx])
+    {
+    case '<':
+      out[outIx++] = '&';
+      out[outIx++] = 'l';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '>':
+      out[outIx++] = '&';
+      out[outIx++] = 'g';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '(':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '0';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ')':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '=':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '6';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '\'':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '3';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '"':
+      out[outIx++] = '&';
+      out[outIx++] = 'q';
+      out[outIx++] = 'u';
+      out[outIx++] = 'o';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ';':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '5';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    default:
+      out[outIx++] = s[sIx++];
+    }
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * startTag -  
 */
 std::string startTag
@@ -173,16 +275,26 @@ std::string valueTag
 (
   const std::string&  indent,
   const std::string&  tagName,
-  const std::string&  value,
+  const std::string&  unescapedValue,
   Format              format,
   bool                showComma,
   bool                isAssociation,
   bool                isVectorElement
 )
 {
+  char* value = htmlEscape(unescapedValue.c_str());
+  
+  if (value == NULL)
+  {
+    return "ERROR";
+  }
+
   if (format == XML)
   {
-    return indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
+    std::string out = indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
+
+    free(value);
+    return out;
   }
 
   if (showComma == true)
