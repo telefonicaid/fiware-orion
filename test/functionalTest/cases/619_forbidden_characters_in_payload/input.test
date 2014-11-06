@@ -47,7 +47,7 @@ brokerStart CB 0-255
 # 15. JSON: Intent to query an entity with  ';' as part of a scopeType
 # 16. JSON: Intent to update an entity with '(' as part of contextAttribute::type
 # 17. JSON: Intent to update an entity with '(' as part of a value in compound contextAttribute::value
-# 18: JSON: Intent to update subscribe to an entity with ')' as part of reference
+# 18: JSON: Intent to subscribe to an entity with ')' as part of reference
 #
 
 
