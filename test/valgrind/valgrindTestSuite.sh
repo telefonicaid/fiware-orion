@@ -216,7 +216,7 @@ function brokerStart()
     # Starting contextBroker in valgrind with a clean database
     killall contextBroker 2> /dev/null
     echo 'db.dropDatabase()' | mongo valgrindtest --quiet > /dev/null
-    valgrind --memcheck:leak-check=full --show-reachable=yes --trace-children=yes contextBroker -port ${CB_TEST_PORT} -db valgrindtest -harakiri -t0-255 > ${NAME}.out 2>&1 &
+    valgrind --memcheck:leak-check=full --show-reachable=yes --trace-children=yes contextBroker -port ${CB_TEST_PORT} -db leaktest -harakiri -t0-255 > ${NAME}.out 2>&1 &
     valgrindPid=$!
 
     # Awaiting valgrind to start contextBroker (sleep 10)

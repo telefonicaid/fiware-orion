@@ -1815,6 +1815,7 @@ void processContextElement(ContextElement*                  ceP,
           buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
 
+        crrV.release();
       }
       else
       {
