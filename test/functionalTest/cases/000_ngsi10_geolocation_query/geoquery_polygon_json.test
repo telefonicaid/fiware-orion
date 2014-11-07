@@ -45,7 +45,7 @@ payload='{
         {
           "name": "location",
           "type": "string",
-          "value": "WSG84"
+          "value": "WGS84"
         }
       ]
     }
@@ -77,7 +77,7 @@ payload='{
         {
           "name": "location",
           "type": "string",
-          "value": "WSG84"
+          "value": "WGS84"
         }
       ]
     }
@@ -109,7 +109,7 @@ payload='{
         {
           "name": "location",
           "type": "string",
-          "value": "WSG84"
+          "value": "WGS84"
         }
       ]
     }
@@ -360,7 +360,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -397,7 +397,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -434,7 +434,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -471,7 +471,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -496,7 +496,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -533,7 +533,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -558,7 +558,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -595,7 +595,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -632,7 +632,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -669,7 +669,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
@@ -694,7 +694,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",
