@@ -49,7 +49,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>'
-orionCurl --url "$url" --payload "$payload" --urlParams attributesFormat=object --out json
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --out json
 echo
 echo
 
@@ -79,7 +79,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>'
-orionCurl --url "$url" --payload "$payload" --urlParams attributesFormat=object --out json -X PUT
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --out json -X PUT
 echo
 echo
 
