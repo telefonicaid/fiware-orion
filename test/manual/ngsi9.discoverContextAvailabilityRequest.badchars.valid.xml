@@ -1,0 +1,11 @@
+<discoverContextAvailabilityRequest>
+  <entityIdList>
+    <entityId type="Ro>om" isPattern="false">
+      <id>ConferenceRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>temperature</attribute>
+    <attribute>pressure</attribute>
+  </attributeList>
+</discoverContextAvailabilityRequest>

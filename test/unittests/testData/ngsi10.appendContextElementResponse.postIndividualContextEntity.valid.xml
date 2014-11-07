@@ -1,4 +1,7 @@
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>entity11</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>

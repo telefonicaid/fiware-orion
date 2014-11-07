@@ -64,6 +64,11 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
   }
   else
   {
+    if (entity.id != "")
+    {
+      out += entity.render(ciP->outFormat, indent + "  ", true);
+    }
+
     out += contextResponseVector.render(ciP, requestType, indent + "  ");
   }
 

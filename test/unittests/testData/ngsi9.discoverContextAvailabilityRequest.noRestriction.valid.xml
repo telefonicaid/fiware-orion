@@ -2,10 +2,10 @@
   <discoverContextAvailabilityRequest>
     <entityIdList>
       <entityId type="Room" isPattern="false">
-        <id>Conference"Room"</id>
+        <id>ConferenceRoom</id>
       </entityId>
       <entityId type="Room" isPattern="false">
-        <id>Office"Room"</id>
+        <id>OfficeRoom</id>
       </entityId>
     </entityIdList>
     <attributeList>

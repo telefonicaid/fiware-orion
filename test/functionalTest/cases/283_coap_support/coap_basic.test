@@ -81,7 +81,10 @@ v:1 t:0 tkl:0 c:2 id:REGEX(\d+)
                 "reasonPhrase": "OK"
             }
         }
-    ]
+    ],
+    "id": "Room1", 
+    "isPattern": "false", 
+    "type": ""
 }
 +++++++ Query +++++++++
 v:1 t:0 tkl:0 c:1 id:REGEX(\d+)

@@ -180,6 +180,14 @@
 
 /* ****************************************************************************
 *
+* DB_NAME_MAX_LEN - max length of database name
+*/
+#define DB_NAME_MAX_LEN  10
+
+
+
+/* ****************************************************************************
+*
 * Option variables
 */
 bool            fg;
@@ -473,6 +481,7 @@ PaArgument paArgs[] =
 
 #define ACE                AllContextEntities
 #define ACE_COMPS_V1       2, { "v1", "contextEntities" }
+#define ACE_POST_WORD     "appendContextElementRequest"
 
 #define ACET               AllEntitiesWithTypeAndId
 #define ACET_COMPS_V1      6, { "v1", "contextEntities", "type", "*", "id", "*" }
@@ -759,6 +768,7 @@ PaArgument paArgs[] =
   { "*",      AFET,  AFET_COMPS_V1,          "",              badVerbGetOnly                            }, \
                                                                                                            \
   { "GET",    ACE,   ACE_COMPS_V1,           "",              getAllContextEntities                     }, \
+  { "POST",   ACE,   ACE_COMPS_V1,           ACE_POST_WORD,   postIndividualContextEntity               }, \
   { "*",      ACE,   ACE_COMPS_V1,           "",              badVerbGetOnly                            }, \
                                                                                                            \
   { "GET",    ACET,  ACET_COMPS_V1,          "",              getAllEntitiesWithTypeAndId               }, \
@@ -1317,6 +1327,12 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  if (strlen(dbName) > DB_NAME_MAX_LEN)
+  {
+    LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
+  }
+
   LM_I(("Orion Context Broker is running"));
 
   if (useOnlyIPv6 && useOnlyIPv4)

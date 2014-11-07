@@ -99,12 +99,15 @@ orionCurl --url "/v1/contextEntities/Room1/attributes/temperature" --json
 --REGEXPECT--
 +++++ 1. create entity +++++
 HTTP/1.1 200 OK
-Content-Length: 821
+Content-Length: 893
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>Room1</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>

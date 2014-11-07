@@ -185,7 +185,7 @@ Date: REGEX(.*)
 # 3. Add attribute A3 to E1/<empty>
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 255
+Content-Length: 310
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -204,7 +204,10 @@ Date: REGEX(.*)
                 "reasonPhrase": "OK"
             }
         }
-    ]
+    ],
+    "id": "E1", 
+    "isPattern": "false", 
+    "type": ""
 }
 
 

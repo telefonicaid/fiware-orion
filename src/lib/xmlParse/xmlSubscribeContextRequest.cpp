@@ -72,7 +72,18 @@ static int entityId(xml_node<>* node, ParseData* reqData)
 static int entityIdId(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
-  reqData->scr.entityIdP->id = node->value();
+
+  if (reqData->scr.entityIdP != NULL)
+  {
+    reqData->scr.entityIdP->id = node->value();
+  }
+  else
+  {
+    LM_W(("Bad Input (XML parse error)"));
+    reqData->errorString = "Bad Input (XML parse error)";
+    return 1;
+  }
+
   return 0;
 }
 

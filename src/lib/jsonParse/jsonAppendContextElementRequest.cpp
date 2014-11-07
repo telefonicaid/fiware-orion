@@ -214,11 +214,63 @@ static std::string domainMetadataValue(const std::string& path, const std::strin
 
 /* ****************************************************************************
 *
+* entityIdId - 
+*/
+static std::string entityIdId(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  reqDataP->acer.res.entity.id = value;
+  LM_T(LmtParse, ("Set 'id' to '%s' for an entity", reqDataP->acer.res.entity.id.c_str()));
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* entityIdType - 
+*/
+static std::string entityIdType(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  reqDataP->acer.res.entity.type = value;
+  LM_T(LmtParse, ("Set 'type' to '%s' for an entity", reqDataP->acer.res.entity.type.c_str()));
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* entityIdIsPattern - 
+*/
+static std::string entityIdIsPattern(const std::string& path, const std::string& value, ParseData* reqDataP)
+{
+  LM_T(LmtParse, ("Got an entityId:isPattern: '%s'", value.c_str()));
+
+  if (!isTrue(value) && !isFalse(value))
+  {
+    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+  }
+
+  reqDataP->acer.res.entity.isPattern = value;
+
+  return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
 * jsonAcerParseVector -
 */
 JsonNode jsonAcerParseVector[] =
 {
   { "/attributeDomainName",                          attributeDomainName   },
+
+  { "/id",                                           entityIdId            },
+  { "/type",                                         entityIdType          },
+  { "/isPattern",                                    entityIdIsPattern     },
 
   { "/attributes",                                   jsonNullTreat         },
   { "/attributes/attribute",                         contextAttribute      },

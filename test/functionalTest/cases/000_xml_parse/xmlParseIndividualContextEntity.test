@@ -143,12 +143,15 @@ Date: REGEX(.*)
 </statusCode>
 3: ++++++++++++ POST that is ok ++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 494
+Content-Length: 570
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>ENTITY_ID</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>

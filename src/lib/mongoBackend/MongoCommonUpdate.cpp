@@ -862,7 +862,21 @@ static bool addTriggeredSubscriptions(std::string                               
     while (cursor->more()) {
 
         BSONObj sub = cursor->next();
-        std::string subIdStr = sub.getField("_id").OID().str();
+        BSONElement idField = sub.getField("_id");
+
+        //
+        // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
+        //
+        // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
+        // an exception and the broker crashes. 
+        //
+        if (idField.eoo() == true)
+        {
+          LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
+          continue;
+        }
+
+        std::string subIdStr = idField.OID().str();
 
         if (subs.count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
@@ -1575,9 +1589,24 @@ void processContextElement(ContextElement*                  ceP,
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
         ++docs;
-        std::string entityId    = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_ID);
-        std::string entityType  = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_TYPE);
-        std::string entitySPath = STR_FIELD(r.getField("_id").embeddedObject(), ENT_SERVICE_PATH);
+
+        BSONElement idField = r.getField("_id");
+
+        //
+        // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
+        //
+        // Now, if 'r.getField("_id")' is not found, if we continue, calling embeddedObject() on it, then we get
+        // an exception and the broker crashes.
+        //
+        if (idField.eoo() == true)
+        {
+          LM_E(("Database Error (error retrieving _id field in doc: %s)", r.toString().c_str()));
+          continue;
+        }
+
+        std::string entityId    = STR_FIELD(idField.embeddedObject(), ENT_ENTITY_ID);
+        std::string entityType  = STR_FIELD(idField.embeddedObject(), ENT_ENTITY_TYPE);
+        std::string entitySPath = STR_FIELD(idField.embeddedObject(), ENT_SERVICE_PATH);
 
         LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 

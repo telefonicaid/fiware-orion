@@ -1,0 +1,29 @@
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>NADA</contextValue>
+        </contextAttribute>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>
+            <level1>
+              <value>1(1</value>
+              <level2>
+                <value>2</value>
+              </level2>
+            </level1>
+          </contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>
