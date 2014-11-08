@@ -80,7 +80,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <attribute>A2</attribute>
   </attributeList>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --urlParams attributesFormat=object --out json
+orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --out json
 echo
 echo
 
