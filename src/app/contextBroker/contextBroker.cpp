@@ -1141,6 +1141,8 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 */
 static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd)
 {
+  LM_M(("dbName: '%s'", dbName.c_str()));
+
   if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
@@ -1327,6 +1329,8 @@ int main(int argC, char* argV[])
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
+
+  LM_M(("dbName: '%s'", dbName));
 
   if (strlen(dbName) > DB_NAME_MAX_LEN)
   {
