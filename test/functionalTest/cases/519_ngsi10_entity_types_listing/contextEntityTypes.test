@@ -92,19 +92,19 @@ echo
 
 
 echo "7. Listing of Entity Types. Response in Object-JSON"
-orionCurl --url '/v1/contextTypes?attributesFormat=object' --json 
+orionCurl --url '/v1/contextTypes?attributeFormat=object' --json 
 echo
 echo
 
 
 echo "8. Listing of Entity Types. Response in Object-JSON, with details=on"
-orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on' --json 
+orionCurl --url '/v1/contextTypes?attributeFormat=object&details=on' --json 
 echo
 echo
 
 
 echo "9. Listing of Entity Types. Response in Object-JSON, with details=on and collapse=true"
-orionCurl --url '/v1/contextTypes?attributesFormat=object&details=on&collapse=true' --json  
+orionCurl --url '/v1/contextTypes?attributeFormat=object&details=on&collapse=true' --json  
 echo
 echo
 
