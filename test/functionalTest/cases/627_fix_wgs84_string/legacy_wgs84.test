@@ -21,13 +21,11 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Geo query circle - deprecated
+Geo query circle
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
 --SHELL--
-# The tests in this file use FIWARE_Location (instead of FIWARE::Location), which was deprecated
-# in Orion 0.16.0
 
 echo "1: +++++++++ Prepare entity for Madrid +++++++++++"
 # Create entities corresponding to the three cities
@@ -48,7 +46,7 @@ payload='<?xml version="1.0"?>
             <contextMetadata>
               <name>location</name>
               <type>string</type>
-              <value>WGS84</value>
+              <value>WSG84</value>
             </contextMetadata>
           </metadata>
         </contextAttribute>
@@ -80,7 +78,7 @@ payload='<?xml version="1.0"?>
             <contextMetadata>
               <name>location</name>
               <type>string</type>
-              <value>WGS84</value>
+              <value>WSG84</value>
             </contextMetadata>
           </metadata>
         </contextAttribute>
@@ -112,7 +110,7 @@ payload='<?xml version="1.0"?>
             <contextMetadata>
               <name>location</name>
               <type>string</type>
-              <value>WGS84</value>
+              <value>WSG84</value>
             </contextMetadata>
           </metadata>
         </contextAttribute>
@@ -139,7 +137,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <centerLatitude>40.418889</centerLatitude>
@@ -170,7 +168,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <centerLatitude>40.418889</centerLatitude>
@@ -201,7 +199,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE_Location</scopeType>
+        <scopeType>FIWARE::Location</scopeType>
         <scopeValue>
           <circle>
             <centerLatitude>40.418889</centerLatitude>
@@ -241,7 +239,7 @@ Date: REGEX(.*)
               <contextMetadata>
                 <name>location</name>
                 <type>string</type>
-                <value>WGS84</value>
+                <value>WSG84</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>
@@ -278,7 +276,7 @@ Date: REGEX(.*)
               <contextMetadata>
                 <name>location</name>
                 <type>string</type>
-                <value>WGS84</value>
+                <value>WSG84</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>
@@ -315,7 +313,7 @@ Date: REGEX(.*)
               <contextMetadata>
                 <name>location</name>
                 <type>string</type>
-                <value>WGS84</value>
+                <value>WSG84</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>

@@ -46,7 +46,7 @@ payload='<?xml version="1.0"?>
             <contextMetadata>
               <name>location</name>
               <type>string</type>
-              <value>WSG84</value>
+              <value>WGS84</value>
             </contextMetadata>
           </metadata>
         </contextAttribute>
@@ -174,7 +174,7 @@ Date: REGEX(.*)
               <contextMetadata>
                 <name>location</name>
                 <type>string</type>
-                <value>WSG84</value>
+                <value>WGS84</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>

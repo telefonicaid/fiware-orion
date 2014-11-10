@@ -33,14 +33,16 @@
 *
 * Names of the URI parameters
 */
-#define URI_PARAM_NOTIFY_FORMAT       "notifyFormat"
-#define URI_PARAM_PAGINATION_OFFSET   "offset"
-#define URI_PARAM_PAGINATION_LIMIT    "limit"
-#define URI_PARAM_PAGINATION_DETAILS  "details"
-#define URI_PARAM_COLLAPSE            "collapse"
-#define URI_PARAM_ENTITY_TYPE         SCOPE_VALUE_ENTITY_TYPE
-#define URI_PARAM_NOT_EXIST           "!exist"
-#define URI_PARAM_EXIST               "exist"
+#define URI_PARAM_NOTIFY_FORMAT           "notifyFormat"
+#define URI_PARAM_PAGINATION_OFFSET       "offset"
+#define URI_PARAM_PAGINATION_LIMIT        "limit"
+#define URI_PARAM_PAGINATION_DETAILS      "details"
+#define URI_PARAM_COLLAPSE                "collapse"
+#define URI_PARAM_ENTITY_TYPE             SCOPE_VALUE_ENTITY_TYPE
+#define URI_PARAM_NOT_EXIST               "!exist"
+#define URI_PARAM_EXIST                   "exist"
+#define URI_PARAM_ATTRIBUTES_FORMAT       "attributesFormat"
+#define URI_PARAM_ATTRIBUTE_FORMAT        "attributeFormat"
 
 
 

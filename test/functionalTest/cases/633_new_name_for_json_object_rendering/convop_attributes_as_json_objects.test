@@ -29,6 +29,16 @@
 #  o UpdateContextElementResponse    (PUT /v1/contextEntities/*)
 #  o ContextAttributeResponse        (GET /v1/contextEntities/*/attributes/*)
 #
+# Also, a test (07) that the old URI param 'attributesFormat' still works is needed
+#
+# 01. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes
+# 02. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (with attributeFormat=object)
+# 03. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (without attributeFormat=object)
+# 04. Update E1/A1 using conv op PUT  /v1/contextEntities/E1/attributes
+# 05. Query  E1/A1 using conv op GET  /v1/contextEntities/E1/attributes/A1 (with attributeFormat=object)
+# 06. Query  E1/A1 using conv op GET  /v1/contextEntities/E1/attributes/A1 (without attributeFormat=object)
+# 07. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (with attributesFormat=object)
+#
 
 --NAME--
 ConvOps with attributes as JSON objects
@@ -37,8 +47,9 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-echo "1. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes"
-url="/v1/contextEntities/E1/attributes"
+echo "01. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes"
+echo "====================================================================="
+url=""
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -49,25 +60,26 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>'
-orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --out json
+orionCurl --url /v1/contextEntities/E1/attributes --payload "$payload" --out json --urlParams attributeFormat=object
 echo
 echo
 
 
-echo "2. query E1/A1 using conv op GET /v1/contextEntities/E1 (with attributeFormat=object)"
-url="/v1/contextEntities/E1"
-orionCurl --url "$url" --urlParams attributeFormat=object --out json
+echo "02. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (with attributeFormat=object)"
+echo "========================================================================================"
+orionCurl --url /v1/contextEntities/E1 --out json --urlParams attributeFormat=object
 echo
 echo
 
-echo "3. query E1/A1 using conv op GET /v1/contextEntities/E1 (without attributeFormat=object)"
-orionCurl --url "$url" --out json
+echo "03. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (without attributeFormat=object)"
+echo "==========================================================================================="
+orionCurl --url /v1/contextEntities/E1 --out json
 echo
 echo
 
 
-echo "4. Update E1/A1 using conv op PUT /v1/contextEntities/E1/attributes"
-url="/v1/contextEntities/E1"
+echo "04. Update E1/A1 using conv op PUT  /v1/contextEntities/E1/attributes"
+echo "====================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
@@ -79,27 +91,35 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>'
-orionCurl --url "$url" --payload "$payload" --urlParams attributeFormat=object --out json -X PUT
+orionCurl --url /v1/contextEntities/E1 --payload "$payload" --urlParams attributeFormat=object --out json -X PUT
 echo
 echo
 
 
-echo "5. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (with attributeFormat=object)"
-url="/v1/contextEntities/E1/attributes/A1"
-orionCurl --url "$url" --urlParams attributeFormat=object --out json
+echo "05. Query  E1/A1 using conv op GET  /v1/contextEntities/E1/attributes/A1 (with attributeFormat=object)"
+echo "======================================================================================================"
+orionCurl --url /v1/contextEntities/E1/attributes/A1 --urlParams attributeFormat=object --out json
 echo
 echo
 
 
-echo "6. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (without attributeFormat=object)"
-url="/v1/contextEntities/E1/attributes/A1"
-orionCurl --url "$url" --out json
+echo "06. Query  E1/A1 using conv op GET  /v1/contextEntities/E1/attributes/A1 (without attributeFormat=object)"
+echo "========================================================================================================="
+orionCurl --url /v1/contextEntities/E1/attributes/A1 --out json
+echo
+echo
+
+
+echo "07. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (with attributesFormat=object)"
+echo "========================================================================================="
+orionCurl --url /v1/contextEntities/E1 --out json --urlParams attributesFormat=object
 echo
 echo
 
 
 --REGEXPECT--
-1. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes
+01. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes
+=====================================================================
 HTTP/1.1 200 OK
 Content-Length: 239
 Content-Type: application/json
@@ -123,7 +143,8 @@ Date: REGEX(.*)
 }
 
 
-2. query E1/A1 using conv op GET /v1/contextEntities/E1 (with attributeFormat=object)
+02. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (with attributeFormat=object)
+========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 259
 Content-Type: application/json
@@ -148,7 +169,8 @@ Date: REGEX(.*)
 }
 
 
-3. query E1/A1 using conv op GET /v1/contextEntities/E1 (without attributeFormat=object)
+03. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (without attributeFormat=object)
+===========================================================================================
 HTTP/1.1 200 OK
 Content-Length: 275
 Content-Type: application/json
@@ -174,7 +196,8 @@ Date: REGEX(.*)
 }
 
 
-4. Update E1/A1 using conv op PUT /v1/contextEntities/E1/attributes
+04. Update E1/A1 using conv op PUT  /v1/contextEntities/E1/attributes
+=====================================================================
 HTTP/1.1 200 OK
 Content-Length: 239
 Content-Type: application/json
@@ -198,7 +221,8 @@ Date: REGEX(.*)
 }
 
 
-5. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (with attributeFormat=object)
+05. Query  E1/A1 using conv op GET  /v1/contextEntities/E1/attributes/A1 (with attributeFormat=object)
+======================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 160
 Content-Type: application/json
@@ -218,7 +242,8 @@ Date: REGEX(.*)
 }
 
 
-6. query E1/A1 using conv op GET /v1/contextEntities/E1/attributes/A1 (without attributeFormat=object)
+06. Query  E1/A1 using conv op GET  /v1/contextEntities/E1/attributes/A1 (without attributeFormat=object)
+=========================================================================================================
 HTTP/1.1 200 OK
 Content-Length: 174
 Content-Type: application/json
@@ -232,6 +257,32 @@ Date: REGEX(.*)
             "value": "99"
         }
     ], 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+07. Query  E1/A1 using conv op GET  /v1/contextEntities/E1 (with attributesFormat=object)
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 260
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": {
+            "A1": {
+                "type": "Attr", 
+                "value": "99"
+            }
+        }, 
+        "id": "E1", 
+        "isPattern": "false", 
+        "type": ""
+    }, 
     "statusCode": {
         "code": "200", 
         "reasonPhrase": "OK"

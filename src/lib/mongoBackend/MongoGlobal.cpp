@@ -1144,7 +1144,7 @@ bool entitiesQuery
                     caP->metadataVector.push_back(md);
                 }
                 if (locAttr == ca.name) {
-                    Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WSG84);
+                    Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
                     caP->metadataVector.push_back(md);
                 }
 
