@@ -950,7 +950,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: (E1, T1) - offending attribute: A5 - attemp to define a location attribute (A5) when another one has been previously defined (A1)", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E1, T1] - offending attribute: A5 - attempt to define a location attribute [A5] when another one has been previously defined [A1]", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1058,7 +1058,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: (E2, T2) - offending attribute: A5 - error parsing location attribute, value: <erroneous>", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - error parsing location attribute, value: <erroneous>", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1166,7 +1166,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_EQ("gurugu", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: (E2, T2) - offending attribute: A5 - only WSG84 is supported for location, found: <gurugu>", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: [E2, T2] - offending attribute: A5 - only WSG84 is supported for location, found: [gurugu]", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1269,7 +1269,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: (E1, T1) - offending attribute: A1 - error parsing location attribute, value: <invalid>", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A1 - error parsing location attribute, value: <invalid>", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1377,7 +1377,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: UPDATE - entity: (E1, T1) - offending attribute: A2 - location nature of an attribute has to be defined at creation time, with APPEND", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A2 - location nature of an attribute has to be defined at creation time, with APPEND", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1486,7 +1486,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: DELETE - entity: (E1, T1) - offending attribute: A1 - location attribute has to be defined at creation time, with APPEND", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: DELETE - entity: [E1, T1] - offending attribute: A1 - location attribute has to be defined at creation time, with APPEND", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

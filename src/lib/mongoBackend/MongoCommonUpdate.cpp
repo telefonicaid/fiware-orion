@@ -1145,7 +1145,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               std::string("action: APPEND") +
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - attemp to define a location attribute [" + targetAttr->name + "] when another one has been previously defined [" + locAttr + "]");
+                                              " - attempt to define a location attribute [" + targetAttr->name + "] when another one has been previously defined [" + locAttr + "]");
                         return false;
                     }
 
