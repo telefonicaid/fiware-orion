@@ -161,8 +161,6 @@ static void prepareDatabase(void) {
    * - E1:
    *     A1: val1
    *     A2: (no value)
-   *     A1*: val1bis
-   *     A1**: val1bis1
    * - E2
    *     A3: val3
    *     A4: (no value)
@@ -174,8 +172,6 @@ static void prepareDatabase(void) {
    * - E1**:
    *     A1: val1
    *     A2: (no value)
-   *     A1*: val1bis
-   *     A1**: val1bis1
    *
    * (*) Means that entity/type is using same name but different type. This is included to check that type is
    *     taken into account.
@@ -187,9 +183,7 @@ static void prepareDatabase(void) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrs" << BSON_ARRAY(
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "val1") <<
-                        BSON("name" << "A2" << "type" << "TA2") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "val1bis") <<
-                        BSON("name" << "A1" << "value" << "val1bis1")
+                        BSON("name" << "A2" << "type" << "TA2")
                         )
                     );
 
@@ -216,9 +210,7 @@ static void prepareDatabase(void) {
   BSONObj en1nt = BSON("_id" << BSON("id" << "E1") <<
                      "attrs" << BSON_ARRAY(
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "val1-nt") <<
-                        BSON("name" << "A2" << "type" << "TA2") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "val1bis-nt") <<
-                        BSON("name" << "A1" << "value" << "val1bis1-nt")
+                        BSON("name" << "A2" << "type" << "TA2")
                         )
                     );
 
@@ -275,7 +267,6 @@ static void prepareDatabaseWithAttributeIds(void) {
                        "attrs" << BSON_ARRAY(
                           BSON("name" << "A1" << "type" << "TA1" << "value" << "val11" << "id" << "ID1") <<
                           BSON("name" << "A1" << "type" << "TA1" << "value" << "val12" << "id" << "ID2") <<
-                          BSON("name" << "A1" << "type" << "TA11" << "value" << "val111") <<
                           BSON("name" << "A2" << "type" << "TA2" << "value" << "val2")
                           )
                       );
@@ -404,11 +395,9 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
@@ -417,14 +406,6 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));    
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -478,11 +459,9 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
-    a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
+    a2 = getAttr(attrs, "A2", "TA2");    
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -491,14 +470,6 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -571,27 +542,17 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    ASSERT_EQ(2, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1bis, "value"));
-    EXPECT_EQ(1360232700, a1bis.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1nt, "value"));
-    EXPECT_EQ(1360232700, a1nt.getIntField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -645,11 +606,9 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
-    a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
+    a2 = getAttr(attrs, "A2", "TA2");    
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -658,14 +617,6 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -765,11 +716,9 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
@@ -778,14 +727,6 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -839,11 +780,9 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
@@ -852,14 +791,6 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -959,27 +890,17 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
+    ASSERT_EQ(2, attrs.size());
+    BSONObj a1 = getAttr(attrs, "A1", "");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1bis, "value"));
-    EXPECT_EQ(1360232700, a1bis.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1nt, "value"));
-    EXPECT_EQ(1360232700, a1nt.getIntField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1021,9 +942,9 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    a1 = getAttr(attrs, "A1", "TA1");
+    a1 = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
 
@@ -1033,27 +954,17 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
-    a1 = getAttr(attrs, "A1", "TA1");
+    ASSERT_EQ(2, attrs.size());
+    a1 = getAttr(attrs, "A1", "");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1bis, "value"));
-    EXPECT_EQ(1360232700, a1bis.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("new_val", C_STR_FIELD(a1nt, "value"));
-    EXPECT_EQ(1360232700, a1nt.getIntField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -1143,11 +1054,9 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
@@ -1156,14 +1065,6 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1217,11 +1118,9 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -1230,14 +1129,6 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -1317,11 +1208,9 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");    
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
@@ -1330,14 +1219,6 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("new_val2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1391,11 +1272,9 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -1404,188 +1283,6 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-
-    /* Release connection */
-    mongoDisconnect();
-
-    utExit();
-
-}
-
-/* ****************************************************************************
-*
-* update1EntNAttr -
-*/
-TEST(mongoUpdateContextRequest, update1EntNAttrSameName)
-{
-    HttpStatusCode         ms;
-    UpdateContextRequest   req;
-    UpdateContextResponse  res;
-
-    utInit();
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Forge the request (from "inside" to "outside") */
-    ContextElement ce;
-    ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca2("A1", "TA1bis", "new_val2");
-    ce.contextAttributeVector.push_back(&ca1);
-    ce.contextAttributeVector.push_back(&ca2);
-    req.contextElementVector.push_back(&ce);
-    req.updateActionType.set("UPDATE");
-
-    /* Invoke the function in mongoBackend library */
-    servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA1bis", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
-
-
-    /* Check that every involved collection at MongoDB is as expected */
-    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
-
-    /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
-    ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
-    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("new_val2", C_STR_FIELD(a1bis, "value"));
-    EXPECT_EQ(1360232700, a1bis.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
-    EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a3 = getAttr(attrs, "A3", "TA3");
-    BSONObj a4 = getAttr(attrs, "A4", "TA4");
-    EXPECT_STREQ("A3", C_STR_FIELD(a3, "name"));
-    EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
-    EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
-    EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_STREQ("A4", C_STR_FIELD(a4, "name"));
-    EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
-    EXPECT_FALSE(a4.hasField("value"));
-    EXPECT_FALSE(a4.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
-    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a5 = getAttr(attrs, "A5", "TA5");
-    BSONObj a6 = getAttr(attrs, "A6", "TA6");
-    EXPECT_STREQ("A5", C_STR_FIELD(a5, "name"));
-    EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
-    EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
-    EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_STREQ("A6", C_STR_FIELD(a6, "name"));
-    EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
-    EXPECT_FALSE(a6.hasField("value"));
-    EXPECT_FALSE(a6.hasField("modDate"));
-
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-
-    /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
-    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
-    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
-    EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
-    EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
-    a1 = getAttr(attrs, "A1", "TA1");
-    a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
-    EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
-    EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -1687,11 +1384,9 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
@@ -1700,14 +1395,6 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("new_val2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1761,11 +1448,9 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -1774,14 +1459,6 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -1854,12 +1531,10 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(5, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
     BSONObj a8 = getAttr(attrs, "A8", "TA8");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -1868,18 +1543,10 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
     EXPECT_STREQ("A8", C_STR_FIELD(a8, "name"));
     EXPECT_STREQ("TA8", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
     EXPECT_EQ(1360232700, a8.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -1933,11 +1600,9 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -1946,14 +1611,6 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -2026,12 +1683,10 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(5, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
     BSONObj a8 = getAttr(attrs, "A8", "");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -2040,18 +1695,10 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
     EXPECT_STREQ("A8", C_STR_FIELD(a8, "name"));
     EXPECT_STREQ("", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
     EXPECT_EQ(1360232700, a8.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -2105,11 +1752,9 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -2118,14 +1763,6 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -2224,12 +1861,10 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(5, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
     BSONObj a8 = getAttr(attrs, "A8", "TA8");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -2238,18 +1873,10 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
     EXPECT_STREQ("A8", C_STR_FIELD(a8, "name"));
     EXPECT_STREQ("TA8", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
     EXPECT_EQ(1360232700, a8.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -2308,11 +1935,9 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(5, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     a8 = getAttr(attrs, "A8", "TA8");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
@@ -2322,14 +1947,6 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
     EXPECT_STREQ("A8", C_STR_FIELD(a8, "name"));
     EXPECT_STREQ("TA8", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
@@ -2432,12 +2049,10 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(5, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
     BSONObj a8 = getAttr(attrs, "A8", "");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -2446,18 +2061,11 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
+
     EXPECT_STREQ("A8", C_STR_FIELD(a8, "name"));
     EXPECT_STREQ("", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
     EXPECT_EQ(1360232700, a8.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -2516,11 +2124,9 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(5, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
-    a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
+    a2 = getAttr(attrs, "A2", "TA2");    
     a8 = getAttr(attrs, "A8", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
@@ -2530,14 +2136,6 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
     EXPECT_STREQ("A8", C_STR_FIELD(a8, "name"));
     EXPECT_STREQ("", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
@@ -2631,12 +2229,10 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(5, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
     BSONObj a8 = getAttr(attrs, "A8", "TA8");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -2645,18 +2241,10 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
     EXPECT_STREQ("A8", C_STR_FIELD(a8, "name"));
     EXPECT_STREQ("TA8", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
     EXPECT_EQ(1360232700, a8.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -2715,11 +2303,9 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -2728,14 +2314,6 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -2814,13 +2392,11 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(6, attrs.size());
+    ASSERT_EQ(4, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
     BSONObj a8 = getAttr(attrs, "A8", "TA8");
     BSONObj a9 = getAttr(attrs, "A9", "TA9");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -2829,10 +2405,6 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
     EXPECT_STREQ("A8", C_STR_FIELD(a8, "name"));
     EXPECT_STREQ("TA8", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
@@ -2841,10 +2413,6 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_STREQ("TA9", C_STR_FIELD(a9, "type"));
     EXPECT_STREQ("val9", C_STR_FIELD(a9, "value"));
     EXPECT_EQ(1360232700, a9.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -2898,11 +2466,9 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -2911,14 +2477,6 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -3021,13 +2579,11 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(6, attrs.size());
+    ASSERT_EQ(4, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
     BSONObj a8 = getAttr(attrs, "A8", "TA8");
     BSONObj a9 = getAttr(attrs, "A9", "TA9");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -3036,10 +2592,6 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
     EXPECT_STREQ("A8", C_STR_FIELD(a8, "name"));
     EXPECT_STREQ("TA8", C_STR_FIELD(a8, "type"));
     EXPECT_STREQ("val8", C_STR_FIELD(a8, "value"));
@@ -3048,10 +2600,6 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_STREQ("TA9", C_STR_FIELD(a9, "type"));
     EXPECT_STREQ("val9", C_STR_FIELD(a9, "value"));
     EXPECT_EQ(1360232700, a9.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -3115,11 +2663,9 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -3128,14 +2674,6 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));    
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -3249,11 +2787,9 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -3262,14 +2798,6 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -3342,22 +2870,12 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(3, attrs.size());
+    ASSERT_EQ(1, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -3411,11 +2929,9 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -3424,14 +2940,6 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -3504,22 +3012,12 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(3, attrs.size());
+    ASSERT_EQ(1, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -3573,11 +3071,9 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -3586,14 +3082,6 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -3804,22 +3292,12 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(3, attrs.size());
+    ASSERT_EQ(1, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -3873,22 +3351,12 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(3, attrs.size());
+    ASSERT_EQ(1, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -3987,22 +3455,12 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(3, attrs.size());
+    ASSERT_EQ(1, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -4056,22 +3514,12 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(3, attrs.size());
-    a1 = getAttr(attrs, "A1", "TA1");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
+    ASSERT_EQ(1, attrs.size());
+    a1 = getAttr(attrs, "A1", "TA1");    
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -4162,22 +3610,12 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(3, attrs.size());
+    ASSERT_EQ(1, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -4226,11 +3664,9 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -4239,14 +3675,6 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -4326,17 +3754,7 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1bis= getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt= getAttr(attrs, "A1", "");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
+    ASSERT_EQ(0, attrs.size());
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -4390,11 +3808,9 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -4403,14 +3819,6 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -4513,17 +3921,7 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
+    ASSERT_EQ(0, attrs.size());
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));    
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -4567,11 +3965,9 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -4580,14 +3976,6 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -4656,11 +4044,9 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -4669,14 +4055,6 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -4730,11 +4108,9 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -4743,14 +4119,6 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -4823,11 +4191,9 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -4836,14 +4202,6 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -4911,11 +4269,9 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -4924,14 +4280,6 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -5009,11 +4357,9 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -5022,14 +4368,6 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -5098,11 +4436,9 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -5111,14 +4447,6 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -5202,11 +4530,9 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -5215,14 +4541,6 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -5276,11 +4594,9 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -5289,14 +4605,6 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -5368,11 +4676,9 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -5381,14 +4687,6 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -5442,11 +4740,9 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -5455,14 +4751,6 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -5535,11 +4823,9 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -5547,15 +4833,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
+    EXPECT_FALSE(a2.hasField("modDate"));   
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -5609,11 +4887,9 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -5622,14 +4898,6 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -5702,11 +4970,9 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -5715,14 +4981,6 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -5775,11 +5033,9 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -5788,14 +5044,6 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -5868,11 +5116,9 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -5881,14 +5127,6 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -5942,11 +5180,9 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -5955,14 +5191,6 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -6052,11 +5280,9 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
@@ -6065,14 +5291,6 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6140,11 +5358,9 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -6153,14 +5369,6 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -6233,11 +5441,9 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
@@ -6246,14 +5452,6 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6307,11 +5505,9 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -6320,14 +5516,6 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -6405,11 +5593,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -6420,16 +5606,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6488,11 +5664,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -6503,26 +5677,15 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    a1 = getAttr(attrs, "A1", "TA11");
+    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");    
     a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1id1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
@@ -6534,11 +5697,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
     EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA11",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val111", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -6574,7 +5732,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     Metadata md("ID", "string", "ID1");
     ca1.metadataVector.push_back(&md);
     ce.contextAttributeVector.push_back(&ca1);
-    ContextAttribute ca2("A1", "TA11", "new_val2");
+    ContextAttribute ca2("A2", "TA2", "new_val2");
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
@@ -6603,13 +5761,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA11", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
     ASSERT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -6627,11 +5785,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -6642,16 +5798,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6710,11 +5856,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -6725,26 +5869,15 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    a1 = getAttr(attrs, "A1", "TA11");
+    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");    
     a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1id1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
@@ -6756,15 +5889,11 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
     EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA11",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("new_val2", C_STR_FIELD(a1, "value"));
-    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_STREQ("new_val2", C_STR_FIELD(a2, "value"));
+    EXPECT_EQ(1360232700, a2.getIntField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
@@ -6843,11 +5972,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -6858,16 +5985,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6926,11 +6043,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -6941,27 +6056,16 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(5, attrs.size());
+    ASSERT_EQ(4, attrs.size());
     BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
     BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    BSONObj a1id3 = getAttr(attrs, "A1", "TA1", "ID3");
-    a1 = getAttr(attrs, "A1", "TA11");
+    BSONObj a1id3 = getAttr(attrs, "A1", "TA1", "ID3");    
     a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1id1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
@@ -6978,11 +6082,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("new_val", C_STR_FIELD(a1id3, "value"));
     EXPECT_STREQ("ID3", C_STR_FIELD(a1id3, "id"));
     EXPECT_EQ(1360232700, a1id3.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA11",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val111", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -7071,11 +6170,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -7086,16 +6183,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7154,11 +6241,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -7169,28 +6254,16 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(6, attrs.size());
+    ASSERT_EQ(4, attrs.size());
     BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
     BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    BSONObj a1id3 = getAttr(attrs, "A1", "TA1", "ID3");
-    a1 = getAttr(attrs, "A1", "TA11");
-    a1bis = getAttr(attrs, "A1", "TA22");
+    BSONObj a1id3 = getAttr(attrs, "A1", "TA1", "ID3");    
     a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1id1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
@@ -7207,16 +6280,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("new_val", C_STR_FIELD(a1id3, "value"));
     EXPECT_STREQ("ID3", C_STR_FIELD(a1id3, "id"));
     EXPECT_EQ(1360232700, a1id3.getIntField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA11",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val111", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA22",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("new_val2", C_STR_FIELD(a1bis, "value"));
-    EXPECT_EQ(1360232700, a1bis.getIntField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -7248,7 +6311,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca("A1", "TA11", "new_val");
+    ContextAttribute ca("A2", "TA2", "new_val");
     Metadata md("ID", "string", "IDX");
     ca.metadataVector.push_back(&md);
     ce.contextAttributeVector.push_back(&ca);
@@ -7272,8 +6335,8 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_EQ("T10", RES_CER(0).entityId.type);
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA11", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
@@ -7281,7 +6344,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_EQ("IDX", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("action: APPEND - entity: (E10, T10) - offending attribute: A1 - attribute can not be appended", RES_CER_STATUS(0).details);
+    EXPECT_EQ("action: APPEND - entity: (E10, T10) - offending attribute: A2 - attribute can not be appended", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7299,11 +6362,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -7314,16 +6375,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7382,11 +6433,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -7397,26 +6446,15 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
     BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    a1 = getAttr(attrs, "A1", "TA11");
     a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1id1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
@@ -7428,11 +6466,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
     EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA11",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val111", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -7510,11 +6543,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -7525,16 +6556,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7593,11 +6614,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -7608,26 +6627,15 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(3, attrs.size());
     BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
     BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    a1 = getAttr(attrs, "A1", "TA11");
     a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1id1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
@@ -7639,11 +6647,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
     EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA11",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val111", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -7726,11 +6729,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -7741,16 +6742,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7809,11 +6800,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -7824,36 +6813,20 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(3, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    a1 = getAttr(attrs, "A1", "TA11");
     a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1id2, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
     EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("TA11",C_STR_FIELD(a1, "type"));
-    EXPECT_STREQ("val111", C_STR_FIELD(a1, "value"));
-    EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -7889,7 +6862,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     Metadata md("ID", "string", "ID1");
     ca1.metadataVector.push_back(&md);
     ce.contextAttributeVector.push_back(&ca1);
-    ContextAttribute ca2("A1", "TA11");
+    ContextAttribute ca2("A2", "TA2");
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -7918,13 +6891,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA11", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
     ASSERT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7942,11 +6915,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -7957,16 +6928,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -8025,11 +6986,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -8040,35 +6999,19 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_FALSE(a1bis.hasField("id"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
-    EXPECT_FALSE(a1nt.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
+    ASSERT_EQ(1, attrs.size());
     BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");    
-    a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1id2, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
     EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
-    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
-    EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
-    EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
     mongoDisconnect();
@@ -9191,11 +8134,9 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
@@ -9204,14 +8145,6 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -9265,11 +8198,9 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -9278,14 +8209,6 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -9362,11 +8285,9 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-    BSONObj a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -9375,14 +8296,6 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -9436,11 +8349,9 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(2, attrs.size());
     a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
-    a1bis = getAttr(attrs, "A1", "TA1bis");
-    a1nt = getAttr(attrs, "A1", "");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
@@ -9449,14 +8360,6 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-    EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-    EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-    EXPECT_FALSE(a1bis.hasField("modDate"));
-    EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-    EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-    EXPECT_FALSE(a1nt.hasField("modDate"));
 
     /* Release connection */
     mongoDisconnect();
@@ -9562,7 +8465,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 
     EXPECT_EQ("collection: unittest.entities "
               "- update() query: { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } "
-              "- update() doc: { $set: { attrs: [ { name: \"A1\", type: \"TA1\", value: \"new_val\", modDate: 1360232700 }, { name: \"A2\", type: \"TA2\" } ], modDate: 1360232700 }, $unset: { location: 1 } } "
+              "- update() doc: { $set: { attrs: [ { name: \"A1\", value: \"new_val\", type: \"TA1\", modDate: 1360232700 }, { name: \"A2\", type: \"TA2\" } ], modDate: 1360232700 }, $unset: { location: 1 } } "
               "- exception: boom!!", RES_CER_STATUS(0).details);
 
     /* Release mocks */
@@ -10419,11 +9322,9 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_FALSE(ent.hasField("modDate"));
   attrs = ent.getField("attrs").Array();
-  ASSERT_EQ(4, attrs.size());
+  ASSERT_EQ(2, attrs.size());
   BSONObj a1 = getAttr(attrs, "A1", "TA1");
   BSONObj a2 = getAttr(attrs, "A2", "TA2");
-  BSONObj a1bis = getAttr(attrs, "A1", "TA1bis");
-  BSONObj a1nt = getAttr(attrs, "A1", "");
   EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
@@ -10432,14 +9333,6 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
   EXPECT_FALSE(a2.hasField("value"));
   EXPECT_FALSE(a2.hasField("modDate"));
-  EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-  EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-  EXPECT_STREQ("val1bis", C_STR_FIELD(a1bis, "value"));
-  EXPECT_FALSE(a1bis.hasField("modDate"));
-  EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-  EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-  EXPECT_STREQ("val1bis1", C_STR_FIELD(a1nt, "value"));
-  EXPECT_FALSE(a1nt.hasField("modDate"));
 
   ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
   EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -10493,11 +9386,9 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
   EXPECT_FALSE(ent.hasField("modDate"));
   attrs = ent.getField("attrs").Array();
-  ASSERT_EQ(4, attrs.size());
+  ASSERT_EQ(2, attrs.size());
   a1 = getAttr(attrs, "A1", "TA1");
   a2 = getAttr(attrs, "A2", "TA2");
-  a1bis = getAttr(attrs, "A1", "TA1bis");
-  a1nt = getAttr(attrs, "A1", "");
   EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -10506,14 +9397,6 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
   EXPECT_FALSE(a2.hasField("value"));
   EXPECT_FALSE(a2.hasField("modDate"));
-  EXPECT_STREQ("A1", C_STR_FIELD(a1bis, "name"));
-  EXPECT_STREQ("TA1bis",C_STR_FIELD(a1bis, "type"));
-  EXPECT_STREQ("val1bis-nt", C_STR_FIELD(a1bis, "value"));
-  EXPECT_FALSE(a1bis.hasField("modDate"));
-  EXPECT_STREQ("A1", C_STR_FIELD(a1nt, "name"));
-  EXPECT_STREQ("",C_STR_FIELD(a1nt, "type"));
-  EXPECT_STREQ("val1bis1-nt", C_STR_FIELD(a1nt, "value"));
-  EXPECT_FALSE(a1nt.hasField("modDate"));
 
   /* Release connection */
   mongoDisconnect();
