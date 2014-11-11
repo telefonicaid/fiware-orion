@@ -29,17 +29,14 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # For a complete reference, please see the online documentation at vagrantup.com.
-
-  # Every Vagrant virtual environment requires a box to build off of.
   
-  # Base OS selection: uncomment only one
-  #config.vm.box = "aetn/CENTOS_6_3_X86_64"  # Cent OS 6.3
-  #config.vm.box = "rafacas/centos63-plain"	# Cent OS 6.3
-  config.vm.box = "hansode/centos-6.3-x86_64"  # Cent OS 6.3
+  # Cent OS 6.5 base image
+  config.vm.box = "chef/centos-6.5"
   
-  #config.vm.box = "chef/centos-6.5"		    # Cent OS 6.5
-   
-  config.vm.provision :shell, path: "scripts/bootstrap/centos63.sh" # Default is CentOS 6.3
+  # This script will be run at startup
+  config.vm.provision :shell, path: "scripts/bootstrap/centos65.sh"
+  
+  # Network configuration
   config.vm.network "forwarded_port", host: 1026, guest: 1026 # Orion port
   config.vm.network "forwarded_port", host: 5683, guest: 5683 # CoAP
 
