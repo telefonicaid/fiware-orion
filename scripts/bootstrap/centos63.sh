@@ -77,13 +77,17 @@ sudo /etc/init.d/mongod start
 ln -fs /vagrant /home/vagrant/fiware-orion
 
 # Set up test environment
-mkdir -p /home/vagrant/bin
+mkdir ~/bin
+export PATH=~/bin:$PATH
+cd /home/vagrant/fiware-orion
+make install_scripts INSTALL_DIR=~
+. scripts/testEnv.sh
+INSTALL_DIR=/home/vagrant make di
+#mv /root/bin/* /home/vagrant/bin
+chown vagrant:vagrant /home/vagrant/bin/*
 
-# Unnecessary
-
-# export PATH=/home/vagrant/bin:$PATH
-# cd /home/vagrant/fiware-orion
-# make install_scripts INSTALL_DIR=~
-# . scripts/testEnv.sh
-# INSTALL_DIR=/home/vagrant make di
-# chown vagrant:vagrant /home/vagrant/bin/*
+# Qt Creator building, Projects->Build Steps->Custom Process Step
+# command:
+#   vagrant 
+# arguments:
+#   ssh -c 'make di -C fiware-orion'
