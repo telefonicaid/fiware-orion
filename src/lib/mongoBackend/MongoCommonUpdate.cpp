@@ -51,40 +51,13 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
 *
 * smartAttrMatch -
 *
-* Note this function is not conmutative: empty type2 match whatever type, but type1 only
-* match an empty type2. Element 1 is supposed to be the one in database, while element 2
-* is the one supposed to be in the NGSI request.
-*
 * FIXME: probably this code could be useful in other places. It should be moved to
 * (and used from) a global place, maybe as part as the class-refactoring within
 * EntityId or Attribute class methods.
 */
-static bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2)
+static bool smartAttrMatch(std::string name1, std::string id1, std::string name2, std::string id2)
 {
-#if 0
-  //
-  // FIXME P9: The identity of an attribute is formed by the name and the type of the attribute.
-  //           [ if both are equal, then the metadata named 'ID' is used to distinguish ].
-  //           Now, there is a convop 'DELETE /v1/contextEntities/type/TYPE/id/ID/attribute/ATTR_NAME'
-  //           that doesn't work because of this. We don't have the type of the attribute, so we can't
-  //           find it for removal.
-  //
-  //           With this outdeffed 'if' below, the problem is fixed, but, the fix also provokes five
-  //           errors in unit tests ...
-  //           We need to decide what to do about this.
-  //
-  if ((id2 == "") && (type2 == ""))
-  {
-    return (name1 == name2);
-  }
-  else 
-#endif
-  if (type2 == "")
-  {
-    return ((name1 == name2) && (id1 == id2));
-  }
-
-  return ((name1 == name2) && (type1 == type2) && (id1 == id2));
+  return ((name1 == name2) && (id1 == id2));
 }
 
 /* ****************************************************************************
@@ -336,7 +309,6 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
     *actualUpdate = false;
 
     newAttr.append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
-    newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
     /* The hasField() check is needed to preserve compatibility with entities that were created
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
@@ -345,12 +317,15 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
     if (STR_FIELD(attr, ENT_ATTRS_ID) != "") {
         newAttr.append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
     }
-    if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
-                       ca.name, ca.type, ca.getId())) {
-
-        /* Attribute match: update value */
-        valueBson(&ca, newAttr);
+    if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_ID), ca.name, ca.getId()))
+    {
         updated = true;
+
+        /* Update value */
+        valueBson(&ca, newAttr);
+
+        /* Update type */
+        newAttr.append(ENT_ATTRS_TYPE, ca.type);
 
         /* Update metadata */
         BSONArrayBuilder mdNewVBuilder;
@@ -399,10 +374,17 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
 
         /* It was an actual update? */
         if (ca.compoundValueP == NULL) {
-            /* In the case of simple value, we check if the value of the attribute changed or the metadata changed (the later
-             * one is done checking if the size of the original and final metadata vectors is different and, if they are of the
-             * same size, checking if the vectors are not equal) */
-            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
+            /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
+             *
+             * 1) the value of the attribute changed
+             * 2) the type of the attribute changed
+             * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
+             *    different and, if they are of the same size, checking if the vectors are not equal)
+             */
+            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value ||
+                 STR_FIELD(attr, ENT_ATTRS_TYPE) != ca.value ||
+                 mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV))
+            {
                 *actualUpdate = true;
             }
         }
@@ -435,6 +417,9 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
             }
 
         }
+
+        /* Type included "as is" */
+        newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
 
         /* Metadata is included "as is" */
         BSONObj mdV;
@@ -470,8 +455,8 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
 static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttribute ca) {
 
     bool deleted = true;
-    if (!smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
-                        ca.name, ca.type, ca.getId())) {
+    if (!smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_ID), ca.name, ca.getId()))
+    {
         /* Attribute doesn't match: value is included "as is" */
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));

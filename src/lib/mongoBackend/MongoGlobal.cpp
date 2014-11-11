@@ -1148,7 +1148,7 @@ bool entitiesQuery
                         BSONObj metadata = metadataV[ix].embeddedObject();
                         Metadata* md;
 
-                        if (metadata.hasField(ENT_ATTRS_TYPE)) {
+                        if (metadata.hasField(ENT_ATTRS_MD_TYPE)) {
                             md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME), STR_FIELD(metadata, ENT_ATTRS_MD_TYPE), STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
                         }
                         else {
