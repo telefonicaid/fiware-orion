@@ -37,6 +37,8 @@ Orion Context Broker will be accessible at `127.0.0.1:1026` (`5683` for CoAP).
 
 You can also use these commands to automate building and running from your favorite IDE.
 
+*NOTE:* The virtualbox machine that is created uses additional resources to those from the broker itself. It uses around 512 MiB of RAM and around 1.20 GiB of disk space with Orion already compiled in debug mode.
+
 
 
 The bootstrap script basically goes through the installation instructions in the README.
