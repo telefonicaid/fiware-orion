@@ -181,7 +181,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
       ciP->httpStatusCode = SccBadRequest;
 
       ciP->answer = std::string("Bad value for XML attribute /type/ for /") +
-        node->name() + "/: /" + xmlAttribute + "/";
+        node->name() + "/: " + xmlAttribute;
 
       LM_W(("Bad Input (%s)", ciP->answer.c_str()));
 
@@ -210,7 +210,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
       else
       {
         ciP->httpStatusCode = SccBadRequest;
-        ciP->answer = std::string("Bad value for XML attribute /type/ for /") + name + "/: /" + xmlAttribute + "/";
+        ciP->answer = std::string("Bad value for XML attribute /type/ for /") + name + "/: " + xmlAttribute;
         LM_W(("Bad Input (%s)", ciP->answer.c_str()));
 
         return;
@@ -430,7 +430,7 @@ std::string xmlTypeAttributeGet(xml_node<>* node)
     }
     else  // XML attribute whose name != 'type': ERROR
     {
-      return std::string("unknown attribute '") + attr->name() + "'";
+      return std::string("unknown attribute /") + attr->name() + "/";
     }
   }
 

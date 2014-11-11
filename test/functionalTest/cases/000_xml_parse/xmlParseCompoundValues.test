@@ -405,7 +405,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 4: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 249
+Content-Length: 247
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -419,7 +419,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 5: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 226
+Content-Length: 224
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -428,12 +428,12 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Bad value for XML attribute 'type' for 'level3': 'badType'</details>
+    <details>Bad value for XML attribute /type/ for /level3/: badType</details>
   </errorCode>
 </updateContextResponse>
 6: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 244
+Content-Length: 242
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -442,7 +442,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Bad value for XML attribute 'type' for 'level3': 'unknown attribute 'happy''</details>
+    <details>Bad value for XML attribute /type/ for /level3/: unknown attribute /happy/</details>
   </errorCode>
 </updateContextResponse>
 7: +++++++++++++++++++++++++++++++++
@@ -476,7 +476,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 8: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 229
+Content-Length: 233
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -485,7 +485,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>compound value error: duplicated tag-name: 'int' in '/struct'</details>
+    <details>compound value error: duplicated tag-name: /int/ in path: /struct</details>
   </errorCode>
 </updateContextResponse>
 --TEARDOWN--
