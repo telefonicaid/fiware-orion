@@ -1,5 +1,29 @@
+#
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# fermin at tid dot es
+#
+# Author: Leandro Guillen
+#
+
 # Setting up EPEL Repo
-wget http://mirror-fpt-telecom.fpt.net/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
+wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
 rpm -ivh epel-release-6-8.noarch.rpm
 
 # Install required packages
@@ -45,7 +69,6 @@ make
 sudo cp examples/coap-client /usr/local/bin
 cd ..
 
-
 # Start MongoDB
 sudo yum update pcre            # otherwise, mongod crashes in CentOS 6.3
 sudo /etc/init.d/mongod start
@@ -54,11 +77,13 @@ sudo /etc/init.d/mongod start
 ln -fs /vagrant /home/vagrant/fiware-orion
 
 # Set up test environment
-mkdir ~/bin
-export PATH=~/bin:$PATH
-cd /home/vagrant/fiware-orion
-make install_scripts INSTALL_DIR=~
-. scripts/testEnv.sh
-INSTALL_DIR=~ make di
-mv /root/bin/* /home/vagrant/bin
-chown vagrant:vagrant /home/vagrant/bin/*
+mkdir -p /home/vagrant/bin
+
+# Unnecessary
+
+# export PATH=/home/vagrant/bin:$PATH
+# cd /home/vagrant/fiware-orion
+# make install_scripts INSTALL_DIR=~
+# . scripts/testEnv.sh
+# INSTALL_DIR=/home/vagrant make di
+# chown vagrant:vagrant /home/vagrant/bin/*

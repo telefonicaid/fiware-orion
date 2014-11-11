@@ -14,6 +14,8 @@ http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-conte
 Note that you don't need this repository code if you install the broker via its RPM package (check Orion Context
 Broker installation and administration manual about installing via RPM).
 
+## Vagrant support
+
 ## Installing and Using the broker
 
 The administration and programming manuals for Orion Context Broker are found in the FI-WARE Catalogue page,
