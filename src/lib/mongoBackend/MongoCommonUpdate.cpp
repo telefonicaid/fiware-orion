@@ -708,8 +708,8 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
                     return false;
                 }
                 else {
-                    if (mdP->value != LOCATION_WSG84) {
-                        *errDetail = "only WSG84 are supported, found: " + mdP->value;
+                    if ((mdP->value != LOCATION_WGS84) && (mdP->value != LOCATION_WGS84_LEGACY)) {
+                        *errDetail = "only WGS84 are supported, found: " + mdP->value;
                         return false;
                     }
 
@@ -1103,8 +1103,8 @@ static bool processContextAttributeVector (ContextElement*                      
                  * an error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
-                                      std::string(" - entity: [") + eP->toString() + "]" +
-                                      std::string(" - offending attribute: ") + targetAttr->toString());
+                                      " - entity: [" + eP->toString() + "]" +
+                                      " - offending attribute: " + targetAttr->toString());
                 return false;
 
             }
@@ -1113,9 +1113,9 @@ static bool processContextAttributeVector (ContextElement*                      
             if (targetAttr->getLocation().length() > 0 && targetAttr->name != locAttr) {
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: UPDATE") +
-                                      std::string(" - entity: [") + eP->toString() + "]" +
-                                      std::string(" - offending attribute: ") + targetAttr->toString() +
-                                      std::string(" - location nature of an attribute has to be defined at creation time, with APPEND"));
+                                      " - entity: [" + eP->toString() + "]" +
+                                      " - offending attribute: " + targetAttr->toString() +
+                                      " - location nature of an attribute has to be defined at creation time, with APPEND");
                 return false;
             }
 
@@ -1123,9 +1123,9 @@ static bool processContextAttributeVector (ContextElement*                      
                 if (!string2coords(targetAttr->value, coordLat, coordLong)) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: UPDATE") +
-                                              std::string(" - entity: [") + eP->toString() + "]" +
-                                              std::string(" - offending attribute: ") + targetAttr->toString() +
-                                              std::string(" - error parsing location attribute, value: <" + targetAttr->value + ">"));
+                                              " - entity: [" + eP->toString() + "]" +
+                                              " - offending attribute: " + targetAttr->toString() +
+                                              " - error parsing location attribute, value: <" + targetAttr->value + ">");
                         return false;
                 }
 
@@ -1149,21 +1149,21 @@ static bool processContextAttributeVector (ContextElement*                      
                         return false;
                     }
 
-                    if (targetAttr->getLocation() != LOCATION_WSG84) {
+                    if ((targetAttr->getLocation() != LOCATION_WGS84) && (targetAttr->getLocation() != LOCATION_WGS84_LEGACY)) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: APPEND") +
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - only WSG84 is supported for location, found: [" + targetAttr->getLocation() + "]");
+                                              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
                         return false;
                     }
 
                     if (!string2coords(targetAttr->value, coordLat, coordLong)) {
                             cerP->statusCode.fill(SccInvalidParameter,
                                                   std::string("action: APPEND") +
-                                                  std::string(" - entity: [") + eP->toString() + "]" +
-                                                  std::string(" - offending attribute: ") + targetAttr->toString() +
-                                                  std::string(" - error parsing location attribute, value: <" + targetAttr->value + ">"));
+                                                  " - entity: [" + eP->toString() + "]" +
+                                                  " - offending attribute: " + targetAttr->toString() +
+                                                  " - error parsing location attribute, value: [" + targetAttr->value + "]");
                             return false;
                     }
                     locAttr = targetAttr->name;
@@ -1193,9 +1193,9 @@ static bool processContextAttributeVector (ContextElement*                      
                 if (targetAttr->getLocation().length() > 0 ) {
                     cerP->statusCode.fill(SccInvalidParameter,
                                           std::string("action: DELETE") +
-                                          std::string(" - entity: [") + eP->toString() + "]" +
-                                          std::string(" - offending attribute: ") + targetAttr->toString() +
-                                          std::string(" - location attribute has to be defined at creation time, with APPEND"));
+                                          " - entity: [" + eP->toString() + "]" +
+                                          " - offending attribute: " + targetAttr->toString() +
+                                          " - location attribute has to be defined at creation time, with APPEND");
                     return false;
                 }
 
@@ -1815,6 +1815,7 @@ void processContextElement(ContextElement*                  ceP,
           buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
 
+        crrV.release();
       }
       else
       {

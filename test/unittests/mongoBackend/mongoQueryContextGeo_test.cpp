@@ -209,7 +209,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_Mad", RES_CER_ATTR(i, 1)->value);
@@ -230,7 +230,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_Leg", RES_CER_ATTR(i, 1)->value);
@@ -305,7 +305,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_Mad", RES_CER_ATTR(i, 1)->value);
@@ -326,7 +326,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_Alc", RES_CER_ATTR(i, 1)->value);
@@ -347,7 +347,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_Leg", RES_CER_ATTR(i, 1)->value);
@@ -423,7 +423,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_Alc", RES_CER_ATTR(i, 1)->value);
@@ -500,7 +500,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_A", RES_CER_ATTR(i, 1)->value);
@@ -521,7 +521,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_B", RES_CER_ATTR(i, 1)->value);
@@ -598,7 +598,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_B", RES_CER_ATTR(i, 1)->value);
@@ -618,7 +618,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("4, 7", RES_CER_ATTR(i, 0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
@@ -695,7 +695,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_A", RES_CER_ATTR(i, 1)->value);
@@ -773,7 +773,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_A", RES_CER_ATTR(i, 1)->value);
@@ -850,7 +850,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_B", RES_CER_ATTR(i, 1)->value);
@@ -871,7 +871,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     ASSERT_EQ(1, RES_CER_ATTR(i, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(i, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("WSG84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("WGS84", RES_CER_ATTR(i, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("foo", RES_CER_ATTR(i, 1)->name);
     EXPECT_EQ("string", RES_CER_ATTR(i, 1)->type);
     EXPECT_EQ("attr_C", RES_CER_ATTR(i, 1)->value);

@@ -45,7 +45,7 @@ payload='{
         {
           "name": "location",
           "type": "string",
-          "value": "WSG84"
+          "value": "WGS84"
         }
       ]
     }
@@ -168,7 +168,7 @@ Date: REGEX(.*)
                             {
                                 "name": "location",
                                 "type": "string",
-                                "value": "WSG84"
+                                "value": "WGS84"
                             }
                         ],
                         "name": "location",

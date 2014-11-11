@@ -238,7 +238,7 @@ std::string ContextAttribute::render
 
   metadataVector.tagSet("metadata");
 
-  if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
+  if ((ciP->uriParam["attributeFormat"] == "object") && (ciP->outFormat == JSON))
   {
     return renderAsJsonObject(ciP, indent, comma, omitValue);
   }

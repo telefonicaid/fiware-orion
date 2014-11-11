@@ -4,3 +4,10 @@ Add: Convenience operations that respond with AppendContextElementResponse now g
      EntityId info included in the response.
 Fix: Changed max-length of tenant names from 20 characters to 50.
      Also the database name (CLI-option '-db') has been given a maximum length of 10 bytes. (Issue #616)
+Fix: No longer responding with 'Service not found: $URL'. (Issue #619)
+Fix: Requests with payload containing forbidden characters are now rejected. (Issue #619)
+Fix: Fixed a bug that made the broker crash on problems with EntityId during XML-parse (in very rare situations).
+Fix: 'WSG84' identifier changed to 'WGS84' (it was a typo), although the old one is still supported to ensure backward compatibility. (Issue #627)
+Fix: Fixed a leak for each forwarding of messages to Context Providers.
+Add: New name for URI param 'attributesFormat': 'attributeFormat' (better English).
+     The old name will be supported as well. (Issue #633)

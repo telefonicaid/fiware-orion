@@ -102,13 +102,13 @@ std::string ContextAttributeVector::render
 
   //
   // NOTE:
-  // If the URI parameter 'attributesFormat' is set to 'object', then the attribute vector
+  // If the URI parameter 'attributeFormat' is set to 'object', then the attribute vector
   // is to be rendered as objects for JSON, and not as a vector.
   // Also, if we have more than one attribute with the same name (possible if different metaID),
   // only one of them should be included in the vector. Any one of them.
   // So, step 1 is to purge the context attribute vector from 'copies'.
   //
-  if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
+  if ((ciP->uriParam["attributeFormat"] == "object") && (ciP->outFormat == JSON))
   {
     std::vector<std::string> added;
 
