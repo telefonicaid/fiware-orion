@@ -97,7 +97,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>registration id: '51307b66f481db11bf860001'</details>
+    <details>registration id: /51307b66f481db11bf860001/</details>
   </errorCode>
 </registerContextResponse>
 --TEARDOWN--

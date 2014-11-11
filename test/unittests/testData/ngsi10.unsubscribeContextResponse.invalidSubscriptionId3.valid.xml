@@ -3,6 +3,6 @@
   <statusCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Invalid Subscription Id: '12345D': bad length (24 chars expected)</details>
+    <details>Invalid Subscription Id: /12345D/: bad length - 24 chars expected</details>
   </statusCode>
 </unsubscribeContextResponse>

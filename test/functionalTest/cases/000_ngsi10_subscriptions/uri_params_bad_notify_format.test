@@ -63,7 +63,7 @@ Trying to ask for HTML as Notification Format
 =============================================
 HTTP/1.1 400 Bad Request
 Connection: close
-Content-Length: 175
+Content-Length: 174
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -71,7 +71,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad notification format: 'HTML'. Valid values: 'XML' and 'JSON'.</details>
+  <details>Bad notification format: /HTML/. Valid values: /XML/ and /JSON/</details>
 </orionError>
 
 

@@ -84,7 +84,7 @@ std::string leakTreat
     // No Cleanup for valgrind, and just in case another malloc
     mongoDisconnect();
     std::string pwd = strdup("Leak test done");
-    OrionError orionError(SccOk, "Leak test; " + pwd);
+    OrionError orionError(SccOk, "Leak test: " + pwd);
     return orionError.render(ciP->outFormat, "");
   }
 

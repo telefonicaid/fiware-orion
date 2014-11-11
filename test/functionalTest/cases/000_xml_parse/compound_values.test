@@ -322,7 +322,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 1: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 193
+Content-Length: 191
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -331,7 +331,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Unknown XML field: 'here'</details>
+    <details>Unknown XML field: here</details>
   </errorCode>
 </updateContextResponse>
 2: +++++++++++++++++++++++++++++++++
@@ -394,7 +394,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 4: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 222
+Content-Length: 226
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -403,7 +403,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>compound value error: duplicated tag-name: 's1' in '/'</details>
+    <details>compound value error: duplicated tag-name: /s1/ in path: /</details>
   </errorCode>
 </updateContextResponse>
 5: +++++++++++++++++++++++++++++++++
@@ -466,7 +466,7 @@ Date: REGEX(.*)
 </updateContextResponse>
 7: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 251
+Content-Length: 250
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -475,7 +475,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>compound value error: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')</details>
+    <details>compound value error: bad tag-name of vector item: /vecitem6/, should be /vecitem/</details>
   </errorCode>
 </updateContextResponse>
 8: +++++++++++++++++++++++++++++++++

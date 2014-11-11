@@ -204,40 +204,40 @@ Date: REGEX(.*)
 }
 10: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 154
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orionError": {
         "code": "400",
-        "details": "service '/v1/registry/notSupportedRequest' not found",
+        "details": "service not found",
         "reasonPhrase": "Bad Request"
     }
 }
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orionError": {
         "code": "400",
-        "details": "service '/v1/notSupportedRequest' not found",
+        "details": "service not found",
         "reasonPhrase": "Bad Request"
     }
 }
 12: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 142
+Content-Length: 119
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orionError": {
         "code": "400",
-        "details": "service '/notSupportedRequest' not found",
+        "details": "service not found",
         "reasonPhrase": "Bad Request"
     }
 }

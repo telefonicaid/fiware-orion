@@ -316,8 +316,8 @@ std::string xmlTreat
                                       "",
                                       reqP->keyword,
                                       SccBadRequest,
-                                      std::string("Expected '") + payloadWord +
-                                        "' payload, got '" + payloadStart + "'");
+                                      std::string("Expected /") + payloadWord +
+                                        "/ payload, got /" + payloadStart + "/");
 
       LM_W(("Bad Input (invalid  payload: wanted: '%s', got '%s')", payloadWord.c_str(), payloadStart));
 

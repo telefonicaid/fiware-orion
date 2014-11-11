@@ -785,7 +785,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: 'EID'</details>
+    <details>Entity id: /EID/</details>
   </statusCode>
 </contextElementResponse>
 
@@ -875,7 +875,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: 'EID'</details>
+    <details>Entity id: /EID/</details>
   </statusCode>
 </contextAttributeResponse>
 
@@ -908,7 +908,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: 'EID'</details>
+    <details>Entity id: /EID/</details>
   </statusCode>
 </contextAttributeResponse>
 
@@ -968,7 +968,7 @@ Date: REGEX(.*)
 <statusCode>
   <code>472</code>
   <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-  <details>action: DELETE - entity: (EID, ) - offending attribute: A1 - attribute not found</details>
+  <details>action: DELETE - entity: [EID, ] - offending attribute: A1 - attribute not found</details>
 </statusCode>
 
 

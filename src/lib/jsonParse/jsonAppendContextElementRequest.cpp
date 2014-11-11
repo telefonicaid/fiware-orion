@@ -250,7 +250,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
   if (!isTrue(value) && !isFalse(value))
   {
-    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+    return "invalid isPattern value for entity: /" + value + "/";
   }
 
   reqDataP->acer.res.entity.isPattern = value;

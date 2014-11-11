@@ -70,7 +70,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad pagination limit: 'abc' (must be a decimal number)</details>
+  <details>Bad pagination limit: /abc/ [must be a decimal number]</details>
 </orionError>
 
 
@@ -85,7 +85,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad pagination offset: 'qwe' (must be a decimal number)</details>
+  <details>Bad pagination offset: /qwe/ [must be a decimal number]</details>
 </orionError>
 
 
@@ -100,7 +100,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad pagination limit: '000000' (a value of ZERO is unaccepted)</details>
+  <details>Bad pagination limit: /000000/ [a value of ZERO is unaccepted]</details>
 </orionError>
 
 
@@ -115,7 +115,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad value for 'details': 'Yes' (accepted: 'on', 'ON', 'off', 'OFF'. Default is 'off')</details>
+  <details>Bad value for /details/: /Yes/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]</details>
 </orionError>
 
 

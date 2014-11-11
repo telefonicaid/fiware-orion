@@ -157,12 +157,12 @@ std::string EntityId::check
 
   if (!isTrue(isPattern) && !isFalse(isPattern) && isPattern != "")
   {
-    return std::string("invalid isPattern (boolean) value for entity: '") + isPattern + "'";
+    return std::string("invalid isPattern value for entity: /") + isPattern + "/";
   }
 
   if ((requestType == RegisterContext) && (isTrue(isPattern)))
   {
-    return "'isPattern' set to true for a registration";
+    return "isPattern set to true for a registration";
   }
 
   return "OK";

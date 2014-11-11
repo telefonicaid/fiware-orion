@@ -2,6 +2,6 @@
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "Bad Request",
-    "details" : "JSON Parse Error (unknown field: '/entities/entity/notSupported')"
+    "details" : "JSON Parse Error: unknown field: /entities/entity/notSupported"
   }
 }

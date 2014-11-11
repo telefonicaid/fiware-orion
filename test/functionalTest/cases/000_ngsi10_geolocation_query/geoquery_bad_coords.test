@@ -194,7 +194,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>coordinate format error (see Orion user manual): 200, 100</details>
+        <details>coordinate format error [see Orion user manual]: 200, 100</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

@@ -78,7 +78,7 @@ HttpStatusCode mapGetIndividualContextEntity
   if ((ms != SccOk) || (qcResponse.contextElementResponseVector.size() == 0))
   {
     response->contextElement.entityId.fill(entityId, entityType, "false");
-    response->statusCode.fill(SccContextElementNotFound, std::string("Entity id: '") + entityId + "'");
+    response->statusCode.fill(SccContextElementNotFound, std::string("Entity id: /") + entityId + "/");
     LM_W(("Bad Input (entityId '%s' not found)", entityId.c_str()));
     return ms;
   }

@@ -117,7 +117,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Expected 'registerContextRequest' payload, got 'discoverContextAvailabilityRequest'</details>
+    <details>Expected /registerContextRequest/ payload, got /discoverContextAvailabilityRequest/</details>
   </errorCode>
 </registerContextResponse>
 1: ++++++++++++++++++++
@@ -131,7 +131,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Expected 'discoverContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
+    <details>Expected /discoverContextAvailabilityRequest/ payload, got /registerContextRequest/</details>
   </errorCode>
 </discoverContextAvailabilityResponse>
 2: ++++++++++++++++++++
@@ -146,7 +146,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Expected 'subscribeContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
+    <details>Expected /subscribeContextAvailabilityRequest/ payload, got /registerContextRequest/</details>
   </errorCode>
 </subscribeContextAvailabilityResponse>
 3: ++++++++++++++++++++
@@ -161,7 +161,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Expected 'updateContextAvailabilitySubscriptionRequest' payload, got 'registerContextRequest'</details>
+    <details>Expected /updateContextAvailabilitySubscriptionRequest/ payload, got /registerContextRequest/</details>
   </errorCode>
 </updateContextAvailabilitySubscriptionResponse>
 4: ++++++++++++++++++++
@@ -176,7 +176,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Expected 'unsubscribeContextAvailabilityRequest' payload, got 'registerContextRequest'</details>
+    <details>Expected /unsubscribeContextAvailabilityRequest/ payload, got /registerContextRequest/</details>
   </statusCode>
 </unsubscribeContextAvailabilityResponse>
 5: ++++++++++++++++++++
@@ -190,7 +190,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Expected 'queryContextRequest' payload, got 'registerContextRequest'</details>
+    <details>Expected /queryContextRequest/ payload, got /registerContextRequest/</details>
   </errorCode>
 </queryContextResponse>
 6: ++++++++++++++++++++
@@ -204,7 +204,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Expected 'updateContextRequest' payload, got 'registerContextRequest'</details>
+    <details>Expected /updateContextRequest/ payload, got /registerContextRequest/</details>
   </errorCode>
 </updateContextResponse>
 7: ++++++++++++++++++++
@@ -219,7 +219,7 @@ Date: REGEX(.*)
     <errorCode>
       <code>400</code>
       <reasonPhrase>Bad Request</reasonPhrase>
-      <details>Expected 'subscribeContextRequest' payload, got 'registerContextRequest'</details>
+      <details>Expected /subscribeContextRequest/ payload, got /registerContextRequest/</details>
     </errorCode>
   </subscribeError>
 </subscribeContextResponse>
@@ -236,7 +236,7 @@ Date: REGEX(.*)
     <errorCode>
       <code>400</code>
       <reasonPhrase>Bad Request</reasonPhrase>
-      <details>Expected 'updateContextSubscriptionRequest' payload, got 'registerContextRequest'</details>
+      <details>Expected /updateContextSubscriptionRequest/ payload, got /registerContextRequest/</details>
     </errorCode>
   </subscribeError>
 </updateContextSubscriptionResponse>
@@ -252,12 +252,12 @@ Date: REGEX(.*)
   <statusCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Expected 'unsubscribeContextRequest' payload, got 'registerContextRequest'</details>
+    <details>Expected /unsubscribeContextRequest/ payload, got /registerContextRequest/</details>
   </statusCode>
 </unsubscribeContextResponse>
 10: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 163
+Content-Length: 128
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -265,11 +265,11 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service '/v1/registry/notSupportedRequest' not found</details>
+  <details>service not found</details>
 </orionError>
 11: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 154
+Content-Length: 128
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -277,11 +277,11 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service '/v1/notSupportedRequest' not found</details>
+  <details>service not found</details>
 </orionError>
 12: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 151
+Content-Length: 128
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -289,7 +289,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service '/notSupportedRequest' not found</details>
+  <details>service not found</details>
 </orionError>
 13: ++++++++++++++++++++
 --TEARDOWN--

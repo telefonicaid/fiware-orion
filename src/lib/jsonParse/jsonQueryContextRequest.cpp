@@ -105,7 +105,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
   reqDataP->qcr.entityIdP->isPattern = value;
   if (!isTrue(value) && !isFalse(value))
   {
-    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+    return "invalid isPattern value for entity: /" + value + "/";
   }
 
   return "OK";
@@ -320,7 +320,7 @@ static std::string circleInverted(const std::string& path, const std::string& va
   parseDataP->qcr.scopeP->circle.invertedSet(value);
   if (!isTrue(value) && !isFalse(value))
   {
-    parseDataP->errorString = "bad string for circle/inverted: '" + value + "'";
+    parseDataP->errorString = "bad string for circle/inverted: /" + value + "/";
     return parseDataP->errorString;
   }
 
@@ -354,7 +354,7 @@ static std::string polygonInverted(const std::string& path, const std::string& v
   parseDataP->qcr.scopeP->polygon.invertedSet(value);
   if (!isTrue(value) && !isFalse(value))
   {
-    parseDataP->errorString = "bad string for polygon/inverted: '" + value + "'";
+    parseDataP->errorString = "bad string for polygon/inverted: /" + value + "/";
     return parseDataP->errorString;
   }
 

@@ -625,7 +625,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_EQ("WSG84", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("You cannot use more than one location attribute when creating an entity (see Orion user manual)", RES_CER_STATUS(0).details);
+    EXPECT_EQ("You cannot use more than one location attribute when creating an entity [see Orion user manual]", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -733,7 +733,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_EQ("WSG84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("coordinate format error (see Orion user manual): invalid", RES_CER_STATUS(0).details);
+    EXPECT_EQ("coordinate format error [see Orion user manual]: invalid", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

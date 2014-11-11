@@ -352,7 +352,7 @@ static std::string jsonParse
     ciP->httpStatusCode = SccBadRequest;
     if (ciP->answer == "")
     {
-      ciP->answer = std::string("JSON Parse Error (unknown field: '") + path.c_str() + "')";
+      ciP->answer = std::string("JSON Parse Error: unknown field: ") + path.c_str();
     }
 
     LM_W(("Bad Input (%s)", ciP->answer.c_str()));

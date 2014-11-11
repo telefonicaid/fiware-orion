@@ -75,7 +75,7 @@ std::string deleteAttributeValueInstance
   if (response.contextElementResponseVector.size() == 0)
   {
     statusCode.fill(SccContextElementNotFound,
-                    std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
+                    std::string("Entity-Attribute pair: /") + entityId + "-" + attributeName + "/");
   }
   else if (response.contextElementResponseVector.size() == 1)
   {

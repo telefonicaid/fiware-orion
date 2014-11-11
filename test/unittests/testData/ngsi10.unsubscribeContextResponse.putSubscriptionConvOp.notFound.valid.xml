@@ -3,6 +3,6 @@
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>subscriptionId: '012345678901234567890123'</details>
+    <details>subscriptionId: /012345678901234567890123/</details>
   </statusCode>
 </unsubscribeContextResponse>

@@ -2,6 +2,6 @@
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>invalid update action type: 'invalid'</details>
+    <details>invalid update action type: /invalid/</details>
   </errorCode>
 </updateContextResponse>

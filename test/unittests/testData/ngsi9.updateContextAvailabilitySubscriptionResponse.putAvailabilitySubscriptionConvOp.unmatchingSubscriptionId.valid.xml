@@ -3,6 +3,6 @@
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>unmatching subscriptionId URI/payload: '111222333444555666777881' vs '111222333444555666777888'</details>
+    <details>unmatching subscriptionId URI/payload: /111222333444555666777881/ vs /111222333444555666777888/</details>
   </errorCode>
 </updateContextAvailabilitySubscriptionResponse>
