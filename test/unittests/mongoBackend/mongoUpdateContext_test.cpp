@@ -543,10 +543,10 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "");
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
@@ -891,10 +891,10 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "");
+    BSONObj a1 = getAttr(attrs, "A1", "TA1");
     BSONObj a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
@@ -942,9 +942,9 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
-    a1 = getAttr(attrs, "A1", "");
+    a1 = getAttr(attrs, "A1", "TA1");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
 
@@ -955,10 +955,10 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
     ASSERT_EQ(2, attrs.size());
-    a1 = getAttr(attrs, "A1", "");
+    a1 = getAttr(attrs, "A1", "TA1");
     a2 = getAttr(attrs, "A2", "TA2");
     EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
-    EXPECT_STREQ("",C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));

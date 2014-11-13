@@ -324,8 +324,18 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         /* Update value */
         valueBson(&ca, newAttr);
 
-        /* Update type */
-        newAttr.append(ENT_ATTRS_TYPE, ca.type);
+        /* Update type (only if type is not empty, otherwise, we leave type untouched) */
+        if (ca.type != "")
+        {
+            newAttr.append(ENT_ATTRS_TYPE, ca.type);
+        }
+        else
+        {
+            if (attr.hasField(ENT_ATTRS_TYPE))
+            {
+                newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
+            }
+        }
 
         /* Update metadata */
         BSONArrayBuilder mdNewVBuilder;
@@ -419,7 +429,10 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         }
 
         /* Type included "as is" */
-        newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
+        if (attr.hasField(ENT_ATTRS_TYPE))
+        {
+            newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
+        }
 
         /* Metadata is included "as is" */
         BSONObj mdV;
