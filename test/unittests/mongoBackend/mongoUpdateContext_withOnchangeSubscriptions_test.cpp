@@ -131,31 +131,26 @@ static void prepareDatabase(void) {
    *
    * - E1:
    *     A1:  X
-   *     A1*: Y
    *     A2:  Z
    *     A3:  W
    *     A7:  R
    * - E2:
    *     A1:  X
-   *     A1*: Y
    *     A2:  Z
    *     A3:  W
    *     A7:  R
    * - E1*:
    *     A1:  X
-   *     A1*: Y
    *     A2:  Z
    *     A3:  W
    *     A7:  R
    * - E2*:
    *     A1:  X
-   *     A1*: Y
    *     A2:  Z
    *     A3:  W
    *     A7:  R
    * - E1**:
    *     A1:  X
-   *     A1*: Y
    *     A2:  Z
    *     A3:  W
    *     A7:  R
@@ -188,7 +183,6 @@ static void prepareDatabase(void) {
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
                      "attrs" << BSON_ARRAY(
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
                         BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
                         BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
                         BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
@@ -198,7 +192,6 @@ static void prepareDatabase(void) {
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
                      "attrs" << BSON_ARRAY(
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
                         BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
                         BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
                         BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
@@ -208,7 +201,6 @@ static void prepareDatabase(void) {
   BSONObj en3 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
                      "attrs" << BSON_ARRAY(
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
                         BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
                         BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
                         BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
@@ -218,7 +210,6 @@ static void prepareDatabase(void) {
   BSONObj en4 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
                      "attrs" << BSON_ARRAY(
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
                         BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
                         BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
                         BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
@@ -228,7 +219,6 @@ static void prepareDatabase(void) {
   BSONObj en5 = BSON("_id" << BSON("id" << "E1") <<
                      "attrs" << BSON_ARRAY(
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
                         BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
                         BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
                         BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
@@ -312,7 +302,6 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
      *
      * - E3:
      *     A1:  X
-     *     A1*: Y
      *     A2:  Z
      *     A3:  W
      *     A7:  R
@@ -334,7 +323,6 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
     BSONObj en = BSON("_id" << BSON("id" << "E3" << "type" << "T3") <<
                        "attrs" << BSON_ARRAY(
                           BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                          BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
                           BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
                           BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
                           BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
@@ -388,10 +376,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
@@ -455,11 +441,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     ContextAttribute ca4("A4", "TA4", "new_val");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
@@ -523,9 +507,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1bis", "Y");
     ContextAttribute ca2("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
@@ -590,10 +572,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr1.contextElementResponseVector.push_back(&cer);
     expectedNcr2.contextElementResponseVector.push_back(&cer);
@@ -664,11 +644,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     ContextAttribute ca4("A4", "TA4", "new_val");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr1.contextElementResponseVector.push_back(&cer);
@@ -739,9 +717,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     expectedNcr2.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1bis", "Y");
     ContextAttribute ca2("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr1.contextElementResponseVector.push_back(&cer);
     expectedNcr2.contextElementResponseVector.push_back(&cer);
@@ -811,10 +787,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     ContextElementResponse cer1;
     cer1.contextElement.entityId.fill("E1", "T", "false");
     ContextAttribute ca11("A1", "TA1", "new_val");
-    ContextAttribute ca12("A1", "TA1bis", "Y");
     ContextAttribute ca13("A3", "TA3", "W");
     cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca12);
     cer1.contextElement.contextAttributeVector.push_back(&ca13);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
@@ -878,11 +852,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     ContextElementResponse cer1;
     cer1.contextElement.entityId.fill("E1", "T", "false");
     ContextAttribute ca11("A1", "TA1", "X");
-    ContextAttribute ca12("A1", "TA1bis", "Y");
     ContextAttribute ca13("A3", "TA3", "W");
     ContextAttribute ca14("A4", "TA4", "new_val");
     cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca12);
     cer1.contextElement.contextAttributeVector.push_back(&ca13);
     cer1.contextElement.contextAttributeVector.push_back(&ca14);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
@@ -946,9 +918,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1;
     cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca11("A1", "TA1bis", "Y");
     ContextAttribute ca12("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
     cer1.contextElement.contextAttributeVector.push_back(&ca12);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
@@ -1012,10 +982,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     ContextElementResponse cer1;
     cer1.contextElement.entityId.fill("E3", "T3", "false");
     ContextAttribute ca11("A1", "TA1", "new_val");
-    ContextAttribute ca12("A1", "TA1bis", "Y");
     ContextAttribute ca13("A3", "TA3", "W");
     cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca12);
     cer1.contextElement.contextAttributeVector.push_back(&ca13);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
@@ -1079,11 +1047,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     ContextElementResponse cer1;
     cer1.contextElement.entityId.fill("E3", "T3", "false");
     ContextAttribute ca11("A1", "TA1", "X");
-    ContextAttribute ca12("A1", "TA1bis", "Y");
     ContextAttribute ca13("A3", "TA3", "W");
     ContextAttribute ca14("A4", "TA4", "new_val");
     cer1.contextElement.contextAttributeVector.push_back(&ca11);
-    cer1.contextElement.contextAttributeVector.push_back(&ca12);
     cer1.contextElement.contextAttributeVector.push_back(&ca13);
     cer1.contextElement.contextAttributeVector.push_back(&ca14);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
@@ -1147,9 +1113,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1;
     cer1.contextElement.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca11("A1", "TA1bis", "Y");
     ContextAttribute ca12("A3", "TA3", "W");
-    cer1.contextElement.contextAttributeVector.push_back(&ca11);
     cer1.contextElement.contextAttributeVector.push_back(&ca12);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
@@ -1213,10 +1177,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
@@ -1280,10 +1242,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
@@ -1347,10 +1307,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
@@ -1631,10 +1589,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
@@ -1701,11 +1657,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     ContextAttribute ca4("A4", "TA4", "new_val4");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
@@ -1772,9 +1726,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
@@ -1839,10 +1791,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
@@ -1908,11 +1858,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     ContextAttribute ca4("A4", "TA4", "new_val4");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
@@ -1999,9 +1947,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
     ContextAttribute caa1("A1", "TA1");
-    ContextAttribute caa2("A1", "TA1bis");
     ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
 
@@ -2044,10 +1990,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "new_val");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
@@ -2112,11 +2056,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     ContextAttribute ca4("A4", "TA4", "new_val");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
@@ -2180,9 +2122,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca1("A1", "TA1bis", "Y");
     ContextAttribute ca2("A3", "TA3", "W");
-    cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
@@ -2246,10 +2186,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
@@ -2313,10 +2251,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
@@ -2380,10 +2316,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
@@ -2664,10 +2598,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
@@ -2734,11 +2666,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     ContextAttribute ca4("A4", "TA4", "new_val4");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
@@ -2805,9 +2735,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
@@ -2872,10 +2800,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "new_val1");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
@@ -2941,11 +2867,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E2", "T2", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
     ContextAttribute ca3("A3", "TA3", "W");
     ContextAttribute ca4("A4", "TA4", "new_val4");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
-    cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
     cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
@@ -3032,9 +2956,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
     ContextAttribute caa1("A1", "TA1");
-    ContextAttribute caa2("A1", "TA1bis");
     ce.contextAttributeVector.push_back(&caa1);
-    ce.contextAttributeVector.push_back(&caa2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
 

@@ -382,7 +382,7 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
              *    different and, if they are of the same size, checking if the vectors are not equal)
              */
             if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value ||
-                 STR_FIELD(attr, ENT_ATTRS_TYPE) != ca.value ||
+                 STR_FIELD(attr, ENT_ATTRS_TYPE) != ca.type ||
                  mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV))
             {
                 *actualUpdate = true;
@@ -619,7 +619,7 @@ static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP) {
         /* Attribute attempting to append hasn't ID. Thus, no attribute with same name can have ID in attrs */
         for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
             BSONObj attr = i.next().embeddedObject();
-            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) != "") {
+            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_ID) != "") {
                 return false;
             }
         }
@@ -629,7 +629,7 @@ static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP) {
         /* Attribute attempting to append has ID. Thus, no attribute with same name cannot have ID in attrs */
         for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
             BSONObj attr = i.next().embeddedObject();
-            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) == "") {
+            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_ID) == "") {
                 return false;
             }
         }

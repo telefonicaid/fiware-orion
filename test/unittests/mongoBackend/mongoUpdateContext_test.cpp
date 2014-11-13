@@ -6117,7 +6117,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     Metadata md("ID", "string", "ID3");
     ca1.metadataVector.push_back(&md);
     ce.contextAttributeVector.push_back(&ca1);
-    ContextAttribute ca2("A1", "TA22", "new_val2");
+    ContextAttribute ca2("A3", "TA3", "new_val3");
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
@@ -6146,13 +6146,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("ID3", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA22", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ("A3", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA3", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
     ASSERT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -6260,11 +6260,12 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(4, attrs.size());
+    ASSERT_EQ(5, attrs.size());
     BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
     BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    BSONObj a1id3 = getAttr(attrs, "A1", "TA1", "ID3");    
+    BSONObj a1id3 = getAttr(attrs, "A1", "TA1", "ID3");
     a2 = getAttr(attrs, "A2", "TA2");
+    a3 = getAttr(attrs, "A3", "TA3");
     EXPECT_STREQ("A1", C_STR_FIELD(a1id1, "name"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
@@ -6284,6 +6285,11 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_FALSE(a2.hasField("id"));
+    EXPECT_STREQ("A3", C_STR_FIELD(a3, "name"));
+    EXPECT_STREQ("TA3",C_STR_FIELD(a3, "type"));
+    EXPECT_STREQ("new_val3", C_STR_FIELD(a3, "value"));
+    EXPECT_EQ(1360232700, a3.getIntField("modDate"));
     EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
