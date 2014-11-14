@@ -383,22 +383,25 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         }
 
         /* It was an actual update? */
-        if (ca.compoundValueP == NULL) {
+        if (ca.compoundValueP == NULL)
+        {
             /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
              *
-             * 1) the value of the attribute changed
-             * 2) the type of the attribute changed
+             * 1) the value of the attribute changed (probably the !attr.hasField(ENT_ATTRS_VALUE) is not needed, as any
+             *    attribute is supposed to have a value (according to NGSI spec), but it doesn't hurt anyway and makes CB
+             *    stronger)
+             * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
+             *    type is optional according to NGSI and the attribute may not have that field in the BSON)
              * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
              *    different and, if they are of the same size, checking if the vectors are not equal)
              */
-            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value ||
-                 STR_FIELD(attr, ENT_ATTRS_TYPE) != ca.type ||
-                 mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV))
-            {
-                *actualUpdate = true;
-            }
+            *actualUpdate = (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value ||
+                            ((ca.type != "") && (!attr.hasField(ENT_ATTRS_TYPE) || STR_FIELD(attr, ENT_ATTRS_TYPE) != ca.type) ) ||
+                            mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
+
         }
-        else {
+        else
+        {
             // FIXME P6: in the case of compound value, it's more difficult to know if an attribute
             // has really changed its value (many levels have to be traversed). Until we can develop the
             // matching logic, we consider actualUpdate always true.
