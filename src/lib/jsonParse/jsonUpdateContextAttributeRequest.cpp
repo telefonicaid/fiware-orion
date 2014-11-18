@@ -57,6 +57,8 @@ static std::string attributeType(const std::string& path, const std::string& val
 */
 static std::string attributeValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
+  reqData->lastContextAttribute = reqData->upcar.attributeP;
+
   reqData->upcar.res.contextValue = value;
 
   return "OK";

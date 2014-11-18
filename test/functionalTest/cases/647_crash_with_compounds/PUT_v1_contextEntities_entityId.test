@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Attribute Compound Value parsing for PUT /v1/contextEntities/entityId
+Attribute Compound Value parsing for PUT /v1/contextEntities/entityId (updateContextElementRequest)
 --SHELL-INIT--
 
 dbInit CB
