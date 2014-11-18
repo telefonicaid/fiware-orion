@@ -278,6 +278,10 @@ std::string endTag
 /* ****************************************************************************
 *
 * valueTag -  
+*
+* NOTE
+* The value of the tag is not HTML-escaped if the value is an Association.
+<* In the case of Associations, the specific values must be HTML-escaped instead.
 */
 std::string valueTag
 (
@@ -290,8 +294,18 @@ std::string valueTag
   bool                isVectorElement
 )
 {
-  char* value = htmlEscape(unescapedValue.c_str());
-  
+  char* value;
+
+  if (isAssociation == false)
+  {
+    value = htmlEscape(unescapedValue.c_str());
+  }
+  else
+  {
+    // unnecessary malloc, but this way I can always free => easier to read
+    value = strdup(unescapedValue.c_str());
+  }
+
   if (value == NULL)
   {
     return "ERROR: no memory";

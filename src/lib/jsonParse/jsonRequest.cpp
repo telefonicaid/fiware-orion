@@ -210,7 +210,7 @@ std::string jsonTreat
                                                 "",
                                                 reqP->keyword,
                                                 SccBadRequest,
-                                                std::string("JSON Parse Error: ") + e.what());
+                                                std::string("JSON Parse Error"));
 
     LM_W(("Bad Input (JSON Parse Error: %s)", e.what()));
     return errorReply;
