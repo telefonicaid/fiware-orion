@@ -34,10 +34,18 @@
 /* ****************************************************************************
 *
 * htmlEscape - 
+*
+* Allocate a new buffer to hold an escaped version of the input buffer 's'.
+* Escaping characters demands more space in the buffer, for some characters up to six
+* characters - double-quote (") needs SIX chars: &quot;
+* So, when allocating room for the output (escaped) buffer, we need to consider the worst case
+* and six times the length of the input buffer is allocated (plus one byte for the zero-termination.
+*
+* See http://www.anglesanddangles.com/asciichart.php for more info on the 'html-escpaing' of ASCII chars.
 */
 char* htmlEscape(const char* s)
 {
-  int   newLen  = strlen(s) * 6 + 1;
+  int   newLen  = strlen(s) * 6 + 1;  // See function header comment
   char* out     = (char*) calloc(1, newLen);
   int   sIx     = 0;
   int   outIx   = 0;
@@ -286,7 +294,7 @@ std::string valueTag
   
   if (value == NULL)
   {
-    return "ERROR";
+    return "ERROR: no memory";
   }
 
   if (format == XML)
