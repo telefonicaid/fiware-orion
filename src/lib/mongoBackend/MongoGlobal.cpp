@@ -690,11 +690,11 @@ static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP)
 *
 * fillQueryServicePath -
 *
-* The regular expression for servicePath is an OR between the exact path and
-* the exact path followed by a slash ('/') and after that, any text (including slashes)
+* The regular expression for servicePath.
 *
-* If the servicePath is empty, then we only look for entities that have no service path
-* associated ("$exists: false").
+* If the servicePath is empty, then we return all entities, no matter their servicePath. This
+* can be seen as a query on "/#" considering that entities without servicePath are implicitly
+* assigned to "/" service path.
 */
 static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::string>& servicePath)
 {
@@ -705,6 +705,8 @@ static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::stri
 #if 0
         // This solution is based on { $in: [ ... ]}. However, it is not clear how to compose regex
         // in a BSONArrayBuilder, see http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
+        // WARNING: this fragment could be obsolete (e.g. based in the all interpretation of Fiware-ServicePath which doesn't
+        // consider '#' to apply recursion.
         BSONArrayBuilder ba;
         for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
             LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
@@ -718,13 +720,27 @@ static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::stri
 #endif
 
         // This solution is based on making the "or" inside the regex, using the "|" as delimiter
-        std::string  servicePathValue = "";
+        std::string servicePathValue = "";
         for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
             LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
             char path[MAX_SERVICE_NAME_LEN];
             slashEscape(servicePath[ix].c_str(), path, sizeof(path));
-            servicePathValue += std::string("^") + path + "$|" + "^" + path + "\\/.*";
-            if (ix < servicePath.size() - 1) {
+            /* Behaviour is different depending if servicePath ends with '#' or not */
+            if (path[strlen(path) - 1] == '#')
+            {
+                /* Remove '\/#' part of the string */
+                int l = strlen(path);
+                path[l - 3] = 0;
+                servicePathValue += std::string("^") + path + "$|" + std::string("^") + path + "\\/.*";
+            }
+            else
+            {
+                servicePathValue += std::string("^") + path + "$";
+            }
+
+            /* Prepare concatenation for next token in regex */
+            if (ix < servicePath.size() - 1)
+            {
                 servicePathValue += std::string("|");
             }
         }
@@ -734,6 +750,7 @@ static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::stri
     {
       bo.append("$exists", false);
     }
+
 }
 
 

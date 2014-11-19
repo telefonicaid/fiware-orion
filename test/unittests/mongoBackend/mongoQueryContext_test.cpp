@@ -1033,7 +1033,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_2levels)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "T", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home/kz");
+  servicePathVector.push_back("/home/kz/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1105,7 +1105,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "T", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home");
+  servicePathVector.push_back("/home/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1262,7 +1262,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1levelbis)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "T", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home2");
+  servicePathVector.push_back("/home2/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1325,7 +1325,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
 
   // Test that three items are found for Service path /home/fg
   servicePathVector.clear();
-  servicePathVector.push_back("/home/fg");
+  servicePathVector.push_back("/home/fg/#");
 
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
@@ -1537,7 +1537,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home/kz");
+  servicePathVector.push_back("/home/kz/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1621,7 +1621,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home");
+  servicePathVector.push_back("/home/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1790,7 +1790,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1levelbis)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home2");
+  servicePathVector.push_back("/home2/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1934,7 +1934,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E3", "", "false");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home/fg");
+  servicePathVector.push_back("/home/fg/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
