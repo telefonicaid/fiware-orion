@@ -1330,10 +1330,9 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
-#if 0
+#ifdef DEBUG_develenv
   //
-  // FIXME P9: Temporary setting trace level 250 until the ftest-ftest-ftest bug is solved
-  //           To be activated once 0.17.0 is branched out from develop.
+  // FIXME P9: Temporary setting trace level 250 in jenkins only, until the ftest-ftest-ftest bug is solved
   //           See issue #652
   //
   lmTraceLevelSet(LmtBug, true);
