@@ -1330,7 +1330,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     else
     {
       LM_T(LmtServicePath, ("Service path string: %s", servicePathV[0].c_str()));
-      bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type << ENT_SERVICE_PATH << servicePathV[0]);
+      bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id << ENT_SERVICE_PATH << servicePathV[0]) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type << ENT_SERVICE_PATH << servicePathV[0]);
     } 
 
     BSONObjBuilder insertedDocB;
