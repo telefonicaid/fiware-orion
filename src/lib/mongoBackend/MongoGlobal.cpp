@@ -88,7 +88,7 @@ bool mongoConnect(const char* host, const char* db, const char* rplSet, const ch
 
     std::string err;
 
-    LM_M(("dbName: '%s'", db));
+    LM_T(LmtBug, ("dbName: '%s'", db));
 
     mongoSemTake(__FUNCTION__, "connecting to mongo");
 
@@ -286,7 +286,7 @@ DBClientBase* getMongoConnection(void)
 extern void setDbPrefix(std::string _dbPrefix)
 {
   dbPrefix = _dbPrefix;
-  LM_M(("Set dbPrefix to '%s'", dbPrefix.c_str()));
+  LM_T(LmtBug, ("Set dbPrefix to '%s'", dbPrefix.c_str()));
 }
 
 /*****************************************************************************
@@ -311,7 +311,7 @@ extern void getOrionDatabases(std::vector<std::string>& dbs) {
         {
           LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
           dbs.push_back(dbName);
-          LM_M(("Pushed back db name '%s'", dbName.c_str()));
+          LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
         }
     }
 
@@ -386,7 +386,7 @@ std::string composeDatabaseName(std::string tenant) {
         result = dbPrefix + "-" + tenant;
     }
 
-    LM_M(("database name composed: '%s'", result.c_str()));
+    LM_T(LmtBug, ("database name composed: '%s'", result.c_str()));
     return result;
 }
 

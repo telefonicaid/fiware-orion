@@ -1141,7 +1141,7 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 */
 static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd)
 {
-  LM_M(("dbName: '%s'", dbName.c_str()));
+  LM_T(LmtBug, ("dbName: '%s'", dbName.c_str()));
 
   if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant))
   {
@@ -1330,7 +1330,15 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
-  LM_M(("dbName: '%s'", dbName));
+#if 0
+  //
+  // FIXME P9: Temporary setting trace level 250 until the ftest-ftest-ftest bug is solved
+  //           To be activated once 0.17.0 is branched out from develop
+  //
+  lmTraceLevelSet(LmtBug, true);
+#endif
+
+  LM_T(LmtBug, ("dbName: '%s'", dbName));
 
   if (strlen(dbName) > DB_NAME_MAX_LEN)
   {
