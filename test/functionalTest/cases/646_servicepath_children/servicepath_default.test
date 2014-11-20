@@ -78,9 +78,272 @@ orionCurl --url /v1/contextEntityTypes/T --json
 echo
 echo
 
-#Date: REGEX(.*)
-
 --REGEXPECT--
-TBD
+01. Set up entities
+===================
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E1",
+    "isPattern": "false",
+    "type": "T"
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E2",
+    "isPattern": "false",
+    "type": "T"
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 314
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "E3",
+    "isPattern": "false",
+    "type": "T"
+}
+
+
+02. Query on / (returns: E1, E2)
+================================
+HTTP/1.1 200 OK
+Content-Length: 732
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "string",
+                        "value": "V"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "string",
+                        "value": "V"
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+Query on /# (returns: E1, E2, E3)
+=================================
+HTTP/1.1 200 OK
+Content-Length: 1082
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "string",
+                        "value": "V"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "string",
+                        "value": "V"
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "string",
+                        "value": "V"
+                    }
+                ],
+                "id": "E3",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Query without servicePath (returns: E1, E2, E3)
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 1082
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "string",
+                        "value": "V"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "string",
+                        "value": "V"
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A",
+                        "type": "string",
+                        "value": "V"
+                    }
+                ],
+                "id": "E3",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
 --TEARDOWN--
 brokerStop CB
