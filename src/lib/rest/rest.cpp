@@ -468,7 +468,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     {
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
-        OrionError e(SccBadRequest, std::string("component '") + comp + "' of ServicePath contains illegal character '" + comp[cIx] + "'");
+        OrionError e(SccBadRequest, "a component of ServicePath contains an illegal character");
         ciP->answer = e.render(ciP->outFormat, "");
         return 4;
       }
@@ -488,13 +488,11 @@ static char* removeTrailingSlash(std::string path)
 {
   char* cpath = (char*) path.c_str();
 
-  LM_M(("in: '%s'", cpath));
-  while (cpath[strlen(cpath) - 1] == '/')
+  /* strlen(cpath) > 1 ensures that root service path "/" is not touched */
+  while ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
   {
     cpath[strlen(cpath) - 1] = 0;
   }
-
-  LM_M(("out: '%s'", cpath));
 
   return cpath;
 }
