@@ -102,8 +102,8 @@ static int attributeType(xml_node<>* node, ParseData* reqData)
 */
 static int attributeValue(xml_node<>* node, ParseData* reqData)
 {
-  parseDataP->lastContextAttribute = parseDataP->upcar.attributeP;
-  parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
+  reqData->lastContextAttribute = reqData->upcar.attributeP;
+  reqData->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
 
   reqData->upcar.res.contextValue = node->value();
 
