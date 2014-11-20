@@ -153,7 +153,7 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
 
   //
   // Give the root pointer of this Compound to the active ContextAttribute
-  // lastContextAttribute is set in the XML parsing routiunes, to point at the
+  // lastContextAttribute is set in the XML parsing routines, to point at the
   // latest contextAttribute, i.e. the attribute whose 'contextValue' is the
   // owner of this compound value tree.
   //
@@ -162,7 +162,15 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
                           ciP->compoundValueRoot,
                           parseDataP->lastContextAttribute));
 
-  parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
+  //
+  // Special case for updateContextAttributeRequest. This payload has no
+  // ContextAttribute to point to by lastContextAttribute, as the whole payload
+  // is a part of a ContextAttribute.
+  //
+  if (strcmp(ciP->payloadWord, "updateContextAttributeRequest") == 0)
+    parseDataP->upcar.res.compoundValueP = ciP->compoundValueRoot;
+  else
+    parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
 
   // Reset the Compound stuff in ConnectionInfo
   ciP->compoundValueRoot = NULL;

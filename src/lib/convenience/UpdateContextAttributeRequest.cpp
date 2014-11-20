@@ -33,6 +33,7 @@
 #include "common/tag.h"
 #include "convenience/UpdateContextAttributeRequest.h"
 #include "ngsi/StatusCode.h"
+#include "parse/compoundValue.h"
 
 
 
@@ -43,6 +44,7 @@
 UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 {
   metadataVector.tagSet("metadata");
+  compoundValueP = NULL;
 }
 
 
@@ -56,10 +58,29 @@ std::string UpdateContextAttributeRequest::render(Format format, std::string ind
   std::string tag = "updateContextAttributeRequest";
   std::string out = "";
   std::string indent2 = indent + "  ";
+  bool        commaAfterContextValue = metadataVector.size() != 0;
 
   out += startTag(indent, tag, format, false);
   out += valueTag(indent2, "type", type, format, true);
-  out += valueTag(indent2, "contextValue", contextValue, format, true);
+
+  if (compoundValueP == NULL)
+  {
+    out += valueTag(indent2, "contextValue", contextValue, format, true);
+  }
+  else
+  {
+    bool isCompoundVector = false;
+
+    if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+    {
+      isCompoundVector = true;
+    }
+
+    out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
+    out += compoundValueP->render(format, indent + "    ");
+    out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
+  }
+
   out += metadataVector.render(format, indent2);
   out += endTag(indent, tag, format);
 
