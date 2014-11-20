@@ -218,10 +218,10 @@ Date: REGEX(.*)
 </unsubscribeContextResponse>
 
 4: ++++++++++++++++++++
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 1286
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
@@ -268,10 +268,10 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 =======================================
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 1286
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
@@ -318,10 +318,10 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 =======================================
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 1286
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
@@ -368,10 +368,10 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 =======================================
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 1286
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
@@ -418,10 +418,10 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 =======================================
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 1286
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 
@@ -468,10 +468,10 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 =======================================
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 1286
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.* libcurl/\d+\.\d+\.\d+)
-Host: 127.0.0.1:9997
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/xml
 

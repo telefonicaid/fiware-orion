@@ -94,6 +94,23 @@ function dbInit()
   fi
 }
 
+
+# ------------------------------------------------------------------------------
+#
+# dbDrop - 
+#
+function dbDrop()
+{
+  db=$1
+
+  if [ "$db" != "" ]
+  then
+    dbInit $db
+  fi
+}
+
+
+
 # ------------------------------------------------------------------------------
 #
 # localBrokerStart
@@ -833,6 +850,7 @@ function coapCurl()
 
 
 export -f dbInit
+export -f dbDrop
 export -f brokerStart
 export -f localBrokerStop
 export -f localBrokerStart

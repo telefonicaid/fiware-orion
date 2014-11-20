@@ -238,4 +238,8 @@ Date: REGEX(.*)
   </contextResponseList>
 </queryContextResponse>
 --TEARDOWN--
+
 brokerStop CB
+dbDrop CB
+dbDrop ${CB_DATABASE_NAME}-t_03
+dbDrop ${CB_DATABASE_NAME}-t_04

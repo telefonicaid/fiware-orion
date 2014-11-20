@@ -1,3 +1,4 @@
+#
 # Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -17,39 +18,26 @@
 #
 # For those usages not covered by this license please contact with
 # fermin at tid dot es
+#
+# Author: Leandro Guillen
 
---NAME--
-Max 10 chars in db-name
---SHELL-INIT--
---SHELL--
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
 
-echo "01. Starting broker with a -dbName of 11 chars - this must fail"
-echo "==============================================================="
-contextBroker -db 12345678901 > /dev/null
-exitCode=$?
-echo "exitCode: $exitCode"
-echo
-echo
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
 
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  # For a complete reference, please see the online documentation at vagrantup.com.
+  
+  # Cent OS 6.5 base image
+  config.vm.box = "chef/centos-6.5"
+  
+  # This script will be run at startup
+  config.vm.provision :shell, path: "scripts/bootstrap/centos65.sh"
+  
+  # Network configuration
+  config.vm.network "forwarded_port", host: 1026, guest: 1026 # Orion port
+  config.vm.network "forwarded_port", host: 5683, guest: 5683 # CoAP
 
-echo "02. Starting broker with a -dbName of 10 chars - this must work"
-echo "==============================================================="
-contextBroker -db 1234567890 > /dev/null
-echo
-echo
-
-
---REGEXPECT--
-01. Starting broker with a -dbName of 11 chars - this must fail
-===============================================================
-exitCode: 1
-
-
-02. Starting broker with a -dbName of 10 chars - this must work
-===============================================================
-
-
---TEARDOWN--
-
-brokerStop CB
-dbDrop 1234567890
+end

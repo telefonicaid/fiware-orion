@@ -88,6 +88,8 @@ bool mongoConnect(const char* host, const char* db, const char* rplSet, const ch
 
     std::string err;
 
+    LM_T(LmtBug, ("dbName: '%s'", db));
+
     mongoSemTake(__FUNCTION__, "connecting to mongo");
 
     bool connected     = false;
@@ -281,8 +283,10 @@ DBClientBase* getMongoConnection(void)
 *
 * setDbPrefix -
 */
-extern void setDbPrefix(std::string _dbPrefix) {
-    dbPrefix = _dbPrefix;
+extern void setDbPrefix(std::string _dbPrefix)
+{
+  dbPrefix = _dbPrefix;
+  LM_T(LmtBug, ("Set dbPrefix to '%s'", dbPrefix.c_str()));
 }
 
 /*****************************************************************************
@@ -303,9 +307,11 @@ extern void getOrionDatabases(std::vector<std::string>& dbs) {
         BSONObj db = (*i).Obj();
         std::string dbName = STR_FIELD(db, "name");
         std::string prefix = dbPrefix + "-";
-        if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0) {
-            LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
-            dbs.push_back(dbName);
+        if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
+        {
+          LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+          dbs.push_back(dbName);
+          LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
         }
     }
 
@@ -379,6 +385,8 @@ std::string composeDatabaseName(std::string tenant) {
          * character, http://docs.mongodb.org/manual/reference/limits/#Restrictions-on-Database-Names-for-Unix-and-Linux-Systems */
         result = dbPrefix + "-" + tenant;
     }
+
+    LM_T(LmtBug, ("database name composed: '%s'", result.c_str()));
     return result;
 }
 

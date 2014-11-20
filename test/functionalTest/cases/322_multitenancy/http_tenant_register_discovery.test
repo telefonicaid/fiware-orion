@@ -208,4 +208,8 @@ Date: REGEX(.*)
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
+
 brokerStop CB
+dbDrop CB
+dbDrop ${CB_DATABASE_NAME}-t_01
+dbDrop ${CB_DATABASE_NAME}-t_02
