@@ -482,6 +482,27 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
 /* ****************************************************************************
 *
+* removeTrailingSlash - 
+*/
+static char* removeTrailingSlash(std::string path)
+{
+  char* cpath = (char*) path.c_str();
+
+  LM_M(("in: '%s'", cpath));
+  while (cpath[strlen(cpath) - 1] == '/')
+  {
+    cpath[strlen(cpath) - 1] = 0;
+  }
+
+  LM_M(("out: '%s'", cpath));
+
+  return cpath;
+}
+
+
+
+/* ****************************************************************************
+*
 * servicePathSplit - 
 */
 int servicePathSplit(ConnectionInfo* ciP)
@@ -504,8 +525,8 @@ int servicePathSplit(ConnectionInfo* ciP)
   for (int ix = 0; ix < servicePaths; ++ix)
   {
     ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));    
-    // FIXME: Ken, coudl you implement removeTrailingSlash() function ?
-    //ciP->servicePathV[ix] = std::string(removeTrailingSlash((char*) ciP->servicePathV[ix].c_str()));
+    ciP->servicePathV[ix] = removeTrailingSlash(ciP->servicePathV[ix]);
+
     LM_T(LmtServicePath, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
