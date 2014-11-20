@@ -1333,7 +1333,8 @@ int main(int argC, char* argV[])
 #if 0
   //
   // FIXME P9: Temporary setting trace level 250 until the ftest-ftest-ftest bug is solved
-  //           To be activated once 0.17.0 is branched out from develop
+  //           To be activated once 0.17.0 is branched out from develop.
+  //           See issue #652
   //
   lmTraceLevelSet(LmtBug, true);
 #endif
@@ -1372,7 +1373,7 @@ int main(int argC, char* argV[])
 #if 0
   //
   // This 'almost always outdeffed' piece of code is used whenever a change is done to the
-  // valgrind test suite, just to make sure that the tool actually detects memory leaks,
+  // valgrind test suite, just to make sure that the tool actually detects memory leaks.
   //
   char* x = (char*) malloc(100000);
   snprintf(x, sizeof(x), "A hundred thousand bytes lost here");
