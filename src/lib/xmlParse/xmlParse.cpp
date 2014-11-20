@@ -51,7 +51,9 @@
 static const char* compoundValueRootV[] =
 {
   "/updateContextRequest/contextElementList/contextElement/contextAttributeList/contextAttribute/contextValue",
-  "/appendContextElementRequest/contextAttributeList/contextAttribute/contextValue"
+  "/appendContextElementRequest/contextAttributeList/contextAttribute/contextValue",
+  "/updateContextElementRequest/contextAttributeList/contextAttribute/contextValue",
+  "/updateContextAttributeRequest/contextValue"
 };
 
 

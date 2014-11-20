@@ -66,7 +66,8 @@ using boost::property_tree::ptree;
 static const char* compoundRootV[] =
 {
   "/contextElements/contextElement/attributes/attribute/value",
-  "/attributes/attribute/value"
+  "/attributes/attribute/value",
+  "/value"
 };
 
 
