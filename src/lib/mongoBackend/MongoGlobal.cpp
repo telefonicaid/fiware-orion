@@ -696,9 +696,10 @@ static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP)
 * can be seen as a query on "/#" considering that entities without servicePath are implicitly
 * assigned to "/" service path.
 */
-static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::string>& servicePath)
+static void fillQueryServicePath(BSONObj& bo, const std::vector<std::string>& servicePath)
 {
 
+    std::string servicePathValue = "";
     if (servicePath.size() > 0)
     {
 
@@ -719,36 +720,36 @@ static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::stri
         bo.append("$in", ba.arr());
 #endif
 
-        // This solution is based on making the "or" inside the regex, using the "|" as delimiter
-        std::string servicePathValue = "";
+        servicePathValue += "{ $in: [ ";
         for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
             LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
             char path[MAX_SERVICE_NAME_LEN];
             slashEscape(servicePath[ix].c_str(), path, sizeof(path));
-            /* Behaviour is different depending if servicePath ends with '#' or not */
             if (path[strlen(path) - 1] == '#')
             {
                 /* Remove '\/#' part of the string */
                 int l = strlen(path);
                 path[l - 3] = 0;
-                servicePathValue += std::string("^") + path + "$|" + std::string("^") + path + "\\/.*";
+                servicePathValue += std::string("/^") + path + "$/, " + std::string("/^") + path + "\\/.*/";
             }
             else
             {
-                servicePathValue += std::string("^") + path + "$";
+                servicePathValue += std::string("/^") + path + "$/";
             }
 
             /* Prepare concatenation for next token in regex */
             if (ix < servicePath.size() - 1)
             {
-                servicePathValue += std::string("|");
+                servicePathValue += std::string(", ");
             }
         }
-        bo.append("$regex", servicePathValue);
+        servicePathValue += " ] }";
+        LM_T(LmtServicePath, ("Service Path JSON string: '%s'", servicePathValue.c_str()));
+        bo = fromjson(servicePathValue);
     }
     else
     {
-      bo.append("$exists", false);
+        bo = BSON("$exists" << false);
     }
 
 }
@@ -975,9 +976,9 @@ bool entitiesQuery
 
     /* Part 2: service path */
     const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
-    BSONObjBuilder inServicePath;
+    BSONObj inServicePath;
     fillQueryServicePath(inServicePath, servicePath);
-    finalQuery.append(servicePathString, inServicePath.obj());
+    finalQuery.append(servicePathString, inServicePath);
 
     /* Part 3: attributes */
     BSONArrayBuilder attrs;
