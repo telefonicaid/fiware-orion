@@ -15,3 +15,4 @@ Fix: attribute type is no longer used as attribute "identification key" (from no
 Add: Fiware-ServicePath '#' syntax for including path children in the query (without '#' only the service path itself is included). (Issue #646)
 Add: "/" is used as implicit service path for entities. (Issue #646)
 Add: queries without Fiware-ServicePath are resolved on "/#" implicitely (i.e. all the paths). (Issue #646)
+Fix: Changed max-length of service path element from 10 characteres to 50. (Issue #649)
