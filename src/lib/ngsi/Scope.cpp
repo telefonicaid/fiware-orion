@@ -112,7 +112,7 @@ std::string Scope::check
         if (!isTrue(circle.invertedString()) && !isFalse(circle.invertedString()))
         {
           LM_W(("Bad Input (bad value for circle/inverted: '%s')", circle.invertedString().c_str()));
-          return "bad value for circle/inverted: '" + circle.invertedString() + "'";
+          return "bad value for circle/inverted: /" + circle.invertedString() + "/";
         }
       }
       else if (circle.center.latitudeString() == "")
@@ -152,7 +152,7 @@ std::string Scope::check
         if (!isTrue(polygon.invertedString()) && !isFalse(polygon.invertedString()))
         {
           LM_W(("Bad Input (bad value for polygon/inverted: '%s')", polygon.invertedString().c_str()));
-          return "bad value for polygon/inverted: '" + polygon.invertedString() + "'";
+          return "bad value for polygon/inverted: /" + polygon.invertedString() + "/";
         }
       }
 

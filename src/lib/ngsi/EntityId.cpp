@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "common/Format.h"
 #include "ngsi/EntityId.h"
+#include "common/tag.h"
 
 
 
@@ -89,12 +90,15 @@ std::string EntityId::render
   const std::string&  assocTag
 )
 {
-  std::string out     = "";
+  std::string  out              = "";
+  char*        isPatternEscaped = htmlEscape(isPattern.c_str());
+  char*        typeEscaped      = htmlEscape(type.c_str());
+  char*        idEscaped        = htmlEscape(id.c_str());
 
   if (format == XML)
   {
-    out += indent + "<" + tag + " type=\"" + type + "\" isPattern=\"" + isPattern + "\">\n";
-    out += indent + "  " + "<id>"        + id        + "</id>"        + "\n";
+    out += indent + "<"  + tag + " type=\"" + typeEscaped + "\" isPattern=\"" + isPatternEscaped + "\">\n";
+    out += indent + "  " + "<id>"           + idEscaped   + "</id>"           + "\n";
     out += indent + "</" + tag + ">\n";
   }
   else
@@ -108,9 +112,9 @@ std::string EntityId::render
     }
 
     out += (isInVector? indent + (isAssoc? "\"" + assocTag + "\" : ": "") + "{\n": "");
-    out += indent2 + "\"type\" : \""      + type      + "\","  + "\n";
-    out += indent2 + "\"isPattern\" : \"" + isPattern + "\","  + "\n";
-    out += indent2 + "\"id\" : \""        + id        + "\"";
+    out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
+    out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
+    out += indent2 + "\"id\" : \""        + idEscaped        + "\"";
 
     if ((comma == true) && (isInVector == false))
     {
@@ -123,6 +127,10 @@ std::string EntityId::render
       out += (comma == true)? ",\n" : (isInVector? "\n" : "");
     }
   }
+
+  free(typeEscaped);
+  free(idEscaped);
+  free(isPatternEscaped);
 
   return out;
 }
@@ -149,12 +157,12 @@ std::string EntityId::check
 
   if (!isTrue(isPattern) && !isFalse(isPattern) && isPattern != "")
   {
-    return std::string("invalid isPattern (boolean) value for entity: '") + isPattern + "'";
+    return std::string("invalid isPattern value for entity: /") + isPattern + "/";
   }
 
   if ((requestType == RegisterContext) && (isTrue(isPattern)))
   {
-    return "'isPattern' set to true for a registration";
+    return "isPattern set to true for a registration";
   }
 
   return "OK";

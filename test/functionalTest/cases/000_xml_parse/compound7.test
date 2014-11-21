@@ -60,7 +60,7 @@ orionCurl --url "$url" --payload "${payload}"
 --REGEXPECT--
 7: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 251
+Content-Length: 250
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -69,7 +69,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>compound value error: bad tag-name of vector item: 'vecitem6' (should be 'vecitem')</details>
+    <details>compound value error: bad tag-name of vector item: /vecitem6/, should be /vecitem/</details>
   </errorCode>
 </updateContextResponse>
 --TEARDOWN--

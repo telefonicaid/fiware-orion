@@ -115,7 +115,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
     if (reg.isEmpty())
     {
        reqSemGive(__FUNCTION__, "ngsi9 register request (no registrations found)");
-       responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: '") + requestP->registrationId.get() + "'");
+       responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: /") + requestP->registrationId.get() + "/");
        responseP->registrationId = requestP->registrationId;
        ++noOfRegistrationUpdateErrors;
        return SccOk;

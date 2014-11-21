@@ -86,7 +86,7 @@ Date: REGEX(.*)
 +++++ 1. Path-Component more than 10 chars
 HTTP/1.1 200 OK
 Connection: close
-Content-Length: 164
+Content-Length: 149
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -94,10 +94,38 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>component-name too long in ServicePath '/h0123456789'</details>
+  <details>component-name too long in ServicePath</details>
 </orionError>
 
 +++++ 2. Too many levels in path
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 145
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>too many components in ServicePath</details>
+</orionError>
+
++++++ 3: bad char in component
+HTTP/1.1 200 OK
+Connection: close
+Content-Length: 172
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orionError>
+  <code>400</code>
+  <reasonPhrase>Bad Request</reasonPhrase>
+  <details>component /h-1/ of ServicePath contains illegal character /-/</details>
+</orionError>
+
++++++ 4: service path must start with a '/'
 HTTP/1.1 200 OK
 Connection: close
 Content-Length: 183
@@ -108,35 +136,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>too many components in ServicePath '/h1/h2/h3/h4/h5/h6/h7/h8/h9/h10/h11'</details>
-</orionError>
-
-+++++ 3: bad char in component
-HTTP/1.1 200 OK
-Connection: close
-Content-Length: 173
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>component 'h-1 ' of ServicePath contains illegal character '-'</details>
-</orionError>
-
-+++++ 4: service path must start with a '/'
-HTTP/1.1 200 OK
-Connection: close
-Content-Length: 185
-Content-Type: application/xml
-Date: REGEX(.*)
-
-<?xml version="1.0"?>
-<orionError>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Only 'absolute' Service Paths allowed (a service path must begin with '/')</details>
+  <details>Only /absolute/ Service Paths allowed [a service path must begin with /]</details>
 </orionError>
 
 +++++ 5: four service paths

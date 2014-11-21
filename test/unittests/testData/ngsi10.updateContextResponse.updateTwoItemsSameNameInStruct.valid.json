@@ -2,6 +2,6 @@
   "errorCode" : {
     "code" : "400",
     "reasonPhrase" : "Bad Request",
-    "details" : "compound value error: duplicated tag-name: 's1' in '/'"
+    "details" : "compound value error: duplicated tag-name: /s1/ in path: /"
   }
 }

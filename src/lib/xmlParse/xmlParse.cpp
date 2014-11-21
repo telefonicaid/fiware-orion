@@ -180,9 +180,8 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
     {
       ciP->httpStatusCode = SccBadRequest;
 
-      ciP->answer = std::string("Bad value for XML attribute 'type' for '") +
-        node->name() +
-        "': '" + xmlAttribute + "'";
+      ciP->answer = std::string("Bad value for XML attribute /type/ for /") +
+        node->name() + "/: " + xmlAttribute;
 
       LM_W(("Bad Input (%s)", ciP->answer.c_str()));
 
@@ -211,7 +210,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
       else
       {
         ciP->httpStatusCode = SccBadRequest;
-        ciP->answer = std::string("Bad value for XML attribute 'type' for '") + name + "': '" + xmlAttribute + "'";
+        ciP->answer = std::string("Bad value for XML attribute /type/ for /") + name + "/: " + xmlAttribute;
         LM_W(("Bad Input (%s)", ciP->answer.c_str()));
 
         return;
@@ -309,7 +308,7 @@ void xmlParse
     ciP->httpStatusCode = SccBadRequest;
     if (ciP->answer == "")
     {
-      ciP->answer = std::string("Unknown XML field: '") + name.c_str() + "'";
+      ciP->answer = std::string("Unknown XML field: ") + name.c_str();
     }
 
     LM_W(("Bad Input (%s)", ciP->answer.c_str()));
@@ -424,14 +423,14 @@ std::string xmlTypeAttributeGet(xml_node<>* node)
     {
        if (type != "")  // set already?
        {
-         return "more than one 'type' attribute";
+         return "more than one /type/ attribute";
        }
 
        type = attr->value();  // save the value of the attribute 'type'
     }
     else  // XML attribute whose name != 'type': ERROR
     {
-      return std::string("unknown attribute '") + attr->name() + "'";
+      return std::string("unknown attribute /") + attr->name() + "/";
     }
   }
 

@@ -183,8 +183,8 @@ std::string jsonTreat
                         "",
                         requestType(request),
                         SccBadRequest,
-                        std::string("Sorry, no request treating object found for RequestType '") +
-                        requestType(request) + "'");
+                        std::string("Sorry, no request treating object found for RequestType /") +
+                        requestType(request) + "/");
 
     LM_W(("Bad Input (no request treating object found for RequestType %d (%s))", request, requestType(request)));
     return errorReply;
@@ -210,7 +210,7 @@ std::string jsonTreat
                                                 "",
                                                 reqP->keyword,
                                                 SccBadRequest,
-                                                std::string("JSON Parse Error: ") + e.what());
+                                                std::string("JSON Parse Error"));
 
     LM_W(("Bad Input (JSON Parse Error: %s)", e.what()));
     return errorReply;

@@ -55,7 +55,7 @@ std::string badRequest
                              "",
                              ciP->payloadWord,
                              SccBadRequest,
-                             std::string("service '") + ciP->url + "' not found");
+                             "service not found");
 
   return answer;
 }

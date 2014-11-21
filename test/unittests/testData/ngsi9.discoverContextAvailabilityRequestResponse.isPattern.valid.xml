@@ -2,6 +2,6 @@
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>invalid isPattern (boolean) value for entity: 'falseX'</details>
+    <details>invalid isPattern value for entity: /falseX/</details>
   </errorCode>
 </discoverContextAvailabilityResponse>

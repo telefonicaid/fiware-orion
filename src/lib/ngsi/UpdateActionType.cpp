@@ -59,7 +59,7 @@ std::string UpdateActionType::check
     return "empty update action type";
   }
 
-  return std::string("invalid update action type: '") + string + "'";
+  return std::string("invalid update action type: /") + string + "/";
 }
 
 

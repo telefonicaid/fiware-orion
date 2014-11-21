@@ -126,7 +126,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: 'ENTITY_ID'</details>
+    <details>Entity id: /ENTITY_ID/</details>
   </statusCode>
 </contextElementResponse>
 2: ++++++++++++ DELETE that fails +++++++++++++++++
@@ -179,7 +179,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>472</code>
     <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-    <details>action: UPDATE - entity: (ENTITY_ID, ) - offending attribute: temperature</details>
+    <details>action: UPDATE - entity: [ENTITY_ID, ] - offending attribute: temperature</details>
   </errorCode>
 </updateContextElementResponse>
 5: ++++++++++++ Register an entity +++++++++++++++++

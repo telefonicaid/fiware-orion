@@ -704,7 +704,7 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
             Metadata* mdP = caP->metadataVector.get(jx);
             if (mdP->name == NGSI_MD_LOCATION) {
                 if (locAttr.length() > 0) {
-                    *errDetail = "You cannot use more than one location attribute when creating an entity (see Orion user manual)";
+                    *errDetail = "You cannot use more than one location attribute when creating an entity [see Orion user manual]";
                     return false;
                 }
                 else {
@@ -714,7 +714,7 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
                     }
 
                     if (!string2coords(caP->value, coordLat, coordLong)) {
-                        *errDetail = "coordinate format error (see Orion user manual): " + caP->value;
+                        *errDetail = "coordinate format error [see Orion user manual]: " + caP->value;
                         return false;
                     }
                     locAttr = caP->name;
@@ -1103,7 +1103,7 @@ static bool processContextAttributeVector (ContextElement*                      
                  * an error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
-                                      " - entity: (" + eP->toString() + ")" +
+                                      " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());
                 return false;
 
@@ -1113,7 +1113,7 @@ static bool processContextAttributeVector (ContextElement*                      
             if (targetAttr->getLocation().length() > 0 && targetAttr->name != locAttr) {
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: UPDATE") +
-                                      " - entity: (" + eP->toString() + ")" +
+                                      " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() +
                                       " - location nature of an attribute has to be defined at creation time, with APPEND");
                 return false;
@@ -1123,7 +1123,7 @@ static bool processContextAttributeVector (ContextElement*                      
                 if (!string2coords(targetAttr->value, coordLat, coordLong)) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: UPDATE") +
-                                              " - entity: (" + eP->toString() + ")" +
+                                              " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
                                               " - error parsing location attribute, value: <" + targetAttr->value + ">");
                         return false;
@@ -1143,27 +1143,27 @@ static bool processContextAttributeVector (ContextElement*                      
                     if (locAttr.length() > 0 && targetAttr->name != locAttr) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: APPEND") +
-                                              " - entity: (" + eP->toString() + ")" +
+                                              " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - attemp to define a location attribute (" + targetAttr->name + ") when another one has been previously defined (" + locAttr + ")");
+                                              " - attempt to define a location attribute [" + targetAttr->name + "] when another one has been previously defined [" + locAttr + "]");
                         return false;
                     }
 
                     if ((targetAttr->getLocation() != LOCATION_WGS84) && (targetAttr->getLocation() != LOCATION_WGS84_LEGACY)) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: APPEND") +
-                                              " - entity: (" + eP->toString() + ")" +
+                                              " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - only WGS84 is supported for location, found: <" + targetAttr->getLocation() + ">");
+                                              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
                         return false;
                     }
 
                     if (!string2coords(targetAttr->value, coordLat, coordLong)) {
                             cerP->statusCode.fill(SccInvalidParameter,
                                                   std::string("action: APPEND") +
-                                                  " - entity: (" + eP->toString() + ")" +
+                                                  " - entity: [" + eP->toString() + "]" +
                                                   " - offending attribute: " + targetAttr->toString() +
-                                                  " - error parsing location attribute, value: <" + targetAttr->value + ">");
+                                                  " - error parsing location attribute, value: [" + targetAttr->value + "]");
                             return false;
                     }
                     locAttr = targetAttr->name;
@@ -1178,7 +1178,7 @@ static bool processContextAttributeVector (ContextElement*                      
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: APPEND") +
-                                      " - entity: (" + eP->toString() + ")" +
+                                      " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
                                       " - attribute can not be appended");
                 return false;
@@ -1193,7 +1193,7 @@ static bool processContextAttributeVector (ContextElement*                      
                 if (targetAttr->getLocation().length() > 0 ) {
                     cerP->statusCode.fill(SccInvalidParameter,
                                           std::string("action: DELETE") +
-                                          " - entity: (" + eP->toString() + ")" +
+                                          " - entity: [" + eP->toString() + "]" +
                                           " - offending attribute: " + targetAttr->toString() +
                                           " - location attribute has to be defined at creation time, with APPEND");
                     return false;
@@ -1212,7 +1212,7 @@ static bool processContextAttributeVector (ContextElement*                      
                  * a error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: DELETE") +
-                                      " - entity: (" + eP->toString() + ")" +
+                                      " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
                                       " - attribute not found");
                 return false;
@@ -1269,7 +1269,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     ensureLocationIndex(tenant);
 
     if (!legalIdUsage(attrsV)) {
-        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: (" + eP->toString() + ")";
+        *errDetail = "Attributes with same name with ID and not ID at the same time in the same entity are forbidden: entity: [" + eP->toString() + "]";
         return false;
     }
 
@@ -1485,7 +1485,7 @@ void processContextElement(ContextElement*                  ceP,
 
                 buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidParameter,                                   
                                    std::string("action: ") + action +
-                                      " - entity: (" + enP->toString(true) + ")" +
+                                      " - entity: [" + enP->toString(true) + "]" +
                                       " - offending attribute: " + aP->toString() +
                                       " - empty attribute not allowed in APPEND or UPDATE");
                 return;

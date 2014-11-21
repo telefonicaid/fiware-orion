@@ -118,7 +118,7 @@ std::string ContextRegistrationAttribute::check
 
   if (!isTrue(isDomain) && !isFalse(isDomain))
   {
-    return std::string("invalid isDomain (boolean) value for registration attribute: '") + isDomain + "'";
+    return std::string("invalid isDomain value for registration attribute: /") + isDomain + "/";
   }
 
   std::string res;

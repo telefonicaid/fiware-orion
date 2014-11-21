@@ -154,7 +154,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity-Attribute pair: 'E01-A1'</details>
+    <details>Entity-Attribute pair: /E01-A1/</details>
   </statusCode>
 </contextAttributeResponse>
 2: ++++++++++++++++++++
@@ -242,7 +242,7 @@ Date: REGEX(.*)
 <statusCode>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>unmatching metadata ID value URI/payload: 'right' vs 'left'</details>
+  <details>unmatching metadata ID value URI/payload: /right/ vs /left/</details>
 </statusCode>
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -254,7 +254,7 @@ Date: REGEX(.*)
 <statusCode>
   <code>472</code>
   <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-  <details>action: DELETE - entity: (E01, ) - offending attribute: A1 - attribute not found</details>
+  <details>action: DELETE - entity: [E01, ] - offending attribute: A1 - attribute not found</details>
 </statusCode>
 8: ++++++++++++++++++++
 HTTP/1.1 200 OK
@@ -279,7 +279,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity-Attribute pair: 'E01-A1'</details>
+    <details>Entity-Attribute pair: /E01-A1/</details>
   </statusCode>
 </contextAttributeResponse>
 --TEARDOWN--
