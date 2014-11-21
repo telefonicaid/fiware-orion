@@ -420,7 +420,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 {
   // 1. Max 10 paths  - ONLY ONE path allowed at this moment
   // 2. Max 10 levels in each path
-  // 3. Max 10 characters in each path component
+  // 3. Max 50 characters in each path component
   // 4. Only alphanum and underscore allowed (just like in tenants)
   
   std::vector<std::string> compV;
@@ -441,16 +441,16 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   if (components > 10)
   {
-    OrionError e(SccBadRequest, std::string("too many components in ServicePath '") + servicePath + "'");
+    OrionError e(SccBadRequest, std::string("too many components in ServicePath"));
     ciP->answer = e.render(ciP->outFormat, "");
     return 2;
   }
 
   for (int ix = 0; ix < components; ++ix)
   {
-    if (strlen(compV[ix].c_str()) > 10)
+    if (strlen(compV[ix].c_str()) > 50)
     {
-      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath '") + servicePath + "'");
+      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath"));
       ciP->answer = e.render(ciP->outFormat, "");
       return 3;
     }
