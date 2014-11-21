@@ -213,20 +213,6 @@ static std::string scopeType(const std::string& path, const std::string& value, 
 
 /* ****************************************************************************
 *
-* scopeOperator - 
-*/
-static std::string scopeOperator(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  reqDataP->qcr.scopeP->oper = value;
-  LM_T(LmtParse, ("Set scope 'operator' to '%s' for a scope", reqDataP->qcr.scopeP->oper.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * scopeValue -
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
@@ -440,7 +426,6 @@ JsonNode jsonQcrParseVector[] =
   { "/restriction/scopes",                                                 jsonNullTreat           },
   { "/restriction/scopes/scope",                                           operationScope          },
   { "/restriction/scopes/scope/type",                                      scopeType               },
-  { "/restriction/scopes/scope/operator",                                  scopeOperator           },
   { "/restriction/scopes/scope/value",                                     scopeValue              },
 
   { "/restriction/scopes/scope/value/circle",                              circle                  },

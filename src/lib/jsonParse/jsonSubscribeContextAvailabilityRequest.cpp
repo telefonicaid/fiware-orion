@@ -222,20 +222,6 @@ static std::string scopeType(const std::string& path, const std::string& value, 
 
 /* ****************************************************************************
 *
-* scopeOperator - 
-*/
-static std::string scopeOperator(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  reqDataP->scar.scopeP->oper = value;
-  LM_T(LmtParse, ("Set scope 'operator' to '%s' for a scope", reqDataP->scar.scopeP->oper.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * scopeValue - 
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
@@ -267,7 +253,6 @@ JsonNode jsonScarParseVector[] =
   { "/restriction/scopes",                 jsonNullTreat        },
   { "/restriction/scopes/scope",           scope,               },
   { "/restriction/scopes/scope/type",      scopeType            },
-  { "/restriction/scopes/scope/operator",  scopeOperator        },
   { "/restriction/scopes/scope/value",     scopeValue           },
   { "LAST", NULL }
 };
