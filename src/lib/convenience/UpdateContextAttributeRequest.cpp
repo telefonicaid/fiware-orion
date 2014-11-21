@@ -110,6 +110,11 @@ std::string UpdateContextAttributeRequest::check
     format = XML;
   }
 
+  if (format == JSON)
+  {
+    indent = "  ";
+  }
+
   if (predetectedError != "")
   {
     response.fill(SccBadRequest, predetectedError);
@@ -127,7 +132,14 @@ std::string UpdateContextAttributeRequest::check
     return "OK";
   }
 
-  return response.render(format, indent);
+  std::string out = response.render(format, indent);
+
+  if (format == JSON)
+  {
+    out = "{\n" + out + "}\n";
+  }
+
+  return out;
 }
 
 

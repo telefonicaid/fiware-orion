@@ -36,6 +36,10 @@ brokerStart CB
 # 01. PUT /v1/contextEntities/entityId with compound attribute value using JSON
 # 02. PUT /v1/contextEntities/entityId with compound attribute value using XML
 #
+# However, to see 'good' results, the entity should exist:
+#
+# 03. POST /v1/contextEntities/entityId with compound attribute value using JSON
+# 04. POST /v1/contextEntities/entityId with compound attribute value using XML
 
 
 echo "01. PUT /v1/contextEntities/entityId with compound attribute value using JSON"
@@ -71,6 +75,39 @@ echo
 echo
 
 
+echo "03. POST /v1/contextEntities/entityId with compound attribute value using JSON"
+payload='{
+  "attributes": [
+    {
+        "name": "sdf",
+        "type": "",
+        "value": {"a": 1}
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/entityId --payload "$payload" --json
+echo
+echo
+
+
+echo "04. POST /v1/contextEntities/entityId with compound attribute value using XML"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<appendContextElementRequest>
+  <contextAttributeList>
+    <contextAttribute>
+      <name>sdf</name>
+      <type></type>
+      <contextValue>
+        <a>2</a>
+      </contextValue>
+    </contextAttribute>
+  </contextAttributeList>
+</appendContextElementRequest>'
+orionCurl --url /v1/contextEntities/entityId --payload "$payload"
+echo
+echo
+
+
 --REGEXPECT--
 01. PUT /v1/contextEntities/entityId with compound attribute value using JSON
 HTTP/1.1 200 OK
@@ -89,11 +126,75 @@ Date: REGEX(.*)
 
 02. PUT /v1/contextEntities/entityId with compound attribute value using XML
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 203
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
+<updateContextElementResponse>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId</details>
+  </errorCode>
+</updateContextElementResponse>
+
+
+03. POST /v1/contextEntities/entityId with compound attribute value using JSON
+HTTP/1.1 200 OK
+Content-Length: 315
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "sdf", 
+                    "type": "", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "id": "entityId", 
+    "isPattern": "false", 
+    "type": ""
+}
+
+
+04. POST /v1/contextEntities/entityId with compound attribute value using XML
+HTTP/1.1 200 OK
+Content-Length: 559
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>entityId</id>
+  </entityId>
+  <contextResponseList>
+    <contextAttributeResponse>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>sdf</name>
+          <type/>
+          <contextValue/>
+        </contextAttribute>
+      </contextAttributeList>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextAttributeResponse>
+  </contextResponseList>
+</appendContextElementResponse>
 
 
 --TEARDOWN--

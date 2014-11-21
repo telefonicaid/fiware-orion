@@ -67,6 +67,7 @@ static const char* compoundRootV[] =
 {
   "/contextElements/contextElement/attributes/attribute/value",
   "/attributes/attribute/value",
+  "/contextResponses/contextResponse/contextElement/attributes/attribute/value",
   "/value"
 };
 
