@@ -1033,7 +1033,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_2levels)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "T", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home/kz");
+  servicePathVector.push_back("/home/kz/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1105,7 +1105,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "T", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home");
+  servicePathVector.push_back("/home/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1211,7 +1211,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   prepareDatabaseWithServicePath("patternType");
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en("E.*", "T", "true");
+  EntityId en("E1\\d", "T", "true");
   req.entityIdVector.push_back(&en);
   servicePathVector.clear();
 
@@ -1226,7 +1226,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  ASSERT_EQ(4, res.contextElementResponseVector.size());
 
   /* Context Element response # 1 */
   EXPECT_EQ("E10", RES_CER(0).entityId.id);
@@ -1239,6 +1239,42 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Context Element response # 2 */
+  EXPECT_EQ("E11", RES_CER(1).entityId.id);
+  EXPECT_EQ("T", RES_CER(1).entityId.type);
+  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
+  EXPECT_EQ("a11", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+  /* Context Element response # 3 */
+  EXPECT_EQ("E12", RES_CER(2).entityId.id);
+  EXPECT_EQ("T", RES_CER(2).entityId.type);
+  EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
+  EXPECT_EQ("a12", RES_CER_ATTR(2, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
+
+  /* Context Element response # 4 */
+  EXPECT_EQ("E13", RES_CER(3).entityId.id);
+  EXPECT_EQ("T", RES_CER(3).entityId.type);
+  EXPECT_EQ("false", RES_CER(3).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
+  EXPECT_EQ("a13", RES_CER_ATTR(3, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
 
   utExit();
 }
@@ -1262,7 +1298,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1levelbis)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "T", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home2");
+  servicePathVector.push_back("/home2/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1325,7 +1361,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
 
   // Test that three items are found for Service path /home/fg
   servicePathVector.clear();
-  servicePathVector.push_back("/home/fg");
+  servicePathVector.push_back("/home/fg/#");
 
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
@@ -1537,7 +1573,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home/kz");
+  servicePathVector.push_back("/home/kz/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1621,7 +1657,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home");
+  servicePathVector.push_back("/home/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1740,7 +1776,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   prepareDatabaseWithServicePath("patternNoType");
 
   /* Forge the request (from "inside" to "outside") */
-  EntityId en("E.*", "", "true");
+  EntityId en("E1\\d", "", "true");
   req.entityIdVector.push_back(&en);
   servicePathVector.clear();
 
@@ -1754,7 +1790,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(1, res.contextElementResponseVector.size());
+  ASSERT_EQ(4, res.contextElementResponseVector.size());
 
   /* Context Element response # 1 */
   EXPECT_EQ("E10", RES_CER(0).entityId.id);
@@ -1767,6 +1803,42 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Context Element response # 2 */
+  EXPECT_EQ("E11", RES_CER(1).entityId.id);
+  EXPECT_EQ("T", RES_CER(1).entityId.type);
+  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
+  EXPECT_EQ("a11", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+  /* Context Element response # 3 */
+  EXPECT_EQ("E12", RES_CER(2).entityId.id);
+  EXPECT_EQ("T", RES_CER(2).entityId.type);
+  EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
+  EXPECT_EQ("a12", RES_CER_ATTR(2, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
+
+  /* Context Element response # 4 */
+  EXPECT_EQ("E13", RES_CER(3).entityId.id);
+  EXPECT_EQ("T", RES_CER(3).entityId.type);
+  EXPECT_EQ("false", RES_CER(3).entityId.isPattern);
+  ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
+  EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
+  EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
+  EXPECT_EQ("a13", RES_CER_ATTR(3, 0)->value);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
 
   utExit();
 }
@@ -1790,7 +1862,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1levelbis)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E.*", "", "true");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home2");
+  servicePathVector.push_back("/home2/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1934,7 +2006,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E3", "", "false");
   req.entityIdVector.push_back(&en);
-  servicePathVector.push_back("/home/fg");
+  servicePathVector.push_back("/home/fg/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -3619,7 +3691,7 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     EXPECT_EQ("collection: unittest.entities - "
-              "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T1\" } ], _id.servicePath: { $exists: false } }, orderby: { creDate: 1 } } - "
+              "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T1\" } ], _id.servicePath: { $in: [ /^/.*/, null ] } }, orderby: { creDate: 1 } } - "
               "exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.contextElementResponseVector.size());    
 

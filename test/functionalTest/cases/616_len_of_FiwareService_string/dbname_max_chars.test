@@ -50,4 +50,6 @@ exitCode: 1
 
 
 --TEARDOWN--
+
 brokerStop CB
+dbDrop 1234567890

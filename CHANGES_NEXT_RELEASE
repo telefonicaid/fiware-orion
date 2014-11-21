@@ -11,3 +11,9 @@ Fix: 'WSG84' identifier changed to 'WGS84' (it was a typo), although the old one
 Fix: Fixed a leak for each forwarding of messages to Context Providers.
 Add: New name for URI param 'attributesFormat': 'attributeFormat' (better English).
      The old name will be supported as well. (Issue #633)
+Fix: attribute type is no longer used as attribute "identification key" (from now on, only name is used for that purpose) (Issue #640)
+Add: Fiware-ServicePath '#' syntax for including path children in the query (without '#' only the service path itself is included). (Issue #646)
+Add: "/" is used as implicit service path for entities. (Issue #646)
+Add: queries without Fiware-ServicePath are resolved on "/#" implicitely (i.e. all the paths). (Issue #646)
+Fix: Changed max-length of service path element from 10 characteres to 50. (Issue #649)
+Fix: service path is no longer ignored at entity creation time for entities without type. (Issue #642)
