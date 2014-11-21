@@ -168,9 +168,13 @@ void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP)
   // is a part of a ContextAttribute.
   //
   if (strcmp(ciP->payloadWord, "updateContextAttributeRequest") == 0)
+  {
     parseDataP->upcar.res.compoundValueP = ciP->compoundValueRoot;
+  }
   else
+  {
     parseDataP->lastContextAttribute->compoundValueP = ciP->compoundValueRoot;
+  }
 
   // Reset the Compound stuff in ConnectionInfo
   ciP->compoundValueRoot = NULL;
