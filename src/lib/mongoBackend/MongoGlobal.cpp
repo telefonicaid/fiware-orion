@@ -698,50 +698,74 @@ static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP)
 *
 * fillQueryServicePath -
 *
-* The regular expression for servicePath is an OR between the exact path and
-* the exact path followed by a slash ('/') and after that, any text (including slashes)
+* The regular expression for servicePath.
 *
-* If the servicePath is empty, then we only look for entities that have no service path
-* associated ("$exists: false").
+* If the servicePath is empty, then we return all entities, no matter their servicePath. This
+* can be seen as a query on "/#" considering that entities without servicePath are implicitly
+* assigned to "/" service path.
 */
-static void fillQueryServicePath(BSONObjBuilder& bo, const std::vector<std::string>& servicePath)
+static BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 {
 
-    if (servicePath.size() > 0)
-    {
+  /* Due to limitations in the BSONArrayBuilder class (that hopefully will be solved in legacy-1.0.0
+   * MongoDB driver) we need to compose the JSON string, then apply fromjson() function. Current
+   * implementation uses an array element for each regex tokens, but we could use only
+   * one element, concatenating all regex tokens using "|" (not sure what is more efficient from a
+   * computational point of view). However, note that we need the $in array as "null" has to be added
+   * as element in any case.
+   *
+   * More information on: http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
+   *
+   */
 
-#if 0
-        // This solution is based on { $in: [ ... ]}. However, it is not clear how to compose regex
-        // in a BSONArrayBuilder, see http://stackoverflow.com/questions/24243276/include-regex-elements-in-bsonarraybuilder
-        BSONArrayBuilder ba;
-        for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
-            LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
-            char path[MAX_SERVICE_NAME_LEN];
-            slashEscape(servicePath[ix].c_str(), path, sizeof(path));
-            const std::string  servicePathValue = std::string("^") + path + "$|" + "^" + path + "\\/.*";
-            BSONElement be;
-            ba.appendRegex(servicePathValue);
-        }
-        bo.append("$in", ba.arr());
-#endif
+  std::string servicePathValue = "";
+  if (servicePath.size() > 0)
+  {
 
-        // This solution is based on making the "or" inside the regex, using the "|" as delimiter
-        std::string  servicePathValue = "";
-        for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
-            LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
-            char path[MAX_SERVICE_NAME_LEN];
-            slashEscape(servicePath[ix].c_str(), path, sizeof(path));
-            servicePathValue += std::string("^") + path + "$|" + "^" + path + "\\/.*";
-            if (ix < servicePath.size() - 1) {
-                servicePathValue += std::string("|");
-            }
-        }
-        bo.append("$regex", servicePathValue);
+    bool nullAdded = false;
+    servicePathValue += "{ $in: [ ";
+    for (unsigned int ix = 0 ; ix < servicePath.size(); ++ix) {
+      LM_T(LmtServicePath, ("Service Path: '%s'", servicePath[ix].c_str()));
+
+      /* Add "null" in the following service path cases: / or /#. In order to avoid adding null
+             * several times, the nullAdded flag is used */
+      if (!nullAdded && ((servicePath[ix] == "/") || (servicePath[ix] == "/#")))
+      {
+        servicePathValue += "null, ";
+        nullAdded = true;
+      }
+
+      char path[MAX_SERVICE_NAME_LEN];
+      slashEscape(servicePath[ix].c_str(), path, sizeof(path));
+      if (path[strlen(path) - 1] == '#')
+      {
+        /* Remove '\/#' trailing part of the string */
+        int l = strlen(path);
+        path[l - 3] = 0;
+        servicePathValue += std::string("/^") + path + "$/, " + std::string("/^") + path + "\\/.*/";
+      }
+      else
+      {
+        servicePathValue += std::string("/^") + path + "$/";
+      }
+
+      /* Prepare concatenation for next token in regex */
+      if (ix < servicePath.size() - 1)
+      {
+        servicePathValue += std::string(", ");
+      }
     }
-    else
-    {
-      bo.append("$exists", false);
-    }
+    servicePathValue += " ] }";
+    LM_T(LmtServicePath, ("Service Path JSON string: '%s'", servicePathValue.c_str()));
+  }
+  else
+  {
+    /* In this case, servicePath match any path, including the case of "null" */
+    servicePathValue = "{$in: [ /^\\/.*/, null] }";
+  }
+
+  return fromjson(servicePathValue);
+
 }
 
 
@@ -966,9 +990,7 @@ bool entitiesQuery
 
     /* Part 2: service path */
     const std::string  servicePathString = "_id." ENT_SERVICE_PATH;
-    BSONObjBuilder inServicePath;
-    fillQueryServicePath(inServicePath, servicePath);
-    finalQuery.append(servicePathString, inServicePath.obj());
+    finalQuery.append(servicePathString, fillQueryServicePath(servicePath));
 
     /* Part 3: attributes */
     BSONArrayBuilder attrs;

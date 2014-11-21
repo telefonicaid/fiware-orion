@@ -455,13 +455,20 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
       return 3;
     }
 
-    const char* comp = compV[ix].c_str();
+    // Last token in the path is allowed to be *exactly* "#", as in /Madrid/Gardens/#. Note that
+    // /Madrid/Gardens/North# is not allowed
+    if ((ix == components - 1) && (compV[ix] == "#"))
+    {
+        continue;
+    }
+
+    const char* comp = compV[ix].c_str();      
 
     for (unsigned int cIx = 0; cIx < strlen(comp); ++cIx)
     {
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
-        OrionError e(SccBadRequest, std::string("component '") + comp + " ' of ServicePath contains illegal character '" + comp[cIx] + "'");
+        OrionError e(SccBadRequest, "a component of ServicePath contains an illegal character");
         ciP->answer = e.render(ciP->outFormat, "");
         return 4;
       }
@@ -469,6 +476,25 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   }
 
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* removeTrailingSlash - 
+*/
+static char* removeTrailingSlash(std::string path)
+{
+  char* cpath = (char*) path.c_str();
+
+  /* strlen(cpath) > 1 ensures that root service path "/" is not touched */
+  while ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
+  {
+    cpath[strlen(cpath) - 1] = 0;
+  }
+
+  return cpath;
 }
 
 
@@ -496,7 +522,9 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   for (int ix = 0; ix < servicePaths; ++ix)
   {
-    ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));
+    ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));    
+    ciP->servicePathV[ix] = removeTrailingSlash(ciP->servicePathV[ix]);
+
     LM_T(LmtServicePath, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 
