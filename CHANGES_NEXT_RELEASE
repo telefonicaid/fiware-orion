@@ -14,7 +14,7 @@ Add: New name for URI param 'attributesFormat': 'attributeFormat' (better Englis
 Fix: Attribute type is no longer used as attribute "identification key" (from now on, only name is used for that purpose) (Issue #640)
 Add: Fiware-ServicePath '#' syntax for including path children in the query (without '#' only the service path itself is included). (Issue #646)
 Add: "/" is used as implicit service path for entities. (Issue #646)
-Add: Queries without Fiware-ServicePath are resolved on "/#" implicitely (i.e. all the paths). (Issue #646)
+Add: Queries without Fiware-ServicePath are resolved on "/#" implicitly (i.e. all the paths). (Issue #646)
 Fix: Changed max-length of service path elements from 10 characteres to 50. (Issue #649)
 Fix: Service path is no longer ignored at entity creation time for entities without type. (Issue #642)
 Fix: The broker crashed on receiving compounds for some convops, e.g. /v1/contextEntities/{entityId} (Issue #647)
