@@ -16,3 +16,4 @@ Add: Fiware-ServicePath '#' syntax for including path children in the query (wit
 Add: "/" is used as implicit service path for entities. (Issue #646)
 Add: queries without Fiware-ServicePath are resolved on "/#" implicitely (i.e. all the paths). (Issue #646)
 Fix: Changed max-length of service path element from 10 characteres to 50. (Issue #649)
+Fix: service path is no longer ignored at entity creation time for entities without type. (Issue #642)
