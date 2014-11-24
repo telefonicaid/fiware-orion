@@ -57,6 +57,14 @@ static std::string attributeType(const std::string& path, const std::string& val
 */
 static std::string attributeValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
+  //
+  // NOTE: UpdateContextAttributeRequest *is* an attribute, so no attributeP is
+  //       called for in UpdateContextAttributeData. However, in order to
+  //       save the 'typeFromXmlAttribute', a ContextAttribute has been added to 
+  //       UpdateContextAttributeData.
+  //
+  reqData->lastContextAttribute = &reqData->upcar.attribute;
+
   reqData->upcar.res.contextValue = value;
 
   return "OK";

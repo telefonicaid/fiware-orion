@@ -101,6 +101,8 @@ static int contextAttributeType(xml_node<>* node, ParseData* reqData)
 */
 static int contextAttributeValue(xml_node<>* node, ParseData* reqData)
 {
+  reqData->lastContextAttribute = reqData->ucer.attributeP;
+  reqData->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
   LM_T(LmtParse, ("Got an attribute value: %s", node->value()));
   reqData->ucer.attributeP->value = node->value();
 
