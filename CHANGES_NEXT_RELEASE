@@ -19,3 +19,4 @@ Fix: Changed max-length of service path elements from 10 characteres to 50. (Iss
 Fix: Service path is no longer ignored at entity creation time for entities without type. (Issue #642)
 Fix: The broker crashed on receiving compounds for some convops, e.g. /v1/contextEntities/{entityId} (Issue #647)
 Fix: Using 443 as default port for "https" notifications. (Issue #639)
+Fix: Payload no longer accept 'operator' as part of a Scope. (Issue #518)
