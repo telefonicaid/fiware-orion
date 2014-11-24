@@ -35,7 +35,7 @@ BROKER_PORT=1026
 BROKER_LOG_DIR=/var/log/contextBroker
 
 # BROKER_PID_FILE - Where to store the pid for orion-broker
-BROKER_PID_FILE=/var/log/contextBroker/contextBroker.pid
+BROKER_PID_FILE=/var/run/contextBroker.pid
 
 ## Database configuration for orion-broker
 BROKER_DATABASE_HOST=localhost
