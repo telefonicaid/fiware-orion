@@ -42,6 +42,7 @@ Scope::Scope()
 {
   type     = "";
   value    = "";
+  oper     = "";
   areaType = orion::NoArea;
 }
 
@@ -55,6 +56,7 @@ Scope::Scope(const std::string& _type, const std::string& _value)
 {
   type  = _type;
   value = _value;
+  oper  = "";
 }
 
 
@@ -67,7 +69,7 @@ std::string Scope::render(Format format, const std::string& indent, bool notLast
 {
   std::string out      = "";
   std::string tag      = "operationScope";
-  const char* tTag     = (format == XML)? "scopeType" : "type";
+  const char* tTag     = (format == XML)? "scopeType"  : "type";
   const char* vTag     = (format == XML)? "scopeValue" : "value";
 
   out += startTag(indent, tag, tag, format, false, false);

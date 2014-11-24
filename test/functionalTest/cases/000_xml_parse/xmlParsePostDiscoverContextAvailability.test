@@ -101,8 +101,7 @@ payload='<?xml version="1.0"?>
     <restriction>
       <scope>
         <operationScope>
-          <scopeType>FIWARE::Filter::Existence</scopeType>
-          <scopeOperator>not</scopeOperator>
+          <scopeType>FIWARE::Filter::Not::Existence</scopeType>
           <scopeValue>entity::type</scopeValue>
         </operationScope>
       </scope>

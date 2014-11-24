@@ -53,12 +53,10 @@ payload='{
     "scopes" : [
       {
         "value" : "sv1",
-        "operator": "op1",
         "type"  : "st1"
       },
       {
         "value" : "sv2",
-        "operator": "op2",
         "type"  : "st2"
       }
     ]

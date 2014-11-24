@@ -208,6 +208,63 @@ static void commonFilters
 
 /* ****************************************************************************
 *
+* scopeFilter - 
+*/
+static void scopeFilter
+(
+  ConnectionInfo*   ciP,
+  ParseData*        parseDataP,
+  RestService*      serviceP
+)
+{
+  std::string  payloadWord  = ciP->payloadWord;
+  Restriction* restrictionP = NULL;
+
+  if (payloadWord == "discoverContextAvailabilityRequest")
+  {
+    restrictionP = &parseDataP->dcar.res.restriction;
+  }
+  else if (payloadWord == "subscribeContextAvailabilityRequest")
+  {
+    restrictionP = &parseDataP->scar.res.restriction;
+  }
+  else if (payloadWord == "updateContextAvailabilitySubscriptionRequest")
+  {
+    restrictionP = &parseDataP->ucas.res.restriction;
+  }
+  else if (payloadWord == "queryContextRequest")
+  {
+    restrictionP = &parseDataP->qcr.res.restriction;
+  }
+  else if (payloadWord == "subscribeContextRequest")
+  {
+    restrictionP = &parseDataP->scr.res.restriction;
+  }
+  else if (payloadWord == "updateContextSubscriptionRequest")
+  {
+    restrictionP = &parseDataP->ucsr.res.restriction;
+  }
+  else
+  {
+    return;
+  }
+
+  for (unsigned int ix = 0; ix < restrictionP->scopeVector.size(); ++ix)
+  {
+    Scope* scopeP = restrictionP->scopeVector[ix];
+
+    if (scopeP->type == SCOPE_FILTER_NOT_EXISTENCE)
+    {
+      scopeP->type = SCOPE_FILTER_EXISTENCE;
+      scopeP->oper = SCOPE_OPERATOR_NOT;
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * filterRelease - 
 */
 static void filterRelease(ParseData* parseDataP, RequestType request)
@@ -355,6 +412,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     commonFilters(ciP, &parseData, &serviceV[ix]);
+    scopeFilter(ciP, &parseData, &serviceV[ix]);
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
     filterRelease(&parseData, serviceV[ix].request);
 

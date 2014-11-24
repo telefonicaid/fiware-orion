@@ -86,7 +86,6 @@ payload='{
     "scopes" : [
       {
         "type" : "t1",
-        "operator": "o1",
         "value" : "v1"
       },
       {
