@@ -441,7 +441,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   if (components > 10)
   {
-    OrionError e(SccBadRequest, std::string("too many components in ServicePath"));
+    OrionError e(SccBadRequest, "too many components in ServicePath");
     ciP->answer = e.render(ciP->outFormat, "");
     return 2;
   }
@@ -450,7 +450,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   {
     if (strlen(compV[ix].c_str()) > 50)
     {
-      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath"));
+      OrionError e(SccBadRequest, "component-name too long in ServicePath");
       ciP->answer = e.render(ciP->outFormat, "");
       return 3;
     }
