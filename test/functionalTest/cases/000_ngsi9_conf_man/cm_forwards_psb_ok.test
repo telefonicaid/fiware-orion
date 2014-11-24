@@ -361,3 +361,6 @@ OK
 --TEARDOWN--
 brokerStop CB
 brokerStop CM
+
+dbDrop CB
+dbDrop CM

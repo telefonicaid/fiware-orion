@@ -314,6 +314,7 @@ typedef struct UpdateContextAttributeData
 {
   UpdateContextAttributeRequest  res;
   Metadata*                      metadataP;
+  ContextAttribute               attribute;
 } UpdateContextAttributeData;
 
 

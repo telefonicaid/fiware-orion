@@ -97,12 +97,10 @@ payload='{
     "scopes": [
       {
         "type" : "st1",
-        "operator": "not",
         "value" : "sv1"
       },
       {
         "type" : "st2",
-        "operator": "NE",
         "value" : "sv2"
       }
     ]

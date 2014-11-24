@@ -39,11 +39,6 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
       <contextValue>23</contextValue>
     </contextAttribute>
     <contextAttribute>
-      <name>temperature</name>
-      <type>Fahrenheit</type>
-      <contextValue>81</contextValue>
-    </contextAttribute>
-    <contextAttribute>
       <name>pressure</name>
       <type>mmHg</type>
       <contextValue>720</contextValue>
@@ -99,7 +94,7 @@ orionCurl --url "/v1/contextEntities/Room1/attributes/temperature" --json
 --REGEXPECT--
 +++++ 1. create entity +++++
 HTTP/1.1 200 OK
-Content-Length: 893
+Content-Length: 729
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -114,11 +109,6 @@ Date: REGEX(.*)
         <contextAttribute>
           <name>temperature</name>
           <type>centigrade</type>
-          <contextValue/>
-        </contextAttribute>
-        <contextAttribute>
-          <name>temperature</name>
-          <type>Fahrenheit</type>
           <contextValue/>
         </contextAttribute>
         <contextAttribute>
@@ -147,7 +137,7 @@ Date: REGEX(.*)
 </statusCode>
 +++++ 3. query +++++
 HTTP/1.1 200 OK
-Content-Length: 771
+Content-Length: 615
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -162,11 +152,6 @@ Date: REGEX(.*)
         <name>temperature</name>
         <type>centigrade</type>
         <contextValue>10</contextValue>
-      </contextAttribute>
-      <contextAttribute>
-        <name>temperature</name>
-        <type>Fahrenheit</type>
-        <contextValue>81</contextValue>
       </contextAttribute>
       <contextAttribute>
         <name>pressure</name>
@@ -193,7 +178,7 @@ Date: REGEX(.*)
 </statusCode>
 +++++ 5. query again +++++
 HTTP/1.1 200 OK
-Content-Length: 771
+Content-Length: 615
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -207,11 +192,6 @@ Date: REGEX(.*)
       <contextAttribute>
         <name>temperature</name>
         <type>centigrade</type>
-        <contextValue>31</contextValue>
-      </contextAttribute>
-      <contextAttribute>
-        <name>temperature</name>
-        <type>Fahrenheit</type>
         <contextValue>31</contextValue>
       </contextAttribute>
       <contextAttribute>
@@ -238,7 +218,7 @@ Date: REGEX(.*)
 }
 +++++ 7. query (JSON) +++++
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 189
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -247,11 +227,6 @@ Date: REGEX(.*)
         {
             "name": "temperature",
             "type": "centigrade",
-            "value": "39"
-        },
-        {
-            "name": "temperature",
-            "type": "Fahrenheit",
             "value": "39"
         }
     ],
@@ -272,17 +247,12 @@ Date: REGEX(.*)
 }
 +++++ 9. query (JSON) +++++
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 189
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "temperature",
-            "type": "centigrade",
-            "value": "39"
-        },
         {
             "name": "temperature",
             "type": "Fahrenheit",

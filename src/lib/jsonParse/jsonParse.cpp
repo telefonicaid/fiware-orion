@@ -66,7 +66,9 @@ using boost::property_tree::ptree;
 static const char* compoundRootV[] =
 {
   "/contextElements/contextElement/attributes/attribute/value",
-  "/attributes/attribute/value"
+  "/attributes/attribute/value",
+  "/contextResponses/contextResponse/contextElement/attributes/attribute/value",
+  "/value"
 };
 
 
@@ -76,7 +78,7 @@ static const char* compoundRootV[] =
 * isCompoundPath -
 *
 * This function examines a path to see whether we are inside a compound value or not.
-* Also, it returned the root of the compound (found in 'compoundValueRootV') and also
+* Also, it returns the root of the compound (found in 'compoundValueRootV') and also
 * the 'rest' of the path, i.e. its relative path inside the compound.
 *
 * If the path doesn't belong to any compond, FALSE is returned.

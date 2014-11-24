@@ -97,20 +97,6 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scopeOperator -
-*/
-static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
-  reqDataP->ucsr.scopeP->oper = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
@@ -453,7 +439,6 @@ XmlNode ucsrParseVector[] =
   { UCS RS "/scope",                             nullTreat                   },
   { UCS RS SC "/operationScope",                 operationScope              },
   { UCS RS SC OSC "/scopeType",                  scopeType                   },
-  { UCS RS SC OSC "/scopeOperator",              scopeOperator               },
   { UCS RS SC OSC "/scopeValue",                 scopeValue                  },
 
   { UCS RS SC OSC SVAL "/circle",                circle                      },

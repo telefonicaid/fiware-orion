@@ -38,8 +38,10 @@
 /* ****************************************************************************
 *
 * DEFAULT_HTTP_PORT - 
+* DEFAULT_HTTPS_PORT -
 */
-#define DEFAULT_HTTP_PORT  80
+#define DEFAULT_HTTP_PORT   80
+#define DEFAULT_HTTPS_PORT  443
 
 
 
@@ -237,7 +239,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
    *      ||             |  |
    * -----  ------------- -- ----
    *   0          2       3    4  position in urlTokens vector
-   *   1  23             4  5     coponentes
+   *   1  23             4  5     components
    */
 
   if ((components < 3) || (components == 3 && urlTokens[2].length() == 0))
@@ -301,7 +303,7 @@ bool parseUrl(const std::string& url, std::string& host, int& port, std::string&
     }
     else
     {
-      port = DEFAULT_HTTP_PORT;
+      port = urlTokens[0] == "https:" ? DEFAULT_HTTPS_PORT : DEFAULT_HTTP_PORT;
     }
   }
 

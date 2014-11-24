@@ -168,8 +168,7 @@ payload='<?xml version="1.0"?>
   <restriction>
     <scope>
       <operationScope>
-        <scopeType>FIWARE::Filter::Existence</scopeType>
-        <scopeOperator>not</scopeOperator>
+        <scopeType>FIWARE::Filter::Not::Existence</scopeType>
         <scopeValue>entity::type</scopeValue>
       </operationScope>
     </scope>
@@ -193,7 +192,6 @@ payload='<?xml version="1.0"?>
     <scope>
       <operationScope>
         <scopeType>FIWARE::Filter::Existence</scopeType>
-        <scopeOperator>nop</scopeOperator>
         <scopeValue>entity::type</scopeValue>
       </operationScope>
     </scope>
@@ -217,8 +215,7 @@ payload='{
   "restriction": {
     "scopes": [
       {
-        "type": "FIWARE::Filter::Existence",
-        "operator": "not",
+        "type": "FIWARE::Filter::Not::Existence",
         "value": "entity::type"
       }
     ]
@@ -243,7 +240,6 @@ payload='{
     "scopes": [
       {
         "type": "FIWARE::Filter::Existence",
-        "operator": "nop",
         "value": "entity::type"
       }
     ]
