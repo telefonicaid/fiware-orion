@@ -34,7 +34,7 @@ brokerStart CB
 #
 # 01. POST /v1/updateContext with compound attribute value <a>1</a> in XML
 # 02. POST /v1/queryContext to see the compound in XML
-# 03. POST /v1/updateContext with compound attribute value <a>3</a> in JSON
+# 03. POST /v1/updateContext with compound attribute value { "a": "3" } in JSON
 # 04. POST /v1/queryContext to see the compound in JSON
 #
 
@@ -81,7 +81,7 @@ echo
 echo
 
 
-echo "03. POST /v1/updateContext with compound attribute value <a>3</a> in JSON"
+echo "03. POST /v1/updateContext with compound attribute value { \"a\": \"3\" } in JSON"
 echo "========================================================================="
 payload='{
   "contextElements": [
@@ -188,7 +188,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-03. POST /v1/updateContext with compound attribute value <a>3</a> in JSON
+03. POST /v1/updateContext with compound attribute value { "a": "3" } in JSON
 =========================================================================
 HTTP/1.1 200 OK
 Content-Length: 384
