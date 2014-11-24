@@ -128,7 +128,7 @@ Date: REGEX(.*)
 +++++ 4: service path must start with a '/'
 HTTP/1.1 200 OK
 Connection: close
-Content-Length: 185
+Content-Length: 183
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -136,7 +136,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Only 'absolute' Service Paths allowed (a service path must begin with '/')</details>
+  <details>Only /absolute/ Service Paths allowed [a service path must begin with /]</details>
 </orionError>
 
 +++++ 5: four service paths

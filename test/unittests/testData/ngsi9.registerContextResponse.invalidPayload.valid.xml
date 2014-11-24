@@ -3,6 +3,6 @@
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>Expected 'discovery' payload, got 'registerContextRequest'</details>
+    <details>Expected /discovery/ payload, got /registerContextRequest/</details>
   </errorCode>
 </registerContextResponse>

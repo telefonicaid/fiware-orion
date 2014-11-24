@@ -57,8 +57,8 @@ std::string putAvailabilitySubscriptionConvOp
                             "",
                             "updateContextAvailabilitySubscription",
                             SccBadRequest,
-                            std::string("unmatching subscriptionId URI/payload: '") +
-                            subscriptionId + "' vs '" + ucasP->subscriptionId.get() + "'");
+                            std::string("unmatching subscriptionId URI/payload: /") +
+                            subscriptionId + "/ vs /" + ucasP->subscriptionId.get() + "/");
     return out;
   }
 

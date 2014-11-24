@@ -3,7 +3,7 @@
     "errorCode" : {
       "code" : "400",
       "reasonPhrase" : "Bad Request",
-      "details" : "invalid payload: invalid isPattern (boolean) value for entity: 'false0'"
+      "details" : "invalid payload: invalid isPattern value for entity: /false0/"
     }
   }
 }

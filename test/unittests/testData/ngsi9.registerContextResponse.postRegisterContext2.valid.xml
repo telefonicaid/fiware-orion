@@ -3,6 +3,6 @@
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>registration id: '012345678901234567890123'</details>
+    <details>registration id: /012345678901234567890123/</details>
   </errorCode>
 </registerContextResponse>

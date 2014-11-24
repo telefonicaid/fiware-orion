@@ -98,7 +98,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     }
 
     if (sub.isEmpty()) {
-       responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: '") + requestP->subscriptionId.get() + "'");
+       responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)");
        return SccOk;
     }

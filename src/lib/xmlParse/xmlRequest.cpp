@@ -263,8 +263,8 @@ std::string xmlTreat
         "",
         requestType(request),
         SccBadRequest,
-        std::string("Sorry, no request treating object found for RequestType '") +
-        requestType(request) + "', method '" + ciP->method + "'");
+        std::string("Sorry, no request treating object found for RequestType /") +
+        requestType(request) + "/, method /" + ciP->method + "/");
 
     LM_W(("Bad Input (no request treating object found for RequestType %d (%s), method %s)",
           request,
@@ -316,8 +316,8 @@ std::string xmlTreat
                                       "",
                                       reqP->keyword,
                                       SccBadRequest,
-                                      std::string("Expected '") + payloadWord +
-                                        "' payload, got '" + payloadStart + "'");
+                                      std::string("Expected /") + payloadWord +
+                                        "/ payload, got /" + payloadStart + "/");
 
       LM_W(("Bad Input (invalid  payload: wanted: '%s', got '%s')", payloadWord.c_str(), payloadStart));
 

@@ -8,6 +8,6 @@
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity id: 'entity11'</details>
+    <details>Entity id: /entity11/</details>
   </statusCode>
 </contextElementResponse>

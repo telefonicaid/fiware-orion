@@ -774,7 +774,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: APPEND - entity: (OfficeRoom, Room, false) - offending attribute: pressure - empty attribute not allowed in APPEND or UPDATE</details>
+        <details>action: APPEND - entity: [OfficeRoom, Room, false] - offending attribute: pressure - empty attribute not allowed in APPEND or UPDATE</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -804,7 +804,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: UPDATE - entity: (OfficeRoom, Room, false) - offending attribute: pressure - empty attribute not allowed in APPEND or UPDATE</details>
+        <details>action: UPDATE - entity: [OfficeRoom, Room, false] - offending attribute: pressure - empty attribute not allowed in APPEND or UPDATE</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -863,7 +863,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: DELETE - entity: (OfficeRoom, Room) - offending attribute: pressure - attribute not found</details>
+        <details>action: DELETE - entity: [OfficeRoom, Room] - offending attribute: pressure - attribute not found</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -893,7 +893,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: DELETE - entity: (OfficeRoom, Room) - offending attribute: pressure - attribute not found</details>
+        <details>action: DELETE - entity: [OfficeRoom, Room] - offending attribute: pressure - attribute not found</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -923,7 +923,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: UPDATE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
+        <details>action: UPDATE - entity: [OfficeRoom, Room] - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -953,7 +953,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: UPDATE - entity: (OfficeRoom, Room) - offending attribute: pressure</details>
+        <details>action: UPDATE - entity: [OfficeRoom, Room] - offending attribute: pressure</details>
       </statusCode>
     </contextElementResponse>
     <contextElementResponse>
@@ -1035,7 +1035,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: UPDATE - entity: (OfficeRoom, Room) - offending attribute: lightstatus</details>
+        <details>action: UPDATE - entity: [OfficeRoom, Room] - offending attribute: lightstatus</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

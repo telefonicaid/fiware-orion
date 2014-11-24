@@ -97,15 +97,15 @@ Date: REGEX(.*)
 
 02. PUT /v1/contextEntities/E/attributes/A with compound attribute value using XML
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 125
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <statusCode>
-  <code>400</code>
-  <reasonPhrase>Bad Request</reasonPhrase>
-  <details>empty context value</details>
+  <code>404</code>
+  <reasonPhrase>No context element found</reasonPhrase>
+  <details>E</details>
 </statusCode>
 
 

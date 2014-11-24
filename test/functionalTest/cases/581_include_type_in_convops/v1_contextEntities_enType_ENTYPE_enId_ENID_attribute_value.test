@@ -189,7 +189,7 @@ Date: REGEX(.*)
 {
     "statusCode": {
         "code": "404", 
-        "details": "Entity-Attribute pair: 'E1-A1'", 
+        "details": "Entity-Attribute pair: /E1-A1/", 
         "reasonPhrase": "No context element found"
     }
 }
@@ -260,7 +260,7 @@ Date: REGEX(.*)
 {
     "statusCode": {
         "code": "404", 
-        "details": "Entity-Attribute pair: 'E1-A1'", 
+        "details": "Entity-Attribute pair: /E1-A1/", 
         "reasonPhrase": "No context element found"
     }
 }
@@ -275,7 +275,7 @@ Date: REGEX(.*)
 
 {
     "code": "472", 
-    "details": "action: DELETE - entity: (E1, T1) - offending attribute: A1 - attribute not found", 
+    "details": "action: DELETE - entity: [E1, T1] - offending attribute: A1 - attribute not found", 
     "reasonPhrase": "request parameter is invalid/not allowed"
 }
 
@@ -289,7 +289,7 @@ Date: REGEX(.*)
 
 {
     "code": "472", 
-    "details": "action: UPDATE - entity: (E1, T1) - offending attribute: A1", 
+    "details": "action: UPDATE - entity: [E1, T1] - offending attribute: A1", 
     "reasonPhrase": "request parameter is invalid/not allowed"
 }
 

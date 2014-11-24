@@ -33,6 +33,116 @@
 
 /* ****************************************************************************
 *
+* htmlEscape - 
+*
+* Allocate a new buffer to hold an escaped version of the input buffer 's'.
+* Escaping characters demands more space in the buffer, for some characters up to six
+* characters - double-quote (") needs SIX chars: &quot;
+* So, when allocating room for the output (escaped) buffer, we need to consider the worst case
+* and six times the length of the input buffer is allocated (plus one byte for the zero-termination.
+*
+* See http://www.anglesanddangles.com/asciichart.php for more info on the 'html-escpaing' of ASCII chars.
+*/
+char* htmlEscape(const char* s)
+{
+  int   newLen  = strlen(s) * 6 + 1;  // See function header comment
+  char* out     = (char*) calloc(1, newLen);
+  int   sIx     = 0;
+  int   outIx   = 0;
+  
+  if (out == NULL)
+  {
+    LM_E(("Internal Error (allocating %d bytes: %s)", newLen, strerror(errno)));
+    return NULL;
+  }
+
+  while (s[sIx] != 0)
+  {
+    switch (s[sIx])
+    {
+    case '<':
+      out[outIx++] = '&';
+      out[outIx++] = 'l';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '>':
+      out[outIx++] = '&';
+      out[outIx++] = 'g';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '(':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '0';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ')':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '4';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '=':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '6';
+      out[outIx++] = '1';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '\'':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '3';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case '"':
+      out[outIx++] = '&';
+      out[outIx++] = 'q';
+      out[outIx++] = 'u';
+      out[outIx++] = 'o';
+      out[outIx++] = 't';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    case ';':
+      out[outIx++] = '&';
+      out[outIx++] = '#';
+      out[outIx++] = '5';
+      out[outIx++] = '9';
+      out[outIx++] = ';';
+      ++sIx;
+      break;
+
+    default:
+      out[outIx++] = s[sIx++];
+    }
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * startTag -  
 */
 std::string startTag
@@ -168,21 +278,45 @@ std::string endTag
 /* ****************************************************************************
 *
 * valueTag -  
+*
+* NOTE
+* The value of the tag is not HTML-escaped if the value is an Association.
+<* In the case of Associations, the specific values must be HTML-escaped instead.
 */
 std::string valueTag
 (
   const std::string&  indent,
   const std::string&  tagName,
-  const std::string&  value,
+  const std::string&  unescapedValue,
   Format              format,
   bool                showComma,
   bool                isAssociation,
   bool                isVectorElement
 )
 {
+  char* value;
+
+  if (isAssociation == false)
+  {
+    value = htmlEscape(unescapedValue.c_str());
+  }
+  else
+  {
+    // unnecessary malloc, but this way I can always free => easier to read
+    value = strdup(unescapedValue.c_str());
+  }
+
+  if (value == NULL)
+  {
+    return "ERROR: no memory";
+  }
+
   if (format == XML)
   {
-    return indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
+    std::string out = indent + "<" + tagName + ">" + value + "</" + tagName + ">" + "\n";
+
+    free(value);
+    return out;
   }
 
   if (showComma == true)

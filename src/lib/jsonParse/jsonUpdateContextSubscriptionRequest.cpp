@@ -215,7 +215,7 @@ static std::string circleInverted(const std::string& path, const std::string& va
   parseDataP->ucsr.scopeP->circle.invertedSet(value);
   if (!isTrue(value) && !isFalse(value))
   {
-    parseDataP->errorString = "bad string for circle/inverted: '" + value + "'";
+    parseDataP->errorString = "bad string for circle/inverted: /" + value + "/";
     return parseDataP->errorString;
   }
 
@@ -248,7 +248,7 @@ static std::string polygonInverted(const std::string& path, const std::string& v
   parseDataP->ucsr.scopeP->polygon.invertedSet(value);
   if (!isTrue(value) && !isFalse(value))
   {
-    parseDataP->errorString = "bad string for polygon/inverted: '" + value + "'";
+    parseDataP->errorString = "bad string for polygon/inverted: /" + value + "/";
     return parseDataP->errorString;
   }
 

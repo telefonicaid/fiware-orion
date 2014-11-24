@@ -2,6 +2,6 @@
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>bad string for circle/inverted: 'not at all'</details>
+    <details>bad string for circle/inverted: /not at all/</details>
   </errorCode>
 </queryContextResponse>

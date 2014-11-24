@@ -73,14 +73,14 @@ orionCurl --url ${url} --payload "${payload}" --json
 echo "++++++++++++++++++++"
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 211
+Content-Length: 166
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400",
-        "details": "JSON Parse Error: <unspecified file>(1): expected object name",
+        "details": "JSON Parse Error",
         "reasonPhrase": "Bad Request"
     },
     "registrationId": "000000000000000000000000"

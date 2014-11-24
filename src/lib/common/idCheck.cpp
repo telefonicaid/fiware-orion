@@ -39,7 +39,7 @@ std::string idCheck(const std::string& s)
 {
   if (s.length() != 24)
   {
-    return "bad length (24 chars expected)";
+    return "bad length - 24 chars expected";
   }
 
   char* cP = (char*) s.c_str();

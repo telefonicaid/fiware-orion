@@ -187,7 +187,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
-    parseDataP->errorString = std::string("bad string for circle/inverted: '") + node->value() + "'";
+    parseDataP->errorString = std::string("bad string for circle/inverted: /") + node->value() + "/";
     return 1;
   }
 
@@ -220,7 +220,7 @@ static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
   parseDataP->ucsr.scopeP->polygon.invertedSet(node->value());
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
-    parseDataP->errorString = std::string("bad string for polygon/inverted: '") + node->value() + "'";
+    parseDataP->errorString = std::string("bad string for polygon/inverted: /") + node->value() + "/";
     return 1;
   }
 
