@@ -59,6 +59,8 @@ HttpStatusCode mapPutIndividualContextEntityAttribute
   ContextElement         ce;
   ContextAttribute       attribute(attributeName, request->type, request->contextValue);
 
+  attribute.compoundValueP = request->compoundValueP;
+
   ce.entityId.fill(entityId, entityType, "false");
   ce.contextAttributeVector.push_back(&attribute);
 

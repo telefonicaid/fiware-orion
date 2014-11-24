@@ -33,9 +33,9 @@ brokerStart CB
 # Standard operation /v1/updateContext with compound attribute values:
 #
 # 01. POST /v1/updateContext with compound attribute value <a>1</a> in XML
-# 02. GET  /v1/queryContext to see the compound in XML
+# 02. POST /v1/queryContext to see the compound in XML
 # 03. POST /v1/updateContext with compound attribute value <a>3</a> in JSON
-# 04. GET  /v1/queryContext to see the compound in JSON
+# 04. POST /v1/queryContext to see the compound in JSON
 #
 
 echo "01. POST /v1/updateContext with compound attribute value <a>1</a> in XML"

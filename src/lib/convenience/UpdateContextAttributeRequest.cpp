@@ -119,7 +119,7 @@ std::string UpdateContextAttributeRequest::check
   {
     response.fill(SccBadRequest, predetectedError);
   }
-  else if (contextValue == "")
+  else if ((contextValue == "") && (compoundValueP == NULL))
   {
     response.fill(SccBadRequest, "empty context value");
   }
