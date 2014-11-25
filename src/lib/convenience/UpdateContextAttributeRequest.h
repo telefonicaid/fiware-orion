@@ -30,6 +30,7 @@
 
 #include "common/Format.h"
 #include "ngsi/MetadataVector.h"
+#include "parse/CompoundValueNode.h"
 
 
 
@@ -42,6 +43,9 @@ typedef struct UpdateContextAttributeRequest
   std::string                type;                // Optional
   std::string                contextValue;        // Mandatory
   MetadataVector             metadataVector;      // Optional
+
+  std::string                typeFromXmlAttribute;
+  orion::CompoundValueNode*  compoundValueP;
 
   UpdateContextAttributeRequest();
   std::string  render(Format format, std::string indent);

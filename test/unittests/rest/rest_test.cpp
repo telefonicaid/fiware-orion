@@ -65,8 +65,8 @@ TEST(rest, servicePathCheck)
   r = servicePathCheck(&ci, ci.servicePath.c_str());
   EXPECT_EQ(2, r);
 
-  // More than 10 chars in path component of Service Path
-  ci.servicePath = "/h0123456789";
+  // More than 50 chars in path component of Service Path
+  ci.servicePath = "/h01234567890123456789012345678901234567890123456789";
   r = servicePathCheck(&ci, ci.servicePath.c_str());
   EXPECT_EQ(3, r);
 

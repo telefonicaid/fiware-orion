@@ -45,6 +45,15 @@
 
 /* ****************************************************************************
 *
+* Tenant name max length
+*/
+#define MAX_TENANT_NAME_LEN            50
+#define MAX_TENANT_NAME_LEN_STRING    "50"
+
+
+
+/* ****************************************************************************
+*
 * payloadParse - 
 */
 std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService* service, XmlRequest** reqPP, JsonRequest** jsonPP)
@@ -88,10 +97,10 @@ static std::string tenantCheck(const std::string& tenant)
 {
   char*        name    = (char*) tenant.c_str();
 
-  if (strlen(name) > 20)
+  if (strlen(name) > MAX_TENANT_NAME_LEN)
   {
-    LM_W(("Bad Input (a tenant name can be max 20 characters long. Length: %d)", strlen(name)));
-    return "bad length - a tenant name can be max 20 characters long";
+    LM_W(("Bad Input (a tenant name can be max %d characters long. Length: %d)", MAX_TENANT_NAME_LEN, strlen(name)));
+    return "bad length - a tenant name can be max " MAX_TENANT_NAME_LEN_STRING " characters long";
   }
 
   while (*name != 0)
@@ -192,6 +201,63 @@ static void commonFilters
     Scope*  scopeP  = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
     scopeP->oper    = "";
     restrictionP->scopeVector.push_back(scopeP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* scopeFilter - 
+*/
+static void scopeFilter
+(
+  ConnectionInfo*   ciP,
+  ParseData*        parseDataP,
+  RestService*      serviceP
+)
+{
+  std::string  payloadWord  = ciP->payloadWord;
+  Restriction* restrictionP = NULL;
+
+  if (payloadWord == "discoverContextAvailabilityRequest")
+  {
+    restrictionP = &parseDataP->dcar.res.restriction;
+  }
+  else if (payloadWord == "subscribeContextAvailabilityRequest")
+  {
+    restrictionP = &parseDataP->scar.res.restriction;
+  }
+  else if (payloadWord == "updateContextAvailabilitySubscriptionRequest")
+  {
+    restrictionP = &parseDataP->ucas.res.restriction;
+  }
+  else if (payloadWord == "queryContextRequest")
+  {
+    restrictionP = &parseDataP->qcr.res.restriction;
+  }
+  else if (payloadWord == "subscribeContextRequest")
+  {
+    restrictionP = &parseDataP->scr.res.restriction;
+  }
+  else if (payloadWord == "updateContextSubscriptionRequest")
+  {
+    restrictionP = &parseDataP->ucsr.res.restriction;
+  }
+  else
+  {
+    return;
+  }
+
+  for (unsigned int ix = 0; ix < restrictionP->scopeVector.size(); ++ix)
+  {
+    Scope* scopeP = restrictionP->scopeVector[ix];
+
+    if (scopeP->type == SCOPE_FILTER_NOT_EXISTENCE)
+    {
+      scopeP->type = SCOPE_FILTER_EXISTENCE;
+      scopeP->oper = SCOPE_OPERATOR_NOT;
+    }
   }
 }
 
@@ -314,15 +380,15 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     ciP->tenant = ciP->tenantFromHttpHeader;
 
     //
-    // A tenant string must not be longer that 20 characters and may only contain
+    // A tenant string must not be longer than 50 characters and may only contain
     // underscores and alphanumeric characters.
     //
     std::string result;
     if ((ciP->tenant != "") && ((result = tenantCheck(ciP->tenant)) != "OK"))
     {
-      OrionError   error(SccBadRequest,
-                         std::string("tenant '") + ciP->tenant + "' not accepted (a tenant string must not be longer that 20 characters" +
-                         " and may only contain underscores and alphanumeric characters)");
+      OrionError  error(SccBadRequest,
+                        "tenant name not accepted (a tenant string must not be longer than " MAX_TENANT_NAME_LEN_STRING " characters"
+                        " and may only contain underscores and alphanumeric characters)");
 
       std::string  response = error.render(ciP->outFormat, "");
 
@@ -346,6 +412,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     commonFilters(ciP, &parseData, &serviceV[ix]);
+    scopeFilter(ciP, &parseData, &serviceV[ix]);
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
     filterRelease(&parseData, serviceV[ix].request);
 
@@ -372,7 +439,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
   LM_W(("Bad Input (service '%s' not recognized)", ciP->url.c_str()));
   ciP->httpStatusCode = SccBadRequest;
-  std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("Service not recognized: ") + ciP->url);
+  std::string answer = restErrorReplyGet(ciP, ciP->outFormat, "", ciP->payloadWord, SccBadRequest, std::string("unrecognized request"));
   restReply(ciP, answer);
 
   compV.clear();

@@ -146,7 +146,17 @@ static int entityId(xml_node<>* node, ParseData* parseDataP)
 static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
-  parseDataP->ncr.cerP->contextElement.entityId.id = node->value();
+
+  if (parseDataP->ncr.cerP != NULL)
+  {
+    parseDataP->ncr.cerP->contextElement.entityId.id = node->value();
+  }
+  else
+  {
+    LM_W(("Bad Input (XML parse error)"));
+    parseDataP->errorString = "Bad Input (XML parse error)";
+    return 1;
+  }
 
   return 0;
 }
@@ -232,6 +242,9 @@ static int contextAttributeType(xml_node<>* node, ParseData* parseDataP)
 static int contextAttributeContextValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
+  parseDataP->lastContextAttribute = parseDataP->ncr.attributeP;
+  parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
+
   parseDataP->ncr.attributeP->value = node->value();
 
   return 0;

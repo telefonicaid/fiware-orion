@@ -25,7 +25,7 @@ Log configuration via REST
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 1-2
+brokerStart CB 200-255
 
 --SHELL--
 echo "=== 1. GET trace level"
@@ -92,14 +92,14 @@ echo
 --REGEXPECT--
 === 1. GET trace level
 HTTP/1.1 200 OK
-Content-Length: 69
+Content-Length: 73
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orion>
   <log>
-    <tracelevels>1-2</tracelevels>
+    <tracelevels>200-255</tracelevels>
   </log>
 </orion>
 

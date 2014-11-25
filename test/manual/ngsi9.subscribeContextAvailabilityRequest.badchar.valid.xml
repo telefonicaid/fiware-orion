@@ -1,0 +1,15 @@
+<subscribeContextAvailabilityRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>ConferenceRoom</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>tempe'rature</attribute>
+    <attribute>occupancy</attribute>
+    <attribute>lightstatus</attribute>
+  </attributeList>
+  <reference>http://10.1.1.1:80/test/interfaceNotification
+  </reference>
+  <duration>PT1M</duration>
+</subscribeContextAvailabilityRequest>

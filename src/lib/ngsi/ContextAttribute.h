@@ -45,7 +45,7 @@ typedef struct ContextAttribute
   std::string     name;            // Mandatory
   std::string     type;            // Optional
   std::string     value;           // Optional (FI-WARE changes - MANDATORY in OMA spec)
-                                   //          Especially for the new convops, value is NOT mandapory
+                                   //          Especially for the new convops, value is NOT mandatory
                                    //          E.g. /v1/contextTypes
   MetadataVector  metadataVector;  // Optional
 

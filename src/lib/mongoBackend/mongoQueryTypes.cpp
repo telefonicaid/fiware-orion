@@ -58,6 +58,9 @@ HttpStatusCode mongoEntityTypes
 
   /* Compose query based on this aggregation command:
    *
+   * FIXME P9: taking into account that type is no longer used as part of the attribute "key", not sure if the
+   * aggregation query below is fully correct
+   *
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
    *                            {$unwind: "$attrs"},
@@ -212,6 +215,9 @@ HttpStatusCode mongoAttributesForEntityType
 
   /* Compose query based on this aggregation command:
    *
+   * FIXME P9: taking into account that type is no longer used as part of the attribute "key", not sure if the
+   * aggregation query below is fully correct
+   *
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$match: { "_id.type": "TYPE" } },
    *                            {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
@@ -281,8 +287,22 @@ HttpStatusCode mongoAttributesForEntityType
   /* See comment above in the other method regarding this strategy to implement pagination */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONObj           resultItem = resultsArray[ix].embeddedObject().getField("_id").embeddedObject();
-    ContextAttribute* ca         = new ContextAttribute(resultItem.getStringField(ENT_ATTRS_NAME), resultItem.getStringField(ENT_ATTRS_TYPE));
+    BSONElement        idField    = resultsArray[ix].embeddedObject().getField("_id");
+
+    //
+    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
+    //
+    // Now, if 'resultsArray[ix].embeddedObject().getField("_id")' is not found, if we continue,
+    // calling embeddedObject() on it, then we get an exception and the broker crashes.
+    //
+    if (idField.eoo() == true)
+    {
+      LM_E(("Database Error (error retrieving _id field in doc: %s)", resultsArray[ix].embeddedObject().toString().c_str()));
+      continue;
+    }
+
+    BSONObj            resultItem = idField.embeddedObject();
+    ContextAttribute*  ca         = new ContextAttribute(resultItem.getStringField(ENT_ATTRS_NAME), resultItem.getStringField(ENT_ATTRS_TYPE));
     responseP->entityType.contextAttributeVector.push_back(ca);
   }
 

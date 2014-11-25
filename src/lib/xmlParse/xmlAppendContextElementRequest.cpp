@@ -211,6 +211,40 @@ static int domainMetadataValue(xml_node<>* node, ParseData* reqData)
 
 
 
+/* ****************************************************************************
+*
+* entityId -
+*/
+static int entityId(xml_node<>* node, ParseData* parseDataP)
+{
+  std::string es = entityIdParse(RegisterContext, node, &parseDataP->acer.res.entity);
+
+  LM_T(LmtParse, ("Got an entityId"));
+
+  if (es != "OK")
+  {
+    parseDataP->errorString = es;
+  }
+
+  return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* entityIdId -
+*/
+static int entityIdId(xml_node<>* node, ParseData* parseDataP)
+{
+  LM_T(LmtParse, ("Got an entity:id: '%s'", node->value()));
+  parseDataP->acer.res.entity.id = node->value();
+
+  return 0;
+}
+
+
+
 #define CATTR "/appendContextElementRequest/contextAttributeList/contextAttribute"
 #define DM    "/appendContextElementRequest/domainMetadata"
 /* ****************************************************************************
@@ -221,6 +255,9 @@ XmlNode acerParseVector[] =
 {
   { "/appendContextElementRequest",                          nullTreat             },
   { "/appendContextElementRequest/attributeDomainName",      attributeDomainName   },
+
+  { "/appendContextElementRequest/entityId",                 entityId              },
+  { "/appendContextElementRequest/entityId/id",              entityIdId            },
 
   { "/appendContextElementRequest/contextAttributeList",     nullTreat             },
   { CATTR,                                                   contextAttribute      },

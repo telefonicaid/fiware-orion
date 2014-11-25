@@ -100,6 +100,7 @@ static JsonRequest jsonRequest[] =
 
   { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                   FUNCS(Ucer)  },
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
+  { AllContextEntities,                    "POST", "appendContextElementRequest",                   FUNCS(Acer)  },
 
   { ContextEntityTypes,                    "POST", "registerProviderRequest",                       FUNCS(Rpr)   },
   { ContextEntityTypes,                    "*",    "registerProviderRequest",                       FUNCS(Rpr)   },

@@ -23,7 +23,10 @@
 --NAME--
 tenant names with upper and lowercase letters in HTTP header
 --SHELL-INIT--
-dbInit testharness-case
+dbInit ${CB_DATABASE_NAME}-case
+dbInit ${CB_DATABASE_NAME}-Case
+dbInit ${CB_DATABASE_NAME}-CASE
+dbInit CB
 brokerStart CB 0 IPV4 -multiservice
 
 --SHELL--
@@ -258,4 +261,9 @@ Date: REGEX(.*)
   </contextRegistrationResponseList>
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
+
 brokerStop CB
+dbDrop ${CB_DATABASE_NAME}-case
+dbDrop ${CB_DATABASE_NAME}-Case
+dbDrop ${CB_DATABASE_NAME}-CASE
+dbDrop CB

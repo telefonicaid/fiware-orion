@@ -141,7 +141,7 @@ function harnessFiles()
   harnessList=""
   TMP_DIR=$(mktemp -d /tmp/xmlCheck.XXXXX)
   vMsg TMP_DIR: $TMP_DIR
-  for FILE in $(find $SRC_TOP/test/functionalTest/cases/ -name *.test)
+  for FILE in $(find $SRC_TOP/test/functionalTest/cases -name *.test)
   do
     PREFIX=$(basename ${FILE%.*})
     $SRC_TOP/test/xmlCheck/xmlExtractor.py $FILE $TMP_DIR $PREFIX

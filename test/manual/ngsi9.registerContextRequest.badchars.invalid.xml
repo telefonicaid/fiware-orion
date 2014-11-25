@@ -1,0 +1,19 @@
+<registerContextRequest>
+  <contextRegistrationList>
+    <contextRegistration>
+      <entityIdList>
+        <entityId type="Room" isPattern="false">
+          <id>Conference<Room</id>
+        </entityId>
+      </entityIdList>
+      <contextRegistrationAttributeList>
+        <contextRegistrationAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <isDomain>false</isDomain>
+        </contextRegistrationAttribute>
+      </contextRegistrationAttributeList>
+    </contextRegistration>
+  </contextRegistrationList>
+  <duration>PT1H</duration>
+</registerContextRequest>

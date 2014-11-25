@@ -70,7 +70,17 @@ static int entityId(xml_node<>* node, ParseData* reqDataP)
 static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
-  reqDataP->qcr.entityIdP->id = node->value();
+
+  if (reqDataP->qcr.entityIdP != NULL)
+  {
+    reqDataP->qcr.entityIdP->id = node->value();
+  }
+  else
+  {
+    LM_W(("Bad Input (XML parse error)"));
+    reqDataP->errorString = "Bad Input (XML parse error)";
+    return 1;
+  }
 
   return 0;
 }
@@ -147,20 +157,6 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeType: '%s'", node->value()));
   reqDataP->qcr.scopeP->type = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeOperator -
-*/
-static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
-  reqDataP->qcr.scopeP->oper = node->value();
 
   return 0;
 }
@@ -449,7 +445,6 @@ XmlNode qcrParseVector[] =
   { QCR RS "/scope",                              nullTreat               },
   { QCR RS SC "/operationScope",                  operationScope          },
   { QCR RS SC OSC "/scopeType",                   scopeType               },
-  { QCR RS SC OSC "/scopeOperator",               scopeOperator           },
   { QCR RS SC OSC "/scopeValue",                  scopeValue              },
 
   { QCR RS SC OSC SV "/circle",                   circle                  },

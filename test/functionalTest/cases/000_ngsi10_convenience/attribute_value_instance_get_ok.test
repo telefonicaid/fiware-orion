@@ -72,7 +72,7 @@ orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/wall"
 --REGEXPECT--
 +++++ 1. creating base entity +++++
 HTTP/1.1 200 OK
-Content-Length: 705
+Content-Length: 763
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -110,7 +110,10 @@ Date: REGEX(.*)
                 "reasonPhrase": "OK"
             }
         }
-    ]
+    ],
+    "id": "Room1", 
+    "isPattern": "false", 
+    "type": ""
 }
 +++++ 2. lookup the entity +++++
 HTTP/1.1 200 OK

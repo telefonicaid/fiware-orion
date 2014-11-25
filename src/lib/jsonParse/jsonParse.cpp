@@ -49,6 +49,7 @@
 
 #include "parse/compoundValue.h"
 #include "parse/CompoundValueNode.h"
+#include "parse/forbiddenChars.h"
 
 #include "jsonParse/JsonNode.h"
 #include "jsonParse/jsonParse.h"
@@ -65,7 +66,9 @@ using boost::property_tree::ptree;
 static const char* compoundRootV[] =
 {
   "/contextElements/contextElement/attributes/attribute/value",
-  "/attributes/attribute/value"
+  "/attributes/attribute/value",
+  "/contextResponses/contextResponse/contextElement/attributes/attribute/value",
+  "/value"
 };
 
 
@@ -75,7 +78,7 @@ static const char* compoundRootV[] =
 * isCompoundPath -
 *
 * This function examines a path to see whether we are inside a compound value or not.
-* Also, it returned the root of the compound (found in 'compoundValueRootV') and also
+* Also, it returns the root of the compound (found in 'compoundValueRootV') and also
 * the 'rest' of the path, i.e. its relative path inside the compound.
 *
 * If the path doesn't belong to any compond, FALSE is returned.
@@ -121,6 +124,19 @@ static bool treat
 
   for (unsigned int ix = 0; parseVector[ix].path != "LAST"; ++ix)
   {
+    //
+    // Before treating a node, a check is made that the value of the node has no forbidden
+    // characters.
+    // However, if the the node has attributes, then the values of the attributes are checked instead
+    //
+    if (forbiddenChars(value.c_str()) == true)
+    {
+      LM_W(("Bad Input (found a forbidden value in '%s')", value.c_str()));
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer = std::string("Illegal value for JSON field");
+      return false;
+    }
+
     if (path == parseVector[ix].path)
     {
       LM_T(LmtTreat, ("calling treat function for '%s': '%s'", path.c_str(), value.c_str()));
@@ -222,6 +238,14 @@ void eatCompound
   {
     if ((nodeName != "") && (nodeValue != ""))  // Named String
     {
+      if (forbiddenChars(nodeValue.c_str()) == true)
+      {
+        LM_W(("Bad Input (found a forbidden value in compound '%s')", nodeValue.c_str()));
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer = std::string("Illegal value for JSON field");
+        return;
+      }
+
       containerP->add(orion::CompoundValueNode::String, nodeName, nodeValue);
       LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s') under '%s'",
                               nodeName.c_str(),

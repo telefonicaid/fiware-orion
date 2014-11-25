@@ -122,6 +122,7 @@ static XmlRequest xmlRequest[] =
   { UpdateContextElement,                  "POST", "updateContextElementRequest",                  FUNCS(ucer)  },
   { IndividualContextEntity,               "PUT",  "updateContextElementRequest",                  FUNCS(ucer)  },
   { IndividualContextEntity,               "POST", "appendContextElementRequest",                  FUNCS(acer)  },
+  { AllContextEntities,                    "POST", "appendContextElementRequest",                  FUNCS(acer)  },
 
   { IndividualContextEntityAttribute,      "POST", "updateContextAttributeRequest",                FUNCS(upcar) },
   { IndividualContextEntityAttribute,      "PUT",  "updateContextAttributeRequest",                FUNCS(upcar) },

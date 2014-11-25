@@ -65,11 +65,20 @@ static int entityId(xml_node<>* node, ParseData* reqData)
 *
 * entityIdId -
 */
-static int entityIdId(xml_node<>* node, ParseData* reqData)
+static int entityIdId(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
 
-  reqData->ucas.entityIdP->id = node->value();
+  if (parseDataP->ucas.entityIdP != NULL)
+  {
+    parseDataP->ucas.entityIdP->id = node->value();
+  }
+  else
+  {
+    LM_W(("Bad Input (XML parse error)"));
+    parseDataP->errorString = "Bad Input (XML parse error)";
+    return 1;
+  }
 
   return 0;
 }
@@ -157,20 +166,6 @@ static int scopeValue(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a scopeValue: '%s'", node->value()));
   reqData->ucas.scopeP->value = node->value();
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeOperator -
-*/
-static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
-  reqDataP->ucas.scopeP->oper = node->value();
-
   return 0;
 }
 
@@ -284,7 +279,6 @@ XmlNode ucasParseVector[] =
   { UCAS "/restriction/scope",                              nullTreat            },
   { UCAS "/restriction/scope/operationScope",               operationScope       },
   { UCAS "/restriction/scope/operationScope/scopeType",     scopeType            },
-  { UCAS "/restriction/scope/operationScope/scopeOperator", scopeOperator        },
   { UCAS "/restriction/scope/operationScope/scopeValue",    scopeValue           },
 
   { UCAS "/subscriptionId",                                 subscriptionId       },

@@ -24,12 +24,14 @@ SET (SOURCES
     CompoundValueNode.cpp
     compoundValue.cpp
     nullTreat.cpp
+    forbiddenChars.cpp
 )
 
 SET (HEADERS
     CompoundValueNode.h
     compoundValue.h
     nullTreat.h
+    forbiddenChars.h
 )
 
 

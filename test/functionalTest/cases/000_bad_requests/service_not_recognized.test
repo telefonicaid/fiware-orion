@@ -33,14 +33,14 @@ orionCurl --url "/v1/contextEntities/Room1/attributes/temperature/foo/bar" --jso
 --REGEXPECT--
 1: +++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 182
+Content-Length: 122
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orionError": {
         "code": "400", 
-        "details": "Service not recognized: /v1/contextEntities/Room1/attributes/temperature/foo/bar", 
+        "details": "unrecognized request", 
         "reasonPhrase": "Bad Request"
     }
 }

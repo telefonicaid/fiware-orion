@@ -10,7 +10,7 @@
   <domainMetadata>
     <contextMetadata>
       <name>cm1</name>
-      <type>string></type>
+      <type>string</type>
       <value>abc</value>
     </contextMetadata>
   </domainMetadata>

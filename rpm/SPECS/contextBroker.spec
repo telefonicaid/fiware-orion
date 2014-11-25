@@ -72,7 +72,9 @@ exit 0
 DATE=$(date "+%Y-%m-%d")
 /sbin/chkconfig --add %{name}
 mkdir -p /var/log/%{name}
+mkdir -p /var/run/%{name}
 chown -R %{owner}:%{owner} /var/log/%{name}
+chown -R %{owner}:%{owner} /var/run/%{name}
 # Secure the configuration file to prevent un-authorized access
 chown %{owner}:%{owner} /etc/sysconfig/%{name}
 chmod 600 /etc/sysconfig/%{name}
@@ -103,7 +105,8 @@ cp -R %{_sourcedir}/etc $RPM_BUILD_ROOT
 # it as part of our install script
 strip $RPM_BUILD_ROOT/usr/bin/contextBroker
 chmod 555 $RPM_BUILD_ROOT/usr/bin/contextBroker
-mkdir -p $RPM_BUILD_ROOT/var/%{name}
+#FIXME: I think next line is not actually needed, thus it has been commented out for a quarentine period (starting on 24/11/2014)
+#mkdir -p $RPM_BUILD_ROOT/var/%{name}
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
 mkdir -p $RPM_BUILD_ROOT/etc/profile.d
 mkdir -p $RPM_BUILD_ROOT/usr/share/contextBroker/tests

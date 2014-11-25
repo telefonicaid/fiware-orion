@@ -71,7 +71,16 @@ static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
 
-  reqDataP->dcar.entityIdP->id = node->value();
+  if (reqDataP->dcar.entityIdP != NULL)
+  {
+    reqDataP->dcar.entityIdP->id = node->value();
+  }
+  else
+  {
+    LM_W(("Bad Input (XML parse error)"));
+    reqDataP->errorString = "Bad Input (XML parse error)";
+    return 1;
+  }
 
   return 0;
 }
@@ -144,20 +153,6 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeType: '%s'", node->value()));
   reqDataP->dcar.scopeP->type = node->value();
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeOperator -
-*/
-static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
-  reqDataP->dcar.scopeP->oper = node->value();
-
   return 0;
 }
 
@@ -259,7 +254,6 @@ XmlNode dcarParseVector[] =
   { "/discoverContextAvailabilityRequest/restriction/scope/operationScope",               operationScope      },
   { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeType",     scopeType           },
   { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeValue",    scopeValue          },
-  { "/discoverContextAvailabilityRequest/restriction/scope/operationScope/scopeOperator", scopeOperator       },
 
   { "LAST", NULL }
 };

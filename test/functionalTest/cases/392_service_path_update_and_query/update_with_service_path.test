@@ -40,7 +40,7 @@ brokerStart CB 0-255
 # 10. Query for entity E, attr A for  ServicePath /home/kz/01
 # 11. Query for entity E, attr A for  ServicePath /home/fg
 # 12. Query for entity E, attr A for  ServicePath /home/fg/02
-# 13. Query for entity E, attr A for  ServicePath /home
+# 13. Query for entity E, attr A for  ServicePath /home/#
 
 
 echo "+++++ 1.  Create an entity E, attr A=k for  ServicePath /home/kz"
@@ -309,7 +309,7 @@ echo
 echo
 
 
-echo "+++++ 13. Query for entity E, attr A for  ServicePath /home"
+echo "+++++ 13. Query for entity E, attr A for  ServicePath /home/#"
 url=/v1/queryContext
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <queryContextRequest>
@@ -319,7 +319,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </entityId>
   </entityIdList>
 </queryContextRequest>'
-orionCurl --url "$url" --payload "$payload" --servicePath /home
+orionCurl --url "$url" --payload "$payload" --servicePath '/home/#'
 echo
 
 --REGEXPECT--
@@ -573,7 +573,7 @@ Date: REGEX(.*)
 
 +++++ 9.  Query for entity E, attr A for  ServicePath /home/kz
 HTTP/1.1 200 OK
-Content-Length: 2175
+Content-Length: 615
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -590,60 +590,6 @@ Date: REGEX(.*)
             <name>A</name>
             <type>attr</type>
             <contextValue>k</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>k1</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>k2</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>k3</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -689,7 +635,7 @@ Date: REGEX(.*)
 
 +++++ 11. Query for entity E, attr A for  ServicePath /home/fg
 HTTP/1.1 200 OK
-Content-Length: 2175
+Content-Length: 615
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -706,60 +652,6 @@ Date: REGEX(.*)
             <name>A</name>
             <type>attr</type>
             <contextValue>f</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>f1</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>f2</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="T" isPattern="false">
-          <id>E</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>A</name>
-            <type>attr</type>
-            <contextValue>f3</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -803,7 +695,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-+++++ 13. Query for entity E, attr A for  ServicePath /home
++++++ 13. Query for entity E, attr A for  ServicePath /home/#
 HTTP/1.1 200 OK
 Content-Length: 4254
 Content-Type: application/xml

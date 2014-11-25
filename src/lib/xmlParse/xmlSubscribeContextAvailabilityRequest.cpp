@@ -71,7 +71,17 @@ static int entityId(xml_node<>* node, ParseData* reqDataP)
 static int entityIdId(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got an entityId:id: '%s'", node->value()));
-  reqDataP->scar.entityIdP->id = node->value();
+
+  if (reqDataP->scar.entityIdP != NULL)
+  {
+    reqDataP->scar.entityIdP->id = node->value();
+  }
+  else
+  {
+    LM_W(("Bad Input (XML parse error)"));
+    reqDataP->errorString = "Bad Input (XML parse error)";
+    return 1;
+  }
 
   return 0;
 }
@@ -162,20 +172,6 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a scopeType: '%s'", node->value()));
   reqDataP->scar.scopeP->type = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* scopeOperator -
-*/
-static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
-  reqDataP->scar.scopeP->oper = node->value();
 
   return 0;
 }
@@ -290,7 +286,6 @@ XmlNode scarParseVector[] =
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope",               operationScope       },
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeType",     scopeType            },
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue",    scopeValue           },
-  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeOperator", scopeOperator        },
 
   { "LAST", NULL }
 };

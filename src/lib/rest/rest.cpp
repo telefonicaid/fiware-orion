@@ -170,6 +170,16 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       return MHD_YES;
     }
   }
+  else if (key == URI_PARAM_ATTRIBUTES_FORMAT)
+  {
+    // If URI_PARAM_ATTRIBUTES_FORMAT used, set URI_PARAM_ATTRIBUTE_FORMAT as well
+    ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] = value;
+  }
+  else if (key == URI_PARAM_ATTRIBUTE_FORMAT)
+  {
+    // If URI_PARAM_ATTRIBUTE_FORMAT used, set URI_PARAM_ATTRIBUTES_FORMAT as well
+    ciP->uriParam[URI_PARAM_ATTRIBUTES_FORMAT] = value;
+  }
   else
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
 
@@ -410,7 +420,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 {
   // 1. Max 10 paths  - ONLY ONE path allowed at this moment
   // 2. Max 10 levels in each path
-  // 3. Max 10 characters in each path component
+  // 3. Max 50 characters in each path component
   // 4. Only alphanum and underscore allowed (just like in tenants)
   
   std::vector<std::string> compV;
@@ -431,27 +441,34 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   if (components > 10)
   {
-    OrionError e(SccBadRequest, std::string("too many components in ServicePath '") + servicePath + "'");
+    OrionError e(SccBadRequest, std::string("too many components in ServicePath"));
     ciP->answer = e.render(ciP->outFormat, "");
     return 2;
   }
 
   for (int ix = 0; ix < components; ++ix)
   {
-    if (strlen(compV[ix].c_str()) > 10)
+    if (strlen(compV[ix].c_str()) > 50)
     {
-      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath '") + servicePath + "'");
+      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath"));
       ciP->answer = e.render(ciP->outFormat, "");
       return 3;
     }
 
-    const char* comp = compV[ix].c_str();
+    // Last token in the path is allowed to be *exactly* "#", as in /Madrid/Gardens/#. Note that
+    // /Madrid/Gardens/North# is not allowed
+    if ((ix == components - 1) && (compV[ix] == "#"))
+    {
+        continue;
+    }
+
+    const char* comp = compV[ix].c_str();      
 
     for (unsigned int cIx = 0; cIx < strlen(comp); ++cIx)
     {
       if (!isalnum(comp[cIx]) && (comp[cIx] != '_'))
       {
-        OrionError e(SccBadRequest, std::string("component '") + comp + " ' of ServicePath contains illegal character '" + comp[cIx] + "'");
+        OrionError e(SccBadRequest, "a component of ServicePath contains an illegal character");
         ciP->answer = e.render(ciP->outFormat, "");
         return 4;
       }
@@ -459,6 +476,25 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   }
 
   return 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* removeTrailingSlash - 
+*/
+static char* removeTrailingSlash(std::string path)
+{
+  char* cpath = (char*) path.c_str();
+
+  /* strlen(cpath) > 1 ensures that root service path "/" is not touched */
+  while ((strlen(cpath) > 1) && (cpath[strlen(cpath) - 1] == '/'))
+  {
+    cpath[strlen(cpath) - 1] = 0;
+  }
+
+  return cpath;
 }
 
 
@@ -486,7 +522,9 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   for (int ix = 0; ix < servicePaths; ++ix)
   {
-    ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));
+    ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));    
+    ciP->servicePathV[ix] = removeTrailingSlash(ciP->servicePathV[ix]);
+
     LM_T(LmtServicePath, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
 

@@ -51,40 +51,13 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
 *
 * smartAttrMatch -
 *
-* Note this function is not conmutative: empty type2 match whatever type, but type1 only
-* match an empty type2. Element 1 is supposed to be the one in database, while element 2
-* is the one supposed to be in the NGSI request.
-*
 * FIXME: probably this code could be useful in other places. It should be moved to
 * (and used from) a global place, maybe as part as the class-refactoring within
 * EntityId or Attribute class methods.
 */
-static bool smartAttrMatch(std::string name1, std::string type1, std::string id1, std::string name2, std::string type2, std::string id2)
+static bool smartAttrMatch(std::string name1, std::string id1, std::string name2, std::string id2)
 {
-#if 0
-  //
-  // FIXME P9: The identity of an attribute is formed by the name and the type of the attribute.
-  //           [ if both are equal, then the metadata named 'ID' is used to distinguish ].
-  //           Now, there is a convop 'DELETE /v1/contextEntities/type/TYPE/id/ID/attribute/ATTR_NAME'
-  //           that doesn't work because of this. We don't have the type of the attribute, so we can't
-  //           find it for removal.
-  //
-  //           With this outdeffed 'if' below, the problem is fixed, but, the fix also provokes five
-  //           errors in unit tests ...
-  //           We need to decide what to do about this.
-  //
-  if ((id2 == "") && (type2 == ""))
-  {
-    return (name1 == name2);
-  }
-  else 
-#endif
-  if (type2 == "")
-  {
-    return ((name1 == name2) && (id1 == id2));
-  }
-
-  return ((name1 == name2) && (type1 == type2) && (id1 == id2));
+  return ((name1 == name2) && (id1 == id2));
 }
 
 /* ****************************************************************************
@@ -336,7 +309,6 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
     *actualUpdate = false;
 
     newAttr.append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
-    newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
     /* The hasField() check is needed to preserve compatibility with entities that were created
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
@@ -345,12 +317,25 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
     if (STR_FIELD(attr, ENT_ATTRS_ID) != "") {
         newAttr.append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
     }
-    if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
-                       ca.name, ca.type, ca.getId())) {
-
-        /* Attribute match: update value */
-        valueBson(&ca, newAttr);
+    if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_ID), ca.name, ca.getId()))
+    {
         updated = true;
+
+        /* Update value */
+        valueBson(&ca, newAttr);
+
+        /* Update type (only if type is not empty, otherwise, we leave type untouched) */
+        if (ca.type != "")
+        {
+            newAttr.append(ENT_ATTRS_TYPE, ca.type);
+        }
+        else
+        {
+            if (attr.hasField(ENT_ATTRS_TYPE))
+            {
+                newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
+            }
+        }
 
         /* Update metadata */
         BSONArrayBuilder mdNewVBuilder;
@@ -398,15 +383,25 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
         }
 
         /* It was an actual update? */
-        if (ca.compoundValueP == NULL) {
-            /* In the case of simple value, we check if the value of the attribute changed or the metadata changed (the later
-             * one is done checking if the size of the original and final metadata vectors is different and, if they are of the
-             * same size, checking if the vectors are not equal) */
-            if (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value || mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV)) {
-                *actualUpdate = true;
-            }
+        if (ca.compoundValueP == NULL)
+        {
+            /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
+             *
+             * 1) the value of the attribute changed (probably the !attr.hasField(ENT_ATTRS_VALUE) is not needed, as any
+             *    attribute is supposed to have a value (according to NGSI spec), but it doesn't hurt anyway and makes CB
+             *    stronger)
+             * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
+             *    type is optional according to NGSI and the attribute may not have that field in the BSON)
+             * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
+             *    different and, if they are of the same size, checking if the vectors are not equal)
+             */
+            *actualUpdate = (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value ||
+                            ((ca.type != "") && (!attr.hasField(ENT_ATTRS_TYPE) || STR_FIELD(attr, ENT_ATTRS_TYPE) != ca.type) ) ||
+                            mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
+
         }
-        else {
+        else
+        {
             // FIXME P6: in the case of compound value, it's more difficult to know if an attribute
             // has really changed its value (many levels have to be traversed). Until we can develop the
             // matching logic, we consider actualUpdate always true.
@@ -434,6 +429,12 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
               LM_T(LmtMongo, ("unknown BSON type"));
             }
 
+        }
+
+        /* Type included "as is" */
+        if (attr.hasField(ENT_ATTRS_TYPE))
+        {
+            newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
         }
 
         /* Metadata is included "as is" */
@@ -470,8 +471,8 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
 static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttribute ca) {
 
     bool deleted = true;
-    if (!smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_TYPE), STR_FIELD(attr, ENT_ATTRS_ID),
-                        ca.name, ca.type, ca.getId())) {
+    if (!smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_ID), ca.name, ca.getId()))
+    {
         /* Attribute doesn't match: value is included "as is" */
         newAttr->append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
         newAttr->append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
@@ -634,7 +635,7 @@ static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP) {
         /* Attribute attempting to append hasn't ID. Thus, no attribute with same name can have ID in attrs */
         for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
             BSONObj attr = i.next().embeddedObject();
-            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) != "") {
+            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_ID) != "") {
                 return false;
             }
         }
@@ -644,7 +645,7 @@ static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP) {
         /* Attribute attempting to append has ID. Thus, no attribute with same name cannot have ID in attrs */
         for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
             BSONObj attr = i.next().embeddedObject();
-            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_TYPE) == caP->type && STR_FIELD(attr, ENT_ATTRS_ID) == "") {
+            if (STR_FIELD(attr, ENT_ATTRS_NAME) == caP->name && STR_FIELD(attr, ENT_ATTRS_ID) == "") {
                 return false;
             }
         }
@@ -708,8 +709,8 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
                     return false;
                 }
                 else {
-                    if (mdP->value != LOCATION_WSG84) {
-                        *errDetail = "only WSG84 are supported, found: " + mdP->value;
+                    if ((mdP->value != LOCATION_WGS84) && (mdP->value != LOCATION_WGS84_LEGACY)) {
+                        *errDetail = "only WGS84 are supported, found: " + mdP->value;
                         return false;
                     }
 
@@ -862,7 +863,21 @@ static bool addTriggeredSubscriptions(std::string                               
     while (cursor->more()) {
 
         BSONObj sub = cursor->next();
-        std::string subIdStr = sub.getField("_id").OID().str();
+        BSONElement idField = sub.getField("_id");
+
+        //
+        // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
+        //
+        // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
+        // an exception and the broker crashes. 
+        //
+        if (idField.eoo() == true)
+        {
+          LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
+          continue;
+        }
+
+        std::string subIdStr = idField.OID().str();
 
         if (subs.count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
@@ -1089,8 +1104,8 @@ static bool processContextAttributeVector (ContextElement*                      
                  * an error StatusCode */
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
-                                      std::string(" - entity: (") + eP->toString() + ")" +
-                                      std::string(" - offending attribute: ") + targetAttr->toString());
+                                      " - entity: (" + eP->toString() + ")" +
+                                      " - offending attribute: " + targetAttr->toString());
                 return false;
 
             }
@@ -1099,9 +1114,9 @@ static bool processContextAttributeVector (ContextElement*                      
             if (targetAttr->getLocation().length() > 0 && targetAttr->name != locAttr) {
                 cerP->statusCode.fill(SccInvalidParameter,
                                       std::string("action: UPDATE") +
-                                      std::string(" - entity: (") + eP->toString() + ")" +
-                                      std::string(" - offending attribute: ") + targetAttr->toString() +
-                                      std::string(" - location nature of an attribute has to be defined at creation time, with APPEND"));
+                                      " - entity: (" + eP->toString() + ")" +
+                                      " - offending attribute: " + targetAttr->toString() +
+                                      " - location nature of an attribute has to be defined at creation time, with APPEND");
                 return false;
             }
 
@@ -1109,9 +1124,9 @@ static bool processContextAttributeVector (ContextElement*                      
                 if (!string2coords(targetAttr->value, coordLat, coordLong)) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: UPDATE") +
-                                              std::string(" - entity: (") + eP->toString() + ")" +
-                                              std::string(" - offending attribute: ") + targetAttr->toString() +
-                                              std::string(" - error parsing location attribute, value: <" + targetAttr->value + ">"));
+                                              " - entity: (" + eP->toString() + ")" +
+                                              " - offending attribute: " + targetAttr->toString() +
+                                              " - error parsing location attribute, value: <" + targetAttr->value + ">");
                         return false;
                 }
 
@@ -1129,27 +1144,27 @@ static bool processContextAttributeVector (ContextElement*                      
                     if (locAttr.length() > 0 && targetAttr->name != locAttr) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: APPEND") +
-                                              std::string(" - entity: (") + eP->toString() + ")" +
-                                              std::string(" - offending attribute: ") + targetAttr->toString() +
-                                              std::string(" - attemp to define a location attribute (" + targetAttr->name + ") when another one has been previously defined (" + locAttr + ")"));
+                                              " - entity: (" + eP->toString() + ")" +
+                                              " - offending attribute: " + targetAttr->toString() +
+                                              " - attemp to define a location attribute (" + targetAttr->name + ") when another one has been previously defined (" + locAttr + ")");
                         return false;
                     }
 
-                    if (targetAttr->getLocation() != LOCATION_WSG84) {
+                    if ((targetAttr->getLocation() != LOCATION_WGS84) && (targetAttr->getLocation() != LOCATION_WGS84_LEGACY)) {
                         cerP->statusCode.fill(SccInvalidParameter,
                                               std::string("action: APPEND") +
-                                              std::string(" - entity: (") + eP->toString() + ")" +
-                                              std::string(" - offending attribute: ") + targetAttr->toString() +
-                                              std::string(" - only WSG84 is supported for location, found: <" + targetAttr->getLocation() + ">"));
+                                              " - entity: (" + eP->toString() + ")" +
+                                              " - offending attribute: " + targetAttr->toString() +
+                                              " - only WGS84 is supported for location, found: <" + targetAttr->getLocation() + ">");
                         return false;
                     }
 
                     if (!string2coords(targetAttr->value, coordLat, coordLong)) {
                             cerP->statusCode.fill(SccInvalidParameter,
                                                   std::string("action: APPEND") +
-                                                  std::string(" - entity: (") + eP->toString() + ")" +
-                                                  std::string(" - offending attribute: ") + targetAttr->toString() +
-                                                  std::string(" - error parsing location attribute, value: <" + targetAttr->value + ">"));
+                                                  " - entity: (" + eP->toString() + ")" +
+                                                  " - offending attribute: " + targetAttr->toString() +
+                                                  " - error parsing location attribute, value: <" + targetAttr->value + ">");
                             return false;
                     }
                     locAttr = targetAttr->name;
@@ -1179,9 +1194,9 @@ static bool processContextAttributeVector (ContextElement*                      
                 if (targetAttr->getLocation().length() > 0 ) {
                     cerP->statusCode.fill(SccInvalidParameter,
                                           std::string("action: DELETE") +
-                                          std::string(" - entity: (") + eP->toString() + ")" +
-                                          std::string(" - offending attribute: ") + targetAttr->toString() +
-                                          std::string(" - location attribute has to be defined at creation time, with APPEND"));
+                                          " - entity: (" + eP->toString() + ")" +
+                                          " - offending attribute: " + targetAttr->toString() +
+                                          " - location attribute has to be defined at creation time, with APPEND");
                     return false;
                 }
 
@@ -1315,7 +1330,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     else
     {
       LM_T(LmtServicePath, ("Service path string: %s", servicePathV[0].c_str()));
-      bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type << ENT_SERVICE_PATH << servicePathV[0]);
+      bsonId = eP->type == "" ? BSON(ENT_ENTITY_ID << eP->id << ENT_SERVICE_PATH << servicePathV[0]) : BSON(ENT_ENTITY_ID << eP->id << ENT_ENTITY_TYPE << eP->type << ENT_SERVICE_PATH << servicePathV[0]);
     } 
 
     BSONObjBuilder insertedDocB;
@@ -1575,9 +1590,24 @@ void processContextElement(ContextElement*                  ceP,
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
         ++docs;
-        std::string entityId    = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_ID);
-        std::string entityType  = STR_FIELD(r.getField("_id").embeddedObject(), ENT_ENTITY_TYPE);
-        std::string entitySPath = STR_FIELD(r.getField("_id").embeddedObject(), ENT_SERVICE_PATH);
+
+        BSONElement idField = r.getField("_id");
+
+        //
+        // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
+        //
+        // Now, if 'r.getField("_id")' is not found, if we continue, calling embeddedObject() on it, then we get
+        // an exception and the broker crashes.
+        //
+        if (idField.eoo() == true)
+        {
+          LM_E(("Database Error (error retrieving _id field in doc: %s)", r.toString().c_str()));
+          continue;
+        }
+
+        std::string entityId    = STR_FIELD(idField.embeddedObject(), ENT_ENTITY_ID);
+        std::string entityType  = STR_FIELD(idField.embeddedObject(), ENT_ENTITY_TYPE);
+        std::string entitySPath = STR_FIELD(idField.embeddedObject(), ENT_SERVICE_PATH);
 
         LM_T(LmtServicePath, ("Found entity '%s' in ServicePath '%s'", entityId.c_str(), entitySPath.c_str()));
 
@@ -1786,6 +1816,7 @@ void processContextElement(ContextElement*                  ceP,
           buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
 
+        crrV.release();
       }
       else
       {
