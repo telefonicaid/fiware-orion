@@ -28,5 +28,5 @@
 
 CURRENT=$(pwd)
 cd $1
-find | egrep '(\.cpp|\.h|\.test|\.txt|\.sh)$' | grep -v BUILD | cut -c 3-
+find | egrep '(\.cpp|\.h|\.test|\.txt|\.sh)$' | grep -v BUILD | grep -v '.git' | cut -c 3-
 cd $CURRENT
