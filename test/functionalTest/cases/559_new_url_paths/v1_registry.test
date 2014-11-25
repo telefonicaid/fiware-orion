@@ -226,7 +226,8 @@ echo
 
 echo "9. POST /v1/registry/contextEntityTypes/S"
 echo "========================================="
-payload='<registerProviderRequest>
+payload='<?xml version="1.0"?>
+<registerProviderRequest>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>'
 orionCurl --url /v1/registry/contextEntityTypes/S --payload "${payload}"
@@ -250,7 +251,8 @@ echo
 
 echo "10. POST /v1/registry/contextEntityTypes/U/attributes"
 echo "====================================================="
-payload='<registerProviderRequest>
+payload='<?xml version="1.0"?>
+<registerProviderRequest>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>'
 orionCurl --url /v1/registry/contextEntityTypes/U/attributes --payload "${payload}"
@@ -274,7 +276,8 @@ echo
 
 echo "11. POST /v1/registry/contextEntityTypes/V/attributes/A"
 echo "======================================================="
-payload='<registerProviderRequest>
+payload='<?xml version="1.0"?>
+<registerProviderRequest>
   <duration>PT1H</duration>
   <providingApplication>http://kz.tid.es/abc</providingApplication>
 </registerProviderRequest>'

@@ -53,6 +53,7 @@ brokerStart CB 0-255
 
 echo "01. XML:  Intent to register an entity with '<' as part of entity::id"
 echo "====================================================================="
+#INVALID_XML
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerContextRequest>
   <contextRegistrationList>
@@ -99,6 +100,7 @@ echo
 
 echo "03. XML:  Intent to register an entity with '=' as part of providingApplication"
 echo "==============================================================================="
+#INVALID_XML
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <registerContextRequest>
   <contextRegistrationList>

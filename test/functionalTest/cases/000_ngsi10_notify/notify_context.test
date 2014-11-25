@@ -84,7 +84,8 @@ orionCurl --url "$url" --payload "$payload"
 
 echo "3: ++++++++++++++++++++"
 url="/v1/queryContext"
-payload='<?xml version="1.0"?><queryContextRequest>
+payload='<?xml version="1.0"?>
+<queryContextRequest>
   <entityIdList>
     <entityId type="Room" isPattern="false">
       <id>ConferenceRoom</id>

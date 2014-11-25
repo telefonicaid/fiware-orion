@@ -144,7 +144,10 @@ function harnessFiles()
   for FILE in $(find $SRC_TOP/test/functionalTest/cases -name *.test)
   do
     PREFIX=$(basename ${FILE%.*})
-    $SRC_TOP/test/xmlCheck/xmlExtractor.py $FILE $TMP_DIR $PREFIX
+    FILE_DIR=$(dirname $FILE)
+    LAST_SUBDIR=$(basename $FILE_DIR)
+    mkdir -p $TMP_DIR/$LAST_SUBDIR
+    $SRC_TOP/test/xmlCheck/xmlExtractor.py $FILE $TMP_DIR/$LAST_SUBDIR $PREFIX
   done
 
   for FILE in $(find $TMP_DIR -name ngsi*.valid.xml)

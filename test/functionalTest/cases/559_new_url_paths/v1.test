@@ -279,7 +279,8 @@ echo
 
 echo "8.2. PUT /v1/contextEntities/EID/attributes/A1"
 echo "================================================"
-payload='<updateContextAttributeRequest>
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
   <type>T</type>
   <contextValue>10</contextValue>
   <metadata>
@@ -304,7 +305,8 @@ echo
 
 echo "8.4. POST /v1/contextEntities/EID/attributes/A1"
 echo "================================================="
-payload='<updateContextAttributeRequest>
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
   <type>T</type>
   <contextValue>10</contextValue>
   <metadata>
@@ -350,7 +352,8 @@ echo
 
 echo "9.2. PUT /v1/contextEntities/EID/attributes/A1/left"
 echo "=========================================================="
-payload='<updateContextAttributeRequest>
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
   <type>T</type>
   <contextValue>10</contextValue>
   <metadata>

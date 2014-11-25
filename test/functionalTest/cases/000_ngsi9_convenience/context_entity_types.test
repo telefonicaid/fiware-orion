@@ -35,7 +35,7 @@ echo
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
-  <registerContextRequest>
+<registerContextRequest>
     <contextRegistrationList>
       <contextRegistration>
         <entityIdList>
@@ -58,7 +58,7 @@ payload='<?xml version="1.0"?>
     </contextRegistrationList>
     <duration>PT1H</duration>
     <registrationId></registrationId>
-  </registerContextRequest>'
+</registerContextRequest>'
 orionCurl --url ${url} --payload "${payload}"
 echo
 
