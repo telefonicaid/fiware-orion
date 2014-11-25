@@ -27,25 +27,25 @@ import re
 from sys import argv
 
 header = []
-header.append('[#|\*] +Copyright 201[3|4] Telefonica Investigacion y Desarrollo, S.A.U$')
-header.append('[#|\*]$')
-header.append('[#|\*] +This file is part of Orion Context Broker.$')
-header.append('[#|\*]$')
-header.append('[#|\*] +Orion Context Broker is free software: you can redistribute it and/or$')
-header.append('[#|\*] +modify it under the terms of the GNU Affero General Public License as$')
-header.append('[#|\*] +published by the Free Software Foundation, either version 3 of the$')
-header.append('[#|\*] +License, or \(at your option\) any later version.$')
-header.append('[#|\*]$')
-header.append('[#|\*] +Orion Context Broker is distributed in the hope that it will be useful,$')
-header.append('[#|\*] +but WITHOUT ANY WARRANTY; without even the implied warranty of$')
-header.append('[#|\*] +MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero$')
-header.append('[#|\*] +General Public License for more details.$')
-header.append('[#|\*]$')
-header.append('[#|\*] +You should have received a copy of the GNU Affero General Public License$')
-header.append('[#|\*] +along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.$')
-header.append('[#|\*]$')
-header.append('[#|\*] +For those usages not covered by this license please contact with$')
-header.append('[#|\*] +fermin at tid dot es$')
+header.append('\s*Copyright 201[3|4|5] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*$')
+header.append('\s*This file is part of Orion Context Broker.$')
+header.append('\s*$')
+header.append('\s*Orion Context Broker is free software: you can redistribute it and/or$')
+header.append('\s*modify it under the terms of the GNU Affero General Public License as$')
+header.append('\s*published by the Free Software Foundation, either version 3 of the$')
+header.append('\s*License, or \(at your option\) any later version.$')
+header.append('\s*$')
+header.append('\s*Orion Context Broker is distributed in the hope that it will be useful,$')
+header.append('\s*but WITHOUT ANY WARRANTY; without even the implied warranty of$')
+header.append('\s*MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero$')
+header.append('\s*General Public License for more details.$')
+header.append('\s*$')
+header.append('\s*You should have received a copy of the GNU Affero General Public License$')
+header.append('\s*along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.$')
+header.append('\s*$')
+header.append('\s*For those usages not covered by this license please contact with$')
+header.append('\s*fermin at tid dot es$')
 
 verbose = True
 
@@ -114,7 +114,8 @@ def ignore(root, file):
     # Particular cases of files that are also ignored
     if file == '.gitignore' or file == '.valgrindrc' or file == '.valgrindSuppressions' \
         or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
-        or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h' or file == 'unittests_that_fail_sporadically.txt':
+        or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h' or file == 'unittests_that_fail_sporadically.txt' \
+        or file == 'Vagrantfile':
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
         or file == 'cmake2junit.xsl'):
@@ -127,7 +128,8 @@ def supported_extension(root, file):
     if file.endswith('.py') or file.endswith('.cpp') or file.endswith('.h') or file.endswith('.xml')\
         or file.endswith('.json') or file.endswith('.test') or file.endswith('.vtest') or file.endswith('.txt')\
         or file.endswith('.sh') or file == 'makefile' or file == 'Makefile' or file.endswith('.spec') \
-        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos') or file.endswith('.js'):
+        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos') \
+        or file.endswith('.js') or file.endswith('.jmx') or file.endswith('.vtestx'):
         return True
 
     if 'config' in root and file == 'contextBroker':
