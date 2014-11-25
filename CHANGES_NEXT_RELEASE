@@ -20,3 +20,5 @@ Fix: Service path is no longer ignored at entity creation time for entities with
 Fix: The broker crashed on receiving compounds for some convops, e.g. /v1/contextEntities/{entityId} (Issue #647)
 Fix: Using 443 as default port for "https" notifications. (Issue #639)
 Fix: Fixed RPM package so PID file is stored in /var/run/contextBroker instead of /var/log/contextBroker. (Issue #612)
+Fix: Payload no longer accepts 'operator' as part of a Scope. (Issue #618)
+Fix: Made compound attribute values for for convenience operations (Issue #660)

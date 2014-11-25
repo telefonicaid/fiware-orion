@@ -70,13 +70,15 @@ void compoundValueStart
     ciP->compoundValueP->type = orion::CompoundValueNode::Vector;
   }
 
-  // In the XML parsing routines, in all context attributes that can accept Compound values,
+  //
+  // In the parsing routines, in all context attributes that can accept Compound values,
   // a pointer to the one where we are right now is saved in ParseData.
   //
   // If this pointer is not set, it is a fatal error and the broker dies, because of the
   // following LM_X, that does an exit
   // It is better to exit here and clearly see the error, than to continue and get strange
   // outputs that will be difficult to trace back to here.
+  //
   if (ciP->parseDataP->lastContextAttribute == NULL)
     orionExitFunction(1, "No pointer to last ContextAttribute");
 

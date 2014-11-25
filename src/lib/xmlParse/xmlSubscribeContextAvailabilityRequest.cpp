@@ -180,20 +180,6 @@ static int scopeType(xml_node<>* node, ParseData* reqDataP)
 
 /* ****************************************************************************
 *
-* scopeOperator -
-*/
-static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
-  reqDataP->scar.scopeP->oper = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqDataP)
@@ -300,7 +286,6 @@ XmlNode scarParseVector[] =
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope",               operationScope       },
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeType",     scopeType            },
   { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeValue",    scopeValue           },
-  { "/subscribeContextAvailabilityRequest/restriction/scope/operationScope/scopeOperator", scopeOperator        },
 
   { "LAST", NULL }
 };
