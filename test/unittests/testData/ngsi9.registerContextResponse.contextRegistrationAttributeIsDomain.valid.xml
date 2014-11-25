@@ -4,6 +4,6 @@
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>invalid isDomain (boolean) value for registration attribute: 'fallsehh'</details>
+    <details>invalid isDomain value for registration attribute: /fallsehh/</details>
   </errorCode>
 </registerContextResponse>

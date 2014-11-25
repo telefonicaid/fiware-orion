@@ -61,7 +61,7 @@ std::string UnsubscribeContextRequest::check(RequestType requestType, Format for
 
   if ((res = subscriptionId.check(SubscribeContext, format, indent, predetectedError, counter)) != "OK")
   {
-     response.statusCode.fill(SccBadRequest, std::string("Invalid Subscription Id: '") + subscriptionId.get() + "': " + res);
+     response.statusCode.fill(SccBadRequest, std::string("Invalid Subscription Id: /") + subscriptionId.get() + "/: " + res);
      return response.render(UnsubscribeContext, format, indent);
   }
 

@@ -3,7 +3,7 @@
     "errorCode" : {
       "code" : "400",
       "reasonPhrase" : "Bad Request",
-      "details" : "invalid payload: bad value for circle/inverted: 'zero'"
+      "details" : "invalid payload: bad value for circle/inverted: /zero/"
     }
   }
 }

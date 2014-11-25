@@ -4,7 +4,7 @@
     "errorCode" : {
       "code" : "400",
       "reasonPhrase" : "Bad Request",
-      "details" : "bad string for circle/inverted: 'zero'"
+      "details" : "bad string for circle/inverted: /zero/"
     }
   }
 }

@@ -57,7 +57,7 @@ orionCurl --url "$url" --payload "${payload}"
 --REGEXPECT--
 4: +++++++++++++++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 222
+Content-Length: 226
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -66,7 +66,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>compound value error: duplicated tag-name: 's1' in '/'</details>
+    <details>compound value error: duplicated tag-name: /s1/ in path: /</details>
   </errorCode>
 </updateContextResponse>
 --TEARDOWN--

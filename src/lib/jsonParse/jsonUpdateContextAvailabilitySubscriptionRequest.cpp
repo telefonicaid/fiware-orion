@@ -99,8 +99,8 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
   if (!isTrue(value) && !isFalse(value))
   {
     LM_W(("Bad Input (invalid isPattern value: '%s')", value.c_str()));
-    reqDataP->errorString = "invalid isPattern (boolean) value for entity: '" + value + "'";
-    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+    reqDataP->errorString = "invalid isPattern value for entity: /" + value + "/";
+    return "invalid isPattern value for entity: /" + value + "/";
   }
 
   reqDataP->ucas.entityIdP->isPattern = value;

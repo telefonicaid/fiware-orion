@@ -160,7 +160,7 @@ Date: REGEX(.*)
 {
     "statusCode": {
         "code": "404",
-        "details": "Attribute-ValueID pair: 'temperature-ground'",
+        "details": "Attribute-ValueID pair: /temperature-ground/",
         "reasonPhrase": "No context element found"
     }
 }

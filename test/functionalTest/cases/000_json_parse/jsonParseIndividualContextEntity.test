@@ -122,7 +122,7 @@ Date: REGEX(.*)
     }, 
     "statusCode": {
         "code": "404", 
-        "details": "Entity id: 'ENTITY_ID'", 
+        "details": "Entity id: /ENTITY_ID/", 
         "reasonPhrase": "No context element found"
     }
 }
@@ -172,7 +172,7 @@ Date: REGEX(.*)
 {
     "errorCode": {
         "code": "472",
-        "details": "action: UPDATE - entity: (ENTITY_ID, ) - offending attribute: temperature",
+        "details": "action: UPDATE - entity: [ENTITY_ID, ] - offending attribute: temperature",
         "reasonPhrase": "request parameter is invalid/not allowed"
     }
 }

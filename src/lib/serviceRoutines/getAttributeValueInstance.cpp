@@ -66,7 +66,7 @@ std::string getAttributeValueInstance
   if (response.contextElementResponseVector.size() == 0)
   {
      car.statusCode.fill(SccContextElementNotFound,
-                         std::string("Entity-Attribute pair: '") + entityId + "-" + attributeName + "'");
+                         std::string("Entity-Attribute pair: /") + entityId + "-" + attributeName + "/");
   }
   else
   {
@@ -91,7 +91,7 @@ std::string getAttributeValueInstance
     if (cav.size() > 0 && car.contextAttributeVector.size() == 0)
     {
       car.statusCode.fill(SccContextElementNotFound,
-                          std::string("Attribute-ValueID pair: '") + attributeName + "-" + valueID + "'");
+                          std::string("Attribute-ValueID pair: /") + attributeName + "-" + valueID + "/");
     }
     else
     {

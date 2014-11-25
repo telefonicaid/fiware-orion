@@ -55,7 +55,7 @@ std::string badNgsi9Request
                              "",
                              ciP->payloadWord,
                              SccBadRequest,
-                             std::string("ngsi9 service '") + ciP->url + "' not found");
+                             "service not found");
 
   return answer;
 }

@@ -344,7 +344,7 @@ Date: REGEX(.*)
 2.4: Content-Type OK, Accepts text/plain: 406, Response in XML
 HTTP/1.1 406 Not Acceptable
 Connection: close
-Content-Length: 212
+Content-Length: 208
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -352,7 +352,7 @@ Date: REGEX(.*)
 <orionError>
   <code>406</code>
   <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable MIME types: 'application/xml, application/json'. Accept header in request: 'text/plain'</details>
+  <details>acceptable MIME types: application/xml, application/json. Accept header in request: text/plain</details>
 </orionError>
 =================================================================
 

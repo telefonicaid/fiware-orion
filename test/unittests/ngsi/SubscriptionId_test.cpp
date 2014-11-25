@@ -63,7 +63,7 @@ TEST(SubscriptionId, check)
 
   sId.set("SUB_123");
   checked = sId.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ("bad length (24 chars expected)", checked.c_str());
+  EXPECT_STREQ("bad length - 24 chars expected", checked.c_str());
 
   sId.set("SUB_12345678901234567890");
   checked = sId.check(RegisterContext, XML, "", "", 0);

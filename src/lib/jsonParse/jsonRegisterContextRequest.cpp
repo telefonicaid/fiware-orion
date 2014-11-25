@@ -116,7 +116,7 @@ static std::string entityIdIsPattern(const std::string& path, const std::string&
 
   if (!isTrue(value) && !isFalse(value))
   {
-    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+    return "invalid isPattern value for entity: /" + value + "/";
   }
 
   if (isTrue(value))
@@ -183,7 +183,7 @@ static std::string craIsDomain(const std::string& path, const std::string& value
 {
   if (!isTrue(value) && !isFalse(value))
   {
-    return "invalid isDomain (boolean) value for context registration attribute: '" + value + "'";
+    return "invalid isDomain value for context registration attribute: /" + value + "/";
   }
 
   reqDataP->rcr.attributeP->isDomain = value;
@@ -414,7 +414,7 @@ static std::string sourceEntityIdIsPattern(const std::string& path, const std::s
 
   if (!isTrue(value) && !isFalse(value))
   {
-    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+    return "invalid isPattern value for entity: /" + value + "/";
   }
 
   if (isTrue(value))
@@ -482,7 +482,7 @@ static std::string targetEntityIdIsPattern(const std::string& path, const std::s
 
   if (!isTrue(value) && !isFalse(value))
   {
-    return "invalid isPattern (boolean) value for entity: '" + value + "'";
+    return "invalid isPattern value for entity: /" + value + "/";
   }
 
   if (isTrue(value))

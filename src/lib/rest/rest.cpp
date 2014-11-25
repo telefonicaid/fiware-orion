@@ -104,7 +104,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       value = "JSON";
     else
     {
-      OrionError error(SccBadRequest, std::string("Bad notification format: '") + value + "'. Valid values: 'XML' and 'JSON'.");
+      OrionError error(SccBadRequest, std::string("Bad notification format: /") + value + "/. Valid values: /XML/ and /JSON/");
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = error.render(ciP->outFormat, "");
       return MHD_YES;
@@ -118,7 +118,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     {
       if ((*cP < '0') || (*cP > '9'))
       {
-        OrionError error(SccBadRequest, std::string("Bad pagination offset: '") + value + "' (must be a decimal number)");
+        OrionError error(SccBadRequest, std::string("Bad pagination offset: /") + value + "/ [must be a decimal number]");
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer         = error.render(ciP->outFormat, "");
         return MHD_YES;
@@ -135,7 +135,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     {
       if ((*cP < '0') || (*cP > '9'))
       {
-        OrionError error(SccBadRequest, std::string("Bad pagination limit: '") + value + "' (must be a decimal number)");
+        OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [must be a decimal number]");
         ciP->httpStatusCode = SccBadRequest;
         ciP->answer         = error.render(ciP->outFormat, "");
         return MHD_YES;
@@ -147,14 +147,14 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     int limit = atoi(val);
     if (limit > atoi(MAX_PAGINATION_LIMIT))
     {
-      OrionError error(SccBadRequest, std::string("Bad pagination limit: '") + value + "' (max: " + MAX_PAGINATION_LIMIT + ")");
+      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [max: " + MAX_PAGINATION_LIMIT + "]");
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = error.render(ciP->outFormat, "");
       return MHD_YES;
     }
     else if (limit == 0)
     {
-      OrionError error(SccBadRequest, std::string("Bad pagination limit: '") + value + "' (a value of ZERO is unaccepted)");
+      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unaccepted]");
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = error.render(ciP->outFormat, "");
       return MHD_YES;
@@ -164,7 +164,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     if ((strcasecmp(value.c_str(), "on") != 0) && (strcasecmp(value.c_str(), "off") != 0))
     {
-      OrionError error(SccBadRequest, std::string("Bad value for 'details': '") + value + "' (accepted: 'on', 'ON', 'off', 'OFF'. Default is 'off')");
+      OrionError error(SccBadRequest, std::string("Bad value for /details/: /") + value + "/ [accepted: /on/, /ON/, /off/, /OFF/. Default is /off/]");
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = error.render(ciP->outFormat, "");
       return MHD_YES;
@@ -397,7 +397,7 @@ static int outFormatCheck(ConnectionInfo* ciP)
                                     "",
                                     "OrionError",
                                     SccNotAcceptable,
-                                    std::string("acceptable MIME types: 'application/xml, application/json'. Accept header in request: '") + ciP->httpHeaders.accept + "'");
+                                    std::string("acceptable MIME types: application/xml, application/json. Accept header in request: ") + ciP->httpHeaders.accept);
 
     ciP->outFormat      = XML; // We use XML as default format
     ciP->httpStatusCode = SccNotAcceptable;
@@ -432,7 +432,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   if (servicePath[0] != '/')
   {
-    OrionError e(SccBadRequest, "Only 'absolute' Service Paths allowed (a service path must begin with '/')");
+    OrionError e(SccBadRequest, "Only /absolute/ Service Paths allowed [a service path must begin with /]");
     ciP->answer = e.render(ciP->outFormat, "");
     return 1;
   }
@@ -441,7 +441,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
   if (components > 10)
   {
-    OrionError e(SccBadRequest, std::string("too many components in ServicePath"));
+    OrionError e(SccBadRequest, "too many components in ServicePath");
     ciP->answer = e.render(ciP->outFormat, "");
     return 2;
   }
@@ -450,7 +450,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
   {
     if (strlen(compV[ix].c_str()) > 50)
     {
-      OrionError e(SccBadRequest, std::string("component-name too long in ServicePath"));
+      OrionError e(SccBadRequest, "component-name too long in ServicePath");
       ciP->answer = e.render(ciP->outFormat, "");
       return 3;
     }

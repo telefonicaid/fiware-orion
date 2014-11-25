@@ -83,7 +83,7 @@ def ignore(root, file):
         return True
 
     # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
-    if 'SRPMS' in root or 'SOURCES' or 'RPMS'in root:
+    if 'SRPMS' in root or 'SOURCES' in root or 'RPMS'in root:
         return True
 
     # Files in the test/valdring directory ending with .out are not processed
@@ -114,7 +114,7 @@ def ignore(root, file):
     # Particular cases of files that are also ignored
     if file == '.gitignore' or file == '.valgrindrc' or file == '.valgrindSuppressions' \
         or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
-        or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h':
+        or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h' or file == 'unittests_that_fail_sporadically.txt':
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
         or file == 'cmake2junit.xsl'):

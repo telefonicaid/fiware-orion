@@ -36,7 +36,7 @@ orionCurl --url "/v1/registry/nothingAtAll"
 --REGEXPECT--
 0: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 162
+Content-Length: 128
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -44,11 +44,11 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service '/NGSI8/contextEntities/entity01' not found</details>
+  <details>service not found</details>
 </orionError>
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 156
+Content-Length: 128
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -56,7 +56,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service '/v1/registry/nothingAtAll' not found</details>
+  <details>service not found</details>
 </orionError>
 --TEARDOWN--
 

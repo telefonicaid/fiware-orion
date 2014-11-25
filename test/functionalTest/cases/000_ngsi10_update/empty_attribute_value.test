@@ -97,7 +97,7 @@ Date: REGEX(.*)
             },
             "statusCode": {
                 "code": "472",
-                "details": "action: APPEND - entity: (ZBarHandlerkla860agfdg4s5s2g7n4iiucrm, ZBarFilter, false) - offending attribute: CodeFoundEvent - empty attribute not allowed in APPEND or UPDATE",
+                "details": "action: APPEND - entity: [ZBarHandlerkla860agfdg4s5s2g7n4iiucrm, ZBarFilter, false] - offending attribute: CodeFoundEvent - empty attribute not allowed in APPEND or UPDATE",
                 "reasonPhrase": "request parameter is invalid/not allowed"
             }
         }
@@ -130,7 +130,7 @@ Date: REGEX(.*)
       <statusCode>
         <code>472</code>
         <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: APPEND - entity: (EObject, T, false) - offending attribute: nnn - empty attribute not allowed in APPEND or UPDATE</details>
+        <details>action: APPEND - entity: [EObject, T, false] - offending attribute: nnn - empty attribute not allowed in APPEND or UPDATE</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

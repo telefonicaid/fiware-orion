@@ -517,7 +517,7 @@ TEST(mongoRegisterContext_update, updateNotFound)
     EXPECT_EQ("51307b66f481db11bf860003", res.registrationId.get());
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("registration id: '51307b66f481db11bf860003'", res.errorCode.details);
+    EXPECT_EQ("registration id: /51307b66f481db11bf860003/", res.errorCode.details);
 
     /* Release connection */
     mongoDisconnect();
@@ -654,7 +654,7 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     EXPECT_EQ("51307b66f481db11bf861111", res.registrationId.get());
     EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
     EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
-    EXPECT_EQ("registration id: '51307b66f481db11bf861111'", res.errorCode.details);
+    EXPECT_EQ("registration id: /51307b66f481db11bf861111/", res.errorCode.details);
 
     /* Release connection */
     mongoDisconnect();

@@ -130,7 +130,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>registration id: '012301230123012301230123'</details>
+    <details>registration id: /012301230123012301230123/</details>
   </errorCode>
 </registerContextResponse>
 3: ++++++++++++++++++++

@@ -204,7 +204,7 @@ fi
 
 --REGEXPECT--
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 128
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -212,7 +212,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>service '/v1/queryContext' not found</details>
+  <details>service not found</details>
 </orionError>
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
