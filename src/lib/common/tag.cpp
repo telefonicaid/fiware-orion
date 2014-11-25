@@ -323,30 +323,48 @@ std::string valueTag
   {
     if (isAssociation == true)
     {
-      return indent + "\"" + tagName + "\" : " + value + ",\n";
+      std::string out = indent + "\"" + tagName + "\" : " + value + ",\n";
+
+      free(value);
+      return out;
     }
     else if (isVectorElement == true)
     {
-      return indent + "\"" + value + "\",\n";
+      std::string out = indent + "\"" + value + "\",\n";
+
+      free(value);
+      return out;
     }
     else
     {
-      return indent + "\"" + tagName + "\" : \"" + value + "\",\n";
+      std::string out = indent + "\"" + tagName + "\" : \"" + value + "\",\n";
+
+      free(value);
+      return out;
     }
   }
   else
   {
     if (isAssociation == true)
     {
-      return indent + "\"" + tagName + "\" : " + value + "\n";
+      std::string out = indent + "\"" + tagName + "\" : " + value + "\n";
+
+      free(value);
+      return out;
     }
     else if (isVectorElement == true)
     {
-      return indent + "\"" + value + "\"\n";
+      std::string out = indent + "\"" + value + "\"\n";
+
+      free(value);
+      return out;
     }
     else
     {
-      return indent + "\"" + tagName + "\" : \"" + value + "\"\n";
+      std::string out = indent + "\"" + tagName + "\" : \"" + value + "\"\n";
+
+      free(value);
+      return out;
     }
   }
 }
