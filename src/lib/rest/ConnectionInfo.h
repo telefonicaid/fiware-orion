@@ -119,6 +119,12 @@ public:
     else                           verb = NOVERB;
   }
 
+  ~ConnectionInfo()
+  {
+    if (compoundValueRoot != NULL)
+      delete compoundValueRoot;
+  }
+
   MHD_Connection*            connection;
   Verb                       verb;
   Format                     inFormat;
