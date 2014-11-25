@@ -18,7 +18,7 @@
 # along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# fermin at tid dot es
+# iot_support at tid dot es 
 
 __author__ = 'fermin'
 
@@ -45,7 +45,7 @@ header.append('\s*You should have received a copy of the GNU Affero General Publ
 header.append('\s*along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.$')
 header.append('\s*$')
 header.append('\s*For those usages not covered by this license please contact with$')
-header.append('\s*fermin at tid dot es$')
+header.append('\s*iot_support at tid dot es$')
 
 verbose = True
 

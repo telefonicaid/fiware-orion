@@ -16,7 +16,7 @@
 # along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# fermin at tid dot es
+# iot_support at tid dot es
 
 ubuntu_distro=$(grep DISTRIB_DESCRIPTION= /etc/lsb-release 2>/dev/null | cut -d\" -f 2 | sed 's/ /_/g')
 debian_distro=$(cat /etc/debian_version 2> /dev/null)

@@ -18,7 +18,7 @@
 # along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# fermin at tid dot es
+# iot_support at tid dot es
 
 # This script extract XML fragments of a given file (passed as first arguments),
 # each fragment put in a separate file in a given directory (passed as second argument).

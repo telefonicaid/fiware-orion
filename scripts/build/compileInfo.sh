@@ -17,7 +17,7 @@
 # along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# fermin at tid dot es
+# iot_support at tid dot es
 
 if [ "$1" == "--release" ]; then
     date=$(LANG=C LC_TIME=C date)
@@ -59,7 +59,7 @@ echo "* You should have received a copy of the GNU Affero General Public License
 echo "* along with Orion Context Broker. If not, see http://www.gnu.org/licenses/." >> $TMP_FILE
 echo "*"                                                                            >> $TMP_FILE
 echo "* For those usages not covered by this license please contact with"           >> $TMP_FILE
-echo "* fermin at tid dot es"                                                       >> $TMP_FILE
+echo "* iot_support at tid dot es"                                                       >> $TMP_FILE
 echo "*/"                                                                           >> $TMP_FILE
 echo                                                                                >> $TMP_FILE
 

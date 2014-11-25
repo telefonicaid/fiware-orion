@@ -18,7 +18,7 @@
 # along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# fermin at tid dot es
+# iot_support at tid dot es
 
 # This script takes two argument as parameters: collection name and field name. For the documents
 # in the collection which field is a number type (Double or 32 bits integer) it converts to a 64 bits integer.

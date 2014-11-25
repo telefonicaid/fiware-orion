@@ -18,7 +18,7 @@
 # along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# fermin at tid dot es
+# iot_support at tid dot es
 #
 
 # This small script is useful for Qt Creator users, in order to regenerate the files directory
@@ -28,5 +28,5 @@
 
 CURRENT=$(pwd)
 cd $1
-find | egrep '(\.cpp|\.h|\.test|\.txt|\.sh)$' | grep -v BUILD | grep -v '.git' | cut -c 3-
+find | egrep '(\.cpp|\.h|\.test|\.txt|\.sh|\.py|\.jmx|\.vtest)$' | grep -v BUILD | grep -v '.git' | cut -c 3-
 cd $CURRENT
