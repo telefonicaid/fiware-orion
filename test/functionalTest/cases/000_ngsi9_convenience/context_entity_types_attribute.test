@@ -75,7 +75,8 @@ orionCurl --url "/v1/registry/contextEntityTypes/Room/attributes/temperature" -X
 # PUT is not allowed
 echo "4: ++++++++++++++++++++"
 url="/v1/registry/contextEntityTypes/Room/attributes/temperature"
-payload='<registerProviderRequest>
+payload='<?xml version="1.0"?>
+<registerProviderRequest>
   <metadata>
     <contextMetadata>
       <name>ID</name>

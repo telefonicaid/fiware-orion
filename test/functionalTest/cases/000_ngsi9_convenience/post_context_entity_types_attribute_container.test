@@ -30,7 +30,8 @@ brokerStart CB
 
 echo "0: ++++++++++++++++++++"
 url="/v1/registry/contextEntityTypes/Room/attributes"
-payload='<registerProviderRequest>
+payload='<?xml version="1.0"?>
+<registerProviderRequest>
   <metadata>
     <contextMetadata>
       <name>ID</name>
@@ -52,7 +53,8 @@ REG_ID=$(echo "$_response" | grep registrationId | awk -F '>' '{print $2}' | awk
 
 echo "1: ++++++++++++++++++++"
 url="/v1/registry/contextEntityTypes/Room/attributes"
-payload='<registerProviderRequest>
+payload='<?xml version="1.0"?>
+<registerProviderRequest>
   <metadata>
     <contextMetadata>
       <name>ID</name>
@@ -73,7 +75,8 @@ orionCurl --url "$url" --payload "$payload"
 
 echo "2: ++++++++++++++++++++"
 url="/v1/registry/contextEntityTypes/Room/attributes"
-payload='<registerProviderRequest>
+payload='<?xml version="1.0"?>
+<registerProviderRequest>
   <metadata>
     <contextMetadata>
       <name>ID</name>

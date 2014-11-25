@@ -75,7 +75,8 @@ echo
 
 echo "04. POST /v1/registry/contextEntities/type/ET1/id/entity02 with XML"
 echo "==================================================================="
-payload='<registerProviderRequest>
+payload='<?xml version="1.0"?>
+<registerProviderRequest>
   <metadata>
     <contextMetadata>
       <name>cm2</name>

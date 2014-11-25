@@ -227,7 +227,8 @@ echo
 
 echo "15. POST /v1/contextEntities/type/T1/id/E1/attributes/A1 XML"
 echo "============================================================"
-payload='<updateContextAttributeRequest>
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
   <type>AT1</type>
   <contextValue>11</contextValue>
   <metadata>
@@ -245,7 +246,8 @@ echo
 
 echo "16. PUT /v1/contextEntities/type/T1/id/E1/attributes/A1 XML"
 echo "==========================================================="
-payload='<updateContextAttributeRequest>
+payload='<?xml version="1.0"?>
+<updateContextAttributeRequest>
   <type>AT1</type>
   <contextValue>10</contextValue>
   <metadata>

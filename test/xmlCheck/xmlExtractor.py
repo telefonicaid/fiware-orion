@@ -75,6 +75,9 @@ tokens_map = {
     'contextElementResponse':           ['ngsi10', 'postponed'],
     'contextAttributeResponse':         ['ngsi10', 'postponed'],
     'statusCode':                       ['ngsi', 'valid'],
+    # New operations
+    'entityTypeAttributesResponse':     ['ngsi10', 'postponed'],
+    'entityTypesResponse':              ['ngsi10', 'postponed'],
     # Orion own types
     'orion':      ['orion', 'invalid'],
     'orionError': ['orion', 'invalid']

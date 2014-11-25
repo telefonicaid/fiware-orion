@@ -35,7 +35,8 @@ orionCurl --url "/v1/contextEntityTypes/Room/attributes"
 # Add an entity of type Room, with one attribute: 'temperature'
 echo "2: ++++++++++++++++++++"
 url="/v1/updateContext"
-payload='<updateContextRequest>
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
   <contextElementList>
     <contextElement>
       <entityId type="Room" isPattern="false">
