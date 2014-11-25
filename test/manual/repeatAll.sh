@@ -16,7 +16,7 @@
 # along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# fermin at tid dot es
+# iot_support at tid dot es
 
 repeat.sh 1000 rcr  ngsi9.registerContextRequest.ok.valid.xml
 repeat.sh 1000 dcar ngsi9.discoverContextAvailabilityRequest.ok.valid.xml
