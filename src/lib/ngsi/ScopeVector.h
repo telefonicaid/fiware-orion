@@ -52,6 +52,12 @@ typedef struct ScopeVector
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
+
+  Scope* operator[](unsigned int ix)
+  {
+    return (ix < vec.size())? vec[ix] : NULL;
+  }
+
 } ScopeVector;
 
 #endif  // SRC_LIB_NGSI_SCOPEVECTOR_H_

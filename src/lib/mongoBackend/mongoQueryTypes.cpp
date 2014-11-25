@@ -58,6 +58,9 @@ HttpStatusCode mongoEntityTypes
 
   /* Compose query based on this aggregation command:
    *
+   * FIXME P9: taking into account that type is no longer used as part of the attribute "key", not sure if the
+   * aggregation query below is fully correct
+   *
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
    *                            {$unwind: "$attrs"},
@@ -211,6 +214,9 @@ HttpStatusCode mongoAttributesForEntityType
   DBClientBase* connection = getMongoConnection();
 
   /* Compose query based on this aggregation command:
+   *
+   * FIXME P9: taking into account that type is no longer used as part of the attribute "key", not sure if the
+   * aggregation query below is fully correct
    *
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$match: { "_id.type": "TYPE" } },

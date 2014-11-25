@@ -242,6 +242,9 @@ static int contextAttributeType(xml_node<>* node, ParseData* parseDataP)
 static int contextAttributeContextValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
+  parseDataP->lastContextAttribute = parseDataP->ncr.attributeP;
+  parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
+
   parseDataP->ncr.attributeP->value = node->value();
 
   return 0;

@@ -33,7 +33,7 @@
 #include "ngsi/EntityId.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
-
+#include "ngsi/Scope.h"
 #include "mongo/client/dbclient.h"
 
 /* ****************************************************************************
@@ -173,8 +173,8 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
 
   /* Define filter scope */
   Scope sc;
-  sc.type = "FIWARE::Filter::Existence";
-  sc.value = "entity::type";
+  sc.type  = SCOPE_FILTER_EXISTENCE;
+  sc.value = SCOPE_VALUE_ENTITY_TYPE;
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */
@@ -228,9 +228,9 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterNotExist)
 
   /* Define filter scope */
   Scope sc;
-  sc.type = "FIWARE::Filter::Existence";
-  sc.oper = "not";
-  sc.value = "entity::type";
+  sc.type  = SCOPE_FILTER_EXISTENCE;
+  sc.oper  = SCOPE_OPERATOR_NOT;
+  sc.value = SCOPE_VALUE_ENTITY_TYPE;
   req.restriction.scopeVector.push_back(&sc);
 
   /* Invoke the function in mongoBackend library */

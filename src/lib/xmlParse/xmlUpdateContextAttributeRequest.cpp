@@ -102,7 +102,16 @@ static int attributeType(xml_node<>* node, ParseData* reqData)
 */
 static int attributeValue(xml_node<>* node, ParseData* reqData)
 {
-  reqData->upcar.res.contextValue = node->value();
+  //
+  // NOTE: UpdateContextAttributeRequest doesn't have a ContextAttribute (it *is* an attribute)
+  //       so no attributeP can exist in UpdateContextAttributeData. 
+  //       However, in order to save the 'typeFromXmlAttribute', a typeFromXmlAttribute has been added to 
+  //       UpdateContextAttributeData, and, in the function compoundValueEnd, instead of following 
+  //       ParseData::lastContextAttribute to find the attribute in question, we go
+  //       directly to ParseData::UpdateContextAttributeData::res, finding compoundValueP
+  //
+  reqData->upcar.res.typeFromXmlAttribute = xmlTypeAttributeGet(node);
+  reqData->upcar.res.contextValue         = node->value();
 
   return 0;
 }

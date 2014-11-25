@@ -163,20 +163,6 @@ static int scopeType(xml_node<>* node, ParseData* reqData)
 
 /* ****************************************************************************
 *
-* scopeOperator -
-*/
-static int scopeOperator(xml_node<>* node, ParseData* reqDataP)
-{
-  LM_T(LmtParse, ("Got a scopeOperator: '%s'", node->value()));
-  reqDataP->scr.scopeP->oper = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * scopeValue -
 */
 static int scopeValue(xml_node<>* node, ParseData* reqData)
@@ -548,7 +534,6 @@ XmlNode scrParseVector[] =
   { SCR RS "/scope",                               nullTreat                  },
   { SCR RS SC "/operationScope",                   operationScope             },
   { SCR RS SC OSC "/scopeType",                    scopeType                  },
-  { SCR RS SC OSC "/scopeOperator",                scopeOperator              },
   { SCR RS SC OSC "/scopeValue",                   scopeValue                 },
 
   { SCR RS SC OSC SVAL "/circle",                  circle                     },

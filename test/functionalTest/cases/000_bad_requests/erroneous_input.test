@@ -59,4 +59,6 @@ Date: REGEX(.*)
   <details>service not found</details>
 </orionError>
 --TEARDOWN--
+
 brokerStop CB
+dbDrop CB

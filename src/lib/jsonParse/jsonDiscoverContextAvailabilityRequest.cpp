@@ -201,20 +201,6 @@ static std::string scopeType(const std::string& path, const std::string& value, 
 
 /* ****************************************************************************
 *
-* scopeOperator - 
-*/
-static std::string scopeOperator(const std::string& path, const std::string& value, ParseData* reqDataP)
-{
-  reqDataP->dcar.scopeP->oper = value;
-  LM_T(LmtParse, ("Set scope 'operator' to '%s' for a scope", reqDataP->dcar.scopeP->oper.c_str()));
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
 * scopeValue - 
 */
 static std::string scopeValue(const std::string& path, const std::string& value, ParseData* reqDataP)
@@ -309,7 +295,6 @@ JsonNode jsonDcarParseVector[] =
   { "/restriction/scopes",                jsonNullTreat         },
   { "/restriction/scopes/scope",          operationScope        },
   { "/restriction/scopes/scope/type",     scopeType             },
-  { "/restriction/scopes/scope/operator", scopeOperator         },
   { "/restriction/scopes/scope/value",    scopeValue            },
 
   { "LAST", NULL }

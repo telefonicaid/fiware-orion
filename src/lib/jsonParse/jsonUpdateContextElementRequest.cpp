@@ -97,6 +97,7 @@ static std::string contextAttributeType(const std::string& path, const std::stri
 */
 static std::string contextAttributeValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
+  reqData->lastContextAttribute = reqData->ucer.attributeP;
   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
   reqData->ucer.attributeP->value = value;
   return "OK";

@@ -1141,6 +1141,8 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 */
 static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd)
 {
+  LM_T(LmtBug, ("dbName: '%s'", dbName.c_str()));
+
   if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
@@ -1328,6 +1330,16 @@ int main(int argC, char* argV[])
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
 
+#ifdef DEBUG_develenv
+  //
+  // FIXME P9: Temporary setting trace level 250 in jenkins only, until the ftest-ftest-ftest bug is solved
+  //           See issue #652
+  //
+  lmTraceLevelSet(LmtBug, true);
+#endif
+
+  LM_T(LmtBug, ("dbName: '%s'", dbName));
+
   if (strlen(dbName) > DB_NAME_MAX_LEN)
   {
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
@@ -1360,7 +1372,7 @@ int main(int argC, char* argV[])
 #if 0
   //
   // This 'almost always outdeffed' piece of code is used whenever a change is done to the
-  // valgrind test suite, just to make sure that the tool actually detects memory leaks,
+  // valgrind test suite, just to make sure that the tool actually detects memory leaks.
   //
   char* x = (char*) malloc(100000);
   snprintf(x, sizeof(x), "A hundred thousand bytes lost here");
