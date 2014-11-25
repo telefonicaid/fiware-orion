@@ -164,4 +164,10 @@ void UpdateContextAttributeRequest::present(std::string indent)
 void UpdateContextAttributeRequest::release(void)
 {
   metadataVector.release();
+
+  if (compoundValueP != NULL)
+  {
+   delete compoundValueP;
+   compoundValueP = NULL;
+  }
 }
