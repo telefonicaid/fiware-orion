@@ -36,7 +36,7 @@ then
 fi
 
 cd $dirname
-SCRIPT_HOME=$(pwd)
+export SCRIPT_HOME=$(pwd)
 cd - > /dev/null 2>&1
 
 
