@@ -73,7 +73,7 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
   TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl boost_thread boost_system pthread)
 ELSE()
   MESSAGE("proxyCoap: Other DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread-mt)
+  TARGET_LINK_LIBRARIES(proxyCoap ${STATIC_LIBS} cantcoap curl -lboost_thread -lboost_system -lpthread)
 ENDIF()
 
 # target_link_libraries (proxyCoap cantcoap curl)

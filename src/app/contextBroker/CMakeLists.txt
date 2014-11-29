@@ -91,7 +91,7 @@ ELSEIF(${DISTRO} STREQUAL "Fedora_20")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)
 ELSE()
   MESSAGE("contextBroker: Other DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)
 ENDIF()
 
 INSTALL(TARGETS               contextBroker
