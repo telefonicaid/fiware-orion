@@ -64,24 +64,21 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
 {
     ConnectionInfo ci;
 
-    LM_M(("KZ: Sending a Notify of %d entities", ncr->contextElementResponseVector.size()));
-
     //
     // Creating value of the Fiware-ServicePath HTTP header.
-    // This is a comma-separated list of the service-paths in order
+    // This is a comma-separated list of the service-paths in the order the entities come in the poyload
     //
     std::string spathList;
     for (unsigned int ix = 0; ix < ncr->contextElementResponseVector.size(); ++ix)
     {
       EntityId* eP = &ncr->contextElementResponseVector[ix]->contextElement.entityId;
-      LM_M(("KZ:   Service path for %s/%s: %s", eP->type.c_str(), eP->id.c_str(), eP->servicePath.c_str()));
+
       if (spathList != "")
       {
         spathList += ",";
       }
       spathList += eP->servicePath;
     }
-    LM_M(("KZ: Service-Path HTTP header: '%s'", spathList.c_str()));
     
     ci.outFormat = format;
     std::string payload = ncr->render(&ci, NotifyContext, "");
@@ -160,7 +157,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", tenant, "", path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD

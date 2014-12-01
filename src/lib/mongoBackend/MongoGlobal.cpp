@@ -1115,11 +1115,6 @@ bool entitiesQuery
         cer->contextElement.entityId.servicePath = STR_FIELD(queryEntity, ENT_SERVICE_PATH);
         cer->contextElement.entityId.isPattern   = "false";
 
-        LM_M(("KZ: Found an entity: '%s' '%s' '%s'",
-              cer->contextElement.entityId.id.c_str(),
-              cer->contextElement.entityId.type.c_str(),
-              cer->contextElement.entityId.servicePath.c_str()));
-
         /* Get the location attribute (if it exists) */
         std::string locAttr;
         if (r.hasElement(ENT_LOCATION)) {
@@ -1573,7 +1568,6 @@ bool processOnChangeCondition
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
-              LM_M(("KZ: Send notification"));
                 getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
@@ -1583,7 +1577,6 @@ bool processOnChangeCondition
             allCerV.release();
         }
         else {
-          LM_M(("KZ: Send notification"));
             getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
             ncr.contextElementResponseVector.release();
             return true;
