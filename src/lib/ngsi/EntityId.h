@@ -40,11 +40,12 @@
 class EntityId
 {
  public:
-  std::string  id;         // Mandatory
-  std::string  type;       // Optional
-  std::string  isPattern;  // Optional
+  std::string  id;           // Mandatory
+  std::string  type;         // Optional
+  std::string  isPattern;    // Optional
 
-  std::string  tag;        // Help variable for the 'render' method
+  std::string  servicePath;  // Not part of payload, just an internal field
+  std::string  tag;          // Help variable for the 'render' method
 
   EntityId();
   EntityId(const std::string&  _id,

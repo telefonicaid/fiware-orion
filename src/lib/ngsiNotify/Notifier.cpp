@@ -64,6 +64,25 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
 {
     ConnectionInfo ci;
 
+    LM_M(("KZ: Sending a Notify of %d entities", ncr->contextElementResponseVector.size()));
+
+    //
+    // Creating value of the Fiware-ServicePath HTTP header.
+    // This is a comma-separated list of the service-paths in order
+    //
+    std::string spathList;
+    for (unsigned int ix = 0; ix < ncr->contextElementResponseVector.size(); ++ix)
+    {
+      EntityId* eP = &ncr->contextElementResponseVector[ix]->contextElement.entityId;
+      LM_M(("KZ:   Service path for %s/%s: %s", eP->type.c_str(), eP->id.c_str(), eP->servicePath.c_str()));
+      if (spathList != "")
+      {
+        spathList += ",";
+      }
+      spathList += eP->servicePath;
+    }
+    LM_M(("KZ: Service-Path HTTP header: '%s'", spathList.c_str()));
+    
     ci.outFormat = format;
     std::string payload = ncr->render(&ci, NotifyContext, "");
 
@@ -80,10 +99,10 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     }
 
     /* Set Content-Type depending on the format */
-    std::string content_type = (format == XML ? "application/xml" : "application/json");
+    std::string content_type = (format == XML)? "application/xml" : "application/json";
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", tenant, spathList, path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -95,6 +114,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     params->protocol      = protocol;
     params->verb          = "POST";
     params->tenant        = tenant;
+    params->servicePath   = spathList;
     params->resource      = path;
     params->content_type  = content_type;
     params->content       = payload;

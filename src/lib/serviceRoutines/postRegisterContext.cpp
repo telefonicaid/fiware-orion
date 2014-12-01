@@ -61,6 +61,7 @@ static std::string fordwardRegisterContext
                                         "http:",
                                         "POST",
                                         tenant,
+                                        "", // FIXME P5: Service-Path
                                         "ngsi9/registerContext",
                                         // FIXME P3: unhardwire content type
                                         std::string("application/xml"),
