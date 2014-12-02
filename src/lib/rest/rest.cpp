@@ -31,6 +31,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/globals.h"
+#include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
 #include "rest/restReply.h"
@@ -593,6 +594,30 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
+* urlCheck - 
+*
+* Returns 'true' if the URL is OK, 'false' otherwise.
+* ciP->answer and ciP->httpStatusCode are set if an error is encountered.
+*
+*/
+bool urlCheck(ConnectionInfo* ciP, const std::string& url)
+{
+  if (forbiddenChars(url.c_str()) == true)
+  {
+    OrionError error(SccBadRequest, "invalid character in URI");
+    ciP->httpStatusCode = SccBadRequest;
+    ciP->answer         = error.render(ciP->outFormat, "");
+
+    return false;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * connectionTreat - 
 *
 * This is the MHD_AccessHandlerCallback function for MHD_start_daemon
@@ -638,14 +663,17 @@ static int connectionTreat
     if (mciP != NULL)
     {
       port = (mciP->client_addr->sa_data[0] << 8) + mciP->client_addr->sa_data[1];
-      snprintf(ip, sizeof(ip), "%d.%d.%d.%d", mciP->client_addr->sa_data[2]  & 0xFF, mciP->client_addr->sa_data[3]  & 0xFF, mciP->client_addr->sa_data[4] & 0xFF, mciP->client_addr->sa_data[5] & 0xFF);
+      snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
+               mciP->client_addr->sa_data[2] & 0xFF,
+               mciP->client_addr->sa_data[3] & 0xFF,
+               mciP->client_addr->sa_data[4] & 0xFF,
+               mciP->client_addr->sa_data[5] & 0xFF);
     }
     else
     {
       port = 0;
       snprintf(ip, sizeof(ip), "IP unknown");
     }
-
 
 
     //
@@ -660,7 +688,8 @@ static int connectionTreat
     *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
     ciP->port = port;
     ciP->ip   = ip;
-    
+
+
     //
     // Transaction starts here
     //
@@ -693,6 +722,13 @@ static int connectionTreat
     ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
+
+    if (urlCheck(ciP, url) == false)
+    {
+      LM_W(("Bad Input (error in URI path)"));
+      restReply(ciP, ciP->answer);
+      return MHD_YES;
+    }
 
     ciP->servicePath = ciP->httpHeaders.servicePath;
     if (servicePathSplit(ciP) != 0)
