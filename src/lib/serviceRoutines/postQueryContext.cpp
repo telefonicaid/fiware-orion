@@ -140,7 +140,7 @@ std::string postQueryContext
   std::string     resource     = prefix + "/queryContext";
   std::string     tenant       = ciP->tenant;
 
-  // FIXME P5: Service-Path ("" after 'tenant' in call to sendHttpSocket
+  // FIXME P5: Service-Path ("" after 'tenant' in call to sendHttpSocket)
   out = sendHttpSocket(ip, port, protocol, verb, tenant, "", resource, "application/xml", payload, false, true);
 
   if ((out == "error") || (out == ""))

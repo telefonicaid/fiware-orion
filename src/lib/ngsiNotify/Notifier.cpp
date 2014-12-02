@@ -65,8 +65,8 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     ConnectionInfo ci;
 
     //
-    // Creating value of the Fiware-ServicePath HTTP header.
-    // This is a comma-separated list of the service-paths in the order the entities come in the poyload
+    // Creating the value of the Fiware-ServicePath HTTP header.
+    // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
     //
     std::string spathList;
     for (unsigned int ix = 0; ix < ncr->contextElementResponseVector.size(); ++ix)
