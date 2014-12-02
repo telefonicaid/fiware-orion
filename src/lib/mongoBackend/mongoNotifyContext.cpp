@@ -56,7 +56,8 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
                               "append",
                               tenant,
                               servicePathV,
-                              uriParams);
+                              uriParams,
+                              "");  // FIXME P9: No xauthToken here for now ...
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 notification");

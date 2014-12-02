@@ -907,7 +907,8 @@ static bool addTriggeredSubscriptions(std::string                               
 static bool processSubscriptions(const EntityId*                           enP,
                                  std::map<string, TriggeredSubscription*>& subs,
                                  std::string&                              err,
-                                 std::string                               tenant)
+                                 std::string                               tenant,
+                                 const std::string&                        xauthToken)
 {
 
     DBClientBase* connection = getMongoConnection();
@@ -945,7 +946,9 @@ static bool processSubscriptions(const EntityId*                           enP,
                                      mapSubId,
                                      trigs->reference,
                                      trigs->format,
-                                     tenant)) {
+                                     tenant,
+                                     xauthToken))
+        {
 
             BSONObj query = BSON("_id" << OID(mapSubId));
             BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
@@ -1456,12 +1459,13 @@ static bool removeEntity
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
 */
-void processContextElement(ContextElement*                  ceP,
-                           UpdateContextResponse*           responseP,
-                           const std::string&               action,
-                           const std::string&               tenant,
-                           const std::vector<std::string>&  servicePathV,
-                           std::map<std::string, std::string>& uriParams    // FIXME P7: we need this to implement "restriction-based" filters
+void processContextElement(ContextElement*                      ceP,
+                           UpdateContextResponse*               responseP,
+                           const std::string&                   action,
+                           const std::string&                   tenant,
+                           const std::vector<std::string>&      servicePathV,
+                           std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
+                           const std::string&                   xauthToken
 )
 {
 
@@ -1748,7 +1752,7 @@ void processContextElement(ContextElement*                  ceP,
         /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
-        processSubscriptions(enP, subsToNotify, err, tenant);
+        processSubscriptions(enP, subsToNotify, err, tenant, xauthToken);
 
         //
         // processSubscriptions cleans up the triggered subscriptions; this call here to
@@ -1856,7 +1860,7 @@ void processContextElement(ContextElement*                  ceP,
             }
           }
 
-          processSubscriptions(enP, subsToNotify, errReason, tenant);
+          processSubscriptions(enP, subsToNotify, errReason, tenant, xauthToken);
         }
 
         responseP->contextElementResponseVector.push_back(cerP);

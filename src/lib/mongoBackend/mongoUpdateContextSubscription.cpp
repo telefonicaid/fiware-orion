@@ -170,7 +170,8 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
                                                 C_STR_FIELD(sub, CSUB_REFERENCE),
                                                 &notificationDone,
                                                 inFormat,
-                                                tenant);
+                                                tenant,
+                                                "");
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
        /* Remove EntityIdVector and AttributeList dynamic memory */

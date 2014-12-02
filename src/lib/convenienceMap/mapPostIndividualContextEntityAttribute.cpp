@@ -65,7 +65,7 @@ HttpStatusCode mapPostIndividualContextEntityAttribute
   ucRequest.updateActionType.set("Append");
 
   ucResponse.errorCode.fill(SccOk);
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
 
   ucRequest.release();
 

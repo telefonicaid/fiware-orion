@@ -370,7 +370,7 @@ extern AttributeList subToAttributeList(BSONObj attrL);
 
 /* ****************************************************************************
 *
-* processOnChangeCondition -
+* processOntimeIntervalCondition -
 *
 */
 extern void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant);
@@ -380,14 +380,24 @@ extern void processOntimeIntervalCondition(std::string subId, int interval, std:
 * processOnChangeCondition -
 *
 */
-extern bool processOnChangeCondition(EntityIdVector enV, AttributeList attrV, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format, std::string tenant);
+extern bool processOnChangeCondition
+(
+  EntityIdVector       enV,
+  AttributeList        attrV,
+  ConditionValueList*  condValues,
+  std::string          subId,
+  std::string          notifyUrl,
+  Format               format,
+  std::string          tenant,
+  const std::string&   xauthToken
+);
 
 /* ****************************************************************************
 *
 * processConditionVector -
 *
 */
-extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant);
+extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant, const std::string& xauthToken);
 
 /* ****************************************************************************
 *

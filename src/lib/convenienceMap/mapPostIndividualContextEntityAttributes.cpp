@@ -65,7 +65,7 @@ HttpStatusCode mapPostIndividualContextEntityAttributes
   ucRequest.contextElementVector.push_back(&ce);
   ucRequest.updateActionType.set("Append");
 
-  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  ms = mongoUpdateContext(&ucRequest, &ucResponse, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
 
   ContextAttributeResponse* car                      = new ContextAttributeResponse();
   ContextElementResponse*   ucContextElementResponse = ucResponse.contextElementResponseVector.get(0);

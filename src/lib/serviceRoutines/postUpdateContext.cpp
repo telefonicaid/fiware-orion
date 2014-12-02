@@ -64,7 +64,7 @@ std::string postUpdateContext
   UpdateContextResponse  upcr;
   std::string            answer;
 
-  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
 
   //
   // Checking for SccFound in the ContextElementResponseVector

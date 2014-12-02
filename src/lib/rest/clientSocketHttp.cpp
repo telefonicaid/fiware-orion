@@ -131,6 +131,7 @@ std::string sendHttpSocket
    const std::string&     verb,
    const std::string&     tenant,
    const std::string&     servicePath,
+   const std::string&     xauthToken,
    const std::string&     resource,
    const std::string&     content_type,
    const std::string&     content,
@@ -280,6 +281,13 @@ std::string sendHttpSocket
   {
     headers = curl_slist_append(headers, ("Fiware-ServicePath: " + servicePath).c_str());
     outgoingMsgSize += servicePath.size() + strlen("Fiware-ServicePath: ");
+  }
+
+  // ----- X-Auth-Token
+  if (xauthToken != "")
+  {
+    headers = curl_slist_append(headers, ("X-Auth-Token: " + xauthToken).c_str());
+    outgoingMsgSize += xauthToken.size() + strlen("X-Auth-Token: ");
   }
 
   // ----- Accept

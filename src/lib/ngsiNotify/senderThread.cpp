@@ -36,12 +36,13 @@ void* startSenderThread(void* p)
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', path='%s', content-type: %s", 
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', xauthToken: '%s', path='%s', content-type: %s", 
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
                        params->tenant.c_str(),
                        params->servicePath.c_str(),
+                       params->xauthToken.c_str(),
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
@@ -51,6 +52,7 @@ void* startSenderThread(void* p)
                    params->verb,
                    params->tenant,
                    params->servicePath,
+                   params->xauthToken,
                    params->resource,
                    params->content_type,
                    params->content,

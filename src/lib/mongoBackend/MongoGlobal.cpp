@@ -1529,7 +1529,8 @@ bool processOnChangeCondition
   std::string         subId,
   std::string         notifyUrl,
   Format              format,
-  std::string tenant
+  std::string         tenant,
+  const std::string&  xauthToken
 )
 {
   std::string          err;
@@ -1568,7 +1569,7 @@ bool processOnChangeCondition
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
-                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
+                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 return true;
@@ -1577,7 +1578,7 @@ bool processOnChangeCondition
             allCerV.release();
         }
         else {
-            getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
+          getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
             ncr.contextElementResponseVector.release();
             return true;
         }
@@ -1601,7 +1602,7 @@ void processOntimeIntervalCondition(std::string subId, int interval, std::string
 * processConditionVector -
 *
 */
-BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant)
+BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant, const std::string& xauthToken)
 {
     BSONArrayBuilder conds;
     *notificationDone = false;
@@ -1631,14 +1632,15 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
                               CSUB_CONDITIONS_VALUE << condValues.arr()));
 
             if (processOnChangeCondition(enV,
-                                     attrL,
-                                     &(nc->condValueList),
-                                     subId,
-                                     url,
-                                     format,
-                                     tenant)) {
-
-                *notificationDone = true;
+                                         attrL,
+                                         &(nc->condValueList),
+                                         subId,
+                                         url,
+                                         format,
+                                         tenant,
+                                         xauthToken))
+            {
+              *notificationDone = true;
             }
 
         }

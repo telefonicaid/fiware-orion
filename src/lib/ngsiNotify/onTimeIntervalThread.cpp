@@ -94,7 +94,7 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 HttpStatusCode s = mongoUpdateCsubNewNotification(params->subId, &err, tenant);
                 if (s == SccOk)
                 {
-                  params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, csi.format);
+                  params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, "", csi.format);
                 }
 
                 ncr.contextElementResponseVector.release();
