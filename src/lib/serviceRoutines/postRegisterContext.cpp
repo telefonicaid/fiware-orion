@@ -68,6 +68,7 @@ static std::string fordwardRegisterContext
                                         // FIXME P3: unhardwire content type
                                         std::string("application/xml"),
                                         payload,
+                                        true,
                                         true);
 
   LM_T(LmtCm, ("response to forward registerContext: '%s'", response.c_str()));
