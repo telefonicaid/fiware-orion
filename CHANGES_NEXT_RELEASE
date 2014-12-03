@@ -1,2 +1,3 @@
 Add:  Service-Path in notifications (Issue #674)
 Add:  Forbidden characters in the URL path are now detected (Issue #672)
+Add:  X-Auth-Token forwarded in notify messages - subscriptions (Issue #673)
