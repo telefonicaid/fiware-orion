@@ -1529,7 +1529,7 @@ bool processOnChangeCondition
   std::string         subId,
   std::string         notifyUrl,
   Format              format,
-  std::string tenant
+  std::string         tenant
 )
 {
   std::string          err;
