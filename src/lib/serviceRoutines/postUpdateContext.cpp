@@ -151,8 +151,7 @@ std::string postUpdateContext
     std::string     resource     = prefix + "/updateContext";
     std::string     tenant       = ciP->tenant;
 
-    // FIXME P5: Service-Path ("" after 'tenant' in call to sendHttpSocket
-    out = sendHttpSocket(ip, port, protocol, verb, tenant, "", resource, "application/xml", payloadIn, false, true);
+    out = sendHttpSocket(ip, port, protocol, verb, tenant, ciP->httpHeaders.servicePath, resource, "application/xml", payloadIn, false, true);
 
     // Should be safe to free up ucrP now ...
     ucrP->release();

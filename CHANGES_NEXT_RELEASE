@@ -1,2 +1,2 @@
-Add:  Service-Path in notifications (Issue #674)
+Add:  Service-Path in ngsi10 notifications (Issue #674)
 Add:  Forbidden characters in the URL path are now detected (Issue #672)
