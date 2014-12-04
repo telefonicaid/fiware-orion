@@ -130,6 +130,7 @@ std::string sendHttpSocket
    const std::string&     protocol,
    const std::string&     verb,
    const std::string&     tenant,
+   const std::string&     servicePath,
    const std::string&     resource,
    const std::string&     content_type,
    const std::string&     content,
@@ -272,6 +273,13 @@ std::string sendHttpSocket
   {
     headers = curl_slist_append(headers, ("fiware-service: " + tenant).c_str());
     outgoingMsgSize += tenant.size() + 16; // "fiware-service: "
+  }
+
+  // ----- Service-Path
+  if (servicePath != "")
+  {
+    headers = curl_slist_append(headers, ("Fiware-ServicePath: " + servicePath).c_str());
+    outgoingMsgSize += servicePath.size() + strlen("Fiware-ServicePath: ");
   }
 
   // ----- Accept

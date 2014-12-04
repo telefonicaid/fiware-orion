@@ -1110,9 +1110,10 @@ bool entitiesQuery
 
         BSONObj queryEntity = r.getObjectField("_id");
 
-        cer->contextElement.entityId.id = STR_FIELD(queryEntity, ENT_ENTITY_ID);
-        cer->contextElement.entityId.type = STR_FIELD(queryEntity, ENT_ENTITY_TYPE);
-        cer->contextElement.entityId.isPattern = "false";
+        cer->contextElement.entityId.id          = STR_FIELD(queryEntity, ENT_ENTITY_ID);
+        cer->contextElement.entityId.type        = STR_FIELD(queryEntity, ENT_ENTITY_TYPE);
+        cer->contextElement.entityId.servicePath = STR_FIELD(queryEntity, ENT_SERVICE_PATH);
+        cer->contextElement.entityId.isPattern   = "false";
 
         /* Get the location attribute (if it exists) */
         std::string locAttr;
@@ -1520,12 +1521,21 @@ AttributeList subToAttributeList(BSONObj sub) {
 * is returned. This is used in the caller to know if lastNotification field in the
 * subscription document in csubs collection has to be modified or not.
 */
-bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format, std::string tenant) {
+bool processOnChangeCondition
+(
+  EntityIdVector      enV,
+  AttributeList       attrL,
+  ConditionValueList* condValues,
+  std::string         subId,
+  std::string         notifyUrl,
+  Format              format,
+  std::string         tenant
+)
+{
+  std::string          err;
+  NotifyContextRequest ncr;
 
-    std::string err;
-    NotifyContextRequest ncr;
-
-    // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
+    // FIXME P10: we are using dummy scope at the moment, until subscription scopes get implemented
     // FIXME P10: we are using an empty service path vector until service paths get implemented for subscriptions
     std::vector<std::string> servicePathV;
     Restriction res;    
@@ -1535,8 +1545,8 @@ bool processOnChangeCondition(EntityIdVector enV, AttributeList attrL, Condition
         return false;
     }
 
-    if (ncr.contextElementResponseVector.size() > 0) {
-
+    if (ncr.contextElementResponseVector.size() > 0)
+    {
         /* Complete the fields in NotifyContextRequest */
         ncr.subscriptionId.set(subId);
         //FIXME: we use a proper origin name
@@ -1591,8 +1601,8 @@ void processOntimeIntervalCondition(std::string subId, int interval, std::string
 * processConditionVector -
 *
 */
-BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant) {
-
+BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant)
+{
     BSONArrayBuilder conds;
     *notificationDone = false;
 

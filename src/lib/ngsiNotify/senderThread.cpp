@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
  *
-  * For those usages not covered by this license please contact with
+ * For those usages not covered by this license please contact with
  * iot_support at tid dot es
  *
  * Author: Fermín Galán Márquez
@@ -36,11 +36,12 @@ void* startSenderThread(void* p)
 
     strncpy(transactionId, params->transactionId, sizeof(transactionId));
 
-    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', path='%s', content-type: %s", 
+    LM_T(LmtNotifier, ("sending to: host='%s', port=%d, verb=%s, tenant='%s', service-path: '%s', path='%s', content-type: %s", 
                        params->ip.c_str(),
                        params->port,
                        params->verb.c_str(),
                        params->tenant.c_str(),
+                       params->servicePath.c_str(),
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
@@ -49,6 +50,7 @@ void* startSenderThread(void* p)
                    params->protocol,                   
                    params->verb,
                    params->tenant,
+                   params->servicePath,
                    params->resource,
                    params->content_type,
                    params->content,

@@ -64,26 +64,42 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
 {
     ConnectionInfo ci;
 
+    //
+    // Creating the value of the Fiware-ServicePath HTTP header.
+    // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
+    //
+    std::string spathList;
+    for (unsigned int ix = 0; ix < ncr->contextElementResponseVector.size(); ++ix)
+    {
+      EntityId* eP = &ncr->contextElementResponseVector[ix]->contextElement.entityId;
+
+      if (spathList != "")
+      {
+        spathList += ",";
+      }
+      spathList += eP->servicePath;
+    }
+    
     ci.outFormat = format;
     std::string payload = ncr->render(&ci, NotifyContext, "");
 
     /* Parse URL */
     std::string  host;
     int          port;
-    std::string  path;
+    std::string  uriPath;
     std::string  protocol;
     
-    if (!parseUrl(url, host, port, path, protocol))
+    if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
       return;
     }
 
     /* Set Content-Type depending on the format */
-    std::string content_type = (format == XML ? "application/xml" : "application/json");
+    std::string content_type = (format == XML)? "application/xml" : "application/json";
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", tenant, spathList, uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -95,7 +111,8 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     params->protocol      = protocol;
     params->verb          = "POST";
     params->tenant        = tenant;
-    params->resource      = path;
+    params->servicePath   = spathList;
+    params->resource      = uriPath;
     params->content_type  = content_type;
     params->content       = payload;
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
@@ -127,9 +144,9 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     /* Parse URL */
     std::string  host;
     int          port;
-    std::string  path;
+    std::string  uriPath;
     std::string  protocol;
-    if (!parseUrl(url, host, port, path, protocol))
+    if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
       return;
@@ -140,7 +157,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", tenant, "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -151,7 +168,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     params->port         = port;
     params->verb         = "POST";
     params->tenant       = tenant;
-    params->resource     = path;   
+    params->resource     = uriPath;   
     params->content_type = content_type;
     params->content      = payload;
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));

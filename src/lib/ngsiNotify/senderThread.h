@@ -35,6 +35,7 @@ typedef struct SenderThreadParams
     std::string    protocol;
     std::string    verb;
     std::string    tenant;
+    std::string    servicePath;
     std::string    resource;
     std::string    content_type;
     std::string    content;
