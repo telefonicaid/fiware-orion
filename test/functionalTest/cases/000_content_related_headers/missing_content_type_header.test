@@ -87,7 +87,6 @@ orionCurl --url "$url" --payload "$payload" --in "application/json; charset=UTF-
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 415 Unsupported Media Type
-Connection: close
 Content-Length: 201
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -100,7 +99,6 @@ Date: REGEX(.*)
 </orionError>
 2: ++++++++++++++++++++
 HTTP/1.1 415 Unsupported Media Type
-Connection: close
 Content-Length: 180
 Content-Type: application/xml
 Date: REGEX(.*)

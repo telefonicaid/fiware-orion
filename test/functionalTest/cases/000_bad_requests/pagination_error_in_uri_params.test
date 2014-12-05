@@ -61,7 +61,6 @@ echo
 --REGEXPECT--
 +++++ 1. bad characters in URI param 'limit'
 HTTP/1.1 400 Bad Request
-Connection: close
 Content-Length: 165
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -76,7 +75,6 @@ Date: REGEX(.*)
 
 +++++ 2. bad characters in URI param 'offset'
 HTTP/1.1 400 Bad Request
-Connection: close
 Content-Length: 166
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -91,7 +89,6 @@ Date: REGEX(.*)
 
 +++++ 3. URI param 'limit' == 0
 HTTP/1.1 400 Bad Request
-Connection: close
 Content-Length: 173
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -106,7 +103,6 @@ Date: REGEX(.*)
 
 +++++ 4. URI param 'details' == 'Yes'
 HTTP/1.1 400 Bad Request
-Connection: close
 Content-Length: 196
 Content-Type: application/xml
 Date: REGEX(.*)

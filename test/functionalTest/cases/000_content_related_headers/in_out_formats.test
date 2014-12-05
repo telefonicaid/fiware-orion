@@ -175,7 +175,6 @@ Date: REGEX(.*)
 
 1.1: Unrecognized Content-Type, Accepts ONLY JSON: 415, response in JSON
 HTTP/1.1 415 Unsupported Media Type
-Connection: close
 Content-Length: 151
 Content-Type: application/json
 Date: REGEX(.*)
@@ -191,7 +190,6 @@ Date: REGEX(.*)
 
 1.2: Unrecognized Content-Type, Accepts ONLY XML: 415, response in XML
 HTTP/1.1 415 Unsupported Media Type
-Connection: close
 Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -206,7 +204,6 @@ Date: REGEX(.*)
 
 1.3: Unrecognized Content-Type, Accepts BOTH JSON and XML: 415, response in XML
 HTTP/1.1 415 Unsupported Media Type
-Connection: close
 Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -221,7 +218,6 @@ Date: REGEX(.*)
 
 1.4: Unrecognized Content-Type, Accepts text/plain: 415, response in XML
 HTTP/1.1 415 Unsupported Media Type
-Connection: close
 Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -236,7 +232,6 @@ Date: REGEX(.*)
 
 1.5: Unrecognized Content-Type, Accepts NOTHING: 415, response in XML
 HTTP/1.1 415 Unsupported Media Type
-Connection: close
 Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -343,7 +338,6 @@ Date: REGEX(.*)
 
 2.4: Content-Type OK, Accepts text/plain: 406, Response in XML
 HTTP/1.1 406 Not Acceptable
-Connection: close
 Content-Length: 208
 Content-Type: application/xml
 Date: REGEX(.*)

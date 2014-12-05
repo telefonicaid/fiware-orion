@@ -247,7 +247,6 @@ Date: REGEX(.*)
 </queryContextResponse>
 5: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
-Connection: close
 Content-Length: 220
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -260,7 +259,6 @@ Date: REGEX(.*)
 </orionError>
 6: ++++++++++++++++++++
 HTTP/1.1 406 Not Acceptable
-Connection: close
 Content-Length: 243
 Content-Type: application/xml
 Date: REGEX(.*)
