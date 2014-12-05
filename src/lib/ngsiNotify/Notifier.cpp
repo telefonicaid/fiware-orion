@@ -86,10 +86,10 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     /* Parse URL */
     std::string  host;
     int          port;
-    std::string  path;
+    std::string  uriPath;
     std::string  protocol;
     
-    if (!parseUrl(url, host, port, path, protocol))
+    if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
       return;
@@ -99,7 +99,18 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string content_type = (format == XML)? "application/xml" : "application/json";
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, spathList, xauthToken, path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host,
+                   port,
+                   protocol,
+                   "POST",
+                   tenant,
+                   spathList,
+                   xauthToken,
+                   uriPath,
+                   content_type,
+                   payload,
+                   true,
+                   NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -113,7 +124,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     params->tenant        = tenant;
     params->servicePath   = spathList;
     params->xauthToken    = xauthToken;
-    params->resource      = path;
+    params->resource      = uriPath;
     params->content_type  = content_type;
     params->content       = payload;
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
@@ -145,9 +156,9 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     /* Parse URL */
     std::string  host;
     int          port;
-    std::string  path;
+    std::string  uriPath;
     std::string  protocol;
-    if (!parseUrl(url, host, port, path, protocol))
+    if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
       return;
@@ -158,7 +169,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, "", "", path, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -169,7 +180,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     params->port         = port;
     params->verb         = "POST";
     params->tenant       = tenant;
-    params->resource     = path;   
+    params->resource     = uriPath;   
     params->content_type = content_type;
     params->content      = payload;
     strncpy(params->transactionId, transactionId, sizeof(params->transactionId));
