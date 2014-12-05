@@ -66,7 +66,7 @@ std::string postIndividualContextEntity
 
   response.entity = reqP->entity;
 
-  if (compV.size() == 3)
+  if (compV.size() == 3)  // /v1/contextEntities/{entityId}
   {
     entityId   = compV[2];
     entityType = "";
@@ -78,7 +78,7 @@ std::string postIndividualContextEntity
       return response.render(ciP, IndividualContextEntity, "");
     }
   }
-  else if (compV.size() == 2)
+  else if (compV.size() == 2)  // /v1/contextEntities
   {
     entityId   = reqP->entity.id;
     entityType = reqP->entity.type;
@@ -93,7 +93,7 @@ std::string postIndividualContextEntity
 
   LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s'", entityId.c_str()));
 
-  ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, "", &parseDataP->acer.res, &response, ciP);
+  ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, entityType, &parseDataP->acer.res, &response, ciP);
 
   response.entity.fill(entityId, entityType, "false");
   answer = response.render(ciP, IndividualContextEntity, "");
