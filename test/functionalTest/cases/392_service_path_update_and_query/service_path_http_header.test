@@ -85,7 +85,6 @@ Date: REGEX(.*)
 
 +++++ 1. Path-Component more than 50 chars
 HTTP/1.1 200 OK
-Connection: close
 Content-Length: 149
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -99,7 +98,6 @@ Date: REGEX(.*)
 
 +++++ 2. Too many levels in path
 HTTP/1.1 200 OK
-Connection: close
 Content-Length: 145
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -113,7 +111,6 @@ Date: REGEX(.*)
 
 +++++ 3: bad char in component
 HTTP/1.1 200 OK
-Connection: close
 Content-Length: 167
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -127,7 +124,6 @@ Date: REGEX(.*)
 
 +++++ 4: service path must start with a '/'
 HTTP/1.1 200 OK
-Connection: close
 Content-Length: 183
 Content-Type: application/xml
 Date: REGEX(.*)
@@ -166,7 +162,6 @@ Date: REGEX(.*)
 
 +++++ 7: eleven service paths
 HTTP/1.1 200 OK
-Connection: close
 Content-Length: 177
 Content-Type: application/xml
 Date: REGEX(.*)
