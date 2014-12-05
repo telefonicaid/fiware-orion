@@ -207,16 +207,16 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
-  if      (strcasecmp(key.c_str(), "user-agent") == 0)      headerP->userAgent      = value;
-  else if (strcasecmp(key.c_str(), "host") == 0)            headerP->host           = value;
-  else if (strcasecmp(key.c_str(), "accept") == 0)          headerP->accept         = value;
-  else if (strcasecmp(key.c_str(), "expect") == 0)          headerP->expect         = value;
-  else if (strcasecmp(key.c_str(), "connection") == 0)      headerP->connection     = value;
-  else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
-  else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key.c_str(), "fiware-service") == 0)  headerP->tenant         = value;
+  if      (strcasecmp(key.c_str(), "User-Agent") == 0)      headerP->userAgent      = value;
+  else if (strcasecmp(key.c_str(), "Host") == 0)            headerP->host           = value;
+  else if (strcasecmp(key.c_str(), "Accept") == 0)          headerP->accept         = value;
+  else if (strcasecmp(key.c_str(), "Expect") == 0)          headerP->expect         = value;
+  else if (strcasecmp(key.c_str(), "Connection") == 0)      headerP->connection     = value;
+  else if (strcasecmp(key.c_str(), "Content-Type") == 0)    headerP->contentType    = value;
+  else if (strcasecmp(key.c_str(), "Content-Length") == 0)  headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)  headerP->tenant         = value;
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)    headerP->xauthToken     = value;
-  else if (strcasecmp(key.c_str(), "fiware-servicepath") == 0)
+  else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
     headerP->servicePathReceived = true;
