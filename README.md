@@ -130,6 +130,7 @@ sudo ldconfig      # just in case... it doesn't hurt :)
 ```
 
 * (Optional proxyCoap) Install cantcoap (with dependencies). Note that we are using a particular snapshot of the code (corresponding to around July 21st, 2014) given that cantcoap repository doesn't provide any releasing mechanism.
+
 ```
 sudo yum install clang CUnit-devel
 
@@ -191,6 +192,7 @@ sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgr
 ```
 
 * (Optional proxyCoap) Install COAP client (an example application included in the libcoap sources).
+* 
 ```
 wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
 mv download libcoap-4.1.1.tar.gz
