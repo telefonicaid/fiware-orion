@@ -413,4 +413,12 @@ extern void slashEscape(const char* from, char* to, unsigned int toLen);
 */
 extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>& subs);
 
+
+/* ****************************************************************************
+*
+* fillQueryServicePath -
+*
+*/
+extern BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
+
 #endif

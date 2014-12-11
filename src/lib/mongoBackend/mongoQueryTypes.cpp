@@ -62,7 +62,8 @@ HttpStatusCode mongoEntityTypes
    * aggregation query below is fully correct
    *
    * db.runCommand({aggregate: "entities",
-   *                pipeline: [ {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
+   *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
+   *                            {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
    *                            {$unwind: "$attrs"},
    *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
    *                            {$sort: {_id: 1} }
@@ -79,6 +80,7 @@ HttpStatusCode mongoEntityTypes
   BSONObj result;
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
+                                              BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
                                               BSON("$project" << BSON("_id" << 1 << C_ATTR_NAME << 1 << C_ATTR_TYPE << 1)) <<
                                               BSON("$unwind" << S_ATTRS) <<
                                               BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRS))) <<
@@ -219,7 +221,7 @@ HttpStatusCode mongoAttributesForEntityType
    * aggregation query below is fully correct
    *
    * db.runCommand({aggregate: "entities",
-   *                pipeline: [ {$match: { "_id.type": "TYPE" } },
+   *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
    *                            {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
    *                            {$unwind: "$attrs"},
    *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
@@ -231,10 +233,10 @@ HttpStatusCode mongoAttributesForEntityType
    *
    */
 
-  BSONObj result;
+  BSONObj result;  
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
-                                              BSON("$match" << BSON(C_ID_ENTITY << entityType)) <<
+                                              BSON("$match" << BSON(C_ID_ENTITY << entityType << C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
                                               BSON("$project" << BSON("_id" << 1 << C_ATTR_NAME << 1 << C_ATTR_TYPE << 1)) <<
                                               BSON("$unwind" << S_ATTRS) <<
                                               BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRS))) <<

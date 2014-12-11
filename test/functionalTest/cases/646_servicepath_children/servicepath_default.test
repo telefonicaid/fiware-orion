@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Service path all children test
+Service path default test
 
 --SHELL-INIT--
 dbInit CB
