@@ -643,9 +643,11 @@ function orionCurl()
   fi
   
   #
-  # Remove "Connection: Keep-Alive" header and print headers out
+  # Remove "Connection: Keep-Alive" and "Connection: close" headers and print headers out
   #
-  sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out
+  sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
+  sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
+  sed '/Connection: Close/d'      /tmp/httpHeaders.out  
   
   #
   # Print and beautify response body, if any  (and if option --noPayloadCheck hasn't been set)

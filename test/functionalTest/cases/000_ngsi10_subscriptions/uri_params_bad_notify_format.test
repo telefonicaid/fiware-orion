@@ -62,7 +62,6 @@ echo
 Trying to ask for HTML as Notification Format
 =============================================
 HTTP/1.1 400 Bad Request
-Connection: close
 Content-Length: 174
 Content-Type: application/xml
 Date: REGEX(.*)
