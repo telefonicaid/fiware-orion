@@ -930,7 +930,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $sort: { _id: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $sort: { _id: 1 } } ] } - "
             "exception: boom!!", res.statusCode.details);
   EXPECT_EQ(0,res.typeEntityVector.size());
 
@@ -971,7 +971,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $sort: { _id: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $sort: { _id: 1 } } ] } - "
             "exception: generic", res.statusCode.details);
   EXPECT_EQ(0,res.typeEntityVector.size());
 
@@ -1505,7 +1505,7 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\" } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id.name: 1, _id.type: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id.name: 1, _id.type: 1 } } ] } - "
             "exception: boom!!", res.statusCode.details);
   EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
 
@@ -1546,7 +1546,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\" } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id.name: 1, _id.type: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id.name: 1, _id.type: 1 } } ] } - "
             "exception: generic", res.statusCode.details);
   EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
 
