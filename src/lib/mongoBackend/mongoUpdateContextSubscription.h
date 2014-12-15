@@ -37,6 +37,13 @@
 *
 * mongoUpdateContextSubscription - 
 */
-extern HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat = XML, const std::string& tenant = "");
+extern HttpStatusCode mongoUpdateContextSubscription
+(
+  UpdateContextSubscriptionRequest*   requestP,
+  UpdateContextSubscriptionResponse*  responseP,
+  Format                              inFormat    = XML,
+  const std::string&                  tenant      = "",
+  const std::string&                  xauthToken  = ""
+);
 
 #endif

@@ -34,6 +34,9 @@ accumulatorStart
 # 01. Update/Append E1/A1
 # 02. Make accumulator subscribe to changes in E1/A1, using an X-Auth-Token
 # 03. Check that the X-Auth-Token from the subscribe request was propagated to accumulator
+# 04. Clear the accumulator
+# 05. Update subscription, using *another* X-Auth-Token
+# 06. Check that the X-Auth-Token from the update subscription request was propagated to accumulator
 #
 
 echo "01. Update/Append E1/A1"
@@ -42,6 +45,11 @@ payload='{
   "attributes" : [
     {
       "name" : "A1",
+      "type" : "AT",
+      "value" : "V"
+    },
+    {
+      "name" : "A2",
       "type" : "AT",
       "value" : "V"
     }
@@ -68,7 +76,7 @@ payload='{
   ],
   "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
   "duration": "P1M",
-  "throttling": "PT2S",
+  "throttling": "PT1S",
   "notifyConditions": [
     {
         "type": "ONCHANGE",
@@ -79,6 +87,7 @@ payload='{
   ]
 }'
 orionCurl --url /v1/subscribeContext --json --payload "${payload}" --xauthToken xauth_from_subscription
+SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
 
@@ -91,11 +100,48 @@ echo
 echo
 
 
+echo "04. Clear the accumulator"
+echo "========================="
+sleep 1
+curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+echo
+echo
+
+
+echo "05. Update subscription, using *another* X-Auth-Token"
+echo "====================================================="
+payload='{
+  "duration": "P1Y",
+  "subscriptionId": "'$SUB_ID'",
+  "throttling": "PT6S",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+        "condValues": [
+          "A2"
+        ]
+    }
+  ]
+}'
+sleep 1
+orionCurl --url /v1/contextSubscriptions/$SUB_ID --payload "${payload}" --xauthToken xauth_from_update_subscription --json -X PUT
+echo
+echo
+
+
+echo "06. Check that the X-Auth-Token from the update subscription request was propagated to accumulator"
+echo "=================================================================================================="
+sleep 1
+curl localhost:${LISTENER_PORT}/dump -s -S
+echo
+echo
+
+
 --REGEXPECT--
 01. Update/Append E1/A1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 312
+Content-Length: 406
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -105,6 +151,11 @@ Date: REGEX(.*)
             "attributes": [
                 {
                     "name": "A1", 
+                    "type": "AT", 
+                    "value": ""
+                }, 
+                {
+                    "name": "A2", 
                     "type": "AT", 
                     "value": ""
                 }
@@ -131,8 +182,8 @@ Date: REGEX(.*)
 {
     "subscribeResponse": {
         "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})",
-        "throttling": "PT2S"
+        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "throttling": "PT1S"
     }
 }
 
@@ -149,6 +200,63 @@ Content-Type: application/json
 
 {
   "subscriptionId" : "REGEX([0-9a-f]{24})"
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "ET",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "AT",
+            "value" : "V"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+04. Clear the accumulator
+=========================
+
+
+05. Update subscription, using *another* X-Auth-Token
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1Y", 
+        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "throttling": "PT6S"
+    }
+}
+
+
+06. Check that the X-Auth-Token from the update subscription request was propagated to accumulator
+==================================================================================================
+POST http://127.0.0.1:REGEX(\d+)/notify
+Content-Length: 459
+X-Auth-Token: xauth_from_update_subscription
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
   "originator" : "localhost",
   "contextResponses" : [
     {
