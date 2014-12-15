@@ -34,8 +34,14 @@
 *
 * mongoNotifyContext -
 */
-HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextResponse* responseP, const std::string& tenant) {
-
+HttpStatusCode mongoNotifyContext
+(
+  NotifyContextRequest*   requestP,
+  NotifyContextResponse*  responseP,
+  const std::string&      tenant,
+  const std::string&      xauthToken
+)
+{
     reqSemTake(__FUNCTION__, "ngsi10 notification");
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
@@ -57,7 +63,7 @@ HttpStatusCode mongoNotifyContext(NotifyContextRequest* requestP, NotifyContextR
                               tenant,
                               servicePathV,
                               uriParams,
-                              "");  // FIXME P9: No xauthToken here for now ...
+                              xauthToken);
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 notification");

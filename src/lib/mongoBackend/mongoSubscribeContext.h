@@ -43,7 +43,8 @@ extern HttpStatusCode mongoSubscribeContext
   SubscribeContextRequest*                   requestP,
   SubscribeContextResponse*                  responseP,
   const std::string&                         tenant,
-  std::map<std::string, std::string>&        uriParam
+  std::map<std::string, std::string>&        uriParam,
+  const std::string&                         xauthToken
 );
 
 #endif
