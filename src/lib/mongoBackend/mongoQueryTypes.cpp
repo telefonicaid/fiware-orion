@@ -233,7 +233,7 @@ HttpStatusCode mongoAttributesForEntityType
    *
    */
 
-  BSONObj result;  
+  BSONObj result;
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
                                               BSON("$match" << BSON(C_ID_ENTITY << entityType << C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
