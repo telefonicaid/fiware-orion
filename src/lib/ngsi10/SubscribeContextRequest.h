@@ -52,8 +52,8 @@ typedef struct SubscribeContextRequest
   NotifyConditionVector  notifyConditionVector;  // Optional
   Throttling             throttling;             // Optional
 
-  /* The number of restrictions */
-  int                    restrictions;
+  int                    restrictions;           // Number of restrictions
+  std::string            servicePath;            // Not sure I need this field here ...
 
   SubscribeContextRequest();
   std::string  render(RequestType requestType, Format format, const std::string& indent);

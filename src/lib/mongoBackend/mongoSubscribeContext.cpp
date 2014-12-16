@@ -46,7 +46,8 @@ HttpStatusCode mongoSubscribeContext
   SubscribeContextResponse*            responseP,
   const std::string&                   tenant,
   std::map<std::string, std::string>&  uriParam,
-  const std::string&                   xauthToken
+  const std::string&                   xauthToken,
+  const std::string&                   servicePath
 )
 {
     std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
@@ -75,8 +76,14 @@ HttpStatusCode mongoSubscribeContext
     sub.append(CSUB_REFERENCE, requestP->reference.get());
 
     /* Throttling */
-    if (!requestP->throttling.isEmpty()) {
+    if (!requestP->throttling.isEmpty())
+    {
       sub.append(CSUB_THROTTLING, (long long) requestP->throttling.parse());
+    }
+
+    if (servicePath != "")
+    {
+      sub.append(CSUB_SERVICE_PATH, servicePath);
     }
 
     /* Build entities array */

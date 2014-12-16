@@ -764,7 +764,8 @@ static bool addTriggeredSubscriptions(std::string                               
                                       std::string                               attr,
                                       std::map<string, TriggeredSubscription*>& subs,
                                       std::string&                              err,
-                                      std::string                               tenant)
+                                      std::string                               tenant,
+                                      const std::vector<std::string>&           servicePathV)
 {
 
     DBClientBase* connection = getMongoConnection();
@@ -775,6 +776,13 @@ static bool addTriggeredSubscriptions(std::string                               
     std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
     std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
     std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
+
+    if (servicePathV.size() > 1)
+    {
+      LM_W(("Bad Input (service path of more than one item is not supported)"));
+      return false;
+    }
+
 
     /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
     BSONObj queryNoPattern = BSON(
@@ -794,20 +802,113 @@ static bool addTriggeredSubscriptions(std::string                               
      * Note that although we are using a isPattern=true in the MongoDB query besides $where, we
      * also need to check that in the if statement in the JavaScript function given that a given
      * sub document could include both isPattern=true and isPattern=false documents */
-    std::string function = std::string("function()") +
-         "{" +
-            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
-                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
-                    "return true; " +
-                "}" +
-            "}" +
-            "return false; " +
-         "}";
-    LM_T(LmtMongo, ("JS function: %s", function.c_str()));
+
+    std::string function;
+
+    //
+    // Check whether Service Path ends in '#' (if so, recursive is set to TRUE),
+    // Also, if Service Path ends in '/', just remove it.
+    //
+    bool   recursive = false;
+
+    if (servicePathV.size() != 0)
+    {
+      char*  spath     = (char*) servicePathV[0].c_str();
+      char*  lastChar  = &spath[strlen(spath) - 1];  // lastChar points to last character of Service Path
+
+      if (*lastChar == '#')
+      {
+        recursive = true;
+        *lastChar = 0;
+        --lastChar;
+      }
+      if (*lastChar == '/')
+      {
+        *lastChar = 0;
+      }
+    }
+
+    // Temp var for debugging
+    int    jsFunctionVersion = 0;
+
+    if ((servicePathV.size() == 0) || (servicePathV[0] == ""))  // No service path (or '/#') - don't check service path
+    {
+      jsFunctionVersion = 1;
+
+      function = std::string("function()\n") +
+        "{\n" +
+        "  for (var i=0; i < this." + CSUB_ENTITIES + ".length; i++)\n" +
+        "  {\n" +
+        "    if (this."   + CSUB_ENTITIES    + "[i]."           + CSUB_ENTITY_ISPATTERN + " == \"true\" &&\n" +
+        "         (this." + CSUB_ENTITIES    + "[i]."           + CSUB_ENTITY_TYPE      + " == \"" + entityType + "\" ||\n" +
+        "          this." + CSUB_ENTITIES    + "[i]."           + CSUB_ENTITY_TYPE      + " == \"\" ||\n" +
+        "          !(\""  + CSUB_ENTITY_TYPE + "\" in this."    + CSUB_ENTITIES         + "[i])) &&\n" +
+        "            \""  + entityId         + "\".match(this." + CSUB_ENTITIES         + "[i]." + CSUB_ENTITY_ID + "))\n" +
+        "    {\n"                   +
+        "      return true;\n"      +
+        "    }\n"                   +
+        "  }\n"                     +
+        "  return false;\n"         +
+        "}\n";
+    }
+    else if (recursive == false)  // Check exact match of servicePath
+    {
+      jsFunctionVersion = 2;
+
+      LM_M(("KZ: Exact match: Service PATH: '%s'", servicePathV[0].c_str()));
+
+      function = std::string("function()\n") +
+        "{\n" +
+        "  for (var i=0; i < this." + CSUB_ENTITIES + ".length; i++)\n" +
+        "  {\n" +
+        "    if (this."   + CSUB_ENTITIES    + "[i]."           + CSUB_ENTITY_ISPATTERN + " == \"true\" && \n" +
+        "         (this." + CSUB_ENTITIES    + "[i]."           + CSUB_ENTITY_TYPE      + " == \"" + entityType + "\" || \n" +
+        "          this." + CSUB_ENTITIES    + "[i]."           + CSUB_ENTITY_TYPE      + " == \"\" || \n" +
+        "          !(\""  + CSUB_ENTITY_TYPE + "\" in this."    + CSUB_ENTITIES         + "[i])) && \n" +
+        "            \""  + entityId         + "\".match(this." + CSUB_ENTITIES         + "[i]." + CSUB_ENTITY_ID + "))\n" +
+        "    {\n"               +
+        "      if (this." + CSUB_SERVICE_PATH + " == " + "'" + servicePathV[0] + "'" + ")\n" +
+        "        return true;\n"    +
+        "      else\n"              +
+        "        return false;\n"   +
+        "    }\n"                   +
+        "  }\n"                     +
+        "  return false;\n "        +
+        "}\n";
+    }
+    else  // entire servicePath must be matched by the servicePath of the subscription
+    {
+      jsFunctionVersion = 3;
+
+      int  spathLen = strlen(servicePathV[0].c_str());
+      char spathLenString[32];
+
+      snprintf(spathLenString, sizeof(spathLenString), "%d", spathLen);
+
+      function = std::string("function()\n") +
+        "{\n" +
+        "  for (var i=0; i < this." + CSUB_ENTITIES + ".length; i++)\n" +
+        "  {\n" +
+        "    if (this."   + CSUB_ENTITIES    + "[i]."           + CSUB_ENTITY_ISPATTERN + " == \"true\" && \n" +
+        "         (this." + CSUB_ENTITIES    + "[i]."           + CSUB_ENTITY_TYPE      + " == \"" + entityType + "\" ||\n" +
+        "          this." + CSUB_ENTITIES    + "[i]."           + CSUB_ENTITY_TYPE      + " == \"\" ||\n" +
+        "          !(\""  + CSUB_ENTITY_TYPE + "\" in this."    + CSUB_ENTITIES         + "[i])) &&\n" +
+        "            \""  + entityId         + "\".match(this." + CSUB_ENTITIES         + "[i]." + CSUB_ENTITY_ID + "))\n" +
+        "    {\n"                                    +
+        "      spathLen = " + spathLenString + ";\n" +
+        "      \n"                                   +
+        "      if (this." + CSUB_SERVICE_PATH + ".substring(0, spathLen) == '" + servicePathV[0] + "'" + ")\n" +
+        "        return true;\n"    +
+        "      else\n"              +
+        "        return false;\n"   +
+        "    }\n"                   +
+        "  }\n"                     +
+        "  return false;\n"         +
+        "}\n";
+    }
+
+    LM_M(("KZ: JS function %d: %s", jsFunctionVersion, function.c_str()));
+    // LM_T(LmtMongo, ("JS function: %s", function.c_str()));
 
     BSONObjBuilder queryPattern;
     queryPattern.append(entPatternQ, "true");
@@ -1074,7 +1175,8 @@ static bool processContextAttributeVector (ContextElement*                      
                                            std::string&                               locAttr,
                                            double&                                    coordLat,
                                            double&                                    coordLong,
-                                           std::string                                tenant)
+                                           std::string                                tenant,
+                                           const std::vector<std::string>&            servicePathV)
 {
 
     EntityId*   eP         = &cerP->contextElement.entityId;
@@ -1236,7 +1338,7 @@ static bool processContextAttributeVector (ContextElement*                      
          * is "bypassed" */
         if (actualUpdate) {
             std::string err;
-            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant))
+            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant, servicePathV))
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
               return false;
@@ -1655,7 +1757,7 @@ void processContextElement(ContextElement*                      ceP,
             coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant)) {
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
@@ -1852,7 +1954,7 @@ void processContextElement(ContextElement*                      ceP,
           {
             std::string err;
 
-            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, subsToNotify, err, tenant))
+            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, subsToNotify, err, tenant, servicePathV))
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
               responseP->contextElementResponseVector.push_back(cerP);
