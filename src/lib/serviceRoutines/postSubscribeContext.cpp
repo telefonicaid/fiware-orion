@@ -48,11 +48,13 @@ std::string postSubscribeContext
   SubscribeContextResponse  scr;
   std::string               answer;
 
-  // FIXME P6: by the moment, we are assuming that notification will be sent in the same format than the one
+  //
+  // FIXME P6: for the moment, we are assuming that notification will be sent in the same format as the one
   // used to do the subscription, so we are passing ciP->inFomat. This is just an heuristic, the client could want
-  // for example to use XML in the subscription message but wants notifications in JSON. We need a more
-  // flexible approach, to be implemented
-  ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken);
+  // for example to use XML in the subscription message but wanting notifications in JSON. We need a more
+  // flexible approach, to be implemented. Perhaps a URL parameter '?notifyFormat=JSON/XML'.
+  //
+  ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePath);
   answer = scr.render(SubscribeContext, ciP->outFormat, "");
 
   return answer;
