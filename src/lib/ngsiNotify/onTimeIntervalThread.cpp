@@ -94,6 +94,10 @@ static void doNotification(OnIntervalThreadParams* params, const std::string& te
                 HttpStatusCode s = mongoUpdateCsubNewNotification(params->subId, &err, tenant);
                 if (s == SccOk)
                 {
+                  // FIXME P6: Note that the X-Auth-Token is left blank in this case.
+                  //           In the future, the ONTIMEINTERVAL notification struture *could* include it
+                  //           (and a TRUST_TOKEN to re-negotiate X-Auth-Token if it gets expired)"
+                  //
                   params->notifier->sendNotifyContextRequest(&ncr, csi.url, tenant, "", csi.format);
                 }
 
