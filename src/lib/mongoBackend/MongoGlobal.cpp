@@ -704,7 +704,7 @@ static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP)
 * can be seen as a query on "/#" considering that entities without servicePath are implicitly
 * assigned to "/" service path.
 */
-static BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
+BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 {
 
   /* Due to limitations in the BSONArrayBuilder class (that hopefully will be solved in legacy-1.0.0
