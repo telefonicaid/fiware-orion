@@ -140,7 +140,18 @@ std::string postQueryContext
   std::string     resource     = prefix + "/queryContext";
   std::string     tenant       = ciP->tenant;
 
-  out = sendHttpSocket(ip, port, protocol, verb, tenant, ciP->httpHeaders.servicePath, resource, "application/xml", payload, false, true);
+  out = sendHttpSocket(ip,
+                       port,
+                       protocol,
+                       verb,
+                       tenant,
+                       ciP->httpHeaders.servicePath,
+                       ciP->httpHeaders.xauthToken,
+                       resource,
+                       "application/xml",
+                       payload,
+                       false,
+                       true);
 
   if ((out == "error") || (out == ""))
   {

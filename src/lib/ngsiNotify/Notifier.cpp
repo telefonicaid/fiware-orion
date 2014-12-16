@@ -60,7 +60,7 @@ Notifier::~Notifier (void)
 *
 * Notifier::sendNotifyContextRequest -
 */
-void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, Format format)
+void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format)
 {
     ConnectionInfo ci;
 
@@ -99,7 +99,18 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string content_type = (format == XML)? "application/xml" : "application/json";
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, spathList, uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host,
+                   port,
+                   protocol,
+                   "POST",
+                   tenant,
+                   spathList,
+                   xauthToken,
+                   uriPath,
+                   content_type,
+                   payload,
+                   true,
+                   NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -112,6 +123,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     params->verb          = "POST";
     params->tenant        = tenant;
     params->servicePath   = spathList;
+    params->xauthToken    = xauthToken;
     params->resource      = uriPath;
     params->content_type  = content_type;
     params->content       = payload;
@@ -157,7 +169,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    sendHttpSocket(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD

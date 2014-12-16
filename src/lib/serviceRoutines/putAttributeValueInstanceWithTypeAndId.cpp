@@ -113,7 +113,7 @@ std::string putAttributeValueInstanceWithTypeAndId
   request.updateActionType.set("UPDATE");
 
   response.errorCode.code = SccNone;
-  ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
 
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)

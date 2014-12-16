@@ -54,11 +54,12 @@ extern std::string sendHttpSocket
   const std::string&     verb,
   const std::string&     tenant,
   const std::string&     servicePath,
+  const std::string&     xauthToken,
   const std::string&     resource, 
   const std::string&     content_type, 
   const std::string&     content,
   bool                   useRush,
-  bool                   waitForResponse = true
+  bool                   waitForResponse
 );
 
 #endif

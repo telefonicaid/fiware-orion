@@ -64,7 +64,7 @@ std::string postUpdateContext
   UpdateContextResponse  upcr;
   std::string            answer;
 
-  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
 
   //
   // Checking for SccFound in the ContextElementResponseVector
@@ -151,7 +151,18 @@ std::string postUpdateContext
     std::string     resource     = prefix + "/updateContext";
     std::string     tenant       = ciP->tenant;
 
-    out = sendHttpSocket(ip, port, protocol, verb, tenant, ciP->httpHeaders.servicePath, resource, "application/xml", payloadIn, false, true);
+    out = sendHttpSocket(ip, 
+                         port,
+                         protocol,
+                         verb,
+                         tenant,
+                         ciP->httpHeaders.servicePath,
+                         ciP->httpHeaders.xauthToken,
+                         resource,
+                         "application/xml",
+                         payloadIn,
+                         false,
+                         true);
 
     // Should be safe to free up ucrP now ...
     ucrP->release();

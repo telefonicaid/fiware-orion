@@ -45,7 +45,8 @@ HttpStatusCode mongoSubscribeContext
   SubscribeContextRequest*             requestP,
   SubscribeContextResponse*            responseP,
   const std::string&                   tenant,
-  std::map<std::string, std::string>&  uriParam
+  std::map<std::string, std::string>&  uriParam,
+  const std::string&                   xauthToken
 )
 {
     std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
@@ -103,7 +104,8 @@ HttpStatusCode mongoSubscribeContext
                                              requestP->reference.get(),
                                              &notificationDone,
                                              (notifyFormat == "XML")? XML : JSON,
-                                             tenant);
+                                             tenant,
+                                             xauthToken);
     sub.append(CSUB_CONDITIONS, conds);
     if (notificationDone) {
         sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());

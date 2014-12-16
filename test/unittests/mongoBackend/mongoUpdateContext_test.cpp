@@ -356,7 +356,7 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -503,7 +503,7 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -651,7 +651,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -825,7 +825,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1002,7 +1002,7 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1164,7 +1164,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1324,7 +1324,7 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1492,7 +1492,7 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1644,7 +1644,7 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1796,7 +1796,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1984,7 +1984,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2177,7 +2177,7 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2349,7 +2349,7 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2518,7 +2518,7 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2705,7 +2705,7 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2831,7 +2831,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2973,7 +2973,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3113,7 +3113,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3227,7 +3227,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3390,7 +3390,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3557,7 +3557,7 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3711,7 +3711,7 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3860,7 +3860,7 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4009,7 +4009,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4152,7 +4152,7 @@ TEST(mongoUpdateContextRequest, createEntity)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4315,7 +4315,7 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4484,7 +4484,7 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4637,7 +4637,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4784,7 +4784,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4931,7 +4931,7 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5077,7 +5077,7 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5228,7 +5228,7 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5402,7 +5402,7 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5551,7 +5551,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5739,7 +5739,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5930,7 +5930,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6124,7 +6124,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6326,7 +6326,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6510,7 +6510,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6693,7 +6693,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6875,7 +6875,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7055,7 +7055,7 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7150,7 +7150,7 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7242,7 +7242,7 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7334,7 +7334,7 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7428,7 +7428,7 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7524,7 +7524,7 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7623,7 +7623,7 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7720,7 +7720,7 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7812,7 +7812,7 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7905,7 +7905,7 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7997,7 +7997,7 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -8092,7 +8092,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -8252,7 +8252,7 @@ TEST(mongoUpdateContextRequest, notExistFilter)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -8447,7 +8447,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -8514,7 +8514,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -8568,7 +8568,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   servicePathVector.push_back("/home/kz/01");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -8655,7 +8655,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_2levels)
   servicePathVector.push_back("/home/kz");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -8755,7 +8755,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   servicePathVector.push_back("/home/kz/01");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -8848,7 +8848,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_2levels)
   servicePathVector.push_back("/home/kz");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+  ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -8960,7 +8960,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     servicePathVector.push_back("/home/fg");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -9062,7 +9062,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     servicePathVector.push_back("/home/fg/01");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -9162,7 +9162,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_2levels)
     servicePathVector.push_back("/home/kz");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -9229,7 +9229,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     servicePathVector.push_back("/home/kz/01");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -9302,7 +9302,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   servicePathVector.push_back("/home/fg");
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoUpdateContext(&ucReq, &ucRes, "", servicePathVector, uriParams);
+  ms = mongoUpdateContext(&ucReq, &ucRes, "", servicePathVector, uriParams, "");
 
 
   /* Check response is as expected */
