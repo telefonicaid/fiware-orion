@@ -46,10 +46,12 @@ HttpStatusCode mongoSubscribeContext
   SubscribeContextResponse*            responseP,
   const std::string&                   tenant,
   std::map<std::string, std::string>&  uriParam,
-  const std::string&                   xauthToken
+  const std::string&                   xauthToken,
+  const std::vector<std::string>&      servicePathV
 )
 {
     std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
+    std::string servicePath  = (servicePathV.size() == 0)? "" : servicePathV[0];
 
     LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormat.c_str()));
 
@@ -79,6 +81,12 @@ HttpStatusCode mongoSubscribeContext
       sub.append(CSUB_THROTTLING, (long long) requestP->throttling.parse());
     }
 
+    if (servicePath != "")
+    {
+      sub.append(CSUB_SERVICE_PATH, servicePath);
+    }
+
+    
     /* Build entities array */
     BSONArrayBuilder entities;
     for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix) {

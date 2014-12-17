@@ -764,10 +764,75 @@ static bool addTriggeredSubscriptions(std::string                               
                                       std::string                               attr,
                                       std::map<string, TriggeredSubscription*>& subs,
                                       std::string&                              err,
-                                      std::string                               tenant)
+                                      std::string                               tenant,
+                                      const std::vector<std::string>&           servicePathV)
 {
+    DBClientBase*             connection      = getMongoConnection();
+    std::string               servicePath     = servicePathV[0];
+    std::vector<std::string>  spathV;
+    int                       spathComponents = 0;
+    std::string               spathRegex      = "";
 
-    DBClientBase* connection = getMongoConnection();
+    //
+    // Split Service Path in 'path components'
+    //
+    LM_M(("KZ: incoming service path: '%s'", servicePath.c_str()));
+    if (servicePath != "")
+    {
+      spathComponents = stringSplit(servicePath, '/', spathV);
+      LM_M(("KZ: %d components in incoming service path", spathComponents));
+    }
+
+    
+    //
+    // Create the REGEX for the Service Path 
+    //
+    // 1. If the incoming request is without service path, then only subscriptions without
+    //    service path is a match (without or with '/#')
+    // 2. If the incoming request has a service path, then the REGEX must be created:
+    //    - Incoming: /a1/a2/a3/a4
+    //    - REGEX: ^/#$ | ^/a1/#$ | | ^/a1/a2/#$ | /a1/a2/a3/#$
+    //
+    if (spathComponents == 0)
+    {
+      spathRegex = "^$|^\\/#$";  // FIXME NOW: Including empty service path also, not sure it's correct
+    }
+    else
+    {
+      //
+      // 1. Empty OR /#
+      //
+      spathRegex = std::string("^$|^\\/\\#$");
+
+
+
+      //
+      // 2. The whole list /a | /a/b | /a/b/c  etc
+      //
+      for (int ix = 0; ix < spathComponents; ++ix)
+      {
+        spathRegex += std::string("|^");
+
+        for (int cIx = 0; cIx <= ix; ++cIx)
+        {
+          spathRegex += std::string("\\/") + spathV[cIx];
+        }
+        spathRegex += std::string("\\/\\#$");
+      }
+
+
+      //
+      // 3. EXACT service path
+      //
+      spathRegex += std::string("|^");
+      for (int cIx = 0; cIx < spathComponents; ++cIx)
+      {
+        spathRegex += std::string("\\/") + spathV[cIx];
+      }
+      spathRegex += std::string("$");
+    }
+
+    LM_M(("KZ: REGEX: '%s'", spathRegex.c_str()));
 
     /* Build query */
     std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
@@ -785,7 +850,8 @@ static bool addTriggeredSubscriptions(std::string                               
                 entPatternQ << "false" <<
                 condTypeQ << ON_CHANGE_CONDITION <<
                 condValueQ << attr <<
-                CSUB_EXPIRATION << BSON("$gt" << (long long) getCurrentTime())
+                CSUB_EXPIRATION << BSON("$gt" << (long long) getCurrentTime()) <<
+                CSUB_SERVICE_PATH << BSON("$regex" << spathRegex)
                 );
 
     /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
@@ -814,10 +880,15 @@ static bool addTriggeredSubscriptions(std::string                               
     queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
     queryPattern.append(condValueQ, attr);
     queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+    queryPattern.append(CSUB_SERVICE_PATH, BSON("$regex" << spathRegex));
     queryPattern.appendCode("$where", function);
 
-    // FIXME: the condTypeQ and condValudeQ part can be "factorized" out of the $or clause
+    // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
     BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
+
+//    LM_M(("KZ: queryNoPattern: '%s'", queryNoPattern.obj().toString().c_str()));
+//    LM_M(("KZ: queryPattern:   '%s'", queryPattern.obj().toString().c_str()));
+    LM_M(("KZ: query:          '%s'", query.toString().c_str()));
 
     /* Do the query */
     auto_ptr<DBClientCursor> cursor;
@@ -1074,7 +1145,8 @@ static bool processContextAttributeVector (ContextElement*                      
                                            std::string&                               locAttr,
                                            double&                                    coordLat,
                                            double&                                    coordLong,
-                                           std::string                                tenant)
+                                           std::string                                tenant,
+                                           const std::vector<std::string>&            servicePathV)
 {
 
     EntityId*   eP         = &cerP->contextElement.entityId;
@@ -1236,7 +1308,7 @@ static bool processContextAttributeVector (ContextElement*                      
          * is "bypassed" */
         if (actualUpdate) {
             std::string err;
-            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant))
+            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant, servicePathV))
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
               return false;
@@ -1655,7 +1727,7 @@ void processContextElement(ContextElement*                      ceP,
             coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant)) {
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
@@ -1852,7 +1924,7 @@ void processContextElement(ContextElement*                      ceP,
           {
             std::string err;
 
-            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, subsToNotify, err, tenant))
+            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, subsToNotify, err, tenant, servicePathV))
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
               responseP->contextElementResponseVector.push_back(cerP);

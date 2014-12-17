@@ -717,6 +717,14 @@ static int connectionTreat
 
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
 
+#if 1
+    if (ciP->httpHeaders.servicePathReceived == true)
+      LM_M(("KZ: incoming %s %s (%s)", method, url, ciP->httpHeaders.servicePath.c_str()));
+    else
+      LM_M(("KZ: incoming %s %s (NO Service Path)", method, url));
+    LM_M(("KZ: ----------------------------------------------------------------------------------------------------"));
+#endif
+
     char tenant[128];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));

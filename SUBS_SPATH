@@ -1,0 +1,89 @@
+1. TEST (See test/functionalTest/cases/675_servicePath_in_ngsi10_subscriptions/simple_ngsi10_subscriptions_with_service_path.test en la rama feature/675_ngsi10_subscriptions_with_servicePath)
+
+#
+# 01. Make accumulator subscribe to all entities of Service Path /Madrid
+# 02. Create entity E/T1 with Service Path /Madrid
+# 03. Create entity E/T2 with Service Path /Barcelona
+# 04. Check that the accumulator received the notification of E/T1 only
+#
+
+
+==========================================================================================
+
+2. Mongo:
+
+> db.entities.find()  # removed creDate & modDate
+{ "_id" : { "id" : "E", "type" : "T1", "servicePath" : "/Madrid"    }, "attrs" : [ { "name" : "A1",  "type" : "AT",  "value" : "V" } ] }
+{ "_id" : { "id" : "E", "type" : "T2", "servicePath" : "/Barcelona" }, "attrs" : [ { "name" : "A1",  "type" : "AT",  "value" : "V" } ] }
+
+> db.csubs.find()
+{
+  "expiration" : NumberLong(1421421662),
+  "reference" : "http://127.0.0.1:9997/notify",
+  "throttling" : NumberLong(1),
+  "servicePath" : "/Madrid/#",
+  "entities" :
+  [
+    {
+      "id" : "E",
+      "type" : "",
+      "isPattern" : "false"
+    }
+  ],
+  "attrs" :[ "A1" ],
+  "conditions" :
+  [
+    {  
+      "type" : "ONCHANGE",
+      "value" : [  "A1" ]
+    }
+  ],
+  "format" : "JSON"
+}
+
+==========================================================================================
+
+3. Traces:
+
+incoming POST /v1/subscribeContext (/Madrid/#)
+----------------------------------------------------------
+
+incoming POST /v1/contextEntities/type/T1/id/E (/Madrid)
+----------------------------------------------------------
+incoming service path: '/Madrid'
+1 components in incoming service path
+REGEX: '^$|^\/\#$|^\/Madrid\/\#$|^\/Madrid$'
+query:
+{
+  $or:
+  [
+    {
+      entities.id: "E",
+      $or:
+      [
+        {
+          entities.type: "T1" 
+        },
+        {
+          entities.type: { $exists: false }
+        }
+      ],
+      entities.isPattern:  "false",
+      conditions.type:     "ONCHANGE",
+      conditions.value:    "A1",
+      expiration:          { $gt: 1418829662 },
+      servicePath:         { $regex: "^$|^\/\#$|^\/Madrid\/\#$|^\/Madrid$" }
+    },
+    {
+      entities.isPattern: "true",
+      conditions.type:    "ONCHANGE",
+      conditions.value:   "A1",
+      expiration:         { $gt: 1418829662 },
+      servicePath:        { $regex: "^$|^\/\#$|^\/Madrid\/\#$|^\/Madrid$" },
+      $where: function(){for (var i=0; i < this.entities.length; i++) {if (this.enti... 
+    }
+  ]
+}
+
+
+... Luego lo mismo con el otro entity (Service Path /Barcelona)

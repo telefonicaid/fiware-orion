@@ -41,6 +41,15 @@ using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
+
+/* ****************************************************************************
+*
+* servicePathV - empty service path vector used for these tests 
+*/
+static const std::vector<std::string> servicePathV;
+
+
+
 /* ****************************************************************************
 *
 * Tests
@@ -190,7 +199,7 @@ TEST(mongoNotifyContextRequest, Ent1Attr1)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -331,7 +340,7 @@ TEST(mongoNotifyContextRequest, Ent1AttrN)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -475,7 +484,7 @@ TEST(mongoNotifyContextRequest, EntNAttr1)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -623,7 +632,7 @@ TEST(mongoNotifyContextRequest, EntNAttrN)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -762,7 +771,7 @@ TEST(mongoNotifyContextRequest, createEntity)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContext(&req, &res);
+    ms = mongoNotifyContext(&req, &res, "", "", servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

@@ -106,6 +106,7 @@ using namespace mongo;
 #define CSUB_ENTITY_ISPATTERN   "isPattern"
 #define CSUB_COUNT              "count"
 #define CSUB_FORMAT             "format"
+#define CSUB_SERVICE_PATH       "servicePath"
 
 #define CASUB_EXPIRATION        "expiration"
 #define CASUB_REFERENCE         "reference"
