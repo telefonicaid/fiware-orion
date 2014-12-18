@@ -1523,22 +1523,23 @@ AttributeList subToAttributeList(BSONObj sub) {
 */
 bool processOnChangeCondition
 (
-  EntityIdVector      enV,
-  AttributeList       attrL,
-  ConditionValueList* condValues,
-  std::string         subId,
-  std::string         notifyUrl,
-  Format              format,
-  std::string         tenant,
-  const std::string&  xauthToken
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  ConditionValueList*              condValues,
+  std::string                      subId,
+  std::string                      notifyUrl,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV
 )
 {
   std::string          err;
   NotifyContextRequest ncr;
 
+    //
     // FIXME P10: we are using dummy scope at the moment, until subscription scopes get implemented
-    // FIXME P10: we are using an empty service path vector until service paths get implemented for subscriptions
-    std::vector<std::string> servicePathV;
+    //
     Restriction res;    
     if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, servicePathV))
     {
@@ -1602,7 +1603,19 @@ void processOntimeIntervalCondition(std::string subId, int interval, std::string
 * processConditionVector -
 *
 */
-BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant, const std::string& xauthToken)
+BSONArray processConditionVector
+(
+  NotifyConditionVector*           ncvP,
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  std::string                      subId,
+  std::string                      url,
+  bool*                            notificationDone,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV
+)
 {
     BSONArrayBuilder conds;
     *notificationDone = false;
@@ -1638,7 +1651,8 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
                                          url,
                                          format,
                                          tenant,
-                                         xauthToken))
+                                         xauthToken,
+                                         servicePathV))
             {
               *notificationDone = true;
             }

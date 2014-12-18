@@ -113,7 +113,8 @@ HttpStatusCode mongoSubscribeContext
                                              &notificationDone,
                                              (notifyFormat == "XML")? XML : JSON,
                                              tenant,
-                                             xauthToken);
+                                             xauthToken,
+                                             servicePathV);
     sub.append(CSUB_CONDITIONS, conds);
     if (notificationDone) {
         sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());

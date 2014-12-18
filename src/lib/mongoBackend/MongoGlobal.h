@@ -383,14 +383,15 @@ extern void processOntimeIntervalCondition(std::string subId, int interval, std:
 */
 extern bool processOnChangeCondition
 (
-  EntityIdVector       enV,
-  AttributeList        attrV,
-  ConditionValueList*  condValues,
-  std::string          subId,
-  std::string          notifyUrl,
-  Format               format,
-  std::string          tenant,
-  const std::string&   xauthToken
+  EntityIdVector                   enV,
+  AttributeList                    attrV,
+  ConditionValueList*              condValues,
+  std::string                      subId,
+  std::string                      notifyUrl,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV
 );
 
 /* ****************************************************************************
@@ -398,7 +399,19 @@ extern bool processOnChangeCondition
 * processConditionVector -
 *
 */
-extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant, const std::string& xauthToken);
+extern BSONArray processConditionVector
+(
+  NotifyConditionVector*           ncvP,
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  std::string                      subId,
+  std::string                      url,
+  bool*                            notificationDone,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV
+);
 
 /* ****************************************************************************
 *

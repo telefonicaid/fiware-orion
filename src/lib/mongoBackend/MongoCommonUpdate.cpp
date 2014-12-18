@@ -979,7 +979,8 @@ static bool processSubscriptions(const EntityId*                           enP,
                                  std::map<string, TriggeredSubscription*>& subs,
                                  std::string&                              err,
                                  std::string                               tenant,
-                                 const std::string&                        xauthToken)
+                                 const std::string&                        xauthToken,
+                                 std::vector<std::string>                  servicePathV)
 {
 
     DBClientBase* connection = getMongoConnection();
@@ -1018,7 +1019,8 @@ static bool processSubscriptions(const EntityId*                           enP,
                                      trigs->reference,
                                      trigs->format,
                                      tenant,
-                                     xauthToken))
+                                     xauthToken,
+                                     servicePathV))
         {
 
             BSONObj query = BSON("_id" << OID(mapSubId));
@@ -1824,7 +1826,7 @@ void processContextElement(ContextElement*                      ceP,
         /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
-        processSubscriptions(enP, subsToNotify, err, tenant, xauthToken);
+        processSubscriptions(enP, subsToNotify, err, tenant, xauthToken, servicePathV);
 
         //
         // processSubscriptions cleans up the triggered subscriptions; this call here to
@@ -1932,7 +1934,7 @@ void processContextElement(ContextElement*                      ceP,
             }
           }
 
-          processSubscriptions(enP, subsToNotify, errReason, tenant, xauthToken);
+          processSubscriptions(enP, subsToNotify, errReason, tenant, xauthToken, servicePathV);
         }
 
         responseP->contextElementResponseVector.push_back(cerP);
