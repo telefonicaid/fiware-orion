@@ -756,6 +756,73 @@ static bool deleteAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 
 /* ****************************************************************************
 *
+* servicePathSubscriptionRegex - 
+*
+* 1. If the incoming request is without service path, then only subscriptions without
+*    service path is a match (without or with '/#', or '/')
+* 2. If the incoming request has a service path, then the REGEX must be created:
+*    - Incoming: /a1/a2/a3
+*    - REGEX: ^/#$ | ^/a1/#$ | | ^/a1/a2/#$ | ^/a1/a2/a3/#$ | ^/a1/a2/a3$
+*
+*/
+std::string servicePathSubscriptionRegex(const std::string servicePath, std::vector<std::string>& spathV)
+{
+  std::string  spathRegex;
+  int          spathComponents;
+
+
+  //
+  // Split Service Path in 'path components'
+  //
+  if (servicePath != "")
+  {
+    spathComponents = stringSplit(servicePath, '/', spathV);
+  }
+
+  if (spathComponents == 0)
+  {
+    spathRegex = "^$|^\\/#$|^\\/$";  // FIXME NOW: Including empty service path also, not sure it's correct
+  }
+  else
+  {
+    //
+    // 1. Empty or '/#'
+    //
+    spathRegex = std::string("^$|^\\/\\#$");
+
+
+
+    //
+    // 2. The whole list /a | /a/b | /a/b/c  etc
+    //
+    for (int ix = 0; ix < spathComponents; ++ix)
+    {
+      spathRegex += std::string("|^");
+
+      for (int cIx = 0; cIx <= ix; ++cIx)
+      {
+        spathRegex += std::string("\\/") + spathV[cIx];
+      }
+      spathRegex += std::string("\\/\\#$");
+    }
+    
+
+    //
+    // 3. EXACT service path
+    //
+    spathRegex += std::string("|^");
+    for (int cIx = 0; cIx < spathComponents; ++cIx)
+    {
+      spathRegex += std::string("\\/") + spathV[cIx];
+    }
+    spathRegex += std::string("$");
+  }
+
+  return spathRegex;
+}
+
+/* ****************************************************************************
+*
 * addTriggeredSubscriptions
 *
 */
@@ -768,67 +835,17 @@ static bool addTriggeredSubscriptions(std::string                               
                                       const std::vector<std::string>&           servicePathV)
 {
     DBClientBase*             connection      = getMongoConnection();
-    std::string               servicePath     = servicePathV[0];
+    std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
     std::vector<std::string>  spathV;
-    int                       spathComponents = 0;
     std::string               spathRegex      = "";
-
-    //
-    // Split Service Path in 'path components'
-    //
-    if (servicePath != "")
-    {
-      spathComponents = stringSplit(servicePath, '/', spathV);
-    }
 
     
     //
     // Create the REGEX for the Service Path 
     //
-    // 1. If the incoming request is without service path, then only subscriptions without
-    //    service path is a match (without or with '/#')
-    // 2. If the incoming request has a service path, then the REGEX must be created:
-    //    - Incoming: /a1/a2/a3
-    //    - REGEX: ^/#$ | ^/a1/#$ | | ^/a1/a2/#$ | ^/a1/a2/a3/#$ | ^/a1/a2/a3$
-    //
-    if (spathComponents == 0)
-    {
-      spathRegex = "^$|^\\/#$";  // FIXME NOW: Including empty service path also, not sure it's correct
-    }
-    else
-    {
-      //
-      // 1. Empty OR /#
-      //
-      spathRegex = std::string("^$|^\\/\\#$");
+    spathRegex = servicePathSubscriptionRegex(servicePath, spathV);
+    spathRegex = std::string("/") + spathRegex + "/";
 
-
-
-      //
-      // 2. The whole list /a | /a/b | /a/b/c  etc
-      //
-      for (int ix = 0; ix < spathComponents; ++ix)
-      {
-        spathRegex += std::string("|^");
-
-        for (int cIx = 0; cIx <= ix; ++cIx)
-        {
-          spathRegex += std::string("\\/") + spathV[cIx];
-        }
-        spathRegex += std::string("\\/\\#$");
-      }
-
-
-      //
-      // 3. EXACT service path
-      //
-      spathRegex += std::string("|^");
-      for (int cIx = 0; cIx < spathComponents; ++cIx)
-      {
-        spathRegex += std::string("\\/") + spathV[cIx];
-      }
-      spathRegex += std::string("$");
-    }
 
     /* Build query */
     std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
@@ -846,9 +863,9 @@ static bool addTriggeredSubscriptions(std::string                               
                 entPatternQ << "false" <<
                 condTypeQ << ON_CHANGE_CONDITION <<
                 condValueQ << attr <<
-                CSUB_EXPIRATION << BSON("$gt" << (long long) getCurrentTime()) <<
-                CSUB_SERVICE_PATH << BSON("$regex" << spathRegex)
-                );
+                CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
+                CSUB_SERVICE_PATH << BSON("$in" << BSON_ARRAY(spathRegex << NULL))
+      );
 
     /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
      * way to do a "reverse regex" query in MongoDB (see
@@ -876,7 +893,7 @@ static bool addTriggeredSubscriptions(std::string                               
     queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
     queryPattern.append(condValueQ, attr);
     queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-    queryPattern.append(CSUB_SERVICE_PATH, BSON("$regex" << spathRegex));
+    queryPattern.appendArray(CSUB_SERVICE_PATH, BSON("$in" << BSON_ARRAY(spathRegex << NULL)));
     queryPattern.appendCode("$where", function);
 
     // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
