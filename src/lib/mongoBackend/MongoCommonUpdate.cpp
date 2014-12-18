@@ -788,8 +788,8 @@ static bool addTriggeredSubscriptions(std::string                               
     // 1. If the incoming request is without service path, then only subscriptions without
     //    service path is a match (without or with '/#')
     // 2. If the incoming request has a service path, then the REGEX must be created:
-    //    - Incoming: /a1/a2/a3/a4
-    //    - REGEX: ^/#$ | ^/a1/#$ | | ^/a1/a2/#$ | /a1/a2/a3/#$
+    //    - Incoming: /a1/a2/a3
+    //    - REGEX: ^/#$ | ^/a1/#$ | | ^/a1/a2/#$ | ^/a1/a2/a3/#$ | ^/a1/a2/a3$
     //
     if (spathComponents == 0)
     {
