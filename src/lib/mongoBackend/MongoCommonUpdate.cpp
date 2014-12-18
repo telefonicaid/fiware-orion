@@ -776,11 +776,9 @@ static bool addTriggeredSubscriptions(std::string                               
     //
     // Split Service Path in 'path components'
     //
-    LM_M(("KZ: incoming service path: '%s'", servicePath.c_str()));
     if (servicePath != "")
     {
       spathComponents = stringSplit(servicePath, '/', spathV);
-      LM_M(("KZ: %d components in incoming service path", spathComponents));
     }
 
     
@@ -831,8 +829,6 @@ static bool addTriggeredSubscriptions(std::string                               
       }
       spathRegex += std::string("$");
     }
-
-    LM_M(("KZ: REGEX: '%s'", spathRegex.c_str()));
 
     /* Build query */
     std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
@@ -885,10 +881,6 @@ static bool addTriggeredSubscriptions(std::string                               
 
     // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
     BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
-
-//    LM_M(("KZ: queryNoPattern: '%s'", queryNoPattern.obj().toString().c_str()));
-//    LM_M(("KZ: queryPattern:   '%s'", queryPattern.obj().toString().c_str()));
-    LM_M(("KZ: query:          '%s'", query.toString().c_str()));
 
     /* Do the query */
     auto_ptr<DBClientCursor> cursor;
