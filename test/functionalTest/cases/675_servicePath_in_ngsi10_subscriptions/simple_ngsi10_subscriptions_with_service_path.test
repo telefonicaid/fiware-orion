@@ -24,16 +24,16 @@ Simple NGSI10 subscriptions with service path
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0
+brokerStart CB 0-255
 accumulatorStart
 
 --SHELL--
 
 #
 # 01. Make accumulator subscribe to all entities of Service Path /Madrid
-# 02. Create entity E/T1 with Service Path /Madrid
-# 03. Create entity E/T2 with Service Path /Barcelona
-# 04. Check that the accumulator received the notification of E/T1 only
+# 02. Create entity E/T with Service Path /Madrid
+# 03. Create entity E/T with Service Path /Barcelona
+# 04. Check that the accumulator received the notification of E/T Madrid only
 #
 
 
@@ -43,7 +43,8 @@ payload='{
   "entities": [
     {
         "isPattern": "false",
-        "id": "E"
+        "id": "E",
+        "type": "T"
     }
   ],
   "attributes": [
@@ -66,40 +67,40 @@ echo
 echo
 
 
-echo "02. Create entity E/T1 with Service Path /Madrid"
-echo "================================================"
+echo "02. Create entity E/T with Service Path /Madrid"
+echo "==============================================="
 payload='{
   "attributes" : [
     {
       "name" : "A1",
       "type" : "AT",
-      "value" : "V"
+      "value" : "Madrid"
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T1/id/E --payload "${payload}" --servicePath /Madrid --json
+orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Madrid --json
 echo
 echo
 
 
-echo "03. Create entity E/T2 with Service Path /Barcelona"
-echo "================================================="
+echo "03. Create entity E/T with Service Path /Barcelona"
+echo "=================================================="
 payload='{
   "attributes" : [
     {
       "name" : "A1",
       "type" : "AT",
-      "value" : "V"
+      "value" : "Barcelona"
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T2/id/E --payload "${payload}" --servicePath /Barcelona --json
+orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Barcelona --json
 echo
 echo
 
 
-echo "04. Check that the accumulator received the initial notification of E/T1 only"
-echo "==========================================================================="
+echo "04. Check that the accumulator received the initial notification of E/T Madrid only"
+echo "==================================================================================="
 sleep 1
 curl localhost:${LISTENER_PORT}/dump -s -S
 echo
@@ -123,10 +124,10 @@ Date: REGEX(.*)
 }
 
 
-02. Create entity E1 with Service Path /Madrid
-==============================================
+02. Create entity E/T with Service Path /Madrid
+===============================================
 HTTP/1.1 200 OK
-Content-Length: 311
+Content-Length: 310
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -146,16 +147,16 @@ Date: REGEX(.*)
             }
         }
     ], 
-    "id": "E1", 
+    "id": "E", 
     "isPattern": "false", 
     "type": "T"
 }
 
 
-03. Create entity E2 with Service Path /Barcelona
-=================================================
+03. Create entity E/T with Service Path /Barcelona
+==================================================
 HTTP/1.1 200 OK
-Content-Length: 311
+Content-Length: 310
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -175,17 +176,17 @@ Date: REGEX(.*)
             }
         }
     ], 
-    "id": "E2", 
+    "id": "E", 
     "isPattern": "false", 
     "type": "T"
 }
 
 
-04. Check that the accumulator received the initial notification of E1 only
-===========================================================================
+04. Check that the accumulator received the initial notification of E/T Madrid only
+===================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /Madrid
-Content-Length: 
+Content-Length: 462
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -199,12 +200,12 @@ Content-Type: application/json
       "contextElement" : {
         "type" : "T",
         "isPattern" : "false",
-        "id" : "E1",
+        "id" : "E",
         "attributes" : [
           {
             "name" : "A1",
             "type" : "AT",
-            "value" : "V"
+            "value" : "Madrid"
           }
         ]
       },
