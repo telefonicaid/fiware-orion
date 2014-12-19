@@ -853,6 +853,12 @@ static bool addTriggeredSubscriptions(std::string                               
     std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
     std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
     std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
+    // std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
+    std::string inRegex      = "{$in: [ /^\\/.*/, null] }";
+
+    LM_M(("KZ: Calling fromjson with '%s'", inRegex.c_str()));
+    BSONObj     spBson       = fromjson(inRegex);
+    LM_M(("KZ: Back from fromjson"));
 
     /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
     BSONObj queryNoPattern = BSON(
@@ -864,8 +870,7 @@ static bool addTriggeredSubscriptions(std::string                               
                 condTypeQ << ON_CHANGE_CONDITION <<
                 condValueQ << attr <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
-                CSUB_SERVICE_PATH << BSON("$in" << BSON_ARRAY(spathRegex << NULL))
-      );
+                CSUB_SERVICE_PATH << spBson);
 
     /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
      * way to do a "reverse regex" query in MongoDB (see
@@ -893,7 +898,7 @@ static bool addTriggeredSubscriptions(std::string                               
     queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
     queryPattern.append(condValueQ, attr);
     queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-    queryPattern.appendArray(CSUB_SERVICE_PATH, BSON("$in" << BSON_ARRAY(spathRegex << NULL)));
+    queryPattern.append(CSUB_SERVICE_PATH, spBson);
     queryPattern.appendCode("$where", function);
 
     // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
