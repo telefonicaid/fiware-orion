@@ -788,7 +788,7 @@ std::string servicePathSubscriptionRegex(const std::string servicePath, std::vec
     //
     // 1. Empty or '/#'
     //
-    spathRegex = std::string("^$|^\\/\\#$");
+    spathRegex = std::string("^$|^\\/#$");
 
 
 
@@ -803,7 +803,7 @@ std::string servicePathSubscriptionRegex(const std::string servicePath, std::vec
       {
         spathRegex += std::string("\\/") + spathV[cIx];
       }
-      spathRegex += std::string("\\/\\#$");
+      spathRegex += std::string("\\/#$");
     }
     
 
@@ -858,9 +858,9 @@ static bool addTriggeredSubscriptions(std::string                               
     std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
     std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
     std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
-    std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
     LM_M(("KZ: In addTriggeredSubscriptions"));
-    // std::string inRegex      = "{$in: [ /^\\/.*/, null] }";
+    std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
+    // std::string inRegex      = "{$in: [ /^$|^\\/#$|^\\/.*/, null] }";
 
     LM_M(("KZ: Calling fromjson with '%s'", inRegex.c_str()));
     BSONObj     spBson       = fromjson(inRegex);
