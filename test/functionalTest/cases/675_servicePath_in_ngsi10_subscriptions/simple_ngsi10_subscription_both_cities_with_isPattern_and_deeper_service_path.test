@@ -217,11 +217,11 @@ Content-Type: application/json
   ]
 }
 =======================================
-POST http://127.0.0.1:9997/notify
+POST http://127.0.0.1:REGEX(\d+)/notify
 Fiware-Servicepath: /Spain/City/Barcelona
 Content-Length: 465
-User-Agent: orion/0.17.0-next libcurl/7.19.7
-Host: 127.0.0.1:9997
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
 Content-Type: application/json
 
