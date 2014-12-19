@@ -31,7 +31,7 @@ accumulatorStart
 --SHELL--
 
 #
-# 01. Make accumulator subscribe to all entities of Service Path /Madrid
+# 01. Make accumulator subscribe to all entities of Service Path /Madrid/#
 # 02. Create entity E/T with Service Path /Madrid
 # 03. Create entity E/T with Service Path /Barcelona
 # 04. Check that the accumulator received the notification of E/T Madrid only

@@ -30,7 +30,7 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Make accumulator subscribe to all entities of Service Path /Madrid AND /Barcelona
+# 01. Make accumulator subscribe to all entities of Service Path /Madrid/# AND /Barcelona/#
 #     This request should fail, as only *one* service-path is allowed for subscriptions.
 #
 
