@@ -1,3 +1,4 @@
+# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -30,15 +31,15 @@ accumulatorStart
 --SHELL--
 
 #
-# 01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid
+# 01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid/#
 # 02. Create entity E/T with Service Path /Spain/City/Madrid
 # 03. Create entity E/T with Service Path /Spain/City/Barcelona
 # 04. Check that the accumulator received the notification of E/T Madrid only
 #
 
 
-echo "01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid"
-echo "================================================================================="
+echo "01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid/#"
+echo "==================================================================================="
 payload='{
   "entities": [
     {
@@ -108,8 +109,8 @@ echo
 
 
 --REGEXPECT--
-01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid
-=================================================================================
+01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid/#
+===================================================================================
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
