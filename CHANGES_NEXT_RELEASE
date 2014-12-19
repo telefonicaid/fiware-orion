@@ -1,6 +1,0 @@
-Add:  Service-Path in ngsi10 notifications (Issue #674)
-Add:  Forbidden characters in the URL path are now detected (Issue #672)
-Add:  X-Auth-Token forwarded in ngsi10 notifications (Issue #673)
-Fix:  Bug: POST /v1/conextEntities didn't save the entity type (from payload) (Issue #684)
-Fix:  Service-Path is taken into account in 'GET /v1/contextTypes' and 'GET /v1/contextTypes/{entityType}' operations (Issue #676)
-Add:  Service-Path is taken into account in ngsi10 subscriptions (Issue #675)
