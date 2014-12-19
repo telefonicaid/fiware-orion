@@ -768,7 +768,7 @@ static bool deleteAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 std::string servicePathSubscriptionRegex(const std::string servicePath, std::vector<std::string>& spathV)
 {
   std::string  spathRegex;
-  int          spathComponents;
+  int          spathComponents = 0;
 
 
   //
@@ -834,17 +834,22 @@ static bool addTriggeredSubscriptions(std::string                               
                                       std::string                               tenant,
                                       const std::vector<std::string>&           servicePathV)
 {
+    LM_M(("KZ: In addTriggeredSubscriptions"));
+
     DBClientBase*             connection      = getMongoConnection();
     std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
     std::vector<std::string>  spathV;
     std::string               spathRegex      = "";
 
     
+    LM_M(("KZ: In addTriggeredSubscriptions"));
     //
     // Create the REGEX for the Service Path 
     //
     spathRegex = servicePathSubscriptionRegex(servicePath, spathV);
+    LM_M(("KZ: In addTriggeredSubscriptions"));
     spathRegex = std::string("/") + spathRegex + "/";
+    LM_M(("KZ: In addTriggeredSubscriptions"));
 
 
     /* Build query */
@@ -853,12 +858,13 @@ static bool addTriggeredSubscriptions(std::string                               
     std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
     std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
     std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
-    // std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
-    std::string inRegex      = "{$in: [ /^\\/.*/, null] }";
+    std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
+    LM_M(("KZ: In addTriggeredSubscriptions"));
+    // std::string inRegex      = "{$in: [ /^\\/.*/, null] }";
 
     LM_M(("KZ: Calling fromjson with '%s'", inRegex.c_str()));
     BSONObj     spBson       = fromjson(inRegex);
-    LM_M(("KZ: Back from fromjson"));
+    LM_M(("KZ: Back from fromjson - creating queryNoPattern"));
 
     /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
     BSONObj queryNoPattern = BSON(
@@ -871,6 +877,8 @@ static bool addTriggeredSubscriptions(std::string                               
                 condValueQ << attr <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
                 CSUB_SERVICE_PATH << spBson);
+
+    LM_M(("KZ: queryNoPattern created"));
 
     /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
      * way to do a "reverse regex" query in MongoDB (see
@@ -893,6 +901,7 @@ static bool addTriggeredSubscriptions(std::string                               
          "}";
     LM_T(LmtMongo, ("JS function: %s", function.c_str()));
 
+    LM_M(("KZ: Creating queryPattern"));
     BSONObjBuilder queryPattern;
     queryPattern.append(entPatternQ, "true");
     queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
@@ -900,9 +909,11 @@ static bool addTriggeredSubscriptions(std::string                               
     queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
     queryPattern.append(CSUB_SERVICE_PATH, spBson);
     queryPattern.appendCode("$where", function);
+    LM_M(("KZ: queryPattern created"));
 
     // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
     BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
+    LM_M(("KZ: query created"));
 
     /* Do the query */
     auto_ptr<DBClientCursor> cursor;
@@ -944,6 +955,7 @@ static bool addTriggeredSubscriptions(std::string                               
         return false;
     }
 
+    LM_M(("KZ: HERE"));
     /* For each one of the subscriptions found, add it to the map (if not already there) */
     while (cursor->more()) {
 
@@ -980,8 +992,8 @@ static bool addTriggeredSubscriptions(std::string                               
         }
     }
 
+    LM_M(("KZ: Done"));
     return true;
-
 }
 
 /* ****************************************************************************
@@ -1164,6 +1176,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                            std::string                                tenant,
                                            const std::vector<std::string>&            servicePathV)
 {
+  LM_M(("KZ: In processContextAttributeVector"));
 
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
@@ -1324,11 +1337,14 @@ static bool processContextAttributeVector (ContextElement*                      
          * is "bypassed" */
         if (actualUpdate) {
             std::string err;
+            LM_M(("KZ: In processContextAttributeVector: calling addTriggeredSubscriptions"));
             if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant, servicePathV))
             {
+              LM_M(("KZ: Here - leaving processContextAttributeVector"));
               cerP->statusCode.fill(SccReceiverInternalError, err);
               return false;
             }
+            LM_M(("KZ: Still in processContextAttributeVector"));
         }
 
     }
@@ -1724,6 +1740,7 @@ void processContextElement(ContextElement*                      ceP,
          * BSONObj, which is an inmutable type. FIXME P6: try to improve this */
         BSONObj attrs = r.getField(ENT_ATTRS).embeddedObject();
 
+        LM_M(("KZ: HERE"));
         /* We accumulate the subscriptions in a map. The key of the map is the string representing
          * subscription id */
         std::map<string, TriggeredSubscription*> subsToNotify;
@@ -1743,13 +1760,16 @@ void processContextElement(ContextElement*                      ceP,
             coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
+        LM_M(("KZ: HERE"));
         if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV)) {
+          LM_M(("KZ: HERE"));
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
             continue;
         }
 
+        LM_M(("KZ: HERE"));
         /* Now that attrs contains the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
         LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
@@ -1763,6 +1783,7 @@ void processContextElement(ContextElement*                      ceP,
             updateUnset.append(ENT_LOCATION, 1);
         }
 
+        LM_M(("KZ: HERE"));
         /* We use $set/$unset to avoid doing a global update that will lose the creation date field. Set if always
            present, unset only if locAttr was erased */
         BSONObj updatedEntity;
@@ -1786,6 +1807,7 @@ void processContextElement(ContextElement*                      ceP,
         else
           bob.append(typeString, entityType);
         
+        LM_M(("KZ: HERE"));
         // The servicePath of THIS object is entitySPath        
         char espath[MAX_SERVICE_NAME_LEN];
         slashEscape(entitySPath.c_str(), espath, sizeof(espath));
@@ -1798,6 +1820,7 @@ void processContextElement(ContextElement*                      ceP,
         
         BSONObj query = bob.obj();
 
+        LM_M(("KZ: HERE"));
         try
         {
             LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getEntitiesCollectionName(tenant).c_str(),
@@ -1859,6 +1882,7 @@ void processContextElement(ContextElement*                      ceP,
     LM_T(LmtServicePath, ("Docs found: %d", docs));
 
 
+        LM_M(("KZ: HERE"));
     /*
      * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()
      * before the query() to check this. However this would add a second interaction with MongoDB.
@@ -1944,6 +1968,7 @@ void processContextElement(ContextElement*                      ceP,
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
               responseP->contextElementResponseVector.push_back(cerP);
+              LM_M(("KZ: FROM"));
               return;
             }
           }
@@ -1954,4 +1979,6 @@ void processContextElement(ContextElement*                      ceP,
         responseP->contextElementResponseVector.push_back(cerP);
       }
     }
+
+    LM_M(("KZ: FROM"));
 }
