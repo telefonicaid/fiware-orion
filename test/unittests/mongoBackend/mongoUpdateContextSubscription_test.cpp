@@ -160,6 +160,14 @@ using ::testing::Return;
 
 /* ****************************************************************************
 *
+* emptyServicePathV -
+*
+* Empty vector of service paths, sent to mongoSubscribeContext during tests.
+*/
+static std::vector<std::string> emptyServicePathV;
+
+/* ****************************************************************************
+*
 * prepareDatabase -
 */
 static void prepareDatabase(void) {
@@ -560,7 +568,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -611,7 +619,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -708,7 +716,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -792,7 +800,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -880,7 +888,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -963,7 +971,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, JSON);
+    ms = mongoUpdateContextSubscription(&req, &res, JSON, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1046,7 +1054,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T1_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1136,7 +1144,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1227,7 +1235,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1315,7 +1323,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1400,7 +1408,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1489,7 +1497,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1580,7 +1588,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1669,7 +1677,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1762,7 +1770,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1860,7 +1868,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1965,7 +1973,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2067,7 +2075,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2174,7 +2182,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2268,7 +2276,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T1_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2358,7 +2366,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T1_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2453,7 +2461,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2548,7 +2556,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_C0)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2640,7 +2648,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2729,7 +2737,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2822,7 +2830,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2917,7 +2925,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3009,7 +3017,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3106,7 +3114,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3208,7 +3216,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3317,7 +3325,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3423,7 +3431,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3534,7 +3542,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3653,7 +3661,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3758,7 +3766,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, JSON);
+    ms = mongoUpdateContextSubscription(&req, &res, JSON, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3861,7 +3869,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3966,7 +3974,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4087,7 +4095,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4208,7 +4216,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4320,7 +4328,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4432,7 +4440,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4558,7 +4566,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4684,7 +4692,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4794,7 +4802,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -4908,7 +4916,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5021,7 +5029,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5128,7 +5136,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5242,7 +5250,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5356,7 +5364,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5468,7 +5476,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5586,7 +5594,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5711,7 +5719,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5831,7 +5839,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -5956,7 +5964,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6078,7 +6086,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6191,7 +6199,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6312,7 +6320,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6435,7 +6443,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6551,7 +6559,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6670,7 +6678,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6798,7 +6806,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -6933,7 +6941,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7061,7 +7069,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7194,7 +7202,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7298,7 +7306,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7387,7 +7395,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     mongoConnect(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -7454,7 +7462,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     mongoConnect(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res);
+    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

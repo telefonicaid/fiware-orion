@@ -46,7 +46,8 @@ HttpStatusCode mongoUpdateContextSubscription
   UpdateContextSubscriptionResponse*  responseP,
   Format                              inFormat,
   const std::string&                  tenant,
-  const std::string&                  xauthToken
+  const std::string&                  xauthToken,
+  const std::vector<std::string>&     servicePathV
 )
 {
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request");
@@ -178,7 +179,9 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 &notificationDone,
                                                 inFormat,
                                                 tenant,
-                                                xauthToken);
+                                                xauthToken,
+                                                servicePathV);
+
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
        /* Remove EntityIdVector and AttributeList dynamic memory */

@@ -36,10 +36,11 @@
 */
 HttpStatusCode mongoNotifyContext
 (
-  NotifyContextRequest*   requestP,
-  NotifyContextResponse*  responseP,
-  const std::string&      tenant,
-  const std::string&      xauthToken
+  NotifyContextRequest*            requestP,
+  NotifyContextResponse*           responseP,
+  const std::string&               tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV
 )
 {
     reqSemTake(__FUNCTION__, "ngsi10 notification");
@@ -48,22 +49,15 @@ HttpStatusCode mongoNotifyContext
      * to do with them */
 
     /* Process each ContextElement */
-    for (unsigned int ix = 0; ix < requestP->contextElementResponseVector.size(); ++ix) {
-        /* We use 'ucr' to conform processContextElement signature but we are not doing anything with that */
-        UpdateContextResponse ucr;
-
-        // FIXME P10: we need to pass an empty service path vector and uriParmas in order to fulfill the processContextElement signature(). To review,
-        // once we implement service path also for subscriptions/notifications
-        std::vector<std::string> servicePathV;
+    for (unsigned int ix = 0; ix < requestP->contextElementResponseVector.size(); ++ix)
+    {
+        // We use 'ucr' to conform to processContextElement signature but we are not doing anything with that
+        UpdateContextResponse  ucr;
+        ContextElement*        ceP = &requestP->contextElementResponseVector.get(ix)->contextElement;
+        // FIXME P10: we pass an empty uriParmas in order to fulfill the processContextElement signature().
         std::map<std::string, std::string> uriParams;
 
-        processContextElement(&requestP->contextElementResponseVector.get(ix)->contextElement,
-                              &ucr,
-                              "append",
-                              tenant,
-                              servicePathV,
-                              uriParams,
-                              xauthToken);
+        processContextElement(ceP, &ucr, "append", tenant, servicePathV, uriParams, xauthToken);
     }
 
     reqSemGive(__FUNCTION__, "ngsi10 notification");
