@@ -20,7 +20,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Simple NGSI10 subscriptions with service path
+Simple NGSI10 subscription with isPattern and deeper service path
 
 --SHELL-INIT--
 dbInit CB
@@ -30,20 +30,20 @@ accumulatorStart
 --SHELL--
 
 #
-# 01. Make accumulator subscribe to all entities of Service Path /Madrid
-# 02. Create entity E/T with Service Path /Madrid
-# 03. Create entity E/T with Service Path /Barcelona
+# 01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid
+# 02. Create entity E/T with Service Path /Spain/City/Madrid
+# 03. Create entity E/T with Service Path /Spain/City/Barcelona
 # 04. Check that the accumulator received the notification of E/T Madrid only
 #
 
 
-echo "01. Make accumulator subscribe to all entities of Service Path /Madrid"
-echo "======================================================================"
+echo "01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid"
+echo "================================================================================="
 payload='{
   "entities": [
     {
-        "isPattern": "false",
-        "id": "E",
+        "isPattern": "true",
+        "id": ".*",
         "type": "T"
     }
   ],
@@ -62,13 +62,13 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --servicePath "/Madrid/#" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}" --servicePath "/Spain/City/Madrid/#" --json
 echo
 echo
 
 
-echo "02. Create entity E/T with Service Path /Madrid"
-echo "==============================================="
+echo "02. Create entity E/T with Service Path /Spain/City/Madrid"
+echo "=========================================================="
 payload='{
   "attributes" : [
     {
@@ -78,13 +78,13 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Madrid --json
+orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Spain/City/Madrid --json
 echo
 echo
 
 
-echo "03. Create entity E/T with Service Path /Barcelona"
-echo "=================================================="
+echo "03. Create entity E/T with Service Path /Spain/City/Barcelona"
+echo "============================================================="
 payload='{
   "attributes" : [
     {
@@ -94,7 +94,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Barcelona --json
+orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Spain/City/Barcelona --json
 echo
 echo
 
@@ -108,8 +108,8 @@ echo
 
 
 --REGEXPECT--
-01. Make accumulator subscribe to all entities of Service Path /Madrid
-======================================================================
+01. Make accumulator subscribe to all entities of Service Path /Spain/City/Madrid
+=================================================================================
 HTTP/1.1 200 OK
 Content-Length: 135
 Content-Type: application/json
@@ -124,8 +124,8 @@ Date: REGEX(.*)
 }
 
 
-02. Create entity E/T with Service Path /Madrid
-===============================================
+02. Create entity E/T with Service Path /Spain/City/Madrid
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: 310
 Content-Type: application/json
@@ -153,8 +153,8 @@ Date: REGEX(.*)
 }
 
 
-03. Create entity E/T with Service Path /Barcelona
-==================================================
+03. Create entity E/T with Service Path /Spain/City/Barcelona
+=============================================================
 HTTP/1.1 200 OK
 Content-Length: 310
 Content-Type: application/json
@@ -185,7 +185,7 @@ Date: REGEX(.*)
 04. Check that the accumulator received the initial notification of E/T Madrid only
 ===================================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /Madrid
+Fiware-Servicepath: /Spain/City/Madrid
 Content-Length: 462
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)

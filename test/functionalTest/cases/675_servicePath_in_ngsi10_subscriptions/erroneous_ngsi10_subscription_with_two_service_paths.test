@@ -20,7 +20,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Simple NGSI10 subscriptions with service path
+Erroneous simple NGSI10 subscription with service path of two items
 
 --SHELL-INIT--
 dbInit CB
@@ -30,7 +30,7 @@ brokerStart CB 0-255
 
 #
 # 01. Make accumulator subscribe to all entities of Service Path /Madrid AND /Barcelona
-#     This request shouldfail, as only *one* ervice-path is allowedfor subscriptions.
+#     This request should fail, as only *one* service-path is allowed for subscriptions.
 #
 
 
