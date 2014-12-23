@@ -60,6 +60,14 @@ using std::auto_ptr;
 
 /* ****************************************************************************
 *
+* OtisTreatFunction - callback signature for treatOntimeintervalSubscriptions
+*/
+typedef void (*OtisTreatFunction)(std::string tenant, BSONObj* bobjP);
+
+
+
+/* ****************************************************************************
+*
 * Globals
 */
 static DBClientBase*        connection;
@@ -454,13 +462,13 @@ void ensureLocationIndex(std::string tenant) {
 
 /* ****************************************************************************
 *
-* getOntimeIntervalsThreads -
+* treatOnTimeIntervalSubscriptions -
 */
-static void getOntimeIntervalsThreads(std::string tenant, std::vector<BSONObj>& subs)
+static void treatOnTimeIntervalSubscriptions(std::string tenant, OtisTreatFunction treatFunction)
 {
-  /* Look for ONTIMEINTERVAL subscriptions in database */
-  std::string condType= CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
-  BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
+  /* Look for ONTIMEINTERVAL subscriptions in the database */
+  std::string condType = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
+  BSONObj     query    = BSON(condType << ON_TIMEINTERVAL_CONDITION);
 
   DBClientBase* connection = getMongoConnection();
   auto_ptr<DBClientCursor> cursor;
@@ -471,10 +479,10 @@ static void getOntimeIntervalsThreads(std::string tenant, std::vector<BSONObj>& 
     cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
 
     /*
-         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-         * exception ourselves
-         */
+     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+     * exception ourselves
+     */
     if (cursor.get() == NULL)
     {
       throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
@@ -495,10 +503,54 @@ static void getOntimeIntervalsThreads(std::string tenant, std::vector<BSONObj>& 
     return;
   }
 
-  /* Store all subs in returning vector */
+  // Call the treat function for each subscription
   while (cursor->more())
   {
-    subs.push_back(cursor->next());
+    BSONObj sub = cursor->next();
+
+    treatFunction(tenant, &sub);
+  }
+}
+
+/* ****************************************************************************
+*
+* recoverOnTimeIntervalThread - 
+*/
+static void recoverOnTimeIntervalThread(std::string tenant, BSONObj* subP)
+{
+  BSONElement  idField = subP->getField("_id");
+  std::string  subId   = idField.OID().str();
+
+  // Paranoia check:  _id exists?
+  if (idField.eoo() == true)
+  {
+    LM_E(("Database Error (error retrieving _id field in doc: '%s')", subP->toString().c_str()));
+    return;
+  }
+
+  // Paranoia check II:  'conditions' exists?
+  BSONElement conditionsField = subP->getField(CSUB_CONDITIONS);
+  if (conditionsField.eoo() == true)
+  {
+    LM_E(("Database Error (error retrieving 'conditions' field) for subscription '%s'", subId.c_str()));
+    return;
+  }
+
+  std::vector<BSONElement> condV = subP->getField(CSUB_CONDITIONS).Array();
+  for (unsigned int ix = 0; ix < condV.size(); ++ix)
+  {
+    BSONObj condition = condV[ix].embeddedObject();
+
+    if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
+    {
+      int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
+
+      LM_T(LmtNotifier, ("creating ONTIMEINTERVAL thread for subscription '%s' with interval %d (tenant '%s')",
+                         subId.c_str(),
+                         interval,
+                         tenant.c_str()));
+      processOntimeIntervalCondition(subId, interval, tenant);
+    }
   }
 }
 
@@ -508,79 +560,30 @@ static void getOntimeIntervalsThreads(std::string tenant, std::vector<BSONObj>& 
 */
 void recoverOntimeIntervalThreads(std::string tenant)
 {
-
-  /* Look for all ONTIMEINTERVAL ids on the given tenant */
-  std::vector<BSONObj> ids;
-  getOntimeIntervalsThreads(tenant, ids);
-
-  /* For each one of the subscriptions found, create threads */
-  for (unsigned int ix = 0; ix < ids.size(); ++ix)
-  {
-
-    BSONObj     sub     = ids[ix];
-    BSONElement idField = sub.getField("_id");
-
-    //
-    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
-    //
-    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
-    // an exception and the broker crashes. 
-    //
-    if (idField.eoo() == true)
-    {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
-      continue;
-    }
-
-    std::string subId = idField.OID().str();
-
-    std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
-    for (unsigned int ix = 0; ix < condV.size(); ++ix) {
-      BSONObj condition = condV[ix].embeddedObject();
-      if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
-        int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
-        LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d (tenant %s)", subId.c_str(), interval, tenant.c_str()));
-        processOntimeIntervalCondition(subId, interval, tenant);
-      }
-    }
-  }
+  treatOnTimeIntervalSubscriptions(tenant, recoverOnTimeIntervalThread);
 }
 
 /* ****************************************************************************
 *
-* destroyAllOntimeIntervalThreads -
+* destroyOnTimeIntervalThread - 
+*/
+static void destroyOnTimeIntervalThread(std::string tenant, BSONObj* subP)
+{
+  BSONElement  idField = subP->getField("_id");
+  std::string  subId   = idField.OID().str();
+
+  notifier->destroyOntimeIntervalThreads(subId);
+}
+
+/* ****************************************************************************
+*
+ destroyAllOntimeIntervalThreads -
 *
 * This function is only to be used under harakiri mode, not for real use
 */
-extern void destroyAllOntimeIntervalThreads(std::string tenant)
+void destroyAllOntimeIntervalThreads(std::string tenant)
 {
-  /* Look for all ONTIMEINTERVAL ids on the given tenant */
-  std::vector<BSONObj> ids;
-  getOntimeIntervalsThreads(tenant, ids);
-
-  /* Iterate destroying thread by thread */
-  for (unsigned int ix = 0; ix < ids.size(); ++ix)
-  {
-    BSONObj      sub     = ids[ix];
-    BSONElement  idField = sub.getField("_id");
-
-    //
-    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
-    //
-    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
-    // an exception and the broker crashes. 
-    //
-    if (idField.eoo() == true)
-    {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
-      continue;
-    }
-
-    std::string  subId = idField.OID().str();
-
-    notifier->destroyOntimeIntervalThreads(subId);
-  }
-
+  treatOnTimeIntervalSubscriptions(tenant, destroyOnTimeIntervalThread);
 }
 
 /* ****************************************************************************
