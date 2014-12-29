@@ -1126,7 +1126,20 @@ bool entitiesQuery
 
         /* Attributes part */
 
-        std::vector<BSONElement> queryAttrV = r.getField(ENT_ATTRS).Array();
+        std::vector<BSONElement> queryAttrV;
+
+        try
+        {
+          queryAttrV = r.getField(ENT_ATTRS).Array();
+        }
+        catch (...)
+        {
+          cer->statusCode.fill(SccContextElementNotFound);
+          cerV->push_back(cer);
+
+          return true;
+        }
+
         for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix) {
 
             ContextAttribute ca;
