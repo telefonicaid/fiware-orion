@@ -1110,11 +1110,55 @@ bool entitiesQuery
     }
 
     /* Process query result */
-    while (cursor->more()) {
+    while (cursor->more())
+    {
+        BSONObj                 r    = cursor->next();
+        std::string             err  = r.getStringField("$err");
+        ContextElementResponse* cer  = new ContextElementResponse();
 
-        BSONObj r = cursor->next();
+        if (err != "")
+        {
+          //
+          // We can't return the error 'as is', as it may contain forbidden characters.
+          // So, we can just match the error and send a less descriptive text.
+          //
+          const char* invalidPolygon      = "Exterior shell of polygon is invalid";
+          const char* defaultErrorString  = "Error at querying MongoDB";
+
+          LM_W(("Database Error (%s)", err.c_str()));
+
+          if (strncmp(err.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
+          {
+            err = invalidPolygon;
+          }
+          else
+          {
+            err = defaultErrorString;
+          }
+
+
+          //
+          // It would be nice to fill in the entity but it is difficult to do this.
+          //
+          // Solution:
+          //   If the incoming entity-vector has only *one* entity, I simply fill it in with enV[0] and
+          //   if more than one entity is in the vector, an empty entity is returned.
+          //
+          if (enV.size() == 1)
+          {
+            cer->contextElement.entityId.fill(enV[0]);
+          }
+          else
+          {
+            cer->contextElement.entityId.fill("", "", "");
+          }
+
+          cer->statusCode.fill(SccReceiverInternalError, err);
+          cerV->push_back(cer);
+          return true;
+        }
+
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-        ContextElementResponse* cer = new ContextElementResponse();
         cer->statusCode.fill(SccOk);
 
         /* Entity part */
@@ -1134,7 +1178,27 @@ bool entitiesQuery
 
         /* Attributes part */
 
-        std::vector<BSONElement> queryAttrV = r.getField(ENT_ATTRS).Array();
+        std::vector<BSONElement> queryAttrV;
+
+        //
+        // This try/catch should not be necessary as all document in the entities collection have an attrs array
+        // from creation time. However, it adds an extra protection, just in case.
+        // Somebody *could* manipulate the mongo database and if so, the broker would crash here.
+        // Better to be on the safe side ...
+        //
+        try
+        {
+          queryAttrV = r.getField(ENT_ATTRS).Array();
+        }
+        catch (...)
+        {
+          LM_E(("Database Error (no attrs array in document of entities collection)"));
+          cer->statusCode.fill(SccReceiverInternalError, "attrs field missing in entity document");
+          cerV->push_back(cer);
+
+          return true;
+        }
+
         for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix) {
 
             ContextAttribute ca;
