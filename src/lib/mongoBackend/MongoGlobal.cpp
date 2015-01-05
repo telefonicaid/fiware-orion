@@ -1114,15 +1114,21 @@ bool entitiesQuery
           // We can't return the error 'as is', as it may contain forbidden characters.
           // So, we can just match the error and sent a less descriptive text
           //
-          const char* invalidPolygon      = "Exterior shell of polygon is invalid - not detected at creation time";
+          const char* invalidPolygon      = "Exterior shell of polygon is invalid";
           const char* defaultErrorString  = "Internal mongo problem";
 
           LM_W(("Database Error (%s)", err.c_str()));
 
           if (strncmp(err.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
-            err = invalidPolygon;
+            err = invalidPolygon + std::string(" - not detected at creation time");
           else
             err = defaultErrorString;
+
+          //
+          // FIXME P1: It would be nice to fill in the entity but it is
+          //           difficult to do this, I simply fill it in with enV[0] ...
+          //
+          cer->contextElement.entityId.fill(enV[0]);
 
           cer->statusCode.fill(SccReceiverInternalError, err);
           cerV->push_back(cer);

@@ -30,11 +30,11 @@ brokerStart CB 0-255
 --SHELL--
 
 #
-# 01. Make the issue690 query with two geoscopes and make sure the broker does not crash
+# 01. Make the issue 690 query with invalid polygon geoscope and make sure the broker does not crash
 #
 
-echo "01. Make the issue690 query with two geoscopes and make sure the broker does not crash"
-echo "======================================================================================"
+echo "01. Make the issue 690 query with invalid polygon geoscope and make sure the broker does not crash"
+echo "=================================================================================================="
 payload='{
   "entities":
   [
@@ -61,18 +61,6 @@ payload='{
             ]
           }
         }
-      },
-      {
-        "type" : "FIWARE::Location",
-        "value" : 
-        {
-          "circle":
-          {
-            "centerLatitude": "-33.602391",
-            "centerLongitude": "-70.661781",
-            "radius": "200"
-          }
-        }
       }
     ]
   }
@@ -83,10 +71,10 @@ echo
 
 
 --REGEXPECT--
-01. Make the issue690 query with two geoscopes and make sure the broker does not crash
-======================================================================================
+01. Make the issue 690 query with invalid polygon geoscope and make sure the broker does not crash
+==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 258
+Content-Length: 348
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -94,13 +82,14 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "id": "", 
-                "isPattern": "false", 
+                "id": ".*", 
+                "isPattern": "true", 
                 "type": ""
             }, 
             "statusCode": {
-                "code": "404", 
-                "reasonPhrase": "No context element found"
+                "code": "500", 
+                "details": "Exterior shell of polygon is invalid - not detected at creation time", 
+                "reasonPhrase": "Internal Server Error"
             }
         }
     ]
