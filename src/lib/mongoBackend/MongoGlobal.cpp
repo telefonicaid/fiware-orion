@@ -1120,17 +1120,22 @@ bool entitiesQuery
         {
           //
           // We can't return the error 'as is', as it may contain forbidden characters.
-          // So, we can just match the error and sent a less descriptive text
+          // So, we can just match the error and send a less descriptive text.
           //
           const char* invalidPolygon      = "Exterior shell of polygon is invalid";
-          const char* defaultErrorString  = "Internal mongo problem";
+          const char* defaultErrorString  = "Error at querying MongoDB";
 
           LM_W(("Database Error (%s)", err.c_str()));
 
           if (strncmp(err.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
-            err = invalidPolygon + std::string(" - not detected at creation time");
+          {
+            err = invalidPolygon;
+          }
           else
+          {
             err = defaultErrorString;
+          }
+
 
           //
           // It would be nice to fill in the entity but it is difficult to do this.
@@ -1188,7 +1193,7 @@ bool entitiesQuery
         catch (...)
         {
           LM_E(("Database Error (no attrs array in document of entities collection)"));
-          cer->statusCode.fill(SccReceiverInternalError);
+          cer->statusCode.fill(SccReceiverInternalError, "attrs field missing in entity document");
           cerV->push_back(cer);
 
           return true;

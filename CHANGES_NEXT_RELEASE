@@ -1,2 +1,2 @@
 Fix:  Fixed the bug about recovering ONTIMEINTERVAL subscriptions (Issue #693)
-Fix:  Fixed the crash in queryContext with a double geoscope (Issue #690)
+Fix:  Fixed the crash in queryContext with an invalid geoscope (Issue #690)
