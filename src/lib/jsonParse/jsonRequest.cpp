@@ -171,6 +171,11 @@ std::string jsonTreat
   std::string   res   = "OK";
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
 
+  if ((content == NULL) || (*content == 0))
+  {
+    return "OK";
+  }
+
   LM_T(LmtParse, ("Treating a JSON request: '%s'", content));
 
   ciP->parseDataP = parseDataP;

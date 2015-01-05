@@ -208,6 +208,11 @@ std::string xmlTreat
   xml_document<>  doc;
   char*           xmlPayload = (char*) content;
 
+  if ((content == NULL) || (*content == 0))
+  {
+    return "OK";
+  }
+
   try
   {
     doc.parse<0>(xmlPayload);
