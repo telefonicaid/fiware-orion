@@ -1,2 +1,3 @@
 Fix:  Fixed the bug about recovering ONTIMEINTERVAL subscriptions (Issue #693)
 Fix:  Fixed the crash in queryContext with a double geoscope (Issue #690)
+Fix:  Protect the broker against payload-less responses to forwarded requests (Issue #699)
