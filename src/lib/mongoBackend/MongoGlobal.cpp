@@ -1102,11 +1102,34 @@ bool entitiesQuery
     }
 
     /* Process query result */
-    while (cursor->more()) {
+    while (cursor->more())
+    {
+        BSONObj                 r    = cursor->next();
+        std::string             err  = r.getStringField("$err");
+        ContextElementResponse* cer  = new ContextElementResponse();
 
-        BSONObj r = cursor->next();
+        if (err != "")
+        {
+          //
+          // We can't return the error 'as is', as it may contain forbidden characters.
+          // So, we can just match the error and sent a less descriptive text
+          //
+          const char* invalidPolygon      = "Exterior shell of polygon is invalid - not detected at creation time";
+          const char* defaultErrorString  = "Internal mongo problem";
+
+          LM_W(("Database Error (%s)", err.c_str()));
+
+          if (strncmp(err.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
+            err = invalidPolygon;
+          else
+            err = defaultErrorString;
+
+          cer->statusCode.fill(SccReceiverInternalError, err);
+          cerV->push_back(cer);
+          return true;
+        }
+
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-        ContextElementResponse* cer = new ContextElementResponse();
         cer->statusCode.fill(SccOk);
 
         /* Entity part */
