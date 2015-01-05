@@ -188,6 +188,19 @@ std::string postUpdateContext
 
     cleanPayload = xmlPayloadClean(out.c_str(), "<updateContextResponse>");
 
+    if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
+    {
+      UpdateContextResponse ucrs;
+
+      // FIXME P1: What StatusCode should be used here?
+      ucrs.errorCode.fill(SccReceiverInternalError, "invalid context provider response");
+
+      // FIXME P1: What 'error concept' should be used here?
+      LM_W(("Other Error (context provider response to UpdateContext is empty)"));
+      answer = ucrs.render(ciP, UpdateContext, "");
+      return answer;
+    }
+
     s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
     provUpcrsP = &parseData.upcrs.res;
     if (s != "OK")
