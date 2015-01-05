@@ -1165,13 +1165,20 @@ bool entitiesQuery
 
         std::vector<BSONElement> queryAttrV;
 
+        //
+        // This try/catch should not be necessary as all document in the entities collection have an attrs array
+        // from creation time. However, it adds an extra protection, just in case.
+        // Somebody *could* manipulate the mongo database and if so, the broker would crash here.
+        // Better to be on the safe side ...
+        //
         try
         {
           queryAttrV = r.getField(ENT_ATTRS).Array();
         }
         catch (...)
         {
-          cer->statusCode.fill(SccContextElementNotFound);
+          LM_E(("Database Error (no attrs array in document of entities collection)"));
+          cer->statusCode.fill(SccReceiverInternalError);
           cerV->push_back(cer);
 
           return true;
