@@ -74,7 +74,7 @@ echo
 01. Make the issue 690 query with invalid polygon geoscope and make sure the broker does not crash
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 348
+Content-Length: 316
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -88,7 +88,7 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "500", 
-                "details": "Exterior shell of polygon is invalid - not detected at creation time", 
+                "details": "Exterior shell of polygon is invalid", 
                 "reasonPhrase": "Internal Server Error"
             }
         }
