@@ -1133,10 +1133,20 @@ bool entitiesQuery
             err = defaultErrorString;
 
           //
-          // FIXME P1: It would be nice to fill in the entity but it is
-          //           difficult to do this, I simply fill it in with enV[0] ...
+          // It would be nice to fill in the entity but it is difficult to do this.
           //
-          cer->contextElement.entityId.fill(enV[0]);
+          // Solution:
+          //   If the incoming entity-vector has only *one* entity, I simply fill it in with enV[0] and
+          //   if more than one entity is in the vector, an empty entity is returned.
+          //
+          if (enV.size() == 1)
+          {
+            cer->contextElement.entityId.fill(enV[0]);
+          }
+          else
+          {
+            cer->contextElement.entityId.fill("", "", "");
+          }
 
           cer->statusCode.fill(SccReceiverInternalError, err);
           cerV->push_back(cer);
