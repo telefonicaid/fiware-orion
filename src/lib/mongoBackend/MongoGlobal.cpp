@@ -519,7 +519,6 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, OtisTreatFuncti
 static void recoverOnTimeIntervalThread(std::string tenant, BSONObj* subP)
 {
   BSONElement  idField = subP->getField("_id");
-  std::string  subId   = idField.OID().str();
 
   // Paranoia check:  _id exists?
   if (idField.eoo() == true)
@@ -527,6 +526,8 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj* subP)
     LM_E(("Database Error (error retrieving _id field in doc: '%s')", subP->toString().c_str()));
     return;
   }
+
+  std::string  subId   = idField.OID().str();
 
   // Paranoia check II:  'conditions' exists?
   BSONElement conditionsField = subP->getField(CSUB_CONDITIONS);
@@ -570,6 +571,13 @@ void recoverOntimeIntervalThreads(std::string tenant)
 static void destroyOnTimeIntervalThread(std::string tenant, BSONObj* subP)
 {
   BSONElement  idField = subP->getField("_id");
+
+  if (idField.eoo() == true)
+  {
+    LM_E(("Database Error (error retrieving _id field in doc: '%s')", subP->toString().c_str()));
+    return;
+  }
+
   std::string  subId   = idField.OID().str();
 
   notifier->destroyOntimeIntervalThreads(subId);
