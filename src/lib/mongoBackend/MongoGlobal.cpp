@@ -62,7 +62,7 @@ using std::auto_ptr;
 *
 * OtisTreatFunction - callback signature for treatOntimeintervalSubscriptions
 */
-typedef void (*OtisTreatFunction)(std::string tenant, BSONObj* bobjP);
+typedef void (*OtisTreatFunction)(std::string tenant, BSONObj& bobjP);
 
 
 
@@ -508,7 +508,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, OtisTreatFuncti
   {
     BSONObj sub = cursor->next();
 
-    treatFunction(tenant, &sub);
+    treatFunction(tenant, sub);
   }
 }
 
@@ -516,28 +516,28 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, OtisTreatFuncti
 *
 * recoverOnTimeIntervalThread - 
 */
-static void recoverOnTimeIntervalThread(std::string tenant, BSONObj* subP)
+static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 {
-  BSONElement  idField = subP->getField("_id");
+  BSONElement  idField = sub.getField("_id");
 
   // Paranoia check:  _id exists?
   if (idField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving _id field in doc: '%s')", subP->toString().c_str()));
+    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
     return;
   }
 
   std::string  subId   = idField.OID().str();
 
   // Paranoia check II:  'conditions' exists?
-  BSONElement conditionsField = subP->getField(CSUB_CONDITIONS);
+  BSONElement conditionsField = sub.getField(CSUB_CONDITIONS);
   if (conditionsField.eoo() == true)
   {
     LM_E(("Database Error (error retrieving 'conditions' field) for subscription '%s'", subId.c_str()));
     return;
   }
 
-  std::vector<BSONElement> condV = subP->getField(CSUB_CONDITIONS).Array();
+  std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
   for (unsigned int ix = 0; ix < condV.size(); ++ix)
   {
     BSONObj condition = condV[ix].embeddedObject();
@@ -568,13 +568,13 @@ void recoverOntimeIntervalThreads(std::string tenant)
 *
 * destroyOnTimeIntervalThread - 
 */
-static void destroyOnTimeIntervalThread(std::string tenant, BSONObj* subP)
+static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 {
-  BSONElement  idField = subP->getField("_id");
+  BSONElement  idField = sub.getField("_id");
 
   if (idField.eoo() == true)
   {
-    LM_E(("Database Error (error retrieving _id field in doc: '%s')", subP->toString().c_str()));
+    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
     return;
   }
 
