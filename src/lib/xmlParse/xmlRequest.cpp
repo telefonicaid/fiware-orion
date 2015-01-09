@@ -208,6 +208,13 @@ std::string xmlTreat
   xml_document<>  doc;
   char*           xmlPayload = (char*) content;
 
+  //
+  // If the payload is empty, the XML parsing library does an assert
+  // and the broker dies.
+  // Therefore, this check here is important, to avoid death.
+  // 
+  // 'OK' is returned as there is no error to send a request without payload.
+  //
   if ((content == NULL) || (*content == 0))
   {
     return "OK";

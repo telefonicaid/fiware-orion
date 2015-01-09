@@ -178,10 +178,12 @@ std::string postQueryContext
   {
     QueryContextResponse qcrs;
 
-    // FIXME P1: What StatusCode should be used here?
-    qcrs.errorCode.fill(SccReceiverInternalError, "invalid context provider response");
+    //
+    // This is really an internal error in the Context Provider
+    // It is not in the orion broker though, so 404 is returned
+    //
+    qcrs.errorCode.fill(SccContextElementNotFound, "invalid context provider response");
 
-    // FIXME P1: What 'error concept' should be used here?
     LM_W(("Other Error (context provider response to QueryContext is empty)"));
     answer = qcrs.render(ciP, QueryContext, "");
     return answer;

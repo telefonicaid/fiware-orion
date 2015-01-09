@@ -171,6 +171,13 @@ std::string jsonTreat
   std::string   res   = "OK";
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
 
+
+  //
+  // If the payload is empty, the XML parsing library does an assert
+  // and the broker dies. I don't know about the JSON library, but just in case ...
+  // 
+  // 'OK' is returned as there is no error to send a request without payload.
+  //
   if ((content == NULL) || (*content == 0))
   {
     return "OK";
