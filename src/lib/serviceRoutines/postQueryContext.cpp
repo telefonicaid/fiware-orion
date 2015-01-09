@@ -153,6 +153,7 @@ std::string postQueryContext
                        false,
                        true);
 
+
   if ((out == "error") || (out == ""))
   {
     QueryContextResponse qcrs;
@@ -172,6 +173,21 @@ std::string postQueryContext
   std::string  errorMsg;
 
   cleanPayload = xmlPayloadClean(out.c_str(), "<queryContextResponse>");
+
+  if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
+  {
+    QueryContextResponse qcrs;
+
+    //
+    // This is really an internal error in the Context Provider
+    // It is not in the orion broker though, so 404 is returned
+    //
+    qcrs.errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+
+    LM_W(("Other Error (context provider response to QueryContext is empty)"));
+    answer = qcrs.render(ciP, QueryContext, "");
+    return answer;
+  }
 
   s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
   if (s != "OK")

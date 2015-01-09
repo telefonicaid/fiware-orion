@@ -188,6 +188,21 @@ std::string postUpdateContext
 
     cleanPayload = xmlPayloadClean(out.c_str(), "<updateContextResponse>");
 
+    if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
+    {
+      UpdateContextResponse ucrs;
+
+      //
+      // This is really an internal error in the Context Provider
+      // It is not in the orion broker though, so 404 is returned
+      //
+      ucrs.errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+
+      LM_W(("Other Error (context provider response to UpdateContext is empty)"));
+      answer = ucrs.render(ciP, UpdateContext, "");
+      return answer;
+    }
+
     s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
     provUpcrsP = &parseData.upcrs.res;
     if (s != "OK")
