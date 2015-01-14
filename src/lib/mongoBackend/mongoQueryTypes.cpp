@@ -48,7 +48,7 @@ HttpStatusCode mongoEntityTypes
   unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
   bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-
+  //bool         collapse       = uriParams[URI_PARAM_COLLAPSE] == "true";
   LM_T(LmtMongo, ("Query Entity Types"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
@@ -78,15 +78,35 @@ HttpStatusCode mongoEntityTypes
    */
 
   BSONObj result;
+
+  // Building the projection part of the query that includes types that have no attributes
+  // See bug: https://github.com/telefonicaid/fiware-orion/issues/686
+  BSONArrayBuilder emptyArrayBuilder;
+  BSONArrayBuilder nulledArrayBuilder;
+  nulledArrayBuilder.appendNull();
+
+  BSONObj projection = BSON(
+    "$project" << BSON(
+      "attrs" << BSON(
+        "$cond" << BSON(
+          "if" << BSON("$eq" << BSON_ARRAY(S_ATTRS << emptyArrayBuilder.arr()) ) <<
+          "then" << nulledArrayBuilder.arr() <<
+          "else" << S_ATTRS
+        )
+      )
+    )
+  );
+
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
                                               BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
                                               BSON("$project" << BSON("_id" << 1 << C_ATTR_NAME << 1 << C_ATTR_TYPE << 1)) <<
+                                              projection <<
                                               BSON("$unwind" << S_ATTRS) <<
                                               BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRS))) <<
                                               BSON("$sort" << BSON("_id" << 1))
                                              )
-                    );
+                     );
 
   LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
 
@@ -144,11 +164,14 @@ HttpStatusCode mongoEntityTypes
     TypeEntity*              type       = new TypeEntity(resultItem.getStringField("_id"));
     std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
 
-    for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
+    if (!attrsArray[0].isNull())
     {
-      BSONObj jAttr = attrsArray[jx].embeddedObject();
-      ContextAttribute* ca = new ContextAttribute(jAttr.getStringField(ENT_ATTRS_NAME), jAttr.getStringField(ENT_ATTRS_TYPE));
-      type->contextAttributeVector.push_back(ca);
+      for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
+      {
+        BSONObj jAttr = attrsArray[jx].embeddedObject();
+        ContextAttribute* ca = new ContextAttribute(jAttr.getStringField(ENT_ATTRS_NAME), jAttr.getStringField(ENT_ATTRS_TYPE));
+        type->contextAttributeVector.push_back(ca);
+      }
     }
 
     responseP->typeEntityVector.push_back(type);
