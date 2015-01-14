@@ -85,13 +85,14 @@ HttpStatusCode mongoEntityTypes
   BSONArrayBuilder nulledArrayBuilder;
   nulledArrayBuilder.appendNull();
 
+  // We are using the $cond: [ .. ] and not the $cond: { .. } one, as the former is the only one valid in MongoDB 2.4
   BSONObj projection = BSON(
     "$project" << BSON(
       "attrs" << BSON(
-        "$cond" << BSON(
-          "if" << BSON("$eq" << BSON_ARRAY(S_ATTRS << emptyArrayBuilder.arr()) ) <<
-          "then" << nulledArrayBuilder.arr() <<
-          "else" << S_ATTRS
+        "$cond" << BSON_ARRAY(
+          BSON("$eq" << BSON_ARRAY(S_ATTRS << emptyArrayBuilder.arr()) ) <<
+          nulledArrayBuilder.arr() <<
+          S_ATTRS
         )
       )
     )
