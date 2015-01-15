@@ -109,7 +109,7 @@ std::string TypeEntity::render
   {
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
 
-    if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true")
+    if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true" || contextAttributeVector.size() == 0)
     {
       out += valueTag(indent  + "  ", "name", type, ciP->outFormat, false);
     }
