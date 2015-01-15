@@ -48,7 +48,6 @@ HttpStatusCode mongoEntityTypes
   unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
   bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-  //bool         collapse       = uriParams[URI_PARAM_COLLAPSE] == "true";
   LM_T(LmtMongo, ("Query Entity Types"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
