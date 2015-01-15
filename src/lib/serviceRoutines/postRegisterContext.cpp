@@ -51,6 +51,7 @@ static std::string fordwardRegisterContext
   char*               host,
   int                 port,
   const std::string&  tenant,
+  const std::string&  xauthToken,
   const std::string&  payload
 )
 {
@@ -62,10 +63,12 @@ static std::string fordwardRegisterContext
                                         "POST",
                                         tenant,
                                         "", // FIXME P5: Service-Path
+                                        xauthToken,
                                         "ngsi9/registerContext",
                                         // FIXME P3: unhardwire content type
                                         std::string("application/xml"),
                                         payload,
+                                        true,
                                         true);
 
   LM_T(LmtCm, ("response to forward registerContext: '%s'", response.c_str()));
@@ -96,7 +99,7 @@ static void registerContextForward
     ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->tenant);
 
     std::string payload  = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, payload);
+    std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload);
 
     if (response == "error")
     {
@@ -141,7 +144,7 @@ static void registerContextForward
     parseDataP->rcr.res.registrationId.set(fwdRegId);
     mongoSetFwdRegId(rcrP->registrationId.get(), fwdRegId, ciP->tenant);
     std::string payload = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, payload);
+    fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload);
   }
 }
 

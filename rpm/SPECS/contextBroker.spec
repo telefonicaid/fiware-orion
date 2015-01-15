@@ -192,6 +192,14 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Dec 19 2014 Fermin Galan <fermin@tid.es> 0.18.0-1 (FIWARE-4.1.3-1)
+- Add:  Service-Path in ngsi10 notifications (Issue #674)
+- Add:  Forbidden characters in the URL path are now detected (Issue #672)
+- Add:  X-Auth-Token forwarded in ngsi10 notifications (Issue #673)
+- Add:  Service-Path is taken into account in ngsi10 subscriptions (Issue #675)
+- Fix:  Bug: POST /v1/conextEntities didn't save the entity type (from payload) (Issue #684)
+- Fix:  Service-Path is taken into account in 'GET /v1/contextTypes' and 'GET /v1/contextTypes/{entityType}' operations (Issue #676)
+
 * Fri Nov 28 2014 Fermin Galan <fermin@tid.es> 0.17.0-1 (FIWARE-4.1.2-1)
 Add: New convop: "POST /v1/contextEntities" (Issue #613).
      Note also that AppendContextElementRequest has been added an EntityId field.

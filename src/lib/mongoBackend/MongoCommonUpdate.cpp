@@ -756,6 +756,73 @@ static bool deleteAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
 
 /* ****************************************************************************
 *
+* servicePathSubscriptionRegex - 
+*
+* 1. If the incoming request is without service path, then only subscriptions without
+*    service path is a match (without or with '/#', or '/')
+* 2. If the incoming request has a service path, then the REGEX must be created:
+*    - Incoming: /a1/a2/a3
+*    - REGEX: ^/#$ | ^/a1/#$ | | ^/a1/a2/#$ | ^/a1/a2/a3/#$ | ^/a1/a2/a3$
+*
+*/
+std::string servicePathSubscriptionRegex(const std::string servicePath, std::vector<std::string>& spathV)
+{
+  std::string  spathRegex;
+  int          spathComponents = 0;
+
+
+  //
+  // Split Service Path in 'path components'
+  //
+  if (servicePath != "")
+  {
+    spathComponents = stringSplit(servicePath, '/', spathV);
+  }
+
+  if (spathComponents == 0)
+  {
+    spathRegex = "^$|^\\/#$|^\\/$";  // FIXME NOW: Including empty service path also, not sure it's correct
+  }
+  else
+  {
+    //
+    // 1. Empty or '/#'
+    //
+    spathRegex = std::string("^$|^\\/#$");
+
+
+
+    //
+    // 2. The whole list /a | /a/b | /a/b/c  etc
+    //
+    for (int ix = 0; ix < spathComponents; ++ix)
+    {
+      spathRegex += std::string("|^");
+
+      for (int cIx = 0; cIx <= ix; ++cIx)
+      {
+        spathRegex += std::string("\\/") + spathV[cIx];
+      }
+      spathRegex += std::string("\\/#$");
+    }
+    
+
+    //
+    // 3. EXACT service path
+    //
+    spathRegex += std::string("|^");
+    for (int cIx = 0; cIx < spathComponents; ++cIx)
+    {
+      spathRegex += std::string("\\/") + spathV[cIx];
+    }
+    spathRegex += std::string("$");
+  }
+
+  return spathRegex;
+}
+
+/* ****************************************************************************
+*
 * addTriggeredSubscriptions
 *
 */
@@ -764,10 +831,21 @@ static bool addTriggeredSubscriptions(std::string                               
                                       std::string                               attr,
                                       std::map<string, TriggeredSubscription*>& subs,
                                       std::string&                              err,
-                                      std::string                               tenant)
+                                      std::string                               tenant,
+                                      const std::vector<std::string>&           servicePathV)
 {
+    DBClientBase*             connection      = getMongoConnection();
+    std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
+    std::vector<std::string>  spathV;
+    std::string               spathRegex      = "";
 
-    DBClientBase* connection = getMongoConnection();
+    
+    //
+    // Create the REGEX for the Service Path 
+    //
+    spathRegex = servicePathSubscriptionRegex(servicePath, spathV);
+    spathRegex = std::string("/") + spathRegex + "/";
+
 
     /* Build query */
     std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
@@ -775,6 +853,8 @@ static bool addTriggeredSubscriptions(std::string                               
     std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
     std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
     std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
+    std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
+    BSONObj     spBson       = fromjson(inRegex);
 
     /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
     BSONObj queryNoPattern = BSON(
@@ -785,8 +865,8 @@ static bool addTriggeredSubscriptions(std::string                               
                 entPatternQ << "false" <<
                 condTypeQ << ON_CHANGE_CONDITION <<
                 condValueQ << attr <<
-                CSUB_EXPIRATION << BSON("$gt" << (long long) getCurrentTime())
-                );
+                CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
+                CSUB_SERVICE_PATH << spBson);
 
     /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
      * way to do a "reverse regex" query in MongoDB (see
@@ -814,9 +894,10 @@ static bool addTriggeredSubscriptions(std::string                               
     queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
     queryPattern.append(condValueQ, attr);
     queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+    queryPattern.append(CSUB_SERVICE_PATH, spBson);
     queryPattern.appendCode("$where", function);
 
-    // FIXME: the condTypeQ and condValudeQ part can be "factorized" out of the $or clause
+    // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
     BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
 
     /* Do the query */
@@ -896,7 +977,6 @@ static bool addTriggeredSubscriptions(std::string                               
     }
 
     return true;
-
 }
 
 /* ****************************************************************************
@@ -907,7 +987,9 @@ static bool addTriggeredSubscriptions(std::string                               
 static bool processSubscriptions(const EntityId*                           enP,
                                  std::map<string, TriggeredSubscription*>& subs,
                                  std::string&                              err,
-                                 std::string                               tenant)
+                                 std::string                               tenant,
+                                 const std::string&                        xauthToken,
+                                 std::vector<std::string>                  servicePathV)
 {
 
     DBClientBase* connection = getMongoConnection();
@@ -945,7 +1027,10 @@ static bool processSubscriptions(const EntityId*                           enP,
                                      mapSubId,
                                      trigs->reference,
                                      trigs->format,
-                                     tenant)) {
+                                     tenant,
+                                     xauthToken,
+                                     servicePathV))
+        {
 
             BSONObj query = BSON("_id" << OID(mapSubId));
             BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) << "$inc" << BSON(CSUB_COUNT << 1));
@@ -1071,9 +1156,9 @@ static bool processContextAttributeVector (ContextElement*                      
                                            std::string&                               locAttr,
                                            double&                                    coordLat,
                                            double&                                    coordLong,
-                                           std::string                                tenant)
+                                           std::string                                tenant,
+                                           const std::vector<std::string>&            servicePathV)
 {
-
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
     std::string entityType = cerP->contextElement.entityId.type;
@@ -1233,7 +1318,7 @@ static bool processContextAttributeVector (ContextElement*                      
          * is "bypassed" */
         if (actualUpdate) {
             std::string err;
-            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant))
+            if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant, servicePathV))
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
               return false;
@@ -1456,12 +1541,13 @@ static bool removeEntity
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
 */
-void processContextElement(ContextElement*                  ceP,
-                           UpdateContextResponse*           responseP,
-                           const std::string&               action,
-                           const std::string&               tenant,
-                           const std::vector<std::string>&  servicePathV,
-                           std::map<std::string, std::string>& uriParams    // FIXME P7: we need this to implement "restriction-based" filters
+void processContextElement(ContextElement*                      ceP,
+                           UpdateContextResponse*               responseP,
+                           const std::string&                   action,
+                           const std::string&                   tenant,
+                           const std::vector<std::string>&      servicePathV,
+                           std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
+                           const std::string&                   xauthToken
 )
 {
 
@@ -1651,7 +1737,7 @@ void processContextElement(ContextElement*                  ceP,
             coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant)) {
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV)) {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
@@ -1748,7 +1834,7 @@ void processContextElement(ContextElement*                  ceP,
         /* Send notifications for each one of the ONCHANGE subscriptions accumulated by
          * previous addTriggeredSubscriptions() invocations */
         std::string err;
-        processSubscriptions(enP, subsToNotify, err, tenant);
+        processSubscriptions(enP, subsToNotify, err, tenant, xauthToken, servicePathV);
 
         //
         // processSubscriptions cleans up the triggered subscriptions; this call here to
@@ -1848,7 +1934,7 @@ void processContextElement(ContextElement*                  ceP,
           {
             std::string err;
 
-            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, subsToNotify, err, tenant))
+            if (!addTriggeredSubscriptions(enP->id, enP->type, ceP->contextAttributeVector.get(ix)->name, subsToNotify, err, tenant, servicePathV))
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
               responseP->contextElementResponseVector.push_back(cerP);
@@ -1856,7 +1942,7 @@ void processContextElement(ContextElement*                  ceP,
             }
           }
 
-          processSubscriptions(enP, subsToNotify, errReason, tenant);
+          processSubscriptions(enP, subsToNotify, errReason, tenant, xauthToken, servicePathV);
         }
 
         responseP->contextElementResponseVector.push_back(cerP);

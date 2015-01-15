@@ -40,7 +40,15 @@
 *
 * mongoUpdateContextSubscription - 
 */
-HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* requestP, UpdateContextSubscriptionResponse* responseP, Format inFormat, const std::string& tenant)
+HttpStatusCode mongoUpdateContextSubscription
+(
+  UpdateContextSubscriptionRequest*   requestP,
+  UpdateContextSubscriptionResponse*  responseP,
+  Format                              inFormat,
+  const std::string&                  tenant,
+  const std::string&                  xauthToken,
+  const std::vector<std::string>&     servicePathV
+)
 {
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request");
 
@@ -151,7 +159,7 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
   /* Notify conditions */
   bool notificationDone = false;
   if (requestP->notifyConditionVector.size() == 0) {
-      newSub.appendArray(CSUB_CONDITIONS, sub.getField(CSUB_CONDITIONS).embeddedObject());
+    newSub.appendArray(CSUB_CONDITIONS, sub.getField(CSUB_CONDITIONS).embeddedObject());
   }
   else {
       /* Destroy any previous ONTIMEINTERVAL thread */
@@ -170,7 +178,10 @@ HttpStatusCode mongoUpdateContextSubscription(UpdateContextSubscriptionRequest* 
                                                 C_STR_FIELD(sub, CSUB_REFERENCE),
                                                 &notificationDone,
                                                 inFormat,
-                                                tenant);
+                                                tenant,
+                                                xauthToken,
+                                                servicePathV);
+
        newSub.appendArray(CSUB_CONDITIONS, conds);
 
        /* Remove EntityIdVector and AttributeList dynamic memory */

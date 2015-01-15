@@ -60,6 +60,14 @@ using std::auto_ptr;
 
 /* ****************************************************************************
 *
+* OtisTreatFunction - callback signature for treatOntimeintervalSubscriptions
+*/
+typedef void (*OtisTreatFunction)(std::string tenant, BSONObj& bobjP);
+
+
+
+/* ****************************************************************************
+*
 * Globals
 */
 static DBClientBase*        connection;
@@ -454,13 +462,13 @@ void ensureLocationIndex(std::string tenant) {
 
 /* ****************************************************************************
 *
-* getOntimeIntervalsThreads -
+* treatOnTimeIntervalSubscriptions -
 */
-static void getOntimeIntervalsThreads(std::string tenant, std::vector<BSONObj>& subs)
+static void treatOnTimeIntervalSubscriptions(std::string tenant, OtisTreatFunction treatFunction)
 {
-  /* Look for ONTIMEINTERVAL subscriptions in database */
-  std::string condType= CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
-  BSONObj query = BSON(condType << ON_TIMEINTERVAL_CONDITION);
+  /* Look for ONTIMEINTERVAL subscriptions in the database */
+  std::string condType = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
+  BSONObj     query    = BSON(condType << ON_TIMEINTERVAL_CONDITION);
 
   DBClientBase* connection = getMongoConnection();
   auto_ptr<DBClientCursor> cursor;
@@ -471,10 +479,10 @@ static void getOntimeIntervalsThreads(std::string tenant, std::vector<BSONObj>& 
     cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
 
     /*
-         * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-         * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-         * exception ourselves
-         */
+     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+     * exception ourselves
+     */
     if (cursor.get() == NULL)
     {
       throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
@@ -495,10 +503,55 @@ static void getOntimeIntervalsThreads(std::string tenant, std::vector<BSONObj>& 
     return;
   }
 
-  /* Store all subs in returning vector */
+  // Call the treat function for each subscription
   while (cursor->more())
   {
-    subs.push_back(cursor->next());
+    BSONObj sub = cursor->next();
+
+    treatFunction(tenant, sub);
+  }
+}
+
+/* ****************************************************************************
+*
+* recoverOnTimeIntervalThread - 
+*/
+static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
+{
+  BSONElement  idField = sub.getField("_id");
+
+  // Paranoia check:  _id exists?
+  if (idField.eoo() == true)
+  {
+    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
+    return;
+  }
+
+  std::string  subId   = idField.OID().str();
+
+  // Paranoia check II:  'conditions' exists?
+  BSONElement conditionsField = sub.getField(CSUB_CONDITIONS);
+  if (conditionsField.eoo() == true)
+  {
+    LM_E(("Database Error (error retrieving 'conditions' field) for subscription '%s'", subId.c_str()));
+    return;
+  }
+
+  std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
+  for (unsigned int ix = 0; ix < condV.size(); ++ix)
+  {
+    BSONObj condition = condV[ix].embeddedObject();
+
+    if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
+    {
+      int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
+
+      LM_T(LmtNotifier, ("creating ONTIMEINTERVAL thread for subscription '%s' with interval %d (tenant '%s')",
+                         subId.c_str(),
+                         interval,
+                         tenant.c_str()));
+      processOntimeIntervalCondition(subId, interval, tenant);
+    }
   }
 }
 
@@ -508,79 +561,37 @@ static void getOntimeIntervalsThreads(std::string tenant, std::vector<BSONObj>& 
 */
 void recoverOntimeIntervalThreads(std::string tenant)
 {
-
-  /* Look for all ONTIMEINTERVAL ids on the given tenant */
-  std::vector<BSONObj> ids;
-  getOntimeIntervalsThreads(tenant, ids);
-
-  /* For each one of the subscriptions found, create threads */
-  for (unsigned int ix = 0; ix < ids.size(); ++ix)
-  {
-
-    BSONObj     sub     = ids[ix];
-    BSONElement idField = sub.getField("_id");
-
-    //
-    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
-    //
-    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
-    // an exception and the broker crashes. 
-    //
-    if (idField.eoo() == true)
-    {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
-      continue;
-    }
-
-    std::string subId = idField.OID().str();
-
-    std::vector<BSONElement> condV = sub.getField(CSUB_CONDITIONS).Array();
-    for (unsigned int ix = 0; ix < condV.size(); ++ix) {
-      BSONObj condition = condV[ix].embeddedObject();
-      if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0) {
-        int interval = condition.getIntField(CSUB_CONDITIONS_VALUE);
-        LM_T(LmtNotifier, ("creating ONTIMEINTERVAL for subscription %s with interval %d (tenant %s)", subId.c_str(), interval, tenant.c_str()));
-        processOntimeIntervalCondition(subId, interval, tenant);
-      }
-    }
-  }
+  treatOnTimeIntervalSubscriptions(tenant, recoverOnTimeIntervalThread);
 }
 
 /* ****************************************************************************
 *
-* destroyAllOntimeIntervalThreads -
+* destroyOnTimeIntervalThread - 
+*/
+static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
+{
+  BSONElement  idField = sub.getField("_id");
+
+  if (idField.eoo() == true)
+  {
+    LM_E(("Database Error (error retrieving _id field in doc: '%s')", sub.toString().c_str()));
+    return;
+  }
+
+  std::string  subId   = idField.OID().str();
+
+  notifier->destroyOntimeIntervalThreads(subId);
+}
+
+/* ****************************************************************************
+*
+ destroyAllOntimeIntervalThreads -
 *
 * This function is only to be used under harakiri mode, not for real use
 */
-extern void destroyAllOntimeIntervalThreads(std::string tenant)
+void destroyAllOntimeIntervalThreads(std::string tenant)
 {
-  /* Look for all ONTIMEINTERVAL ids on the given tenant */
-  std::vector<BSONObj> ids;
-  getOntimeIntervalsThreads(tenant, ids);
-
-  /* Iterate destroying thread by thread */
-  for (unsigned int ix = 0; ix < ids.size(); ++ix)
-  {
-    BSONObj      sub     = ids[ix];
-    BSONElement  idField = sub.getField("_id");
-
-    //
-    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
-    //
-    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
-    // an exception and the broker crashes. 
-    //
-    if (idField.eoo() == true)
-    {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
-      continue;
-    }
-
-    std::string  subId = idField.OID().str();
-
-    notifier->destroyOntimeIntervalThreads(subId);
-  }
-
+  treatOnTimeIntervalSubscriptions(tenant, destroyOnTimeIntervalThread);
 }
 
 /* ****************************************************************************
@@ -1099,11 +1110,55 @@ bool entitiesQuery
     }
 
     /* Process query result */
-    while (cursor->more()) {
+    while (cursor->more())
+    {
+        BSONObj                 r    = cursor->next();
+        std::string             err  = r.getStringField("$err");
+        ContextElementResponse* cer  = new ContextElementResponse();
 
-        BSONObj r = cursor->next();
+        if (err != "")
+        {
+          //
+          // We can't return the error 'as is', as it may contain forbidden characters.
+          // So, we can just match the error and send a less descriptive text.
+          //
+          const char* invalidPolygon      = "Exterior shell of polygon is invalid";
+          const char* defaultErrorString  = "Error at querying MongoDB";
+
+          LM_W(("Database Error (%s)", err.c_str()));
+
+          if (strncmp(err.c_str(), invalidPolygon, strlen(invalidPolygon)) == 0)
+          {
+            err = invalidPolygon;
+          }
+          else
+          {
+            err = defaultErrorString;
+          }
+
+
+          //
+          // It would be nice to fill in the entity but it is difficult to do this.
+          //
+          // Solution:
+          //   If the incoming entity-vector has only *one* entity, I simply fill it in with enV[0] and
+          //   if more than one entity is in the vector, an empty entity is returned.
+          //
+          if (enV.size() == 1)
+          {
+            cer->contextElement.entityId.fill(enV[0]);
+          }
+          else
+          {
+            cer->contextElement.entityId.fill("", "", "");
+          }
+
+          cer->statusCode.fill(SccReceiverInternalError, err);
+          cerV->push_back(cer);
+          return true;
+        }
+
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-        ContextElementResponse* cer = new ContextElementResponse();
         cer->statusCode.fill(SccOk);
 
         /* Entity part */
@@ -1123,7 +1178,27 @@ bool entitiesQuery
 
         /* Attributes part */
 
-        std::vector<BSONElement> queryAttrV = r.getField(ENT_ATTRS).Array();
+        std::vector<BSONElement> queryAttrV;
+
+        //
+        // This try/catch should not be necessary as all document in the entities collection have an attrs array
+        // from creation time. However, it adds an extra protection, just in case.
+        // Somebody *could* manipulate the mongo database and if so, the broker would crash here.
+        // Better to be on the safe side ...
+        //
+        try
+        {
+          queryAttrV = r.getField(ENT_ATTRS).Array();
+        }
+        catch (...)
+        {
+          LM_E(("Database Error (no attrs array in document of entities collection)"));
+          cer->statusCode.fill(SccReceiverInternalError, "attrs field missing in entity document");
+          cerV->push_back(cer);
+
+          return true;
+        }
+
         for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix) {
 
             ContextAttribute ca;
@@ -1523,21 +1598,23 @@ AttributeList subToAttributeList(BSONObj sub) {
 */
 bool processOnChangeCondition
 (
-  EntityIdVector      enV,
-  AttributeList       attrL,
-  ConditionValueList* condValues,
-  std::string         subId,
-  std::string         notifyUrl,
-  Format              format,
-  std::string         tenant
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  ConditionValueList*              condValues,
+  std::string                      subId,
+  std::string                      notifyUrl,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV
 )
 {
   std::string          err;
   NotifyContextRequest ncr;
 
+    //
     // FIXME P10: we are using dummy scope at the moment, until subscription scopes get implemented
-    // FIXME P10: we are using an empty service path vector until service paths get implemented for subscriptions
-    std::vector<std::string> servicePathV;
+    //
     Restriction res;    
     if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, servicePathV))
     {
@@ -1568,7 +1645,7 @@ bool processOnChangeCondition
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
-                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
+                getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 return true;
@@ -1577,7 +1654,7 @@ bool processOnChangeCondition
             allCerV.release();
         }
         else {
-            getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, format);
+          getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
             ncr.contextElementResponseVector.release();
             return true;
         }
@@ -1601,7 +1678,19 @@ void processOntimeIntervalCondition(std::string subId, int interval, std::string
 * processConditionVector -
 *
 */
-BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant)
+BSONArray processConditionVector
+(
+  NotifyConditionVector*           ncvP,
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  std::string                      subId,
+  std::string                      url,
+  bool*                            notificationDone,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV
+)
 {
     BSONArrayBuilder conds;
     *notificationDone = false;
@@ -1631,14 +1720,16 @@ BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV
                               CSUB_CONDITIONS_VALUE << condValues.arr()));
 
             if (processOnChangeCondition(enV,
-                                     attrL,
-                                     &(nc->condValueList),
-                                     subId,
-                                     url,
-                                     format,
-                                     tenant)) {
-
-                *notificationDone = true;
+                                         attrL,
+                                         &(nc->condValueList),
+                                         subId,
+                                         url,
+                                         format,
+                                         tenant,
+                                         xauthToken,
+                                         servicePathV))
+            {
+              *notificationDone = true;
             }
 
         }

@@ -64,7 +64,7 @@ std::string postUpdateContext
   UpdateContextResponse  upcr;
   std::string            answer;
 
-  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
 
   //
   // Checking for SccFound in the ContextElementResponseVector
@@ -151,7 +151,18 @@ std::string postUpdateContext
     std::string     resource     = prefix + "/updateContext";
     std::string     tenant       = ciP->tenant;
 
-    out = sendHttpSocket(ip, port, protocol, verb, tenant, ciP->httpHeaders.servicePath, resource, "application/xml", payloadIn, false, true);
+    out = sendHttpSocket(ip, 
+                         port,
+                         protocol,
+                         verb,
+                         tenant,
+                         ciP->httpHeaders.servicePath,
+                         ciP->httpHeaders.xauthToken,
+                         resource,
+                         "application/xml",
+                         payloadIn,
+                         false,
+                         true);
 
     // Should be safe to free up ucrP now ...
     ucrP->release();
@@ -176,6 +187,21 @@ std::string postUpdateContext
     UpdateContextResponse*  provUpcrsP;
 
     cleanPayload = xmlPayloadClean(out.c_str(), "<updateContextResponse>");
+
+    if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
+    {
+      UpdateContextResponse ucrs;
+
+      //
+      // This is really an internal error in the Context Provider
+      // It is not in the orion broker though, so 404 is returned
+      //
+      ucrs.errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+
+      LM_W(("Other Error (context provider response to UpdateContext is empty)"));
+      answer = ucrs.render(ciP, UpdateContext, "");
+      return answer;
+    }
 
     s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
     provUpcrsP = &parseData.upcrs.res;

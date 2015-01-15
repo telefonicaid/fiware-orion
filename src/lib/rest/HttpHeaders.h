@@ -50,6 +50,8 @@ typedef struct HttpHeaders
   std::string   contentType;
   std::string   tenant;
   std::string   servicePath;
+  std::string   xauthToken;
+
   bool          servicePathReceived;
 
   unsigned int  contentLength;

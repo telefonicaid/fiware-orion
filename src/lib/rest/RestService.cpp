@@ -346,7 +346,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       continue;
     }
 
-    if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (serviceV[ix].verb != "*"))
+    if ((ciP->payload != NULL) && (ciP->payloadSize != 0) && (ciP->payload[0] != 0) && (serviceV[ix].verb != "*"))
     {
       std::string response;
 
