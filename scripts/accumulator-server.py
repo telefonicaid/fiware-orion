@@ -33,7 +33,7 @@ __author__ = 'fermin'
 # * Curl users: use -H "Expect:" (default "Expect: 100-continue" used by curl has been problematic
 #   in the past)
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
-#   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
+#   "Content-Type: application/x-www-form-urlencoded" has been problematic in the past)
 
 from flask import Flask, request, Response
 from sys import argv, exit
@@ -44,8 +44,15 @@ import os
 import atexit
 import string
 import signal
+from OpenSSL import SSL
 
-
+# Set up TLS
+dir = os.path.dirname(argv[0])
+if dir == '':
+    dir = os.curdir
+context = SSL.Context(SSL.SSLv23_METHOD)
+context.use_certificate_file(os.path.join(dir, 'accumulator.crt'))
+context.use_privatekey_file(os.path.join(dir, 'accumulator.key'))
 
 # This function is registered to be called upon termination
 def all_done():
@@ -56,6 +63,7 @@ port = 1028
 host='0.0.0.0'
 server_url = '/accumulate'
 verbose = 0
+https = 0
 
 # Arguments from command line
 if len(argv) > 2:
@@ -66,6 +74,9 @@ if len(argv) > 3:
     if argv[3] == 'on':
         print 'verbose mode is on'
         verbose = 1
+    if argv[3] == 'https':
+        print 'https mode is on'
+        https = 1
     else:
         host = argv[3]
 
@@ -73,6 +84,18 @@ if len(argv) > 4:
     if argv[4] == 'on':
         print 'verbose mode is on'
         verbose = 1
+    if argv[4] == 'https':
+        print 'https mode is on'
+        https = 1
+
+if len(argv) > 5:
+    if argv[5] == 'on':
+        print 'verbose mode is on'
+        verbose = 1
+    if argv[5] == 'https':
+        print 'https mode is on'
+        https = 1
+
 
 pid = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"
@@ -201,4 +224,7 @@ if __name__ == '__main__':
     # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
-    app.run(host=host, port=port)
+    if https == 1:
+        app.run(host=host, port=port, ssl_context=context)
+    else:
+        app.run(host=host, port=port)
