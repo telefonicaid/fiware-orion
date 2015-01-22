@@ -393,6 +393,7 @@ function accumulatorStart()
 {
   bindIp=$1
   port=$2
+  https=$3
 
   # If port is missing, we use the default LISTENER_PORT
   if [ -z "$port" ]
@@ -402,7 +403,13 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  accumulator-server.py $port /notify $bindIp 2> /tmp/accumulator_$port &
+  if [ "$https" == "https" ]
+  then
+    accumulator-server.py $port /notify $bindIp $https 2> /tmp/accumulator_$port &
+  else
+    accumulator-server.py $port /notify $bindIp 2> /tmp/accumulator_$port &
+  fi
+
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
