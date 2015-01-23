@@ -24,7 +24,7 @@
 
 # Setting up EPEL Repo
 wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-rpm -ivh epel-release-6-8.noarch.rpm
+sudo rpm -ivh epel-release-6-8.noarch.rpm
 
 # Install required packages
 sudo yum -y install make cmake gcc-c++ scons git libmicrohttpd-devel boost-devel libcurl-devel clang CUnit-devel mongodb-server python python-flask python-jinja2 curl libxml2 nc mongodb-org valgrind libxslt
