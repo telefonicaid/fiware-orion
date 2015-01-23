@@ -332,15 +332,21 @@ std::string sendHttpSocket
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
 
   // Set up URL
-  std::string url= "";
+  std::string url = "";
 
   if (protocol == "https:")
+  {
     url += protocol + "//";
+  }
 
   if (isIPv6(ip))
+  {
     url += "[" + ip + "]";
+  }
   else
+  {
     url += ip;
+  }
 
   url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
 
