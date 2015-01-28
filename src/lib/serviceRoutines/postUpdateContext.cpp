@@ -138,7 +138,7 @@ std::string postUpdateContext
     //
     // 3. Render a string of the request we want to forward, forced to XML
     //    FIXME P8: The format of this string (XML or JSON) should depend on the
-    //              format of the incoming message, but right now we force it to XML.
+    //              CB-CPr content type negotiation, but right now we force it to XML.
     //
     ConnectionInfo ci;
 
