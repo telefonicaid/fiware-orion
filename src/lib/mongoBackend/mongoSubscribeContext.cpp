@@ -100,7 +100,7 @@ HttpStatusCode mongoSubscribeContext
     bool notificationDone = false;
     BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
                                              requestP->entityIdVector,
-                                             requestP->attributeList, oid.str(),
+                                             requestP->attributeList, oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
                                              (notifyFormat == "XML")? XML : JSON,
@@ -154,7 +154,7 @@ HttpStatusCode mongoSubscribeContext
 
     /* Fill the response element */
     responseP->subscribeResponse.duration = requestP->duration;
-    responseP->subscribeResponse.subscriptionId.set(oid.str());
+    responseP->subscribeResponse.subscriptionId.set(oid.toString());
     responseP->subscribeResponse.throttling = requestP->throttling;
 
     return SccOk;
