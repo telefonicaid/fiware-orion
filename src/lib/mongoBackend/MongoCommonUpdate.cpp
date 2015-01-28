@@ -958,7 +958,7 @@ static bool addTriggeredSubscriptions(std::string                               
           continue;
         }
 
-        std::string subIdStr = idField.OID().str();
+        std::string subIdStr = idField.OID().toString();
 
         if (subs.count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
