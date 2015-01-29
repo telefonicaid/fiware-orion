@@ -1,0 +1,1 @@
+- Fix: always run in multiservice mode, ignoring -multiservice (#725)
