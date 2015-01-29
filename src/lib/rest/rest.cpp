@@ -224,14 +224,6 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
-  /* If servicePath was not provided, then use the default value */
-  if (!headerP->servicePathReceived)
-  {
-    headerP->servicePath         = DEFAULT_SERVICE_PATH;
-    headerP->servicePathReceived = true;
-  }
-
-
   if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
     LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
 
@@ -722,6 +714,8 @@ static int connectionTreat
     }
     LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
 
+    /* In the case an actual Fiware-ServicePath is found, the default will be overwritten */
+    ciP->httpHeaders.servicePath = DEFAULT_SERVICE_PATH;
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
 
     char tenant[128];
