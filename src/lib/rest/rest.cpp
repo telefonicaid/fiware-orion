@@ -225,7 +225,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
 
   /* If servicePath was not provided, then use the default value */
-  if (headerP->servicePathReceived = false)
+  if (!headerP->servicePathReceived)
   {
     headerP->servicePath         = DEFAULT_SERVICE_PATH;
     headerP->servicePathReceived = true;
