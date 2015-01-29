@@ -277,14 +277,7 @@ std::string sendHttpSocket
   }
 
   // ----- Service-Path
-  // FIXME P8: the != "/" was added after PR #729, which makes "/" the default servicePath in
-  // request not having that header. However, this causes as side-effect that a
-  // "Fiware-ServicePath: /" header is added in notifications, thus breaking several tests harness.
-  // Given that the "clean" implementation of Fiware-ServicePath propagation will be implemented
-  // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
-  // we introduce that condition to avoid breaking tests currently. Once #714 gets implemented,
-  // this FIXME will be removed (and all the test harness adjusted, if needed)
-  if ((servicePath != "") && (servicePath != "/"))
+  if (servicePath != "")
   {
     headers = curl_slist_append(headers, ("Fiware-ServicePath: " + servicePath).c_str());
     outgoingMsgSize += servicePath.size() + strlen("Fiware-ServicePath: ");

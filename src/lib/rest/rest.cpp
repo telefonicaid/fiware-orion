@@ -614,6 +614,59 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
   return true;
 }
 
+/* ****************************************************************************
+*
+* defaultServicePath
+*
+* Returns a default servicePath (to be used in the case Fiware-servicePath header
+* is not found in the request) depending on the RequestCheck
+*/
+std::string defaultServicePath(const char* url, const char* method)
+{
+  /* Look for standard operation (based on the URL). Given that some operations are
+   * a substring of other, we search first for the longest ones
+   *
+   *  updateContextAvailabilitySubscription
+   *  unsubscribeContextAvailability
+   *  subscribeContextAvailability
+   *  discoverContextAvailability
+   *  updateContextSubscription
+   *  unsubscribeContext
+   *  subscribeContext
+   *  registerContext
+   *  updateContext
+   *  queryContext
+   *
+   */
+  // FIXME P5: this strategy can be improved taking into account position. Otherwise, it is
+  // ambigous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
+  // highly improbable that the user uses entities which id (or type) match the name of a
+  // standard operation
+  if      (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
+  else if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
+  else if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
+  else if (strcasestr(url, "discoverContextAvailability") != NULL)           return DEFAULT_SERVICE_PATH_RECURSIVE;
+  else if (strcasestr(url, "updateContextSubscription") != NULL)             return DEFAULT_SERVICE_PATH_RECURSIVE;
+  else if (strcasestr(url, "unsubscribeContext") != NULL)                    return DEFAULT_SERVICE_PATH_RECURSIVE;
+  else if (strcasestr(url, "subscribeContext") != NULL)                      return DEFAULT_SERVICE_PATH_RECURSIVE;
+  else if (strcasestr(url, "registerContext") != NULL)                       return DEFAULT_SERVICE_PATH;
+  else if (strcasestr(url, "updateContext") != NULL)                         return DEFAULT_SERVICE_PATH;
+  else if (strcasestr(url, "queryContext") != NULL)                          return DEFAULT_SERVICE_PATH_RECURSIVE;
+
+  /* Look for convenience operation. Subscription-related operations are special, all the other depend on
+   * the method
+   */
+  else if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_RECURSIVE;
+  else if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_RECURSIVE;
+  else if (strcasecmp(method, "POST") == 0)                                  return DEFAULT_SERVICE_PATH;
+  else if (strcasecmp(method, "PUT") == 0)                                   return DEFAULT_SERVICE_PATH;
+  else if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
+  else if (strcasecmp(method, "GET") == 0)                                   return DEFAULT_SERVICE_PATH_RECURSIVE;
+
+  LM_E(("Runtime Error (cannot found default service path for: (%s, %s))", method, url));
+  return DEFAULT_SERVICE_PATH;
+}
+
 
 
 /* ****************************************************************************
@@ -715,7 +768,7 @@ static int connectionTreat
     LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
 
     /* In the case an actual Fiware-ServicePath is found, the default will be overwritten */
-    ciP->httpHeaders.servicePath = DEFAULT_SERVICE_PATH;
+    ciP->httpHeaders.servicePath = defaultServicePath(url, method);
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
 
     char tenant[128];
