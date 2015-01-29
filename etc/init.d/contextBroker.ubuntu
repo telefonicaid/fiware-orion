@@ -1,17 +1,4 @@
 #! /bin/sh
-# contextBroker         Start/Stop the Context Broker
-#
-### BEGIN INIT INFO
-# Provides:          contextBroker
-# Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Example initscript
-# Description:       This file should be used to construct scripts to be
-#                    placed in /etc/init.d.
-### END INIT INFO
-
 # Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -33,6 +20,17 @@
 # iot_support at tid dot es
 #
 # Author: Carlos Quijano <carlos@crqgestion.es>
+#
+### BEGIN INIT INFO
+# Provides:          contextBroker
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Example initscript
+# Description:       This file should be used to construct scripts to be
+#                    placed in /etc/init.d.
+### END INIT INFO
 
 # Do NOT "set -e"
 
