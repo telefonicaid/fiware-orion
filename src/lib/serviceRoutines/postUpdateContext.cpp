@@ -64,7 +64,7 @@ std::string postUpdateContext
   UpdateContextResponse  upcr;
   std::string            answer;
 
-  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
+  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
 
   //
   // Checking for SccFound in the ContextElementResponseVector
@@ -81,6 +81,23 @@ std::string postUpdateContext
     answer = upcr.render(ciP, UpdateContext, "");
     return answer;
   }
+
+  //
+  // If upcr.contextElementResponseVector contains TWO responses and one of them is a 'SccFound',
+  // then skip the one that isn't 'SccFound'.
+  //
+  // FIXME P6: Temporary hack for 'Entity found but Attribute not found':
+  //           See FIXME P6 'Temporary hack ...' 
+  //           in MongoCommonUpdate.cpp, function processContextElement
+  //
+  if (upcr.contextElementResponseVector.size() == 2)
+  {
+    if (upcr.contextElementResponseVector[1]->statusCode.code == SccFound)
+    {
+      upcr.contextElementResponseVector.erase(upcr.contextElementResponseVector.begin());
+    }
+  }
+
 
   for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)
   {

@@ -1157,7 +1157,8 @@ static bool processContextAttributeVector (ContextElement*                      
                                            double&                                    coordLat,
                                            double&                                    coordLong,
                                            std::string                                tenant,
-                                           const std::vector<std::string>&            servicePathV)
+                                           const std::vector<std::string>&            servicePathV,
+                                           std::string*                               why)
 {
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
@@ -1191,6 +1192,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: UPDATE") + 
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());
+                *why = "Attribute Not Found";
                 return false;
 
             }
@@ -1547,7 +1549,8 @@ void processContextElement(ContextElement*                      ceP,
                            const std::string&                   tenant,
                            const std::vector<std::string>&      servicePathV,
                            std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
-                           const std::string&                   xauthToken
+                           const std::string&                   xauthToken,
+                           const std::string&                   caller
 )
 {
 
@@ -1675,7 +1678,6 @@ void processContextElement(ContextElement*                      ceP,
     while (cursor->more()) {
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-        ++docs;
 
         BSONElement idField = r.getField("_id");
 
@@ -1705,6 +1707,7 @@ void processContextElement(ContextElement*                      ceP,
             LM_T(LmtServicePath, ("Removing entity"));
             removeEntity(entityId, entityType, cerP, tenant, entitySPath);
             responseP->contextElementResponseVector.push_back(cerP);
+            ++docs;
             continue;
         }
 
@@ -1737,12 +1740,38 @@ void processContextElement(ContextElement*                      ceP,
             coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV)) {
+        std::string why;
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV, &why))
+        {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
+
+            //
+            // FIXME P6: Temporary hack for 'Entity found but Attribute not found':
+            //           If caller is 'postContextUpdate' then we need to keep 'docs' at zero for 'Attribute Not Found'
+            //           as to force the call to lookup ngsi9 registrations to do the forward of the message.
+            //           For all other combinations, add to 'docs'.
+            //
+            //           This hack makes 'mongoUpdateContext' return TWO responses for this circumstance, one saying
+            //           "Error: Attribute Not Found", the other indicating that it can be found in a Context Provider.
+            //           This is true only for calls from the function 'postUpdateContext'.
+            //           That function remedies this situation by removiong ther unwanted response (the first one),
+            //           and then overwriting the second one with the response of the Context Provider.
+            //
+            //           This is just a temporary fix.
+            //           The real fix will probably be a rewrite of this piece of code,
+            //           implemented when fixing 'definitely' the issue #716
+            //
+            if ((why != "Attribute Not Found") || (caller != "postContextUpdate"))
+            {
+              ++docs;
+            }
+
             continue;
         }
+
+        ++docs;
 
         /* Now that attrs contains the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
