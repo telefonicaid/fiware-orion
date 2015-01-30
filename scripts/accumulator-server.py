@@ -36,7 +36,6 @@ __author__ = 'fermin'
 #   "Content-Type: application/x-www-form-urlencoded" has been problematic in the past)
 
 from flask import Flask, request, Response
-from sys import argv, exit
 from datetime import datetime
 from math import trunc
 from time import sleep
@@ -44,57 +43,41 @@ import os
 import atexit
 import string
 import signal
+import argparse
+import sys
 from OpenSSL import SSL
-
-# Set up TLS
-dir = os.path.dirname(argv[0])
-if dir == '':
-    dir = os.curdir
-context = SSL.Context(SSL.SSLv23_METHOD)
-context.use_certificate_file(os.path.join(dir, 'accumulator.crt'))
-context.use_privatekey_file(os.path.join(dir, 'accumulator.key'))
 
 # This function is registered to be called upon termination
 def all_done():
     os.unlink(pidfile)
 
-# Default arguments
-port = 1028
-host='0.0.0.0'
-server_url = '/accumulate'
-verbose = 0
+# Parse arguments from command line
+parser = argparse.ArgumentParser()
+parser.add_argument("--port", help='The port that will be listened to', type=int, default=1028)
+parser.add_argument("--host", help='The host that will represent the accumulator', default='0.0.0.0')
+parser.add_argument("--url", help='The URL that will hold the test resource (i.e. "/notify"',default='/accumulate')
+parser.add_argument("--verbose", help='Verbosity on or off', default=0)
+parser.add_argument("--cert", help='Certificate to use for the server (PEM)')
+parser.add_argument("--key", help='Private key to use for the server (PEM)')
+args = parser.parse_args()
+
+# Get arguments from command-line parameters
+port = args.port
+host = args.host
+server_url = args.url
+verbose = args.verbose
 https = 0
 
-# Arguments from command line
-if len(argv) > 2:
-    port = int(argv[1])
-    server_url = argv[2]
-
-if len(argv) > 3:
-    if argv[3] == 'on':
-        print 'verbose mode is on'
-        verbose = 1
-    if argv[3] == 'https':
-        print 'https mode is on'
+# If we are provided both key and cert we launch in SSL mode
+if args.cert or args.key:
+    if args.cert and args.key:
         https = 1
+        context = SSL.Context(SSL.SSLv23_METHOD)
+        context.use_certificate_file(args.cert)
+        context.use_privatekey_file(args.key)
     else:
-        host = argv[3]
-
-if len(argv) > 4:
-    if argv[4] == 'on':
-        print 'verbose mode is on'
-        verbose = 1
-    if argv[4] == 'https':
-        print 'https mode is on'
-        https = 1
-
-if len(argv) > 5:
-    if argv[5] == 'on':
-        print 'verbose mode is on'
-        verbose = 1
-    if argv[5] == 'https':
-        print 'https mode is on'
-        https = 1
+        print "Error: You must specify both a certificate and a key to use SSL"
+        sys.exit(1)
 
 
 pid = str(os.getpid())
