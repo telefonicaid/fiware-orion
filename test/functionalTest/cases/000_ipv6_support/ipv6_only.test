@@ -26,8 +26,8 @@ IPv6 Only
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255 IPV6
-accumulatorStart 0.0.0.0 ${LISTENER_PORT}
-accumulatorStart :: ${LISTENER2_PORT}
+accumulatorStart --host 0.0.0.0 --port ${LISTENER_PORT}
+accumulatorStart --host :: --port ${LISTENER2_PORT}
 
 --SHELL--
 echo "1: ++++++++++++++++++++"
