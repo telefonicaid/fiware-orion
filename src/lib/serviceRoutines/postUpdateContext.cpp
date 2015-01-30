@@ -83,20 +83,37 @@ std::string postUpdateContext
   }
 
   //
-  // If upcr.contextElementResponseVector contains TWO responses and one of them is a 'SccFound',
-  // then skip the one that isn't 'SccFound'.
+  // If upcr.contextElementResponseVector contains >= TWO responses and the second of them is a 'SccFound',
+  // then skip the first, the one that isn't 'SccFound'.
+  // Also, if the first of them is 472, then skip the second
   //
   // FIXME P6: Temporary hack for 'Entity found but Attribute not found':
   //           See FIXME P6 'Temporary hack ...' 
   //           in MongoCommonUpdate.cpp, function processContextElement
   //
-  if (upcr.contextElementResponseVector.size() == 2)
+
+  //
+  // 1. Remove Response 0 if Response 1 is SccFound AND Response 0 is NOT SccFound
+  //
+  if (upcr.contextElementResponseVector.size() >= 2)
   {
-    if (upcr.contextElementResponseVector[1]->statusCode.code == SccFound)
+    if ((upcr.contextElementResponseVector[1]->statusCode.code == SccFound) && (upcr.contextElementResponseVector[0]->statusCode.code != SccFound))
     {
-      upcr.contextElementResponseVector.erase(upcr.contextElementResponseVector.begin());
+      upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin());
     }
   }
+
+  //
+  // 2. Remove Response 1 if Response 0 is SccInvalidParameter
+  //
+  if (upcr.contextElementResponseVector.size() >= 2)
+  {
+    if (upcr.contextElementResponseVector[0]->statusCode.code == SccInvalidParameter)
+    {
+      upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + 1);
+    }
+  }
+
 
 
   for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)

@@ -1763,7 +1763,7 @@ void processContextElement(ContextElement*                      ceP,
             //           The real fix will probably be a rewrite of this piece of code,
             //           implemented when fixing 'definitely' the issue #716
             //
-            if ((why != "Attribute Not Found") || (caller != "postContextUpdate"))
+            if ((why != "Attribute Not Found") || (caller != "postUpdateContext"))
             {
               ++docs;
             }
@@ -1917,7 +1917,7 @@ void processContextElement(ContextElement*                      ceP,
           {
             // Suitable CProvider has been found: creating response and returning
             std::string prApp = crrV[0]->contextRegistration.providingApplication.get();
-            LM_T(LmtCtxProviders, ("context provide found: %s", prApp.c_str()));
+            LM_T(LmtCtxProviders, ("context provider found: %s", prApp.c_str()));
             buildGeneralErrorResponse(ceP, NULL, responseP, SccFound, prApp, &ceP->contextAttributeVector);
           }
           else
