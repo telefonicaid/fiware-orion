@@ -648,28 +648,30 @@ std::string defaultServicePath(const char* url, const char* method)
   // standard operation
 
   // FIXME P5: unhardwire literals
-  if      (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
-  else if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
-  else if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
-  else if (strcasestr(url, "discoverContextAvailability") != NULL)           return DEFAULT_SERVICE_PATH_RECURSIVE;
-  else if (strcasestr(url, "updateContextSubscription") != NULL)             return DEFAULT_SERVICE_PATH_RECURSIVE;
-  else if (strcasestr(url, "unsubscribeContext") != NULL)                    return DEFAULT_SERVICE_PATH_RECURSIVE;
-  else if (strcasestr(url, "subscribeContext") != NULL)                      return DEFAULT_SERVICE_PATH_RECURSIVE;
-  else if (strcasestr(url, "registerContext") != NULL)                       return DEFAULT_SERVICE_PATH;
-  else if (strcasestr(url, "updateContext") != NULL)                         return DEFAULT_SERVICE_PATH;
-  else if (strcasestr(url, "queryContext") != NULL)                          return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "discoverContextAvailability") != NULL)           return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "notifyContextAvailability") != NULL)             return DEFAULT_SERVICE_PATH;
+  if (strcasestr(url, "updateContextSubscription") != NULL)             return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "unsubscribeContext") != NULL)                    return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "subscribeContext") != NULL)                      return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "registerContext") != NULL)                       return DEFAULT_SERVICE_PATH;
+  if (strcasestr(url, "updateContext") != NULL)                         return DEFAULT_SERVICE_PATH;
+  if (strcasestr(url, "notifyContext") != NULL)                         return DEFAULT_SERVICE_PATH;
+  if (strcasestr(url, "queryContext") != NULL)                          return DEFAULT_SERVICE_PATH_RECURSIVE;
 
   /* Look for convenience operation. Subscription-related operations are special, all the other depend on
    * the method
    */
-  else if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_RECURSIVE;
-  else if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_RECURSIVE;
-  else if (strcasecmp(method, "POST") == 0)                                  return DEFAULT_SERVICE_PATH;
-  else if (strcasecmp(method, "PUT") == 0)                                   return DEFAULT_SERVICE_PATH;
-  else if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
-  else if (strcasecmp(method, "GET") == 0)                                   return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasecmp(method, "POST") == 0)                                  return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "PUT") == 0)                                   return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "GET") == 0)                                   return DEFAULT_SERVICE_PATH_RECURSIVE;
 
-  LM_E(("Runtime Error (cannot found default service path for: (%s, %s))", method, url));
+  LM_W(("Bad Input (cannot find default service path for: (%s, %s))", method, url));
   return DEFAULT_SERVICE_PATH;
 }
 
