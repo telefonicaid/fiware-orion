@@ -637,11 +637,17 @@ std::string defaultServicePath(const char* url, const char* method)
    *  updateContext
    *  queryContext
    *
+   * Note that in the case of unsubscribeContext and unsubscribeContextAvailability doesn't
+   * actually use a servicePath, but we also provide a default in that case for the sake of
+   * completeness
    */
-  // FIXME P5: this strategy can be improved taking into account position. Otherwise, it is
+
+  // FIXME P5: this strategy can be improved taking into account full URL. Otherwise, it is
   // ambigous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
   // highly improbable that the user uses entities which id (or type) match the name of a
   // standard operation
+
+  // FIXME P5: unhardwire literals
   if      (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
   else if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
   else if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
@@ -767,9 +773,12 @@ static int connectionTreat
     }
     LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
 
-    /* In the case an actual Fiware-ServicePath is found, the default will be overwritten */
-    ciP->httpHeaders.servicePath = defaultServicePath(url, method);
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
+    if (!ciP->httpHeaders.servicePathReceived)
+    {
+      ciP->httpHeaders.servicePath = defaultServicePath(url, method);
+      ciP->httpHeaders.servicePathReceived = true;
+    }
 
     char tenant[128];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));

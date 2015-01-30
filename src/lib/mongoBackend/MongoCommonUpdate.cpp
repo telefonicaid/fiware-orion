@@ -781,7 +781,7 @@ std::string servicePathSubscriptionRegex(const std::string servicePath, std::vec
 
   if (spathComponents == 0)
   {
-    spathRegex = "^$|^\\/#$|^\\/$";  // FIXME NOW: Including empty service path also, not sure it's correct
+    spathRegex = "^$|^\\/#$|^\\/$";
   }
   else
   {
