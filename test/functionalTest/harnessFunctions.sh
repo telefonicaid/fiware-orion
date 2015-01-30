@@ -391,23 +391,57 @@ function accumulatorStop()
 #
 function accumulatorStart()
 {
-  bindIp=$1
-  port=$2
-  https=$3
+  host=""
+  port=""
+  url=""
+  cert=""
+  key=""
 
+  # Read parameters
+  while [ "$#" != 0 ]
+  do
+      if   [ "$1" == "--host" ]; then  host="$2"; shift;
+      elif [ "$1" == "--port" ]; then  port="$2"; shift;
+      elif [ "$1" == "--url"  ]; then  url="$2"; shift;
+      elif [ "$1" == "--cert" ]; then  cert="$2"; shift;
+      elif [ "$1" == "--key"  ]; then  key="$2"; shift;
+    fi
+    shift
+  done
+
+  # If host is missing we use the default ACCUM_HOST
+  if [ -z "$host" ]
+  then
+    host=$ACCUM_HOST
+  fi
+  
   # If port is missing, we use the default LISTENER_PORT
   if [ -z "$port" ]
   then
     port=$LISTENER_PORT
   fi
 
+  # If URL is missing we use the default ACCUM_RESOURCE
+  if [ -z "$url" ]
+  then
+    url=$ACCUM_RESOURCE
+  fi
+
   accumulatorStop $port
 
-  if [ "$https" == "https" ]
+  # echo host: $host
+  # echo port: $port
+  # echo url: $url
+  # echo cert: $cert
+  # echo key: $key
+  # echo Running: accumulator-server.py --port $port --url $url --host $host
+
+  # If we are provided both key and cert we launch in SSL mode
+  if [ -z "$cert" ] && [ -z "$key" ]
   then
-    accumulator-server.py $port /notify $bindIp $https 2> /tmp/accumulator_$port &
+    accumulator-server.py --port $port --url $url --host $host 2> /tmp/accumulator_$port &
   else
-    accumulator-server.py $port /notify $bindIp 2> /tmp/accumulator_$port &
+    accumulator-server.py --port $port --url $url --host $host --cert $cert --key $key 2> /tmp/accumulator_$port &
   fi
 
   echo accumulator running as PID $$
