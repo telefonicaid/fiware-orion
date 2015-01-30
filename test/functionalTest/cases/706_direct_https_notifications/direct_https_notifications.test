@@ -26,7 +26,8 @@ Direct HTTPS notifications
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
-accumulatorStart 127.0.0.1 1443 https
+${SCRIPT_HOME}/../../scripts/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
+accumulatorStart --host 127.0.0.1 --port 1443 --cert /tmp/harnessTest.pem --key /tmp/harnessTest.key
 
 --SHELL--
 
@@ -211,3 +212,4 @@ Content-Type: application/json
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+rm -f /tmp/harnessTest.key /tmp/harnessTest.pem
