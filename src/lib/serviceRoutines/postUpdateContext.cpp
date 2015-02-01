@@ -94,16 +94,6 @@ std::string postUpdateContext
 
 
   //
-  // Debug - show all responses and their types
-  //
-  LM_M(("KZ: ----------------------------------------------------------------"));
-  LM_M(("KZ: In: %d vector-items", parseDataP->upcr.res.contextElementVector.size()));
-  LM_M(("KZ: Out: %d vector-items", upcr.contextElementResponseVector.size()));
-  for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)
-    LM_M(("KZ: Out[%d]: (%d) %s", ix, upcr.contextElementResponseVector[ix]->statusCode.code, upcr.contextElementResponseVector[ix]->statusCode.reasonPhrase.c_str()));
-  LM_M(("KZ: ----------------------------------------------------------------"));
-
-  //
   // Removing 'garbage' from the response vector (when just *one* incoming contextElement
   //
   
@@ -131,7 +121,6 @@ std::string postUpdateContext
           {
             // Remove the 472
             upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix);
-            LM_M(("KZ: Removing the 472 to keep the 302"));
           }
 
           // 472+404
@@ -139,7 +128,6 @@ std::string postUpdateContext
           {
             // Remove the 404
             upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix + 1);
-            LM_M(("KZ: Removing the 404 to keep the 472"));
           }
         }
       }
