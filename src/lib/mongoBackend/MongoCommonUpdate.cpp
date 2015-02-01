@@ -1148,6 +1148,8 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 * Returns true if entity was actually modified, false otherwise (including fail cases)
 *
 */
+#define ATTRIBUTE_NOT_FOUND 1
+
 static bool processContextAttributeVector (ContextElement*                            ceP,
                                            std::string                                action,
                                            std::map<string, TriggeredSubscription*>&  subsToNotify,
@@ -1158,7 +1160,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                            double&                                    coordLong,
                                            std::string                                tenant,
                                            const std::vector<std::string>&            servicePathV,
-                                           std::string*                               why)
+                                           int*                                       why)
 {
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
@@ -1192,7 +1194,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: UPDATE") + 
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());
-                *why = "Attribute Not Found";
+                *why = ATTRIBUTE_NOT_FOUND;
                 return false;
 
             }
@@ -1740,7 +1742,7 @@ void processContextElement(ContextElement*                      ceP,
             coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        std::string why;
+        int why = 0;
         if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV, &why))
         {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
@@ -1763,7 +1765,7 @@ void processContextElement(ContextElement*                      ceP,
             //           The real fix will probably be a rewrite of this piece of code,
             //           implemented when fixing 'definitely' the issue #716
             //
-            if ((why != "Attribute Not Found") || (caller != "postUpdateContext"))
+            if ((why != ATTRIBUTE_NOT_FOUND) || (caller != "postUpdateContext"))
             {
               ++docs;
             }

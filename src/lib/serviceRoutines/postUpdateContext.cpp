@@ -92,28 +92,59 @@ std::string postUpdateContext
   //           in MongoCommonUpdate.cpp, function processContextElement
   //
 
-  //
-  // 1. Remove Response 0 if Response 1 is SccFound AND Response 0 is NOT SccFound
-  //
-  if (upcr.contextElementResponseVector.size() >= 2)
-  {
-    if ((upcr.contextElementResponseVector[1]->statusCode.code == SccFound) && (upcr.contextElementResponseVector[0]->statusCode.code != SccFound))
-    {
-      upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin());
-    }
-  }
 
   //
-  // 2. Remove Response 1 if Response 0 is SccInvalidParameter
+  // Debug - show all responses and their types
   //
-  if (upcr.contextElementResponseVector.size() >= 2)
+  LM_M(("KZ: ----------------------------------------------------------------"));
+  LM_M(("KZ: In: %d vector-items", parseDataP->upcr.res.contextElementVector.size()));
+  LM_M(("KZ: Out: %d vector-items", upcr.contextElementResponseVector.size()));
+  for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)
+    LM_M(("KZ: Out[%d]: (%d) %s", ix, upcr.contextElementResponseVector[ix]->statusCode.code, upcr.contextElementResponseVector[ix]->statusCode.reasonPhrase.c_str()));
+  LM_M(("KZ: ----------------------------------------------------------------"));
+
+  //
+  // Removing 'garbage' from the response vector (when just *one* incoming contextElement
+  //
+  
+  if (upcr.contextElementResponseVector.size() != parseDataP->upcr.res.contextElementVector.size())
   {
-    if (upcr.contextElementResponseVector[0]->statusCode.code == SccInvalidParameter)
+    for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size() - 1; ++ix)
     {
-      upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + 1);
+      //
+      // 2 cases:
+      //
+      // o 1. 472+302:  keep 302
+      //   Out[0]: (472) request parameter is invalid/not allowed
+      //   Out[1]: (302) Found
+      //
+      // o 2. 472+404: keep 472
+      //   Out[0]: (472) request parameter is invalid/not allowed
+      //   Out[1]: (404) No context element found
+      //
+      if (upcr.contextElementResponseVector[ix]->statusCode.code == 472)
+      {
+        if (ix + 1 < upcr.contextElementResponseVector.size())
+        {
+          // 472+302
+          if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == 302)
+          {
+            // Remove the 472
+            upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix);
+            LM_M(("KZ: Removing the 472 to keep the 302"));
+          }
+
+          // 472+404
+          else if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == 404)
+          {
+            // Remove the 404
+            upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix + 1);
+            LM_M(("KZ: Removing the 404 to keep the 472"));
+          }
+        }
+      }
     }
   }
-
 
 
   for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)
