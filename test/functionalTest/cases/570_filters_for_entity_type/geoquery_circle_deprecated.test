@@ -25,6 +25,7 @@ Geo query circle - deprecated
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 # The tests in this file use FIWARE_Location (instead of FIWARE::Location), which was deprecated
 # in Orion 0.16.0
@@ -517,3 +518,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

@@ -25,6 +25,7 @@ ServicePath HTTP Headers
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -175,3 +176,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

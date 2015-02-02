@@ -25,6 +25,7 @@ Convenience2 contextEntityTypes test
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255 IPV4
+
 --SHELL--
 
 echo "0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg"
@@ -398,3 +399,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

@@ -381,4 +381,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbInit CB
+dbDrop CB

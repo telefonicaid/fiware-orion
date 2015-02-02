@@ -331,16 +331,16 @@ url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p230</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p230</contextValue>
+       </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>

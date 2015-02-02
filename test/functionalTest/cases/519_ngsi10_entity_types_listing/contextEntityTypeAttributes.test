@@ -25,6 +25,7 @@ Convenience2 contextEntityTypeAttributes test
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255 IPV4
+
 --SHELL--
 
 
@@ -301,3 +302,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB
