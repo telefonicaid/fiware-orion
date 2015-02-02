@@ -80,6 +80,7 @@ static std::string          subscribeContextCollectionName;
 static std::string          subscribeContextAvailabilityCollectionName;
 static std::string          assocationsCollectionName;
 static Notifier*            notifier;
+static bool                 multitenant;
 
 /* ****************************************************************************
 *
@@ -92,9 +93,10 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 *
 * mongoConnect -
 */
-bool mongoConnect(const char* host, const char* db, const char* rplSet, const char* username, const char* passwd, bool multitenant) {
+bool mongoConnect(const char* host, const char* db, const char* rplSet, const char* username, const char* passwd, bool _multitenant) {
 
     std::string err;
+    multitenant = _multitenant;
 
     LM_T(LmtBug, ("dbName: '%s'", db));
 
@@ -383,7 +385,7 @@ static std::string composeCollectionName(std::string tenant, std::string colName
 */
 std::string composeDatabaseName(std::string tenant) {
     std::string result;
-    if (tenant == "")
+    if (!multitenant || (tenant == ""))
     {
         result = dbPrefix;
     }

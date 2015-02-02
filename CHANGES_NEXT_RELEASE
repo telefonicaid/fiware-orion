@@ -1,5 +1,6 @@
-Fix:  Fixed the bug about recovering ONTIMEINTERVAL subscriptions (Issue #693)
-Fix:  Fixed the crash in queryContext with an invalid geoscope (Issue #690)
-Fix:  Protect the broker against payload-less responses to forwarded requests (Issue #699)
-Fix:  Fixed bug that prevented types from entities with no attributes from being listed (Issue #686)
-Add:  The broker is now able to use HTTPS to send notifications directly without using Rush (Issue #706)
+- Fix: The option '-multiservice' was ignored and the broker ran always in multiservice mode. Now the option is taken taken into account (Issue #725)
+- Fix: Forwarded requests always in XML (Issue #703)
+- Fix: internal substitution of servicePath defaults ("/" for update-like operations, "/#" for query-like operations)
+- Fix: Temporal hack to allow for forwarding of 'attribute not found in entity found' (Issue #716)
+- Add:  The broker is now able to use HTTPS to send notifications directly without using Rush (Issue #706)
+

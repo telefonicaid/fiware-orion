@@ -169,10 +169,10 @@ TEST(UpdateContextAvailabilitySubscriptionRequest, response)
   StatusCode                                     ec(SccBadRequest, "Detail");
   UpdateContextAvailabilitySubscriptionResponse  ucas2(ec);
   std::string                                    out;
-  const char*                                    outfile1 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response1.ok.xml";
-  const char*                                    outfile2 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response2.ok.xml";
-  const char*                                    outfile3 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response3.ok.xml";
-  const char*                                    outfile4 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response4.ok.xml";
+  const char*                                    outfile1 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response1.valid.xml";
+  const char*                                    outfile2 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response2.valid.xml";
+  const char*                                    outfile3 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response3.valid.xml";
+  const char*                                    outfile4 = "ngsi9.updateContextAvailabilitySubscriptionResponse.response4.valid.xml";
   
   utInit();
 

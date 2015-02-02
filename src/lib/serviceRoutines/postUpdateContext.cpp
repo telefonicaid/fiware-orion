@@ -64,7 +64,7 @@ std::string postUpdateContext
   UpdateContextResponse  upcr;
   std::string            answer;
 
-  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
+  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
 
   //
   // Checking for SccFound in the ContextElementResponseVector
@@ -81,6 +81,68 @@ std::string postUpdateContext
     answer = upcr.render(ciP, UpdateContext, "");
     return answer;
   }
+
+  //
+  // If upcr.contextElementResponseVector contains >= TWO responses and the second of them is a 'SccFound',
+  // then skip the first, the one that isn't 'SccFound'.
+  // Also, if the first of them is 472, then skip the second
+  //
+  // FIXME P6: Temporary hack for 'Entity found but Attribute not found':
+  //           See FIXME P6 'Temporary hack ...' 
+  //           in MongoCommonUpdate.cpp, function processContextElement
+  //
+
+
+  //
+  // Removing 'garbage' from the response vector
+  // [ When then number of incoming contextElement is different than the number of contextElement responses ]
+  //
+  // There are two different cases of 'garbage', as when a 472 is encountered, to allow for the search for a 302
+  // (meaning that the entity/attribute is found is a ngsi9 registration), the search for the entity/attribute is 
+  // not considered finalized, and later on the 472 is followed by either a 302 (Found) or a 404 (Not Found).
+  //
+  // The 302 gives more info than the 472 (especially as it makes us forward the request right here), while in the
+  // other case, the 404 gives less info than the 472, so for the case of '472+302', the 302 must ge kept and for
+  // '472+404', the 472 must be kept
+  // 
+  //
+  
+  if (upcr.contextElementResponseVector.size() != parseDataP->upcr.res.contextElementVector.size())
+  {
+    // Note that the loop ends at the contextElementResponse BEFORE the last contextElementResponse in the vector
+    for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size() - 1; ++ix)
+    {
+      //
+      // 2 cases:
+      //
+      // o 1. 472+302:  keep 302
+      //   Out[0]: (472) request parameter is invalid/not allowed
+      //   Out[1]: (302) Found
+      //
+      // o 2. 472+404: keep 472
+      //   Out[0]: (472) request parameter is invalid/not allowed
+      //   Out[1]: (404) No context element found
+      //
+      if (upcr.contextElementResponseVector[ix]->statusCode.code == SccInvalidParameter)
+      {
+        if (ix + 1 < upcr.contextElementResponseVector.size())
+        {
+          // 472+302 (SccInvalidParameter+SccFound): Remove the 472
+          if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccFound)
+          {
+            upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix);
+          }
+
+          // 472+404 (SccInvalidParameter+SccContextElementNotFound): Remove the 404
+          else if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccContextElementNotFound)
+          {
+            upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix + 1);
+          }
+        }
+      }
+    }
+  }
+
 
   for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)
   {
@@ -136,9 +198,15 @@ std::string postUpdateContext
 
 
     //
-    // 3. Render an XML-string of the request we want to forward
+    // 3. Render a string of the request we want to forward, forced to XML
+    //    FIXME P8: The format of this string (XML or JSON) should depend on the
+    //              CB-CPr content type negotiation, but right now we force it to XML.
     //
-    std::string payloadIn = ucrP->render(ciP, UpdateContext, "");
+    ConnectionInfo ci;
+
+    ci.outFormat = XML;
+
+    std::string payloadIn = ucrP->render(&ci, UpdateContext, "");
 
     LM_T(LmtCtxProviders, ("payloadIn:\n%s", payloadIn.c_str()));
 

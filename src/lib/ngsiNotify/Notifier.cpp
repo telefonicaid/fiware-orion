@@ -69,6 +69,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
     //
     std::string spathList;
+    bool atLeastOneNotDefault = false;
     for (unsigned int ix = 0; ix < ncr->contextElementResponseVector.size(); ++ix)
     {
       EntityId* eP = &ncr->contextElementResponseVector[ix]->contextElement.entityId;
@@ -78,6 +79,18 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
         spathList += ",";
       }
       spathList += eP->servicePath;
+      atLeastOneNotDefault = atLeastOneNotDefault || (eP->servicePath != "/");
+    }
+    // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
+    // request not having that header. However, this causes as side-effect that a
+    // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
+    // Given that the "clean" implementation of Fiware-ServicePath propagation will be implemented
+    // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
+    // we introduce the atLeastOneNotDefault hack. Once #714 gets implemented,
+    // this FIXME will be removed (and all the test harness adjusted, if needed)
+    if (!atLeastOneNotDefault)
+    {
+      spathList = "";
     }
     
     ci.outFormat = format;

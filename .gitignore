@@ -39,4 +39,6 @@ fiware-orion.includes
 rpm/RPMS/
 rpm/SRPMS/
 rpm/SOURCES/
+rpm/BUILDROOT/
+rpm/src/
 

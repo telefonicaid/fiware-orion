@@ -30,7 +30,9 @@
 
 #include "rest/RestService.h"
 
-#define  MAX_LEN_IP   64
+#define  MAX_LEN_IP                      64
+#define  DEFAULT_SERVICE_PATH            "/"
+#define  DEFAULT_SERVICE_PATH_RECURSIVE  "/#"
 
 /* ****************************************************************************
 *

@@ -192,6 +192,12 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Fri Jan 16 2015 Fermin Galan <fermin@tid.es> 0.18.1-1 (FIWARE-4.2.1-1)
+- Fix: Fixed the bug about recovering ONTIMEINTERVAL subscriptions (Issue #693)
+- Fix: Fixed the crash in queryContext with an invalid geoscope (Issue #690)
+- Fix: Protect the broker against payload-less responses to forwarded requests (Issue #699)
+- Fix: Fixed bug that prevented types from entities with no attributes from being listed (Issue #686)
+
 * Fri Dec 19 2014 Fermin Galan <fermin@tid.es> 0.18.0-1 (FIWARE-4.1.3-1)
 - Add:  Service-Path in ngsi10 notifications (Issue #674)
 - Add:  Forbidden characters in the URL path are now detected (Issue #672)
