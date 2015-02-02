@@ -94,11 +94,22 @@ std::string postUpdateContext
 
 
   //
-  // Removing 'garbage' from the response vector (when just *one* incoming contextElement
+  // Removing 'garbage' from the response vector
+  // [ When then number of incoming contextElement is different than the number of contextElement responses ]
+  //
+  // There are two different cases of 'garbage', as when a 472 is encountered, to allow for the search for a 302
+  // (meaning that the entity/attribute is found is a ngsi9 registration), the search for the entity/attribute is 
+  // not considered finalized, and later on the 472 is followed by either a 302 (Found) or a 404 (Not Found).
+  //
+  // The 302 gives more info than the 472 (especially as it makes us forward the request right here), while in the
+  // other case, the 404 gives less info than the 472, so for the case of '472+302', the 302 must ge kept and for
+  // '472+404', the 472 must be kept
+  // 
   //
   
   if (upcr.contextElementResponseVector.size() != parseDataP->upcr.res.contextElementVector.size())
   {
+    // Note that the loop ends at the contextElementResponse BEFORE the last contextElementResponse in the vector
     for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size() - 1; ++ix)
     {
       //
@@ -112,21 +123,19 @@ std::string postUpdateContext
       //   Out[0]: (472) request parameter is invalid/not allowed
       //   Out[1]: (404) No context element found
       //
-      if (upcr.contextElementResponseVector[ix]->statusCode.code == 472)
+      if (upcr.contextElementResponseVector[ix]->statusCode.code == SccInvalidParameter)
       {
         if (ix + 1 < upcr.contextElementResponseVector.size())
         {
-          // 472+302
-          if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == 302)
+          // 472+302 (SccInvalidParameter+SccFound): Remove the 472
+          if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccFound)
           {
-            // Remove the 472
             upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix);
           }
 
-          // 472+404
-          else if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == 404)
+          // 472+404 (SccInvalidParameter+SccContextElementNotFound): Remove the 404
+          else if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccContextElementNotFound)
           {
-            // Remove the 404
             upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix + 1);
           }
         }
