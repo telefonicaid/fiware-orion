@@ -24,7 +24,7 @@
 Rush
 --SHELL-INIT--
 dbInit CB
-accumulatorStart localhost $LISTENER_PORT
+accumulatorStart
 brokerStart CB 0-255 IPV4 -rush localhost:$LISTENER_PORT
 
 --SHELL--
