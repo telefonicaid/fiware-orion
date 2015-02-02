@@ -130,13 +130,18 @@ std::string postUpdateContext
           // 472+302 (SccInvalidParameter+SccFound): Remove the 472
           if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccFound)
           {
+            upcr.contextElementResponseVector[ix]->release();
+            delete(upcr.contextElementResponseVector[ix]);
             upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix);
           }
 
           // 472+404 (SccInvalidParameter+SccContextElementNotFound): Remove the 404
           else if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccContextElementNotFound)
           {
+            upcr.contextElementResponseVector[ix + 1]->release();
+            delete(upcr.contextElementResponseVector[ix + 1]);
             upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix + 1);
+            ix = ix + 1;
           }
         }
       }
