@@ -22,6 +22,7 @@
 
 --NAME--
 Convenience2 contextEntityTypeAttributes test
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255 IPV4

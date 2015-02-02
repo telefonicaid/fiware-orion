@@ -22,9 +22,11 @@
 
 --NAME--
 Geo query circle
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 
 echo "1: +++++++++ Prepare entity for Madrid +++++++++++"

@@ -22,8 +22,8 @@
 
 --NAME--
 Attribute Compound Value parsing for POST /v1/notifyContext (notifyContextRequest)
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 brokerStart CB
 

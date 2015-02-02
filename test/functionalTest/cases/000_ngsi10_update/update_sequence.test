@@ -22,6 +22,7 @@
 
 --NAME--
 Update SEQ
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -1123,3 +1124,4 @@ Date: REGEX(.*)
 </updateContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB
