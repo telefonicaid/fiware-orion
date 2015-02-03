@@ -36,6 +36,12 @@
 *
 * mongoRegisterContext - 
 */
-extern HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, const std::string& tenant = "");
+extern HttpStatusCode mongoRegisterContext
+(
+  RegisterContextRequest*          requestP,
+  RegisterContextResponse*         responseP,
+  const std::string&               tenant       = "",
+  const std::vector<std::string>*  servicePathV = NULL
+);
 
 #endif
