@@ -46,10 +46,10 @@ using namespace mongo;
 */
 HttpStatusCode mongoRegisterContext
 (
-  RegisterContextRequest*          requestP,
-  RegisterContextResponse*         responseP,
-  const std::string&               tenant,
-  const std::vector<std::string>*  servicePathV
+  RegisterContextRequest*   requestP,
+  RegisterContextResponse*  responseP,
+  const std::string&        tenant,
+  const std::string&        servicePath
 )
 {    
     reqSemTake(__FUNCTION__, "ngsi9 register request");
@@ -59,10 +59,11 @@ HttpStatusCode mongoRegisterContext
     DBClientBase* connection = getMongoConnection();
 
     /* Check if new registration */
-    if (requestP->registrationId.isEmpty()) {
-        HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant);
-        reqSemGive(__FUNCTION__, "ngsi9 register request");
-        return result;
+    if (requestP->registrationId.isEmpty())
+    {
+      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, servicePath);
+      reqSemGive(__FUNCTION__, "ngsi9 register request");
+      return result;
     }
 
     /* It is not a new registration, so it should be an update */
@@ -73,8 +74,9 @@ HttpStatusCode mongoRegisterContext
         id = OID(requestP->registrationId.get());
 
         mongoSemTake(__FUNCTION__, "findOne from RegistrationsCollection");
-        reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id));
+        reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id << "servicePath" << servicePath));
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection");
+
         LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
     }
     catch (const AssertionException &e)
@@ -127,7 +129,7 @@ HttpStatusCode mongoRegisterContext
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant);
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, servicePath);
     reqSemGive(__FUNCTION__, "ngsi9 register request");
     return result;
 }

@@ -676,3 +676,36 @@ void strReplace(char* to, int toLen, const char* from, const char* oldString, co
 
   to[toIx] = 0;
 }
+
+
+
+/* ****************************************************************************
+*
+* servicePathCheck - 
+*/
+std::string servicePathCheck(const char* servicePath)
+{
+  if (servicePath  == NULL)      return "No Service Path";
+  if (*servicePath == 0)         return "Empty Service Path";
+
+  //
+  // A service-path contains only alphanumeric characters, plus underscore
+  //
+  while (*servicePath != 0)
+  {
+    if ((*servicePath >= 'A') && (*servicePath <= 'Z'))
+      ;
+    else if ((*servicePath >= 'a') && (*servicePath <= 'z'))
+      ;
+    else if (*servicePath == '_')
+      ;
+    else
+    {
+      return "Bad Character in Service-Path";
+    }
+
+    ++servicePath;
+  }
+
+  return "OK";
+}

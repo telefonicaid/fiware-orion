@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/string.h"
 #include "serviceRoutines/postRegisterContext.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "mongoBackend/mongoConfManOperations.h"
@@ -52,7 +53,8 @@ static std::string fordwardRegisterContext
   int                 port,
   const std::string&  tenant,
   const std::string&  xauthToken,
-  const std::string&  payload
+  const std::string&  payload,
+  const std::string&  servicePath
 )
 {
   LM_T(LmtCm, ("forwarding registerContext to: host='%s', port=%d", fwdHost, fwdPort));
@@ -62,7 +64,7 @@ static std::string fordwardRegisterContext
                                         "http:",
                                         "POST",
                                         tenant,
-                                        "", // FIXME P5: Service-Path
+                                        servicePath,
                                         xauthToken,
                                         "ngsi9/registerContext",
                                         // FIXME P3: unhardwire content type
@@ -96,10 +98,10 @@ static void registerContextForward
   if (parseDataP->rcr.res.registrationId.isEmpty())
   {
     /* New registration case */
-    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->tenant);
+    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->tenant, ciP->servicePathV[0]);
 
     std::string payload  = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload);
+    std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0]);
 
     if (response == "error")
     {
@@ -140,11 +142,11 @@ static void registerContextForward
     /* Update case */
     std::string fwdRegId = mongoGetFwdRegId(parseDataP->rcr.res.registrationId.get(), ciP->tenant);
 
-    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->tenant);
+    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->tenant, ciP->servicePathV[0]);
     parseDataP->rcr.res.registrationId.set(fwdRegId);
     mongoSetFwdRegId(rcrP->registrationId.get(), fwdRegId, ciP->tenant);
     std::string payload = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload);
+    fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0]);
   }
 }
 
@@ -163,6 +165,32 @@ std::string postRegisterContext
 )
 {
   RegisterContextResponse  rcr;
+  std::string              answer;
+
+  //
+  // If more than ONE service-path is input, an error is returned as response.
+  // If NO service-path is issued, then the default service-path "/" is used.
+  // After these checks, the service-path is checked to be 'correct'.
+  //
+  if (ciP->servicePathV.size() > 1)
+  {
+    LM_W(("Bad Input (more than one service path for a registration)"));
+    rcr.errorCode.fill(SccBadRequest, "more than one service path for notification");
+    answer = rcr.render(RegisterContext, ciP->outFormat, "");
+    return answer;
+  }
+  else if (ciP->servicePathV.size() == 0)
+  {
+    ciP->servicePathV.push_back("/");
+  }
+
+  std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
+  if (res != "OK")
+  {
+    rcr.errorCode.fill(SccBadRequest, res);
+    answer = rcr.render(RegisterContext, ciP->outFormat, "");
+    return answer;
+  }
 
   if (fwdPort != 0)
   {
@@ -170,10 +198,11 @@ std::string postRegisterContext
   }
   else
   {
-    ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->tenant);
+    LM_M(("KZ: registering entity %s with servicePath '%s'", parseDataP->rcr.res.contextRegistrationVector[0]->entityIdVector[0]->id.c_str(), ciP->servicePathV[0].c_str()));
+    ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->tenant, ciP->servicePathV[0]);
   }
 
-  std::string answer = rcr.render(RegisterContext, ciP->outFormat, "");
+  answer = rcr.render(RegisterContext, ciP->outFormat, "");
 
   return answer;
 }

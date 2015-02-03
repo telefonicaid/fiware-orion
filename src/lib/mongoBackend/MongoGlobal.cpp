@@ -1389,7 +1389,8 @@ bool registrationsQuery
   int                                 offset,
   int                                 limit,
   bool                                details,
-  long long*                          countP
+  long long*                          countP,
+  const std::vector<std::string>*     servicePathV
 )
 {
     DBClientBase* connection = getMongoConnection();
@@ -1811,7 +1812,7 @@ bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, st
     std::string err;
     NotifyContextAvailabilityRequest ncar;
 
-    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant))
+    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant, NULL))
     {
        ncar.contextRegistrationResponseVector.release();
        return false;

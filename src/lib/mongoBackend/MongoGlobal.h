@@ -71,6 +71,7 @@ using namespace mongo;
 #define REG_ATTRS_NAME              "name"
 #define REG_ATTRS_TYPE              "type"
 #define REG_ATTRS_ISDOMAIN          "isDomain"
+#define REG_SERVICE_PATH            "servicePath"
 
 #define ENT_ATTRS                    "attrs"
 #define ENT_ENTITY_ID                "id"
@@ -343,10 +344,11 @@ extern bool registrationsQuery
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
-  int                                 offset  = DEFAULT_PAGINATION_OFFSET_INT,
-  int                                 limit   = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                                details = false,
-  long long*                          countP  = NULL
+  int                                 offset       = DEFAULT_PAGINATION_OFFSET_INT,
+  int                                 limit        = DEFAULT_PAGINATION_LIMIT_INT,
+  bool                                details      = false,
+  long long*                          countP       = NULL,
+  const std::vector<std::string>*     servicePathV = NULL
 );
 
 /* ****************************************************************************
