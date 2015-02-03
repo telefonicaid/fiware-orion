@@ -128,11 +128,11 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     }
 
     /* Send notifications for matching context registrations */
-    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.str(), requestP->reference.get(), inFormat, tenant);
+    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), inFormat, tenant);
 
     /* Fill the response element */
     responseP->duration = requestP->duration;
-    responseP->subscriptionId.set(oid.str());
+    responseP->subscriptionId.set(oid.toString());
 
     reqSemGive(__FUNCTION__, "ngsi9 subscribe request");
     return SccOk;
