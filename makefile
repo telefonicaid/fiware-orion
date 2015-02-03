@@ -432,7 +432,7 @@ cppcheck:
 sonar_metrics: coverage
 	scripts/build/sonarProperties.sh $(BROKER_VERSION) > sonar-project.properties 
 	cd BUILD_COVERAGE/src && gcovr --gcov-exclude='.*parseArgs.*' --gcov-exclude='.*logMsg.*' -x -o ../../coverage.xml && cd ../../
-	sed s#filename=\"/var/develenv/jenkins/jobs/orion-sonar/workspace/#filename=\"/var/develenv/jenkins/jobs/metrics-queue-consumer/workspace/workspace/#g ./coverage.xml > ./coverage_sonar.xml
+	sed 's#filename="/var/develenv/jenkins/jobs/'$JOB_NAME'/workspace#filename="/var/develenv/jenkins/jobs/metrics-queue-consumer/workspace/workspace#g' coverage.xml > coverage_sonar.xml
 	cppcheck --xml -j 8 --enable=all -I src/lib/ -i src/lib/parseArgs -i src/lib/logMsg src/ 2>cppcheck-result.xml
 
 .PHONY: rpm mock mock32 mock64 valgrind
