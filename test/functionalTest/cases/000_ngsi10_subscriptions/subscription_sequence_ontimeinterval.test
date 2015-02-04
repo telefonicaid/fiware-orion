@@ -22,8 +22,8 @@
 
 --NAME--
 Subscription sequence ONTIMEINTERVAL
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 brokerStart CB
 accumulatorStart
@@ -408,3 +408,4 @@ TIMES: REGEX((0, 2, 4, 5, 9, 13, 14, 24, 34, 35, 37, 39, 53, 65, 67, 69|0, 2, 4,
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

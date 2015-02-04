@@ -22,6 +22,7 @@
 
 --NAME--
 Service not recognized
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -46,3 +47,4 @@ Date: REGEX(.*)
 }
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

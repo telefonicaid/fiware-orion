@@ -24,7 +24,6 @@
 Subscription ID metadata
 
 --SHELL-INIT--
-
 dbInit CB
 brokerStart CB
 accumulatorStart
@@ -219,3 +218,4 @@ Content-Type: application/xml
 
 brokerStop CB
 accumulatorStop
+dbDrop CB

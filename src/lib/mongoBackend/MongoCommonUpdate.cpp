@@ -781,7 +781,7 @@ std::string servicePathSubscriptionRegex(const std::string servicePath, std::vec
 
   if (spathComponents == 0)
   {
-    spathRegex = "^$|^\\/#$|^\\/$";  // FIXME NOW: Including empty service path also, not sure it's correct
+    spathRegex = "^$|^\\/#$|^\\/$";
   }
   else
   {
@@ -958,7 +958,7 @@ static bool addTriggeredSubscriptions(std::string                               
           continue;
         }
 
-        std::string subIdStr = idField.OID().str();
+        std::string subIdStr = idField.OID().toString();
 
         if (subs.count(subIdStr) == 0) {
             LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
@@ -1148,6 +1148,8 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 * Returns true if entity was actually modified, false otherwise (including fail cases)
 *
 */
+#define ATTRIBUTE_NOT_FOUND 1
+
 static bool processContextAttributeVector (ContextElement*                            ceP,
                                            std::string                                action,
                                            std::map<string, TriggeredSubscription*>&  subsToNotify,
@@ -1157,7 +1159,8 @@ static bool processContextAttributeVector (ContextElement*                      
                                            double&                                    coordLat,
                                            double&                                    coordLong,
                                            std::string                                tenant,
-                                           const std::vector<std::string>&            servicePathV)
+                                           const std::vector<std::string>&            servicePathV,
+                                           int*                                       why)
 {
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
@@ -1191,6 +1194,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: UPDATE") + 
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());
+                *why = ATTRIBUTE_NOT_FOUND;
                 return false;
 
             }
@@ -1547,7 +1551,8 @@ void processContextElement(ContextElement*                      ceP,
                            const std::string&                   tenant,
                            const std::vector<std::string>&      servicePathV,
                            std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
-                           const std::string&                   xauthToken
+                           const std::string&                   xauthToken,
+                           const std::string&                   caller
 )
 {
 
@@ -1675,7 +1680,6 @@ void processContextElement(ContextElement*                      ceP,
     while (cursor->more()) {
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
-        ++docs;
 
         BSONElement idField = r.getField("_id");
 
@@ -1705,6 +1709,7 @@ void processContextElement(ContextElement*                      ceP,
             LM_T(LmtServicePath, ("Removing entity"));
             removeEntity(entityId, entityType, cerP, tenant, entitySPath);
             responseP->contextElementResponseVector.push_back(cerP);
+            ++docs;
             continue;
         }
 
@@ -1737,12 +1742,38 @@ void processContextElement(ContextElement*                      ceP,
             coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV)) {
+        int why = 0;
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV, &why))
+        {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
+
+            //
+            // FIXME P6: Temporary hack for 'Entity found but Attribute not found':
+            //           If caller is 'postContextUpdate' then we need to keep 'docs' at zero for 'Attribute Not Found'
+            //           as to force the call to lookup ngsi9 registrations to do the forward of the message.
+            //           For all other combinations, add to 'docs'.
+            //
+            //           This hack makes 'mongoUpdateContext' return TWO responses for this circumstance, one saying
+            //           "Error: Attribute Not Found", the other indicating that it can be found in a Context Provider.
+            //           This is true only for calls from the function 'postUpdateContext'.
+            //           That function remedies this situation by removiong ther unwanted response (the first one),
+            //           and then overwriting the second one with the response of the Context Provider.
+            //
+            //           This is just a temporary fix.
+            //           The real fix will probably be a rewrite of this piece of code,
+            //           implemented when fixing 'definitely' the issue #716
+            //
+            if ((why != ATTRIBUTE_NOT_FOUND) || (caller != "postUpdateContext"))
+            {
+              ++docs;
+            }
+
             continue;
         }
+
+        ++docs;
 
         /* Now that attrs contains the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
@@ -1888,7 +1919,7 @@ void processContextElement(ContextElement*                      ceP,
           {
             // Suitable CProvider has been found: creating response and returning
             std::string prApp = crrV[0]->contextRegistration.providingApplication.get();
-            LM_T(LmtCtxProviders, ("context provide found: %s", prApp.c_str()));
+            LM_T(LmtCtxProviders, ("context provider found: %s", prApp.c_str()));
             buildGeneralErrorResponse(ceP, NULL, responseP, SccFound, prApp, &ceP->contextAttributeVector);
           }
           else

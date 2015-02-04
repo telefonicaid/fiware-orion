@@ -22,6 +22,7 @@
 
 --NAME--
 Convenience Context Entity Attributes
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -108,3 +109,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB
