@@ -21,7 +21,6 @@
 #
 # Author: Carlos Quijano <carlos@crqgestion.es>
 #
-
 ### BEGIN INIT INFO
 # Provides:          contextBroker
 # Required-Start:    $remote_fs $syslog
