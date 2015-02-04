@@ -92,8 +92,6 @@ ELSEIF(${DISTRO} STREQUAL "Fedora_20")
 ELSE()
   MESSAGE("contextBroker: Other DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)
-  INSTALL(PROGRAMS ${CMAKE_SOURCE_DIR}/etc/init.d/contextBroker.ubuntu DESTINATION /etc/init.d RENAME contextBroker)
-  INSTALL(FILES ${CMAKE_SOURCE_DIR}/etc/config/contextBroker DESTINATION /etc/default RENAME contextBroker)
 ENDIF()
 
 IF (${DISTRO} MATCHES "Ubuntu.*")
