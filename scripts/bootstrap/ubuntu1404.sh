@@ -27,6 +27,7 @@
 #sudo rpm -ivh epel-release-6-8.noarch.rpm
 
 # Install required packages
+sudo apt-get update
 sudo apt-get -y install make cmake build-essential scons git libmicrohttpd-dev libboost-dev libboost-thread-dev libboost-filesystem-dev libboost-program-options-dev  libcurl4-gnutls-dev clang libcunit1-dev mongodb-server python python-flask python-jinja2 curl libxml2 netcat-openbsd mongodb valgrind libxslt1.1 libssl-dev libcrypto++-dev
 
 # Install MongoDB C++ Driver
