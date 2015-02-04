@@ -198,7 +198,16 @@ std::string postRegisterContext
   }
   else
   {
-    LM_M(("KZ: registering entity %s with servicePath '%s'", parseDataP->rcr.res.contextRegistrationVector[0]->entityIdVector[0]->id.c_str(), ciP->servicePathV[0].c_str()));
+    LM_M(("KZ: size of ciP->servicePathV: %d", ciP->servicePathV.size()));
+    LM_M(("KZ: ciP->servicePathV[0]: '%s'", ciP->servicePathV[0].c_str()));
+    LM_M(("KZ: Number of contextRegistrations: %d", parseDataP->rcr.res.contextRegistrationVector.size()));
+    LM_M(("KZ: Number of entityIds: %d", parseDataP->rcr.res.contextRegistrationVector[0]->entityIdVector.size()));
+
+    if (parseDataP->rcr.res.contextRegistrationVector[0]->entityIdVector.size() > 0)
+      LM_M(("KZ: registering entity %s with servicePath '%s'", parseDataP->rcr.res.contextRegistrationVector[0]->entityIdVector[0]->id.c_str(), ciP->servicePathV[0].c_str()));
+    else
+      LM_M(("KZ: registering NO ENTITY with servicePath '%s'", ciP->servicePathV[0].c_str()));
+
     ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->tenant, ciP->servicePathV[0]);
   }
 

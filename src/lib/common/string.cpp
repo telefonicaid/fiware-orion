@@ -697,10 +697,15 @@ std::string servicePathCheck(const char* servicePath)
       ;
     else if ((*servicePath >= 'a') && (*servicePath <= 'z'))
       ;
+    else if ((*servicePath >= '0') && (*servicePath <= '9'))
+      ;
     else if (*servicePath == '_')
+      ;
+    else if (*servicePath == '/')
       ;
     else
     {
+      LM_W(("Bad Input (Bad Character '%c' in Service-Path)", *servicePath));
       return "Bad Character in Service-Path";
     }
 

@@ -117,13 +117,15 @@ static void prepareDatabase(void) {
   BSONObj reg1 = BSON(
               "_id" << OID("51307b66f481db11bf860001") <<
               "expiration" << 10000000 <<              
-              "contextRegistration" << BSON_ARRAY(cr1)
+              "contextRegistration" << BSON_ARRAY(cr1) <<
+              "servicePath" << "/"
               );
 
   BSONObj reg2 = BSON(
               "_id" << OID("51307b66f481db11bf860002") <<
               "expiration" << 20000000 <<              
-              "contextRegistration" << BSON_ARRAY(cr2 << cr3)
+              "contextRegistration" << BSON_ARRAY(cr2 << cr3) <<
+              "servicePath" << "/"
               );
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
@@ -157,6 +159,7 @@ TEST(mongoRegisterContext_update, updateCase1)
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
+  
   /* Prepare mock */
   NotifierMock* notifierMock = new NotifierMock();
   EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
@@ -183,7 +186,8 @@ TEST(mongoRegisterContext_update, updateCase1)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, "", "/");
+  LM_M(("Invoke mongoRegisterContext in mongoBackend library and EXIT. ms: %d", ms));
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

@@ -231,7 +231,7 @@ static HttpStatusCode associationsDiscoverContextAvailability
         }
 
         ContextRegistrationResponseVector crrV;
-        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant, DEFAULT_PAGINATION_OFFSET_INT, DEFAULT_PAGINATION_LIMIT_INT, false, NULL, &servicePathV))
+        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV))
         {
             responseP->errorCode.fill(SccReceiverInternalError, err);
             mdV.release();
@@ -279,7 +279,7 @@ static HttpStatusCode conventionalDiscoverContextAvailability
     long long   count = -1;
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
-    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, offset, limit, details, &count, &servicePathV))
+    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, servicePathV, offset, limit, details, &count))
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));

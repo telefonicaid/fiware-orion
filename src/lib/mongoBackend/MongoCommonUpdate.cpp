@@ -1913,7 +1913,7 @@ void processContextElement(ContextElement*                      ceP,
         // For now, we use limit=1. That ensures that maximum one providing application is returned. In the future,
         // we will consider leaving this limit open and define an algorithm to pick the right one, and ordered list, etc.
         //
-        if (registrationsQuery(enV, attrL, &crrV, &err, tenant, 0, 1, false))
+        if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 1, false))
         {
           if (crrV.size() > 0)
           {

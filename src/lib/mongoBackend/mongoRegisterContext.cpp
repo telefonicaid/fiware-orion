@@ -52,16 +52,23 @@ HttpStatusCode mongoRegisterContext
   const std::string&        servicePath
 )
 {    
+    std::string sPath = servicePath;
+
     reqSemTake(__FUNCTION__, "ngsi9 register request");
 
     LM_T(LmtMongo, ("Register Context Request"));
 
     DBClientBase* connection = getMongoConnection();
 
+    // Default value for service-path is "/"
+    if (sPath == "")
+      sPath = "/";
+
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())
     {
-      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, servicePath);
+      LM_M(("KZ: registering NEW entity"));
+      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath);
       reqSemGive(__FUNCTION__, "ngsi9 register request");
       return result;
     }
@@ -74,7 +81,8 @@ HttpStatusCode mongoRegisterContext
         id = OID(requestP->registrationId.get());
 
         mongoSemTake(__FUNCTION__, "findOne from RegistrationsCollection");
-        reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id << "servicePath" << servicePath));
+        LM_M(("KZ: looking up OLD registration"));
+        reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id << "servicePath" << sPath));
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection");
 
         LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
@@ -122,6 +130,7 @@ HttpStatusCode mongoRegisterContext
 
     if (reg.isEmpty())
     {
+       LM_M(("KZ: No registration found"));
        reqSemGive(__FUNCTION__, "ngsi9 register request (no registrations found)");
        responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: /") + requestP->registrationId.get() + "/");
        responseP->registrationId = requestP->registrationId;
@@ -129,7 +138,7 @@ HttpStatusCode mongoRegisterContext
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, servicePath);
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath);
     reqSemGive(__FUNCTION__, "ngsi9 register request");
     return result;
 }
