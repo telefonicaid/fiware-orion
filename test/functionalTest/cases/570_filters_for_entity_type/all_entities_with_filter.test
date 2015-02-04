@@ -26,6 +26,7 @@
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 
 #
@@ -486,3 +487,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

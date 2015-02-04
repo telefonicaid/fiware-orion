@@ -22,6 +22,7 @@
 
 --NAME--
 Compound Values for UpdateContextRequest 5
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-1
@@ -84,3 +85,4 @@ Date: REGEX(.*)
 </updateContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

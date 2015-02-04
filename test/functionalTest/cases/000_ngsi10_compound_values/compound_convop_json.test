@@ -22,6 +22,7 @@
 
 --NAME--
 Create and query compound values (conv op and JSON creation)
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -485,3 +486,4 @@ Date: REGEX(.*)
 }
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

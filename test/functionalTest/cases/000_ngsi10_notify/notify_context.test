@@ -22,6 +22,7 @@
 
 --NAME--
 Notify Context processing
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -154,3 +155,4 @@ Date: REGEX(.*)
 </queryContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

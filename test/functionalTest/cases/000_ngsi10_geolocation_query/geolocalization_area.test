@@ -215,3 +215,4 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB
