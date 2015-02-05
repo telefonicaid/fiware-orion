@@ -19,22 +19,26 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 #
-# Author: Leandro Guillen
+# Author: José Jaime
 #
 
 # Setting up EPEL Repo
-wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-sudo rpm -ivh epel-release-6-8.noarch.rpm
+#wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+#sudo rpm -ivh epel-release-6-8.noarch.rpm
 
 # Install required packages
-sudo yum -y install make cmake gcc-c++ scons git libmicrohttpd-devel boost-devel libcurl-devel clang CUnit-devel mongodb-server python python-flask python-jinja2 curl libxml2 nc mongodb-org valgrind libxslt
+sudo apt-get update
+sudo apt-get -y install make cmake build-essential scons git libmicrohttpd-dev libboost-dev libboost-thread-dev libboost-filesystem-dev libboost-program-options-dev  libcurl4-gnutls-dev clang libcunit1-dev mongodb-server python python-flask python-jinja2 curl libxml2 netcat-openbsd mongodb valgrind libxslt1.1 libssl-dev libcrypto++-dev
 
 # Install MongoDB C++ Driver
 wget http://downloads.mongodb.org/cxx-driver/mongodb-linux-x86_64-2.2.3.tgz
 tar xfvz mongodb-linux-x86_64-2.2.3.tgz
 cd mongo-cxx-driver-v2.2
-scons                                         # The build/libmongoclient.a library is generated as outcome
-sudo scons install                            # This puts .h files in /usr/local/include and libmongoclient.a in /usr/local/lib
+git clone https://github.com/mongodb/mongo-cxx-driver.git
+cd mongo-cxx-driver/
+git checkout 26compat
+scons --use-system-boost
+sudo scons --use-system-boost --full
 sudo chmod a+r -R /usr/local/include/mongo    # It seems that scons install breaks permissions
 cd ..
 
@@ -70,8 +74,8 @@ sudo cp examples/coap-client /usr/local/bin
 cd ..
 
 # Start MongoDB
-sudo yum update pcre            # otherwise, mongod crashes in CentOS 6.3
-sudo /etc/init.d/mongod start
+sudo apt-get install libpcre3            # otherwise, mongod crashes in CentOS 6.3
+sudo service mongodb start
 
 # Set up a more convenient workspace
 ln -fs /vagrant /home/vagrant/fiware-orion
