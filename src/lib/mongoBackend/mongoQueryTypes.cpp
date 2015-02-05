@@ -143,7 +143,7 @@ HttpStatusCode mongoEntityTypes
       return SccOk;
   }
 
-  /* Processing result to build response*/
+  /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
@@ -159,7 +159,6 @@ HttpStatusCode mongoEntityTypes
    */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-
     BSONObj                  resultItem = resultsArray[ix].embeddedObject();
     TypeEntity*              type       = new TypeEntity(resultItem.getStringField("_id"));
     std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
@@ -168,6 +167,9 @@ HttpStatusCode mongoEntityTypes
     {
       for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
       {
+        if (attrsArray[jx].isNull())
+          continue;
+        
         BSONObj jAttr = attrsArray[jx].embeddedObject();
         ContextAttribute* ca = new ContextAttribute(jAttr.getStringField(ENT_ATTRS_NAME), jAttr.getStringField(ENT_ATTRS_TYPE));
         type->contextAttributeVector.push_back(ca);
@@ -175,7 +177,6 @@ HttpStatusCode mongoEntityTypes
     }
 
     responseP->typeEntityVector.push_back(type);
-
   }
 
   char detailsMsg[256];
