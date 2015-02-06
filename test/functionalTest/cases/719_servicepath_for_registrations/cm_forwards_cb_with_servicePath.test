@@ -452,5 +452,5 @@ OK
 brokerStop CB
 brokerStop CM
 
-#dbDrop CB
-#dbDrop CM
+dbDrop CB
+dbDrop CM
