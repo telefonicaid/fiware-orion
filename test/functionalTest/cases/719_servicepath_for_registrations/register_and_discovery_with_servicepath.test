@@ -36,6 +36,7 @@ brokerStart CB 0
 # 04. Discovery of E.*/A1 with service path /a1/e2
 # 05. Discovery of E.*/A1 with service path /a1
 # 06. Discovery of E.*/A1 with service path /a1/#
+# 07. Discovery of E.*/A1 with service path /a2/#
 #
 
 echo "01. Register E1/A1 with service path /a1/e1"
@@ -166,6 +167,25 @@ payload='{
     ]
 }'
 orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --json --servicePath '/a1/#'
+echo
+echo
+
+
+echo "07. Discovery of E.*/A1 with service path /a2/#"
+echo "==============================================="
+payload='{
+    "entities": [
+        {
+            "type": "T",
+            "isPattern": "true",
+            "id": "E.*"
+        }
+    ],
+    "attributes" : [
+        "A1"
+    ]
+}'
+orionCurl --url /v1/registry/discoverContextAvailability --payload "${payload}" --json --servicePath '/a2/#'
 echo
 echo
 
@@ -324,6 +344,21 @@ Date: REGEX(.*)
             }
         }
     ]
+}
+
+
+07. Discovery of E.*/A1 with service path /a2/#
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
 }
 
 
