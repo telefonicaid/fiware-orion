@@ -22,6 +22,7 @@
 
 --NAME--
 Subscription sequence empty attributes
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -659,3 +660,4 @@ Content-Type: application/xml
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

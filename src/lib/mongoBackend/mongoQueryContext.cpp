@@ -101,12 +101,14 @@ HttpStatusCode mongoQueryContext
           std::string prApp = crrV[0]->contextRegistration.providingApplication.get();
           LM_T(LmtCtxProviders, ("context provide found: %s", prApp.c_str()));
           responseP->errorCode.fill(SccFound, prApp);
+          crrV.release();
           return SccOk;
         }
       }
       else
       {
         LM_E(("Database Error (%s)", err.c_str()));
+        crrV.release();  // Just in case
       }
 
       //

@@ -22,6 +22,7 @@
 
 --NAME--
 NGSI10 Convenience PUT Attribute Value Instance
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -284,3 +285,4 @@ Date: REGEX(.*)
 </contextAttributeResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

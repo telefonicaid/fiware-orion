@@ -22,6 +22,7 @@
 
 --NAME--
 Convenience NGSI9 Context Entity Type Attribute Container
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -164,3 +165,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

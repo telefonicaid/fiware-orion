@@ -22,9 +22,11 @@
 
 --NAME--
 XML Parse ContextEntitiesByEntityId
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 echo "1: ++++++++++++++++++++"
 
@@ -254,3 +256,4 @@ Date: REGEX(.*)
 9: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

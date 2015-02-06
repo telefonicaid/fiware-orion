@@ -22,6 +22,7 @@
 
 --NAME--
 Subscription sequence ONTIMEINTERVAL expiration check
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -244,3 +245,4 @@ Content-Type: application/xml
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

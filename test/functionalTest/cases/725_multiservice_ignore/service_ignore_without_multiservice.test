@@ -22,8 +22,10 @@
 
 --NAME--
 Ignoring service header when not running in multiservice mode
+
 --SHELL-INIT--
 dbInit CB
+dbInit ${CB_DATABASE_NAME}-foo
 brokerStart CB 0-255 IPV4
 
 --SHELL--
@@ -101,5 +103,6 @@ Date: REGEX(.*)
 
 brokerStop CB
 dbDrop CB
-# The next drop is to prevent the case in which the test failed and two databases were created
+
+# The following drop is to prevent the case in which the test failed and two databases were created
 dbDrop ${CB_DATABASE_NAME}-foo

@@ -117,3 +117,4 @@ Date: REGEX(.*)
 </appendContextElementResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

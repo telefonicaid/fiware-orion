@@ -115,7 +115,7 @@ def ignore(root, file):
     if file == '.gitignore' or file == '.valgrindrc' or file == '.valgrindSuppressions' \
         or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
         or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h' or file == 'unittests_that_fail_sporadically.txt' \
-        or file == 'Vagrantfile':
+        or file == 'Vagrantfile' or file == "contextBroker.ubuntu":
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
         or file == 'cmake2junit.xsl'):

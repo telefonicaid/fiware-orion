@@ -22,6 +22,7 @@
 
 --NAME--
 Create and query compound vector 2 (xml json)
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -149,3 +150,4 @@ Date: REGEX(.*)
 }
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

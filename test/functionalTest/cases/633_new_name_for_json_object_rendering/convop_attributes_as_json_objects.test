@@ -42,6 +42,7 @@
 
 --NAME--
 ConvOps with attributes as JSON objects
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -292,3 +293,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB
