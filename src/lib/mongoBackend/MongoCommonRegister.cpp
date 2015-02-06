@@ -399,8 +399,6 @@ HttpStatusCode processRegisterContext
             EntityId* en = cr->entityIdVector.get(jx);
             triggerEntitiesV.push_back(en);
 
-            LM_M(("KZ: Registering entity '%s' with servicePath '%s'", en->id.c_str(), servicePath.c_str()));
-
             if (en->type == "")
             {
                 entities.append(BSON(REG_ENTITY_ID << en->id));

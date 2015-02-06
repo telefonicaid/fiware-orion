@@ -67,7 +67,6 @@ HttpStatusCode mongoRegisterContext
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())
     {
-      LM_M(("KZ: registering NEW entity"));
       HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath);
       reqSemGive(__FUNCTION__, "ngsi9 register request");
       return result;
@@ -81,7 +80,6 @@ HttpStatusCode mongoRegisterContext
         id = OID(requestP->registrationId.get());
 
         mongoSemTake(__FUNCTION__, "findOne from RegistrationsCollection");
-        LM_M(("KZ: looking up OLD registration"));
         reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id << "servicePath" << sPath));
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection");
 
@@ -130,7 +128,6 @@ HttpStatusCode mongoRegisterContext
 
     if (reg.isEmpty())
     {
-       LM_M(("KZ: No registration found"));
        reqSemGive(__FUNCTION__, "ngsi9 register request (no registrations found)");
        responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: /") + requestP->registrationId.get() + "/");
        responseP->registrationId = requestP->registrationId;
