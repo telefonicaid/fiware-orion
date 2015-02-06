@@ -27,6 +27,7 @@ URI params and subscriptions
 dbInit CB
 brokerStart CB 31,60
 accumulatorStart localhost $LISTENER_PORT
+
 --SHELL--
 
 # 0. URI params for orionCurl
@@ -569,3 +570,4 @@ Content-Type: application/json
 --TEARDOWN--
 brokerStop CB
 accumulatorStop ${LISTENER_PORT}
+dbDrop CB

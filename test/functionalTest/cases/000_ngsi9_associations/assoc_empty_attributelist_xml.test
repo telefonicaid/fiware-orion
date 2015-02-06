@@ -22,6 +22,7 @@
 
 --NAME--
 Associations empty attribute list XML
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -241,3 +242,4 @@ Date: REGEX(.*)
 </discoverContextAvailabilityResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

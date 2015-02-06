@@ -22,8 +22,8 @@
 
 --NAME--
 Rush with HTTPS
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 accumulatorStart localhost $LISTENER_PORT
 brokerStart CB 0-255 IPV4 -rush localhost:$LISTENER_PORT
@@ -181,3 +181,4 @@ Content-Type: application/xml
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

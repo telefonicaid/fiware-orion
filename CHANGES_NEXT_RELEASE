@@ -1,2 +1,5 @@
 - Fix: The option '-multiservice' was ignored and the broker ran always in multiservice mode. Now the option is taken taken into account (Issue #725)
+- Fix: Forwarded requests always in XML (Issue #703)
+- Fix: internal substitution of servicePath defaults ("/" for update-like operations, "/#" for query-like operations)
+- Fix: Temporal hack to allow for forwarding of 'attribute not found in entity found' (Issue #716)
 - Fix: Broker crashes dealing with "GET /v1/contextTypes" operation when DB contains entities of the same type, ones with attributes and others without them (Issue #740)

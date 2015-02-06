@@ -22,6 +22,7 @@
 
 --NAME--
 Subscription sequence ONTIMEINTERVAL bad duration
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -116,3 +117,4 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

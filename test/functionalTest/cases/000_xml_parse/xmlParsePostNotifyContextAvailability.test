@@ -22,6 +22,7 @@
 
 --NAME--
 XML Parse Post NotifyContextAvailability
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -149,3 +150,4 @@ Date: REGEX(.*)
 3: ***********************************
 --TEARDOWN--
 brokerStop CB
+dbDrop CB
