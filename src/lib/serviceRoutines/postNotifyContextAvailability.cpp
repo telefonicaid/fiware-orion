@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/string.h"
+#include "common/defaultValues.h"
 #include "mongoBackend/mongoNotifyContextAvailability.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
@@ -67,7 +68,7 @@ std::string postNotifyContextAvailability
   }
   else if (ciP->servicePathV.size() == 0)
   {
-    ciP->servicePathV.push_back("/");
+    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
   }
 
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());

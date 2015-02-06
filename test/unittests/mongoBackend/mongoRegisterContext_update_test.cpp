@@ -187,7 +187,6 @@ TEST(mongoRegisterContext_update, updateCase1)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoRegisterContext(&req, &res, "", "/");
-  LM_M(("Invoke mongoRegisterContext in mongoBackend library and EXIT. ms: %d", ms));
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -566,9 +565,7 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    LM_M(("Calling mongoRegisterContext with regId == '%s'", req.registrationId.get().c_str()));
     ms = mongoRegisterContext(&req, &res);
-    LM_M(("Back from mongoRegisterContext with regId == '%s'", req.registrationId.get().c_str()));
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

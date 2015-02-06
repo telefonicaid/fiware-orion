@@ -29,6 +29,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
+#include "common/defaultValues.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonRegister.h"
@@ -62,7 +63,9 @@ HttpStatusCode mongoRegisterContext
 
     // Default value for service-path is "/"
     if (sPath == "")
-      sPath = "/";
+    {
+      sPath = DEFAULT_SERVICE_PATH;
+    }
 
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())

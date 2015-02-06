@@ -681,7 +681,11 @@ void strReplace(char* to, int toLen, const char* from, const char* oldString, co
 
 /* ****************************************************************************
 *
-* servicePathCheck - 
+* servicePathCheck - check one single component of the service-path
+*
+* NOTE
+* This function is used for register/notify only. '#' is not an accepted character,
+* as it would be for discoveries/subscriptions
 */
 std::string servicePathCheck(const char* servicePath)
 {
