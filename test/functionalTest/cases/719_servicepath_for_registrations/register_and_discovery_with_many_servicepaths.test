@@ -30,6 +30,7 @@ brokerStart CB 0
 --SHELL--
 
 #
+# 00. Registration with invalid service path
 # 01. Register E1/A1 with service path /a1/e1
 # 02. Register E2/A1 with service path /a1/e2
 # 03. Register E3/A1 with service path /a1/e3
@@ -39,6 +40,34 @@ brokerStart CB 0
 # 07. Discovery of E.*/A1 with service path /a1/e1,/a1/e2
 # 08. Discovery of E.*/A1 with service path /a1/e1
 #
+
+echo "00. Registration with invalid service path"
+echo "=========================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "${payload}" --json --servicePath /a1/e1+@
+echo
+echo
+
 
 echo "01. Register E1/A1 with service path /a1/e1"
 echo "==========================================="
@@ -229,6 +258,22 @@ echo
 
 
 --REGEXPECT--
+00. Registration with invalid service path
+==========================================
+HTTP/1.1 200 OK
+Content-Length: 158
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orionError": {
+        "code": "400", 
+        "details": "a component of ServicePath contains an illegal character", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
 01. Register E1/A1 with service path /a1/e1
 ===========================================
 HTTP/1.1 200 OK
