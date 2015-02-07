@@ -416,7 +416,7 @@ static int outFormatCheck(ConnectionInfo* ciP)
 *
 * servicePathCheck - check vector of service paths
 *
-* This function is called for ALL requests, when aservice-path URI-parameter is found.
+* This function is called for ALL requests, when a service-path URI-parameter is found.
 * So, '#' is considered a valid character at it is valid for discoveries and queries.
 * Later on, if the request is a registration or notification, another function is called
 * to make sure there is only ONE service path and that there is no '#' present.
