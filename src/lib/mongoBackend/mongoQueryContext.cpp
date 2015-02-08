@@ -91,9 +91,9 @@ HttpStatusCode mongoQueryContext
       // Check a pontential Context Provider in the registrations collection
       ContextRegistrationResponseVector crrV;
       std::string err;      
-      // For now, we use limit=1. That's ensures that as much as one providing application is returned. In the future,
-      // we would consider leave this limit open and define an algorithm to pick the right one, and ordered list, etc.
-      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, 0, 1, false))
+      // For now, we use limit=1. That ensures that max one providing application is returned. In the future,
+      // we should consider leaving this limit open and define an algorithm to pick the right one, and ordered list, etc.
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 1, false))
       {
         if (crrV.size() > 0)
         {

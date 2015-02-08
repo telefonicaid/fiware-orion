@@ -3,3 +3,6 @@
 - Fix: internal substitution of servicePath defaults ("/" for update-like operations, "/#" for query-like operations)
 - Fix: Temporal hack to allow for forwarding of 'attribute not found in entity found' (Issue #716)
 - Fix: Broker crashes dealing with "GET /v1/contextTypes" operation when DB contains entities of the same type, ones with attributes and others without them (Issue #740)
+- Fix: Service-Path supported for registrations and discoveries (Issue #719)
+- Fix: Service-Path supported for forwarding of registrations between Config Manager and Context Broker (Issue #719)
+- Fix: Service-Path supported for forwarding to Context Providers (Issue #719)

@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/string.h"
+#include "common/defaultValues.h"
 #include "mongoBackend/mongoNotifyContextAvailability.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
@@ -50,10 +52,35 @@ std::string postNotifyContextAvailability
 )
 {
   NotifyContextAvailabilityResponse  ncar;
+  std::string                        answer;
 
-  ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->tenant);
+  //
+  // If more than ONE service-path is input, an error is returned as response.
+  // If NO service-path is issued, then the default service-path "/" is used.
+  // After these checks, the service-path is checked to be 'correct'.
+  //
+  if (ciP->servicePathV.size() > 1)
+  {
+    ncar.responseCode.fill(SccBadRequest, "more than one service path for notification");
+    LM_W(("Bad Input (more than one service path for a notification)"));
+    answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
+    return answer;
+  }
+  else if (ciP->servicePathV.size() == 0)
+  {
+    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
+  }
 
-  std::string answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
+  std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
+  if (res != "OK")
+  {
+    ncar.responseCode.fill(SccBadRequest, res);
+    answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
+    return answer;
+  }
 
+  ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->tenant, ciP->servicePathV[0]);
+
+  answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
   return answer;
 }

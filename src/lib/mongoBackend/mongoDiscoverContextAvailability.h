@@ -43,7 +43,8 @@ extern HttpStatusCode mongoDiscoverContextAvailability
   DiscoverContextAvailabilityRequest*        requestP,
   DiscoverContextAvailabilityResponse*       responseP,
   const std::string&                         tenant,
-  std::map<std::string, std::string>&        uriParams
+  std::map<std::string, std::string>&        uriParams,
+  const std::vector<std::string>&            servicePathV
 );
 
 #endif

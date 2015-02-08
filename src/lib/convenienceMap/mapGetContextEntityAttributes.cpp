@@ -51,5 +51,5 @@ HttpStatusCode mapGetContextEntityAttributes
   EntityId                           entityId(id, "", "false");
 
   request.entityIdVector.push_back(&entityId);
-  return mongoDiscoverContextAvailability(&request, response, ciP->tenant, ciP->uriParam);
+  return mongoDiscoverContextAvailability(&request, response, ciP->tenant, ciP->uriParam, ciP->servicePathV);
 }
