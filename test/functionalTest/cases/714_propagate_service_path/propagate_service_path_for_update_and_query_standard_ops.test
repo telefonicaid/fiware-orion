@@ -46,6 +46,7 @@ brokerStart CP1 0
 # 07. Query E1/* in CP1 with service-path /world/1 (response: A1=W1-CB)
 # 08. Query E1/* in CP1 with service-path /world/2 (response: A2=W2-CB)
 # 09. Query E1/* in CP1 with service-path /world/# (response: A1=W1-CB,A2=W2-CB)
+# 10. Query E1/* in CP1 without service-path (response: A1=W1-CB,A2=W2-CB)
 #
 
 
@@ -243,6 +244,22 @@ payload='{
   ]
 }'
 orionCurl --url /v1/queryContext --payload "${payload}" --json --port $CP1_PORT --servicePath /world/#
+echo
+echo
+
+
+echo "10. Query E1/* in CP1 without service-path (response: A1=W1-CB,A2=W2-CB)"
+echo "========================================================================"
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --json --port $CP1_PORT
 echo
 echo
 
@@ -464,6 +481,55 @@ Date: REGEX(.*)
 
 09. Query E1/* in CP1 with service-path /world/# (response: A1=W1-CB,A2=W2-CB)
 ==============================================================================
+HTTP/1.1 200 OK
+Content-Length: 742
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "W1-CB"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": "W2-CB"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+10. Query E1/* in CP1 without service-path (response: A1=W1-CB,A2=W2-CB)
+========================================================================
 HTTP/1.1 200 OK
 Content-Length: 742
 Content-Type: application/json
