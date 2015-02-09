@@ -73,7 +73,7 @@ std::string postUpdateContext
   if (ciP->servicePathV.size() > 1)
   {
     upcr.errorCode.fill(SccBadRequest, "more than one service path in context update request");
-    LM_W(("Bad Input (more than one service path for a notification)"));
+    LM_W(("Bad Input (more than one service path for an update request)"));
     answer = upcr.render(ciP, UpdateContext, "");
     return answer;
   }
