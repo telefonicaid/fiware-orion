@@ -45,6 +45,7 @@ brokerStart CP1 0 IPV4 -multiservice
 # 06. Update/UPDATE E1/A1=T2-CB in CB with tenant T2
 # 07. Query E1/A1 in CP1 with tenant T1 (A1 == T1-CB)
 # 08. Query E1/A1 in CP1 with tenant T2 (A1 == T2-CB)
+# 09. Query E1/A1 in CP1 without tenant (no hits)
 #
 
 
@@ -232,6 +233,25 @@ payload='{
   ]
 }'
 orionCurl --url /v1/queryContext --payload "${payload}" --json --port $CP1_PORT --httpTenant T2
+echo
+echo
+
+
+echo "09. Query E1/A1 in CP1 without tenant (no hits)"
+echo "==============================================="
+payload='{
+  "entities": [
+    {
+      "type": "T",
+      "isPattern": "false",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "${payload}" --json --port $CP1_PORT
 echo
 echo
 
@@ -448,6 +468,21 @@ Date: REGEX(.*)
             }
         }
     ]
+}
+
+
+09. Query E1/A1 in CP1 without tenant (no hits)
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
 }
 
 
