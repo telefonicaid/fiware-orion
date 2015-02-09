@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
+#include "common/defaultValues.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -63,6 +64,32 @@ std::string postUpdateContext
 {
   UpdateContextResponse  upcr;
   std::string            answer;
+
+  //
+  // If more than ONE service-path is input, an error is returned as response.
+  // If NO service-path is issued, then the default service-path "/" is used.
+  // After these checks, the service-path is checked to be 'correct'.
+  //
+  if (ciP->servicePathV.size() > 1)
+  {
+    upcr.errorCode.fill(SccBadRequest, "more than one service path in context update request");
+    LM_W(("Bad Input (more than one service path for a notification)"));
+    answer = upcr.render(ciP, UpdateContext, "");
+    return answer;
+  }
+  else if (ciP->servicePathV.size() == 0)
+  {
+    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
+  }
+
+  std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
+  if (res != "OK")
+  {
+    upcr.errorCode.fill(SccBadRequest, res);
+    answer = upcr.render(ciP, UpdateContext, "");
+    return answer;
+  }
+
 
   ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
 

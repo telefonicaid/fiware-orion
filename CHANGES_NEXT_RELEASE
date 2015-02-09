@@ -6,3 +6,4 @@
 - Fix: Service-Path supported for registrations and discoveries (Issue #719)
 - Fix: Service-Path supported for forwarding of registrations between Config Manager and Context Broker (Issue #719)
 - Fix: Service-Path supported for forwarding to Context Providers (Issue #719)
+- Fix: Hash sign (#) in service-path, or multiple service-paths not valid for updateContext requests (Issue #746)
