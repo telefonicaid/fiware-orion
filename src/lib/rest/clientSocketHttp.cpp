@@ -340,8 +340,6 @@ std::string sendHttpSocket
     url = ip;
   url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
 
-  LM_M(("KZ: forwarding '%s' message with xauthToken '%s'", url.c_str(), xauthToken.c_str()));
-
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, verb.c_str()); // Set HTTP verb
