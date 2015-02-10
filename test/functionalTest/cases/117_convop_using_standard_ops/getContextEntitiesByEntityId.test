@@ -1,0 +1,250 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+ConvOp getContextEntitiesByEntityId: /v1/registry/contextEntities/{entityId::id}
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# This test case verifies that the convop 'getContextEntitiesByEntityId' does everything
+# that ngsi9 discovery does, including URI parameters, etc.
+#
+
+#
+# 01. Register E1/T1/A1
+# 02. Register E1//A2 (type is empty)
+# 03. Register E1/T2/A3
+# 04. Discover E1 using /v1/registry/contextEntities/E1
+#
+
+echo "01. Register E1/T1/A1"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Register E1//A2 (type is empty)"
+echo "==================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A2",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Register E1/T2/A3"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T2",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A3",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Discover E1 using /v1/registry/contextEntities/E1"
+echo "====================================================="
+orionCurl --url "/v1/registry/contextEntities/E1" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Register E1/T1/A1
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+02. Register E1//A2 (type is empty)
+===================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+03. Register E1/T2/A3
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+04. Discover E1 using /v1/registry/contextEntities/E1
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 1254
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A1", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A2", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": ""
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A3", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T2"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
