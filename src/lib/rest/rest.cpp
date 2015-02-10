@@ -789,7 +789,6 @@ static int connectionTreat
     if (!ciP->httpHeaders.servicePathReceived)
     {
       ciP->httpHeaders.servicePath = defaultServicePath(url, method);
-      ciP->httpHeaders.servicePathReceived = true;
     }
 
     char tenant[128];

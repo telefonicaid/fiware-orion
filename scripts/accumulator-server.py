@@ -46,7 +46,6 @@ import string
 import signal
 
 
-
 # This function is registered to be called upon termination
 def all_done():
     os.unlink(pidfile)
@@ -114,6 +113,18 @@ atexit.register(all_done)
 
 
 app = Flask(__name__)
+
+@app.route("/v1/updateContext", methods=['POST'])
+def record():
+    global ac
+    ac += "Got a /v1/updateContext";
+    return Response(status=200)
+
+@app.route("/v1/queryContext", methods=['POST'])
+def record():
+    global ac
+    ac += "Got a /v1/queryContext";
+    return Response(status=200)
 
 @app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE'])
 def record():

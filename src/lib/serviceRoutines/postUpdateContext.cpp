@@ -250,13 +250,14 @@ std::string postUpdateContext
     std::string     verb         = "POST";
     std::string     resource     = prefix + "/updateContext";
     std::string     tenant       = ciP->tenant;
+    std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
 
     out = sendHttpSocket(ip, 
                          port,
                          protocol,
                          verb,
                          tenant,
-                         ciP->httpHeaders.servicePath,
+                         servicePath,
                          ciP->httpHeaders.xauthToken,
                          resource,
                          "application/xml",

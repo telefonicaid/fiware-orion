@@ -111,6 +111,8 @@ echo
 echo "04. Dump accumulator to see X-Auth headers"
 echo "=========================================="
 curl localhost:${LISTENER_PORT}/dump -s -S
+echo
+echo
 
 
 --REGEXPECT--
@@ -161,6 +163,51 @@ Date: REGEX(.*)
 
 04. Dump accumulator to see X-Auth headers
 ==========================================
+POST http://localhost:REGEX(\d+)/v1/updateContext
+Content-Length: 472
+X-Auth-Token: kz
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/xml
+
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="T" isPattern="false">
+        <id>E1</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>A1</name>
+          <type>string</type>
+          <contextValue>W1-CB</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>UPDATE</updateAction>
+</updateContextRequest>
+=======================================
+POST http://localhost:9997/v1/queryContext
+Content-Length: 223
+X-Auth-Token: kz
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/xml
+
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="T" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+  </attributeList>
+</queryContextRequest>
+=======================================
 
 
 --TEARDOWN--
