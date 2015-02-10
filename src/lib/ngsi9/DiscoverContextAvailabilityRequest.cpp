@@ -100,3 +100,26 @@ void DiscoverContextAvailabilityRequest::present(const std::string& indent)
    attributeList.present(indent);
    restriction.present(indent);
 }
+
+
+
+/* ****************************************************************************
+*
+* DiscoverContextAvailabilityRequest::fill - 
+*/
+void DiscoverContextAvailabilityRequest::fill
+(
+  EntityId&                            eid,        // Might be changed to a vector of entities
+  const std::vector<std::string>&      attributeV,
+  const Restriction&                   restriction
+)
+{
+  entityIdVector.push_back(&eid);
+
+  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  {
+    attributeList.push_back(attributeV[ix]);
+  }
+
+  // FIXME P9: restriction with scope-vector must be copied to this->restriction
+}

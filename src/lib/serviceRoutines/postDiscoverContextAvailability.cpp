@@ -51,8 +51,6 @@ std::string postDiscoverContextAvailability
   DiscoverContextAvailabilityResponse  dcar;
   std::string                          answer;
 
-  parseDataP->dcar.res.present("");
-  jsonDcarPresent(parseDataP);
   ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, &dcar, ciP->tenant, ciP->uriParam, ciP->servicePathV);
   answer = dcar.render(DiscoverContextAvailability, ciP->outFormat, "");
 
