@@ -263,7 +263,7 @@ Content-Type: application/xml
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 =======================================
-POST http://localhost:9997/v1/queryContext
+POST http://localhost:REGEX(\d+)/v1/queryContext
 Content-Length: 223
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -307,7 +307,7 @@ Content-Type: application/xml
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>
 =======================================
-POST http://localhost:9997/v1/queryContext
+POST http://localhost:REGEX(\d+)/v1/queryContext
 Content-Length: 223
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
