@@ -42,6 +42,7 @@ brokerStart CB
 # 10. Register E1/T1/A9
 # 11. Discover E1 using /v1/registry/contextEntities/E1, pagination '0-2'
 # 12. Discover E1 using /v1/registry/contextEntities/E1, pagination '3-23'
+# 13. Discover E1 using /v1/registry/contextEntities/E1, pagination '5', with details
 #
 
 echo "01. Register E1/T1/A0"
@@ -344,6 +345,12 @@ echo
 echo "12. Discover E1 using /v1/registry/contextEntities/E1, pagination '3-23'"
 echo "========================================================================"
 orionCurl --url "/v1/registry/contextEntities/E1?offset=3&limit=20" --json
+echo
+echo
+
+echo "13. Discover E1 using /v1/registry/contextEntities/E1, pagination '5', with details"
+echo "==================================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1?offset=5&limit=1&details=on" --json
 echo
 echo
 
@@ -692,6 +699,43 @@ Date: REGEX(.*)
             }
         }
     ]
+}
+
+
+13. Discover E1 using /v1/registry/contextEntities/E1, pagination '5', with details
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 546
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A5", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ], 
+    "errorCode": {
+        "code": "200", 
+        "details": "Count: 10", 
+        "reasonPhrase": "OK"
+    }
 }
 
 
