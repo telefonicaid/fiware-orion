@@ -1,0 +1,1 @@
+- Fix:  All convenience operations to use the service routines of standard operations (Issue #117)

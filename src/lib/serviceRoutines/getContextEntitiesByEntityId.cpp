@@ -29,10 +29,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapGetContextEntitiesByEntityId.h"
 #include "ngsi/ParseData.h"
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
+#include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "rest/ConnectionInfo.h"
+#include "serviceRoutines/postDiscoverContextAvailability.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
 
 
@@ -40,6 +40,21 @@
 /* ****************************************************************************
 *
 * getContextEntitiesByEntityId - 
+*
+* GET /v1/registry/contextEntities/{entityId::id}
+* GET /NGSI9/contextEntities/{entityId::id}
+*
+* This convenience operation performs an ngsi9 discovery of a fixed
+* entityId::id (no wildcards allowed), isPattern == false and type empty,
+* which matches ANY type.
+*
+* However, if the URI parameter '!exist=entity::type', then instead only
+* entities with EMPTY types will be discovered.
+* 
+* Service routine to call: postDiscoverContextAvailability.
+*
+* As this convop shares output format (DiscoverContextAvailabilityResponse) with its
+* corresponding standard operation, there is no need to convert the output.
 */
 std::string getContextEntitiesByEntityId
 (
@@ -49,15 +64,23 @@ std::string getContextEntitiesByEntityId
   ParseData*                 parseDataP
 )
 {
-  std::string                          entityId = (compV[0] == "v1")? compV[3] : compV[2];
-  std::string                          answer;
-  DiscoverContextAvailabilityResponse  response;
+  std::string  entityId = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string  answer;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'GET' request for entityId '%s'", entityId.c_str()));
+  //
+  // Fill in parseDataP->dcar.res to pass to postDiscoverContextAvailability
+  //
+  EntityId                             eId(entityId, "", "");
+  std::vector<std::string>             attributeV;
+  Restriction                          restriction;
 
-  ciP->httpStatusCode = mapGetContextEntitiesByEntityId(entityId, "", &response, ciP);
-  answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
-  response.release();
+  parseDataP->dcar.res.fill(eId, attributeV, restriction);
+
+
+  //
+  // Call the standard operation 
+  //
+  answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
 
   return answer;
 }
