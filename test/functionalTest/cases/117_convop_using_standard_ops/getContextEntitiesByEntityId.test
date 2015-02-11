@@ -35,14 +35,21 @@ brokerStart CB
 #
 
 #
-# 01. Register E1/T1/A1
-# 02. Register E1//A2 (type is empty)
-# 03. Register E1/T2/A3
-# 04. Discover E1 using /v1/registry/contextEntities/E1
+# 01. Register E1/T1/A1 with Service-Path /A1
+# 02. Register E1//A2 (type is empty) with Service-Path /A2
+# 03. Register E1/T2/A3 with Service-Path /A3
+# 04. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1
+# 05. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A2
+# 06. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A3
+# 07. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A2,/A3
+# 08. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A2,/A3
+# 09. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /B1
+# 10. Discover E1 using /v1/registry/contextEntities/E1 without Service-Path
+# 11. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /#
 #
 
-echo "01. Register E1/T1/A1"
-echo "====================="
+echo "01. Register E1/T1/A1 with Service-Path /A1"
+echo "==========================================="
 payload='{
   "contextRegistrations": [
   {
@@ -65,13 +72,13 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json --servicePath /A1
 echo
 echo
 
 
-echo "02. Register E1//A2 (type is empty)"
-echo "==================================="
+echo "02. Register E1//A2 (type is empty) with Service-Path /A2"
+echo "========================================================="
 payload='{
   "contextRegistrations": [
   {
@@ -94,13 +101,13 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json  --servicePath /A2
 echo
 echo
 
 
-echo "03. Register E1/T2/A3"
-echo "====================="
+echo "03. Register E1/T2/A3 with Service-Path /A3"
+echo "==========================================="
 payload='{
   "contextRegistrations": [
   {
@@ -123,21 +130,70 @@ payload='{
  ],
  "duration": "P1M"
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json  --servicePath /A3
 echo
 echo
 
 
-echo "04. Discover E1 using /v1/registry/contextEntities/E1"
-echo "====================================================="
+echo "04. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1"
+echo "==========================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A1
+echo
+echo
+
+
+echo "05. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A2"
+echo "==============================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A1,/A2
+echo
+echo
+
+
+echo "06. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A3"
+echo "==============================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A1,/A3
+echo
+echo
+
+
+echo "07. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A2,/A3"
+echo "==============================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A2,/A3
+echo
+echo
+
+
+echo "08. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A2,/A3"
+echo "==================================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /A1,/A2,/A3
+echo
+echo
+
+
+echo "09. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /B1"
+echo "==========================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /B1
+echo
+echo
+
+
+echo "10. Discover E1 using /v1/registry/contextEntities/E1 without Service-Path"
+echo "=========================================================================="
 orionCurl --url "/v1/registry/contextEntities/E1" --json
 echo
 echo
 
 
+echo "11. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /#"
+echo "=========================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1" --json --servicePath /#
+echo
+echo
+
+
 --REGEXPECT--
-01. Register E1/T1/A1
-=====================
+01. Register E1/T1/A1 with Service-Path /A1
+===========================================
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
@@ -149,8 +205,8 @@ Date: REGEX(.*)
 }
 
 
-02. Register E1//A2 (type is empty)
-===================================
+02. Register E1//A2 (type is empty) with Service-Path /A2
+=========================================================
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
@@ -162,8 +218,8 @@ Date: REGEX(.*)
 }
 
 
-03. Register E1/T2/A3
-=====================
+03. Register E1/T2/A3 with Service-Path /A3
+===========================================
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
@@ -175,8 +231,348 @@ Date: REGEX(.*)
 }
 
 
-04. Discover E1 using /v1/registry/contextEntities/E1
-=====================================================
+04. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 448
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A1", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+
+
+05. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A2
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 850
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A1", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A2", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": ""
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+
+
+06. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A3
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 852
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A1", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A3", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T2"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+
+
+07. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A2,/A3
+===============================================================================
+HTTP/1.1 200 OK
+Content-Length: 850
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A2", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": ""
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A3", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T2"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+
+
+08. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /A1,/A2,/A3
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 1254
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A1", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A2", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": ""
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A3", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T2"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+
+
+09. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /B1
+===========================================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+10. Discover E1 using /v1/registry/contextEntities/E1 without Service-Path
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 1254
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A1", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A2", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": ""
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A3", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T2"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+
+
+11. Discover E1 using /v1/registry/contextEntities/E1 with Service-Path /#
+==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 1254
 Content-Type: application/json
