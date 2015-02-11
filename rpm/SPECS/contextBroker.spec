@@ -192,6 +192,18 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Wed Feb 11 2015 Fermin Galan <fermin@tid.es> 0.19.0-1 (FIWARE-4.2.2-1)
+- Fix: The option '-multiservice' was ignored and the broker ran always in multiservice mode. Now the option is taken taken into account (Issue #725)
+- Fix: Forwarded requests always in XML (Issue #703)
+- Fix: internal substitution of servicePath defaults ("/" for update-like operations, "/#" for query-like operations)
+- Fix: Temporal hack to allow for forwarding of 'attribute not found in entity found' (Issue #716)
+- Fix: Broker crashes dealing with "GET /v1/contextTypes" operation when DB contains entities of the same type, ones with attributes and others without them (Issue #740)
+- Fix: Service-Path supported for registrations and discoveries (Issue #719)
+- Fix: Service-Path supported for forwarding of registrations between Config Manager and Context Broker (Issue #719)
+- Fix: Service-Path supported for forwarding to Context Providers (Issue #719)
+- Fix: Hash sign (#) in service-path, or multiple service-paths not valid for updateContext requests (Issue #746)
+- Fix: Not forwarding the default Service-Path to context providers (Issue #714)
+
 * Fri Jan 16 2015 Fermin Galan <fermin@tid.es> 0.18.1-1 (FIWARE-4.2.1-1)
 - Fix: Fixed the bug about recovering ONTIMEINTERVAL subscriptions (Issue #693)
 - Fix: Fixed the crash in queryContext with an invalid geoscope (Issue #690)
