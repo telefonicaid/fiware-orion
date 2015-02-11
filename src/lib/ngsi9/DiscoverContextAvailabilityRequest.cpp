@@ -109,7 +109,7 @@ void DiscoverContextAvailabilityRequest::present(const std::string& indent)
 */
 void DiscoverContextAvailabilityRequest::fill
 (
-  EntityId&                            eid,        // Might be changed to a vector of entities
+  EntityId&                            eid,
   const std::vector<std::string>&      attributeV,
   const Restriction&                   restriction
 )

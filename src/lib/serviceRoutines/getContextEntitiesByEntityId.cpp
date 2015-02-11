@@ -67,9 +67,6 @@ std::string getContextEntitiesByEntityId
   std::string  entityId = (compV[0] == "v1")? compV[3] : compV[2];
   std::string  answer;
 
-  LM_M(("KZ: CONVENIENCE: got a 'GET' request for entityId '%s'", entityId.c_str()));
-
-
   //
   // Fill in parseDataP->dcar.res to pass to postDiscoverContextAvailability
   //
@@ -81,45 +78,9 @@ std::string getContextEntitiesByEntityId
 
 
   //
-  // Debugging
-  //
-  unsigned int ix;
-
-  LM_M(("KZ: entities:   %d", parseDataP->dcar.res.entityIdVector.size()));
-  for (ix = 0; ix < parseDataP->dcar.res.entityIdVector.size(); ++ix)
-  {
-    LM_M(("KZ: entity %d:   { id='%s', isPattern='%s', type='%s' }",
-          ix,
-          parseDataP->dcar.res.entityIdVector[ix]->id.c_str(),
-          parseDataP->dcar.res.entityIdVector[ix]->isPattern.c_str(),
-          parseDataP->dcar.res.entityIdVector[ix]->type.c_str()));
-  }
-
-  LM_M(("KZ: attributes: %d", parseDataP->dcar.res.attributeList.size()));
-  for (ix = 0; ix < parseDataP->dcar.res.attributeList.size();++ix)
-  {
-    LM_M(("KZ: attribute %d: '%s'", ix, parseDataP->dcar.res.attributeList[ix].c_str()));
-  }
-
-  LM_M(("KZ: scopes:     %d", parseDataP->dcar.res.restriction.scopeVector.size()));
-  for (ix = 0; ix < parseDataP->dcar.res.restriction.scopeVector.size();++ix)
-  {
-    LM_M(("KZ: scope %d: '%s'", 
-          ix,
-          parseDataP->dcar.res.restriction.scopeVector[ix]->type.c_str(),
-          parseDataP->dcar.res.restriction.scopeVector[ix]->value.c_str()));
-  }
-
-  //
   // Call the standard operation 
   //
   answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
-
-
-  //
-  // Release the data used
-  //
-  // parseDataP->dcar.res.release();
 
   return answer;
 }
