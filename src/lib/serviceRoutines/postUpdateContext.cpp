@@ -53,6 +53,12 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 /* ****************************************************************************
 *
 * postUpdateContext -
+*
+* POST /v1/updateContext
+* POST /ngsi10/updateContext
+*
+* Payload In:  UpdateContextRequest
+* Payload Out: UpdateContextResponse
 */
 std::string postUpdateContext
 (
@@ -208,6 +214,7 @@ std::string postUpdateContext
 
     if (parseUrl(cerP->statusCode.details, ip, port, prefix, protocol) == false)
     {
+      LM_W(("Bad Input (providing application: '%s')", cerP->statusCode.details.c_str()));
       cerP->statusCode.fill(SccReceiverInternalError, "error parsing providing application");
       continue;
     }
