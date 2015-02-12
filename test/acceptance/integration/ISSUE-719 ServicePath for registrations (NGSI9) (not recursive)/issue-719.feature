@@ -197,7 +197,6 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And there is "0" petitions requested to the mock
     And clean the mongo database of the service "issue_719"
 
-# Falla
   @issue_755 @issue-719
   Scenario: Delete an entity doesnt exist in context broker (error expected), having context providers with the same entity in the same subservice and other in other subservice
     Given a started mock
