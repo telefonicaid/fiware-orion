@@ -34,6 +34,7 @@ brokerStart CB
 # 02. Discover entities of type ET
 # 03. Update registration using POST /v1/registry/contextEntityTypes/ET and payload
 # 04. Discover entities of type ET
+#
 
 echo "01. Register entities of type ET using POST /v1/registry/contextEntityTypes/ET and payload"
 echo "=========================================================================================="
