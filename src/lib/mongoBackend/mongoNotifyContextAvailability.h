@@ -31,8 +31,14 @@
 
 /* ****************************************************************************
 *
-* mongoNofityContextAvailability -
+* mongoNotifyContextAvailability -
 */
-extern HttpStatusCode mongoNotifyContextAvailability(NotifyContextAvailabilityRequest* requestP, NotifyContextAvailabilityResponse* responseP, const std::string& tenant = "");
+extern HttpStatusCode mongoNotifyContextAvailability
+(
+  NotifyContextAvailabilityRequest*   requestP,
+  NotifyContextAvailabilityResponse*  responseP,
+  const std::string&                  tenant      = "",
+  const std::string&                  servicePath = ""
+);
 
 #endif

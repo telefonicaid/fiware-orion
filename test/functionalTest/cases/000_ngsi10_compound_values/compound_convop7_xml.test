@@ -22,6 +22,7 @@
 
 --NAME--
 Create and query compound values (EVector XML)
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 60,80
@@ -125,3 +126,4 @@ Date: REGEX(.*)
 </contextElementResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

@@ -32,6 +32,7 @@
 #include "common/tag.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -238,7 +239,7 @@ std::string ContextAttribute::render
 
   metadataVector.tagSet("metadata");
 
-  if ((ciP->uriParam["attributeFormat"] == "object") && (ciP->outFormat == JSON))
+  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outFormat == JSON))
   {
     return renderAsJsonObject(ciP, indent, comma, omitValue);
   }

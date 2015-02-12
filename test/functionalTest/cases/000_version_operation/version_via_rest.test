@@ -22,6 +22,7 @@
 
 --NAME--
 broker version via REST
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -70,3 +71,4 @@ Date: REGEX(.*)
 }
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

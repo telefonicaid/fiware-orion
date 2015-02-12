@@ -22,8 +22,8 @@
 
 --NAME--
 Subscription availability sequence
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 brokerStart CB
 accumulatorStart
@@ -542,3 +542,4 @@ Content-Type: application/xml
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

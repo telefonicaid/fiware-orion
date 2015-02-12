@@ -80,6 +80,7 @@ static std::string          subscribeContextCollectionName;
 static std::string          subscribeContextAvailabilityCollectionName;
 static std::string          assocationsCollectionName;
 static Notifier*            notifier;
+static bool                 multitenant;
 
 /* ****************************************************************************
 *
@@ -92,9 +93,10 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 *
 * mongoConnect -
 */
-bool mongoConnect(const char* host, const char* db, const char* rplSet, const char* username, const char* passwd, bool multitenant) {
+bool mongoConnect(const char* host, const char* db, const char* rplSet, const char* username, const char* passwd, bool _multitenant) {
 
     std::string err;
+    multitenant = _multitenant;
 
     LM_T(LmtBug, ("dbName: '%s'", db));
 
@@ -383,7 +385,7 @@ static std::string composeCollectionName(std::string tenant, std::string colName
 */
 std::string composeDatabaseName(std::string tenant) {
     std::string result;
-    if (tenant == "")
+    if (!multitenant || (tenant == ""))
     {
         result = dbPrefix;
     }
@@ -776,7 +778,6 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
   }
 
   return fromjson(servicePathValue);
-
 }
 
 
@@ -1384,6 +1385,7 @@ bool registrationsQuery
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
+  const std::vector<std::string>&     servicePathV,
   int                                 offset,
   int                                 limit,
   bool                                details,
@@ -1403,22 +1405,28 @@ bool registrationsQuery
     BSONArrayBuilder entitiesWithType;
     BSONArrayBuilder entitiesWithoutType;    
 
-    for (unsigned int ix = 0; ix < enV.size(); ++ix) {        
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+    {
         EntityId* en = enV.get(ix);
-        if (isTrue(en->isPattern)) {
+        if (isTrue(en->isPattern))
+        {
             BSONObjBuilder b;
             b.appendRegex(contextRegistrationEntitiesId, en->id);
-            if (en->type != "") {
+            if (en->type != "")
+            {
                 b.append(contextRegistrationEntitiesType, en->type);
             }
             entityOr.append(b.obj());
         }
-        else { /* isPattern = false */
-            if (en->type == "") {
+        else  /* isPattern = false */
+        {
+            if (en->type == "")
+            {
                 entitiesWithoutType.append(en->id);
                 LM_T(LmtMongo, ("Entity discovery without type: id '%s'", en->id.c_str()));
             }
-            else {
+            else
+            {
                 /* We have detected that sometimes mongo stores { id: ..., type ...} and others { type: ..., id: ...},
                    so we have to take both them into account */
                 entitiesWithType.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
@@ -1427,8 +1435,10 @@ bool registrationsQuery
             }
         }
     }
+
     BSONArrayBuilder attrs;
-    for (unsigned int ix = 0; ix < attrL.size(); ++ix) {
+    for (unsigned int ix = 0; ix < attrL.size(); ++ix)
+    {
         std::string attrName = attrL.get(ix);
         attrs.append(attrName);
         LM_T(LmtMongo, ("Attribute discovery: '%s'", attrName.c_str()));
@@ -1442,11 +1452,20 @@ bool registrationsQuery
      * it has no impact on MongoDB query optimizer */
     queryBuilder.append("$or", entityOr.arr());
     queryBuilder.append(REG_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-    if (attrs.arrSize() > 0) {
+
+    if (attrs.arrSize() > 0)
+    {
         /* If we don't do this checking, the {$in: [] } in the attribute name part will
          * make the query fail*/
         queryBuilder.append(contextRegistrationAttrsNames, BSON("$in" << attrs.arr()));
     }
+
+    //
+    // 'And-in' the service path
+    //
+    const std::string  servicePathString = REG_SERVICE_PATH;
+    queryBuilder.append(servicePathString, fillQueryServicePath(servicePathV));
+
 
     /* Do the query on MongoDB */
     // FIXME P2: use field selector to include the only relevant field: contextRegistration array (e.g. "expiration" is not needed)
@@ -1804,12 +1823,13 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 * This method returns true if the notification was actually send. Otherwise, false
 * is returned.
 */
-bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant) {
-
-    std::string err;
+bool processAvailabilitySubscription(EntityIdVector enV, AttributeList attrL, std::string subId, std::string notifyUrl, Format format, std::string tenant)
+{
+    std::string                      err;
     NotifyContextAvailabilityRequest ncar;
+    const std::vector<std::string>   servicePathV;  // FIXME P5: servicePath for NGSI9 Subscriptions
 
-    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant))
+    if (!registrationsQuery(enV, attrL, &ncar.contextRegistrationResponseVector, &err, tenant, servicePathV))
     {
        ncar.contextRegistrationResponseVector.release();
        return false;

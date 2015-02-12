@@ -22,8 +22,8 @@
 
 --NAME--
 Attribute Compound Value parsing for PUT /v1/contextEntities/entityId (updateContextElementRequest)
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 brokerStart CB
 
@@ -377,4 +377,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbInit CB
+dbDrop CB

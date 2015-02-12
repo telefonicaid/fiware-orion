@@ -22,6 +22,7 @@
 
 --NAME--
 JSON Parse BadVerb RegisterContext
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -81,3 +82,4 @@ Date: REGEX(.*)
 ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

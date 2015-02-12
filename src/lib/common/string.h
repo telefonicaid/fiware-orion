@@ -151,4 +151,12 @@ extern void strReplace
   const char* oldString
 );
 
+
+
+/* ****************************************************************************
+*
+* servicePathCheck - 
+*/
+extern std::string servicePathCheck(const char* servicePath);
+
 #endif  // SRC_LIB_COMMON_STRING_H_
