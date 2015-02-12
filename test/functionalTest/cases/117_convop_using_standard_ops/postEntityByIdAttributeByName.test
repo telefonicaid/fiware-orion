@@ -93,7 +93,7 @@ payload='{
         {
           "name": "A1",
           "type": "degree",
-          "value": "20"
+          "value": "30"
         }
       ]
     }
@@ -248,7 +248,7 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "degree", 
-                        "value": "20"
+                        "value": "30"
                     }
                 ], 
                 "id": "E1", 
