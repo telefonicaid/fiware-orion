@@ -64,7 +64,7 @@ def the_path_in_the_last_petition_contains(step, head, value):
         headers = mock_response[str(elements - 1)]['headers']
         print headers
         assert head in headers and headers[head] == value, \
-            'The head {head} doesnt exist or the value is not {value},\
+            'The head {head} does not exist or the value is not {value},\
              check the headers forwarded {headers}' \
                 .format(head=head, value=value, headers=headers)
     except KeyError as e:
