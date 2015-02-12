@@ -21,7 +21,7 @@
 # iot_support at tid dot es
 """
 
-__author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 from flask import Flask, request
 import json
@@ -31,106 +31,42 @@ app = Flask(__name__)
 
 counter = 0
 petitions = {}
-
-query_context_response_json = {
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "temperature",
-                        "type": "float",
-                        "value": "23"
-                    },
-                    {
-                        "name": "pressure",
-                        "type": "integer",
-                        "value": "720"
-                    }
-                ],
-                "id": "Room1",
-                "isPattern": "false",
-                "type": "Room"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-query_context_response_xml = """<?xml version="1.0"?>
-<queryContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>Room1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>float</type>
-            <contextValue>23</contextValue>
-          </contextAttribute>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>integer</type>
-            <contextValue>720</contextValue>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</queryContextResponse>"""
-
-update_context_response_xml = """
-<?xml version="1.0"?>
-<updateContextResponse>
-  <contextResponseList>
-    <contextElementResponse>
-      <contextElement>
-        <entityId type="Room" isPattern="false">
-          <id>Room1</id>
-        </entityId>
-        <contextAttributeList>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>float</type>
-            <contextValue/>
-          </contextAttribute>
-          <contextAttribute>
-            <name>pressure</name>
-            <type>integer</type>
-            <contextValue/>
-          </contextAttribute>
-        </contextAttributeList>
-      </contextElement>
-      <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-      </statusCode>
-    </contextElementResponse>
-  </contextResponseList>
-</updateContextResponse>
-"""
-
+response_defined_by_user = {}
 
 @app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'UPDATE', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'PUT'])
 @app.route('/<path:path>', methods=['GET', 'POST', 'UPDATE', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'PUT'])
 def catch(path):
+    """
+    Capture all requests to the mock. Depending of the path, the functionality changes, the possibilities are:
+    - get_data --> Response with all petitions and reset the petitions
+    - set_response --> Set specific response for all petitions (except specials)
+    - reset_response --> Reset the response for all petitions (except specials)
+    :param path:
+    :return:
+    """
     global counter
     global petitions
+    global response_defined_by_user
 
     if path == 'get_data':
         resp = petitions.copy()
         petitions = {}
         return json.dumps(resp), 200
+    elif path == 'set_response':
+        try:
+            response_recv = json.loads(request.data)
+        except Exception as e:
+            raise e, 'The payload is not a json object, the payload is: {payload}'.format(payload=request.data)
+        try:
+            response_defined_by_user.update({'headers', response_recv['headers']})
+            response_defined_by_user.update({'payload', response_recv['payload']})
+            response_defined_by_user.update({'status_code', response_recv['status_code']})
+        except KeyError as e:
+            raise e, 'The response received in the payload is {response}'.format(response=response_recv)
+        return 'Response set', 200
+    elif path == 'reset_response':
+        response_defined_by_user = {}
+        return 'Response reset', 200
     else:
         petitions.update({
             counter: {
@@ -144,10 +80,8 @@ def catch(path):
                 petitions[counter].update({"payload": json.loads(request.data)})
             except:
                 petitions[counter].update({"payload": request.data})
-        if path.lower().find('querycontext') >= 0:
-            return query_context_response_xml, 200
-        if path.lower().find('updatecontext') >= 0:
-            return update_context_response_xml, 200
+        if response_defined_by_user != {}:
+            return response_defined_by_user['payload'], response_defined_by_user['status_code'], response_defined_by_user['headers']
         else:
             return "Saved", 200
 
