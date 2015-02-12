@@ -22,7 +22,6 @@ For those usages not covered by the GNU Affero General Public License
 please contact with::[iot_support@tid.es]
 """
 from iotqautils.cb_utils import CbNgsi10Utils, CbNgsi9Utils
-import requests
 from integration.tools.general_utils import check_key_value, drop_database
 
 __author__ = 'Jon'
