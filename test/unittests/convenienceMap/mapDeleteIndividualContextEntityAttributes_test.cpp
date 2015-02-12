@@ -28,7 +28,6 @@
 #include "logMsg/traceLevels.h"
 #include "common/globals.h"
 
-#include "convenienceMap/mapGetContextEntityAttributes.h"
 #include "convenience/RegisterProviderRequest.h"
 #include "convenienceMap/mapDeleteIndividualContextEntityAttributes.h"
 #include "mongoBackend/mongoRegisterContext.h"
