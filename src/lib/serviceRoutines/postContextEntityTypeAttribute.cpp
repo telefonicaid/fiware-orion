@@ -40,7 +40,10 @@
 * postContextEntityTypeAttribute -
 *
 * POST /ngsi9/contextEntityTypes/{typeName}/attributes/{attributeName}
-* PAYLOAD: RegisterProviderRequest
+* POST /v1/registry/contextEntityTypes/{typeName}/attributes/{attributeName}
+*
+* Payload In: RegisterProviderRequest
+* Payload Out: RegisterContextResponse
 *
 * 1. Transform RegisterProviderRequest+typeName+attributeName into a RegisterContextRequest
 * 2. Call the Standard operation for RegisterContextRequest 

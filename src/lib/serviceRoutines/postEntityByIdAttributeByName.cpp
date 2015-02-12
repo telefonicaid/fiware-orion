@@ -39,8 +39,11 @@
 *
 * postEntityByIdAttributeByName - 
 *
+* POST /v1/registry/contextEntities/{entityId}/attributes/{attributeName}
 * POST /ngsi9/contextEntities/{entityId}/attributes/{attributeName}
-* PAYLOAD: RegisterProviderRequest
+*
+* Payload In:  RegisterProviderRequest
+* Payload Out: RegisterContextResponse
 *
 * 1. Transform RegisterProviderRequest+entityId+attributeName into a RegisterContextRequest
 * 2. Call the Standard operation for RegisterContextRequest

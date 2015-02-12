@@ -53,6 +53,12 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 /* ****************************************************************************
 *
 * postUpdateContext -
+*
+* POST /v1/updateContext
+* POST /ngsi10/updateContext
+*
+* Payload In:  UpdateContextRequest
+* Payload Out: UpdateContextResponse
 */
 std::string postUpdateContext
 (

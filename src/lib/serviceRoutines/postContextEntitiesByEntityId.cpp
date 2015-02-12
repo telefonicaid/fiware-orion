@@ -39,8 +39,11 @@
 *
 * postContextEntitiesByEntityId - 
 *
+* POST /v1/registry/contextEntities/{entityId}
 * POST /ngsi9/contextEntities/{entityId}
-* PAYLOAD: RegisterProviderRequest
+*
+* Payload In:  RegisterProviderRequest
+* Payload Out: RegisterContextResponse
 *
 * 1. Transform RegisterProviderRequest+entityId into a RegisterContextRequest
 * 2. Call the Standard operation for RegisterContextRequest
