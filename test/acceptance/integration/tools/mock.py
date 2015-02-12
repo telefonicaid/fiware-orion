@@ -25,6 +25,7 @@ __author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
 
 from flask import Flask, request
 import json
+import sys
 
 app = Flask(__name__)
 
@@ -152,5 +153,7 @@ def catch(path):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5566, debug=True)
+    if len(sys.argv) != 2:
+        raise AttributeError, "Usage is \"python mock.py bind_ip port\""
+    app.run(host=sys.argv[1], port=sys.argv[2], debug=True)
 

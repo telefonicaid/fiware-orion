@@ -86,7 +86,7 @@ def start_mock():
     # if platform.system() == 'Windows':
     # path = path[0:path.rfind('\\')] + '\\mocks\\'
     DEVNULL = open(os.devnull, 'wb')
-    command = ['python', '{path}\\mock.py'.format(path=path)]
+    command = ['python', '{path}\\mock.py {bind_ip} {port}'.format(path=path, bind_ip=world.config['mock']['bind_ip'], bind_ip=world.config['mock']['port'])]
     return subprocess.Popen(command, stdout=DEVNULL, stderr=DEVNULL).pid
 
 
