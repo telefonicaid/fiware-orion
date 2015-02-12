@@ -30,7 +30,7 @@ from lettuce import step, world
 # Mock start
 @step('a started mock')
 def start_mock_step(step):
-    world.mock_pid = start_mock()
+    world.mock = start_mock()
 
 
 @step('retrieve information from the mock')
