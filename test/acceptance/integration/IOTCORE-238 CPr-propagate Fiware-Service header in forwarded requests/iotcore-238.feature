@@ -1,0 +1,133 @@
+# Created by Jon at 28/01/2015
+Feature: When the ContextBroker fowards  a requests to a Context Provider, the header Fiware-Service, is fowareded too
+  # Enter feature description here
+#TODO: Check if there is more operations forwarded
+  
+  @iotcore-238
+  Scenario: Fiware-Service header is forwarded to a Context Provider query operation
+    Given a started mock
+    # First registration
+    And a new NGSI version "9" petition with the service "iotcore_238" and the subservice "/subservice"
+    And the following entities to consult
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And the following attributes to consult
+      | attribute_name | attribute_type |
+      | att1           | att_type_1     |
+    And a context registrations with the before entities and attributes and the following providing applications
+      | providing_application      |
+      | /context_provider/service1 |
+    And build the standard context registration payload with the previous data and duration "P1M"
+    And a standard context registration is asked with the before information
+    # Query consult
+    And a new NGSI version "10" petition with the service "iotcore_238" and the subservice "/subservice"
+    And the following entities to consult
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And build the standard query context payload with the previous data
+    When a standard query context is asked with the before information
+    #Mock information
+    Then retrieve information from the mock
+    And the path in the last mock petition contains "service1"
+    And there is "1" petitions requested to the mock
+    And headers of the last mock petition contains the head "Fiware-Service" with the value "iotcore_238"
+    And  clean the mongo database of the service "iotcore_238"
+
+  @iotcore-238
+  Scenario: Fiware-Service header is not forwarded to a Context Provider query operation if its not send
+    Given a started mock
+    # First registration
+    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
+    And the following entities to consult
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And the following attributes to consult
+      | attribute_name | attribute_type |
+      | att1           | att_type_1     |
+    And a context registrations with the before entities and attributes and the following providing applications
+      | providing_application      |
+      | /context_provider/service1 |
+    And build the standard context registration payload with the previous data and duration "P1M"
+    And a standard context registration is asked with the before information
+    # Query consult
+    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
+    And the following entities to consult
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And build the standard query context payload with the previous data
+    When a standard query context is asked with the before information
+    #Mock information
+    Then retrieve information from the mock
+    And the path in the last mock petition contains "service1"
+    And there is "1" petitions requested to the mock
+    And headers of the last mock petition not contains the head "Fiware-Service"
+    And headers of the last mock petition contains the head "Fiware-Servicepath" with the value "/subservice"
+    And  clean the mongo database of the service "iotcore_238"
+
+  @iotcore-238
+  Scenario: Fiware-Service header is forwarded to a Context Provider update operation
+    Given a started mock
+    # First registration
+    And a new NGSI version "9" petition with the service "iotcore_238" and the subservice "/subservice"
+    And the following entities to consult
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And the following attributes to consult
+      | attribute_name | attribute_type |
+      | att1           | att_type_1     |
+    And a context registrations with the before entities and attributes and the following providing applications
+      | providing_application      |
+      | /context_provider/service1 |
+    And build the standard context registration payload with the previous data and duration "P1M"
+    And a standard context registration is asked with the before information
+    # Update operation
+    And a new NGSI version "10" petition with the service "iotcore_238" and the subservice "/subservice"
+    And the following attributes to create
+      | attribute_name | attribute_type | attribute_value |
+      | att1           | att_type_1     | 25              |
+    And a context elements with the before attrs and the following entities
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And build the standard entity update payload with the previous data
+    When a standard context entity update is asked with the before information
+    #Mock information
+    Then retrieve information from the mock
+    And the path in the last mock petition contains "service1"
+    And there is "1" petitions requested to the mock
+    And headers of the last mock petition contains the head "Fiware-Service" with the value "iotcore_238"
+    And  clean the mongo database of the service "iotcore_238"
+
+  @iotcore-238
+  Scenario: Fiware-Service header is not forwarded to a Context Provider update operation if it is not send
+    Given a started mock
+    # First registration
+    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
+    And the following entities to consult
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And the following attributes to consult
+      | attribute_name | attribute_type |
+      | att1           | att_type_1     |
+    And a context registrations with the before entities and attributes and the following providing applications
+      | providing_application      |
+      | /context_provider/service1 |
+    And build the standard context registration payload with the previous data and duration "P1M"
+    And a standard context registration is asked with the before information
+    # Update operation
+    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
+    And the following attributes to create
+      | attribute_name | attribute_type | attribute_value |
+      | att1           | att_type_1     | 25              |
+    And a context elements with the before attrs and the following entities
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And build the standard entity update payload with the previous data
+    When a standard context entity update is asked with the before information
+    #Mock information
+    Then retrieve information from the mock
+    And the path in the last mock petition contains "service1"
+    And there is "1" petitions requested to the mock
+    And headers of the last mock petition not contains the head "Fiware-Service"
+    And headers of the last mock petition contains the head "Fiware-Servicepath" with the value "/subservice"
+    And  clean the mongo database of the service "iotcore_238"
+
