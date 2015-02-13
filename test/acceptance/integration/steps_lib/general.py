@@ -24,7 +24,6 @@
 __author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
 
 from iotqautils.cb_utils import CbNgsi10Utils, CbNgsi9Utils
-import requests
 from integration.tools.general_utils import check_key_value, drop_database
 from lettuce import step, world
 

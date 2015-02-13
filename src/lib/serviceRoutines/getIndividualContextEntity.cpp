@@ -54,8 +54,6 @@ std::string getIndividualContextEntity
   EntityTypeInfo          typeInfo    = EntityTypeEmptyOrNotEmpty;
   ContextElementResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
-
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
   {
     typeInfo = EntityTypeEmpty;

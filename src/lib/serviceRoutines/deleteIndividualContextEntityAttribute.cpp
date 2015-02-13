@@ -56,8 +56,6 @@ std::string deleteIndividualContextEntityAttribute
   if (compV.size() > 2)   entityId      = compV[2];
   if (compV.size() > 4)   attributeName = compV[4];
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s'", entityId.c_str()));
-
   ciP->httpStatusCode = mapDeleteIndividualContextEntityAttribute(entityId, "", attributeName, &response, ciP);
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
