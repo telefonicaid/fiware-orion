@@ -87,9 +87,9 @@ def start_mock():
     path, fl = os.path.split(os.path.realpath(__file__))
     DEVNULL = open(os.devnull, 'wb')
     if platform.system() == 'Windows':
-        command = ['python', '{path}\\mock.py {bind_ip} {port}'.format(path=path, bind_ip=world.config['mock']['bind_ip'], port=world.config['mock']['port'])]
+        command = ['python', '{path}\\mock.py --host {bind_ip} --port {port}'.format(path=path, bind_ip=world.config['mock']['bind_ip'], port=world.config['mock']['port'])]
     elif platform.system() == 'Linux':
-        command = ['python', '{path}/mock.py {bind_ip} {port}'.format(path=path, bind_ip=world.config['mock']['bind_ip'], port=world.config['mock']['port'])]
+        command = ['python', '{path}\\mock.py --host {bind_ip} --port {port}'.format(path=path, bind_ip=world.config['mock']['bind_ip'], port=world.config['mock']['port'])]
     else:
         raise ValueError, 'The SO is not compatible with the mock'
     return subprocess.Popen(command, stdout=DEVNULL, stderr=DEVNULL)
