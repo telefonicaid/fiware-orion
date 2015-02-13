@@ -57,10 +57,6 @@ std::string getEntityByIdAttributeByName
   std::string                          attributeName = (compV[0] == "v1")? compV[5] : compV[4];
   std::string                          answer;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entityId '%s', attribute '%s'",
-                        entityId.c_str(), attributeName.c_str()));
-
-
   //
   // 1. Fill in parseDataP->dcar.res to pass to postDiscoverContextAvailability
   //

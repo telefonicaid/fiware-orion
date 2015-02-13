@@ -54,7 +54,6 @@ extern std::string deleteAllEntitiesWithTypeAndId
   std::string  answer;
   StatusCode   response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'DELETE' request for entityId '%s', type '%s'", enId.c_str(), enType.c_str()));
   ciP->httpStatusCode = mapDeleteIndividualContextEntity(enId, enType, &response, ciP);
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();

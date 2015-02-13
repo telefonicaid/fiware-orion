@@ -59,8 +59,6 @@ std::string getContextEntityTypes
   std::string  typeName     = (compV[0] == "v1")? compV[3] : compV[2];
   std::string  answer;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entity type '%s'", typeName.c_str()));
-
   //
   // 1. Fill in parseDataP->dcar.res to pass to postDiscoverContextAvailability
   //

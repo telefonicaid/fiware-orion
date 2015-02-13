@@ -91,8 +91,6 @@ std::string postIndividualContextEntity
     }
   }
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s'", entityId.c_str()));
-
   ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, entityType, &parseDataP->acer.res, &response, ciP);
 
   response.entity.fill(entityId, entityType, "false");

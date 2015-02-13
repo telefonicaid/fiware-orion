@@ -54,9 +54,6 @@ std::string postIndividualContextEntityAttributeWithTypeAndId
   std::string  attributeName = compV[7];
   StatusCode   response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s', type '%s' and attribute '%s'",
-                        entityId.c_str(), entityType.c_str(), attributeName.c_str()));
-
   ciP->httpStatusCode = mapPostIndividualContextEntityAttribute(entityId,
                                                                 entityType,
                                                                 attributeName,
