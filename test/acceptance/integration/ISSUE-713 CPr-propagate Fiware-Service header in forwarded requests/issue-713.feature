@@ -21,7 +21,6 @@
 
 # Created by Jon at 28/01/2015
 Feature: When the ContextBroker fowards  a requests to a Context Provider, the header Fiware-Service, is fowareded too
-  # Enter feature description here
 #TODO: Check if there is more operations forwarded
   
   @issue-713
