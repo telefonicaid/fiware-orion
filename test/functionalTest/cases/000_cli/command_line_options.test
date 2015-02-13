@@ -20,9 +20,12 @@
 
 --NAME--
 broker version
+
 --SHELL-INIT--
+
 --SHELL--
 contextBroker -u
+
 --REGEXPECT--
 Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-u' (usage)]

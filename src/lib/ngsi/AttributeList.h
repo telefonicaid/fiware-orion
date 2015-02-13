@@ -54,6 +54,16 @@ typedef struct AttributeList
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
+
+  std::string  operator[](unsigned int ix)
+  {
+    if (ix < attributeV.size())
+    {
+      return attributeV[ix];
+    }
+
+    return "";
+  }
 } AttributeList;
 
 #endif  // SRC_LIB_NGSI_ATTRIBUTELIST_H_

@@ -45,15 +45,16 @@ using std::auto_ptr;
 */
 static bool associationsQuery
 (
-  EntityIdVector*       enV,
-  AttributeList*        attrL,
-  const std::string&    scope,
-  MetadataVector*       mdV,
-  std::string*          err,
-  const std::string&    tenant,
-  int                   offset,
-  int                   limit,
-  bool                  details
+  EntityIdVector*                  enV,
+  AttributeList*                   attrL,
+  const std::string&               scope,
+  MetadataVector*                  mdV,
+  std::string*                     err,
+  const std::string&               tenant,
+  int                              offset,
+  int                              limit,
+  bool                             details,
+  const std::vector<std::string>&  servicePathV
 )
 {
     DBClientBase* connection = getMongoConnection();
@@ -181,7 +182,8 @@ static HttpStatusCode associationsDiscoverContextAvailability
   const std::string&                    tenant,
   int                                   offset,
   int                                   limit,
-  bool                                  details
+  bool                                  details,
+  const std::vector<std::string>&       servicePathV
 )
 {
     if (scope == SCOPE_VALUE_ASSOC_ALL)
@@ -193,7 +195,7 @@ static HttpStatusCode associationsDiscoverContextAvailability
 
     MetadataVector mdV;
     std::string err;
-    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details))
+    if (!associationsQuery(&requestP->entityIdVector, &requestP->attributeList, scope, &mdV, &err, tenant, offset, limit, details, servicePathV))
     {
         mdV.release();
         responseP->errorCode.fill(SccReceiverInternalError, std::string("Database error: ") + err);
@@ -229,7 +231,7 @@ static HttpStatusCode associationsDiscoverContextAvailability
         }
 
         ContextRegistrationResponseVector crrV;
-        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant))
+        if (!registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV))
         {
             responseP->errorCode.fill(SccReceiverInternalError, err);
             mdV.release();
@@ -269,14 +271,15 @@ static HttpStatusCode conventionalDiscoverContextAvailability
   const std::string&                    tenant,
   int                                   offset,
   int                                   limit,
-  bool                                  details
+  bool                                  details,
+  const std::vector<std::string>&       servicePathV
 )
 {
     std::string err;
     long long   count = -1;
 
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
-    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, offset, limit, details, &count))
+    if (!registrationsQuery(requestP->entityIdVector, requestP->attributeList, &responseP->responseVector, &err, tenant, servicePathV, offset, limit, details, &count))
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
@@ -329,10 +332,11 @@ static HttpStatusCode conventionalDiscoverContextAvailability
 */
 HttpStatusCode mongoDiscoverContextAvailability
 (
-  DiscoverContextAvailabilityRequest*        requestP,
-  DiscoverContextAvailabilityResponse*       responseP,
-  const std::string&                         tenant,
-  std::map<std::string, std::string>&        uriParams
+  DiscoverContextAvailabilityRequest*   requestP,
+  DiscoverContextAvailabilityResponse*  responseP,
+  const std::string&                    tenant,
+  std::map<std::string, std::string>&   uriParams,
+  const std::vector<std::string>&       servicePathV
 )
 {
   int          offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -344,9 +348,9 @@ HttpStatusCode mongoDiscoverContextAvailability
 
   LM_T(LmtMongo, ("DiscoverContextAvailability Request"));  
 
-  /* Depending on the scope used, we invoke one function or other. DiscoverContextAvailability may behave
-   * differently depending on the scope. Although OperationScope is a list in NGSI, we only support one
-   * scope at the same time */
+  /* Depending on the scope used, we invoke one function or another. DiscoverContextAvailability may behave
+   * differently depending on the scope. Although OperationScope is a list in NGSI, we only support ONE
+   * scope at a time */
   int nScopes = requestP->restriction.scopeVector.size();
   if (nScopes > 0)
   {
@@ -360,7 +364,7 @@ HttpStatusCode mongoDiscoverContextAvailability
 
     if (scopeType == SCOPE_TYPE_ASSOC)
     {
-      HttpStatusCode ms = associationsDiscoverContextAvailability(requestP, responseP, scopeValue, tenant, offset, limit, details);
+      HttpStatusCode ms = associationsDiscoverContextAvailability(requestP, responseP, scopeValue, tenant, offset, limit, details, servicePathV);
       reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request (association)");
       return ms;
     }
@@ -370,7 +374,7 @@ HttpStatusCode mongoDiscoverContextAvailability
     }
   }
 
-  HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP, tenant, offset, limit, details);
+  HttpStatusCode hsCode = conventionalDiscoverContextAvailability(requestP, responseP, tenant, offset, limit, details, servicePathV);
   if (hsCode != SccOk)
     ++noOfDiscoveryErrors;
 

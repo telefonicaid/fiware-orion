@@ -24,7 +24,7 @@ VERSION=$1
 ################################ COMMON PROPERTIES:BEGIN
 ### PROJECT PROPERTIES ###
 echo sonar.projectName=context-broker
-echo sonar.projectKey=com.tdigital.orion:context-broker
+echo sonar.projectKey=com.telefonica.iot:orion
 echo sonar.projectVersion=$VERSION
 ### SOURCES
 echo sonar.sources=src/

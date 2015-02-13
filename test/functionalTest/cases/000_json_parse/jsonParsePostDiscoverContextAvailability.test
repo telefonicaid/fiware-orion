@@ -22,6 +22,7 @@
 
 --NAME--
 JSON Parse Post DiscoverContextAvailability
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -287,3 +288,4 @@ Date: REGEX(.*)
 +++++ Discovery 2 Done +++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

@@ -22,6 +22,7 @@
 
 --NAME--
 Subscription sequence wildcards ONINTERVAL
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -522,3 +523,4 @@ TIMES: 0, 2, 4, 6, 8, 10
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

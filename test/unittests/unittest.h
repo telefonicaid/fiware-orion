@@ -54,6 +54,14 @@ extern std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
+* servicePathV - 
+*/
+extern std::vector<std::string> servicePathV;
+
+ 
+
+/* ****************************************************************************
+*
 * servicePathVector - 
 */
 extern std::vector<std::string> servicePathVector;

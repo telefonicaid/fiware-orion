@@ -1,10 +1,33 @@
+# -*- coding: utf-8 -*-
+# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es 
+  
 # Created by Jon at 10/02/2015
-Feature: ServicePath for registrations (NGSI9) (not recursive)
+Feature: Service support for registries (NGSI9)
   # Enter feature description here
-  @iotcore-124
-  Scenario: Subscribe different entities with the same provider and services but different subservice
+#TODO: Test the subscriptions operation, if service and subservice diference the context provider, when the functionality is defined
+
+  @issue-322
+  Scenario: Subscribe different entities with the same provider and subservices but different service
     # First registration
-    Given a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice1"
+    Given a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -18,7 +41,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice2"
+    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -32,7 +55,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Discover
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type | is_pattern |
       | Room.*    | Room        | true       |
@@ -40,13 +63,14 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     When a standard disconver context availability is asked with the before information
     Then check the response has the key "id" with the value "Room2"
     And check the response has not the key "id" with the value "Room3"
-    And clean the mongo database of the service "iotcore_124"
+    And clean the mongo database of the service "issue_322"
+    And clean the mongo database of the service "issue_322_2"
 
-  @iotcore-124
-  Scenario: Query context to a subservice
+  @issue-322
+  Scenario: Query context of an entity in two context provider with different service
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice1/1"
+    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -59,7 +83,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice1/2"
+    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -72,7 +96,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Query consult
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice1/2"
+    And a new NGSI version "10" petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -82,13 +106,14 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     Then retrieve information from the mock
     And the path in the last mock petition contains "service2"
     And there is "1" petitions requested to the mock
-    And  clean the mongo database of the service "iotcore_124"
+    And  clean the mongo database of the service "issue_322"
+    And  clean the mongo database of the service "issue_322_2"
 
-  @iotcore-124
-  Scenario: Update an entity in a context provider, having other context provider with the same entity in other subservice
+  @issue-322
+  Scenario: Update an entity in a context provider, having other context provider with the same entity in other service
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -101,7 +126,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice2"
+    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -114,7 +139,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -126,13 +151,14 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     Then retrieve information from the mock
     And the path in the last mock petition contains "service1"
     And there is "1" petitions requested to the mock
-    And clean the mongo database of the service "iotcore_124"
+    And clean the mongo database of the service "issue_322"
+    And clean the mongo database of the service "issue_322_2"
 
-  @iotcore-124
-  Scenario: Append an entity in a context broker, having context providers with the same entity in the same subservice and other in other subservice
+  @issue-322
+  Scenario: Append an entity in a context broker, having context providers with the same entity in the same service and other in other service
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -145,7 +171,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice2"
+    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -158,7 +184,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -169,14 +195,14 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     When a standard context entity creation is asked with the before information
     Then retrieve information from the mock
     And there is "0" petitions requested to the mock
-    And clean the mongo database of the service "iotcore_124"
+    And clean the mongo database of the service "issue_322"
+    And clean the mongo database of the service "issue_322_2"
 
-# Falla
-  @issue_755 @iotcore-124
+  @issue-755 @issue-322
   Scenario: Delete an entity doesnt exist in context broker (error expected), having context providers with the same entity in the same subservice and other in other subservice
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -189,7 +215,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice2"
+    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -202,7 +228,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Delete operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     |                 |
@@ -213,14 +239,14 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     When a standard context entity delete is asked with the before information
     Then retrieve information from the mock
     And there is "0" petitions requested to the mock
-    And clean the mongo database of the service "iotcore_124"
-    And print the request and the response
+    And clean the mongo database of the service "issue_322"
+    And clean the mongo database of the service "issue_322_2"
 
-  @iotcore-124
-  Scenario: Entity in CB and in CP with the same subervice, and in other CP with other subservice.
+  @issue-322
+  Scenario: Entity in CB and in CP with the same service, and in other CP with other service.
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -233,7 +259,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice2"
+    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -246,7 +272,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -256,7 +282,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard entity creation payload with the previous data
     And a standard context entity creation is asked with the before information
     # Query operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -264,14 +290,14 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And a standard query context is asked with the before information
     Then retrieve information from the mock
     And there is "0" petitions requested to the mock
-    And clean the mongo database of the service "iotcore_124"
-    And print the request and the response
+    And clean the mongo database of the service "issue_322"
+    And clean the mongo database of the service "issue_322_2"
 
-  @iotcore-124
-  Scenario: Entity in CB and in CP with the same subervice, and in other CP with other subservice.
+  @issue-322
+  Scenario: Entity in CB and in CP with the same service, and in other CP with other service.
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -284,7 +310,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice2"
+    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -297,7 +323,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice1"
+    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -307,7 +333,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard entity creation payload with the previous data
     And a standard context entity creation is asked with the before information
     # Query operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice2"
+    And a new NGSI version "10" petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -316,14 +342,14 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     Then retrieve information from the mock
     And there is "1" petitions requested to the mock
     And the path in the last mock petition contains "service2"
-    And clean the mongo database of the service "iotcore_124"
-    And print the request and the response
+    And clean the mongo database of the service "issue_322"
+    And clean the mongo database of the service "issue_322_2"
 
-  @iotcore-124
-  Scenario: Entity in CB and in CP without servicepath, and in other CP with other servicepath.
+  @issue-322
+  Scenario: Entity in CB and in CP without service, and in other CP with other service.
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "empty"
+    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -336,7 +362,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice"
+    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -349,7 +375,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "empty"
+    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -359,7 +385,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard entity creation payload with the previous data
     And a standard context entity creation is asked with the before information
     # Query operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice"
+    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -368,14 +394,14 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     Then retrieve information from the mock
     And there is "1" petitions requested to the mock
     And the path in the last mock petition contains "service2"
-    And clean the mongo database of the service "iotcore_124"
+    And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service ""
 
-  @iotcore-124
-  Scenario: Entity in CB and in CP with servicepath, and in other CP without servicepath.
+  @issue-322
+  Scenario: Entity in CB and in CP with service, and in other CP without service.
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "/subservice"
+    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -388,7 +414,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "iotcore_124" and the subservice "empty"
+    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -401,7 +427,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "/subservice"
+    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -411,7 +437,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard entity creation payload with the previous data
     And a standard context entity creation is asked with the before information
     # Query operation
-    And a new NGSI version "10" petition with the service "iotcore_124" and the subservice "empty"
+    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -420,5 +446,5 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     Then retrieve information from the mock
     And there is "1" petitions requested to the mock
     And the path in the last mock petition contains "service2"
-    And clean the mongo database of the service "iotcore_124"
+    And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service ""

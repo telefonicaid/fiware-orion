@@ -22,6 +22,7 @@
 
 --NAME--
 Big request for updateContext
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -2139,3 +2140,4 @@ Date: REGEX(.*)
 </updateContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

@@ -46,6 +46,8 @@ typedef struct RegisterContextRequest
   Duration                   duration;                   // Optional
   RegistrationId             registrationId;             // Optional
 
+  std::string                servicePath;                // Not part of payload, just an internal field
+
   std::string   render(RequestType requestType, Format format, const std::string& indent);
   std::string   check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(void);

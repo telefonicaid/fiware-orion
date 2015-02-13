@@ -22,6 +22,7 @@
 
 --NAME--
 Large request error for /v1/subscribeContext
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -54,3 +55,4 @@ Date: REGEX(.*)
 </subscribeContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

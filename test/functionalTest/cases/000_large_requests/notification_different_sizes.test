@@ -22,8 +22,8 @@
 
 --NAME--
 Notifications of different sizes
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255
 accumulatorStart
@@ -246,6 +246,6 @@ Date: REGEX(.*)
 #       19870:   d.dd.d
 #       19875:   d.dd.d-next
 
-cp /tmp/contextBroker.log /tmp/contextBroker.log.notification_different_sizes
 brokerStop CB
 accumulatorStop
+dbDrop CB

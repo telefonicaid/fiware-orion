@@ -29,6 +29,7 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/sem.h"
+#include "common/defaultValues.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/MongoCommonRegister.h"
@@ -44,19 +45,34 @@ using namespace mongo;
 *
 * mongoRegisterContext - 
 */
-HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, const std::string& tenant)
+HttpStatusCode mongoRegisterContext
+(
+  RegisterContextRequest*   requestP,
+  RegisterContextResponse*  responseP,
+  const std::string&        tenant,
+  const std::string&        servicePath
+)
 {    
+    std::string sPath = servicePath;
+
     reqSemTake(__FUNCTION__, "ngsi9 register request");
 
     LM_T(LmtMongo, ("Register Context Request"));
 
     DBClientBase* connection = getMongoConnection();
 
+    // Default value for service-path is "/"
+    if (sPath == "")
+    {
+      sPath = DEFAULT_SERVICE_PATH;
+    }
+
     /* Check if new registration */
-    if (requestP->registrationId.isEmpty()) {
-        HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant);
-        reqSemGive(__FUNCTION__, "ngsi9 register request");
-        return result;
+    if (requestP->registrationId.isEmpty())
+    {
+      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath);
+      reqSemGive(__FUNCTION__, "ngsi9 register request");
+      return result;
     }
 
     /* It is not a new registration, so it should be an update */
@@ -67,8 +83,9 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
         id = OID(requestP->registrationId.get());
 
         mongoSemTake(__FUNCTION__, "findOne from RegistrationsCollection");
-        reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id));
+        reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id << "servicePath" << sPath));
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection");
+
         LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
     }
     catch (const AssertionException &e)
@@ -121,7 +138,7 @@ HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterCo
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant);
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath);
     reqSemGive(__FUNCTION__, "ngsi9 register request");
     return result;
 }
