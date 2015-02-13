@@ -19,15 +19,17 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
+
 # Created by Jon at 28/01/2015
-Feature: When the ContextBroker fowards  a requests to a Context Provider, the header Fiware-Service, is fowareded too
+Feature: When the ContextBroker forwards a requests to a Context Provider, the header Fiware-Servicepath, is fowareded too
+  # Enter feature description here
 #TODO: Check if there is more operations forwarded
-  
-  @issue-713
-  Scenario: Fiware-Service header is forwarded to a Context Provider query operation
+
+  @issue-714
+  Scenario: Fiware-Servicepath header is forwarded to a Context Provider query operation
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "issue_713" and the subservice "/subservice"
+    And a new NGSI version "9" petition with the service "issue_714" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -40,7 +42,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Query consult
-    And a new NGSI version "10" petition with the service "issue_713" and the subservice "/subservice"
+    And a new NGSI version "10" petition with the service "issue_714" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -50,14 +52,14 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     Then retrieve information from the mock
     And the path in the last mock petition contains "service1"
     And there is "1" petitions requested to the mock
-    And headers of the last mock petition contains the head "Fiware-Service" with the value "issue_713"
-    And  clean the mongo database of the service "issue_713"
+    And headers of the last mock petition contains the head "Fiware-Servicepath" with the value "/subservice"
+    And  clean the mongo database of the service "issue_714"
 
-  @issue-713
-  Scenario: Fiware-Service header is not forwarded to a Context Provider query operation if its not send
+  @issue-714
+  Scenario: Fiware-Servicepath header is not forwarded to a Context Provider query operation if its not send
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI version "9" petition with the service "issue_714" and the subservice "empty"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -70,7 +72,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Query consult
-    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI version "10" petition with the service "issue_714" and the subservice "empty"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -80,15 +82,15 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     Then retrieve information from the mock
     And the path in the last mock petition contains "service1"
     And there is "1" petitions requested to the mock
-    And headers of the last mock petition not contains the head "Fiware-Service"
-    And headers of the last mock petition contains the head "Fiware-Servicepath" with the value "/subservice"
-    And  clean the mongo database of the service "issue_713"
+    And headers of the last mock petition not contains the head "Fiware-Servicepath"
+    And headers of the last mock petition contains the head "Fiware-Service" with the value "issue_714"
+    And  clean the mongo database of the service "issue_714"
 
-  @issue-713
-  Scenario: Fiware-Service header is forwarded to a Context Provider update operation
+  @issue-714
+  Scenario: Fiware-Servicepath header is forwarded to a Context Provider update operation
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "issue_713" and the subservice "/subservice"
+    And a new NGSI version "9" petition with the service "issue_714" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -101,7 +103,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "issue_713" and the subservice "/subservice"
+    And a new NGSI version "10" petition with the service "issue_714" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -114,14 +116,14 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     Then retrieve information from the mock
     And the path in the last mock petition contains "service1"
     And there is "1" petitions requested to the mock
-    And headers of the last mock petition contains the head "Fiware-Service" with the value "issue_713"
-    And  clean the mongo database of the service "issue_713"
+    And headers of the last mock petition contains the head "Fiware-Servicpathe" with the value "/subservice"
+    And  clean the mongo database of the service "issue_714"
 
-  @issue-713
-  Scenario: Fiware-Service header is not forwarded to a Context Provider update operation if it is not send
+  @issue-714
+  Scenario: Fiware-Servicepath header is not forwarded to a Context Provider update operation if it is not send
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI version "9" petition with the service "issue_714" and the subservice "empty"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -134,7 +136,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI version "10" petition with the service "issue_714" and the subservice "empty"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -147,7 +149,5 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     Then retrieve information from the mock
     And the path in the last mock petition contains "service1"
     And there is "1" petitions requested to the mock
-    And headers of the last mock petition not contains the head "Fiware-Service"
-    And headers of the last mock petition contains the head "Fiware-Servicepath" with the value "/subservice"
-    And  clean the mongo database of the service "issue_713"
-
+    And headers of the last mock petition not contains the head "Fiware-Servicepath"
+    And clean the mongo database of the service "issue_714"
