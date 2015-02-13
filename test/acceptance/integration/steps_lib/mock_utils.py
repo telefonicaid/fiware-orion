@@ -26,11 +26,17 @@ __author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
 import requests
 from integration.tools.general_utils import start_mock, check_world_attribute_is_not_none
 from lettuce import step, world
+from integration.tools.responses_predefined import responses
 
 # Mock start
 @step('a started mock')
 def start_mock_step(step):
-    world.mock_pid = start_mock()
+    world.mock = start_mock()
+
+@step('set the response of the context provider mock as "([^"]*)"')
+def set_the_Response_of_the_context_provider_mock_as(step, response):
+    assert 'Response set' == requests.request('post', 'http://{mock_ip}:{mock_port}/set_response'.format(
+        mock_ip=world.config['mock']['host'], mock_port=world.config['mock']['port']), data=responses[response])
 
 
 @step('retrieve information from the mock')

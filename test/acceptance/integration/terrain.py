@@ -36,7 +36,7 @@ def before_all():
     world.context_registrations = None
     world.service = None
     world.subservice = None
-    world.mock_pid = None
+    world.mock = None
     world.mock_data = None
     world.payloads_count = -1
     world.response_count = -1
