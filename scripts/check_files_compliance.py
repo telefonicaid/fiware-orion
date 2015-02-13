@@ -111,10 +111,10 @@ def ignore(root, file):
         return True
 
     # Particular cases of files that are also ignored
-    if file == '.gitignore' or file == '.valgrindrc' or file == '.valgrindSuppressions' \
-            or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
-            or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h' or file == 'unittests_that_fail_sporadically.txt' \
-            or file == 'Vagrantfile' or file == "contextBroker.ubuntu":
+    files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'README.md', 'LICENSE',
+                   'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
+                   'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu']
+    if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
                                       or file == 'cmake2junit.xsl'):
@@ -126,28 +126,31 @@ def ignore(root, file):
 
 
 def supported_extension(root, file):
-    # FIXME: there should be a smarter way of doing this instead of so long or statement :)
+    """
+    Check if the file is supported depending of the name, the extension of the name inside a path
+    :param root:
+    :param file:
+    :return:
+    """
     extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
                   'centos', 'js', 'jmx', 'vtestx', 'feature']
     names = ['makefile', 'Makefile']
+
+    # Check extensions
     if os.path.splitext(file)[1][1:] in extensions:
         return True
+
+    # Check filenames
     if file in names:
         return True
-    # if file.endswith('.py') or file.endswith('.cpp') or file.endswith('.h') or file.endswith('.xml')\
-    # or file.endswith('.json') or file.endswith('.test') or file.endswith('.vtest') or file.endswith('.txt')\
-    #     or file.endswith('.sh') or file == 'makefile' or file == 'Makefile' or file.endswith('.spec') \
-    #     or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos') \
-    #     or file.endswith('.js') or file.endswith('.jmx') or file.endswith('.vtestx'):
-    #     return True
 
+    # Check a filename in a root
     if 'config' in root and file == 'contextBroker':
         return True
 
     filename = os.path.join(root, file)
-    print 'not supported extension: ' + filename
+    print 'not supported extension: {filename}'.format(filename=filename)
     return False
-
 
 if len(argv) > 1:
     dir = argv[1]
@@ -179,14 +182,14 @@ for root, dirs, files in os.walk(dir):
             bad += 1
         else:
             # DEBUG
-            #print filename + ': OK'
+            # print filename + ': OK'
             good += 1
 
 print '--------------'
 print 'Summary:'
-print '   good:    ' + str(good)
-print '   bad:     ' + str(bad)
-print 'Total: ' + str(good + bad)
+print '   good:    {good}'.format(good=str(good))
+print '   bad:     {bad}'.format(bad=str(bad))
+print 'Total: {total}'.format(str(good + bad))
 
 if bad > 0:
     exit(1)
