@@ -198,8 +198,7 @@ Feature: Service support for registries (NGSI9)
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
-# Falla
-  @issue_755 @issue-322
+  @issue-755 @issue-322
   Scenario: Delete an entity doesnt exist in context broker (error expected), having context providers with the same entity in the same subservice and other in other subservice
     Given a started mock
     # First registration
