@@ -53,8 +53,6 @@ extern std::string getAllEntitiesWithTypeAndId
   std::string             enId   = compV[5];
   ContextElementResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with type='%s', and id='%s'", enType.c_str(), enId.c_str()));
-
   ciP->httpStatusCode = mapGetIndividualContextEntity(enId, enType, EntityTypeEmptyOrNotEmpty, &response, ciP);
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
