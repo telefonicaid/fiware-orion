@@ -42,6 +42,9 @@
 * GET /v1/registry/contextEntities/{entityId::id}/attributes
 * GET /ngsi9/contextEntities/{entityId::id}/attributes
 *
+* Payload In:  None
+* Payload Out: DiscoverContextAvailabilityResponse
+*
 * 1. Fill in DiscoverContextAvailabilityRequest
 * 2. Call postDiscoverContextAvailability
 */
