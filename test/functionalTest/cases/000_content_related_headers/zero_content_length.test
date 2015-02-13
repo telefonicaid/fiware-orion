@@ -22,6 +22,7 @@
 
 --NAME--
 Zero content length
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -42,3 +43,4 @@ curl localhost:${CB_PORT}/v1/registry/registerContext --header "Content-Length: 
 </registerContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

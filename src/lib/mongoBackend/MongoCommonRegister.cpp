@@ -46,8 +46,8 @@ using std::auto_ptr;
 * processAssociations -
 *
 */
-static bool processAssociations(MetadataVector mdV, std::string* err, std::string tenant) {
-
+static bool processAssociations(MetadataVector mdV, std::string* err, std::string tenant)
+{
     // FIXME: first version of associations doesn't support association update
 
     DBClientBase* connection = getMongoConnection();
@@ -124,16 +124,18 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
 * mongoUpdateContext.cpp, so maybe it makes to factorize it.
 *
 */
-static bool processSubscriptions(EntityIdVector                       triggerEntitiesV,
-                                 map<string, TriggeredSubscription*>& subs,
-                                 std::string&                         err,
-                                 std::string                          tenant)
+static bool processSubscriptions
+(
+  EntityIdVector                        triggerEntitiesV,
+  map<string, TriggeredSubscription*>&  subs,
+  std::string&                          err,
+  const std::string&                    tenant
+)
 {
-
     /* For each one of the subscriptions in the map, send notification */
     bool ret = true;
-    for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it) {
-
+    for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
+    {
         std::string mapSubId         = it->first;
         TriggeredSubscription* trigs = it->second;
 
@@ -345,13 +347,20 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
 *   used to put the document in the DB.
 *
 */
-HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, OID* id, std::string tenant)
+HttpStatusCode processRegisterContext
+(
+  RegisterContextRequest*   requestP,
+  RegisterContextResponse*  responseP,
+  OID*                      id,
+  const std::string&        tenant,
+  const std::string&        servicePath
+)
 {
-
     DBClientBase* connection = getMongoConnection();
 
     /* If expiration is not present, then use a default one */
-    if (requestP->duration.isEmpty()) {
+    if (requestP->duration.isEmpty())
+    {
         requestP->duration.set(DEFAULT_DURATION);
     }
 
@@ -370,6 +379,7 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
     }
     reg.append("_id", oid);
     reg.append(REG_EXPIRATION, expiration);
+    reg.append(REG_SERVICE_PATH, servicePath);
 
     /* We accumulate the subscriptions in a map. The key of the map is the string representing
      * subscription id */
@@ -379,39 +389,40 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
     EntityIdVector triggerEntitiesV;
 
     BSONArrayBuilder contextRegistration;
-    for (unsigned int ix = 0; ix < requestP->contextRegistrationVector.size(); ++ix) {
-
+    for (unsigned int ix = 0; ix < requestP->contextRegistrationVector.size(); ++ix)
+    {
         ContextRegistration* cr = requestP->contextRegistrationVector.get(ix);
 
         BSONArrayBuilder entities;
-        for (unsigned int jx = 0; jx < cr->entityIdVector.size(); ++jx) {
-
+        for (unsigned int jx = 0; jx < cr->entityIdVector.size(); ++jx)
+        {
             EntityId* en = cr->entityIdVector.get(jx);
             triggerEntitiesV.push_back(en);
 
-            if (en->type == "") {
+            if (en->type == "")
+            {
                 entities.append(BSON(REG_ENTITY_ID << en->id));
                 LM_T(LmtMongo, ("Entity registration: {id: %s}", en->id.c_str()));
             }
-            else {
+            else
+            {
                 entities.append(BSON(REG_ENTITY_ID << en->id << REG_ENTITY_TYPE << en->type));
                 LM_T(LmtMongo, ("Entity registration: {id: %s, type: %s}", en->id.c_str(), en->type.c_str()));
             }
-
         }
 
         BSONArrayBuilder attrs;
-        for (unsigned int jx = 0; jx < cr->contextRegistrationAttributeVector.size(); ++jx) {
-
+        for (unsigned int jx = 0; jx < cr->contextRegistrationAttributeVector.size(); ++jx)
+        {
            ContextRegistrationAttribute* cra = cr->contextRegistrationAttributeVector.get(jx);
             attrs.append(BSON(REG_ATTRS_NAME << cra->name << REG_ATTRS_TYPE << cra->type << "isDomain" << cra->isDomain));
             LM_T(LmtMongo, ("Attribute registration: {name: %s, type: %s, isDomain: %s}",
                                cra->name.c_str(),
                                cra->type.c_str(),
-                               cra->isDomain.c_str())
-            );
+                               cra->isDomain.c_str()));
 
-            for (unsigned int kx = 0; kx < requestP->contextRegistrationVector.get(ix)->contextRegistrationAttributeVector.get(jx)->metadataVector.size(); ++kx) {
+            for (unsigned int kx = 0; kx < requestP->contextRegistrationVector.get(ix)->contextRegistrationAttributeVector.get(jx)->metadataVector.size(); ++kx)
+            {
                 // FIXME: metadata not supported at the moment
             }
         }
@@ -441,7 +452,8 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
 
     BSONObj regDoc = reg.obj();
     LM_T(LmtMongo, ("upsert update() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), regDoc.toString().c_str()));
-    try {
+    try
+    {
         mongoSemTake(__FUNCTION__, "update in RegistrationsCollection");
         /* Note the fourth parameter is set to "true". This means "upsert", so if the document doesn't previously
          * exist in the collection, it is created. Thus, this way is ok with both uses of
@@ -450,7 +462,8 @@ HttpStatusCode processRegisterContext(RegisterContextRequest* requestP, Register
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
         LM_I(("Database Operation Successful (_id: %s)", oid.toString().c_str()));
     }
-    catch( const DBException &e ) {
+    catch (const DBException& e)
+    {
         mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (DBException)");
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +

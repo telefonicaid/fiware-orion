@@ -22,6 +22,7 @@
 
 --NAME--
 Large request error for /v1/queryContext
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -52,3 +53,4 @@ Date: REGEX(.*)
 </queryContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

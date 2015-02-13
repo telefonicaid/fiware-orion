@@ -22,6 +22,7 @@
 
 --NAME--
 Convenience NGSI10 Context Entity Types
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -181,3 +182,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

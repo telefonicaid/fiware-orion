@@ -37,6 +37,7 @@
 
 --NAME--
 Query Redirect Operation
+
 --SHELL-INIT--
 dbInit CB
 dbInit CP1

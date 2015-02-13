@@ -28,6 +28,7 @@ dbInit CB
 ${SCRIPT_HOME}/../../scripts/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
 extraParams="-https -key /tmp/harnessTest.key -cert /tmp/harnessTest.pem"
 brokerStart CB 0-255 IPV4 "$extraParams"
+
 --SHELL--
 #
 # Register a Sensor of temperature
@@ -123,3 +124,4 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 rm -f /tmp/harnessTest.key /tmp/harnessTest.pem
+dbDrop CB

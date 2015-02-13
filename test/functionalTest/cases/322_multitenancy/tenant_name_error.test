@@ -22,6 +22,7 @@
 
 --NAME--
 Erroneous tenant url names
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0 IPV4 -multiservice
@@ -142,6 +143,7 @@ Date: REGEX(.*)
 
 
 --TEARDOWN--
+
 brokerStop CB
 dbDrop CB
 dbDrop ${CB_DATABASE_NAME}-01234567890123456789012345678901234567890123456789

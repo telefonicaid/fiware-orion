@@ -22,6 +22,7 @@
 
 --NAME--
 Create and query compound object XML-JSON
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -130,3 +131,4 @@ Date: REGEX(.*)
 }
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

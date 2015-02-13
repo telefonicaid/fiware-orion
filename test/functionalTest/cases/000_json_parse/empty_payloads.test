@@ -22,6 +22,7 @@
 
 --NAME--
 Empty payloads errors in JSON
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -244,3 +245,4 @@ Date: REGEX(.*)
 13: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

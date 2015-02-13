@@ -2897,7 +2897,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     std::string s2 = res.errorCode.details.substr(71+24, res.errorCode.details.size()-71-24);
     EXPECT_EQ("collection: unittest.registrations "
               "- upsert update(): { _id: ObjectId('",s1);
-    EXPECT_EQ("'), expiration: 1360232760, contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: {}, providingApplication: \"http://dummy.com\" } ] } "
+    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: {}, providingApplication: \"http://dummy.com\" } ] } "
               "- exception: boom!!", s2);
 
     /* Release mock */

@@ -22,6 +22,7 @@
 
 --NAME--
 JSON Parse Post RegisterContext NoEntities
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -73,3 +74,4 @@ Date: REGEX(.*)
 ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

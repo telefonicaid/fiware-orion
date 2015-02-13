@@ -344,4 +344,8 @@ Content-Type: application/json
 
 --TEARDOWN--
 brokerStop CB
+brokerStop CP1
 accumulatorStop
+
+dbDrop CB
+dbDrop CP1
