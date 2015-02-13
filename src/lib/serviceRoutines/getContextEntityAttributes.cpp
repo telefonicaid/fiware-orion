@@ -28,8 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 #include "serviceRoutines/postDiscoverContextAvailability.h"
 #include "serviceRoutines/getContextEntityAttributes.h"
 
