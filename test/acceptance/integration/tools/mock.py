@@ -89,5 +89,5 @@ def catch(path):
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         raise AttributeError, "Usage is \"python mock.py bind_ip port\""
-    app.run(host=sys.argv[1], port=sys.argv[2], debug=True)
+    app.run(host=str(sys.argv[1]), port=int(sys.argv[2]), debug=True)
 
