@@ -65,8 +65,6 @@ extern std::string postAllEntitiesWithTypeAndId
     return response.render(ciP, IndividualContextEntity, "");
   }
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s', type '%s'", enId.c_str(), enType.c_str()));
-
   ciP->httpStatusCode = mapPostIndividualContextEntity(enId, enType, &parseDataP->acer.res, &response, ciP);
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();

@@ -29,7 +29,6 @@
 #include "logMsg/traceLevels.h"
 
 #include "ngsi/ParseData.h"
-#include "ngsi9/DiscoverContextAvailabilityRequest.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/postDiscoverContextAvailability.h"
 #include "serviceRoutines/getContextEntityTypeAttribute.h"
@@ -39,6 +38,15 @@
 /* ****************************************************************************
 *
 * getContextEntityTypeAttribute -
+*
+* GET /v1/registry/contextEntityTypes/{entityId::type}/attributes/{attributeName}
+* GET /ngsi9/contextEntityTypes/{entityId::type}/attributes/{attributeName}
+*
+* Payload In:  None
+* Payload Out: DiscoverContextAvailabilityResponse
+*
+* 1. Fill in DiscoverContextAvailabilityRequest
+* 2. Call postDiscoverContextAvailability
 */
 std::string getContextEntityTypeAttribute
 (
@@ -48,17 +56,29 @@ std::string getContextEntityTypeAttribute
   ParseData*                 parseDataP
 )
 {
-  std::string                          entityType     = (compV[0] == "v1")? compV[3] : compV[2];
-  std::string                          attributeName  = (compV[0] == "v1")? compV[5] : compV[4];
-  DiscoverContextAvailabilityRequest*  requestP       = &parseDataP->dcar.res;
-  EntityId                             entityId(".*", entityType, "true");
+  std::string  entityType     = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string  attributeName  = (compV[0] == "v1")? compV[5] : compV[4];
+  std::string  answer;
 
   LM_T(LmtConvenience,
        ("CONVENIENCE: got a  'GET' request for entity type '%s', attribute: '%s'",
         entityType.c_str(), attributeName.c_str()));
 
-  requestP->entityIdVector.push_back(&entityId);
-  requestP->attributeList.push_back(attributeName);
+  //
+  // 1. Fill in parseDataP->dcar.res to pass to postDiscoverContextAvailability
+  //
+  EntityId                             eId(".*", entityType, "true");
+  std::vector<std::string>             attributeV;
+  Restriction                          restriction;
 
-  return postDiscoverContextAvailability(ciP, components, compV, parseDataP);
+  attributeV.push_back(attributeName);
+  parseDataP->dcar.res.fill(eId, attributeV, restriction);
+
+
+  //
+  // 2. Call the standard operation 
+  //
+  answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
+
+  return answer;
 }

@@ -52,8 +52,6 @@ std::string postIndividualContextEntityAttributes
   std::string                   entityId = compV[2];
   AppendContextElementResponse* responseP = new AppendContextElementResponse();
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'POST' request for entityId '%s'", entityId.c_str()));
-
   ciP->httpStatusCode = mapPostIndividualContextEntityAttributes(entityId, &parseDataP->acer.res, responseP, ciP);
   answer = responseP->render(ciP, IndividualContextEntityAttributes, "");
   responseP->release();

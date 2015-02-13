@@ -28,9 +28,9 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapGetEntityByIdAttributeByName.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "serviceRoutines/postDiscoverContextAvailability.h"
 #include "serviceRoutines/getEntityByIdAttributeByName.h"
 
 
@@ -38,6 +38,12 @@
 /* ****************************************************************************
 *
 * getEntityByIdAttributeByName -
+*
+* GET /v1/registry/contextEntities/{entityId::id}/attributes/{attributeName}
+* GET /ngsi9/contextEntities/{entityId::id}/attributes/{attributeName}
+*
+* Payload In:  None
+* Payload Out: DiscoverContextAvailabilityResponse
 */
 std::string getEntityByIdAttributeByName
 (
@@ -50,14 +56,23 @@ std::string getEntityByIdAttributeByName
   std::string                          entityId      = (compV[0] == "v1")? compV[3] : compV[2];
   std::string                          attributeName = (compV[0] == "v1")? compV[5] : compV[4];
   std::string                          answer;
-  DiscoverContextAvailabilityResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a  'GET' request for entityId '%s', attribute '%s'",
-                        entityId.c_str(), attributeName.c_str()));
+  //
+  // 1. Fill in parseDataP->dcar.res to pass to postDiscoverContextAvailability
+  //
+  EntityId                             eId(entityId, "", "");
+  std::vector<std::string>             attributeV;
+  Restriction                          restriction;
 
-  ciP->httpStatusCode = mapGetEntityByIdAttributeByName(entityId, "", attributeName, &response, ciP);
-  answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
-  response.release();
+  attributeV.push_back(attributeName);
+
+  parseDataP->dcar.res.fill(eId, attributeV, restriction);
+
+
+  //
+  // 2. Call the standard operation 
+  //
+  answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
 
   return answer;
 }
