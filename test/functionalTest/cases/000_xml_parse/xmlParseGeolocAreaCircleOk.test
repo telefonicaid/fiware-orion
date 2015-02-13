@@ -22,6 +22,7 @@
 
 --NAME--
 XML Parse Post Geolocation Area Circle OK
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -240,3 +241,4 @@ echo '6: +++++++++++++++++++++++++++++++++++++'
 6: +++++++++++++++++++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

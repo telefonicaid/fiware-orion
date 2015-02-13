@@ -22,6 +22,7 @@
 
 --NAME--
 Update sequence with empty contextValue - compound bug check
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -80,3 +81,4 @@ Date: REGEX(.*)
 </updateContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

@@ -22,6 +22,7 @@
 
 --NAME--
 Custom metadata ONCHANGE subscription
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -629,3 +630,4 @@ Content-Type: application/json
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

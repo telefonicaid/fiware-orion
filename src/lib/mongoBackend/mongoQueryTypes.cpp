@@ -63,11 +63,18 @@ HttpStatusCode mongoEntityTypes
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
    *                            {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
+   *                            {$project: { "attrs"
+   *                                  {$cond: [ {$eq: [ "$attrs", [ ] ] }, [null], "$attrs"] }
+   *                               }
+   *                            },
    *                            {$unwind: "$attrs"},
    *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
    *                            {$sort: {_id: 1} }
    *                          ]
    *                })
+   *
+   * The $cond part is hard... more information at http://stackoverflow.com/questions/27510143/empty-array-prevents-document-to-appear-in-query
+   * As a consequence, some "null" values may appear in the resulting attrs vector, which are prunned by the result processing logic.
    *
    * FIXME P6: in the future, we can interpret the collapse parameter at this layer. If collapse=true so we don't need attributes, the
    * following command can be used:
@@ -143,7 +150,7 @@ HttpStatusCode mongoEntityTypes
       return SccOk;
   }
 
-  /* Processing result to build response*/
+  /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
@@ -159,7 +166,6 @@ HttpStatusCode mongoEntityTypes
    */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-
     BSONObj                  resultItem = resultsArray[ix].embeddedObject();
     TypeEntity*              type       = new TypeEntity(resultItem.getStringField("_id"));
     std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
@@ -168,6 +174,12 @@ HttpStatusCode mongoEntityTypes
     {
       for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
       {
+        /* This is the place in which null elements in the resulting attrs vector are prunned */
+        if (attrsArray[jx].isNull())
+        {
+          continue;
+        }
+        
         BSONObj jAttr = attrsArray[jx].embeddedObject();
         ContextAttribute* ca = new ContextAttribute(jAttr.getStringField(ENT_ATTRS_NAME), jAttr.getStringField(ENT_ATTRS_TYPE));
         type->contextAttributeVector.push_back(ca);
@@ -175,7 +187,6 @@ HttpStatusCode mongoEntityTypes
     }
 
     responseP->typeEntityVector.push_back(type);
-
   }
 
   char detailsMsg[256];

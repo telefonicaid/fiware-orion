@@ -54,7 +54,7 @@ add_definitions(${RAPIDXML_VERSION})
 
 # Baseline compiler flags, any change here will affect all build types
 #set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror")
-set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -g -Werror")
+set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -g -Werror -fno-var-tracking-assignments")
 
 #
 # Platform checks
@@ -135,7 +135,7 @@ if (${BUILD_ARCH} STREQUAL "x86_64")
 else (NOT ${BUILD_ARCH} STREQUAL "x86_64")
     link_directories("/usr/lib")
 endif (${BUILD_ARCH} STREQUAL "x86_64")
-
+link_directories("/usr/lib/x86_64-linux-gnu")
 #
 # Enabling test harness
 #

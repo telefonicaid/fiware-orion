@@ -1,0 +1,744 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+Pagination in discovery-convOps 
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Register E1/T1/A0
+# 02. Register E1/T1/A1
+# 03. Register E1/T1/A2
+# 04. Register E1/T1/A3
+# 05. Register E1/T1/A4
+# 06. Register E1/T1/A5
+# 07. Register E1/T1/A6
+# 08. Register E1/T1/A7
+# 09. Register E1/T1/A8
+# 10. Register E1/T1/A9
+# 11. Discover E1 using /v1/registry/contextEntities/E1, pagination '0-2'
+# 12. Discover E1 using /v1/registry/contextEntities/E1, pagination '3-23'
+# 13. Discover E1 using /v1/registry/contextEntities/E1, pagination '5', with details
+#
+
+echo "01. Register E1/T1/A0"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A0",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Register E1/T1/A1"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Register E1/T1/A2"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A2",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Register E1/T1/A3"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A3",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Register E1/T1/A4"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A4",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Register E1/T1/A5"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A5",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Register E1/T1/A6"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A6",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Register E1/T1/A7"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A7",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "09. Register E1/T1/A8"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A8",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Register E1/T1/A9"
+echo "====================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A9",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://kz.tid.es/abc"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Discover E1 using /v1/registry/contextEntities/E1, pagination '0-2'"
+echo "======================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1?offset=0&limit=3" --json
+echo
+echo
+
+
+echo "12. Discover E1 using /v1/registry/contextEntities/E1, pagination '3-23'"
+echo "========================================================================"
+orionCurl --url "/v1/registry/contextEntities/E1?offset=3&limit=20" --json
+echo
+echo
+
+echo "13. Discover E1 using /v1/registry/contextEntities/E1, pagination '5', with details"
+echo "==================================================================================="
+orionCurl --url "/v1/registry/contextEntities/E1?offset=5&limit=1&details=on" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Register E1/T1/A0
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+02. Register E1/T1/A1
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+03. Register E1/T1/A2
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+04. Register E1/T1/A3
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+05. Register E1/T1/A4
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+06. Register E1/T1/A5
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+07. Register E1/T1/A6
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+08. Register E1/T1/A7
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+09. Register E1/T1/A8
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+10. Register E1/T1/A9
+=====================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+11. Discover E1 using /v1/registry/contextEntities/E1, pagination '0-2'
+=======================================================================
+HTTP/1.1 200 OK
+Content-Length: 1256
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A0", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A1", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A2", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+
+
+12. Discover E1 using /v1/registry/contextEntities/E1, pagination '3-23'
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 2872
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A3", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A4", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A5", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A6", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A7", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A8", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A9", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ]
+}
+
+
+13. Discover E1 using /v1/registry/contextEntities/E1, pagination '5', with details
+===================================================================================
+HTTP/1.1 200 OK
+Content-Length: 546
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A5", 
+                        "type": "string"
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/abc"
+            }
+        }
+    ], 
+    "errorCode": {
+        "code": "200", 
+        "details": "Count: 10", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

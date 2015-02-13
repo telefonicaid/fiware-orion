@@ -22,10 +22,11 @@
 
 --NAME--
 Accept header fail
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 # Note that curl by default uses "Accept: */*" so this step is testing that "no header" is interpreted as
 # "Accept: */*" according to HTTP RFC
@@ -60,3 +61,4 @@ Date: REGEX(.*)
 </queryContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

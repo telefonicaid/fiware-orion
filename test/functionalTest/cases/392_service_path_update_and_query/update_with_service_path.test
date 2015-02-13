@@ -22,6 +22,7 @@
 
 --NAME--
 Update With Service Path
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255
@@ -853,3 +854,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB
