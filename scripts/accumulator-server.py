@@ -121,6 +121,8 @@ atexit.register(all_done)
 
 app = Flask(__name__)
 
+@app.route("/v1/updateContext", methods=['POST'])
+@app.route("/v1/queryContext", methods=['POST'])
 @app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE'])
 def record():
 

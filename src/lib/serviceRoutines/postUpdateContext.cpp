@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
+#include "common/defaultValues.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -52,6 +53,12 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 /* ****************************************************************************
 *
 * postUpdateContext -
+*
+* POST /v1/updateContext
+* POST /ngsi10/updateContext
+*
+* Payload In:  UpdateContextRequest
+* Payload Out: UpdateContextResponse
 */
 std::string postUpdateContext
 (
@@ -63,6 +70,32 @@ std::string postUpdateContext
 {
   UpdateContextResponse  upcr;
   std::string            answer;
+
+  //
+  // If more than ONE service-path is input, an error is returned as response.
+  // If NO service-path is issued, then the default service-path "/" is used.
+  // After these checks, the service-path is checked to be 'correct'.
+  //
+  if (ciP->servicePathV.size() > 1)
+  {
+    upcr.errorCode.fill(SccBadRequest, "more than one service path in context update request");
+    LM_W(("Bad Input (more than one service path for an update request)"));
+    answer = upcr.render(ciP, UpdateContext, "");
+    return answer;
+  }
+  else if (ciP->servicePathV.size() == 0)
+  {
+    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
+  }
+
+  std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
+  if (res != "OK")
+  {
+    upcr.errorCode.fill(SccBadRequest, res);
+    answer = upcr.render(ciP, UpdateContext, "");
+    return answer;
+  }
+
 
   ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
 
@@ -130,13 +163,18 @@ std::string postUpdateContext
           // 472+302 (SccInvalidParameter+SccFound): Remove the 472
           if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccFound)
           {
+            upcr.contextElementResponseVector[ix]->release();
+            delete(upcr.contextElementResponseVector[ix]);
             upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix);
           }
 
           // 472+404 (SccInvalidParameter+SccContextElementNotFound): Remove the 404
           else if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccContextElementNotFound)
           {
+            upcr.contextElementResponseVector[ix + 1]->release();
+            delete(upcr.contextElementResponseVector[ix + 1]);
             upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix + 1);
+            ix = ix + 1;
           }
         }
       }
@@ -176,6 +214,7 @@ std::string postUpdateContext
 
     if (parseUrl(cerP->statusCode.details, ip, port, prefix, protocol) == false)
     {
+      LM_W(("Bad Input (providing application: '%s')", cerP->statusCode.details.c_str()));
       cerP->statusCode.fill(SccReceiverInternalError, "error parsing providing application");
       continue;
     }
@@ -218,13 +257,14 @@ std::string postUpdateContext
     std::string     verb         = "POST";
     std::string     resource     = prefix + "/updateContext";
     std::string     tenant       = ciP->tenant;
+    std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
 
     out = sendHttpSocket(ip, 
                          port,
                          protocol,
                          verb,
                          tenant,
-                         ciP->httpHeaders.servicePath,
+                         servicePath,
                          ciP->httpHeaders.xauthToken,
                          resource,
                          "application/xml",

@@ -22,6 +22,7 @@
 
 --NAME--
 NGSI10 Empty Entity Type Check
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -427,4 +428,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-
+dbDrop CB

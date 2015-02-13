@@ -53,8 +53,6 @@ std::string putIndividualContextEntityAttribute
   std::string  attributeName = compV[4];
   StatusCode   response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'PUT' request for entityId '%s'", entityId.c_str()));
-
   ciP->httpStatusCode = mapPutIndividualContextEntityAttribute(entityId,
                                                                "",
                                                                attributeName,

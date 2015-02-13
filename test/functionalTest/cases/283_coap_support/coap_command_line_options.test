@@ -20,9 +20,12 @@
 
 --NAME--
 proxyCoap command-line options
+
 --SHELL-INIT--
+
 --SHELL--
 proxyCoap -u
+
 --REGEXPECT--
 Usage: proxyCoap  [option '-U' (extended usage)]
                   [option '-u' (usage)]

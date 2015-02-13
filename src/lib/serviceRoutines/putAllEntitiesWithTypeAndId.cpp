@@ -54,7 +54,6 @@ extern std::string putAllEntitiesWithTypeAndId
   std::string                   answer;
   UpdateContextElementResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'PUT' request for entityId '%s', type '%s'", enId.c_str(), enType.c_str()));
   ciP->httpStatusCode = mapPutIndividualContextEntity(enId, enType, &parseDataP->ucer.res, &response, ciP);
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();

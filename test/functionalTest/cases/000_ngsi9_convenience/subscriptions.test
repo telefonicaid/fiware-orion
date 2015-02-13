@@ -22,6 +22,7 @@
 
 --NAME--
 NGSI9 Convenience Subscriptions
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -138,3 +139,4 @@ Date: REGEX(.*)
 5: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

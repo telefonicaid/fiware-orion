@@ -22,8 +22,8 @@
 
 --NAME--
 Rush with HTTPS
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 ${SCRIPT_HOME}/../../scripts/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
 accumulatorStart --host localhost --port $LISTENER_PORT --cert /tmp/harnessTest.pem --key /tmp/harnessTest.key
@@ -182,4 +182,5 @@ Content-Type: application/xml
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB
 rm -f /tmp/harnessTest.key /tmp/harnessTest.pem

@@ -177,3 +177,4 @@ Content-Type: application/json
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

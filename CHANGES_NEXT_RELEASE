@@ -1,6 +1,1 @@
-- Fix: The option '-multiservice' was ignored and the broker ran always in multiservice mode. Now the option is taken taken into account (Issue #725)
-- Fix: Forwarded requests always in XML (Issue #703)
-- Fix: internal substitution of servicePath defaults ("/" for update-like operations, "/#" for query-like operations)
-- Fix: Temporal hack to allow for forwarding of 'attribute not found in entity found' (Issue #716)
-- Add:  The broker is now able to use HTTPS to send notifications directly without using Rush (Issue #706)
-
+- Fix:  All convenience operations to use the service routines of standard operations (Issue #117)

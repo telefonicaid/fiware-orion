@@ -22,9 +22,11 @@
 
 --NAME--
 Geo query with invalid coordinates
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 
 echo "1: +++++++++ Update/Append +++++++++++"
@@ -247,3 +249,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

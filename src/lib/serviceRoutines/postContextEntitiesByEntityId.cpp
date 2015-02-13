@@ -30,8 +30,7 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "ngsi9/RegisterContextRequest.h"
-#include "serviceRoutines/postRegisterContext.h"  // instead of convenienceMap function, postRegisterContext is used
+#include "serviceRoutines/postRegisterContext.h"
 #include "serviceRoutines/postContextEntitiesByEntityId.h"
 
 
@@ -40,7 +39,14 @@
 *
 * postContextEntitiesByEntityId - 
 *
+* POST /v1/registry/contextEntities/{entityId}
 * POST /ngsi9/contextEntities/{entityId}
+*
+* Payload In:  RegisterProviderRequest
+* Payload Out: RegisterContextResponse
+*
+* 1. Transform RegisterProviderRequest+entityId into a RegisterContextRequest
+* 2. Call the Standard operation for RegisterContextRequest
 */
 std::string postContextEntitiesByEntityId
 (
@@ -51,12 +57,11 @@ std::string postContextEntitiesByEntityId
 )
 {
   std::string  entityId = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string  answer;
 
-  // Transform RegisterProviderRequest into RegisterContextRequest
   parseDataP->rcr.res.fill(parseDataP->rpr.res, entityId, "", "");
+  answer = postRegisterContext(ciP, components, compV, parseDataP);
 
-  // Now call postRegisterContext (postRegisterContext doesn't use the parameters 'components' and 'compV')
-  std::string answer = postRegisterContext(ciP, components, compV, parseDataP);
   parseDataP->rpr.res.release();
   parseDataP->rcr.res.release();
 

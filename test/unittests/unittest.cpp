@@ -68,6 +68,14 @@ std::map<std::string, std::string> uriParams;
 
 /* ****************************************************************************
 *
+* servicePathV - 
+*/
+std::vector<std::string> servicePathV;
+
+ 
+
+/* ****************************************************************************
+*
 * servicePathVector - 
 */
 std::vector<std::string> servicePathVector;
@@ -126,7 +134,6 @@ void utInit(void)
   // Resetting servicePathVector
   //
   servicePathVector.clear();
-
 }
 
 

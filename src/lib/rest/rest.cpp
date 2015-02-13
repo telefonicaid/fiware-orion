@@ -33,6 +33,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/globals.h"
+#include "common/defaultValues.h"
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
@@ -415,17 +416,26 @@ static int outFormatCheck(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* servicePathCheck - 
+* servicePathCheck - check vector of service paths
 *
-* Not static just to let unit tests call this function
+* This function is called for ALL requests, when a service-path URI-parameter is found.
+* So, '#' is considered a valid character at it is valid for discoveries and queries.
+* Later on, if the request is a registration or notification, another function is called
+* to make sure there is only ONE service path and that there is no '#' present.
+*
+* FIXME P5: updates should also call the other servicePathCheck (in common lib)
+*
+* [ Not static just to let unit tests call this function ]
 */
 int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 {
+  //
   // 1. Max 10 paths  - ONLY ONE path allowed at this moment
   // 2. Max 10 levels in each path
   // 3. Max 50 characters in each path component
   // 4. Only alphanum and underscore allowed (just like in tenants)
-  
+  //    OR: Last component is EXACTLY '#'
+  //
   std::vector<std::string> compV;
   int                      components;
 
@@ -781,7 +791,6 @@ static int connectionTreat
     if (!ciP->httpHeaders.servicePathReceived)
     {
       ciP->httpHeaders.servicePath = defaultServicePath(url, method);
-      ciP->httpHeaders.servicePathReceived = true;
     }
 
     char tenant[128];

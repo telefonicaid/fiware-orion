@@ -22,8 +22,8 @@
 
 --NAME--
 Rush with HTTPS
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 
 #accumulatorStart
@@ -184,4 +184,5 @@ Content-Type: application/xml
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB
 rm -f /tmp/harnessTest.key /tmp/harnessTest.pem
