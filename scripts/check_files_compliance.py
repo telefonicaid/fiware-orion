@@ -189,7 +189,7 @@ print '--------------'
 print 'Summary:'
 print '   good:    {good}'.format(good=str(good))
 print '   bad:     {bad}'.format(bad=str(bad))
-print 'Total: {total}'.format(str(good + bad))
+print 'Total: {total}'.format(total=str(good + bad))
 
 if bad > 0:
     exit(1)
