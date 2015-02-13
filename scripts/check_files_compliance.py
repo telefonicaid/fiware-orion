@@ -51,7 +51,6 @@ verbose = True
 
 # check_file returns an error string in the case of error or empty string if everything goes ok
 def check_file(file):
-
     # The license header doesn't necessarily starts in the first line, e.g. due to a #define in a .h file
     # or a hashbang (#!/usr/bin/python...). Thus, we locate the starting line and start the comparison from
     # that line
@@ -76,14 +75,14 @@ def check_file(file):
     # reaching the end of the header. Both cases means false
     return 'end of file reached without finding header beginning'
 
-def ignore(root, file):
 
+def ignore(root, file):
     # Files in the BUILD_* or .git directories are not processed
     if 'BUILD_' in root or '.git' in root:
         return True
 
     # Files in the rpm/SRPMS, rpm/SOURCES or rpm/RPMS directories are not processed
-    if 'SRPMS' in root or 'SOURCES' in root or 'RPMS'in root:
+    if 'SRPMS' in root or 'SOURCES' in root or 'RPMS' in root:
         return True
 
     # Files in the test/valdring directory ending with .out are not processed
@@ -104,7 +103,7 @@ def ignore(root, file):
 
     # Files used by the Qt IDE (they start with contextBroker.*) are not processed
     if file.endswith('.creator') or file.endswith('.creator.user') or file.endswith('.config') \
-       or file.endswith('.files') or file.endswith('.includes'):
+            or file.endswith('.files') or file.endswith('.includes'):
         return True
 
     # Files used by the PyCharm IDE (in the .idea/ directory) are not processed
@@ -113,26 +112,34 @@ def ignore(root, file):
 
     # Particular cases of files that are also ignored
     if file == '.gitignore' or file == '.valgrindrc' or file == '.valgrindSuppressions' \
-        or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
-        or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h' or file == 'unittests_that_fail_sporadically.txt' \
-        or file == 'Vagrantfile' or file == "contextBroker.ubuntu":
+            or file == 'README.md' or file == 'LICENSE' or file == 'ContributionPolicy.txt' \
+            or file == 'CHANGES_NEXT_RELEASE' or file == 'compileInfo.h' or file == 'unittests_that_fail_sporadically.txt' \
+            or file == 'Vagrantfile' or file == "contextBroker.ubuntu":
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
-        or file == 'cmake2junit.xsl'):
+                                      or file == 'cmake2junit.xsl'):
         return True
     if 'acceptance' in root and (file.endswith('.txt') or file.endswith('.json')):
         return True
 
     return False
 
+
 def supported_extension(root, file):
     # FIXME: there should be a smarter way of doing this instead of so long or statement :)
-    if file.endswith('.py') or file.endswith('.cpp') or file.endswith('.h') or file.endswith('.xml')\
-        or file.endswith('.json') or file.endswith('.test') or file.endswith('.vtest') or file.endswith('.txt')\
-        or file.endswith('.sh') or file == 'makefile' or file == 'Makefile' or file.endswith('.spec') \
-        or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos') \
-        or file.endswith('.js') or file.endswith('.jmx') or file.endswith('.vtestx'):
+    extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
+                  'centos', 'js', 'jmx', 'vtestx', 'feature']
+    names = ['makefile', 'Makefile']
+    if os.path.splitext(file)[1][1:] in extensions:
         return True
+    if file in names:
+        return True
+    # if file.endswith('.py') or file.endswith('.cpp') or file.endswith('.h') or file.endswith('.xml')\
+    # or file.endswith('.json') or file.endswith('.test') or file.endswith('.vtest') or file.endswith('.txt')\
+    #     or file.endswith('.sh') or file == 'makefile' or file == 'Makefile' or file.endswith('.spec') \
+    #     or file.endswith('.cfg') or file.endswith('.DISABLED') or file.endswith('.xtest') or file.endswith('.centos') \
+    #     or file.endswith('.js') or file.endswith('.jmx') or file.endswith('.vtestx'):
+    #     return True
 
     if 'config' in root and file == 'contextBroker':
         return True
@@ -140,6 +147,7 @@ def supported_extension(root, file):
     filename = os.path.join(root, file)
     print 'not supported extension: ' + filename
     return False
+
 
 if len(argv) > 1:
     dir = argv[1]
@@ -150,10 +158,10 @@ else:
 good = 0
 bad = 0
 
-for root,dirs,files in os.walk(dir):
+for root, dirs, files in os.walk(dir):
     for file in [f for f in files]:
         # DEBUG
-        #print(os.path.join(root, file))
+        # print(os.path.join(root, file))
 
         # Only process files that match a given pattern
         if ignore(root, file):
@@ -161,7 +169,7 @@ for root,dirs,files in os.walk(dir):
 
         # Check that the extension is supported
         if not supported_extension(root, file):
-            bad +=1
+            bad += 1
             continue
 
         filename = os.path.join(root, file)
