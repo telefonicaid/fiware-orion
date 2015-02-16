@@ -25,8 +25,8 @@ __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 
 responses = {
-    'query_context_response_from_context_provider_xml': """
-                                                            <?xml version="1.0"?>
+    'query_context_response_from_context_provider_xml': {
+        'body': """<?xml version="1.0"?>
                                                             <queryContextResponse>
                                                               <contextResponseList>
                                                                 <contextElementResponse>
@@ -55,7 +55,12 @@ responses = {
                                                               </contextResponseList>
                                                             </queryContextResponse>
                                                             """,
-    'update_context_response_from_context_provider_xml': """
+        'status_code': 200,
+        'headers': {},
+        'delay': 0
+        },
+    'update_context_response_from_context_provider_xml': {
+        'body': """
                                                             <?xml version="1.0"?>
                                                             <updateContextResponse>
                                                               <contextResponseList>
@@ -84,5 +89,9 @@ responses = {
                                                                 </contextElementResponse>
                                                               </contextResponseList>
                                                             </updateContextResponse>
-                                                            """
+                                                            """,
+        'status_code': 200,
+        'headers': {},
+        'delay': 0
+    }
 }

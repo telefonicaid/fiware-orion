@@ -102,7 +102,6 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import time
 import argparse
 
-
 class RequestHandler(BaseHTTPRequestHandler):
     """
     Handler for the HTTP requests received by the mock.
@@ -123,7 +122,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         elif "queues" in self.path:
             """Send the current queues for requests and responses."""
+            self.send_response(200)
+            self.end_headers()
             self.get_queues()
+
 
         else:
             """Otherwise, serve the previously uploaded content."""
@@ -158,6 +160,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             """Store the response to be served in the path specified."""
             resource = self.path.replace("/mock_configurations", "")
             self.store_response(resource)
+            self.send_response(200)
 
         else:
             """Otherwise, serve the previously uploaded content."""
@@ -199,7 +202,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             if len(resource.split("?")) > 1:
                 query_params = resource.split("?").pop()
 
-        request_data = {"body": body, "query_params": query_params, "content_type": content_type, "method": method}
+        request_data = {"body": body, "query_params": query_params, "content_type": content_type, "method": method, "headers": dict(self.headers)}
 
         """Add the content to the configured resource queue"""
         if resource.split("?").pop(0) not in self.requests_qeues:
@@ -267,9 +270,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         if "body" in response_info:
             body = response_info["body"]
             try:
-                self.wfile.write(json.dumps(body))
+                self.wfile.write(json.loads(body))
             except:
-                self.wfile.write(body)
+                self.wfile.write(str(body))
 
     def get_queues(self):
         """Get the requests and responses queues."""

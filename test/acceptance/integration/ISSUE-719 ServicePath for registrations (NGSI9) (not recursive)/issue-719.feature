@@ -68,6 +68,8 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
   @issue-719
   Scenario: Query context to a subservice
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_719" and the subservice "/subservice1/1"
     And the following entities to consult
@@ -110,6 +112,8 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
   @issue-719
   Scenario: Update an entity in a context provider, having other context provider with the same entity in other subservice
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_719" and the subservice "/subservice1"
     And the following entities to consult
@@ -292,6 +296,8 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
   @issue-719
   Scenario: Entity in CB and in CP with the same subervice, and in other CP with other subservice.
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_719" and the subservice "/subservice1"
     And the following entities to consult
@@ -344,6 +350,8 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
   @issue-719
   Scenario: Entity in CB and in CP without servicepath, and in other CP with other servicepath.
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_719" and the subservice "empty"
     And the following entities to consult
@@ -396,6 +404,8 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
   @issue-719
   Scenario: Entity in CB and in CP with servicepath, and in other CP without servicepath.
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_719" and the subservice "/subservice"
     And the following entities to consult
