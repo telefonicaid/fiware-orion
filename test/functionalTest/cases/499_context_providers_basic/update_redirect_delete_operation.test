@@ -37,8 +37,6 @@
 Update Redirect/DELETE
 --SHELL-INIT--
 
-rm -f /tmp/orionCurlURL
-
 dbInit CB
 dbInit CP1
 

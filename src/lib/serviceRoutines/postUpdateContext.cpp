@@ -28,6 +28,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
+#include "common/defaultValues.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -52,6 +53,12 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 /* ****************************************************************************
 *
 * postUpdateContext -
+*
+* POST /v1/updateContext
+* POST /ngsi10/updateContext
+*
+* Payload In:  UpdateContextRequest
+* Payload Out: UpdateContextResponse
 */
 std::string postUpdateContext
 (
@@ -64,7 +71,33 @@ std::string postUpdateContext
   UpdateContextResponse  upcr;
   std::string            answer;
 
-  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
+  //
+  // If more than ONE service-path is input, an error is returned as response.
+  // If NO service-path is issued, then the default service-path "/" is used.
+  // After these checks, the service-path is checked to be 'correct'.
+  //
+  if (ciP->servicePathV.size() > 1)
+  {
+    upcr.errorCode.fill(SccBadRequest, "more than one service path in context update request");
+    LM_W(("Bad Input (more than one service path for an update request)"));
+    answer = upcr.render(ciP, UpdateContext, "");
+    return answer;
+  }
+  else if (ciP->servicePathV.size() == 0)
+  {
+    ciP->servicePathV.push_back(DEFAULT_SERVICE_PATH);
+  }
+
+  std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
+  if (res != "OK")
+  {
+    upcr.errorCode.fill(SccBadRequest, res);
+    answer = upcr.render(ciP, UpdateContext, "");
+    return answer;
+  }
+
+
+  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
 
   //
   // Checking for SccFound in the ContextElementResponseVector
@@ -81,6 +114,73 @@ std::string postUpdateContext
     answer = upcr.render(ciP, UpdateContext, "");
     return answer;
   }
+
+  //
+  // If upcr.contextElementResponseVector contains >= TWO responses and the second of them is a 'SccFound',
+  // then skip the first, the one that isn't 'SccFound'.
+  // Also, if the first of them is 472, then skip the second
+  //
+  // FIXME P6: Temporary hack for 'Entity found but Attribute not found':
+  //           See FIXME P6 'Temporary hack ...' 
+  //           in MongoCommonUpdate.cpp, function processContextElement
+  //
+
+
+  //
+  // Removing 'garbage' from the response vector
+  // [ When then number of incoming contextElement is different than the number of contextElement responses ]
+  //
+  // There are two different cases of 'garbage', as when a 472 is encountered, to allow for the search for a 302
+  // (meaning that the entity/attribute is found is a ngsi9 registration), the search for the entity/attribute is 
+  // not considered finalized, and later on the 472 is followed by either a 302 (Found) or a 404 (Not Found).
+  //
+  // The 302 gives more info than the 472 (especially as it makes us forward the request right here), while in the
+  // other case, the 404 gives less info than the 472, so for the case of '472+302', the 302 must ge kept and for
+  // '472+404', the 472 must be kept
+  // 
+  //
+  
+  if (upcr.contextElementResponseVector.size() != parseDataP->upcr.res.contextElementVector.size())
+  {
+    // Note that the loop ends at the contextElementResponse BEFORE the last contextElementResponse in the vector
+    for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size() - 1; ++ix)
+    {
+      //
+      // 2 cases:
+      //
+      // o 1. 472+302:  keep 302
+      //   Out[0]: (472) request parameter is invalid/not allowed
+      //   Out[1]: (302) Found
+      //
+      // o 2. 472+404: keep 472
+      //   Out[0]: (472) request parameter is invalid/not allowed
+      //   Out[1]: (404) No context element found
+      //
+      if (upcr.contextElementResponseVector[ix]->statusCode.code == SccInvalidParameter)
+      {
+        if (ix + 1 < upcr.contextElementResponseVector.size())
+        {
+          // 472+302 (SccInvalidParameter+SccFound): Remove the 472
+          if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccFound)
+          {
+            upcr.contextElementResponseVector[ix]->release();
+            delete(upcr.contextElementResponseVector[ix]);
+            upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix);
+          }
+
+          // 472+404 (SccInvalidParameter+SccContextElementNotFound): Remove the 404
+          else if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccContextElementNotFound)
+          {
+            upcr.contextElementResponseVector[ix + 1]->release();
+            delete(upcr.contextElementResponseVector[ix + 1]);
+            upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix + 1);
+            ix = ix + 1;
+          }
+        }
+      }
+    }
+  }
+
 
   for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)
   {
@@ -114,6 +214,7 @@ std::string postUpdateContext
 
     if (parseUrl(cerP->statusCode.details, ip, port, prefix, protocol) == false)
     {
+      LM_W(("Bad Input (providing application: '%s')", cerP->statusCode.details.c_str()));
       cerP->statusCode.fill(SccReceiverInternalError, "error parsing providing application");
       continue;
     }
@@ -136,9 +237,15 @@ std::string postUpdateContext
 
 
     //
-    // 3. Render an XML-string of the request we want to forward
+    // 3. Render a string of the request we want to forward, forced to XML
+    //    FIXME P8: The format of this string (XML or JSON) should depend on the
+    //              CB-CPr content type negotiation, but right now we force it to XML.
     //
-    std::string payloadIn = ucrP->render(ciP, UpdateContext, "");
+    ConnectionInfo ci;
+
+    ci.outFormat = XML;
+
+    std::string payloadIn = ucrP->render(&ci, UpdateContext, "");
 
     LM_T(LmtCtxProviders, ("payloadIn:\n%s", payloadIn.c_str()));
 
@@ -150,13 +257,14 @@ std::string postUpdateContext
     std::string     verb         = "POST";
     std::string     resource     = prefix + "/updateContext";
     std::string     tenant       = ciP->tenant;
+    std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
 
     out = sendHttpSocket(ip, 
                          port,
                          protocol,
                          verb,
                          tenant,
-                         ciP->httpHeaders.servicePath,
+                         servicePath,
                          ciP->httpHeaders.xauthToken,
                          resource,
                          "application/xml",

@@ -121,7 +121,6 @@ SET (SOURCES
     convenienceMap/mapPutIndividualContextEntity_test.cpp
 
     convenienceMap/mapGetIndividualContextEntityAttribute_test.cpp
-    convenienceMap/mapPostIndividualContextEntityAttribute_test.cpp
 
     convenienceMap/mapDeleteIndividualContextEntityAttributes_test.cpp
     convenienceMap/mapGetIndividualContextEntityAttributes_test.cpp
@@ -327,11 +326,11 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")
 ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")
   MESSAGE("unitTest: openSUSE DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)
-ELSEIF(${DISTRO} STREQUAL "CentOS_6.3")
+ELSEIF(${DISTRO} MATCHES "CentOS_6.*")
   MESSAGE("unitTest: CentOS DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
 ELSE()
   MESSAGE("unitTest: Other DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)
 ENDIF()
 

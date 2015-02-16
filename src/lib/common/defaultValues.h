@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_CONVENIENCEMAP_MAPGETCONTEXTENTITYATTRIBUTES_H_
-#define SRC_LIB_CONVENIENCEMAP_MAPGETCONTEXTENTITYATTRIBUTES_H_
+#ifndef SRC_LIB_COMMON_DEFAULTVALUES_H_
+#define SRC_LIB_COMMON_DEFAULTVALUES_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,23 +25,11 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-
-#include "ngsi9/DiscoverContextAvailabilityResponse.h"
-#include "rest/HttpStatusCode.h"
-#include "rest/ConnectionInfo.h"
 
 
 
-/* ****************************************************************************
-*
-* mapGetContextEntityAttributes - 
-*/
-extern HttpStatusCode mapGetContextEntityAttributes
-(
-  const std::string&                    id,
-  DiscoverContextAvailabilityResponse*  response,
-  ConnectionInfo*                       ciP
-);
+#define  DEFAULT_SERVICE_PATH            "/"
+#define  DEFAULT_SERVICE_PATH_RECURSIVE  "/#"
 
-#endif  // SRC_LIB_CONVENIENCEMAP_MAPGETCONTEXTENTITYATTRIBUTES_H_
+
+#endif  // SRC_LIB_COMMON_DEFAULTVALUES_H_

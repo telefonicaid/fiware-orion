@@ -22,6 +22,7 @@
 
 --NAME--
 Associations Update Things case
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -153,3 +154,4 @@ Date: REGEX(.*)
 3: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

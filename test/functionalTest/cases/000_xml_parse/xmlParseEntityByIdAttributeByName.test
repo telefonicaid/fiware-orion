@@ -22,6 +22,7 @@
 
 --NAME--
 XML Parse EntityByIdAttributeByName
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -275,3 +276,4 @@ Date: REGEX(.*)
 9: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

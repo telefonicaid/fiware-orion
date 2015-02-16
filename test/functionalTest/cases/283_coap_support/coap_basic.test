@@ -22,8 +22,8 @@
 
 --NAME--
 Coap Basic interaction
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 brokerStart CB
 proxyCoapStart
@@ -151,3 +151,4 @@ v:1 t:0 tkl:0 c:1 id:REGEX(\d+)
 --TEARDOWN--
 proxyCoapStop
 brokerStop CB
+dbDrop CB

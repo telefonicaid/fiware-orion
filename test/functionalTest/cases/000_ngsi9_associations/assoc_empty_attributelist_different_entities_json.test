@@ -22,6 +22,7 @@
 
 --NAME--
 Associations empty attribute list different entities JSON
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -443,3 +444,4 @@ Date: REGEX(.*)
 }
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

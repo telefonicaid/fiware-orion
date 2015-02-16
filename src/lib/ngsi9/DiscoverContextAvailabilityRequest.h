@@ -47,9 +47,19 @@ typedef struct DiscoverContextAvailabilityRequest
   int                  restrictions;  // Auxiliar - the parameter for check should be removed
 
   DiscoverContextAvailabilityRequest();
+
   void                 release(void);
   void                 present(const std::string& indent);
-  std::string          check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
+
+  std::string          check(RequestType         requestType,
+                             Format              format,
+                             const std::string&  indent,
+                             const std::string&  predetectedError,
+                             int                 counter);
+
+  void                 fill(EntityId&                        eid,
+                            const std::vector<std::string>&  attributeV,
+                            const Restriction&               restriction);
 } DiscoverContextAvailabilityRequest;
 
 #endif

@@ -22,6 +22,7 @@
 
 --NAME--
 Registration fail
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -102,3 +103,4 @@ Date: REGEX(.*)
 </registerContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

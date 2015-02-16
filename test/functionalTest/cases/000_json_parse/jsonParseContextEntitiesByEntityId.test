@@ -22,6 +22,7 @@
 
 --NAME--
 JSON Parse ContextEntitiesByEntityId
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -248,3 +249,4 @@ Date: REGEX(.*)
 9: ++++++++++++++++++++
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

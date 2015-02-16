@@ -1,0 +1,17 @@
+{
+  "environment": {
+    "name": "orion",
+    "logs_path": "logs"
+  },
+  "context_broker": {
+    "host": "localhost",
+    "port": "1026"
+  },
+  "mock": {
+    "port": "5566"
+  },
+  "mongo": {
+    "host": "localhost",
+    "port": "27017"
+  }
+}

@@ -46,3 +46,4 @@ Date: REGEX(.*)
 </statusCode>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB
