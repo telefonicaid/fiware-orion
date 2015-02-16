@@ -35,7 +35,19 @@
 
 /* ****************************************************************************
 *
-* putAvailabilitySubscriptionConvOp - 
+* putAvailabilitySubscriptionConvOp - update an ngsi9 subscription
+*
+* PUT /v1/registry/contextAvailabilitySubscriptions/{subscriptionId}
+* PUT /ngsi9/contextAvailabilitySubscriptions/{subscriptionId}
+*
+* Payload In:  UpdateContextAvailabilitySubscriptionRequest
+* Payload Out: UpdateContextAvailabilitySubscriptionResponse
+*
+* 1. The payload in is exactly the same as for the corresponding standard operation
+*    /v1/registry/updateContextAvailabilitySubscription, so, nothing needs to be done.
+* 2. Make sure the subscriptionId in the URL is *exactly the same* as the subscriptionId
+*    in the payload - if not, return an error.
+* 3. Call the standard service routine 'postUpdateContextAvailabilitySubscription'
 */
 std::string putAvailabilitySubscriptionConvOp
 (
