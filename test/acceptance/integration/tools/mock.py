@@ -46,14 +46,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             resource = self.path.replace("/mock_configurations", "")
             self.recover_request(resource)
             self.log_message("%s", "GET con mock config")
-
         elif "queues" in self.path:
             """Send the current queues for requests and responses."""
             self.send_response(200)
             self.end_headers()
             self.get_queues()
-
-
         else:
             """Otherwise, serve the previously uploaded content."""
             self.store_request(self.path, "GET")
