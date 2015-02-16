@@ -23,7 +23,7 @@
 import json
 import time
 
-__author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 import requests
 from integration.tools.general_utils import start_mock, check_world_attribute_is_not_none

@@ -23,7 +23,7 @@
 import platform
 import psutil
 
-__author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 import pymongo
 from lettuce import world

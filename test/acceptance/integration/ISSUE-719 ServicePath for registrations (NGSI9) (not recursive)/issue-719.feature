@@ -19,7 +19,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-__author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 # Created by Jon at 10/02/2015
 Feature: ServicePath for registrations (NGSI9) (not recursive)
