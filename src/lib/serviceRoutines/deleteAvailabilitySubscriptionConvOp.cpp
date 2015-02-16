@@ -35,6 +35,15 @@
 /* ****************************************************************************
 *
 * deleteAvailabilitySubscriptionConvOp - 
+*
+* DELETE /v1/registry/contextAvailabilitySubscriptions/{subscriptionId}
+* DELETE /ngsi9/contextAvailabilitySubscriptions/{subscriptionId}
+*
+* Payload In:  None
+* Payload Out: UnsubscribeContextAvailabilityResponse
+*
+* 1. Fill in UnsubscribeContextAvailabilityRequest using 'subscriptionId'
+* 2. Call the Standard operation for UnsubscribeContextAvailabilityRequest
 */
 std::string deleteAvailabilitySubscriptionConvOp
 (
@@ -44,10 +53,9 @@ std::string deleteAvailabilitySubscriptionConvOp
   ParseData*                 parseDataP
 )
 {
-  UnsubscribeContextAvailabilityRequest*  ucarP          = &parseDataP->ucar.res;
-  std::string                             subscriptionId = (compV[0] == "v1")? compV[3] : compV[2];
+  std::string  subscriptionId = (compV[0] == "v1")? compV[3] : compV[2];
 
-  ucarP->subscriptionId = subscriptionId;
+  parseDataP->ucar.res.fill(subscriptionId);
 
   return postUnsubscribeContextAvailability(ciP, components, compV, parseDataP);
 }
