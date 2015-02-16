@@ -36,8 +36,7 @@ DB = sys.argv[1]
 COL = 'entities'
 
 need_fix = False
-#verbose = False
-verbose = True 
+verbose = False
 
 client = MongoClient('localhost', 27017)
 db = client[DB]
