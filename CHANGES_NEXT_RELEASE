@@ -1,2 +1,3 @@
 - Fix: The option '-multiservice' was ignored and the broker ran always in multiservice mode. Now the option is taken taken into account (Issue #725)
 - Fix: Broker crashes dealing with "GET /v1/contextTypes" operation when DB contains entities of the same type, ones with attributes and others without them (Issue #740)
+- Fix: Correct rendering of response to convop "POST /v1/contextEntities/{entityId::id}/attributes/{attributeName} (Issue #772)
