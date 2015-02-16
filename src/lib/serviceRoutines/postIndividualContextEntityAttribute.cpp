@@ -59,7 +59,8 @@ std::string postIndividualContextEntityAttribute
                                                                 &parseDataP->upcar.res,
                                                                 &response,
                                                                 ciP);
-  answer = response.render(ciP->outFormat, "");
+
+  answer = response.render(ciP->outFormat, "", false, false);
 
   return answer;
 }
