@@ -23,84 +23,11 @@
 
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
-# from flask import Flask, request
-# import json
-# import sys
-#
-# app = Flask(__name__)
-#
-# counter = 0
-# petitions = {}
-# response_defined_by_user = {}
-#
-# @app.route('/', defaults={'path': ''}, methods=['GET', 'POST', 'UPDATE', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'PUT'])
-# @app.route('/<path:path>', methods=['GET', 'POST', 'UPDATE', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'PUT'])
-# def catch(path):
-#     """
-#     Capture all requests to the mock. Depending of the path, the functionality changes, the possibilities are:
-#     - get_data --> Response with all petitions and reset the petitions
-#     - set_response --> Set specific response for all petitions (except specials)
-#     - reset_response --> Reset the response for all petitions (except specials)
-#     :param path:
-#     :return:
-#     """
-#     global counter
-#     global petitions
-#     global response_defined_by_user
-#
-#     if path == 'get_data':
-#         resp = petitions.copy()
-#         petitions = {}
-#         return json.dumps(resp), 200
-#     elif path == 'set_response':
-#         try:
-#             response_recv = json.loads(request.data)
-#         except Exception as e:
-#             raise e, 'The payload is not a json object, the payload is: {payload}'.format(payload=request.data)
-#         try:
-#             response_defined_by_user.update({'headers', response_recv['headers']})
-#             response_defined_by_user.update({'payload', response_recv['payload']})
-#             response_defined_by_user.update({'status_code', response_recv['status_code']})
-#         except KeyError as e:
-#             raise e, 'The response received in the payload is {response}'.format(response=response_recv)
-#         return 'Response set', 200
-#     elif path == 'reset_response':
-#         response_defined_by_user = {}
-#         return 'Response reset', 200
-#     else:
-#         petitions.update({
-#             counter: {
-#                 "path": path,
-#                 "headers": dict(request.headers),
-#                 "parms": request.args
-#             }
-#         })
-#         if request.data:
-#             try:
-#                 petitions[counter].update({"payload": json.loads(request.data)})
-#             except:
-#                 petitions[counter].update({"payload": request.data})
-#         if response_defined_by_user != {}:
-#             return response_defined_by_user['payload'], response_defined_by_user['status_code'], response_defined_by_user['headers']
-#         else:
-#             return "Saved", 200
-#
-#
-# if __name__ == '__main__':
-#     if len(sys.argv) != 2:
-#         raise AttributeError, "Usage is \"python mock.py bind_ip port\""
-#     app.run(host=str(sys.argv[1]), port=int(sys.argv[2]), debug=True)
-#
-
-
-
-
-# -*- coding: utf-8 -*-
-
 import json
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import time
 import argparse
+
 
 class RequestHandler(BaseHTTPRequestHandler):
     """
@@ -202,7 +129,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             if len(resource.split("?")) > 1:
                 query_params = resource.split("?").pop()
 
-        request_data = {"body": body, "query_params": query_params, "content_type": content_type, "method": method, "headers": dict(self.headers)}
+        request_data = {"body": body, "query_params": query_params, "content_type": content_type, "method": method,
+                        "headers": dict(self.headers)}
 
         """Add the content to the configured resource queue"""
         if resource.split("?").pop(0) not in self.requests_queues:
@@ -236,7 +164,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.responses_queues[resource].append(response)
 
         """Add the content to the dictionary of responses."""
-        #self.responses_dict.update(response)
+        # self.responses_dict.update(response)
 
         """Send the response to the request."""
         self.send_response(204)
@@ -292,6 +220,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.responses_queues.clear()
         self.send_response(204)
         self.end_headers()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

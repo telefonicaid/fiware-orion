@@ -85,18 +85,20 @@ def start_mock():
     :return:
     """
     path, fl = os.path.split(os.path.realpath(__file__))
-    DEVNULL = open(os.devnull, 'wb')
     stderr_file = open('logs/mock_err.log', 'w')
     stdout_file = open('logs/mock_out.log', 'w')
     if platform.system() == 'Windows':
-        command = ['python', '{path}\\mock.py'.format(path=path), '--host', '{bind_ip}'.format(bind_ip=world.config['mock']['bind_ip']), '--port', '{port}'.format(port=world.config['mock']['port'])]
+        command = ['python', '{path}\\mock.py'.format(path=path), '--host',
+                   '{bind_ip}'.format(bind_ip=world.config['mock']['bind_ip']), '--port',
+                   '{port}'.format(port=world.config['mock']['port'])]
     elif platform.system() == 'Linux':
-        command = ['python', '{path}/mock.py'.format(path=path), '--host', '{bind_ip}'.format(bind_ip=world.config['mock']['bind_ip']), '--port', '{port}'.format(port=world.config['mock']['port'])]
+        command = ['python', '{path}/mock.py'.format(path=path), '--host',
+                   '{bind_ip}'.format(bind_ip=world.config['mock']['bind_ip']), '--port',
+                   '{port}'.format(port=world.config['mock']['port'])]
     else:
         raise ValueError, 'The SO is not compatible with the mock'
     print command
     return subprocess.Popen(command, stderr=stderr_file, stdout=stdout_file)
-    #return subprocess.Popen(command, stdout=DEVNULL, stderr=DEVNULL)
 
 
 def stop_mock():
@@ -110,6 +112,7 @@ def stop_mock():
         elif platform.system() == 'Linux':
             kill(world.mock.pid)
         world.mock = None
+
 
 def kill(proc_pid):
     """
