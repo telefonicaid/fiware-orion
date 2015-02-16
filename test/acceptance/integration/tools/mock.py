@@ -107,8 +107,8 @@ class RequestHandler(BaseHTTPRequestHandler):
     Handler for the HTTP requests received by the mock.
     """
 
-    responses_qeues = dict()
-    requests_qeues = dict()
+    responses_queues = dict()
+    requests_queues = dict()
 
     def do_GET(self):
         """
@@ -172,7 +172,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         Return the oldest stored request to the resource
         """
         try:
-            request_info = self.requests_qeues[resource].pop(0)
+            request_info = self.requests_queues[resource].pop(0)
         except:
             self.send_response(404)
             self.end_headers()
@@ -205,11 +205,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         request_data = {"body": body, "query_params": query_params, "content_type": content_type, "method": method, "headers": dict(self.headers)}
 
         """Add the content to the configured resource queue"""
-        if resource.split("?").pop(0) not in self.requests_qeues:
-            self.requests_qeues[resource.split("?").pop(0)] = []
-            self.requests_qeues[resource.split("?").pop(0)].append(request_data)
+        if resource.split("?").pop(0) not in self.requests_queues:
+            self.requests_queues[resource.split("?").pop(0)] = []
+            self.requests_queues[resource.split("?").pop(0)].append(request_data)
         else:
-            self.requests_qeues[resource.split("?").pop(0)].append(request_data)
+            self.requests_queues[resource.split("?").pop(0)].append(request_data)
 
     def store_response(self, resource):
         """
@@ -229,11 +229,11 @@ class RequestHandler(BaseHTTPRequestHandler):
         response = json.loads(body)
 
         """Add the content to the configured resource queue"""
-        if resource not in self.responses_qeues:
-            self.responses_qeues[resource] = []
-            self.responses_qeues[resource].append(response)
+        if resource not in self.responses_queues:
+            self.responses_queues[resource] = []
+            self.responses_queues[resource].append(response)
         else:
-            self.responses_qeues[resource].append(response)
+            self.responses_queues[resource].append(response)
 
         """Add the content to the dictionary of responses."""
         #self.responses_dict.update(response)
@@ -245,7 +245,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     def serve_response(self):
         """Get the data for the response from the dictionary of responses."""
         try:
-            response_info = self.responses_qeues[self.path.split("?").pop(0)].pop(0)
+            response_info = self.responses_queues[self.path.split("?").pop(0)].pop(0)
         except:
             self.send_response(404)
             self.end_headers()
@@ -278,8 +278,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Get the requests and responses queues."""
         try:
             body = dict()
-            body.update({"requests": self.requests_qeues})
-            body.update({"responses": self.responses_qeues})
+            body.update({"requests": self.requests_queues})
+            body.update({"responses": self.responses_queues})
             self.wfile.write(json.dumps(body))
         except:
             self.send_response(500)
@@ -288,8 +288,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def empty_queues(self):
         """Empty the requests and responses queues."""
-        self.requests_qeues.clear()
-        self.responses_qeues.clear()
+        self.requests_queues.clear()
+        self.responses_queues.clear()
         self.send_response(204)
         self.end_headers()
 
