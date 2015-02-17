@@ -18,6 +18,7 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
+# __author__ = 'Jon Calderin Goñi (jon dot caldering at gmail dot com)'
 
 @issue-715
 Feature: CPr: propagate X-Auth-Token header in forwarded requests
