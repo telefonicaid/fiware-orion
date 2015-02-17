@@ -128,7 +128,7 @@ def kill(proc_pid):
 
 def drop_database(ip, port, database):
     if database == "":
-        pymongo.Connection(ip, port).drop_database('orion'.format(service=database))
+        pymongo.Connection(ip, port).drop_database('orion')
     else:
         pymongo.Connection(ip, port).drop_database('orion-{service}'.format(service=database))
 
