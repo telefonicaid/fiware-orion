@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -154,4 +154,4 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     And there is "1" petitions requested to the mock
     And clean the mongo database of the service "issue_715"
 
-#Fixme: Repeat all tests with convenience operation, when developed
+#Fixme: Repeat all tests with convenience operation, when developed. This is pending on the "big refactoring" in CPr funciontality being done in 1Q2015"
