@@ -59,6 +59,18 @@ def a_new_ngsi10_petition_with_the_service_and_the_subservice(step, ngsi_version
         raise ValueError(
             'The version of ngsi api have to be \'9\' or \'10\', not {ngsi_version}'.format(ngsi_version=ngsi_version))
 
+@step('add the following headers to the petition')
+def add_headers_to_the_cb_library(step):
+    """
+    Add headers of the table to the cb instance, the format of the table is
+    | header | value |
+    :param step:
+    :return:
+    """
+    for line in step.hashes:
+        if 'header' in line and 'value' in line:
+            world.cb[world.cb_count].headers.update({line['header']: line['value']})
+
 
 @step('print the request and the response')
 def print_the_request_and_the_response(step):
