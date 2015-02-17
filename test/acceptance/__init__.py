@@ -21,7 +21,7 @@
 # iot_support at tid dot es
 """
 
-__author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 
 from lettuce import world

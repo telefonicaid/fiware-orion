@@ -26,6 +26,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
   @issue-713
   Scenario: Fiware-Service header is forwarded to a Context Provider query operation
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_713" and the subservice "/subservice"
     And the following entities to consult
@@ -56,6 +57,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
   @issue-713
   Scenario: Fiware-Service header is not forwarded to a Context Provider query operation if its not send
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
@@ -87,6 +89,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
   @issue-713
   Scenario: Fiware-Service header is forwarded to a Context Provider update operation
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_713" and the subservice "/subservice"
     And the following entities to consult
@@ -120,6 +123,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
   @issue-713
   Scenario: Fiware-Service header is not forwarded to a Context Provider update operation if it is not send
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult

@@ -21,7 +21,7 @@
 # iot_support at tid dot es
 """
 
-__author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 from iotqautils.cb_utils import CbNgsi10Utils, CbNgsi9Utils
 from integration.tools.general_utils import check_key_value, drop_database

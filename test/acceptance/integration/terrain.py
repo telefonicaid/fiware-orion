@@ -21,7 +21,7 @@
 # iot_support at tid dot es
 """
 
-__author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 from lettuce import before, world, after
 from integration.tools.general_utils import stop_mock
@@ -36,7 +36,7 @@ def before_all():
     world.context_registrations = None
     world.service = None
     world.subservice = None
-    world.mock_pid = None
+    world.mock = None
     world.mock_data = None
     world.payloads_count = -1
     world.response_count = -1
