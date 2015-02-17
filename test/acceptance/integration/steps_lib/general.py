@@ -95,6 +95,13 @@ def check_the_response_has_the_key_with_the_value(step, key, value):
 def check_the_response_has_the_key_with_the_value(step, key, value):
     assert check_key_value(world.responses[world.response_count].json(), key, value) == False
 
+@step('check the response has not the key "([^"]*)"$')
+def check_the_response_has_the_key_with_the_value(step, key):
+    assert key not in world.responses[world.response_count].json()
+
+@step('check the response has the key "([^"]*)"$')
+def check_the_response_has_the_key_with_the_value(step, key):
+    assert key in world.responses[world.response_count].json()
 
 # Mongho utils
 @step('clean the mongo database of the service "([^"]*)"')
