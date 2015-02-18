@@ -139,6 +139,7 @@ void ContextElement::present(const std::string& indent, int ix)
   attributeDomainName.present(indent + "  ");
   contextAttributeVector.present(indent + "  ");
   domainMetadataVector.present("Domain", indent + "  ");
+  PRINTF("%s  PA: %s\n", indent.c_str(), providingApplication.c_str());
 }
 
 
@@ -153,6 +154,7 @@ void ContextElement::fill(const struct ContextElement& ce)
   attributeDomainName.fill(ce.attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ce.contextAttributeVector);
   domainMetadataVector.fill((MetadataVector*) &ce.domainMetadataVector);
+  providingApplication = ce.providingApplication;
 }
 
 
@@ -167,4 +169,5 @@ void ContextElement::fill(ContextElement* ceP)
   attributeDomainName.fill(ceP->attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector);
   domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
+  providingApplication = ceP->providingApplication;
 }

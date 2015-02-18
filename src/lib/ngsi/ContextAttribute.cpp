@@ -48,6 +48,7 @@ ContextAttribute::ContextAttribute()
   value                 = "";
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
+  providingApplication  = "";
 }
 
 
@@ -62,6 +63,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   type                  = caP->type;
   value                 = caP->value;
   compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
+  providingApplication  = caP->providingApplication;
   typeFromXmlAttribute  = "";
 
   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
@@ -101,6 +103,7 @@ ContextAttribute::ContextAttribute
   value                 = _value;
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
+  providingApplication  = "";
 }
 
 
@@ -122,6 +125,7 @@ ContextAttribute::ContextAttribute
   type                  = _type;
   compoundValueP        = _compoundValueP;
   typeFromXmlAttribute  = "";
+  providingApplication  = "";
 }
 
 
@@ -326,6 +330,8 @@ void ContextAttribute::present(const std::string& indent, int ix)
   {
     compoundValueP->show(indent + "  ");
   }
+
+  PRINTF("%s  PA:       %s\n", indent.c_str(), providingApplication.c_str());
 
   metadataVector.present("Attribute", indent + "  ");
 }
