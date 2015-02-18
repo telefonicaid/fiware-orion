@@ -41,7 +41,9 @@ Some examples:
 - Git issue 713
 - Git issue 714
 - Git issue 719
-- Jira iotcore 182
+- Git issue 322
+- Git issue 715
+- Git issue 716
 
 ### properties.json
 
