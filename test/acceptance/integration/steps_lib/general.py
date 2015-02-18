@@ -59,6 +59,7 @@ def a_new_ngsi10_petition_with_the_service_and_the_subservice(step, ngsi_version
         raise ValueError(
             'The version of ngsi api have to be \'9\' or \'10\', not {ngsi_version}'.format(ngsi_version=ngsi_version))
 
+
 @step('add the following headers to the petition')
 def add_headers_to_the_cb_library(step):
     """
@@ -88,12 +89,31 @@ def print_the_request_and_the_response(step):
 # Response utils
 @step('check the response has the key "([^"]*)" with the value "([^"]*)"')
 def check_the_response_has_the_key_with_the_value(step, key, value):
-    assert check_key_value(world.responses[world.response_count].json(), key, value)
+    assert check_key_value(world.responses[world.response_count].json(), key,
+                           value), 'The key {key} is not in the response or has not the value {value}. \
+                           Response: {response}'.format(
+        key=key, value=value, response=world.responses[world.response_count])
 
 
 @step('check the response has not the key "([^"]*)" with the value "([^"]*)"')
-def check_the_response_has_the_key_with_the_value(step, key, value):
-    assert check_key_value(world.responses[world.response_count].json(), key, value) == False
+def check_the_response_has_not_the_key_with_the_value(step, key, value):
+    assert check_key_value(world.responses[world.response_count].json(), key,
+                           value) is False, 'The key {key} is in the response and has the value {value}. \
+                           Response: {response}'.format(
+        key=key, value=value, response=world.responses[world.response_count])
+
+
+@step('check the response has not the key "([^"]*)"$')
+def check_the_response_has_not_the_key(step, key):
+    assert key not in world.responses[world.response_count].json(), 'The key {key} is in the response. Response: \
+    {response}'.fromat(key=key, respose=world.responses[world.response_count])
+
+
+@step('check the response has the key "([^"]*)"$')
+def check_the_response_has_the_key(step, key):
+    assert key in world.responses[
+        world.response_count].json(), 'The key {key} is not in the response. \
+        Response: {response}'.fromat(key=key, response=world.responses[world.response_count])
 
 
 # Mongho utils
