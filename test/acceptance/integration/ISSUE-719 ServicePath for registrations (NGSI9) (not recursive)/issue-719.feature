@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -18,12 +18,10 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
+# __author__ = 'Jon Calderin Goñi (jon dot caldering at gmail dot com)'
 
-__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
-
-# Created by Jon at 10/02/2015
 Feature: ServicePath for registrations (NGSI9) (not recursive)
-  # Enter feature description here
+
   @issue-719
   Scenario: Subscribe different entities with the same provider and services but different subservice
     # First registration

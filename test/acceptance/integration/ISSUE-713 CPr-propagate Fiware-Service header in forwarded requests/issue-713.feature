@@ -1,5 +1,5 @@
 # -*- coding: latin-1 -*-
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -18,8 +18,8 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
+# __author__ = 'Jon Calderin Goñi (jon dot caldering at gmail dot com)'
 
-# Created by Jon at 28/01/2015
 Feature: When the ContextBroker fowards  a requests to a Context Provider, the header Fiware-Service, is fowareded too
 #TODO: Check if there is more operations forwarded
   
