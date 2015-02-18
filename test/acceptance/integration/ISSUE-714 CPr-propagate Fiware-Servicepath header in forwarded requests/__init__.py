@@ -1,5 +1,5 @@
 # -*- coding: latin-1 -*-
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
