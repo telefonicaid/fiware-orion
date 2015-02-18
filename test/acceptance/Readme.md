@@ -38,12 +38,12 @@ Some examples:
 
 ### Tests Coverage (features):
 
-- Git issue 713
-- Git issue 714
-- Git issue 719
-- Git issue 322
-- Git issue 715
-- Git issue 716
+- Git ISSUE-713 - CPr-propagate Fiware-Service header in forwarded requests
+- Git ISSUE-714 - CPr-propagate Fiware-Servicepath header in forwarded requests
+- Git ISSUE-719 - ServicePath for registrations (NGSI9) (not recursive)
+- Git ISSUE-322 - Service support for registries (NGSI9)
+- Git ISSUE-715 - CPr-propagate X-Auth-Token header in forwarded requests
+- Git ISSUE-716 - ContextProvicer forwarding for attributes not existing in existing entities
 
 ### properties.json
 
