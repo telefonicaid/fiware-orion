@@ -46,13 +46,14 @@ def warn(n, s):
 
 def duplicated_attr_name(n, list):
     names = {}
+    at_least_one_dup = False
     for attr in list:
-        if (names.has_key(attr['name'])):
+        if (attr['name'] in names):
             warn(n, 'attribute %s is duplicated' % attr['name'])
-            return True
+            at_least_one_dup = True
         else:
             names[attr['name']] = 1
-    return False
+    return at_least_one_dup
 
 def has_attr(attr, doc_attrs):
     for a in doc_attrs:
@@ -61,8 +62,10 @@ def has_attr(attr, doc_attrs):
     return False
 
 def is_attr_in_doc_older(attr, doc, dup):
-    # This method assumes that attribute is not duplicated in doc or dup (the method is called
-    # after passing that check)
+    """
+    This method assumes that attribute is not duplicated in doc or dup (the method is called
+    after passing that check)
+    """
     
     mod_date_doc = 0
     mod_date_dup = 0
@@ -98,7 +101,7 @@ def merge_sp():
     for doc in db[COL].find({'_id.servicePath': '/'}):
         n += 1
         id = doc['_id']['id']
-        if doc['_id'].has_key('type'):
+        if 'type' in doc['_id']:
             type = doc['_id']['type']
         else:
             type = ''

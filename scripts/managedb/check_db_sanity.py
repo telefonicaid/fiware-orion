@@ -48,16 +48,17 @@ def warn(s):
 
 def duplicated_attr_name(id, type, sp, list):
     names = {}
+    at_least_one_dup = False
     for attr in list:
-        if (names.has_key(attr['name'])):
+        if (attr['name'] in names):
             warn('<%s, %s, %s> attribute %s is duplicated' % (id, type, sp, attr['name']))
-            return True
+            at_least_one_dup = True 
         else:
             names[attr['name']] = 1
-    return False
+    return at_least_one_dup
 
 def value_or_empty(d, k):
-    if d.has_key(k):
+    if k in d:
        return d[k]
     else:
        return ''

@@ -46,10 +46,10 @@ def msg(s):
         print s
 
 def in_seen(id, type, attrs_n):
-    if (not seen.has_key(id)):
+    if (not id in seen):
         return False
     else:
-        if seen[id].has_key(type):
+        if type in seen[id]:
             # This is a sanity check. If attribute number differ, we want to know 
             if (seen[id][type] != attrs_n):
                 msg('* different attrs count for duplicated entity <%s, %s> stored=%d, compared=%d' % (id, type, seen[id][type], attrs_n))
@@ -58,18 +58,18 @@ def in_seen(id, type, attrs_n):
             return False
 
 def add_seen(id, type, attrs_n):
-    if (not seen.has_key(id)):
+    if (not id in seen):
        seen[id] =  {}
     seen[id][type] = attrs_n 
 
 def in_dups(id, type):
-    if (not dups.has_key(id)):
+    if (not id in dups):
         return False
     else:
-        return dups[id].has_key(type)
+        return type in dups[id]
  
 def add_dups(id, type):
-    if (not dups.has_key(id)):
+    if (not id in dups):
        dups[id] =  {}
     dups[id][type] = 1 
 
@@ -86,13 +86,13 @@ def get_sp_dups():
 
     for doc in db[COL].find():
         n += 1
-        if (doc['_id'].has_key('servicePath') and doc['_id']['servicePath'] != "/"):
+        if ('servicePath' in doc['_id'] and doc['_id']['servicePath'] != "/"):
             # Ignoring entities with a not default servicePath, such as '/A' or '/A/A1'
             skipped += 1
             continue
 
         id = doc['_id']['id']
-        if (doc['_id'].has_key('type')):
+        if ('type' in doc['_id']):
             type = doc['_id']['type']
         else:
             type = ''
@@ -124,14 +124,14 @@ def fix_null_sps():
 
     for doc in db[COL].find():
         id = doc['_id']['id']
-        if (doc['_id'].has_key('type')):
+        if ('type' in doc['_id']):
             type = doc['_id']['type']
         else:
             type = ''
         attrs_n = len(doc['attrs'])
 
         # Anomalies or entities already with servicePath are skipeed
-        if (in_dups(id, type) or doc['_id'].has_key('servicePath')):
+        if (in_dups(id, type) or 'servicePath' in doc['_id']):
             continue
         
         hits += 1
