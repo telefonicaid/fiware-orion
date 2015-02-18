@@ -28,6 +28,11 @@ from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 import time
 import argparse
 
+#TODO: Add port for configuration(other server sharing content)
+# Save requests headers too
+# Fill the response queh get-queues is ask
+# Change the build of json in the response (change json.dumps for json.loads) to adapt it to the xml too
+
 
 class RequestHandler(BaseHTTPRequestHandler):
     """

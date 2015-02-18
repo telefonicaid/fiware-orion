@@ -8,10 +8,10 @@ This mock is used to simulate a behaviour of any kind of http server.
 ```
     *****************************************************************************************
     *                                                                                       *
-    *  usage: python mock.py <bind_ip> <port>                                               *
-    *           ex: python mock.py 0.0.0.0 5566                                             *
+    *  usage: python mock.py [--host host] [--port port]                                    *
+    *           ex: python mock.py --host 0.0.0.0 --port 5566                               *
     *  parameters:                                                                          *
-    *         bind_ip: ip from where a http request can coming from. 0.0.0.0 to everywhere  *
+    *         host_ip: ip from where a http request can coming from. 0.0.0.0 to everywhere  *
     *         port: http port where the mock is listeing                                    *
     *                                                                                       *
     *  Comments:                                                                            *
@@ -23,28 +23,39 @@ This mock is used to simulate a behaviour of any kind of http server.
 ```
 
 #### API Rest requests:
+Mock has to be configured in execution time, sending to the mock which response has to serve in each url. The responses are queues, once is send, is popped too.
+The request did to the mock, are stored in a queue too.
+###### GET
 
-###### Default
+- http://ip:port/*/mock_configuration
+    - Get the last request to the mock in the url asked, deleting '/mock_configuration' part of the url
+- http://ip:port/queues
+    - Get the queues for responses and requests
+- http://ip:port/*
+    - Get the last response saved before in the queue
+    
+###### DELETE
+
+- http://ip:port/queues
+    - Empty the queues of requests and responses
+- http://ip:port/*
+    - Serve the response set before in the queue with the url
+    
+###### PUT
 
 - http://ip:port/*
-    - The mock store the information received, and return "Saved" and a 200 status code. The way to store is in a dict, an element for each request with all information (headers, parms, payload and path)
+    - Serve the response set before in the queue with the url
     
-###### Retrieve de requests information
+###### POST
 
-- http://ip:port/get_data
-    - The mock return all requests done to it since it was started, or since the last reset, and reset the responses information
-    
-###### Set a personalized response
-
-- http://ip:port/set_response
-    - A personalized response is set in the mock, this response will be response to all petitions, instead the "Saved" and 200. The response has to go in a json in the following format:
+- http://ip:port/*/mock_configurations
+    - Configure the response and save it in the queue. the payload of the post request has to have the structure:
     {
-        'headers': {dict/json with the headers},
-        'payload': string with the payload,
-        'status_code': an int with the status code to return
+        'status_code': HTTP status code to be sent in the response.,
+        'headers': headers dict to be included in the response,
+        'body': Body to be included in the response,
+        'delay': Delay in seconds before sending the response
     }
-
-###### Reset the response to the default
-
-- http://ip:port/reset_response
-    - Reset the response to the default "Saved" and a 200 status code.
+- http://ip:port/*
+    - Serve the response set before in the queue with the url
+   
