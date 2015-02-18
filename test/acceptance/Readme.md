@@ -23,6 +23,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
      ```
      pip install -r requirements.txt --allow-all-external
      ```
+- Orion compiled and running (From code or RPM, its independent)
 
 ### Tests execution:
 
@@ -49,8 +50,24 @@ Some examples:
 
 Config the environment to execute the test.
 Its needed:
-
-- Orion compiled and running (From code or RPM, its independent)
+{
+  "environment": {
+    "name": "orion",
+    "logs_path": "logs" # Path where the logs will be stored
+  },
+  "context_broker": {
+    "host": "localhost", # Ip where Orion is running
+    "port": "1026" # Port where Orion is listening
+  },
+  "mock": {
+    "port": "5566", # Port where the mock will be listening
+    "bind_ip": "0.0.0.0" # Address from mock will accept requests
+  },
+  "mongo": {
+    "host": "localhost", # Ip where the mongoDB is running
+    "port": "27017" # Port where MongoDB is listening
+  }
+}
 
 
 ### tags
