@@ -74,10 +74,10 @@ def build_the_standard_query_context_payload_with_the_previous_data(step):
     :return:
     """
     check_world_attribute_is_not_none(['entities'])
-    rows = len(step.hashes)
-    if rows != 1:
-        raise ValueError('The table of the step has to have only 1 row but it has {rows}'.format(rows=rows))
     if 'attributes' in step.hashes[0]:
+        rows = len(step.hashes)
+        if rows != 1:
+            raise ValueError('The table of the step has to have only 1 row but it has {rows}'.format(rows=rows))
         world.payloads[world.payloads_count] = PayloadUtils.build_standard_query_context_payload(
             world.entities, step.hashes[0]['attributes'].split(','))
     else:
