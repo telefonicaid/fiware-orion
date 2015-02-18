@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITY_H_
-#define SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITY_H_
+#ifndef ENTITY_TYPE_INFO_H
+#define ENTITY_TYPE_INFO_H
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,27 +25,18 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-
-#include "mongoBackend/MongoGlobal.h"
-#include "ngsi/ContextElementResponse.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/HttpStatusCode.h"
-#include "rest/EntityTypeInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* mapGetIndividualContextEntity - 
+* EntityTypeInfo - entity::type empty, not empty OR either
 */
-extern HttpStatusCode mapGetIndividualContextEntity
-(
-  const std::string&       entityId,
-  const std::string&       entityType,
-  EntityTypeInfo           typeInfo,
-  ContextElementResponse*  response,
-  ConnectionInfo*          ciP
-);
+typedef enum EntityTypeInfo
+{
+  EntityTypeEmptyOrNotEmpty,
+  EntityTypeEmpty,
+  EntityTypeNotEmpty
+} EntityTypeInfo;
 
-#endif  // SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITY_H_
+#endif

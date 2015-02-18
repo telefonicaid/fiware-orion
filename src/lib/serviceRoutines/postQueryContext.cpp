@@ -59,15 +59,40 @@ std::string postQueryContext
   ParseData*                 parseDataP
 )
 {
-  QueryContextResponse  qcr;
-  std::string           answer;
+  //
+  // Convops calling this routine may need the response in digital
+  // So, the digital response is passed back in parseDataP->qcrs.res
+  //
+  QueryContextResponse*  qcrP = &parseDataP->qcrs.res;
+  std::string            answer;
 
-  ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, &qcr, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, qcrP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   // If no redirectioning is necessary, just return the result
-  if (qcr.errorCode.code != SccFound)
+  if (qcrP->errorCode.code != SccFound)
   {
-    answer = qcr.render(ciP, QueryContext, "");
+    //
+    // In case the response is empty, fill response with the entity we looked for
+    //
+    if (qcrP->contextElementResponseVector.size() == 0)
+    {
+      //
+      // FIXME P6: What do we do if we have more than one entity in incoming entityIdVector?
+      //           Push each entityId in a separate contextElementResponse?
+      //           Also, perhaps mongoQueryContext should implement this and not postQueryContext
+      //
+      // ContextElementResponse* cerP = new ContextElementResponse();
+      // cerP->contextElement.entityId.fill(parseDataP->qcr.res.entityIdVector[0]);
+      // cerP->statusCode.fill(SccContextElementNotFound);
+      // qcrP->contextElementResponseVector.push_back(cerP);
+
+      // It's better not to give any details here as we'd have to choose ONE of the entities in the vector ...
+      // std::string details = "Entity id: /" + parseDataP->qcr.res.entityIdVector[0]->id + "/";
+
+      qcrP->errorCode.fill(SccContextElementNotFound);
+    }
+
+    answer = qcrP->render(ciP, QueryContext, "");
     return answer;
   }
 
@@ -80,7 +105,7 @@ std::string postQueryContext
 
   //
   // An entity/attribute has been found on some context provider.
-  // We need to forward the query request to the context provider, indicated in qcr.errorCode.details.
+  // We need to forward the query request to the context provider, indicated in qcrP->errorCode.details.
   //
   // 1. Parse the providing application to extract IP, port and URI-path
   // 2. The exact same QueryContextRequest will be used for the query-forwarding
@@ -94,16 +119,16 @@ std::string postQueryContext
   //
   // 1. Parse the providing application to extract IP, port and URI-path
   //
-  if (parseUrl(qcr.errorCode.details, ip, port, prefix, protocol) == false)
+  if (parseUrl(qcrP->errorCode.details, ip, port, prefix, protocol) == false)
   {
     QueryContextResponse qcrs;
 
-    LM_W(("Bad Input (invalid proving application '%s')", qcr.errorCode.details.c_str()));
+    LM_W(("Bad Input (invalid proving application '%s')", qcrP->errorCode.details.c_str()));
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
 
-    qcrs.errorCode.fill(SccContextElementNotFound, "");
-    answer = qcrs.render(ciP, QueryContext, "");
+    qcrP->errorCode.fill(SccContextElementNotFound, "");
+    answer = qcrP->render(ciP, QueryContext, "");
     return answer;
   }
 

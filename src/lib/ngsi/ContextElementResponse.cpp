@@ -29,6 +29,7 @@
 #include "common/Format.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementResponse.h"
+#include "ngsi10/QueryContextResponse.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -109,4 +110,38 @@ void ContextElementResponse::present(const std::string& indent, int ix)
 {
   contextElement.present(indent, ix);
   statusCode.present(indent);
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::fill - 
+*/
+void ContextElementResponse::fill(QueryContextResponse* qcrP)
+{
+  if (qcrP == NULL)
+  {
+    statusCode.fill(SccContextElementNotFound);
+    return;
+  }
+
+  if (qcrP->contextElementResponseVector.size() == 0)
+  {
+    statusCode.fill(&qcrP->errorCode);
+    return;
+  }
+
+  if (qcrP->contextElementResponseVector.size() > 1)
+  {
+    statusCode.fill(SccReceiverInternalError, "More than one response in contextElementResponseVector");
+    return;
+  }
+
+  contextElement.fill(&qcrP->contextElementResponseVector[0]->contextElement);
+
+  if (qcrP->errorCode.code != SccNone)
+  {
+    statusCode.fill(&qcrP->errorCode);
+  }
 }

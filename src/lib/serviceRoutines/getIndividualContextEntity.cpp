@@ -28,17 +28,38 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapGetIndividualContextEntity.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/ContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/getIndividualContextEntity.h"
+#include "serviceRoutines/postQueryContext.h"
 
 
 
 /* ****************************************************************************
 *
-* getIndividualContextEntity -
+* getIndividualContextEntity - 
+*
+* GET /v1/contextEntities/{entityId::id}
+* GET /ngsi10/contextEntities/{entityId::id}
+*
+* Payload In:  None
+* Payload Out: ContextElementResponse
+*
+* URI parameters:
+*   - !exist=entity::type
+*   - exist=entity::type
+*   - entity::type=TYPE
+*
+* 0. Take care of URI params
+* 1. Fill in QueryContextRequest
+* 2. Add URI parameters as Scope in restriction
+* 3. Call postQueryContext standard service routine
+* 4. If 404 Not Found - enter request entity data into response context element
+* 5. Translate QueryContextResponse to ContextElementResponse
+* 6. Cleanup and return result
 */
 std::string getIndividualContextEntity
 (
@@ -54,6 +75,7 @@ std::string getIndividualContextEntity
   EntityTypeInfo          typeInfo    = EntityTypeEmptyOrNotEmpty;
   ContextElementResponse  response;
 
+  // 0. Take care of URI params
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
   {
     typeInfo = EntityTypeEmpty;
@@ -62,13 +84,35 @@ std::string getIndividualContextEntity
   {
     typeInfo = EntityTypeNotEmpty;
   }
-
   entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
-  ciP->httpStatusCode = mapGetIndividualContextEntity(entityId, entityType, typeInfo, &response, ciP);
 
+  // 1. Fill in QueryContextRequest
+  parseDataP->qcr.res.fill(entityId, entityType, typeInfo);
+
+
+  // 2. Call standard operation
+  answer = postQueryContext(ciP, components, compV, parseDataP);
+
+
+  // 3. Fill in ContextElementResponse from QueryContextResponse
+  response.statusCode.fill(SccOk);
+  response.fill(&parseDataP->qcrs.res);
+
+
+  // 4. If 404 Not Found - enter request entity data into response context element
+  if (response.statusCode.code == SccContextElementNotFound)
+  {
+    response.contextElement.entityId.fill(entityId, entityType, "false");
+    response.statusCode.details = "Entity id: /" + entityId + "/";
+  }
+
+
+  // 5. Render the ContextElementResponse
   answer = response.render(ciP, IndividualContextEntity, "");
-  response.release();
 
+
+  // 6. Cleanup and return result
+  response.release();
   return answer;
 }
