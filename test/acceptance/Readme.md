@@ -14,11 +14,11 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 ##### Environment preparation:
 
 - If you are going to use a virtual environment (optional):
-  * Create a virtual environment somewhere, e.g. in ~/venv (virtualenv ~/venv) (optional)
-  * Activate the virtual environment (source ~/venv/bin/activate) (optional)
+  * Create a virtual environment somewhere, e.g. in ~/venv (`virtualenv ~/venv`) (optional)
+  * Activate the virtual environment (`source ~/venv/bin/activate`) (optional)
 - Both if you are using a virtual environment or not:
   * Change to the test/acceptance folder of the project.
-  * Set the environment variable (Windows and Linux) GIT_SSL_NO_VERIFY=true
+  * Set the environment variable (Windows and Linux) `export GIT_SSL_NO_VERIFY=true`
   * Install the requirements for the acceptance tests in the virtual environment
      ```
      pip install -r requirements.txt --allow-all-external
@@ -72,5 +72,14 @@ Its needed:
 
 ### tags
 
-There is a tag for each feature file
+There is a tag for each feature file:
+
+issue-713
+issue-714
+issue-715
+issue-716
+issue-719
+issue-322
+issue-755
+issue_755
 
