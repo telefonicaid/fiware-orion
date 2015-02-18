@@ -71,7 +71,6 @@ def the_path_in_the_last_petition_contains(step, head, value):
     mock_response = eval(world.mock_data.text)['requests']
     elements = len(mock_response.keys())
     try:
-        print mock_response
         headers = mock_response[mock_response.keys()[elements - 1]][0]['headers']
         print headers
         assert head.lower() in headers and headers[head.lower()] == value, \
@@ -102,7 +101,6 @@ def the_path_in_the_last_petition_contains(step, head):
 @step('there is "([^"]*)" petitions requested to the mock')
 def there_is_petitions_requested_to_the_mock(step, number_requests):
     check_world_attribute_is_not_none(['mock_data'])
-    print world.mock_data.text
     number_mock_requests = len(eval(world.mock_data.text)['requests'].keys())
     assert str(number_requests) == str(
         number_mock_requests), 'The requests to the mock were {number_mock_requests} and the expeted are {number_expected}'.format(
