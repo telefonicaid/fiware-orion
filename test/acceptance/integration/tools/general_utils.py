@@ -97,7 +97,6 @@ def start_mock():
                    '{port}'.format(port=world.config['mock']['port'])]
     else:
         raise ValueError, 'The SO is not compatible with the mock'
-    print command
     return subprocess.Popen(command, stderr=stderr_file, stdout=stdout_file)
 
 
