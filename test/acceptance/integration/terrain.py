@@ -49,6 +49,7 @@ def before_all():
 @after.each_scenario
 def after_each_scenario(scenario):
     stop_mock()
+    world.cb[world.cb_count].log = None
 
 @after.all
 def after_all(total):
