@@ -1,2 +1,3 @@
 - Fix: Correct rendering of response to convop "POST /v1/contextEntities/{entityId::id}/attributes/{attributeName} (Issue #772)
 - Fix:  All convenience operations to use the service routines of standard operations (Issue #117)
+- Add: context providers full functionality (Issue #787)

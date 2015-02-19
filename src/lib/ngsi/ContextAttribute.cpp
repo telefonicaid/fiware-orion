@@ -49,6 +49,7 @@ ContextAttribute::ContextAttribute()
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   providingApplication  = "";
+  found                 = true;
 }
 
 
@@ -64,6 +65,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   value                 = caP->value;
   compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
   providingApplication  = caP->providingApplication;
+  found                 = caP->found;
   typeFromXmlAttribute  = "";
 
   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
@@ -104,6 +106,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   providingApplication  = "";
+  found                 = true;
 }
 
 
@@ -126,6 +129,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = _compoundValueP;
   typeFromXmlAttribute  = "";
   providingApplication  = "";
+  found                 = true;
 }
 
 

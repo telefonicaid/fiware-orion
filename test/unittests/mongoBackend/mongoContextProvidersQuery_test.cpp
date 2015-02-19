@@ -73,6 +73,11 @@
 * - patternNoType
 * - mixPatternAndNotPattern
 *
+* Cases involving more than one CPR:
+*
+* - severalCprs1
+* - severalCprs2
+*
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
 * mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
 * MongoDB layer.
@@ -301,6 +306,231 @@ static void prepareDatabasePatternTrue(void)
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseSeveralCprs1 -
+*
+*/
+static void prepareDatabaseSeveralCprs1(void)
+{
+
+  /* Set database */
+  setupDatabase();
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* We create the following entities:
+   *
+   *   E1 - A1 - 1
+   *
+   * We create the following registries
+   *
+   * - Reg1: CR: E1 - A2 - CPR1
+   * - Reg2: CR: E1 - A3 - CPR2
+   * - Reg3: CR: E1 - A4 - CPR1
+   * - Reg4: CR: E1 - A5 - CPR2
+   * - Reg5: CR: E1 - <null> - CPR3
+   *
+   */
+
+  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
+                     "attrs" << BSON_ARRAY(
+                        BSON("name" << "A1" << "type" << "T" << "value" << "1")
+                        )
+                    );
+
+  BSONObj cr1 = BSON("providingApplication" << "http://cpr1.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) <<
+                     "attrs" << BSON_ARRAY(
+                         BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")
+                         )
+                     );
+  BSONObj cr2 = BSON("providingApplication" << "http://cpr2.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) <<
+                     "attrs" << BSON_ARRAY(
+                         BSON("name" << "A3" << "type" << "T" << "isDomain" << "false")
+                         )
+                     );
+  BSONObj cr3 = BSON("providingApplication" << "http://cpr1.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) <<
+                     "attrs" << BSON_ARRAY(
+                         BSON("name" << "A4" << "type" << "T" << "isDomain" << "false")
+                         )
+                     );
+  BSONObj cr4 = BSON("providingApplication" << "http://cpr2.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) <<
+                     "attrs" << BSON_ARRAY(
+                         BSON("name" << "A5" << "type" << "T" << "isDomain" << "false")
+                         )
+                     );
+
+  BSONObj cr5 = BSON("providingApplication" << "http://cpr3.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) /*<<
+                     "attrs" << BSON_ARRAY*/
+                     );
+
+  /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
+  BSONObj reg1 = BSON(
+              "_id" << OID("51307b66f481db11bf860001") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr1)
+              );
+
+  BSONObj reg2 = BSON(
+              "_id" << OID("51307b66f481db11bf860002") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr2)
+              );
+
+  BSONObj reg3 = BSON(
+              "_id" << OID("51307b66f481db11bf860003") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr3)
+              );
+
+  BSONObj reg4 = BSON(
+              "_id" << OID("51307b66f481db11bf860004") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr4)
+              );
+
+  BSONObj reg5 = BSON(
+              "_id" << OID("51307b66f481db11bf860005") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr5)
+              );
+
+  connection->insert(ENTITIES_COLL, en1);
+  connection->insert(REGISTRATIONS_COLL, reg1);
+  connection->insert(REGISTRATIONS_COLL, reg2);
+  connection->insert(REGISTRATIONS_COLL, reg3);
+  connection->insert(REGISTRATIONS_COLL, reg4);
+  connection->insert(REGISTRATIONS_COLL, reg5);
+
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseSeveralCprs2 -
+*
+*/
+static void prepareDatabaseSeveralCprs2(void)
+{
+
+  /* Set database */
+  setupDatabase();
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* We create the following entities:
+   *
+   *   E1 - A1 - 1
+   *
+   * We create the following registries
+   *
+   * - Reg1: CR: E1 - A1 - CPR1
+   * - Reg2: CR: E1 - A2 - CPR1
+   * - Reg3: CR: E1 - A3 - CPR2
+   * - Reg4: CR: E1 - <null> - CPR2
+   * - Reg5: CR: E1 - <null> - CPR3
+   *
+   */
+
+
+  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
+                     "attrs" << BSON_ARRAY(
+                        BSON("name" << "A1" << "type" << "T" << "value" << "1")
+                        )
+                    );
+
+  BSONObj cr1 = BSON("providingApplication" << "http://cpr1.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) <<
+                     "attrs" << BSON_ARRAY(
+                         BSON("name" << "A1" << "type" << "T" << "isDomain" << "false")
+                         )
+                     );
+  BSONObj cr2 = BSON("providingApplication" << "http://cpr1.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) <<
+                     "attrs" << BSON_ARRAY(
+                         BSON("name" << "A2" << "type" << "T" << "isDomain" << "false")
+                         )
+                     );
+  BSONObj cr3 = BSON("providingApplication" << "http://cpr2.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) <<
+                     "attrs" << BSON_ARRAY(
+                         BSON("name" << "A3" << "type" << "T" << "isDomain" << "false")
+                         )
+                     );
+  BSONObj cr4 = BSON("providingApplication" << "http://cpr2.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) <<
+                     "attrs" << BSONArray()
+                     );
+
+  BSONObj cr5 = BSON("providingApplication" << "http://cpr3.com" <<
+                     "entities" << BSON_ARRAY(
+                         BSON("id" << "E1" << "type" << "T")
+                         ) /*<<
+                     "attrs" << BSON_ARRAY()*/
+                     );
+
+  /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
+  BSONObj reg1 = BSON(
+              "_id" << OID("51307b66f481db11bf860001") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr1)
+              );
+
+  BSONObj reg2 = BSON(
+              "_id" << OID("51307b66f481db11bf860002") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr2)
+              );
+
+  BSONObj reg3 = BSON(
+              "_id" << OID("51307b66f481db11bf860003") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr3)
+              );
+
+  BSONObj reg4 = BSON(
+              "_id" << OID("51307b66f481db11bf860004") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr4)
+              );
+
+  BSONObj reg5 = BSON(
+              "_id" << OID("51307b66f481db11bf860005") <<
+              "expiration" << 1879048191 <<
+              "contextRegistration" << BSON_ARRAY(cr5)
+              );
+
+  connection->insert(ENTITIES_COLL, en1);
+  connection->insert(REGISTRATIONS_COLL, reg1);
+  connection->insert(REGISTRATIONS_COLL, reg2);
+  connection->insert(REGISTRATIONS_COLL, reg3);
+  connection->insert(REGISTRATIONS_COLL, reg4);
+  connection->insert(REGISTRATIONS_COLL, reg5);
+
 }
 
 /* ****************************************************************************
@@ -1148,6 +1378,196 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
+  mongoDisconnect();
+
+  utExit();
+
+}
+
+
+/* ****************************************************************************
+*
+* severalCprs1 -
+*
+* Query:  E1 - (A1, A2, A3, A4, A5, A6, A7)
+* Result: E1 - A1 - 1
+*              A2 - fwd CPR1
+*              A3 - fwd CPR2
+*              A4 - fwd CPR1
+*              A5 - fwd CPR2
+*              A6 - fwd CPR3
+*              A7 - Not found (actually not returned in the mongoBacken response)
+*
+*/
+TEST(mongoContextProvidersQueryRequest, severalCprs1)
+{
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  /* Prepare database */
+  utInit();
+  prepareDatabaseSeveralCprs1();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T", "false");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A1");
+  req.attributeList.push_back("A2");
+  req.attributeList.push_back("A3");
+  req.attributeList.push_back("A4");
+  req.attributeList.push_back("A5");
+  req.attributeList.push_back("A6");
+  req.attributeList.push_back("A7");
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("", RES_CER(0).providingApplication);
+  ASSERT_EQ(6, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 3)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 3)->value);
+  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication);
+
+  EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 4)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 4)->value);
+  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication);
+
+  EXPECT_EQ("A6", RES_CER_ATTR(0, 5)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 5)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 5)->value);
+  EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(0, 5)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
+  mongoDisconnect();
+
+  utExit();
+
+}
+
+/* ****************************************************************************
+*
+* severalCprs2 -
+*
+* Query:  E1 - <null>
+* Result: E1 - A1 - 1
+*              A2 - fwd CPR1
+*              A3 - fwd CPR2
+*              <null> - fwd CPR2
+*              <null> - fwd CPR3
+*/
+TEST(mongoContextProvidersQueryRequest, severalCprs2)
+{
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  /* Prepare database */
+  utInit();
+  prepareDatabaseSeveralCprs2();
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T", "false");
+  req.entityIdVector.push_back(&en);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(3, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);  
+  EXPECT_EQ("", RES_CER(0).providingApplication);
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Context Element response # 2 */
+  EXPECT_EQ("E1", RES_CER(1).entityId.id);
+  EXPECT_EQ("T", RES_CER(1).entityId.type);
+  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplication);
+  ASSERT_EQ(0, RES_CER(1).contextAttributeVector.size());
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+  /* Context Element response # 3 */
+  EXPECT_EQ("E1", RES_CER(2).entityId.id);
+  EXPECT_EQ("T", RES_CER(2).entityId.type);
+  EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
+  EXPECT_EQ("http://cpr3.com", RES_CER(0).providingApplication);
+  ASSERT_EQ(0, RES_CER(2).contextAttributeVector.size());
+  EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();

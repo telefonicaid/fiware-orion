@@ -50,6 +50,7 @@ typedef struct ContextAttribute
   MetadataVector  metadataVector;          // Optional
 
   std::string     providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
+  bool            found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
 
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
