@@ -135,7 +135,7 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP)
   //
   // FIXME P7: If more than one context element is found, we simply select the first one.
   //           A better approach would be to change this convop to return a vector of responses.
-  //           Adding awarning with 'Bad Input' - with this I mean that the user that sends the 
+  //           Adding a warning with 'Bad Input' - with this I mean that the user that sends the 
   //           query needs to avoid using this conv op to make any queries that can giv e more than
   //           one unique context element :-).
   //
