@@ -132,10 +132,16 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP)
     return;
   }
 
+  //
+  // FIXME P7: If more than one context element is found, we simply select the first one.
+  //           A better approach would be to change this convop to return a vector of responses.
+  //           Adding awarning with 'Bad Input' - with this I mean that the user that sends the 
+  //           query needs to avoid using this conv op to make any queries that can giv e more than
+  //           one unique context element :-).
+  //
   if (qcrP->contextElementResponseVector.size() > 1)
   {
-    statusCode.fill(SccReceiverInternalError, "More than one response in contextElementResponseVector");
-    return;
+    LM_W(("Bad Input (more than one context element found the this query - selecting the first one"));
   }
 
   contextElement.fill(&qcrP->contextElementResponseVector[0]->contextElement);
