@@ -51,5 +51,5 @@ def after_each_scenario(scenario):
     stop_mock()
 
 @after.all
-def after_all():
+def after_all(total):
     drop_all_test_databases(world.config['mongo']['host'], world.config['mongo']['port'])
