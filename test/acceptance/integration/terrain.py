@@ -24,7 +24,7 @@
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 from lettuce import before, world, after
-from integration.tools.general_utils import stop_mock
+from integration.tools.general_utils import stop_mock, drop_all_test_databases
 
 @before.all
 def before_all():
@@ -49,3 +49,7 @@ def before_all():
 @after.each_scenario
 def after_each_scenario(scenario):
     stop_mock()
+
+@after.all
+def after_all():
+    drop_all_test_databases(world.config['mongo']['host'], world.config['mongo']['port'])

@@ -132,3 +132,12 @@ def drop_database(ip, port, database):
     else:
         pymongo.Connection(ip, port).drop_database('acceptance-{service}'.format(service=database))
 
+
+def drop_all_test_databases(ip, port):
+    db = pymongo.Connection(ip, port)
+    for db_name in db.database_names():
+        if db_name.find('acceptance') >= 0:
+            print "Droping database: {db_name}".format(db_name=db_name)
+            db.drop_database(db_name)
+
+
