@@ -1,0 +1,335 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+ConvOp getIndividualContextEntity: GET /v1/contextEntities/{entityId::id}
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+#
+# FIXME P5: Once the broker implements forward queries for empty entity types, this test case should
+#           include forwarding.
+#
+# 01. Update/APPEND E1/T1/A1 without service-path
+# 02. Update/APPEND E1//A1 without service-path
+# 03. Update/APPEND E1/T1/A2 with service-path /A2
+# 04. Update/APPEND E1//A2 with service-path /A2
+# 05. Query E1 without service-path
+# 06. Query E1 with service-path '/'
+# 07. Query E1 with service-path '/A2'
+# 08. Query E1 with service-path '/#'
+# 09. Query E1 without service-path and URI param !exist=entity::type
+# 10. Query E1 without service-path and exist=entity::type
+# 11. Query E1 without service-path and URI param entity::type=T1
+#
+
+echo "01. Update/APPEND E1/T1/A1 without service-path"
+echo "==============================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "degree",
+          "value": "a1t1e1"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Update/APPEND E1//A1 without service-path"
+echo "============================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "degree",
+          "value": "a1__e1"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Update/APPEND E1/T1/A2 with service-path /A2"
+echo "=========================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "degree",
+          "value": "a2t1e1"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /A2
+echo
+echo
+
+
+echo "04. Update/APPEND E1//A2 with service-path /A2"
+echo "=========================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "",
+      "isPattern": "false",
+      "id": "E1",
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "degree",
+          "value": "a2__e1"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json --servicePath /A2
+echo
+echo
+
+
+echo "05. Query E1 without service-path"
+echo "================================="
+orionCurl --url /v1/contextEntities/E1 --json
+echo
+echo
+
+
+echo "06. Query E1 with service-path '/'"
+echo "=================================="
+orionCurl --url /v1/contextEntities/E1 --json --servicePath /
+echo
+echo
+
+echo "07. Query E1 with service-path '/A2'"
+echo "===================================="
+orionCurl --url /v1/contextEntities/E1 --json --servicePath /A2
+echo
+echo
+
+
+echo "08. Query E1 with service-path '/#'"
+echo "==================================="
+orionCurl --url /v1/contextEntities/E1 --json --servicePath /#
+echo
+echo
+
+
+echo "09. Query E1 without service-path and URI param !exist=entity::type"
+echo "==================================================================="
+orionCurl --url /v1/contextEntities/E1?!exist=entity::type --json
+echo
+echo
+
+
+echo "10. Query E1 without service-path and exist=entity::type"
+echo "========================================================"
+orionCurl --url /v1/contextEntities/E1?exist=entity::type --json
+echo
+echo
+
+
+echo "11. Query E1 without service-path and URI param entity::type=T1"
+echo "==============================================================="
+orionCurl --url /v1/contextEntities/E1?entity::type=T1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Update/APPEND E1/T1/A1 without service-path
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+}
+
+
+02. Update/APPEND E1//A1 without service-path
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+}
+
+
+03. Update/APPEND E1/T1/A2 with service-path /A2
+================================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+}
+
+
+04. Update/APPEND E1//A2 with service-path /A2
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+}
+
+
+05. Query E1 without service-path
+=================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  E1/T1/A1, E1//A1, E1/T1/A2, E1//A2
+}
+
+
+06. Query E1 with service-path '/'
+==================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  E1/T1/A1, E1//A1
+}
+
+
+07. Query E1 with service-path '/A2'
+====================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  E1/T1/A2, E1//A2
+}
+
+
+08. Query E1 with service-path '/#'
+===================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  E1/T1/A1, E1//A1, E1/T1/A2, E1//A2
+}
+
+
+09. Query E1 without service-path and URI param !exist=entity::type
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  E1//A1,E1//A2
+}
+
+
+10. Query E1 without service-path and exist=entity::type
+========================================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  E1/T1/A1,E1/T1/A2
+}
+
+
+11. Query E1 without service-path and URI param entity::type=T1
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  E1/T1/A1,E1/T1/A2
+}
+
+
+12. Query E1 without service-path and URI param entity::type=T2
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+  404
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
