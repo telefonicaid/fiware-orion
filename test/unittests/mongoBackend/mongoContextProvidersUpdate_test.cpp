@@ -96,7 +96,7 @@
 *
 * FIXME P7: duplicated function in mongoUpdateContext_test.cpp. Unify.
 */
-static BSONObj getAttr(std::vector<BSONElement> attrs, std::string name, std::string type, std::string id = "") {
+BSONObj getAttr(std::vector<BSONElement> attrs, std::string name, std::string type, std::string id = "") {
 
     BSONElement be;
     for (unsigned int ix = 0; ix < attrs.size(); ++ix) {
