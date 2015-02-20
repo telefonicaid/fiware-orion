@@ -114,5 +114,7 @@ std::string getIndividualContextEntity
 
   // 6. Cleanup and return result
   response.release();
+  parseDataP->qcr.res.release();
+
   return answer;
 }
