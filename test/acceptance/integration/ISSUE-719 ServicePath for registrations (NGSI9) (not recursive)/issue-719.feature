@@ -238,7 +238,6 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     Then retrieve information from the mock
     And there is "0" petitions requested to the mock
     And clean the mongo database of the service "issue_719"
-    And print the request and the response
 
   @issue-719
   Scenario: Entity in CB and in CP with the same subervice, and in other CP with other subservice.
@@ -343,7 +342,6 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And there is "1" petitions requested to the mock
     And the path in the last mock petition contains "service2"
     And clean the mongo database of the service "issue_719"
-    And print the request and the response
 
   @issue-719
   Scenario: Entity in CB and in CP without servicepath, and in other CP with other servicepath.

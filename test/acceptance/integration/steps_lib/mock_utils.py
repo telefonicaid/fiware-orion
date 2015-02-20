@@ -72,7 +72,6 @@ def the_path_in_the_last_petition_contains(step, head, value):
     elements = len(mock_response.keys())
     try:
         headers = mock_response[mock_response.keys()[elements - 1]][0]['headers']
-        print headers
         assert head.lower() in headers and headers[head.lower()] == value, \
             'The head {head} does not exist or the value is not {value},\
              check the headers forwarded {headers}' \

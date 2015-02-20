@@ -97,7 +97,6 @@ def start_mock():
                    '{port}'.format(port=world.config['mock']['port'])]
     else:
         raise ValueError, 'The SO is not compatible with the mock'
-    print command
     return subprocess.Popen(command, stderr=stderr_file, stdout=stdout_file)
 
 
@@ -127,8 +126,30 @@ def kill(proc_pid):
 
 
 def drop_database(ip, port, database):
+    """
+    Drop a specific database in a MongoDB that has the "acceptance" prefix in its name
+    :param ip:
+    :param port:
+    :param database:
+    :return:
+    """
     if database == "":
-        pymongo.Connection(ip, port).drop_database('orion')
+        pymongo.Connection(ip, port).drop_database('acceptance')
     else:
-        pymongo.Connection(ip, port).drop_database('orion-{service}'.format(service=database))
+        pymongo.Connection(ip, port).drop_database('acceptance-{service}'.format(service=database))
+
+
+def drop_all_test_databases(ip, port):
+    """
+    Drop all databases in a MongoDB that have the "acceptance" prefix in its name
+    :param ip:
+    :param port:
+    :return:
+    """
+    db = pymongo.Connection(ip, port)
+    for db_name in db.database_names():
+        if db_name.find('acceptance') >= 0:
+            print "Droping database: {db_name}".format(db_name=db_name)
+            db.drop_database(db_name)
+
 
