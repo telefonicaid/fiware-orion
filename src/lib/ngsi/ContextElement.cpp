@@ -154,8 +154,7 @@ void ContextElement::fill(const struct ContextElement& ce)
   attributeDomainName.fill(ce.attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ce.contextAttributeVector);
   domainMetadataVector.fill((MetadataVector*) &ce.domainMetadataVector);
-  providingApplication = ce.providingApplication;
-  found = ce.found;
+  providingApplication = ce.providingApplication;  
 }
 
 
@@ -170,6 +169,5 @@ void ContextElement::fill(ContextElement* ceP)
   attributeDomainName.fill(ceP->attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector);
   domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
-  providingApplication = ceP->providingApplication;
-  found = ceP->found;
+  providingApplication = ceP->providingApplication;  
 }

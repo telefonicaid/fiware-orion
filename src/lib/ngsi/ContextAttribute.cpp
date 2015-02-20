@@ -34,7 +34,10 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 
-
+// FIXME P5: we have the same macro in parseArg library. That is not efficient: the macro (along
+// with probably more stuff) should be isolated in a separate library, invoked but all the other
+// libraries which need it)
+#define FT(x) (x == true)? "true" : "false"
 
 /* ****************************************************************************
 *
@@ -336,6 +339,7 @@ void ContextAttribute::present(const std::string& indent, int ix)
   }
 
   PRINTF("%s  PA:       %s\n", indent.c_str(), providingApplication.c_str());
+  PRINTF("%s  found:    %s\n", indent.c_str(), FT(found));
 
   metadataVector.present("Attribute", indent + "  ");
 }

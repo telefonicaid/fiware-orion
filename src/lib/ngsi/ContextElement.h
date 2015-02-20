@@ -49,8 +49,6 @@ typedef struct ContextElement
   MetadataVector          domainMetadataVector;    // Optional
 
   std::string             providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
-  bool                    found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
-                                                   // FIXME P10 #787: not sure if we need this at the end... it only would be needed in E-<null> updates, which seems not having too much sense
 
   std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma);
   void         present(const std::string& indent, int ix);
