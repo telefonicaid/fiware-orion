@@ -126,6 +126,13 @@ def kill(proc_pid):
 
 
 def drop_database(ip, port, database):
+    """
+    Drop a specific database in a MongoDB that has the "acceptance" prefix in its name
+    :param ip:
+    :param port:
+    :param database:
+    :return:
+    """
     if database == "":
         pymongo.Connection(ip, port).drop_database('acceptance')
     else:
@@ -133,6 +140,12 @@ def drop_database(ip, port, database):
 
 
 def drop_all_test_databases(ip, port):
+    """
+    Drop all databases in a MongoDB that have the "acceptance" prefix in its name
+    :param ip:
+    :param port:
+    :return:
+    """
     db = pymongo.Connection(ip, port)
     for db_name in db.database_names():
         if db_name.find('acceptance') >= 0:
