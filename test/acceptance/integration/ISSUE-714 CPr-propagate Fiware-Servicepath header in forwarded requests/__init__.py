@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
+# -*- coding: latin-1 -*-
 # Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
@@ -19,33 +18,5 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
-"""
 
-__author__ = 'Jon Calderin GoÃ±i (jon.caldering@gmail.com)'
-
-from lettuce import before, world, after
-from integration.tools.general_utils import stop_mock
-
-@before.all
-def before_all():
-    world.entities = None
-    world.attributes_consult = None
-    world.attributes_creation = None
-    world.context_elements = None
-    world.notify_conditions = None
-    world.context_registrations = None
-    world.service = None
-    world.subservice = None
-    world.mock = None
-    world.mock_data = None
-    world.payloads_count = -1
-    world.response_count = -1
-    world.cb_count = -1
-    world.cb = {}
-    world.payloads = {}
-    world.responses = {}
-
-
-@after.each_scenario
-def after_each_scenario(scenario):
-    stop_mock()
+__author__ = 'Jon Calderín Goñi (jon.caldering@gmail.com)'

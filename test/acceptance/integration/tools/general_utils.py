@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -20,8 +20,10 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 """
+import platform
+import psutil
 
-__author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 import pymongo
 from lettuce import world
@@ -83,11 +85,20 @@ def start_mock():
     :return:
     """
     path, fl = os.path.split(os.path.realpath(__file__))
-    # if platform.system() == 'Windows':
-    # path = path[0:path.rfind('\\')] + '\\mocks\\'
-    DEVNULL = open(os.devnull, 'wb')
-    command = ['python', '{path}\\mock_cb_utils.py'.format(path=path)]
-    return subprocess.Popen(command, stdout=DEVNULL, stderr=DEVNULL).pid
+    stderr_file = open('logs/mock_err.log', 'w')
+    stdout_file = open('logs/mock_out.log', 'w')
+    if platform.system() == 'Windows':
+        command = ['python', '{path}\\mock.py'.format(path=path), '--host',
+                   '{bind_ip}'.format(bind_ip=world.config['mock']['bind_ip']), '--port',
+                   '{port}'.format(port=world.config['mock']['port'])]
+    elif platform.system() == 'Linux':
+        command = ['python', '{path}/mock.py'.format(path=path), '--host',
+                   '{bind_ip}'.format(bind_ip=world.config['mock']['bind_ip']), '--port',
+                   '{port}'.format(port=world.config['mock']['port'])]
+    else:
+        raise ValueError, 'The SO is not compatible with the mock'
+    print command
+    return subprocess.Popen(command, stderr=stderr_file, stdout=stdout_file)
 
 
 def stop_mock():
@@ -95,14 +106,29 @@ def stop_mock():
     Stop the mock
     :return:
     """
-    if world.mock_pid != None:
-        subprocess.Popen(['taskkill', '/F', '/T', '/PID', str(world.mock_pid)])
-        world.mock_pid = None
+    if world.mock != None:
+        if platform.system() == 'Windows':
+            subprocess.Popen(['taskkill', '/F', '/T', '/PID', str(world.mock.pid)])
+        elif platform.system() == 'Linux':
+            kill(world.mock.pid)
+        world.mock = None
+
+
+def kill(proc_pid):
+    """
+    Funct to kill all process with his children
+    :param proc_pid:
+    :return:
+    """
+    process = psutil.Process(proc_pid)
+    for proc in process.get_children(recursive=True):
+        proc.kill()
+    process.kill()
 
 
 def drop_database(ip, port, database):
     if database == "":
-        pymongo.Connection(ip, port).drop_database('orion'.format(service=database))
+        pymongo.Connection(ip, port).drop_database('orion')
     else:
         pymongo.Connection(ip, port).drop_database('orion-{service}'.format(service=database))
 

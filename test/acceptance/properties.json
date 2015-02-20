@@ -8,7 +8,8 @@
     "port": "1026"
   },
   "mock": {
-    "port": "5566"
+    "port": "5566",
+    "bind_ip": "0.0.0.0"
   },
   "mongo": {
     "host": "localhost",

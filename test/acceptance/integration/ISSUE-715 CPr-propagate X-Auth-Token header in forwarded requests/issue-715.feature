@@ -1,5 +1,5 @@
-# -*- coding: latin-1 -*-
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# -*- coding: utf-8 -*-
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -18,18 +18,16 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
+# __author__ = 'Jon Calderin Goñi (jon dot caldering at gmail dot com)'
 
+@issue-715
+Feature: CPr: propagate X-Auth-Token header in forwarded requests
 
-# Created by Jon at 28/01/2015
-Feature: When the ContextBroker forwards a requests to a Context Provider, the header Fiware-Servicepath, is fowareded too
-  # Enter feature description here
-#TODO: Check if there is more operations forwarded
-
-  @issue-714
-  Scenario: Fiware-Servicepath header is forwarded to a Context Provider query operation
+  Scenario: Forward the X-Auth-Token for the context provider in a query operation
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_714" and the subservice "/subservice"
+    And a new NGSI version "9" petition with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -37,12 +35,15 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
       | attribute_name | attribute_type |
       | att1           | att_type_1     |
     And a context registrations with the before entities and attributes and the following providing applications
-      | providing_application      |
-      | /context_provider/service1 |
+      | providing_application     |
+      | /context_provider/service |
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Query consult
-    And a new NGSI version "10" petition with the service "issue_714" and the subservice "/subservice"
+    And a new NGSI version "10" petition with the service "issue_715" and the subservice "/subservice"
+    And add the following headers to the petition
+      | header       | value |
+      | X-Auth-Token | aaaa  |
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -50,16 +51,16 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     When a standard query context is asked with the before information
     #Mock information
     Then retrieve information from the mock
-    And the path in the last mock petition contains "service1"
+    And headers of the last mock petition contains the head "X-Auth-Token" with the value "aaaa"
+    And the path in the last mock petition contains "service"
     And there is "1" petitions requested to the mock
-    And headers of the last mock petition contains the head "Fiware-Servicepath" with the value "/subservice"
-    And  clean the mongo database of the service "issue_714"
+    And clean the mongo database of the service "issue_715"
 
-  @issue-714
-  Scenario: Fiware-Servicepath header is not forwarded to a Context Provider query operation if its not send
+  Scenario: Forward the X-Auth-Token for the context provider in an update operation
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_714" and the subservice "empty"
+    And a new NGSI version "9" petition with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -67,43 +68,15 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
       | attribute_name | attribute_type |
       | att1           | att_type_1     |
     And a context registrations with the before entities and attributes and the following providing applications
-      | providing_application      |
-      | /context_provider/service1 |
-    And build the standard context registration payload with the previous data and duration "P1M"
-    And a standard context registration is asked with the before information
-    # Query consult
-    And a new NGSI version "10" petition with the service "issue_714" and the subservice "empty"
-    And the following entities to consult
-      | entity_id | entity_type |
-      | Room1     | Room        |
-    And build the standard query context payload with the previous data
-    When a standard query context is asked with the before information
-    #Mock information
-    Then retrieve information from the mock
-    And the path in the last mock petition contains "service1"
-    And there is "1" petitions requested to the mock
-    And headers of the last mock petition not contains the head "Fiware-Servicepath"
-    And headers of the last mock petition contains the head "Fiware-Service" with the value "issue_714"
-    And  clean the mongo database of the service "issue_714"
-
-  @issue-714
-  Scenario: Fiware-Servicepath header is forwarded to a Context Provider update operation
-    Given a started mock
-    # First registration
-    And a new NGSI version "9" petition with the service "issue_714" and the subservice "/subservice"
-    And the following entities to consult
-      | entity_id | entity_type |
-      | Room1     | Room        |
-    And the following attributes to consult
-      | attribute_name | attribute_type |
-      | att1           | att_type_1     |
-    And a context registrations with the before entities and attributes and the following providing applications
-      | providing_application      |
-      | /context_provider/service1 |
+      | providing_application     |
+      | /context_provider/service |
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "issue_714" and the subservice "/subservice"
+    And a new NGSI version "10" petition with the service "issue_715" and the subservice "/subservice"
+    And add the following headers to the petition
+      | header       | value |
+      | X-Auth-Token | aaaa  |
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -114,16 +87,16 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     When a standard context entity update is asked with the before information
     #Mock information
     Then retrieve information from the mock
-    And the path in the last mock petition contains "service1"
+    And headers of the last mock petition contains the head "X-Auth-Token" with the value "aaaa"
+    And the path in the last mock petition contains "service"
     And there is "1" petitions requested to the mock
-    And headers of the last mock petition contains the head "Fiware-Servicpathe" with the value "/subservice"
-    And  clean the mongo database of the service "issue_714"
+    And clean the mongo database of the service "issue_715"
 
-  @issue-714
-  Scenario: Fiware-Servicepath header is not forwarded to a Context Provider update operation if it is not send
+  Scenario: Do not forward the X-Auth-Token for the context provider in a query operation
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_714" and the subservice "empty"
+    And a new NGSI version "9" petition with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -131,12 +104,42 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
       | attribute_name | attribute_type |
       | att1           | att_type_1     |
     And a context registrations with the before entities and attributes and the following providing applications
-      | providing_application      |
-      | /context_provider/service1 |
+      | providing_application     |
+      | /context_provider/service |
+    And build the standard context registration payload with the previous data and duration "P1M"
+    And a standard context registration is asked with the before information
+    # Query consult
+    And a new NGSI version "10" petition with the service "issue_715" and the subservice "/subservice"
+    And the following entities to consult
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And build the standard query context payload with the previous data
+    When a standard query context is asked with the before information
+    #Mock information
+    Then retrieve information from the mock
+    And headers of the last mock petition not contains the head "X-Auth-Token"
+    And the path in the last mock petition contains "service"
+    And there is "1" petitions requested to the mock
+    And clean the mongo database of the service "issue_715"
+
+  Scenario: Do not forward the X-Auth-Token for the context provider in a update operation
+    Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
+    # First registration
+    And a new NGSI version "9" petition with the service "issue_715" and the subservice "/subservice"
+    And the following entities to consult
+      | entity_id | entity_type |
+      | Room1     | Room        |
+    And the following attributes to consult
+      | attribute_name | attribute_type |
+      | att1           | att_type_1     |
+    And a context registrations with the before entities and attributes and the following providing applications
+      | providing_application     |
+      | /context_provider/service |
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "issue_714" and the subservice "empty"
+    And a new NGSI version "10" petition with the service "issue_715" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -147,7 +150,9 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     When a standard context entity update is asked with the before information
     #Mock information
     Then retrieve information from the mock
-    And the path in the last mock petition contains "service1"
+    And headers of the last mock petition not contains the head "X-Auth-Token"
+    And the path in the last mock petition contains "service"
     And there is "1" petitions requested to the mock
-    And headers of the last mock petition not contains the head "Fiware-Servicepath"
-    And clean the mongo database of the service "issue_714"
+    And clean the mongo database of the service "issue_715"
+
+#Fixme: Repeat all tests with convenience operation, when developed. This is pending on the "big refactoring" in CPr funciontality being done in 1Q2015"

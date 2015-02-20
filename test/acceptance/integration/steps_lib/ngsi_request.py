@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -21,7 +21,7 @@
 # iot_support at tid dot es
 """
 
-__author__ = 'Jon Calderin Goñi (jcaldering@gmail.com)'
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 
 from lettuce import step, world
@@ -61,3 +61,26 @@ def a_standard_context_registration_is_asked_with_the_before_information(step):
 def a_standard_discover_context_availability_is_asked_with_the_before_information(step):
     world.responses[world.response_count] = world.cb[world.cb_count].discover_context_availability(
         world.payloads[world.payloads_count])
+
+# Convenience
+
+@step('a convenience query context is asked with the following data')
+def a_standard_query_context_is_asked_with_the_before_information(step):
+    """
+    Execute a convenience query context with the information in the table. The format is:
+    | entity_id(optional) | entity_type(optional) | attirbute(optional) |
+    :param step:
+    :return:
+    """
+    rows = len(step.hashes)
+    if rows != 1:
+        raise ValueError, 'The table for this steps has to have only 1 row but it has {rows}'.format(rows=rows)
+    kargs = dict()
+    if 'entity_id' in step.hashes[0]:
+        kargs.update({'entity_id': step.hashes[0]['entity_id']})
+    if 'entity_type' in step.hashes[0]:
+        kargs.update({'entity_type': step.hashes[0]['entity_type']})
+    if 'attribute' in step.hashes[0]:
+        kargs.update({'attribute': step.hashes[0]['attribute']})
+    world.responses[world.response_count] = world.cb[world.cb_count].convenience_query_context(**kargs)
+

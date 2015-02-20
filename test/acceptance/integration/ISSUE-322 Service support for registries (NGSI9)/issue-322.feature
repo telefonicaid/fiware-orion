@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -17,11 +17,11 @@
 # along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
 #
 # For those usages not covered by this license please contact with
-# iot_support at tid dot es 
-  
-# Created by Jon at 10/02/2015
+# iot_support at tid dot es
+# __author__ = 'Jon Calderin Goñi (jon dot caldering at gmail dot com)'
+
+
 Feature: Service support for registries (NGSI9)
-  # Enter feature description here
 #TODO: Test the subscriptions operation, if service and subservice diference the context provider, when the functionality is defined
 
   @issue-322
@@ -69,6 +69,8 @@ Feature: Service support for registries (NGSI9)
   @issue-322
   Scenario: Query context of an entity in two context provider with different service
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
@@ -112,6 +114,8 @@ Feature: Service support for registries (NGSI9)
   @issue-322
   Scenario: Update an entity in a context provider, having other context provider with the same entity in other service
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
@@ -296,6 +300,8 @@ Feature: Service support for registries (NGSI9)
   @issue-322
   Scenario: Entity in CB and in CP with the same service, and in other CP with other service.
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
@@ -348,6 +354,8 @@ Feature: Service support for registries (NGSI9)
   @issue-322
   Scenario: Entity in CB and in CP without service, and in other CP with other service.
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
@@ -400,6 +408,8 @@ Feature: Service support for registries (NGSI9)
   @issue-322
   Scenario: Entity in CB and in CP with service, and in other CP without service.
     Given a started mock
+    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
