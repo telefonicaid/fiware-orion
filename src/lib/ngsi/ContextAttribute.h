@@ -42,12 +42,16 @@
 */
 typedef struct ContextAttribute
 {
-  std::string     name;            // Mandatory
-  std::string     type;            // Optional
-  std::string     value;           // Optional (FI-WARE changes - MANDATORY in OMA spec)
-                                   //          Especially for the new convops, value is NOT mandatory
-                                   //          E.g. /v1/contextTypes
-  MetadataVector  metadataVector;  // Optional
+  std::string     name;                    // Mandatory
+  std::string     type;                    // Optional
+  std::string     value;                   // Optional (FI-WARE changes - MANDATORY in OMA spec)
+                                           //          Especially for the new convops, value is NOT mandatory
+                                           //          E.g. /v1/contextTypes
+  MetadataVector  metadataVector;          // Optional
+
+  std::string     providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
+  bool            found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
+                                           // It means attribute found either locally or remotely in prodiving application
 
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;

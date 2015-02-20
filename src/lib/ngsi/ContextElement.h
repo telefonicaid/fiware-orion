@@ -48,6 +48,8 @@ typedef struct ContextElement
   ContextAttributeVector  contextAttributeVector;  // Optional
   MetadataVector          domainMetadataVector;    // Optional
 
+  std::string             providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
+
   std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma);
   void         present(const std::string& indent, int ix);
   void         release(void);

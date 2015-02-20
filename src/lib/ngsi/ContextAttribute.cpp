@@ -34,7 +34,10 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
 
-
+// FIXME P5: we have the same macro in parseArg library. That is not efficient: the macro (along
+// with probably more stuff) should be isolated in a separate library, invoked but all the other
+// libraries which need it)
+#define FT(x) (x == true)? "true" : "false"
 
 /* ****************************************************************************
 *
@@ -48,6 +51,8 @@ ContextAttribute::ContextAttribute()
   value                 = "";
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
+  providingApplication  = "";
+  found                 = true;
 }
 
 
@@ -62,6 +67,8 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   type                  = caP->type;
   value                 = caP->value;
   compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
+  providingApplication  = caP->providingApplication;
+  found                 = caP->found;
   typeFromXmlAttribute  = "";
 
   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
@@ -101,6 +108,8 @@ ContextAttribute::ContextAttribute
   value                 = _value;
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
+  providingApplication  = "";
+  found                 = true;
 }
 
 
@@ -122,6 +131,8 @@ ContextAttribute::ContextAttribute
   type                  = _type;
   compoundValueP        = _compoundValueP;
   typeFromXmlAttribute  = "";
+  providingApplication  = "";
+  found                 = true;
 }
 
 
@@ -326,6 +337,9 @@ void ContextAttribute::present(const std::string& indent, int ix)
   {
     compoundValueP->show(indent + "  ");
   }
+
+  PRINTF("%s  PA:       %s\n", indent.c_str(), providingApplication.c_str());
+  PRINTF("%s  found:    %s\n", indent.c_str(), FT(found));
 
   metadataVector.present("Attribute", indent + "  ");
 }
