@@ -52,6 +52,7 @@
 *   - !exist=entity::type
 *   - exist=entity::type
 *   - entity::type=TYPE
+*   - attributesFormat=object
 *
 * 0. Take care of URI params
 * 1. Fill in QueryContextRequest

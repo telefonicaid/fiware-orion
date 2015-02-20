@@ -50,6 +50,7 @@ brokerStart CB 0
 # 09. Query E1 with service-path '/A2' and URI param exist=entity::type
 # 10. Query E1 without service-path and URI param entity::type=T1
 # 11. Query E3 with service-path '/A2' and URI param !exist=entity::type
+# 12. Query E2 with service-path '/A2' and attributesFormat set to JSON-object
 #
 
 echo "01. Update/APPEND E1/T1/A1 without service-path"
@@ -226,6 +227,13 @@ echo
 echo "11. Query E3 with service-path '/A2' and URI param !exist=entity::type"
 echo "======================================================================"
 orionCurl --url /v1/contextEntities/E3?!exist=entity::type --json --servicePath /A2
+echo
+echo
+
+
+echo "12. Query E2 with service-path '/A2' and attributesFormat set to JSON-object"
+echo "============================================================================"
+orionCurl --url /v1/contextEntities/E2 --json --servicePath /A2 --urlParams attributesFormat=object
 echo
 echo
 
@@ -538,6 +546,32 @@ Date: REGEX(.*)
         "id": "E3", 
         "isPattern": "false", 
         "type": ""
+    }, 
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+12. Query E2 with service-path '/A2' and attributesFormat set to JSON-object
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 270
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": {
+            "A2": {
+                "type": "degree", 
+                "value": "a2_t2_e2"
+            }
+        }, 
+        "id": "E2", 
+        "isPattern": "false", 
+        "type": "T2"
     }, 
     "statusCode": {
         "code": "200", 
