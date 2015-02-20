@@ -77,6 +77,7 @@
 *
 * - severalCprs1
 * - severalCprs2
+* - severalCprs3
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
 * mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
@@ -313,7 +314,7 @@ static void prepareDatabasePatternTrue(void)
 * prepareDatabaseSeveralCprs1 -
 *
 */
-static void prepareDatabaseSeveralCprs1(void)
+static void prepareDatabaseSeveralCprs1(bool addGenericRegistry)
 {
 
   /* Set database */
@@ -331,7 +332,7 @@ static void prepareDatabaseSeveralCprs1(void)
    * - Reg2: CR: E1 - A3 - CPR2
    * - Reg3: CR: E1 - A4 - CPR1
    * - Reg4: CR: E1 - A5 - CPR2
-   * - Reg5: CR: E1 - <null> - CPR3
+   * - Reg5: CR: E1 - <null> - CPR3  (if addGenericRegistry = true)
    *
    */
 
@@ -417,7 +418,10 @@ static void prepareDatabaseSeveralCprs1(void)
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
-  connection->insert(REGISTRATIONS_COLL, reg5);
+  if (addGenericRegistry)
+  {
+    connection->insert(REGISTRATIONS_COLL, reg5);
+  }
 
 }
 
@@ -1393,14 +1397,13 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
 *
 * severalCprs1 -
 *
-* Query:  E1 - (A1, A2, A3, A4, A5, A6, A7)
+* Query:  E1 - (A1, A2, A3, A4, A5, A6)
 * Result: E1 - A1 - 1
 *              A2 - fwd CPR1
 *              A3 - fwd CPR2
 *              A4 - fwd CPR1
 *              A5 - fwd CPR2
 *              A6 - fwd CPR3
-*              A7 - Not found (actually not returned in the mongoBacken response)
 *
 */
 TEST(mongoContextProvidersQueryRequest, severalCprs1)
@@ -1411,7 +1414,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
 
   /* Prepare database */
   utInit();
-  prepareDatabaseSeveralCprs1();
+  prepareDatabaseSeveralCprs1(true);
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T", "false");
@@ -1422,7 +1425,6 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   req.attributeList.push_back("A4");
   req.attributeList.push_back("A5");
   req.attributeList.push_back("A6");
-  req.attributeList.push_back("A7");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
@@ -1490,6 +1492,96 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
 *
 * severalCprs2 -
 *
+* Query:  E1 - (A1, A2, A3, A4, A5, A6)
+* Result: E1 - A1 - 1
+*              A2 - fwd CPR1
+*              A3 - fwd CPR2
+*              A4 - fwd CPR1
+*              A5 - fwd CPR2
+*              A6 - Not found (actually, don't returned by mongoBackend)
+*
+*/
+TEST(mongoContextProvidersQueryRequest, severalCprs2)
+{
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  /* Prepare database */
+  utInit();
+  prepareDatabaseSeveralCprs1(false);
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T", "false");
+  req.entityIdVector.push_back(&en);
+  req.attributeList.push_back("A1");
+  req.attributeList.push_back("A2");
+  req.attributeList.push_back("A3");
+  req.attributeList.push_back("A4");
+  req.attributeList.push_back("A5");
+  req.attributeList.push_back("A6");
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ("", RES_CER(0).providingApplication);
+  ASSERT_EQ(5, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 3)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 3)->value);
+  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication);
+
+  EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 4)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 4)->value);
+  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Check entities collection hasn't been touched */
+  DBClientBase* connection = getMongoConnection();
+  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
+  mongoDisconnect();
+
+  utExit();
+
+}
+
+/* ****************************************************************************
+*
+* severalCprs3 -
+*
 * Query:  E1 - <null>
 * Result: E1 - A1 - 1
 *              A2 - fwd CPR1
@@ -1497,7 +1589,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
 *              <null> - fwd CPR2
 *              <null> - fwd CPR3
 */
-TEST(mongoContextProvidersQueryRequest, severalCprs2)
+TEST(mongoContextProvidersQueryRequest, severalCprs3)
 {
   HttpStatusCode        ms;
   QueryContextRequest   req;
