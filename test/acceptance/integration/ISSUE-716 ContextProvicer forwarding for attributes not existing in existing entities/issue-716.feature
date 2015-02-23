@@ -23,6 +23,9 @@
 @issue-716
 Feature: Context Provider forwarding for attributes not existing in existing entities
 
+  Background:
+    Given the Context Broker started with multitenancy
+
   Scenario: Query an entity in the CB and in the CP with the attributes in the CP
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
