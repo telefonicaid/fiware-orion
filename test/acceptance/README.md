@@ -50,6 +50,7 @@ Some examples:
 
 Config the environment to execute the test.
 Its needed:
+```
 {
   "environment": {
     "name": "orion",
@@ -74,6 +75,7 @@ Its needed:
     "password": "" #Ssh password of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
   }
 }
+```
 
 
 ### tags
