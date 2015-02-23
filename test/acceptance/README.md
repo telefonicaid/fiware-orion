@@ -80,13 +80,15 @@ Its needed:
 
 ### tags
 
-There is a tag for each feature file:
+There is a tag for each issue in github:
 
+```
 issue-713
-issue-714
-issue-715
-issue-716
-issue-719
-issue-322
-issue-755
+issue-714 
+issue-715 
+issue-716 
+issue-719 
+issue-322 
+issue-755 
+```
 
