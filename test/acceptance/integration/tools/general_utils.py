@@ -296,7 +296,7 @@ def stop_cb():
                 if local('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
                     local('kill -9 {pid} && sleep 5'.format(pid=world.cb_pid))
                     if local('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
-                        raise ValueError('After try to kill pep, is still running ')
+                        raise ValueError('After try to kill context broker, is still running ')
     else:
         if world.cb_pid != '':
             if run('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
@@ -304,7 +304,7 @@ def stop_cb():
                 if run('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
                     run('kill -9 {pid} && sleep 5'.format(pid=world.cb_pid))
                     if run('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
-                        raise ValueError('After try to kill pep, is still running ')
+                        raise ValueError('After try to kill context broker, is still running ')
     world.cb_pid = get_cb_pid() # It should be '' (empty)
 
 
