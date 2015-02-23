@@ -20,11 +20,14 @@
 # iot_support at tid dot es
 # __author__ = 'Jon Calderin Goñi (jon dot caldering at gmail dot com)'
 
+  @issue-714
 Feature: When the ContextBroker forwards a requests to a Context Provider, the header Fiware-Servicepath, is fowareded too
   # Enter feature description here
 #TODO: Check if there is more operations forwarded
 
-  @issue-714
+  Background:
+    Given the Context Broker started with multitenancy
+
   Scenario: Fiware-Servicepath header is forwarded to a Context Provider query operation
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
@@ -55,7 +58,6 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     And headers of the last mock petition contains the head "Fiware-Servicepath" with the value "/subservice"
     And  clean the mongo database of the service "issue_714"
 
-  @issue-714
   Scenario: Fiware-Servicepath header is not forwarded to a Context Provider query operation if its not send
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
@@ -87,7 +89,6 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     And headers of the last mock petition contains the head "Fiware-Service" with the value "issue_714"
     And  clean the mongo database of the service "issue_714"
 
-  @issue-714
   Scenario: Fiware-Servicepath header is forwarded to a Context Provider update operation
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
@@ -121,7 +122,6 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     And headers of the last mock petition contains the head "Fiware-Servicepath" with the value "/subservice"
     And  clean the mongo database of the service "issue_714"
 
-  @issue-714
   Scenario: Fiware-Servicepath header is not forwarded to a Context Provider update operation if it is not send
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"

@@ -24,10 +24,11 @@
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 from lettuce import before, world, after
-from integration.tools.general_utils import stop_mock, drop_all_test_databases
+from integration.tools.general_utils import stop_mock, drop_all_test_databases, check_properties, get_cb_pid, stop_cb
 
 @before.all
 def before_all():
+    check_properties()
     world.entities = None
     world.attributes_consult = None
     world.attributes_creation = None
@@ -44,6 +45,8 @@ def before_all():
     world.cb = {}
     world.payloads = {}
     world.responses = {}
+    world.cb_config_to_start = ''
+    world.cb_pid = get_cb_pid()
 
 
 @after.each_scenario
@@ -54,3 +57,4 @@ def after_each_scenario(scenario):
 @after.all
 def after_all(total):
     drop_all_test_databases(world.config['mongo']['host'], int(world.config['mongo']['port']))
+    stop_cb()

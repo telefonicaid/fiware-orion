@@ -20,11 +20,13 @@
 # iot_support at tid dot es
 # __author__ = 'Jon Calderin Goñi (jon dot caldering at gmail dot com)'
 
-
+@issue-322
 Feature: Service support for registries (NGSI9)
 #TODO: Test the subscriptions operation, if service and subservice diference the context provider, when the functionality is defined
 
-  @issue-322
+  Background:
+    Given the Context Broker started with multitenancy
+
   Scenario: Subscribe different entities with the same provider and subservices but different service
     # First registration
     Given a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
@@ -66,7 +68,6 @@ Feature: Service support for registries (NGSI9)
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
-  @issue-322
   Scenario: Query context of an entity in two context provider with different service
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
@@ -111,7 +112,6 @@ Feature: Service support for registries (NGSI9)
     And  clean the mongo database of the service "issue_322"
     And  clean the mongo database of the service "issue_322_2"
 
-  @issue-322
   Scenario: Update an entity in a context provider, having other context provider with the same entity in other service
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
@@ -158,7 +158,6 @@ Feature: Service support for registries (NGSI9)
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
-  @issue-322
   Scenario: Append an entity in a context broker, having context providers with the same entity in the same service and other in other service
     Given a started mock
     # First registration
@@ -202,7 +201,7 @@ Feature: Service support for registries (NGSI9)
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
-  @issue-755 @issue-322
+  @issue-755
   Scenario: Delete an entity doesnt exist in context broker (error expected), having context providers with the same entity in the same subservice and other in other subservice
     Given a started mock
     # First registration
@@ -246,7 +245,6 @@ Feature: Service support for registries (NGSI9)
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
-  @issue-322
   Scenario: Entity in CB and in CP with the same service, and in other CP with other service.
     Given a started mock
     # First registration
@@ -297,7 +295,6 @@ Feature: Service support for registries (NGSI9)
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
-  @issue-322
   Scenario: Entity in CB and in CP with the same service, and in other CP with other service.
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
@@ -350,8 +347,7 @@ Feature: Service support for registries (NGSI9)
     And the path in the last mock petition contains "service2"
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
-
-  @issue-322
+  @act
   Scenario: Entity in CB and in CP without service, and in other CP with other service.
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
@@ -405,7 +401,6 @@ Feature: Service support for registries (NGSI9)
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service ""
 
-  @issue-322
   Scenario: Entity in CB and in CP with service, and in other CP without service.
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"

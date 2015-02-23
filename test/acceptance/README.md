@@ -66,6 +66,12 @@ Its needed:
   "mongo": {
     "host": "localhost", # Ip where the mongoDB is running
     "port": "27017" # Port where MongoDB is listening
+  },
+  "deploy_data": {
+    "host": "", #Host where the context broker is deployed
+    "ssh_port": "", #Ssh port of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
+    "user": "", #Ssh user of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
+    "password": "" #Ssh password of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
   }
 }
 
