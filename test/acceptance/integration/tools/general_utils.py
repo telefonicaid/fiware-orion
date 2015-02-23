@@ -21,6 +21,7 @@
 # iot_support at tid dot es
 """
 
+
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 import platform
@@ -29,7 +30,10 @@ import pymongo
 from lettuce import world
 import os
 import subprocess
-from fabric.api import run, local, env, output
+from fabric.api import env, output
+from fabric import api
+from fabric.contrib.files import exists
+
 
 
 def check_world_attribute_is_not_none(attributes):
@@ -250,10 +254,25 @@ def get_cb_pid():
     config = world.config['deploy_data']
     if not config['host'] == 'localhost' or not config['host'] == '127.0.0.1':
         localhost = False
+        runner = 'run'
     else:
+        runner = 'local'
         localhost = True
     set_ssh_config(localhost)
-    return run("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+    if exists('/tmp/contextBroker.pid'):
+        pid_number = getattr(api, runner)('cat /tmp/contextBroker.pid')
+        cmd_line = getattr(api, runner)('cat /proc/{pid_number}/cmdline'.format(pid_number=pid_number))
+        if cmd_line == 'contextBroker':
+            if getattr(api, runner)('ps -p {pid_number} | grep contextBroker'.format(pid_number=pid_number)) != '':
+                return pid_number
+            else:
+                return getattr(api, runner)("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+        else:
+            return getattr(api, runner)("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+    else:
+        return getattr(api, runner)("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+
+        
 
 def start_cb(parms):
     """
@@ -264,17 +283,14 @@ def start_cb(parms):
     config = world.config['deploy_data']
     if not config['host'] == 'localhost' or not config['host'] == '127.0.0.1':
         localhost = False
+        runner = 'run'
     else:
+        runner = 'local'
         localhost = True
     set_ssh_config(localhost)
     if world.cb_pid != '':
         stop_cb()
-    if localhost:
-        local('{bin_path} {parms} >> /tmp/cb_acceptance_test.log'.format(bin_path=config['bin_path'], parms=parms))
-    else:
-        run('{bin_path} {parms} >> /tmp/cb_acceptance_test.lo'.format(bin_path=config['bin_path'], parms=parms))
-    world.cb_pid = get_cb_pid()
-
+    getattr(api, runner)('{bin_path} {parms} >> /tmp/cb_acceptance_test.log'.format(bin_path=config['bin_path'], parms=parms))
 
 
 def stop_cb():
@@ -285,26 +301,18 @@ def stop_cb():
     config = world.config['deploy_data']
     if not config['host'] == 'localhost' or not config['host'] == '127.0.0.1':
         localhost = False
+        runner = 'run'
     else:
+        runner = 'local'
         localhost = True
     set_ssh_config(localhost)
     # Check if there is CB running
-    if localhost:
-        if world.cb_pid != '':
-            if local('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
-                local('kill -15 {pid} && sleep 5'.format(pid=world.cb_pid))
-                if local('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
-                    local('kill -9 {pid} && sleep 5'.format(pid=world.cb_pid))
-                    if local('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
-                        raise ValueError('After try to kill context broker, is still running ')
-    else:
-        if world.cb_pid != '':
-            if run('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
-                run('kill -15 {pid} && sleep 5'.format(pid=world.cb_pid))
-                if run('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
-                    run('kill -9 {pid} && sleep 5'.format(pid=world.cb_pid))
-                    if run('ps -p {pid} | grep contextBroker'.format(pid=world.cb_pid)) != '':
-                        raise ValueError('After try to kill context broker, is still running ')
+    if get_cb_pid() != '':
+        getattr(api, runner)('kill -15 {pid} && sleep 5'.format(pid=get_cb_pid()))
+        if get_cb_pid() != '':
+            getattr(api, runner)('kill -9 {pid} && sleep 5'.format(pid=get_cb_pid()))
+            if get_cb_pid() != '':
+                raise EnvironmentError('After try to kill the Context Broker process, is still running, kill it manually')
     world.cb_pid = get_cb_pid() # It should be '' (empty)
 
 
