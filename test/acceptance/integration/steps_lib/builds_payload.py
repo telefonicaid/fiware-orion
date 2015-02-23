@@ -86,7 +86,16 @@ def build_the_standard_query_context_payload_with_the_previous_data(step):
     else:
         world.payloads[world.payloads_count] = PayloadUtils.build_standard_query_context_payload(
             world.entities)
+        
+@step('build the standard context registration payload with the previous data and the following')
+def build_the_standard_context_registration_payload_with_the_previous_data_and_the_following(step)
+    """
+    
+    :param step:
+    :return:
+    """
 
+# NGSI 9
 
 @step('build the standard context registration payload with the previous data and duration "([^"]*)"')
 def build_the_standard_context_registration_payload_with_the_previous_data(step, duration):
@@ -112,4 +121,5 @@ def build_the_standard_discover_context_availability_payload_with_the_previous_d
     check_world_attribute_is_not_none(['entities'])
     world.payloads[world.payloads_count] = PayloadUtils.build_discover_context_availability_payload(
         world.entities)
+    
 

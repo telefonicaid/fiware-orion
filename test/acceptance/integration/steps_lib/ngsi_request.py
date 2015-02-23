@@ -49,7 +49,13 @@ def a_standard_context_entity_delete_is_asked_with_the_before_information(step):
 def a_standard_query_context_is_asked_with_the_before_information(step):
     world.responses[world.response_count] = world.cb[world.cb_count].standard_query_context(
         world.payloads[world.payloads_count])
+    
+@step('a standard context subscription is asked with the before information')
+def a_standard_context_subscription_is_asked_with_the_before_information(step):
+    world.responses[world.response_count] = world.cb[world.cb_count].standard_subscribe_context_ontime(
+        world.payloads[world.payloads_count])
 
+# NFGSI 9
 
 @step('a standard context registration is asked with the before information')
 def a_standard_context_registration_is_asked_with_the_before_information(step):
@@ -62,6 +68,7 @@ def a_standard_discover_context_availability_is_asked_with_the_before_informatio
     world.responses[world.response_count] = world.cb[world.cb_count].discover_context_availability(
         world.payloads[world.payloads_count])
 
+# ***************
 # Convenience
 
 @step('a convenience query context is asked with the following data')
