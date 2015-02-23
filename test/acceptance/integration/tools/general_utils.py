@@ -20,15 +20,20 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 """
-import platform
-import psutil
+
 
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
+import platform
+import psutil
 import pymongo
 from lettuce import world
 import os
 import subprocess
+from fabric.api import env, output
+from fabric import api
+from fabric.contrib.files import exists
+
 
 
 def check_world_attribute_is_not_none(attributes):
@@ -151,5 +156,166 @@ def drop_all_test_databases(ip, port):
         if db_name.find('acceptance') >= 0:
             print "Droping database: {db_name}".format(db_name=db_name)
             db.drop_database(db_name)
+
+
+def raise_property_bad_configuration(section):
+    raise ValueError(
+        'The {section} section in the properties.json is bad configured: {section_conf} \n Configuration: {config}'.format(
+            section=section, section_conf=world.confg[section], config=world.config))
+
+
+def check_properties():
+    """
+    Funct that check if the properties is set
+    :return:
+    """
+    try:
+        # Environment
+        checking = world.config['environment']
+        if checking['name'] == "" or checking['logs_path'] == "":
+            raise_property_bad_configuration('environment')
+        # Context Broker
+        checking = world.config['context_broker']
+        if checking['host'] == "" or checking['port'] == "":
+            raise_property_bad_configuration('context_broker')
+        else:
+            try:
+                int(checking['port'])
+            except ValueError:
+                print 'The port has to be a string with numbers, but is {port}'.format(port=checking['port'])
+                raise_property_bad_configuration('context_broker')
+        # Mock
+        checking = world.config['mock']
+        if checking['port'] == "" or checking['bind_ip'] == "":
+            raise_property_bad_configuration('mock')
+        else:
+            try:
+                int(checking['port'])
+            except ValueError:
+                print 'The port has to be a string with numbers, but is {port}'.format(port=checking['port'])
+                raise_property_bad_configuration('mock')
+        # Mongo
+        checking = world.config['mock']
+        if checking['host'] == "" and checking['port'] == "":
+            raise_property_bad_configuration('mongo')
+        else:
+            try:
+                int(checking['port'])
+            except ValueError:
+                print 'The port has to be a string with numbers, but is {port}'.format(port=checking['port'])
+                raise_property_bad_configuration('mongo')
+        # Deploy data
+        checking = world.config['deploy_data']
+        if checking['host'] == "":
+            raise_property_bad_configuration('deploy_data')
+        else:
+            if not checking['host'] == 'localhost' or not checking['host'] == '127.0.0.1':
+                empty_attrs = ['ssh_port', 'user', 'password', 'bin_path']
+                for attr in empty_attrs:
+                    if checking[attr] == "":
+                        raise_property_bad_configuration('deploy_data')
+                try:
+                    int(checking['ssh_port'])
+                except ValueError:
+                    print 'The port has to be a string with numbers, but is {port}'.format(port=checking['ssh_port'])
+                    raise_property_bad_configuration('deploy_data')
+    except KeyError as e:
+        print "There is a property bad configured/set: properties: {config}".format(config=world.config)
+        raise e
+
+
+def set_ssh_config(localhost):
+    """
+    Config fabric parms
+    :return:
+    """
+    output['stdout'] = False
+    output['running'] = False
+    output['warnings'] = False
+    try:
+        config = world.config['deploy_data']
+        if not localhost:
+            # Set ssh connection info
+            env.host_string = '{ip}:{ssh_port}'.format(ip=config['host'], ssh_port=config['ssh_port'])
+            env.user = config['user']
+            env.password = config['password']
+            env.sudo_password = config['password']
+            env.warn_only = True
+    except KeyError as e:
+        print 'set_ssh_config: In the properties file there is not definition about the deploy information. Config: {config}\n'.format(
+            config=world.config)
+        raise e
+
+def get_cb_pid():
+    """
+    Get the cb pid, if its running
+    :return:
+    """
+    config = world.config['deploy_data']
+    if not config['host'] == 'localhost' or not config['host'] == '127.0.0.1':
+        localhost = False
+        runner = 'run'
+    else:
+        runner = 'local'
+        localhost = True
+    set_ssh_config(localhost)
+    if exists('/tmp/contextBroker.pid'):
+        pid_number = getattr(api, runner)('cat /tmp/contextBroker.pid')
+        cmd_line = getattr(api, runner)('cat /proc/{pid_number}/cmdline'.format(pid_number=pid_number))
+        if cmd_line == 'contextBroker':
+            if getattr(api, runner)('ps -p {pid_number} | grep contextBroker'.format(pid_number=pid_number)) != '':
+                return pid_number
+            else:
+                return getattr(api, runner)("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+        else:
+            return getattr(api, runner)("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+    else:
+        return getattr(api, runner)("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+
+        
+
+def start_cb(parms):
+    """
+    Start the Context Broker in the machine set in the properties file
+    :param parms:
+    :return:
+    """
+    config = world.config['deploy_data']
+    if not config['host'] == 'localhost' or not config['host'] == '127.0.0.1':
+        localhost = False
+        runner = 'run'
+    else:
+        runner = 'local'
+        localhost = True
+    set_ssh_config(localhost)
+    if world.cb_pid != '':
+        stop_cb()
+    getattr(api, runner)('{bin_path} {parms} >> /tmp/cb_acceptance_test.log'.format(bin_path=config['bin_path'], parms=parms))
+
+
+def stop_cb():
+    """
+    Stop a cb instance with the pid in world.cb_pid
+    :return:
+    """
+    config = world.config['deploy_data']
+    if not config['host'] == 'localhost' or not config['host'] == '127.0.0.1':
+        localhost = False
+        runner = 'run'
+    else:
+        runner = 'local'
+        localhost = True
+    set_ssh_config(localhost)
+    # Check if there is CB running
+    if get_cb_pid() != '':
+        getattr(api, runner)('kill -15 {pid} && sleep 5'.format(pid=get_cb_pid()))
+        if get_cb_pid() != '':
+            getattr(api, runner)('kill -9 {pid} && sleep 5'.format(pid=get_cb_pid()))
+            if get_cb_pid() != '':
+                raise EnvironmentError('After try to kill the Context Broker process, is still running, kill it manually')
+    world.cb_pid = get_cb_pid() # It should be '' (empty)
+
+
+
 
 
