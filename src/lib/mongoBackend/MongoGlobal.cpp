@@ -1268,6 +1268,26 @@ bool entitiesQuery
 
                 cer->contextElement.contextAttributeVector.push_back(caP);
             }
+        }        
+
+        /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
+        for (unsigned int ix = 0; ix < attrL.size(); ++ix)
+        {
+          bool found = false;
+          std::string attrName = attrL.get(ix);
+          for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
+          {
+            if (attrName == cer->contextElement.contextAttributeVector.get(jx)->name)
+            {
+              found = true;
+              break;
+            }
+          }
+          if (!found)
+          {
+            ContextAttribute* caP = new ContextAttribute(attrName, "", "", false);
+            cer->contextElement.contextAttributeVector.push_back(caP);
+          }
         }
 
         cer->statusCode.fill(SccOk);
@@ -1338,9 +1358,13 @@ static void processContextRegistrationElement (BSONObj cr, EntityIdVector enV, A
 
     /* Note that attributes can be included only if at least one entity has been found */
     if (crr.contextRegistration.entityIdVector.size() > 0) {
-        std::vector<BSONElement> queryAttrV = cr.getField(REG_ATTRS).Array();
-        for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix) {
+        if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
+        {
+          std::vector<BSONElement> queryAttrV = cr.getField(REG_ATTRS).Array();
+          for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
+          {
             processAttribute(&crr, attrL, queryAttrV[ix].embeddedObject());
+          }
         }
     }
 
