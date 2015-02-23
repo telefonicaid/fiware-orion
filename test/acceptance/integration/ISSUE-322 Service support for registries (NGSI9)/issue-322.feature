@@ -347,7 +347,7 @@ Feature: Service support for registries (NGSI9)
     And the path in the last mock petition contains "service2"
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
-  @act
+
   Scenario: Entity in CB and in CP without service, and in other CP with other service.
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
