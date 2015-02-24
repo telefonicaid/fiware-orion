@@ -87,7 +87,7 @@ TEST(UnsubscribeContextResponse, jsonRender)
 
   // 2. 200, no details
   uncrP->subscriptionId.set("012345678901234567890123");
-  uncrP->statusCode.fill(SccOk);
+  uncrP->statusCode.fill(SccOk, "");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   out = uncrP->render(QueryContext, JSON, "");

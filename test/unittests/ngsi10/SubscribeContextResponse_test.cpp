@@ -92,7 +92,7 @@ TEST(SubscribeContextResponse, json_render)
 
 
   // 2.
-  scrP->subscribeError.errorCode.fill(SccBadRequest);
+  scrP->subscribeError.errorCode.fill(SccBadRequest, "");
   scrP->subscribeError.subscriptionId.set("012345678901234567890123");
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), filename2)) << "Error getting test data from '" << filename2 << "'";

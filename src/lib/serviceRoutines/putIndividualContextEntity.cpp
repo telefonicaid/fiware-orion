@@ -32,6 +32,7 @@
 #include "convenienceMap/mapPutIndividualContextEntity.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 
 
@@ -39,6 +40,22 @@
 /* ****************************************************************************
 *
 * putIndividualContextEntity - 
+*
+* Corresponding Standard Operation: UpdateContext/UPDATE
+*
+* PUT /v1/contextEntities/{entityId::id}
+* PUT /ngsi10/contextEntities/{entityId::id}
+*
+* Payload In:  UpdateContextElementRequest
+* Payload Out: UpdateContextElementResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+*
+* 01. Fill in UpdateContextRequest from UpdateContextElementRequest
+* 02. Call postUpdateContext standard service routine
+* 03. Translate UpdateContextResponse to UpdateContextElementResponse
+* 04. Cleanup and return result
 */
 std::string putIndividualContextEntity
 (
@@ -52,9 +69,22 @@ std::string putIndividualContextEntity
   std::string                   entityId = compV[2];
   UpdateContextElementResponse  response;
 
-  ciP->httpStatusCode = mapPutIndividualContextEntity(entityId, "", &parseDataP->ucer.res, &response, ciP);
+  // 01. Fill in UpdateContextRequest from UpdateContextElementRequest and entityId
+  parseDataP->upcr.res.fill(&parseDataP->ucer.res, entityId);
+
+  // And, set the UpdateActionType to UPDATE
+  parseDataP->upcr.res.updateActionType.set("UPDATE");
+  
+
+  // 02. Call postUpdateContext standard service routine
+  answer = postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 03. Translate UpdateContextResponse to UpdateContextElementResponse
+  response.fill(&parseDataP->upcrs.res);
+
+  // 04. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
-
   return answer;
 }

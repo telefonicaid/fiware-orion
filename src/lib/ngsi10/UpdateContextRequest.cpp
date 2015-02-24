@@ -31,11 +31,11 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "convenience/UpdateContextElementRequest.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "rest/ConnectionInfo.h"
-
 
 
 /* ****************************************************************************
@@ -120,4 +120,24 @@ void UpdateContextRequest::present(const std::string& indent)
   PRINTF("\n\n");
   contextElementVector.present(indent);
   updateActionType.present(indent);
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill(const UpdateContextElementRequest* ucerP, const std::string& entityId)
+{
+  ContextElement* ceP = new ContextElement();
+
+  ceP->entityId.fill(entityId, "", "false");
+  ceP->attributeDomainName.fill(ucerP->attributeDomainName);
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &ucerP->contextAttributeVector);
+  ceP->domainMetadataVector.fill((MetadataVector*) &ucerP->domainMetadataVector);
+
+  contextElementVector.push_back(ceP);
+
+  updateActionType.set("UPDATE");  // Coming from an UpdateContextElementRequest (PUT), must be UPDATE
 }

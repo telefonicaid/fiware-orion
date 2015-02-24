@@ -1,0 +1,429 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+ConvOp putIndividualContextEntity: PUT /v1/contextEntities/{entityId::id}
+
+--SHELL-INIT--
+dbInit CB
+dbInit CP1
+brokerStart CB
+brokerStart CP1
+
+--SHELL--
+
+#
+# 01. Update/UPDATE E1/A1=1 and see it fail (PUT /v1/contextEntities/E1)
+# 02. Update/APPEND E1/A1=10 (POST /v1/updateContext)
+# 03. Update/UPDATE E1/A1=1 and see it work (PUT /v1/contextEntities/E1)
+# 04. Query CB for E1/A1
+# 05. Update/APPEND E2/A2=1 in CP1 
+# 06. Register E2/A2 in CB with CP1 as providing application
+# 07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1
+# 08. Query CP1 for E2/A2
+#
+
+echo "01. Update/UPDATE E1/A1=1 and see it fail (PUT /v1/contextEntities/E1)"
+echo "======================================================================"
+payload='{
+  "attributes": [
+    {
+        "name": "A1",
+        "type": "",
+        "value": 1
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/E1 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "02. Update/APPEND E1/A1=10 (POST /v1/updateContext)"
+echo "==================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "",
+          "value": 10
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Update/UPDATE E1/A1=1 and see it work (PUT /v1/contextEntities/E1)"
+echo "======================================================================"
+payload='{
+  "attributes": [
+    {
+        "name": "A1",
+        "type": "",
+        "value": 3
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/E1 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "04. Query CB for E1/A1"
+echo "======================"
+payload='{
+  "entities": [
+    {
+      "type": "",
+      "isPattern": "",
+      "id": "E1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Update/APPEND E2/A2=1 in CP1"
+echo "================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "id":   "E2",
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "A",
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
+echo
+echo
+
+
+echo "06. Register E2/A2 in CB with CP1 as providing application"
+echo "=========================================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "E",
+         "isPattern": "false",
+         "id": "E2"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A2",
+        "type": "A",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1"
+echo "=================================================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "E",
+      "id":   "E2",
+      "attributes": [
+        {
+          "name": "A2",
+          "type": "A",
+          "value": 22
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Query CP1 for E2/A2"
+echo "======================="
+payload='{
+  "entities": [
+    {
+      "id":   "E2",
+      "type": "E"
+    }
+  ],
+  "attributes": [
+    "A2"
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
+
+
+----REGEXPECT--
+01. Update/UPDATE E1/A1=1 and see it fail (PUT /v1/contextEntities/E1)
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 116
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "details": "E1", 
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+02. Update/APPEND E1/A1=10 (POST /v1/updateContext)
+===================================================
+HTTP/1.1 200 OK
+Content-Length: 375
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": ""
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Update/UPDATE E1/A1=1 and see it work (PUT /v1/contextEntities/E1)
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1", 
+                    "type": "", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Query CB for E1/A1
+======================
+HTTP/1.1 200 OK
+Content-Length: 376
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "", 
+                        "value": "3"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": ""
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Update/APPEND E2/A2=1 in CP1
+================================
+HTTP/1.1 200 OK
+Content-Length: 377
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "A", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "E"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. Register E2/A2 in CB with CP1 as providing application
+==========================================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 449
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "A", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "E"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "details": "Redirected to context provider localhost:9801/v1", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+08. Query CP1 for E2/A2
+=======================
+HTTP/1.1 200 OK
+Content-Length: 451
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "A", 
+                        "value": "22"
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "E"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "details": "Redirected to context provider localhost:9801/v1", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
+brokerStop CB
+brokerStop CP1
+dbDrop CB
+dbDrop CP1

@@ -52,6 +52,7 @@ typedef struct ContextAttributeResponse
                     std::string      indent,
                     std::string      predetectedError,
                     int              counter);
+  void        fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode);
 } ContextAttributeResponse;
 
 #endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSE_H_
