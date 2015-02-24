@@ -128,11 +128,17 @@ void UpdateContextRequest::present(const std::string& indent)
 *
 * UpdateContextRequest::fill - 
 */
-void UpdateContextRequest::fill(const UpdateContextElementRequest* ucerP, const std::string& entityId)
+void UpdateContextRequest::fill
+(
+  const UpdateContextElementRequest* ucerP,
+  const std::string&                 entityId,
+  const std::string&                 entityType
+)
 {
   ContextElement* ceP = new ContextElement();
 
-  ceP->entityId.fill(entityId, "", "false");
+  ceP->entityId.fill(entityId, entityType, "false");
+
   ceP->attributeDomainName.fill(ucerP->attributeDomainName);
   ceP->contextAttributeVector.fill((ContextAttributeVector*) &ucerP->contextAttributeVector);
   ceP->domainMetadataVector.fill((MetadataVector*) &ucerP->domainMetadataVector);

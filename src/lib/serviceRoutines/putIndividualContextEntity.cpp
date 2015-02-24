@@ -51,11 +51,15 @@
 *
 * URI parameters:
 *   - attributesFormat=object
+*   - entity::type=TYPE
+*   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
+*     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
 *
-* 01. Fill in UpdateContextRequest from UpdateContextElementRequest
-* 02. Call postUpdateContext standard service routine
-* 03. Translate UpdateContextResponse to UpdateContextElementResponse
-* 04. Cleanup and return result
+* 01. Take care of URI params
+* 02. Fill in UpdateContextRequest from UpdateContextElementRequest
+* 03. Call postUpdateContext standard service routine
+* 04. Translate UpdateContextResponse to UpdateContextElementResponse
+* 05. Cleanup and return result
 */
 std::string putIndividualContextEntity
 (
@@ -68,22 +72,28 @@ std::string putIndividualContextEntity
   std::string                   answer;
   std::string                   entityId = compV[2];
   UpdateContextElementResponse  response;
+  std::string                   entityType;
 
-  // 01. Fill in UpdateContextRequest from UpdateContextElementRequest and entityId
-  parseDataP->upcr.res.fill(&parseDataP->ucer.res, entityId);
+  // 01. Take care of URI params
+  entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+
+
+  // 02. Fill in UpdateContextRequest from UpdateContextElementRequest and entityId
+  parseDataP->upcr.res.fill(&parseDataP->ucer.res, entityId, entityType);
 
   // And, set the UpdateActionType to UPDATE
   parseDataP->upcr.res.updateActionType.set("UPDATE");
   
 
-  // 02. Call postUpdateContext standard service routine
+  // 03. Call postUpdateContext standard service routine
   answer = postUpdateContext(ciP, components, compV, parseDataP);
 
 
-  // 03. Translate UpdateContextResponse to UpdateContextElementResponse
+  // 04. Translate UpdateContextResponse to UpdateContextElementResponse
   response.fill(&parseDataP->upcrs.res);
 
-  // 04. Cleanup and return result
+
+  // 05. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
   return answer;
