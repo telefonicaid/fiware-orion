@@ -105,7 +105,7 @@ def build_the_standard_context_subscription_ontime_payload_with_the_previous_dat
                     'The column {column} has to exist in the table. The table is: {hashes}'.format(column=column,
                                                                                                    hashes=step.hashes))
         world.payloads[world.payloads_count] = PayloadUtils.build_standard_subscribe_context_payload(
-            world.entities, step.hashes[0]['attributes'],
+            world.entities, step.hashes[0]['attributes'].split(','),
             'http://{ip}:{port}{path}'.format(ip=world.config['mock']['host'], port=world.config['mock']['port'],
                                               path=step.hashes[0]['reference']),
             step.hashes[0]['duration'],

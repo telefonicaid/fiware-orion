@@ -20,6 +20,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 """
+import time
 
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
@@ -84,6 +85,10 @@ def print_the_request_and_the_response(step):
         print world.responses[i].text
         print "***************************"
     print "-----------------------------------"
+
+@step('wait "([^"]*)" seconds')
+def wait_seconds(step, seconds):
+    time.sleep(int(seconds))
 
 
 # Response utils

@@ -24,16 +24,12 @@
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 from lettuce import step, world
-from integration.tools.general_utils import start_cb
+from integration.tools.general_utils import start_cb, get_cb_pid
 
-@step('the Context Broker started with multitenancy')
-def the_context_broker_started_with_multitenancy(step):
-    """
-    Get the info of the properties and start the context broker
-    :param step:
-    :return:
-    """
-    if world.cb_config_to_start != 'multitenancy':
-        world.bin_parms = '-multiservice -t 0-255 -db acceptance'
-        start_cb(world.bin_parms)
-        world.cb_config_to_start = 'multitenancy'
+@step('request a restart of cb')
+def request_a_restart_of_cb(step):
+    start_cb(world.bin_parms)
+
+@step('check cb is running')
+def check_cb_is_running(step):
+    assert get_cb_pid() != '', 'The Context broker is not running'

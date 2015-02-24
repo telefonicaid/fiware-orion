@@ -22,19 +22,74 @@
 
 Feature: Subscribe context tests
 
+  Background:
+    Given the Context Broker started with multitenancy
+
+  @act
   Scenario: Reset the context broker with ontime subscriptions active
     # Set mock
     Given a started mock
     And set the response of the context provider mock in path "/subscription" as "ok"
+    # Append
+    And a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
+    And the following attributes to create
+      | attribute_name | attribute_type | attribute_value |
+      | temperature    | centigrade     | 25              |
+    And a context elements with the before attrs and the following entities
+      | entity_id | entity_type |
+      | Room1     | RoomOne     |
+      | Room2     | RoomOne     |
+      | Room3     | RoomTwo     |
+      | Room4     | RoomTwo     |
+    And build the standard entity creation payload with the previous data
+    When a standard context entity creation is asked with the before information
     # Subscribe context
     Given a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
-      | entity1   | type1       |
+      | Room1     | RoomOne     |
+      | Room2     | RoomOne     |
+      | Room3     | RoomTwo     |
+      | Room4     | RoomTwo     |
     And a notify conditions with the following data
-      | type   | time | attributes  |
-      | ontime | P1M  | temperature |
+      | type   | time  | attributes  |
+      | ontime | PT10S | temperature |
     And build the standard context subscription ontime payload with the previous data and the following
-      | attributes(list, separated by comma) | reference     | duration |
-      | temperature                          | /subscription | P1M      |
+      | attributes  | reference     | duration |
+      | temperature | /subscription | PT1M     |
     And a standard context subscription is asked with the before information
+    # Update the attribute value
+    And a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
+    And the following attributes to create
+      | attribute_name | attribute_type | attribute_value |
+      | temperature    | centigrade     | 26              |
+    And a context elements with the before attrs and the following entities
+      | entity_id | entity_type |
+      | Room1     | RoomOne     |
+    And build the standard entity update payload with the previous data
+    When a standard context entity update is asked with the before information
+    # Wait 5 seconds
+    And wait "5" seconds
+    # Check the mock gets the notify
+    And retrieve information from the mock
+    And print the request and the response
+    And there is "1" petitions requested to the mock
+    # Restart Context Broker
+    And request a restart of cb
+    And check cb is running
+    # Update the attribute again
+    And a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
+    And the following attributes to create
+      | attribute_name | attribute_type | attribute_value |
+      | temperature    | centigrade     | 27              |
+    And a context elements with the before attrs and the following entities
+      | entity_id | entity_type |
+      | Room2     | RoomOne     |
+    And build the standard entity update payload with the previous data
+    When a standard context entity update is asked with the before information
+    # Wait 5 seconds
+    And wait "5" seconds
+    # Check the mock gets the notify
+    And retrieve information from the mock
+    And there is "2" petitions requested to the mock
+    And print the information stored in the mock
