@@ -38,6 +38,43 @@
 
 /* ****************************************************************************
 *
+* pruneNotFoundContextElements -
+*
+* Remove attributes in the vector with 'found' value is 'false'
+*
+*/
+void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector& newCerV)
+{
+  for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
+  {
+    ContextElementResponse* cerP = oldCerV.get(ix);
+    ContextElementResponse* newCerP = new ContextElementResponse();
+
+    // FIXME: don't likes this explicit copy too much... constructors or fill() method should be better
+    newCerP->contextElement.entityId.id = cerP->contextElement.entityId.id;
+    newCerP->contextElement.entityId.type = cerP->contextElement.entityId.type;
+    newCerP->contextElement.entityId.isPattern = cerP->contextElement.entityId.isPattern;
+    newCerP->contextElement.providingApplication = cerP->contextElement.providingApplication;
+    newCerP->statusCode.code = cerP->statusCode.code;
+    newCerP->statusCode.details = cerP->statusCode.details;
+    newCerP->statusCode.reasonPhrase = cerP->statusCode.reasonPhrase;
+
+    for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); ++jx)
+    {
+      ContextAttribute* caP = cerP->contextElement.contextAttributeVector.get(jx);
+      if (caP->found)
+      {
+        ContextAttribute* newCaP = new ContextAttribute(caP);
+        newCerP->contextElement.contextAttributeVector.push_back(newCaP);
+      }
+
+    }
+    newCerV.push_back(newCerP);
+  }
+}
+
+/* ****************************************************************************
+*
 * someContextElementNotFound -
 *
 * Returns true if some attribut with 'found' set to 'false' is found in the CER vector passed
@@ -168,11 +205,13 @@ HttpStatusCode mongoQueryContext
     bool        ok;
     long long   count = -1;
 
+    ContextElementResponseVector rawCerV;
+
     reqSemTake(__FUNCTION__, "ngsi10 query request");
     ok = entitiesQuery(requestP->entityIdVector,
                        requestP->attributeList,
                        requestP->restriction,
-                       &responseP->contextElementResponseVector,
+                       &rawCerV,
                        &err,
                        true,
                        tenant,
@@ -192,11 +231,11 @@ HttpStatusCode mongoQueryContext
     ContextRegistrationResponseVector crrV;
 
     /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
-    if (someContextElementNotFound(responseP->contextElementResponseVector) &&
+    if (someContextElementNotFound(rawCerV) &&
         registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false) &&
         (crrV.size() > 0))
     {
-      fillContextProviders(responseP->contextElementResponseVector, crrV);
+      fillContextProviders(rawCerV, crrV);
     }
     else
     {
@@ -207,11 +246,11 @@ HttpStatusCode mongoQueryContext
 
     /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
     AttributeList attrNullList;
-    if (someContextElementNotFound(responseP->contextElementResponseVector) &&
+    if (someContextElementNotFound(rawCerV) &&
         registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false)
         && (crrV.size() > 0))
     {
-      fillContextProviders(responseP->contextElementResponseVector, crrV);
+      fillContextProviders(rawCerV, crrV);
     }
     else
     {
@@ -220,8 +259,8 @@ HttpStatusCode mongoQueryContext
     }
     crrV.release();
 
-    /* Prune "not found" CER */
-    //pruneNotFoundContextElements()
+    /* Prune "not found" CERs */
+    pruneNotFoundContextElements(rawCerV, responseP->contextElementResponseVector);
 
     // FIXME: details and pagination suff has to be re-thought */
     if (responseP->contextElementResponseVector.size() == 0)
