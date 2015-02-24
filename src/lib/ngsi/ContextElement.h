@@ -43,12 +43,12 @@
 */
 typedef struct ContextElement
 {
-  EntityId                entityId;                // Mandatory
-  AttributeDomainName     attributeDomainName;     // Optional
-  ContextAttributeVector  contextAttributeVector;  // Optional
-  MetadataVector          domainMetadataVector;    // Optional
+  EntityId                 entityId;                // Mandatory
+  AttributeDomainName      attributeDomainName;     // Optional
+  ContextAttributeVector   contextAttributeVector;  // Optional
+  MetadataVector           domainMetadataVector;    // Optional
 
-  std::string             providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
+  std::vector<std::string> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
 
   std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma);
   void         present(const std::string& indent, int ix);

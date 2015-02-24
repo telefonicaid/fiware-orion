@@ -1405,6 +1405,8 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
 *              A5 - fwd CPR2
 *              A6 - fwd CPR3
 *
+*         CPR Vector: [ ]
+*
 */
 TEST(mongoContextProvidersQueryRequest, severalCprs1)
 {
@@ -1442,7 +1444,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("T", RES_CER(0).entityId.type);
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  EXPECT_EQ("", RES_CER(0).providingApplication);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
   ASSERT_EQ(6, RES_CER(0).contextAttributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
@@ -1495,6 +1497,8 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
 *              A5 - fwd CPR2
 *              A6 - Not found (actually, don't returned by mongoBackend)
 *
+*         CPR Vector: [ ]
+*
 */
 TEST(mongoContextProvidersQueryRequest, severalCprs2)
 {
@@ -1532,7 +1536,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("T", RES_CER(0).entityId.type);
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  EXPECT_EQ("", RES_CER(0).providingApplication);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
   ASSERT_EQ(5, RES_CER(0).contextAttributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
@@ -1576,8 +1580,8 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
 * Result: E1 - A1 - 1
 *              A2 - fwd CPR1
 *              A3 - fwd CPR2
-*              <null> - fwd CPR2
-*              <null> - fwd CPR3
+*
+*         CPR vector: [CPR2, CPR3]
 */
 TEST(mongoContextProvidersQueryRequest, severalCprs3)
 {
@@ -1603,13 +1607,16 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(3, res.contextElementResponseVector.size());
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
 
   /* Context Element response # 1 */
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("T", RES_CER(0).entityId.type);
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);  
-  EXPECT_EQ("", RES_CER(0).providingApplication);
+  ASSERT_EQ(2, RES_CER(0).providingApplicationList.size());
+  EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplicationList[0]);
+  EXPECT_EQ("http://cpr3.com", RES_CER(0).providingApplicationList[1]);
+
   ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
@@ -1630,31 +1637,6 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
-
-  /* Context Element response # 2 */
-  EXPECT_EQ("E1", RES_CER(1).entityId.id);
-  EXPECT_EQ("T", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-  EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplication);
-  ASSERT_EQ(0, RES_CER(1).contextAttributeVector.size());
-  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
-
-  /* Context Element response # 3 */
-  EXPECT_EQ("E1", RES_CER(2).entityId.id);
-  EXPECT_EQ("T", RES_CER(2).entityId.type);
-  EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-  EXPECT_EQ("http://cpr3.com", RES_CER(0).providingApplication);
-  ASSERT_EQ(0, RES_CER(2).contextAttributeVector.size());
-  EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
-
-  /* Check entities collection hasn't been touched */
-  DBClientBase* connection = getMongoConnection();
-  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
   utExit();
 

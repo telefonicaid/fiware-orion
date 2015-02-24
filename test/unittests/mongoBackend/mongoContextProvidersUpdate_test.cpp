@@ -1559,7 +1559,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
   EXPECT_EQ("T", RES_CER(0).entityId.type);
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  EXPECT_EQ("", RES_CER(0).providingApplication);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
   ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
@@ -1584,7 +1584,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
   EXPECT_EQ("T", RES_CER(1).entityId.type);
   EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-  EXPECT_EQ("", RES_CER(1).providingApplication);
+  EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
   ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
@@ -1609,7 +1609,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("E3", RES_CER(2).entityId.id);
   EXPECT_EQ("T", RES_CER(2).entityId.type);
   EXPECT_EQ("false", RES_CER(2).entityId.isPattern);
-  EXPECT_EQ("", RES_CER(2).providingApplication);
+  EXPECT_EQ(0, RES_CER(2).providingApplicationList.size());
   ASSERT_EQ(2, RES_CER(2).contextAttributeVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(2, 0)->name);
@@ -1635,7 +1635,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ("E3", RES_CER(3).entityId.id);
   EXPECT_EQ("T", RES_CER(3).entityId.type);
   EXPECT_EQ("false", RES_CER(3).entityId.isPattern);
-  EXPECT_EQ("", RES_CER(3).providingApplication);
+  EXPECT_EQ(0, RES_CER(3).providingApplicationList.size());
   ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
 
   EXPECT_EQ("A7", RES_CER_ATTR(3, 0)->name);

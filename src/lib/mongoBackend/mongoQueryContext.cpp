@@ -54,7 +54,7 @@ void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, Context
     newCerP->contextElement.entityId.id = cerP->contextElement.entityId.id;
     newCerP->contextElement.entityId.type = cerP->contextElement.entityId.type;
     newCerP->contextElement.entityId.isPattern = cerP->contextElement.entityId.isPattern;
-    newCerP->contextElement.providingApplication = cerP->contextElement.providingApplication;
+    newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;
     newCerP->statusCode.code = cerP->statusCode.code;
     newCerP->statusCode.details = cerP->statusCode.details;
     newCerP->statusCode.reasonPhrase = cerP->statusCode.reasonPhrase;
