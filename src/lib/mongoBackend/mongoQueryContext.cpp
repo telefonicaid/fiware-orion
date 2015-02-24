@@ -176,6 +176,65 @@ void fillContextProviders(ContextElementResponseVector& cerV, ContextRegistratio
 
 /* ****************************************************************************
 *
+* addContextProviderEntity -
+*
+*/
+void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP, std::string pa)
+{
+//TBD
+}
+
+/* ****************************************************************************
+*
+* addContextProviderAttribute -
+*
+*
+*/
+void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* enP, ContextRegistrationAttribute* craP, std::string pa)
+{
+//TBD
+}
+
+
+/* ****************************************************************************
+*
+* addContextProviders -
+*
+*
+* This functions takes a CRR vector and adds the Context Providers in the CER vector
+* (except the ones corresponding to some locally found attribute, i.e. info already in the
+* CER vector)
+*
+*/
+void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV)
+{
+  for (unsigned int ix = 0; ix < crrV.size(); ++ix)
+  {
+    ContextRegistration cr = crrV.get(ix)->contextRegistration;
+    if (cr.contextRegistrationAttributeVector.size() == 0)
+    {
+      /* Registration without attributes */
+      for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
+      {
+        addContextProviderEntity(cerV, cr.entityIdVector.get(jx), cr.providingApplication.get());
+      }
+    }
+    else
+    {
+      /* Registration with attributes */
+      for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
+      {
+        for (unsigned int kx = 0; kx < cr.contextRegistrationAttributeVector.size(); ++kx)
+        {
+          addContextProviderAttribute(cerV, cr.entityIdVector.get(jx), cr.contextRegistrationAttributeVector.get(kx), cr.providingApplication.get());
+        }
+      }
+    }
+  }
+}
+
+/* ****************************************************************************
+*
 * mongoQueryContext - 
 */
 HttpStatusCode mongoQueryContext
@@ -251,6 +310,22 @@ HttpStatusCode mongoQueryContext
         && (crrV.size() > 0))
     {
       fillContextProviders(rawCerV, crrV);
+    }
+    else
+    {
+      /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+      LM_E(("Database Error (%s)", err.c_str()));
+    }
+    crrV.release();
+
+    /* Special case: request with <null> attributes. In that case, entityQuery() may have captured some local attribute, but
+     * the list need to be completed. Note that in the case of having this request someContextElementNotFound() is always false
+     * so we efficient not invoking registrationQuery() too much times */
+    if (requestP->attributeList.size() == 0 &&
+        registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false) &&
+        (crrV.size() > 0))
+    {
+      addContextProviders(rawCerV, crrV);
     }
     else
     {
