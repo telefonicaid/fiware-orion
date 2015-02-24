@@ -181,7 +181,14 @@ void fillContextProviders(ContextElementResponseVector& cerV, ContextRegistratio
 */
 void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP, std::string pa)
 {
-//TBD
+  for (unsigned int ix = 0; ix < cerV.size(); ++ix)
+  {
+    if (cerV.get(ix)->contextElement.entityId.id == enP->id && cerV.get(ix)->contextElement.entityId.type == enP->type)
+    {
+      cerV.get(ix)->contextElement.providingApplicationList.push_back(pa);
+      return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
+    }
+  }
 }
 
 /* ****************************************************************************
@@ -192,7 +199,25 @@ void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP,
 */
 void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* enP, ContextRegistrationAttribute* craP, std::string pa)
 {
-//TBD
+  for (unsigned int ix = 0; ix < cerV.size(); ++ix)
+  {
+    if (cerV.get(ix)->contextElement.entityId.id == enP->id && cerV.get(ix)->contextElement.entityId.type == enP->type)
+    {
+      for (unsigned int jx = 0; jx < cerV.get(ix)->contextElement.contextAttributeVector.size(); ++jx)
+      {
+        std::string attrName = cerV.get(ix)->contextElement.contextAttributeVector.get(jx)->name;
+        if (attrName == craP->name)
+        {
+          /* In this case, the attribute has been already found in local database. CPr is unnecessary */
+          return;
+        }
+      }
+      /* Reached this point, no attribute was found, so adding it with corresponding CPr info */
+      ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
+      caP->providingApplication = pa;
+      cerV.get(ix)->contextElement.contextAttributeVector.push_back(caP);
+    }
+  }
 }
 
 

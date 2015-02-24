@@ -1625,12 +1625,12 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
   EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(0, 1)->providingApplication);
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 2)->providingApplication);
 
