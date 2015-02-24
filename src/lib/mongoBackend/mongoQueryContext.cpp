@@ -365,7 +365,37 @@ HttpStatusCode mongoQueryContext
     // FIXME: details and pagination suff has to be re-thought */
     if (responseP->contextElementResponseVector.size() == 0)
     {
-      responseP->errorCode.fill(SccContextElementNotFound);
+
+      // If the query has an empty response, we have to fill in the status code part in the response.
+      //
+      // However, if the response was empty due to a too high pagination offset,
+      // and if the user has asked for 'details' (as URI parameter, then the response should include information about
+      // the number of hits without pagination.
+      //
+
+      if (details && (count > 0) && (offset >= count))
+      {
+        char details[256];
+
+        snprintf(details, sizeof(details), "Number of matching entities: %lld. Offset is %d", count, offset);
+        responseP->errorCode.fill(SccContextElementNotFound, details);
+      }
+      else
+      {
+        responseP->errorCode.fill(SccContextElementNotFound);
+      }
+    }
+    else if (details)
+    {
+      //
+      // If all was OK, but the details URI param was set to 'on', then the responses error code details
+      // 'must' contain the total count of hits.
+      //
+
+      char details[64];
+
+      snprintf(details, sizeof(details), "Count: %lld", count);
+      responseP->errorCode.fill(SccOk, details);
     }
 
     return SccOk;
