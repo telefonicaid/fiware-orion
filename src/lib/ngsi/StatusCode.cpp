@@ -136,18 +136,6 @@ void StatusCode::fill(HttpStatusCode _code, const std::string& _details)
 
 /* ****************************************************************************
 *
-* StatusCode::fill - but without touching details
-*/
-void StatusCode::fill(HttpStatusCode _code)
-{
-  code          = _code;
-  reasonPhrase  = httpStatusCodeString(code);
-}
-
-
-
-/* ****************************************************************************
-*
 * StatusCode::fill -
 */
 void StatusCode::fill(StatusCode* scP)

@@ -95,7 +95,7 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
   {
     if (contextElementResponseVector.size() == 0)
     {
-      errorCode.fill(SccContextElementNotFound);
+      errorCode.fill(SccContextElementNotFound, errorCode.details);
       out += errorCode.render(ciP->outFormat, indent + "  ");
     }
     else
