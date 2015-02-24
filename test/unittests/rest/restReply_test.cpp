@@ -388,11 +388,9 @@ TEST(restReply, restErrorReplyGet)
   EXPECT_STREQ(expectedBuf, out.c_str());
 
 
-  LM_M(("KZ: failing test coming up"));
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucrOutfile01)) << "Error getting test data from '" << ucrOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
-  LM_M(("KZ: failing test done"));
 
   out = restErrorReplyGet(&ci, XML, "", ucr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
