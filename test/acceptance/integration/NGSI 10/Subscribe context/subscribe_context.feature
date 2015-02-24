@@ -25,7 +25,6 @@ Feature: Subscribe context tests
   Background:
     Given the Context Broker started with multitenancy
 
-  @act
   Scenario: Reset the context broker with ontime subscriptions active
     # Set mock
     Given a started mock
