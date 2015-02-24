@@ -38,7 +38,7 @@ brokerStart CP1
 # 04. Query CB for E1/A1
 # 05. Update/APPEND E2/A2=1 in CP1 
 # 06. Register E2/A2 in CB with CP1 as providing application
-# 07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1
+# 07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1 (PUT /v1/contextEntities/E2)
 # 08. Query CP1 for E2/A2
 #
 
@@ -121,7 +121,7 @@ echo "================================"
 payload='{
   "contextElements": [
     {
-      "type": "E",
+      "type": "",
       "id":   "E2",
       "attributes": [
         {
@@ -146,7 +146,7 @@ payload='{
   {
     "entities": [
       {
-         "type": "E",
+         "type": "",
          "isPattern": "false",
          "id": "E2"
       }
@@ -168,25 +168,18 @@ echo
 echo
 
 
-echo "07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1"
-echo "=================================================================="
+echo "07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1 (PUT /v1/contextEntities/E2)"
+echo "==============================================================================================="
 payload='{
-  "contextElements": [
+  "attributes": [
     {
-      "type": "E",
-      "id":   "E2",
-      "attributes": [
-        {
-          "name": "A2",
-          "type": "A",
-          "value": 22
-        }
-      ]
+        "name": "A2",
+        "type": "A",
+        "value": 22
     }
-  ],
-  "updateAction": "UPDATE"
+  ]
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/contextEntities/E2 --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -197,7 +190,7 @@ payload='{
   "entities": [
     {
       "id":   "E2",
-      "type": "E"
+      "type": ""
     }
   ],
   "attributes": [
@@ -317,7 +310,7 @@ Date: REGEX(.*)
 05. Update/APPEND E2/A2=1 in CP1
 ================================
 HTTP/1.1 200 OK
-Content-Length: 377
+Content-Length: 376
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -334,7 +327,7 @@ Date: REGEX(.*)
                 ], 
                 "id": "E2", 
                 "isPattern": "false", 
-                "type": "E"
+                "type": ""
             }, 
             "statusCode": {
                 "code": "200", 
@@ -358,28 +351,23 @@ Date: REGEX(.*)
 }
 
 
-07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1
-==================================================================
+07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1 (PUT /v1/contextEntities/E2)
+===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 449
+Content-Length: 326
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "contextResponses": [
         {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A2", 
-                        "type": "A", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "E"
-            }, 
+            "attributes": [
+                {
+                    "name": "A2", 
+                    "type": "A", 
+                    "value": ""
+                }
+            ], 
             "statusCode": {
                 "code": "200", 
                 "details": "Redirected to context provider localhost:9801/v1", 
@@ -393,7 +381,7 @@ Date: REGEX(.*)
 08. Query CP1 for E2/A2
 =======================
 HTTP/1.1 200 OK
-Content-Length: 451
+Content-Length: 450
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -410,7 +398,7 @@ Date: REGEX(.*)
                 ], 
                 "id": "E2", 
                 "isPattern": "false", 
-                "type": "E"
+                "type": ""
             }, 
             "statusCode": {
                 "code": "200", 
