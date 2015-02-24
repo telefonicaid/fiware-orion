@@ -146,7 +146,9 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
   // Special treatment if only one contextElementResponse that is NOT FOUND and if
   // UpdateContextElementResponse::errorCode is not 404 already
   //
-  // Also if NO contextElementResponse is present 
+  // Also if NO contextElementResponse is present
+  //
+  // These 'fixes' are mainly to maintain backward compatibility
   //
   if ((errorCode.code != SccContextElementNotFound) && (contextAttributeResponseVector.size() == 1) && (contextAttributeResponseVector[0]->statusCode.code == SccContextElementNotFound))
   {
