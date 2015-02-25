@@ -1352,16 +1352,14 @@ void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, Context
     ContextElementResponse* cerP = oldCerV.get(ix);
     ContextElementResponse* newCerP = new ContextElementResponse();
 
-    bool notPruneEntity = cerP->notPrune;
+    /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
+     * of this is that attributeDomainName and domainMetadataVector and not being copied, but it should not be a problem, given that
+     * domain attributes are not implemented */
+    newCerP->contextElement.entityId.fill(&cerP->contextElement.entityId);
+    newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;  // FIXME P10: not sure if this is the right way of doing, maybe we need a fill() method for this
+    newCerP->statusCode.fill(&cerP->statusCode);
 
-    // FIXME: don't likes this explicit copy too much... constructors or fill() method should be better
-    newCerP->contextElement.entityId.id = cerP->contextElement.entityId.id;
-    newCerP->contextElement.entityId.type = cerP->contextElement.entityId.type;
-    newCerP->contextElement.entityId.isPattern = cerP->contextElement.entityId.isPattern;
-    newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;
-    newCerP->statusCode.code = cerP->statusCode.code;
-    newCerP->statusCode.details = cerP->statusCode.details;
-    newCerP->statusCode.reasonPhrase = cerP->statusCode.reasonPhrase;
+    bool notPruneEntity = cerP->notPrune;
 
     for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); ++jx)
     {
