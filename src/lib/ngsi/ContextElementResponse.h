@@ -42,6 +42,10 @@ typedef struct ContextElementResponse
   ContextElement   contextElement;             // Mandatory
   StatusCode       statusCode;                 // Mandatory
 
+  bool             notPrune;                   // operational attribute used internally by the queryContext logic for not deleting entities that were
+                                               // without attributes in the Orion DB
+
+  ContextElementResponse();
   std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma = false);
   void         present(const std::string& indent, int ix);
   void         release(void);

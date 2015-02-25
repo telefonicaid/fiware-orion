@@ -31,6 +31,14 @@
 #include "ngsi/ContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
 
+/* ****************************************************************************
+*
+* ContextElementResponse::render -
+*/
+ContextElementResponse::ContextElementResponse()
+{
+  notPrune = true;
+}
 
 
 /* ****************************************************************************

@@ -1317,6 +1317,10 @@ bool entitiesQuery
           cerP->contextElement.entityId.type = enV.get(ix)->type;
           cerP->contextElement.entityId.isPattern = "false";
 
+          /* This entity has to be prunned if after CPr searching no attribute is "added" to it. The notPrune attribute distinguish this kind of
+           * entities from the "real ones" that are without attributes in the Orion local database (a rare case, but may happen) */
+          cerP->notPrune = false;
+
           for (unsigned int jx = 0; jx < attrL.size(); ++jx)
           {
             ContextAttribute* caP = new ContextAttribute(attrL.get(jx), "", "");
@@ -1348,6 +1352,8 @@ void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, Context
     ContextElementResponse* cerP = oldCerV.get(ix);
     ContextElementResponse* newCerP = new ContextElementResponse();
 
+    bool notPruneEntity = cerP->notPrune;
+
     // FIXME: don't likes this explicit copy too much... constructors or fill() method should be better
     newCerP->contextElement.entityId.id = cerP->contextElement.entityId.id;
     newCerP->contextElement.entityId.type = cerP->contextElement.entityId.type;
@@ -1369,8 +1375,8 @@ void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, Context
     }
 
     /* If after prunning the entity has no attribute and no CPr information, then it is not included
-     * in the output vector */
-    if (newCerP->contextElement.contextAttributeVector.size() == 0 && newCerP->contextElement.providingApplicationList.size() == 0)
+     * in the output vector, except if "notPrune" is set to true */
+    if (!notPruneEntity && newCerP->contextElement.contextAttributeVector.size() == 0 && newCerP->contextElement.providingApplicationList.size() == 0)
     {
       newCerP->release();
       delete newCerP;
