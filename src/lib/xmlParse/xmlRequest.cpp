@@ -154,6 +154,7 @@ static XmlRequest xmlRequest[] =
   { RegisterResponse,                      "POST", "registerContextResponse",                      FUNCS(rcrs)  },
   { RtQueryContextResponse,                "POST", "queryContextResponse",                         FUNCS(qcrs)  },
   { RtUpdateContextResponse,               "POST", "updateContextResponse",                        FUNCS(upcrs) },
+  { RtUpdateContextResponse,               "PUT",  "updateContextResponse",                        FUNCS(upcrs) },
 
   // Without payload
   { LogRequest,                            "*", "", NULL, NULL, NULL, NULL, NULL },

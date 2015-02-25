@@ -52,6 +52,7 @@ typedef struct StatusCode
   std::string  render(Format format, const std::string& indent, bool comma = false, bool showTag = true);
   void         fill(HttpStatusCode _code, const std::string& _details = "");
   void         fill(StatusCode* scP);
+  void         fill(const StatusCode& scP);
   void         present(const std::string& indent);
   void         release(void);
   void         tagSet(const std::string& _tag);

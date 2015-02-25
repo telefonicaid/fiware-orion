@@ -119,3 +119,15 @@ void ContextAttributeResponse::release(void)
 {
   contextAttributeVector.release();
 }
+
+
+
+/* ****************************************************************************
+*
+* fill - 
+*/
+void ContextAttributeResponse::fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode)
+{
+  contextAttributeVector.fill(_cavP);
+  statusCode.fill(_statusCode);
+}

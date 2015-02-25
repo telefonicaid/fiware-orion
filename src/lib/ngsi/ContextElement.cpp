@@ -28,9 +28,21 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/Request.h"
 #include "ngsi/ContextElement.h"
+#include "ngsi/EntityId.h"
+#include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
+
+
+
+/* ****************************************************************************
+*
+* ContextElement::ContextElement - 
+*/
+ContextElement::ContextElement()
+{
+  entityId.fill("", "", "false");
+}
 
 
 

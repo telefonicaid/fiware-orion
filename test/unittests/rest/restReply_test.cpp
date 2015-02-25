@@ -391,6 +391,7 @@ TEST(restReply, restErrorReplyGet)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), ucrOutfile01)) << "Error getting test data from '" << ucrOutfile01 << "'";
   out = restErrorReplyGet(&ci, XML, "", ucr1, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
+
   out = restErrorReplyGet(&ci, XML, "", ucr2, SccOk, "detail");
   EXPECT_STREQ(expectedBuf, out.c_str());
   out = restErrorReplyGet(&ci, XML, "", ucr3, SccOk, "detail");

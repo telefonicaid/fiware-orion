@@ -147,6 +147,17 @@ void StatusCode::fill(StatusCode* scP)
 
 /* ****************************************************************************
 *
+* StatusCode::fill -
+*/
+void StatusCode::fill(const StatusCode& sc)
+{
+  fill(sc.code, sc.details);
+}
+
+
+
+/* ****************************************************************************
+*
 * StatusCode::check -
 */
 std::string StatusCode::check
