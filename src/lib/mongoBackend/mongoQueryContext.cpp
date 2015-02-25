@@ -38,43 +38,6 @@
 
 /* ****************************************************************************
 *
-* pruneNotFoundContextElements -
-*
-* Remove attributes in the vector with 'found' value is 'false'
-*
-*/
-void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector& newCerV)
-{
-  for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
-  {
-    ContextElementResponse* cerP = oldCerV.get(ix);
-    ContextElementResponse* newCerP = new ContextElementResponse();
-
-    // FIXME: don't likes this explicit copy too much... constructors or fill() method should be better
-    newCerP->contextElement.entityId.id = cerP->contextElement.entityId.id;
-    newCerP->contextElement.entityId.type = cerP->contextElement.entityId.type;
-    newCerP->contextElement.entityId.isPattern = cerP->contextElement.entityId.isPattern;
-    newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;
-    newCerP->statusCode.code = cerP->statusCode.code;
-    newCerP->statusCode.details = cerP->statusCode.details;
-    newCerP->statusCode.reasonPhrase = cerP->statusCode.reasonPhrase;
-
-    for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); ++jx)
-    {
-      ContextAttribute* caP = cerP->contextElement.contextAttributeVector.get(jx);
-      if (caP->found)
-      {
-        ContextAttribute* newCaP = new ContextAttribute(caP);
-        newCerP->contextElement.contextAttributeVector.push_back(newCaP);
-      }
-
-    }
-    newCerV.push_back(newCerP);
-  }
-}
-
-/* ****************************************************************************
-*
 * someContextElementNotFound -
 *
 * Returns true if some attribut with 'found' set to 'false' is found in the CER vector passed
@@ -343,7 +306,7 @@ HttpStatusCode mongoQueryContext
     }
     crrV.release();
 
-    /* Special case: request with <null> attributes. In that case, entityQuery() may have captured some local attribute, but
+    /* Special case: request with <null> attributes. In that case, entitiesQuery() may have captured some local attribute, but
      * the list need to be completed. Note that in the case of having this request someContextElementNotFound() is always false
      * so we efficient not invoking registrationQuery() too much times */
     if (requestP->attributeList.size() == 0 &&
@@ -360,7 +323,7 @@ HttpStatusCode mongoQueryContext
     crrV.release();
 
     /* Prune "not found" CERs */
-    pruneNotFoundContextElements(rawCerV, responseP->contextElementResponseVector);
+    pruneNotFoundContextElements(rawCerV, &responseP->contextElementResponseVector);
 
     // FIXME: details and pagination suff has to be re-thought */
     if (responseP->contextElementResponseVector.size() == 0)

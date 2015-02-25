@@ -1298,6 +1298,43 @@ bool entitiesQuery
     return true;
 }
 
+/* ****************************************************************************
+*
+* pruneNotFoundContextElements -
+*
+* Remove attributes in the vector with 'found' value is 'false'
+*
+*/
+void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP)
+{
+  for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
+  {
+    ContextElementResponse* cerP = oldCerV.get(ix);
+    ContextElementResponse* newCerP = new ContextElementResponse();
+
+    // FIXME: don't likes this explicit copy too much... constructors or fill() method should be better
+    newCerP->contextElement.entityId.id = cerP->contextElement.entityId.id;
+    newCerP->contextElement.entityId.type = cerP->contextElement.entityId.type;
+    newCerP->contextElement.entityId.isPattern = cerP->contextElement.entityId.isPattern;
+    newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;
+    newCerP->statusCode.code = cerP->statusCode.code;
+    newCerP->statusCode.details = cerP->statusCode.details;
+    newCerP->statusCode.reasonPhrase = cerP->statusCode.reasonPhrase;
+
+    for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); ++jx)
+    {
+      ContextAttribute* caP = cerP->contextElement.contextAttributeVector.get(jx);
+      if (caP->found)
+      {
+        ContextAttribute* newCaP = new ContextAttribute(caP);
+        newCerP->contextElement.contextAttributeVector.push_back(newCaP);
+      }
+
+    }
+    newCerVP->push_back(newCerP);
+  }
+}
+
 /*****************************************************************************
 *
 * processEntity -
@@ -1655,15 +1692,18 @@ bool processOnChangeCondition
   std::string          err;
   NotifyContextRequest ncr;
 
-    //
     // FIXME P10: we are using dummy scope at the moment, until subscription scopes get implemented
     //
     Restriction res;    
-    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, servicePathV))
+    ContextElementResponseVector rawCerV;
+    if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, false, tenant, servicePathV))
     {
         ncr.contextElementResponseVector.release();
         return false;
     }
+
+    /* Prune "not found" CERs */
+    pruneNotFoundContextElements(rawCerV, &ncr.contextElementResponseVector);
 
     if (ncr.contextElementResponseVector.size() > 0)
     {
@@ -1675,16 +1715,19 @@ bool processOnChangeCondition
         if (condValues != NULL) {
             /* Check if some of the attributes in the NotifyCondition values list are in the entity.
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
-            ContextElementResponseVector allCerV;
+            ContextElementResponseVector rawCerV, allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
             // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
-            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant, servicePathV))
+            if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
             {
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
                 return false;
             }
+
+            /* Prune "not found" CERs */
+            pruneNotFoundContextElements(rawCerV, &allCerV);
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */

@@ -132,14 +132,18 @@ HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const 
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
     // FIXME P10: we are using an empty service path vector until service paths get implemented for subscriptions
+    ContextElementResponseVector rawCerV;
     std::vector<std::string> servicePath;
     Restriction res;
-    if (!entitiesQuery(enV, attrL, res, cerV, err, true, tenant, servicePath))
+    if (!entitiesQuery(enV, attrL, res, &rawCerV, err, true, tenant, servicePath))
     {
         reqSemGive(__FUNCTION__, "get context-element responses (no entities found)");
         cerV->release();
         return SccOk;
     }
+
+    /* Prune "not found" CERs */
+    pruneNotFoundContextElements(rawCerV, cerV);
 
     reqSemGive(__FUNCTION__, "get context-element responses");
     return SccOk;
