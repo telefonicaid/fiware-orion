@@ -152,6 +152,18 @@ void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP,
       return;    /* by construction, no more than one CER with the same entity information should exist in the CERV) */
     }
   }
+
+  /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
+  ContextElementResponse* cerP = new ContextElementResponse();
+  cerP->contextElement.entityId.id = enP->id;
+  cerP->contextElement.entityId.type = enP->type;
+  cerP->contextElement.entityId.isPattern = "false";
+  cerP->contextElement.providingApplicationList.push_back(pa);
+
+  cerP->statusCode.fill(SccOk);
+
+  cerV.push_back(cerP);
+
 }
 
 /* ****************************************************************************
@@ -179,8 +191,23 @@ void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* e
       ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
       caP->providingApplication = pa;
       cerV.get(ix)->contextElement.contextAttributeVector.push_back(caP);
+      return;
     }
   }
+
+  /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
+  ContextElementResponse* cerP = new ContextElementResponse();
+  cerP->contextElement.entityId.id = enP->id;
+  cerP->contextElement.entityId.type = enP->type;
+  cerP->contextElement.entityId.isPattern = "false";
+
+  cerP->statusCode.fill(SccOk);
+
+  ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
+  caP->providingApplication = pa;
+  cerP->contextElement.contextAttributeVector.push_back(caP);
+
+  cerV.push_back(cerP);
 }
 
 
@@ -278,49 +305,60 @@ HttpStatusCode mongoQueryContext
     ContextRegistrationResponseVector crrV;
 
     /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
-    if (someContextElementNotFound(rawCerV) &&
-        registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false) &&
-        (crrV.size() > 0))
-    {
-      fillContextProviders(rawCerV, crrV);
+    if (someContextElementNotFound(rawCerV)) {
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      {
+        if (crrV.size() > 0)
+        {
+          fillContextProviders(rawCerV, crrV);
+        }
+      }
+      else
+      {
+        /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+        LM_E(("Database Error (%s)", err.c_str()));
+      }
+      crrV.release();
     }
-    else
-    {
-      /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-      LM_E(("Database Error (%s)", err.c_str()));
-    }
-    crrV.release();
 
     /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
     AttributeList attrNullList;
-    if (someContextElementNotFound(rawCerV) &&
-        registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false)
-        && (crrV.size() > 0))
+    if (someContextElementNotFound(rawCerV))
     {
-      fillContextProviders(rawCerV, crrV);
+      if (registrationsQuery(requestP->entityIdVector, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      {
+        if (crrV.size() > 0)
+        {
+          fillContextProviders(rawCerV, crrV);
+        }
+      }
+      else
+      {
+        /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+        LM_E(("Database Error (%s)", err.c_str()));
+      }
+      crrV.release();
     }
-    else
-    {
-      /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-      LM_E(("Database Error (%s)", err.c_str()));
-    }
-    crrV.release();
 
     /* Special case: request with <null> attributes. In that case, entitiesQuery() may have captured some local attribute, but
      * the list need to be completed. Note that in the case of having this request someContextElementNotFound() is always false
      * so we efficient not invoking registrationQuery() too much times */
-    if (requestP->attributeList.size() == 0 &&
-        registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false) &&
-        (crrV.size() > 0))
+    if (requestP->attributeList.size() == 0)
     {
-      addContextProviders(rawCerV, crrV);
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      {
+        if (crrV.size() > 0)
+        {
+          addContextProviders(rawCerV, crrV);
+        }
+      }
+      else
+      {
+        /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+        LM_E(("Database Error (%s)", err.c_str()));
+      }
+      crrV.release();
     }
-    else
-    {
-      /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
-      LM_E(("Database Error (%s)", err.c_str()));
-    }
-    crrV.release();
 
     /* Prune "not found" CERs */
     pruneNotFoundContextElements(rawCerV, &responseP->contextElementResponseVector);

@@ -541,8 +541,9 @@ static void prepareDatabaseSeveralCprs2(void)
 *
 * noPatternAttrsAll -
 *
-* Discover:  E3 -no attrs
+* Discover:  E3 - <null>
 * Result:    E3 - (A1, A2, A3) - http://cr1.com
+*
 */
 TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
 {
@@ -563,11 +564,37 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
 
-  ASSERT_EQ(0,res.contextElementResponseVector.size());
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E3", RES_CER(0).entityId.id);
+  EXPECT_EQ("T3", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -603,6 +630,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -611,6 +639,32 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   EXPECT_EQ("http://cr2.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -628,6 +682,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
 * Discover:  E1 - A1
 * Result:    E1 - A1 - http://cr1.com
 *            E1 - A1 - http://cr2.com
+*
+* In this case, htpt://cr2.com also matches, but current implementation of mongoBackend
+* returns only one of them (which one is not specified).
 *
 * This test also checks that discovering for type (E1) doesn't match with no-typed
 * entities (E1** - cr5 is not returned)
@@ -650,6 +707,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -658,6 +716,32 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -695,6 +779,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -703,6 +788,37 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E3", RES_CER(0).entityId.id);
+  EXPECT_EQ("T3", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -718,8 +834,11 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
 * noPatternSeveralCREs -
 *
 * Discover:  E1 - no attrs
-* Result:    E1 - (A1, A2, A3) - http://cr1.com
-*            E1 - (A1, A4)     - http://cr2.com
+* Result:    E1 -  A1, A2, A3 - http://cr1.com
+*                  A4         - http://cr2.com
+*
+* For A1 two CPrs overlap and mongoBacken takes http://cr1.com
+*
 */
 TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
 {
@@ -738,6 +857,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -746,6 +866,47 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(4, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 3)->value);
+  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -763,6 +924,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
 * Discover:  E2 - no attrs
 * Result:    E2 - (A1, A2, A3) - http://cr1.com
 *            E2 - (A2, A3)     - http://cr3.com
+*
+* For A2 and A3 is there overlap with http:;//cr3.com, but mongoBackend sets http://cr1.com
+*
 */
 TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
 {
@@ -781,6 +945,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -789,6 +954,42 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E2", RES_CER(0).entityId.id);
+  EXPECT_EQ("T2", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -823,6 +1024,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -830,11 +1032,16 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
   EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
   EXPECT_EQ(0, res.contextElementResponseVector.size());
+#endif
 
-  /* Check entities collection hasn't been touched */
-  DBClientBase* connection = getMongoConnection();
-  ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
+  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
   utExit();
 
@@ -867,6 +1074,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -874,6 +1082,16 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
   EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
   EXPECT_EQ(0,res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
+  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(0, res.contextElementResponseVector.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -889,9 +1107,14 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
 * noPatternMultiEntity -
 *
 * Discover:  (E1, E2) - no attrs
-* Result:    (E1, E2) - (A1, A2, A3) - http://cr1.com
-*            E1       - (A1, A4)     - http://cr2.com
-*            E2       - (A2, A3)     - http://cr3.com
+* Result:    E1 - A1, A2, A3 - http://cr1.com
+*                 A4         - http://cr2.com
+*            E2 - A1, A2, A3 - http://cr1.com
+*
+* Overlaps:
+*    E1-A1: cr1 and cr2
+*    E2-A2: cr1 and cr3
+*    E2-A3: cr1 and cr3
 */
 TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
 {
@@ -912,6 +1135,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -920,6 +1144,73 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(4, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 3)->value);
+  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication);
+
+  /* Context Element response # 1 */
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+  EXPECT_EQ("E2", RES_CER(1).entityId.id);
+  EXPECT_EQ("T2", RES_CER(1).entityId.type);
+  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
+  ASSERT_EQ(3, RES_CER(1).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(1, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(1, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(1, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(1, 2)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -936,7 +1227,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
 *
 * Discover:  E1 - (A3, A4, A5)
 * Result:    E1 - A3 - http://cr1.com
-*            E1 - A4 - http://cr2.com
+*                 A4 - http://cr2.com
 */
 TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 {
@@ -958,6 +1249,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -966,6 +1258,37 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -981,9 +1304,12 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 * noPatternMultiEntityAttrs -
 *
 * Discover:  (E1, E2) - (A3, A4, A5)
-* Result:    (E1, E2) - A3 - http://cr1.com
-*            E1       - A4 - http://cr2.com
-*            E2       - A3 - http://cr3.com
+* Result:    E1 - A3 - http://cr1.com
+*                 A4 - http://cr2.com
+*            E2 - A3 - http://cr1.com
+*
+* E2-A3 is also provided by http://cr3.com, but mongoBackend choses cr1
+*
 */
 TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
 {
@@ -1007,6 +1333,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -1015,6 +1342,53 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(2, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T1", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  /* Context Element response # 2 */
+  EXPECT_EQ("E2", RES_CER(1).entityId.id);
+  EXPECT_EQ("T2", RES_CER(1).entityId.type);
+  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
+  ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
+
+  EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1057,6 +1431,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -1065,6 +1440,42 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E3", RES_CER(0).entityId.id);
+  EXPECT_EQ("T3", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1104,6 +1515,7 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -1112,6 +1524,42 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E3", RES_CER(0).entityId.id);
+  EXPECT_EQ("T3", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1147,6 +1595,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -1155,6 +1604,42 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   EXPECT_EQ("http://cr2.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E3", RES_CER(0).entityId.id);
+  EXPECT_EQ("T3", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1191,6 +1676,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -1199,6 +1685,42 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E3", RES_CER(0).entityId.id);
+  EXPECT_EQ("T3", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1237,6 +1759,7 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -1245,6 +1768,42 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   EXPECT_EQ("http://cr1.com", res.errorCode.details);
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E3", RES_CER(0).entityId.id);
+  EXPECT_EQ("T3", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1279,6 +1838,7 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
 
+#if 0
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -1286,6 +1846,42 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
   EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
   EXPECT_EQ(0, res.errorCode.details.size());
   EXPECT_EQ(0,res.contextElementResponseVector.size());
+#endif
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E3", RES_CER(0).entityId.id);
+  EXPECT_EQ("T3", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();

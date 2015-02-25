@@ -1295,6 +1295,42 @@ bool entitiesQuery
         cerV->push_back(cer);
     }
 
+    /* All the not-patterned entities in the request not in the response are added (without attributes), as they are
+     * used before prunning in the CPr calculation logic */
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+    {
+      if (enV.get(ix)->isPattern != "true")
+      {
+        bool needToAdd = true;
+        for (unsigned int jx = 0; jx < cerV->size(); ++jx)
+        {
+          if (cerV->get(jx)->contextElement.entityId.id == enV.get(ix)->id && cerV->get(jx)->contextElement.entityId.type == enV.get(ix)->type)
+          {
+            needToAdd = false;
+            break;  /* jx */
+          }
+        }
+        if (needToAdd)
+        {
+          ContextElementResponse* cerP = new ContextElementResponse();
+          cerP->contextElement.entityId.id = enV.get(ix)->id;
+          cerP->contextElement.entityId.type = enV.get(ix)->type;
+          cerP->contextElement.entityId.isPattern = "false";
+
+          for (unsigned int jx = 0; jx < attrL.size(); ++jx)
+          {
+            ContextAttribute* caP = new ContextAttribute(attrL.get(jx), "", "");
+            caP->found = false;
+            cerP->contextElement.contextAttributeVector.push_back(caP);
+          }
+
+          cerP->statusCode.fill(SccOk);
+
+          cerV->push_back(cerP);
+        }
+      }
+    }
+
     return true;
 }
 
@@ -1331,7 +1367,18 @@ void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, Context
       }
 
     }
-    newCerVP->push_back(newCerP);
+
+    /* If after prunning the entity has no attribute and no CPr information, then it is not included
+     * in the output vector */
+    if (newCerP->contextElement.contextAttributeVector.size() == 0 && newCerP->contextElement.providingApplicationList.size() == 0)
+    {
+      newCerP->release();
+      delete newCerP;
+    }
+    else
+    {
+      newCerVP->push_back(newCerP);
+    }
   }
 }
 
