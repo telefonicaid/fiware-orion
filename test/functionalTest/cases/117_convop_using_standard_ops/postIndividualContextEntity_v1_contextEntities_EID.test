@@ -348,14 +348,14 @@ Date: REGEX(.*)
 06. POST /v1/contextEntities/E2?entity::type=E (isPattern='true' in payload) and see it fail
 ============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 159
+Content-Length: 171
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400", 
-        "details": "entityId::isPattern in contextUpdate convenience operation", 
+        "details": "entityId::isPattern set to true in contextUpdate convenience operation",
         "reasonPhrase": "Bad Request"
     }
 }

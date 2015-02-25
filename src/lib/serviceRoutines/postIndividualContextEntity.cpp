@@ -124,7 +124,7 @@ std::string postIndividualContextEntity
   // 01.03. entityId::isPattern
   if (reqP->entity.isPattern == "true")
   {
-    std::string error = "entityId::isPattern in contextUpdate convenience operation";
+    std::string error = "entityId::isPattern set to true in contextUpdate convenience operation";
 
     LM_W(("Bad Input (%s)", error.c_str()));
     response.errorCode.fill(SccBadRequest, error);
