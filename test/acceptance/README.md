@@ -50,6 +50,7 @@ Some examples:
 
 Config the environment to execute the test.
 Its needed:
+```
 {
   "environment": {
     "name": "orion",
@@ -66,20 +67,28 @@ Its needed:
   "mongo": {
     "host": "localhost", # Ip where the mongoDB is running
     "port": "27017" # Port where MongoDB is listening
+  },
+  "deploy_data": {
+    "host": "", #Host where the context broker is deployed
+    "ssh_port": "", #Ssh port of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
+    "user": "", #Ssh user of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
+    "password": "" #Ssh password of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
   }
 }
+```
 
 
 ### tags
 
-There is a tag for each feature file:
+There is a tag for each issue in github:
 
+```
 issue-713
-issue-714
-issue-715
-issue-716
-issue-719
-issue-322
-issue-755
-issue_755
+issue-714 
+issue-715 
+issue-716 
+issue-719 
+issue-322 
+issue-755 
+```
 

@@ -80,15 +80,15 @@ std::string postQueryContext
       // FIXME P6: What do we do if we have more than one entity in incoming entityIdVector?
       //           Push each entityId in a separate contextElementResponse?
       //           Also, perhaps mongoQueryContext should implement this and not postQueryContext
+      //           This FIXME is related to github issue #588 and (probably) #650.
+      //           Also, optimizing this would be part of issue #768
       //
-      // ContextElementResponse* cerP = new ContextElementResponse();
-      // cerP->contextElement.entityId.fill(parseDataP->qcr.res.entityIdVector[0]);
-      // cerP->statusCode.fill(SccContextElementNotFound);
-      // qcrP->contextElementResponseVector.push_back(cerP);
 
+
+      //
       // It's better not to give any details here as we'd have to choose ONE of the entities in the vector ...
       // std::string details = "Entity id: /" + parseDataP->qcr.res.entityIdVector[0]->id + "/";
-
+      //
       qcrP->errorCode.fill(SccContextElementNotFound);
     }
 

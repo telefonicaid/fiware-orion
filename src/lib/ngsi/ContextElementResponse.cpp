@@ -138,6 +138,8 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP)
   //           Adding a warning with 'Bad Input' - with this I mean that the user that sends the 
   //           query needs to avoid using this conv op to make any queries that can give more than
   //           one unique context element :-).
+  //           This FIXME is related to github issue #588 and (probably) #650.
+  //           Also, optimizing this would be part of issue #768
   //
   if (qcrP->contextElementResponseVector.size() > 1)
   {

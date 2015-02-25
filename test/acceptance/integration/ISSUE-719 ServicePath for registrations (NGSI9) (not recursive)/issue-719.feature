@@ -20,9 +20,11 @@
 # iot_support at tid dot es
 # __author__ = 'Jon Calderin Goñi (jon dot caldering at gmail dot com)'
 
+@issue-719
 Feature: ServicePath for registrations (NGSI9) (not recursive)
+  Background:
+    Given the Context Broker started with multitenancy
 
-  @issue-719
   Scenario: Subscribe different entities with the same provider and services but different subservice
     # First registration
     Given a new NGSI version "9" petition with the service "issue_719" and the subservice "/subservice1"
@@ -63,7 +65,6 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And check the response has not the key "id" with the value "Room3"
     And clean the mongo database of the service "issue_719"
 
-  @issue-719
   Scenario: Query context to a subservice
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
@@ -107,7 +108,6 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And there is "1" petitions requested to the mock
     And  clean the mongo database of the service "issue_719"
 
-  @issue-719
   Scenario: Update an entity in a context provider, having other context provider with the same entity in other subservice
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
@@ -153,7 +153,6 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And there is "1" petitions requested to the mock
     And clean the mongo database of the service "issue_719"
 
-  @issue-719
   Scenario: Append an entity in a context broker, having context providers with the same entity in the same subservice and other in other subservice
     Given a started mock
     # First registration
@@ -196,7 +195,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And there is "0" petitions requested to the mock
     And clean the mongo database of the service "issue_719"
 
-  @issue_755 @issue-719
+  @issue_755
   Scenario: Delete an entity doesnt exist in context broker (error expected), having context providers with the same entity in the same subservice and other in other subservice
     Given a started mock
     # First registration
@@ -238,9 +237,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     Then retrieve information from the mock
     And there is "0" petitions requested to the mock
     And clean the mongo database of the service "issue_719"
-    And print the request and the response
 
-  @issue-719
   Scenario: Entity in CB and in CP with the same subervice, and in other CP with other subservice.
     Given a started mock
     # First registration
@@ -289,9 +286,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     Then retrieve information from the mock
     And there is "0" petitions requested to the mock
     And clean the mongo database of the service "issue_719"
-    And print the request and the response
 
-  @issue-719
   Scenario: Entity in CB and in CP with the same subervice, and in other CP with other subservice.
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
@@ -343,9 +338,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And there is "1" petitions requested to the mock
     And the path in the last mock petition contains "service2"
     And clean the mongo database of the service "issue_719"
-    And print the request and the response
 
-  @issue-719
   Scenario: Entity in CB and in CP without servicepath, and in other CP with other servicepath.
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"

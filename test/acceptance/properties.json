@@ -14,5 +14,12 @@
   "mongo": {
     "host": "localhost",
     "port": "27017"
+  },
+  "deploy_data": {
+    "host": "localhost",
+    "ssh_port": "22",
+    "user": "root",
+    "password": "root",
+    "bin_path": "/usr/bin/contextBroker"
   }
 }

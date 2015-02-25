@@ -23,6 +23,9 @@
 @issue-715
 Feature: CPr: propagate X-Auth-Token header in forwarded requests
 
+  Background:
+    Given the Context Broker started with multitenancy
+
   Scenario: Forward the X-Auth-Token for the context provider in a query operation
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
