@@ -119,9 +119,9 @@ TEST(AppendContextElementResponse, check_xml)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  // 2. bad contextResponseVector
+  // 2. bad contextAttributeResponseVector
   car.contextAttributeVector.push_back(&ca);
-  acer.contextResponseVector.push_back(&car);
+  acer.contextAttributeResponseVector.push_back(&car);
   out = acer.check(&ci, IndividualContextEntity, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -158,9 +158,9 @@ TEST(AppendContextElementResponse, check_json)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  // 2. bad contextResponseVector
+  // 2. bad contextAttributeResponseVector
   car.contextAttributeVector.push_back(&ca);
-  acer.contextResponseVector.push_back(&car);
+  acer.contextAttributeResponseVector.push_back(&car);
   out = acer.check(&ci, IndividualContextEntity, "", "", 0);
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
@@ -188,12 +188,12 @@ TEST(AppendContextElementResponse, release)
   utInit();
 
   carP->contextAttributeVector.push_back(caP);
-  acer.contextResponseVector.push_back(carP);
+  acer.contextAttributeResponseVector.push_back(carP);
 
   EXPECT_EQ(1, carP->contextAttributeVector.size());
-  EXPECT_EQ(1, acer.contextResponseVector.size());
+  EXPECT_EQ(1, acer.contextAttributeResponseVector.size());
   acer.release();
-  EXPECT_EQ(0, acer.contextResponseVector.size());
+  EXPECT_EQ(0, acer.contextAttributeResponseVector.size());
 
   utExit();
 }

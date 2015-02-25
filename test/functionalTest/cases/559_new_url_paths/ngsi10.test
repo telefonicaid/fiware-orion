@@ -721,13 +721,13 @@ Date: REGEX(.*)
 6.3. POST /ngsi10/contextEntities/EID
 ===================================
 HTTP/1.1 200 OK
-Content-Length: 556
+Content-Length: 557
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
-  <entityId type="" isPattern="false">
+  <entityId type="T" isPattern="false">
     <id>EID</id>
   </entityId>
   <contextResponseList>

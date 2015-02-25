@@ -32,6 +32,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "convenience/UpdateContextElementRequest.h"
+#include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -146,4 +147,24 @@ void UpdateContextRequest::fill
   contextElementVector.push_back(ceP);
 
   updateActionType.set("UPDATE");  // Coming from an UpdateContextElementRequest (PUT), must be UPDATE
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill(const AppendContextElementRequest* acerP)
+{
+  ContextElement* ceP = new ContextElement();
+
+  ceP->entityId.fill(&acerP->entity);
+
+  ceP->attributeDomainName.fill(acerP->attributeDomainName);
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &acerP->contextAttributeVector);
+  ceP->domainMetadataVector.fill((MetadataVector*) &acerP->domainMetadataVector);
+
+  contextElementVector.push_back(ceP);
+  updateActionType.set("APPEND");  // Coming from an AppendContextElementRequest (POST), must be APPEND
 }
