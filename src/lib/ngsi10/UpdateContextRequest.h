@@ -59,6 +59,7 @@ typedef struct UpdateContextRequest
   void         present(const std::string& indent);
   void         fill(const UpdateContextElementRequest* ucerP, const std::string& entityId, const std::string& entityType);
   void         fill(const AppendContextElementRequest* acerP);
+  void         fill(const std::string& entityId, const std::string& entityType, const std::string& isPattern, const std::string& _updateActionType);
 } UpdateContextRequest;
 
 #endif
