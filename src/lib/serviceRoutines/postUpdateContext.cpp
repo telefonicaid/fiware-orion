@@ -97,7 +97,7 @@ std::string postUpdateContext
   }
 
 
-#if 0
+#if 1
   LM_M(("KZ '%s' %s:%s (%s:%s)", 
         parseDataP->upcr.res.updateActionType.c_str(),
         parseDataP->upcr.res.contextElementVector[0]->entityId.id.c_str(),

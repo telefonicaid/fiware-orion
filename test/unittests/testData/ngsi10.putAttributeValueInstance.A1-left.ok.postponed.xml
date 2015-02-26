@@ -4,7 +4,7 @@
   <metadata>
     <contextMetadata>
       <name>ID</name>
-      <type>none</type>
+      <type>string</type>
       <value>left</value>
     </contextMetadata>
   </metadata>

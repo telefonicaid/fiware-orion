@@ -109,6 +109,8 @@ TEST(putAttributeValueInstance, notFound)
 */
 TEST(putAttributeValueInstance, found)
 {
+  LM_M(("KZ: ----------------- Here it starts -------------------------------"));
+
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes",          "POST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
   const char*    infile1    = "ngsi10.IndividualContextEntityAttributes.A1-left.postponed.xml";
@@ -135,7 +137,10 @@ TEST(putAttributeValueInstance, found)
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
   out              = restService(&ci2, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());  // THIS LINE FAILS !!!
+
+  LM_M(("KZ: ----------------- Here it ends -------------------------------"));
+  LM_M(("KZ: --------------------------------------------------------------"));
 
   utExit();
 }
