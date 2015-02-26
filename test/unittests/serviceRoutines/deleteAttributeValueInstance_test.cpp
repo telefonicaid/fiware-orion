@@ -24,7 +24,7 @@
 */
 #include "logMsg/logMsg.h"
 
-#include "serviceRoutines/postIndividualContextEntityAttributes.h"
+#include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/getAttributeValueInstance.h"
 #include "serviceRoutines/putAttributeValueInstance.h"
 #include "serviceRoutines/deleteAttributeValueInstance.h"
@@ -42,7 +42,7 @@
 */
 static RestService rs[] = 
 {
-  { "POST",   IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes"           }, "appendContextElementRequest",   postIndividualContextEntityAttributes },
+  { "POST",   IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes"           }, "appendContextElementRequest",   postIndividualContextEntity           },
   { "GET",    AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              getAttributeValueInstance             },
   { "PUT",    AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "updateContextAttributeRequest", putAttributeValueInstance             },
   { "DELETE", AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              deleteAttributeValueInstance          },

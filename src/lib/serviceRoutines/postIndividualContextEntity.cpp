@@ -86,7 +86,7 @@ std::string postIndividualContextEntity
   AppendContextElementRequest*  reqP                  = &parseDataP->acer.res;
   AppendContextElementResponse  response;
   std::string                   entityIdFromPayload   = reqP->entity.id;
-  std::string                   entityIdFromURL       = (compV.size() == 3)? compV[2] : "";
+  std::string                   entityIdFromURL       = ((compV.size() == 3) || (compV.size() == 4))? compV[2] : "";
   std::string                   entityId;
   std::string                   entityTypeFromPayload = reqP->entity.type;
   std::string                   entityTypeFromURL     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];

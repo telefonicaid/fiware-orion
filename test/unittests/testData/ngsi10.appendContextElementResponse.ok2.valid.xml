@@ -2,7 +2,7 @@
   <contextAttributeList>
     <contextAttribute>
       <name>A1</name>
-      <type></type>
+      <type>Room</type>
       <contextValue>10</contextValue>
       <metadata>
         <contextMetadata>

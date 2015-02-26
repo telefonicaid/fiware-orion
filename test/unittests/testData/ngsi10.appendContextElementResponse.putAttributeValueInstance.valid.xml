@@ -1,10 +1,13 @@
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>E1</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>
         <contextAttribute>
           <name>A1</name>
-          <type></type>
+          <type>Room</type>
           <contextValue></contextValue>
           <metadata>
             <contextMetadata>
