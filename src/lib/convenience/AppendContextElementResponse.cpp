@@ -135,7 +135,6 @@ void AppendContextElementResponse::release(void)
 * NOTE
 * This method is used in the service routine of 'POST /v1/contextEntities/{entityId::id} et al.
 * Only ONE response in the vector contextElementResponseVector of UpdateContextResponse is possible.
-* FIXME P7: Is this true? Only ONE response?
 */
 void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP)
 {
