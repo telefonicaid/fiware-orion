@@ -97,6 +97,15 @@ std::string postUpdateContext
   }
 
 
+#if 0
+  LM_M(("KZ '%s' %s:%s (%s:%s)", 
+        parseDataP->upcr.res.updateActionType.c_str(),
+        parseDataP->upcr.res.contextElementVector[0]->entityId.id.c_str(),
+        parseDataP->upcr.res.contextElementVector[0]->entityId.type.c_str(),
+        parseDataP->upcr.res.contextElementVector[0]->contextAttributeVector[0]->name.c_str(),
+        parseDataP->upcr.res.contextElementVector[0]->contextAttributeVector[0]->type.c_str()));
+#endif
+
   ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
 
   //
