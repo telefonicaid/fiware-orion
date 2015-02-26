@@ -39,6 +39,7 @@
 * Forward declarations
 */
 struct UpdateContextElementRequest;
+struct AppendContextElementRequest;
 
 
 
@@ -57,6 +58,7 @@ typedef struct UpdateContextRequest
   void         release(void);
   void         present(const std::string& indent);
   void         fill(const UpdateContextElementRequest* ucerP, const std::string& entityId, const std::string& entityType);
+  void         fill(const AppendContextElementRequest* acerP);
 } UpdateContextRequest;
 
 #endif

@@ -84,7 +84,7 @@ HttpStatusCode mapPostIndividualContextEntity
   }
   car->statusCode.fill(&contextElementResponse->statusCode);
 
-  response->contextResponseVector.push_back(car);
+  response->contextAttributeResponseVector.push_back(car);
   response->errorCode.fill(&ucResponse.contextElementResponseVector.get(0)->statusCode);
 
   ucRequest.release();

@@ -32,6 +32,8 @@
 #include "common/tag.h"
 #include "convenience/ContextAttributeResponseVector.h"
 #include "ngsi/StatusCode.h"
+#include "ngsi/ContextElementResponse.h"
+#include "ngsi10/UpdateContextResponse.h"
 #include "convenience/AppendContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
 
@@ -69,7 +71,7 @@ std::string AppendContextElementResponse::render(ConnectionInfo* ciP, RequestTyp
       out += entity.render(ciP->outFormat, indent + "  ", true);
     }
 
-    out += contextResponseVector.render(ciP, requestType, indent + "  ");
+    out += contextAttributeResponseVector.render(ciP, requestType, indent + "  ");
   }
 
   out += endTag(indent, tag, ciP->outFormat);
@@ -98,7 +100,7 @@ std::string AppendContextElementResponse::check
   {
     errorCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = contextResponseVector.check(ciP, requestType, indent, "", counter)) != "OK")
+  else if ((res = contextAttributeResponseVector.check(ciP, requestType, indent, "", counter)) != "OK")
   {
     errorCode.fill(SccBadRequest, res);
   }
@@ -120,6 +122,70 @@ void AppendContextElementResponse::release(void)
 {
   LM_T(LmtRelease, ("Releasing AppendContextElementResponse"));
 
-  contextResponseVector.release();
+  contextAttributeResponseVector.release();
   errorCode.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* AppendContextElementResponse::fill - 
+*
+* NOTE
+* This method is used in the service routine of 'POST /v1/contextEntities/{entityId::id} et al.
+* Only ONE response in the vector contextElementResponseVector of UpdateContextResponse is possible.
+*/
+void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP)
+{
+  ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
+
+  if (ucrsP->contextElementResponseVector.size() != 0)
+  {
+    contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
+  }
+
+  entity.fill(&cerP->contextElement.entityId);
+  errorCode.fill(ucrsP->errorCode);
+
+  //
+  // Special treatment if only one contextElementResponse that is NOT FOUND and if
+  // AppendContextElementResponse::errorCode is not 404 already
+  //
+  // Also if NO contextElementResponse is present
+  //
+  // These 'fixes' are mainly to maintain backward compatibility
+  //
+  if ((errorCode.code != SccContextElementNotFound) &&
+      (contextAttributeResponseVector.size() == 1) &&
+      (contextAttributeResponseVector[0]->statusCode.code == SccContextElementNotFound)
+     )
+  {
+    errorCode.fill(SccContextElementNotFound);
+  }
+  else if ((errorCode.code != SccContextElementNotFound) && (contextAttributeResponseVector.size() == 0))
+  {
+    errorCode.fill(SccContextElementNotFound);
+  }
+  else if (contextAttributeResponseVector.size() == 1)
+  {
+    //
+    // Now, if any error inside ContextAttributeResponse, move it to the outside, but only if we have ONLY ONE contextAttributeResponse
+    // and only if there is no error already in the 'external' errorCode.
+    //
+    if (((errorCode.code == SccNone) || (errorCode.code == SccOk)) && 
+        ((contextAttributeResponseVector[0]->statusCode.code != SccNone) && (contextAttributeResponseVector[0]->statusCode.code != SccOk)))
+    {
+      errorCode.fill(contextAttributeResponseVector[0]->statusCode);
+    }
+  }
+
+  // Now, if the external error code is 404 and 'details' is empty - add the name of the incoming entity::id as details
+  if ((errorCode.code == SccContextElementNotFound) && (errorCode.details == ""))
+  {
+    if (ucrsP->contextElementResponseVector.size() == 1)
+    {
+      errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
+    }
+  }
 }
