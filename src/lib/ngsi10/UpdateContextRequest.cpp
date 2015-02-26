@@ -168,3 +168,19 @@ void UpdateContextRequest::fill(const AppendContextElementRequest* acerP)
   contextElementVector.push_back(ceP);
   updateActionType.set("APPEND");  // Coming from an AppendContextElementRequest (POST), must be APPEND
 }
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill(const std::string& entityId, const std::string& entityType, const std::string& isPattern, const std::string& _updateActionType)
+{
+  ContextElement* ceP = new ContextElement();
+
+  ceP->entityId.fill(entityId, entityType, isPattern);
+  contextElementVector.push_back(ceP);
+
+  updateActionType.set(_updateActionType);
+}
