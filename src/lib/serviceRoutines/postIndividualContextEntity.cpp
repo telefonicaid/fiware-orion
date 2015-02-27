@@ -165,5 +165,7 @@ std::string postIndividualContextEntity
   // 05. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
+  parseDataP->upcr.res.release();
+
   return answer;
 }
