@@ -75,31 +75,29 @@ orionCurl --url "$url" --payload "${payload}" -X "PUT"
 --REGEXPECT--
 +++++ 1. put an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 389
+Content-Length: 203
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <updateContextElementResponse>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList/>
-      <statusCode>
-        <code>404</code>
-        <reasonPhrase>No context element found</reasonPhrase>
-        <details>entity01</details>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>entity01</details>
+  </errorCode>
 </updateContextElementResponse>
 +++++ 2. post an entity +++++
 HTTP/1.1 200 OK
-Content-Length: 489
+Content-Length: 564
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>entity01</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>
