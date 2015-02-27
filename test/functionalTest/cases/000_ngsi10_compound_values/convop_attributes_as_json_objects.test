@@ -102,7 +102,7 @@ echo
 --REGEXPECT--
 1. Create E1/A1 using conv op POST /v1/contextEntities/E1/attributes
 HTTP/1.1 200 OK
-Content-Length: 239
+Content-Length: 294
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -120,7 +120,10 @@ Date: REGEX(.*)
                 "reasonPhrase": "OK"
             }
         }
-    ]
+    ], 
+    "id": "E1", 
+    "isPattern": "false", 
+    "type": ""
 }
 
 

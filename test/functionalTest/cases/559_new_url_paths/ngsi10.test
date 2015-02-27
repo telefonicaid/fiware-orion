@@ -240,7 +240,7 @@ echo
 
 
 echo "7.3. POST /ngsi10/contextEntities/EID/attributes"
-echo "=============================================="
+echo "================================================"
 payload='<?xml version="1.0"?>
 <appendContextElementRequest>
   <contextAttributeList>
@@ -774,7 +774,7 @@ Date: REGEX(.*)
 7.1. GET /ngsi10/contextEntities/EID/attributes
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 366
+Content-Length: 316
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -784,7 +784,6 @@ Date: REGEX(.*)
     <entityId type="" isPattern="false">
       <id>EID</id>
     </entityId>
-    <contextAttributeList/>
   </contextElement>
   <statusCode>
     <code>404</code>
@@ -797,34 +796,32 @@ Date: REGEX(.*)
 7.2. PUT /ngsi10/contextEntities/EID/attributes
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 198
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <updateContextElementResponse>
-  <contextResponseList>
-    <contextAttributeResponse>
-      <contextAttributeList/>
-      <statusCode>
-        <code>404</code>
-        <reasonPhrase>No context element found</reasonPhrase>
-        <details>EID</details>
-      </statusCode>
-    </contextAttributeResponse>
-  </contextResponseList>
+  <errorCode>
+    <code>404</code>
+    <reasonPhrase>No context element found</reasonPhrase>
+    <details>EID</details>
+  </errorCode>
 </updateContextElementResponse>
 
 
 7.3. POST /ngsi10/contextEntities/EID/attributes
-==============================================
+================================================
 HTTP/1.1 200 OK
-Content-Length: 486
+Content-Length: 556
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>EID</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>

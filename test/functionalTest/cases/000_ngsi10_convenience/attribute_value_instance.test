@@ -160,12 +160,15 @@ Date: REGEX(.*)
 </contextAttributeResponse>
 2: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 685
+Content-Length: 755
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
+  <entityId type="" isPattern="false">
+    <id>E01</id>
+  </entityId>
   <contextResponseList>
     <contextAttributeResponse>
       <contextAttributeList>
@@ -202,7 +205,7 @@ Date: REGEX(.*)
 </statusCode>
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 495
+Content-Length: 499
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -211,7 +214,7 @@ Date: REGEX(.*)
   <contextAttributeList>
     <contextAttribute>
       <name>A1</name>
-      <type/>
+      <type>Room</type>
       <contextValue>10</contextValue>
       <metadata>
         <contextMetadata>

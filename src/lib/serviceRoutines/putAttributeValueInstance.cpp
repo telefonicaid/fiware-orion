@@ -90,11 +90,8 @@ std::string putAttributeValueInstance
     }
   }
 
-  LM_M(("KZ: ID OK"));
-
   ContextAttribute*               attributeP    = new ContextAttribute(attributeName, upcarP->type, upcarP->contextValue);
   ContextElement*                 ceP           = new ContextElement();
-  LM_M(("KZ: Attribute: %s:%s", attributeP->name.c_str(), attributeP->type.c_str()));
 
   // Copy the metadata vector of the input payload
   attributeP->metadataVector.fill((MetadataVector*) &upcarP->metadataVector);
@@ -113,66 +110,39 @@ std::string putAttributeValueInstance
   request.contextElementVector.push_back(ceP);
   request.updateActionType.set("UPDATE");
 
-  LM_M(("KZ: entityId='%s', attributeName='%s', ID='%s'", entityId.c_str(), attributeName.c_str(), valueId.c_str()));
-
   response.errorCode.code = SccNone;
 
-  LM_M(("KZ: So, what is REALLY sent to mongoUpdateContext?"));
-  LM_M(("KZ: ----------------------------------------------"));
-  LM_M(("KZ: Entity id: '%s', type: '%s', isPattern: '%s', Attribute name: '%s', type: '%s', value: '%s', meta-ID: name: '%s', type: '%s', value: '%s'",
-        request.contextElementVector[0]->entityId.id.c_str(), 
-        request.contextElementVector[0]->entityId.type.c_str(), 
-        request.contextElementVector[0]->entityId.isPattern.c_str(), 
-        request.contextElementVector[0]->contextAttributeVector[0]->name.c_str(),
-        request.contextElementVector[0]->contextAttributeVector[0]->type.c_str(),
-        request.contextElementVector[0]->contextAttributeVector[0]->value.c_str(),
-        request.contextElementVector[0]->contextAttributeVector[0]->metadataVector.get(0)->name.c_str(),
-        request.contextElementVector[0]->contextAttributeVector[0]->metadataVector.get(0)->type.c_str(),
-        request.contextElementVector[0]->contextAttributeVector[0]->metadataVector.get(0)->value.c_str()));
-
   ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
-
-  LM_M(("KZ: mongoUpdateContext: %d", ciP->httpStatusCode));
 
   StatusCode statusCode;
   if (response.contextElementResponseVector.size() == 0)
   {
-    LM_M(("KZ: contextElementResponseVector is empty"));
     statusCode.fill(SccContextElementNotFound,
                     std::string("Entity-Attribute pair: /") + entityId + "-" + attributeName + "/");
   }
   else if (response.contextElementResponseVector.size() == 1)
   {
-    LM_M(("KZ: contextElementResponseVector of ONE element"));
-
     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
-
-    LM_M(("KZ: cerP->statusCode.code == %d", cerP->statusCode.code));
 
     if (response.errorCode.code != SccNone)
     {
-      LM_M(("KZ: response.errorCode.code == %d", response.errorCode.code));
       statusCode.fill(&response.errorCode);
     }
     else if (cerP->statusCode.code != SccNone)
     {
-      LM_M(("KZ: cerP->statusCode.code == %d", cerP->statusCode.code));
       statusCode.fill(&cerP->statusCode);
     }
     else
     {
-      LM_M(("KZ: no error/none"));
       statusCode.fill(SccOk);
     }
   }
   else
   {
-    LM_M(("KZ: contextElementResponseVector of > 1 elements: ERROR"));
     statusCode.fill(SccReceiverInternalError,
                     "More than one response from putAttributeValueInstance::mongoUpdateContext");
   }
 
   request.release();
-  LM_M(("KZ: statusCode.code == %d", statusCode.code));
   return statusCode.render(ciP->outFormat, "", false, false);
 }
