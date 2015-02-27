@@ -106,6 +106,9 @@ TEST(putAttributeValueInstance, notFound)
 /* ****************************************************************************
 *
 * found - 
+*
+* FIXME P7: enable again once tghe convop for /ngsi10/contextEntities/E1/attributes/A1/left
+*           is transformed to use Standard Operations.
 */
 TEST(putAttributeValueInstance,  DISABLED_found)
 {
