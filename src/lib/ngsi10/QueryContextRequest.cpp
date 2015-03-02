@@ -153,7 +153,13 @@ void QueryContextRequest::fill(const std::string& entityId, const std::string& e
 *
 * QueryContextRequest::fill - 
 */
-void QueryContextRequest::fill(const std::string& entityId, const std::string& entityType, EntityTypeInfo typeInfo)
+void QueryContextRequest::fill
+(
+  const std::string& entityId,
+  const std::string& entityType,
+  EntityTypeInfo     typeInfo,
+  const std::string& attributeName
+)
 {
   EntityId* eidP = new EntityId(entityId, entityType, "false");
 
@@ -166,5 +172,10 @@ void QueryContextRequest::fill(const std::string& entityId, const std::string& e
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
       
     restriction.scopeVector.push_back(scopeP);
+  }
+
+  if (attributeName != "")
+  {
+    attributeList.push_back(attributeName);
   }
 }
