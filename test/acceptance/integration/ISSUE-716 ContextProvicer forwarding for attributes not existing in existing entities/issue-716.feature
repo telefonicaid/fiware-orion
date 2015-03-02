@@ -28,7 +28,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CP
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_716" and the subservice "/subservice"
     And the following entities to consult
@@ -69,7 +69,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CB
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_716" and the subservice "/subservice"
     And the following entities to consult
@@ -109,7 +109,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CP but in other subservice (Not found is ok)
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_716" and the subservice "/subservice"
     And the following entities to consult
@@ -150,7 +150,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CP but in other service (Not found is ok)
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_716" and the subservice "/subservice"
     And the following entities to consult
@@ -194,7 +194,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
 
   Scenario: Update an entity in the CB and in the CP with the attributes in the CP
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_716" and the subservice "/subservice"
     And the following entities to consult
@@ -236,7 +236,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CB
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_716" and the subservice "/subservice"
     And the following entities to consult
@@ -277,7 +277,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CP but in other subservice (Not found is ok)
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_716" and the subservice "/subservice"
     And the following entities to consult
@@ -319,7 +319,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CP but in other service (Not found is ok)
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_716" and the subservice "/subservice"
     And the following entities to consult

@@ -17,9 +17,9 @@
   },
   "deploy_data": {
     "host": "localhost",
-    "ssh_port": "22",
-    "user": "root",
-    "password": "root",
-    "bin_path": "/usr/bin/contextBroker"
+    "ssh_port": "",
+    "user": "",
+    "password": "",
+    "bin_path": ""
   }
 }

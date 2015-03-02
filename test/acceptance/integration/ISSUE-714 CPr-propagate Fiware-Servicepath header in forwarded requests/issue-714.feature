@@ -30,7 +30,7 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
 
   Scenario: Fiware-Servicepath header is forwarded to a Context Provider query operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_714" and the subservice "/subservice"
     And the following entities to consult
@@ -60,7 +60,7 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
 
   Scenario: Fiware-Servicepath header is not forwarded to a Context Provider query operation if its not send
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_714" and the subservice "empty"
     And the following entities to consult
@@ -91,7 +91,7 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
 
   Scenario: Fiware-Servicepath header is forwarded to a Context Provider update operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_714" and the subservice "/subservice"
     And the following entities to consult
@@ -124,7 +124,7 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
 
   Scenario: Fiware-Servicepath header is not forwarded to a Context Provider update operation if it is not send
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_714" and the subservice "empty"
     And the following entities to consult

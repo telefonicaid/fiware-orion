@@ -49,7 +49,13 @@ def a_standard_context_entity_delete_is_asked_with_the_before_information(step):
 def a_standard_query_context_is_asked_with_the_before_information(step):
     world.responses[world.response_count] = world.cb[world.cb_count].standard_query_context(
         world.payloads[world.payloads_count])
+    
+@step('a standard context subscription is asked with the before information')
+def a_standard_context_subscription_is_asked_with_the_before_information(step):
+    world.responses[world.response_count] = world.cb[world.cb_count].standard_subscribe_context_ontime(
+        world.payloads[world.payloads_count])
 
+# NFGSI 9
 
 @step('a standard context registration is asked with the before information')
 def a_standard_context_registration_is_asked_with_the_before_information(step):
@@ -62,10 +68,11 @@ def a_standard_discover_context_availability_is_asked_with_the_before_informatio
     world.responses[world.response_count] = world.cb[world.cb_count].discover_context_availability(
         world.payloads[world.payloads_count])
 
+# ***************
 # Convenience
 
 @step('a convenience query context is asked with the following data')
-def a_standard_query_context_is_asked_with_the_before_information(step):
+def a_convenience_query_context_is_asked_with_the_following_data(step):
     """
     Execute a convenience query context with the information in the table. The format is:
     | entity_id(optional) | entity_type(optional) | attirbute(optional) |
@@ -74,7 +81,7 @@ def a_standard_query_context_is_asked_with_the_before_information(step):
     """
     rows = len(step.hashes)
     if rows != 1:
-        raise ValueError, 'The table for this steps has to have only 1 row but it has {rows}'.format(rows=rows)
+        raise ValueError('The table for this steps has to have only 1 row but it has {rows}'.format(rows=rows))
     kargs = dict()
     if 'entity_id' in step.hashes[0]:
         kargs.update({'entity_id': step.hashes[0]['entity_id']})
@@ -83,4 +90,25 @@ def a_standard_query_context_is_asked_with_the_before_information(step):
     if 'attribute' in step.hashes[0]:
         kargs.update({'attribute': step.hashes[0]['attribute']})
     world.responses[world.response_count] = world.cb[world.cb_count].convenience_query_context(**kargs)
+
+
+@step('a convenience delete context is asked with the following data')
+def a_convenience_delete_entity_is_asked_with_the_following_information(step):
+    """
+    Execute a convenience query context with the information in the table. The format is:
+    | entity_id | entity_type(optional) |
+    :param step:
+    :return:
+    """
+    rows = len(step.hashes)
+    if rows != 1:
+        raise ValueError('The table for this steps has to have only 1 row but it has {rows}'.format(rows=rows))
+    kargs = dict()
+    if 'entity_id' in step.hashes[0]:
+        kargs.update({'entity_id': step.hashes[0]['entity_id']})
+    else:
+        raise ValueError('The entity_id is mandatory. Table: {table}'.format(table=step.hashes))
+    if 'entity_type' in step.hashes[0]:
+        kargs.update({'entity_type': step.hashes[0]['entity_type']})
+    world.responses[world.response_count] = world.cb[world.cb_count].convenience_entity_delete_url_method(**kargs)
 

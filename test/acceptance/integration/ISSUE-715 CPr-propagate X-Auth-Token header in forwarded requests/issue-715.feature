@@ -28,7 +28,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
 
   Scenario: Forward the X-Auth-Token for the context provider in a query operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
@@ -61,7 +61,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
 
   Scenario: Forward the X-Auth-Token for the context provider in an update operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
@@ -97,7 +97,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
 
   Scenario: Do not forward the X-Auth-Token for the context provider in a query operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
@@ -127,7 +127,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
 
   Scenario: Do not forward the X-Auth-Token for the context provider in a update operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
     And a new NGSI "9" api petition with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
