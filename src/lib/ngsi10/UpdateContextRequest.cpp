@@ -31,11 +31,12 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "convenience/UpdateContextElementRequest.h"
+#include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "rest/ConnectionInfo.h"
-
 
 
 /* ****************************************************************************
@@ -120,4 +121,66 @@ void UpdateContextRequest::present(const std::string& indent)
   PRINTF("\n\n");
   contextElementVector.present(indent);
   updateActionType.present(indent);
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill
+(
+  const UpdateContextElementRequest* ucerP,
+  const std::string&                 entityId,
+  const std::string&                 entityType
+)
+{
+  ContextElement* ceP = new ContextElement();
+
+  ceP->entityId.fill(entityId, entityType, "false");
+
+  ceP->attributeDomainName.fill(ucerP->attributeDomainName);
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &ucerP->contextAttributeVector);
+  ceP->domainMetadataVector.fill((MetadataVector*) &ucerP->domainMetadataVector);
+
+  contextElementVector.push_back(ceP);
+
+  updateActionType.set("UPDATE");  // Coming from an UpdateContextElementRequest (PUT), must be UPDATE
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill(const AppendContextElementRequest* acerP)
+{
+  ContextElement* ceP = new ContextElement();
+
+  ceP->entityId.fill(&acerP->entity);
+
+  ceP->attributeDomainName.fill(acerP->attributeDomainName);
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &acerP->contextAttributeVector);
+  ceP->domainMetadataVector.fill((MetadataVector*) &acerP->domainMetadataVector);
+
+  contextElementVector.push_back(ceP);
+  updateActionType.set("APPEND");  // Coming from an AppendContextElementRequest (POST), must be APPEND
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill(const std::string& entityId, const std::string& entityType, const std::string& isPattern, const std::string& _updateActionType)
+{
+  ContextElement* ceP = new ContextElement();
+
+  ceP->entityId.fill(entityId, entityType, isPattern);
+  contextElementVector.push_back(ceP);
+
+  updateActionType.set(_updateActionType);
 }

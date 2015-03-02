@@ -152,3 +152,15 @@ void ContextAttributeResponseVector::release(void)
 
   vec.clear();
 }
+
+
+
+/* ****************************************************************************
+*
+* ContextAttributeResponseVector::fill -
+*/
+void ContextAttributeResponseVector::fill(ContextAttributeVector* cavP, const StatusCode& statusCode)
+{
+  vec.push_back(new ContextAttributeResponse());
+  vec[0]->fill(cavP, statusCode);
+}

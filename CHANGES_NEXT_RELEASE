@@ -1,2 +1,7 @@
 - Fix: Correct rendering of response to convop "POST /v1/contextEntities/{entityId::id}/attributes/{attributeName} (Issue #772)
-- Fix:  All convenience operations to use the service routines of standard operations (Issue #117)
+- Fix: All convenience operations to use the service routines of standard operations (Issue #117)
+- Fix: Made 'POST /v1/contextEntities/{entityId::id}' and 'POST /v1/contextEntities' accept entity::id and entity::type
+       in both payload and URL, as long as the values coincide.
+- Fix: A few more of the 'responses without entityId::type filled in' found and fixed (Issue #585)
+- Fix: The convenience operations "/v1/contextAttributes/{entity::id}/attributes" now share implementation with
+       convenience operations "/v1/contextAttributes/{entity::id}" and are thus 100% identical.

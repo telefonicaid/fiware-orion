@@ -133,11 +133,7 @@
 #include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
-#include "serviceRoutines/getIndividualContextEntityAttributes.h"
-#include "serviceRoutines/putIndividualContextEntityAttributes.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
-#include "serviceRoutines/postIndividualContextEntityAttributes.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttributes.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypesAttribute.h"
@@ -687,10 +683,10 @@ PaArgument paArgs[] =
   { "DELETE", ICE,   ICE_COMPS_V0,         "",              deleteIndividualContextEntity             }, \
   { "*",      ICE,   ICE_COMPS_V0,         "",              badVerbAllFour                            }, \
                                                                                                          \
-  { "GET",    ICEA,  ICEA_COMPS_V0,        "",              getIndividualContextEntityAttributes      }, \
-  { "PUT",    ICEA,  ICEA_COMPS_V0,        ICEA_PUT_WORD,   putIndividualContextEntityAttributes      }, \
-  { "POST",   ICEA,  ICEA_COMPS_V0,        ICEA_POST_WORD,  postIndividualContextEntityAttributes     }, \
-  { "DELETE", ICEA,  ICEA_COMPS_V0,        "",              deleteIndividualContextEntityAttributes   }, \
+  { "GET",    ICEA,  ICEA_COMPS_V0,        "",              getIndividualContextEntity                }, \
+  { "PUT",    ICEA,  ICEA_COMPS_V0,        ICEA_PUT_WORD,   putIndividualContextEntity                }, \
+  { "POST",   ICEA,  ICEA_COMPS_V0,        ICEA_POST_WORD,  postIndividualContextEntity               }, \
+  { "DELETE", ICEA,  ICEA_COMPS_V0,        "",              deleteIndividualContextEntity             }, \
   { "*",      ICEA,  ICEA_COMPS_V0,        "",              badVerbAllFour                            }, \
                                                                                                          \
   { "GET",    ICEAA, ICEAA_COMPS_V0,       "",              getIndividualContextEntityAttribute       }, \
@@ -729,10 +725,10 @@ PaArgument paArgs[] =
   { "DELETE", ICE,   ICE_COMPS_V1,           "",              deleteIndividualContextEntity             }, \
   { "*",      ICE,   ICE_COMPS_V1,           "",              badVerbAllFour                            }, \
                                                                                                            \
-  { "GET",    ICEA,  ICEA_COMPS_V1,          "",              getIndividualContextEntityAttributes      }, \
-  { "PUT",    ICEA,  ICEA_COMPS_V1,          ICEA_PUT_WORD,   putIndividualContextEntityAttributes      }, \
-  { "POST",   ICEA,  ICEA_COMPS_V1,          ICEA_POST_WORD,  postIndividualContextEntityAttributes     }, \
-  { "DELETE", ICEA,  ICEA_COMPS_V1,          "",              deleteIndividualContextEntityAttributes   }, \
+  { "GET",    ICEA,  ICEA_COMPS_V1,          "",              getIndividualContextEntity                }, \
+  { "PUT",    ICEA,  ICEA_COMPS_V1,          ICEA_PUT_WORD,   putIndividualContextEntity                }, \
+  { "POST",   ICEA,  ICEA_COMPS_V1,          ICEA_POST_WORD,  postIndividualContextEntity               }, \
+  { "DELETE", ICEA,  ICEA_COMPS_V1,          "",              deleteIndividualContextEntity             }, \
   { "*",      ICEA,  ICEA_COMPS_V1,          "",              badVerbAllFour                            }, \
                                                                                                            \
   { "GET",    ICEAA, ICEAA_COMPS_V1,         "",              getIndividualContextEntityAttribute       }, \

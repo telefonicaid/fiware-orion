@@ -68,8 +68,8 @@ std::string postUpdateContext
   ParseData*                 parseDataP
 )
 {
-  UpdateContextResponse  upcr;
-  std::string            answer;
+  UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
+  std::string             answer;
 
   //
   // If more than ONE service-path is input, an error is returned as response.
@@ -78,9 +78,9 @@ std::string postUpdateContext
   //
   if (ciP->servicePathV.size() > 1)
   {
-    upcr.errorCode.fill(SccBadRequest, "more than one service path in context update request");
+    upcrsP->errorCode.fill(SccBadRequest, "more than one service path in context update request");
     LM_W(("Bad Input (more than one service path for an update request)"));
-    answer = upcr.render(ciP, UpdateContext, "");
+    answer = upcrsP->render(ciP, UpdateContext, "");
     return answer;
   }
   else if (ciP->servicePathV.size() == 0)
@@ -91,13 +91,13 @@ std::string postUpdateContext
   std::string res = servicePathCheck(ciP->servicePathV[0].c_str());
   if (res != "OK")
   {
-    upcr.errorCode.fill(SccBadRequest, res);
-    answer = upcr.render(ciP, UpdateContext, "");
+    upcrsP->errorCode.fill(SccBadRequest, res);
+    answer = upcrsP->render(ciP, UpdateContext, "");
     return answer;
   }
 
 
-  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, &upcr, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
+  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
 
   //
   // Checking for SccFound in the ContextElementResponseVector
@@ -105,18 +105,18 @@ std::string postUpdateContext
   //
 
   //
-  // If upcr.errorCode contains an error after mongoUpdateContext, we return a 404 Not Found.
+  // If upcrsP->errorCode contains an error after mongoUpdateContext, we return a 404 Not Found.
   // Right now, this only happens if there is more than one servicePath, but in the future this may grow
   //
-  if ((upcr.errorCode.code != SccOk) && (upcr.errorCode.code != SccNone))
+  if ((upcrsP->errorCode.code != SccOk) && (upcrsP->errorCode.code != SccNone))
   {
-    upcr.errorCode.fill(SccContextElementNotFound, "");
-    answer = upcr.render(ciP, UpdateContext, "");
+    upcrsP->errorCode.fill(SccContextElementNotFound, "");
+    answer = upcrsP->render(ciP, UpdateContext, "");
     return answer;
   }
 
   //
-  // If upcr.contextElementResponseVector contains >= TWO responses and the second of them is a 'SccFound',
+  // If upcrsP->contextElementResponseVector contains >= TWO responses and the second of them is a 'SccFound',
   // then skip the first, the one that isn't 'SccFound'.
   // Also, if the first of them is 472, then skip the second
   //
@@ -140,10 +140,10 @@ std::string postUpdateContext
   // 
   //
   
-  if (upcr.contextElementResponseVector.size() != parseDataP->upcr.res.contextElementVector.size())
+  if (upcrsP->contextElementResponseVector.size() != parseDataP->upcr.res.contextElementVector.size())
   {
     // Note that the loop ends at the contextElementResponse BEFORE the last contextElementResponse in the vector
-    for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size() - 1; ++ix)
+    for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size() - 1; ++ix)
     {
       //
       // 2 cases:
@@ -156,24 +156,24 @@ std::string postUpdateContext
       //   Out[0]: (472) request parameter is invalid/not allowed
       //   Out[1]: (404) No context element found
       //
-      if (upcr.contextElementResponseVector[ix]->statusCode.code == SccInvalidParameter)
+      if (upcrsP->contextElementResponseVector[ix]->statusCode.code == SccInvalidParameter)
       {
-        if (ix + 1 < upcr.contextElementResponseVector.size())
+        if (ix + 1 < upcrsP->contextElementResponseVector.size())
         {
           // 472+302 (SccInvalidParameter+SccFound): Remove the 472
-          if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccFound)
+          if (upcrsP->contextElementResponseVector[ix + 1]->statusCode.code == SccFound)
           {
-            upcr.contextElementResponseVector[ix]->release();
-            delete(upcr.contextElementResponseVector[ix]);
-            upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix);
+            upcrsP->contextElementResponseVector[ix]->release();
+            delete(upcrsP->contextElementResponseVector[ix]);
+            upcrsP->contextElementResponseVector.vec.erase(upcrsP->contextElementResponseVector.vec.begin() + ix);
           }
 
           // 472+404 (SccInvalidParameter+SccContextElementNotFound): Remove the 404
-          else if (upcr.contextElementResponseVector[ix + 1]->statusCode.code == SccContextElementNotFound)
+          else if (upcrsP->contextElementResponseVector[ix + 1]->statusCode.code == SccContextElementNotFound)
           {
-            upcr.contextElementResponseVector[ix + 1]->release();
-            delete(upcr.contextElementResponseVector[ix + 1]);
-            upcr.contextElementResponseVector.vec.erase(upcr.contextElementResponseVector.vec.begin() + ix + 1);
+            upcrsP->contextElementResponseVector[ix + 1]->release();
+            delete(upcrsP->contextElementResponseVector[ix + 1]);
+            upcrsP->contextElementResponseVector.vec.erase(upcrsP->contextElementResponseVector.vec.begin() + ix + 1);
             ix = ix + 1;
           }
         }
@@ -182,9 +182,9 @@ std::string postUpdateContext
   }
 
 
-  for (unsigned int ix = 0; ix < upcr.contextElementResponseVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
   {
-    ContextElementResponse* cerP = upcr.contextElementResponseVector[ix];
+    ContextElementResponse* cerP = upcrsP->contextElementResponseVector[ix];
 
     // If the statusCode.code is not SccFound, we leave the ContextElementResponse exactly the way it is
     if (cerP->statusCode.code != SccFound)
@@ -232,7 +232,7 @@ std::string postUpdateContext
 
     ucrP->updateActionType      = parseDataP->upcr.res.updateActionType;
     ucrP->contextElementVector.push_back(ceP);
-    ceP->fill(upcr.contextElementResponseVector[ix]->contextElement);
+    ceP->fill(upcrsP->contextElementResponseVector[ix]->contextElement);
 
 
 
@@ -337,6 +337,6 @@ std::string postUpdateContext
     }
   }
 
-  answer = upcr.render(ciP, UpdateContext, "");
+  answer = upcrsP->render(ciP, UpdateContext, "");
   return answer;
 }
