@@ -30,7 +30,7 @@ Feature: Subscribe context tests
     Given a started mock
     And set the response of the mock in the path "/subscription" as "ok"
     # Append
-    And a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
+    And a new "NGSI10" api request with the service "service" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | temperature    | centigrade     | 25              |
@@ -43,7 +43,7 @@ Feature: Subscribe context tests
     And build the standard entity creation payload with the previous data
     When a standard context entity creation is asked with the before information
     # Subscribe context
-    Given a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
+    Given a new "NGSI10" api request with the service "service" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | RoomOne     |
@@ -52,18 +52,18 @@ Feature: Subscribe context tests
       | Room4     | RoomTwo     |
     And a notify conditions with the following data
       | type   | time  | attributes  |
-      | ontime | PT3S | temperature |
+      | ontime | PT10S | temperature |
     And build the standard context subscription ontime payload with the previous data and the following
       | attributes  | reference     | duration |
       | temperature | /subscription | PT1M     |
     And a standard context subscription is asked with the before information
-    # Wait 4 seconds
-    And wait "4" seconds
+    # Wait 12 seconds
+    And wait "12" seconds
     # Check the mock gets the notify
     And retrieve information from the mock
-    And there is "2" petitions requested to the mock
+    And there is "2" requests requested to the mock
     # Update the attribute value
-    And a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
+    And a new "NGSI10" api request with the service "service" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | temperature    | centigrade     | 26              |
@@ -72,17 +72,17 @@ Feature: Subscribe context tests
       | Room1     | RoomOne     |
     And build the standard entity update payload with the previous data
     When a standard context entity update is asked with the before information
-    # Wait 2 seconds
-    And wait "3" seconds
+    # Wait 10 seconds
+    And wait "10" seconds
     # Check the mock gets the notify
     And retrieve information from the mock
-    And there is "3" petitions requested to the mock
+    And there is "3" requests requested to the mock
     And the "3" requests of the mock has the key "value" with the value "26"
     # Restart Context Broker
     And request a restart of cb
     And check cb is running
     # Update the attribute again
-    And a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
+    And a new "NGSI10" api request with the service "service" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | temperature    | centigrade     | 27              |
@@ -91,10 +91,10 @@ Feature: Subscribe context tests
       | Room2     | RoomOne     |
     And build the standard entity update payload with the previous data
     When a standard context entity update is asked with the before information
-    # Wait 5 seconds
-    And wait "2" seconds
+    # Wait 10 seconds
+    And wait "5" seconds
     # Check the mock gets the notify
     And retrieve information from the mock
-    And there is "4" petitions requested to the mock
+    And there is "4" requests requested to the mock
     And the "4" requests of the mock has the key "value" with the value "27"
     And print the information stored in the mock

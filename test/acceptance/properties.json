@@ -4,7 +4,7 @@
     "logs_path": "logs"
   },
   "context_broker": {
-    "host": "localhost",
+    "host": "192.168.0.103",
     "port": "1026"
   },
   "mock": {
@@ -12,14 +12,14 @@
     "bind_ip": "0.0.0.0"
   },
   "mongo": {
-    "host": "localhost",
+    "host": "192.168.0.103",
     "port": "27017"
   },
   "deploy_data": {
-    "host": "localhost",
-    "ssh_port": "",
-    "user": "",
-    "password": "",
-    "bin_path": ""
+    "host": "192.168.0.103",
+    "ssh_port": "49153",
+    "user": "root",
+    "password": "root",
+    "bin_path": "/usr/bin/contextBroker"
   }
 }

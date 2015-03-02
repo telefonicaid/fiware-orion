@@ -29,8 +29,8 @@ from integration.tools.general_utils import check_key_value, drop_database
 from lettuce import step, world
 
 
-@step('a new NGSI "([^"]*)" api petition with the service "([^"]*)" and the subservice "([^"]*)"')
-def a_new_ngsi10_petition_with_the_service_and_the_subservice(step, ngsi_version, service, subservice):
+@step('a new "([^"]*)" api request with the service "([^"]*)" and the subservice "([^"]*)"')
+def a_new_request_with_the_service_and_the_subservice(step, ngsi_version, service, subservice):
     world.entities = None
     world.attributes_consult = None
     world.attributes_creation = None
@@ -49,20 +49,20 @@ def a_new_ngsi10_petition_with_the_service_and_the_subservice(step, ngsi_version
     world.payloads_count += 1
     world.response_count += 1
     world.cb_count += 1
-    if ngsi_version == '10':
+    if ngsi_version == 'NGSI10':
         world.cb[world.cb_count] = CbNgsi10Utils(world.config['context_broker']['host'], world.service,
                                                  world.subservice,
                                                  port=world.config['context_broker']['port'], log_verbosity='ERROR')
-    elif ngsi_version == '9':
+    elif ngsi_version == 'NGSI9':
         world.cb[world.cb_count] = CbNgsi9Utils(world.config['context_broker']['host'], world.service, world.subservice,
                                                 port=world.config['context_broker']['port'], log_verbosity='ERROR')
     else:
         raise ValueError(
-            'The version of ngsi api have to be \'9\' or \'10\', not {ngsi_version}'.format(ngsi_version=ngsi_version))
+            'The version of ngsi api have to be \'NGSI9\' or \'NGSI10\', not {ngsi_version}'.format(ngsi_version=ngsi_version))
 
 
-@step('add the following headers to the petition')
-def add_headers_to_the_cb_library(step):
+@step('add the following headers to the request')
+def add_the_following_headers_to_the_request(step):
     """
     Add headers of the table to the cb instance, the format of the table is
     | header | value |
