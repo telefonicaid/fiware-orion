@@ -252,6 +252,9 @@ void ContextAttributeVector::release(void)
 */
 void ContextAttributeVector::fill(ContextAttributeVector* cavP)
 {
+  if (cavP == NULL)
+    return;
+
   for (unsigned int ix = 0; ix < cavP->size(); ++ix)
   {
     ContextAttribute* caP = new ContextAttribute(cavP->get(ix));
