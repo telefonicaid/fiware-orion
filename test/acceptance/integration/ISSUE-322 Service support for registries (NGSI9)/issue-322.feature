@@ -29,7 +29,7 @@ Feature: Service support for registries (NGSI9)
 
   Scenario: Subscribe different entities with the same provider and subservices but different service
     # First registration
-    Given a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    Given a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -43,7 +43,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second registration
-    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -57,7 +57,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Discover
-    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type | is_pattern |
       | Room.*    | Room        | true       |
@@ -73,7 +73,7 @@ Feature: Service support for registries (NGSI9)
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -86,7 +86,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -99,7 +99,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Query consult
-    And a new NGSI version "10" petition with the service "issue_322_2" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -117,7 +117,7 @@ Feature: Service support for registries (NGSI9)
     And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
     And set the response of the context provider mock in path "/context_provider/service2/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -130,7 +130,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -143,7 +143,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -161,7 +161,7 @@ Feature: Service support for registries (NGSI9)
   Scenario: Append an entity in a context broker, having context providers with the same entity in the same service and other in other service
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -174,7 +174,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -187,7 +187,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -205,7 +205,7 @@ Feature: Service support for registries (NGSI9)
   Scenario: Delete an entity doesnt exist in context broker (error expected), having context providers with the same entity in the same subservice and other in other subservice
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -218,7 +218,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -231,7 +231,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Delete operation
-    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     |                 |
@@ -248,7 +248,7 @@ Feature: Service support for registries (NGSI9)
   Scenario: Entity in CB and in CP with the same service, and in other CP with other service.
     Given a started mock
     # First registration
-    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -261,7 +261,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -274,7 +274,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -284,7 +284,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard entity creation payload with the previous data
     And a standard context entity creation is asked with the before information
     # Query operation
-    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -300,7 +300,7 @@ Feature: Service support for registries (NGSI9)
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -313,7 +313,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "issue_322_2" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -326,7 +326,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -336,7 +336,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard entity creation payload with the previous data
     And a standard context entity creation is asked with the before information
     # Query operation
-    And a new NGSI version "10" petition with the service "issue_322_2" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322_2" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -353,7 +353,7 @@ Feature: Service support for registries (NGSI9)
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -366,7 +366,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -379,7 +379,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "empty" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -389,7 +389,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard entity creation payload with the previous data
     And a standard context entity creation is asked with the before information
     # Query operation
-    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -406,7 +406,7 @@ Feature: Service support for registries (NGSI9)
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     And set the response of the context provider mock in path "/context_provider/service2/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_322" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -419,7 +419,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Second Registration
-    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -432,7 +432,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Append operation
-    And a new NGSI version "10" petition with the service "issue_322" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_322" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -442,7 +442,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard entity creation payload with the previous data
     And a standard context entity creation is asked with the before information
     # Query operation
-    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |

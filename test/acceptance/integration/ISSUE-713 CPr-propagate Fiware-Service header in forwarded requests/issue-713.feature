@@ -31,7 +31,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_713" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_713" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -44,7 +44,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Query consult
-    And a new NGSI version "10" petition with the service "issue_713" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_713" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -61,7 +61,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -74,7 +74,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Query consult
-    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -92,7 +92,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_713" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "issue_713" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -105,7 +105,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "issue_713" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "issue_713" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -125,7 +125,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     Given a started mock
     And set the response of the context provider mock in path "/context_provider/service1/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI "9" api petition with the service "empty" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -138,7 +138,7 @@ Feature: When the ContextBroker fowards  a requests to a Context Provider, the h
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "empty" and the subservice "/subservice"
+    And a new NGSI "10" api petition with the service "empty" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |

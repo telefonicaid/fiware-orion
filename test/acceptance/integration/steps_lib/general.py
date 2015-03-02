@@ -28,7 +28,7 @@ from integration.tools.general_utils import check_key_value, drop_database
 from lettuce import step, world
 
 
-@step('a new NGSI version "([^"]*)" petition with the service "([^"]*)" and the subservice "([^"]*)"')
+@step('a new NGSI "([^"]*)" api petition with the service "([^"]*)" and the subservice "([^"]*)"')
 def a_new_ngsi10_petition_with_the_service_and_the_subservice(step, ngsi_version, service, subservice):
     world.entities = None
     world.attributes_consult = None
