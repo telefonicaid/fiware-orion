@@ -37,7 +37,7 @@ def start_mock_step(step):
     time.sleep(1)
 
 
-@step('set the response of the context provider mock in path "([^"]*)" as "([^"]*)"')
+@step('set the response of the mock in the path "([^"]*)" as "([^"]*)"')
 def set_the_Response_of_the_context_provider_mock_as(step, url, response):
     mock_url = 'http://{mock_ip}:{mock_port}{url}/mock_configurations'.format(
         mock_ip=world.config['mock']['host'], mock_port=world.config['mock']['port'], url=url)

@@ -28,7 +28,7 @@ Feature: Subscribe context tests
   Scenario: Reset the context broker with ontime subscriptions active
     # Set mock
     Given a started mock
-    And set the response of the context provider mock in path "/subscription" as "ok"
+    And set the response of the mock in the path "/subscription" as "ok"
     # Append
     And a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
     And the following attributes to create
