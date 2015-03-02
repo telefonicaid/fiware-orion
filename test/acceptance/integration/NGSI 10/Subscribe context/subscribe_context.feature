@@ -24,7 +24,7 @@ Feature: Subscribe context tests
 
   Background:
     Given the Context Broker started with multitenancy
-
+  @issue-693
   Scenario: Reset the context broker with ontime subscriptions active
     # Set mock
     Given a started mock
@@ -52,11 +52,16 @@ Feature: Subscribe context tests
       | Room4     | RoomTwo     |
     And a notify conditions with the following data
       | type   | time  | attributes  |
-      | ontime | PT10S | temperature |
+      | ontime | PT3S | temperature |
     And build the standard context subscription ontime payload with the previous data and the following
       | attributes  | reference     | duration |
       | temperature | /subscription | PT1M     |
     And a standard context subscription is asked with the before information
+    # Wait 4 seconds
+    And wait "4" seconds
+    # Check the mock gets the notify
+    And retrieve information from the mock
+    And there is "2" petitions requested to the mock
     # Update the attribute value
     And a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
     And the following attributes to create
@@ -67,12 +72,12 @@ Feature: Subscribe context tests
       | Room1     | RoomOne     |
     And build the standard entity update payload with the previous data
     When a standard context entity update is asked with the before information
-    # Wait 5 seconds
-    And wait "5" seconds
+    # Wait 2 seconds
+    And wait "3" seconds
     # Check the mock gets the notify
     And retrieve information from the mock
-    And print the request and the response
-    And there is "1" petitions requested to the mock
+    And there is "3" petitions requested to the mock
+    And the "3" requests of the mock has the key "value" with the value "26"
     # Restart Context Broker
     And request a restart of cb
     And check cb is running
@@ -87,8 +92,9 @@ Feature: Subscribe context tests
     And build the standard entity update payload with the previous data
     When a standard context entity update is asked with the before information
     # Wait 5 seconds
-    And wait "5" seconds
+    And wait "2" seconds
     # Check the mock gets the notify
     And retrieve information from the mock
-    And there is "2" petitions requested to the mock
+    And there is "4" petitions requested to the mock
+    And the "4" requests of the mock has the key "value" with the value "27"
     And print the information stored in the mock

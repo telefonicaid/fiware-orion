@@ -16,10 +16,10 @@
     "port": "27017"
   },
   "deploy_data": {
-    "host": "10.95.231.15",
-    "ssh_port": "49153",
-    "user": "root",
-    "password": "root",
-    "bin_path": "/usr/bin/contextBroker"
+    "host": "localhost",
+    "ssh_port": "",
+    "user": "",
+    "password": "",
+    "bin_path": ""
   }
 }

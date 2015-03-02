@@ -26,7 +26,7 @@ import time
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 import requests
-from integration.tools.general_utils import start_mock, check_world_attribute_is_not_none, pretty
+from integration.tools.general_utils import start_mock, check_world_attribute_is_not_none, pretty, check_key_value
 from lettuce import step, world
 from integration.tools.responses_predefined import responses
 
@@ -111,4 +111,11 @@ def there_is_petitions_requested_to_the_mock(step, number_requests):
 @step('print the information stored in the mock')
 def print_the_information_stored_in_the_mock(step):
     pretty(json.loads(world.mock_data.text))
+
+@step('the "([^"]*)" requests of the mock has the key "([^"]*)" with the value "([^"]*)"')
+def the_requests_of_the_mock_has_the_key_with_the_value(step, number_request, key, value):
+    assert check_key_value(world.mock_data.json()['requests'][world.mock_data.json()['requests'].keys()[0]][int(number_request)-1], key,
+                           value) is False, 'The key {key} is in the response and has the value {value}. \
+                           Response: {response}'.format(
+        key=key, value=value, response=world.responses[world.response_count])
 
