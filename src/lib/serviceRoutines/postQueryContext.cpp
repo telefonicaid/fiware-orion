@@ -216,7 +216,7 @@ std::string postQueryContext
   //
   // NOTE
   // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
-  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if if came from a 
+  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a 
   // POST /v1/queryContext. 
   // So, here we change the verb/method for POST.
   //
@@ -227,7 +227,7 @@ std::string postQueryContext
   if (s != "OK")
   {
     QueryContextResponse qcrs;
-    
+
     qcrs.errorCode.fill(SccContextElementNotFound, "");
     LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
     answer = qcrs.render(ciP, QueryContext, "");
