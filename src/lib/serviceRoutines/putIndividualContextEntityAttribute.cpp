@@ -75,6 +75,7 @@ std::string putIndividualContextEntityAttribute
   std::string  entityType    = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string  attributeName = compV[4];
   StatusCode   response;
+  
 
   // 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
   parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName);
@@ -91,6 +92,6 @@ std::string putIndividualContextEntityAttribute
   // 4. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
-  parseDataP->upcr.res.release();
+
   return answer;
 }
