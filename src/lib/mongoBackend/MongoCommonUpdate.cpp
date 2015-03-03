@@ -520,7 +520,7 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
     bool updated = false;
     for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
 
-        BSONObjBuilder   newAttr;
+        BSONObjBuilder newAttr;
         bool unitActualUpdate = false;
         if (checkAndUpdate(newAttr, i.next().embeddedObject(), *caP, &unitActualUpdate) && !updated) {
             updated = true;
