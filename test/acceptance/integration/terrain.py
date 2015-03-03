@@ -60,4 +60,3 @@ def after_each_scenario(scenario):
 def after_all(total):
     drop_all_test_databases(world.config['mongo']['host'], int(world.config['mongo']['port']))
     stop_cb()
-    pass
