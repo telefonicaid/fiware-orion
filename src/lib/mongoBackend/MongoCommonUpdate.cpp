@@ -406,7 +406,6 @@ static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttrib
             // has really changed its value (many levels have to be traversed). Until we can develop the
             // matching logic, we consider actualUpdate always true.
             *actualUpdate = true;
-            updated       = true;  // FIXME: is it OK to do this?
         }
 
     }
