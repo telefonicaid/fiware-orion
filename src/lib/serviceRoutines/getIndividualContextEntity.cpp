@@ -55,11 +55,11 @@
 *   - attributesFormat=object
 *
 * 0. Take care of URI params
-* 1. Fill in QueryContextRequest
-* 2. Add URI parameters as Scope in restriction
-* 3. Call postQueryContext standard service routine
+* 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)
+* 2. Call standard operation
+* 3. Fill in ContextElementResponse from QueryContextResponse
 * 4. If 404 Not Found - enter request entity data into response context element
-* 5. Translate QueryContextResponse to ContextElementResponse
+* 5. Render the ContextElementResponse
 * 6. Cleanup and return result
 */
 std::string getIndividualContextEntity
@@ -88,7 +88,7 @@ std::string getIndividualContextEntity
   entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
 
-  // 1. Fill in QueryContextRequest
+  // 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)
   parseDataP->qcr.res.fill(entityId, entityType, typeInfo);
 
 

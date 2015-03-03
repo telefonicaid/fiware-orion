@@ -179,7 +179,6 @@ std::string postQueryContext
                        false,
                        true);
 
-
   if ((out == "error") || (out == ""))
   {
     QueryContextResponse qcrs;
@@ -194,7 +193,6 @@ std::string postQueryContext
   //
   // 5. Parse the XML response and fill in a binary QueryContextResponse
   //
-  ParseData    parseData;
   std::string  s;
   std::string  errorMsg;
 
@@ -215,11 +213,21 @@ std::string postQueryContext
     return answer;
   }
 
-  s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
+  //
+  // NOTE
+  // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
+  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if if came from a 
+  // POST /v1/queryContext. 
+  // So, here we change the verb/method for POST.
+  //
+  ciP->verb   = POST;
+  ciP->method = "POST";
+
+  s = xmlTreat(cleanPayload, ciP, parseDataP, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
   if (s != "OK")
   {
     QueryContextResponse qcrs;
-
+    
     qcrs.errorCode.fill(SccContextElementNotFound, "");
     LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
     answer = qcrs.render(ciP, QueryContext, "");
@@ -234,7 +242,7 @@ std::string postQueryContext
   snprintf(portV, sizeof(portV), "%d", port);
 
   // Fill in the response from the redirection into the response to the originator of this request
-  QueryContextResponse* qcrsP = &parseData.qcrs.res;
+  QueryContextResponse* qcrsP = &parseDataP->qcrs.res;
 
   //
   // Returning 'redirected to' in StatusCode::details
@@ -248,6 +256,10 @@ std::string postQueryContext
   {
     qcrsP->contextElementResponseVector[0]->statusCode.details =
       "Redirected to context provider " + ip + ":" + portV + prefix;
+  }
+  else if (qcrsP->errorCode.details == "")
+  {
+    qcrsP->errorCode.fill(SccOk, std::string("Redirected to context provider ") + ip + ":" + portV + prefix);
   }
 
   answer = qcrsP->render(ciP, QueryContext, "");
