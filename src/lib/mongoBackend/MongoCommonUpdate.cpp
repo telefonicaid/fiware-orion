@@ -303,13 +303,12 @@ static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
 * original value of the attribute was different that the one used in the update (this is
 * important for ONCHANGE notifications).
 */
-static bool checkAndUpdate(BSONObjBuilder& newAttr, BSONObj attr, ContextAttribute ca, bool* actualUpdate) {
+static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttribute ca, bool* actualUpdate) {
 
     bool updated = false;
     *actualUpdate = false;
 
     newAttr.append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
-
     /* The hasField() check is needed to preserve compatibility with entities that were created
      * in database by a CB instance previous to the support of creation and modification dates */
     if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
@@ -409,6 +408,7 @@ static bool checkAndUpdate(BSONObjBuilder& newAttr, BSONObj attr, ContextAttribu
             *actualUpdate = true;
             updated       = true;  // FIXME: is it OK to do this?
         }
+
     }
     else {
         /* Attribute doesn't match */
@@ -520,12 +520,11 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
     bool updated = false;
     for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
 
-        BSONObjBuilder  newAttr;
+        BSONObjBuilder   newAttr;
         bool unitActualUpdate = false;
         if (checkAndUpdate(newAttr, i.next().embeddedObject(), *caP, &unitActualUpdate) && !updated) {
             updated = true;
         }
-
         /* If at least one actual update was done at checkAndUpdate() level, then updateAttribute()
          * actual update is true */
         if (unitActualUpdate == true) {
