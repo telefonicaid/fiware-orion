@@ -96,7 +96,6 @@ std::string postUpdateContext
     return answer;
   }
 
-
   ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
 
   //

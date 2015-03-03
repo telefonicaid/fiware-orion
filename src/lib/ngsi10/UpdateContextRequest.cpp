@@ -37,6 +37,8 @@
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "convenience/UpdateContextAttributeRequest.h"
+
 
 
 /* ****************************************************************************
@@ -175,7 +177,13 @@ void UpdateContextRequest::fill(const AppendContextElementRequest* acerP)
 *
 * UpdateContextRequest::fill - 
 */
-void UpdateContextRequest::fill(const std::string& entityId, const std::string& entityType, const std::string& isPattern, const std::string& _updateActionType)
+void UpdateContextRequest::fill
+(
+  const std::string& entityId,
+  const std::string& entityType,
+  const std::string& isPattern,
+  const std::string& _updateActionType
+)
 {
   ContextElement* ceP = new ContextElement();
 
@@ -183,4 +191,39 @@ void UpdateContextRequest::fill(const std::string& entityId, const std::string& 
   contextElementVector.push_back(ceP);
 
   updateActionType.set(_updateActionType);
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill
+(
+  const UpdateContextAttributeRequest* ucarP,
+  const std::string&                   entityId,
+  const std::string&                   entityType,
+  const std::string&                   attributeName
+)
+{
+  ContextElement*   ceP = new ContextElement();
+  ContextAttribute* caP;
+
+  if (ucarP->compoundValueP != NULL)
+  {
+    caP = new ContextAttribute(attributeName, ucarP->type, ucarP->compoundValueP);
+  }
+  else
+  {
+    caP = new ContextAttribute(attributeName, ucarP->type, ucarP->contextValue);
+  }
+
+  caP->metadataVector.fill((MetadataVector*) &ucarP->metadataVector);
+  ceP->contextAttributeVector.push_back(caP);
+  ceP->entityId.fill(entityId, entityType, "false");
+
+  contextElementVector.push_back(ceP);
+  
+  updateActionType.set("UPDATE");  // Coming from an UpdateContextAttributeRequest (PUT), must be UPDATE
 }
