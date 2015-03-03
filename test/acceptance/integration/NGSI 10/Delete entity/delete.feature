@@ -27,7 +27,7 @@ Feature: Subscribe context tests
 
   Scenario: Delete an entity does not exist with convenience and type extended
     # Append
-    Given a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
+    Given a new "NGSI10" api request with the service "service" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | temperature    | centigrade     | 25              |
@@ -37,7 +37,7 @@ Feature: Subscribe context tests
       | Room2     | RoomTwo     |
     And build the standard entity creation payload with the previous data
     And a standard context entity creation is asked with the before information
-    And a new NGSI version "10" petition with the service "service" and the subservice "/subservice"
+    And a new "NGSI10" api request with the service "service" and the subservice "/subservice"
     When a convenience delete context is asked with the following data
       | entity_id | entity_type |
       | Room2     | RoomOne     |

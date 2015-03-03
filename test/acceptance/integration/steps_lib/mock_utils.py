@@ -51,22 +51,22 @@ def get_mock_information(step):
         mock_ip=world.config['mock']['host'], mock_port=world.config['mock']['port']))
 
 
-@step('the path in the last mock petition contains "([^"]*)"')
-def the_path_in_the_last_petition_contains(step, content):
+@step('the path in the last mock request contains "([^"]*)"')
+def the_path_in_the_last_request_contains(step, content):
     check_world_attribute_is_not_none(['mock_data'])
     mock_response = eval(world.mock_data.text)
     path = mock_response['requests'].keys()[0]
     try:
         assert path.find(
-            content) >= 0, 'The content "{content}" is not in the path of the last petition in the mock "{path}"'.format(
+            content) >= 0, 'The content "{content}" is not in the path of the last request in the mock "{path}"'.format(
             content=str(content), path=str(path))
     except KeyError as e:
         print mock_response
         raise e
 
 
-@step('headers of the last mock petition contains the head "([^"]*)" with the value "([^"]*)"')
-def the_path_in_the_last_petition_contains(step, head, value):
+@step('headers of the last mock request contains the head "([^"]*)" with the value "([^"]*)"')
+def the_path_in_the_last_request_contains(step, head, value):
     check_world_attribute_is_not_none(['mock_data'])
     mock_response = eval(world.mock_data.text)['requests']
     elements = len(mock_response.keys())
@@ -81,8 +81,8 @@ def the_path_in_the_last_petition_contains(step, head, value):
         raise e
 
 
-@step('headers of the last mock petition not contains the head "([^"]*)"$')
-def the_path_in_the_last_petition_contains(step, head):
+@step('headers of the last mock request not contains the head "([^"]*)"$')
+def the_path_in_the_last_request_contains(step, head):
     check_world_attribute_is_not_none(['mock_data'])
     mock_response = eval(world.mock_data.text)['requests']
     elements = len(mock_response.keys())
@@ -97,8 +97,8 @@ def the_path_in_the_last_petition_contains(step, head):
         raise e
 
 
-@step('there is "([^"]*)" petitions requested to the mock')
-def there_is_petitions_requested_to_the_mock(step, number_requests):
+@step('there is "([^"]*)" requests sent to the mock')
+def there_is_requests_requested_to_the_mock(step, number_requests):
     check_world_attribute_is_not_none(['mock_data'])
     requests = json.loads(world.mock_data.text)['requests']
     number_mock_requests = 0
