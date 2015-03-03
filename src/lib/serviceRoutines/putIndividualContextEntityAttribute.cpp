@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: TID Developer
+* Author: Ken Zangelin
 */
 #include <string>
 #include <vector>
@@ -28,7 +28,6 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenience/UpdateContextElementResponse.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/uriParamNames.h"
@@ -44,8 +43,8 @@
 *
 * putIndividualContextEntityAttribute -
 *
-* GET /v1/contextEntities/{entityId::id}/attributes/{attributeName}
-* GET /ngsi10/contextEntities/{entityId::id}/attributes/{attributeName}
+* PUT /v1/contextEntities/{entityId::id}/attributes/{attributeName}
+* PUT /ngsi10/contextEntities/{entityId::id}/attributes/{attributeName}
 *
 * Payload In:  UpdateContextAttributeRequest
 * Payload Out: StatusCode
@@ -78,7 +77,7 @@ std::string putIndividualContextEntityAttribute
   
 
   // 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
-  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName);
+  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "UPDATE");
   
 
   // 2. Call postUpdateContext standard service routine
