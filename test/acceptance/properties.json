@@ -4,7 +4,7 @@
     "logs_path": "logs"
   },
   "context_broker": {
-    "host": "192.168.0.103",
+    "host": "localhost",
     "port": "1026"
   },
   "mock": {
@@ -12,7 +12,7 @@
     "bind_ip": "0.0.0.0"
   },
   "mongo": {
-    "host": "192.168.0.103",
+    "host": "localhost",
     "port": "27017"
   },
   "deploy_data": {
