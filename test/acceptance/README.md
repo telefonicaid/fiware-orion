@@ -39,12 +39,14 @@ Some examples:
 
 ### Tests Coverage (features):
 
-- Git ISSUE-713 - CPr-propagate Fiware-Service header in forwarded requests
-- Git ISSUE-714 - CPr-propagate Fiware-Servicepath header in forwarded requests
-- Git ISSUE-719 - ServicePath for registrations (NGSI9) (not recursive)
-- Git ISSUE-322 - Service support for registries (NGSI9)
-- Git ISSUE-715 - CPr-propagate X-Auth-Token header in forwarded requests
-- Git ISSUE-716 - ContextProvicer forwarding for attributes not existing in existing entities
+- ISSUE-322 Service support for registries (NGSI9)
+- ISSUE-713 CPr-propagate Fiware-Service header in forwarded requests
+- ISSUE-714 CPr-propagate Fiware-Servicepath header in forwarded requests
+- ISSUE-715 CPr-propagate X-Auth-Token header in forwarded requests
+- ISSUE-716 ContextProvicer forwarding for attributes not existing in existing entities
+- ISSUE-719 ServicePath for registrations (NGSI9) (not recursive)
+- Delete entity
+- Subscribe context
 
 ### properties.json
 
@@ -57,22 +59,23 @@ Its needed:
     "logs_path": "logs" # Path where the logs will be stored
   },
   "context_broker": {
-    "host": "localhost", # Ip where Orion is running
-    "port": "1026" # Port where Orion is listening
+    "host": "", # Ip where Orion is running
+    "port": "" # Port where Orion is listening
   },
   "mock": {
-    "port": "5566", # Port where the mock will be listening
-    "bind_ip": "0.0.0.0" # Address from mock will accept requests
+    "port": "", # Port where the mock will be listening
+    "bind_ip": "" # Address from mock will accept requests
   },
   "mongo": {
-    "host": "localhost", # Ip where the mongoDB is running
-    "port": "27017" # Port where MongoDB is listening
+    "host": "", # Ip where the mongoDB is running
+    "port": "" # Port where MongoDB is listening
   },
   "deploy_data": {
     "host": "", #Host where the context broker is deployed
     "ssh_port": "", #Ssh port of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
     "user": "", #Ssh user of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
     "password": "" #Ssh password of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
+    "bin_path": "" #Path where the bin file of CB is located.
   }
 }
 ```
@@ -83,12 +86,15 @@ Its needed:
 There is a tag for each issue in github:
 
 ```
+delete_entity
+issue-322
 issue-713
-issue-714 
-issue-715 
-issue-716 
-issue-719 
-issue-322 
-issue-755 
+issue-714
+issue-715
+issue-716
+issue-719
+issue-755
+issue_755
+subscribe_context
 ```
 

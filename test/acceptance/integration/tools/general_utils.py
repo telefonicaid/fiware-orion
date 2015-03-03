@@ -20,6 +20,7 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 """
+import json
 
 
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
@@ -263,14 +264,14 @@ def get_cb_pid():
         pid_number = getattr(api, runner)('cat /tmp/contextBroker.pid')
         cmd_line = getattr(api, runner)('cat /proc/{pid_number}/cmdline'.format(pid_number=pid_number))
         if cmd_line == 'contextBroker':
-            if getattr(api, runner)('ps -p {pid_number} | grep contextBroker'.format(pid_number=pid_number)) != '':
+            if getattr(api, runner)('ps -p {pid_number} | grep bin/contextBroker'.format(pid_number=pid_number)) != '':
                 return pid_number
             else:
-                return getattr(api, runner)("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+                return getattr(api, runner)("ps -ef | grep bin/contextBroker | grep -v grep | awk '{print $2}'")
         else:
-            return getattr(api, runner)("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+            return getattr(api, runner)("ps -ef | grep bin/contextBroker | grep -v grep | awk '{print $2}'")
     else:
-        return getattr(api, runner)("ps -ef | grep contextBroker | grep -v grep | awk '{print $2}'")
+        return getattr(api, runner)("ps -ef | grep bin/contextBroker | grep -v grep | awk '{print $2}'")
 
         
 
@@ -291,6 +292,7 @@ def start_cb(parms):
     if world.cb_pid != '':
         stop_cb()
     getattr(api, runner)('{bin_path} {parms} >> /tmp/cb_acceptance_test.log'.format(bin_path=config['bin_path'], parms=parms))
+    world.cb_pid = get_cb_pid()
 
 
 def stop_cb():
@@ -308,12 +310,19 @@ def stop_cb():
     set_ssh_config(localhost)
     # Check if there is CB running
     if get_cb_pid() != '':
+        print get_cb_pid()
         getattr(api, runner)('kill -15 {pid} && sleep 5'.format(pid=get_cb_pid()))
         if get_cb_pid() != '':
+            print get_cb_pid()
             getattr(api, runner)('kill -9 {pid} && sleep 5'.format(pid=get_cb_pid()))
             if get_cb_pid() != '':
+                print get_cb_pid()
                 raise EnvironmentError('After try to kill the Context Broker process, is still running, kill it manually')
     world.cb_pid = get_cb_pid() # It should be '' (empty)
+
+
+def pretty(json_pret):
+    print json.dumps(json_pret, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 

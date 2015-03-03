@@ -88,6 +88,32 @@ def build_the_standard_query_context_payload_with_the_previous_data(step):
             world.entities)
 
 
+@step('build the standard context subscription ontime payload with the previous data and the following')
+def build_the_standard_context_subscription_ontime_payload_with_the_previous_data_and_the_following(step):
+    """
+    Build the payload taking into account the entities and notify condition have to be defined before
+    | attributes(list, separated by comma) | reference | duration |
+    :param step:
+    :return:
+    """
+    check_world_attribute_is_not_none(['entities', 'notify_conditions'])
+    if len(step.hashes) == 1:
+        columns = ['attributes', 'reference', 'duration']
+        for column in columns:
+            if column not in step.hashes[0]:
+                raise ValueError(
+                    'The column {column} has to exist in the table. The table is: {hashes}'.format(column=column,
+                                                                                                   hashes=step.hashes))
+        world.payloads[world.payloads_count] = PayloadUtils.build_standard_subscribe_context_payload(
+            world.entities, step.hashes[0]['attributes'].split(','),
+            'http://{ip}:{port}{path}'.format(ip=world.config['mock']['host'], port=world.config['mock']['port'],
+                                              path=step.hashes[0]['reference']),
+            step.hashes[0]['duration'],
+            world.notify_conditions)
+
+
+# NGSI 9
+
 @step('build the standard context registration payload with the previous data and duration "([^"]*)"')
 def build_the_standard_context_registration_payload_with_the_previous_data(step, duration):
     """
@@ -112,4 +138,5 @@ def build_the_standard_discover_context_availability_payload_with_the_previous_d
     check_world_attribute_is_not_none(['entities'])
     world.payloads[world.payloads_count] = PayloadUtils.build_discover_context_availability_payload(
         world.entities)
+    
 
