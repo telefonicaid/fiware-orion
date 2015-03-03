@@ -102,7 +102,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext?empty=entity::type --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload" --json
 echo
 echo
 
@@ -170,7 +170,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext?empty=entity::type --payload "$payload" --json --servicePath /e1/#
+orionCurl --url /v1/queryContext --payload "$payload" --json --servicePath /e1/#
 echo
 echo
 
@@ -184,7 +184,7 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/queryContext?empty=entity::type --payload "$payload" --json --servicePath /e1/a4
+orionCurl --url /v1/queryContext --payload "$payload" --json --servicePath /e1/a4
 echo
 echo
 
