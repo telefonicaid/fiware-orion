@@ -48,6 +48,17 @@
 * Payload In:  UpdateContextAttributeRequest
 * Payload Out: StatusCode
 *
+* URI parameters:
+*   - entity::type=TYPE
+*   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
+*     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
+*   [ attributesFormat=object: makes no sense for this operation as StatusCode is returned ]
+*   
+* 0. Take care of URI params
+* 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
+* 2. Call postUpdateContext standard service routine
+* 3. Translate UpdateContextResponse to StatusCode
+* 4. Cleanup and return result
 */
 std::string postIndividualContextEntityAttribute
 (
