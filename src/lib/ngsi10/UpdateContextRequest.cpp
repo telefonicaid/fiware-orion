@@ -204,7 +204,8 @@ void UpdateContextRequest::fill
   const UpdateContextAttributeRequest* ucarP,
   const std::string&                   entityId,
   const std::string&                   entityType,
-  const std::string&                   attributeName
+  const std::string&                   attributeName,
+  const std::string&                   _updateActionType
 )
 {
   ContextElement*   ceP = new ContextElement();
@@ -225,5 +226,5 @@ void UpdateContextRequest::fill
 
   contextElementVector.push_back(ceP);
   
-  updateActionType.set("UPDATE");  // Coming from an UpdateContextAttributeRequest (PUT), must be UPDATE
+  updateActionType.set(_updateActionType);
 }
