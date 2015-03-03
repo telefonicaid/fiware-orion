@@ -325,13 +325,6 @@ static bool checkAndUpdate(BSONObjBuilder& newAttr, BSONObj attr, ContextAttribu
     }
 
 
-    //
-    // DEBUGGING
-    //
-    std::string idValue = STR_FIELD(attr, ENT_ATTRS_ID);
-
-
-
     if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_ID), ca.name, ca.getId()))
     {
         updated = true;
