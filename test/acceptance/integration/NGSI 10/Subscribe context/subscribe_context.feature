@@ -20,11 +20,12 @@
 # iot_support at tid dot es
 # __author__ = 'Jon Calderin Goñi (jon dot caldering at gmail dot com)'
 
+@subscribe_context
 Feature: Subscribe context tests
 
   Background:
     Given the Context Broker started with multitenancy
-  @issue-693
+
   Scenario: Reset the context broker with ontime subscriptions active
     # Set mock
     Given a started mock
