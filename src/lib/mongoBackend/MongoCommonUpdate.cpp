@@ -1195,6 +1195,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());
                 *why = ATTRIBUTE_NOT_FOUND;
+                LM_W(("Bad Input (attribute not found)"));
                 return false;
 
             }
@@ -1206,6 +1207,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() +
                                       " - location nature of an attribute has to be defined at creation time, with APPEND");
+                LM_W(("Bad Input (location nature of an attribute has to be defined at creation time, with APPEND)"));
                 return false;
             }
 
@@ -1216,6 +1218,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
                                               " - error parsing location attribute, value: <" + targetAttr->value + ">");
+                        LM_W(("Bad Input (error parsing location attribute)"));
                         return false;
                 }
 
@@ -1236,6 +1239,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
                                               " - attempt to define a location attribute [" + targetAttr->name + "] when another one has been previously defined [" + locAttr + "]");
+                        LM_W(("Bad Input (attempt to define a second location attribute)"));
                         return false;
                     }
 
@@ -1245,6 +1249,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
                                               " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
+                        LM_W(("Bad Input (only WGS84 is supported for location)"));
                         return false;
                     }
 
@@ -1254,6 +1259,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                                   " - entity: [" + eP->toString() + "]" +
                                                   " - offending attribute: " + targetAttr->toString() +
                                                   " - error parsing location attribute, value: [" + targetAttr->value + "]");
+                            LM_W(("Bad Input (error parsing location attribute)"));
                             return false;
                     }
                     locAttr = targetAttr->name;
@@ -1271,6 +1277,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
                                       " - attribute can not be appended");
+                LM_W(("Bad Input (attribute can not be appended)"));
                 return false;
             }
         }
@@ -1286,6 +1293,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                           " - entity: [" + eP->toString() + "]" +
                                           " - offending attribute: " + targetAttr->toString() +
                                           " - location attribute has to be defined at creation time, with APPEND");
+                    LM_W(("Bad Input (location attribute has to be defined at creation time)"));
                     return false;
                 }
 
@@ -1305,6 +1313,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
                                       " - attribute not found");
+                LM_W(("Bad Input (attribute to be deleted is not found)"));
                 return false;
 
             }
@@ -1580,6 +1589,7 @@ void processContextElement(ContextElement*                      ceP,
                                       " - entity: [" + enP->toString(true) + "]" +
                                       " - offending attribute: " + aP->toString() +
                                       " - empty attribute not allowed in APPEND or UPDATE");
+                LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
                 return;
             }
         }

@@ -503,7 +503,8 @@ function dbInsertEntity()
 #   --servicePath <path>           (Service Path in HTTP header)
 #   --urlParams   <params>         (URI parameters 'in' URL-string)
 #   --xauthToken  <token>          (X-Auth token value)
-#   --verbose                      
+#   --verbose                      (verbose output)
+#   --noPayloadCheck               (don't check the payload)
 #
 # Any parameters are sent as is to 'curl'
 # 
