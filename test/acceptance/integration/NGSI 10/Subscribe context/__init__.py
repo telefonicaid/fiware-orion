@@ -1,4 +1,6 @@
-# Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+# -*- coding: utf-8 -*-
+"""
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -17,8 +19,6 @@
 #
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
+"""
 
-for db in $(dbList.sh | awk '{ print $1 }' | grep ftest)
-do
-  dbReset.sh $db
-done
+__author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'

@@ -5,3 +5,5 @@
 - Fix: A few more of the 'responses without entityId::type filled in' found and fixed (Issue #585)
 - Fix: The convenience operations "/v1/contextAttributes/{entity::id}/attributes" now share implementation with
        convenience operations "/v1/contextAttributes/{entity::id}" and are thus 100% identical.
+- Fix: The convenience operation "PUT /v1/contextAttributes/{entity::id}/attributes/{attribute::name}" had a bug
+       about the metadata in the update, this error has been fixed.

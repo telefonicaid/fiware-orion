@@ -93,5 +93,11 @@ responses = {
         'status_code': 200,
         'headers': {},
         'delay': 0
+    },
+    'ok': {
+        'body': "",
+        'status_code': 200,
+        'headers': {},
+        'delay': 0
     }
 }

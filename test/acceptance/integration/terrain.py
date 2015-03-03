@@ -47,6 +47,8 @@ def before_all():
     world.responses = {}
     world.cb_config_to_start = ''
     world.cb_pid = get_cb_pid()
+    world.bin_parms = None
+    drop_all_test_databases(world.config['mongo']['host'], int(world.config['mongo']['port']))
 
 
 @after.each_scenario
