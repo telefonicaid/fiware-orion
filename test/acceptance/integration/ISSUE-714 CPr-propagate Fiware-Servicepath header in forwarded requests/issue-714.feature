@@ -54,7 +54,7 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     #Mock information
     Then retrieve information from the mock
     And the path in the last mock request contains "service1"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And headers of the last mock request contains the head "Fiware-Servicepath" with the value "/subservice"
     And  clean the mongo database of the service "issue_714"
 
@@ -84,7 +84,7 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     #Mock information
     Then retrieve information from the mock
     And the path in the last mock request contains "service1"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And headers of the last mock request not contains the head "Fiware-Servicepath"
     And headers of the last mock request contains the head "Fiware-Service" with the value "issue_714"
     And  clean the mongo database of the service "issue_714"
@@ -118,7 +118,7 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     #Mock information
     Then retrieve information from the mock
     And the path in the last mock request contains "service1"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And headers of the last mock request contains the head "Fiware-Servicepath" with the value "/subservice"
     And  clean the mongo database of the service "issue_714"
 
@@ -151,6 +151,6 @@ Feature: When the ContextBroker forwards a requests to a Context Provider, the h
     #Mock information
     Then retrieve information from the mock
     And the path in the last mock request contains "service1"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And headers of the last mock request not contains the head "Fiware-Servicepath"
     And clean the mongo database of the service "issue_714"

@@ -58,11 +58,11 @@ Feature: Subscribe context tests
       | attributes  | reference     | duration |
       | temperature | /subscription | PT1M     |
     And a standard context subscription is asked with the before information
-    # Wait 12 seconds
+    # Wait 12 seconds for the notification
     And wait "12" seconds
     # Check the mock gets the notify
     And retrieve information from the mock
-    And there is "2" requests requested to the mock
+    And there is "2" requests sent to the mock
     # Update the attribute value
     And a new "NGSI10" api request with the service "service" and the subservice "/subservice"
     And the following attributes to create
@@ -73,11 +73,11 @@ Feature: Subscribe context tests
       | Room1     | RoomOne     |
     And build the standard entity update payload with the previous data
     When a standard context entity update is asked with the before information
-    # Wait 10 seconds
+    # Wait 10 seconds for the notification
     And wait "10" seconds
     # Check the mock gets the notify
     And retrieve information from the mock
-    And there is "3" requests requested to the mock
+    And there is "3" requests sent to the mock
     And the "3" requests of the mock has the key "value" with the value "26"
     # Restart Context Broker
     And request a restart of cb
@@ -92,10 +92,10 @@ Feature: Subscribe context tests
       | Room2     | RoomOne     |
     And build the standard entity update payload with the previous data
     When a standard context entity update is asked with the before information
-    # Wait 10 seconds
+    # Wait 5 seconds for the notification
     And wait "5" seconds
     # Check the mock gets the notify
     And retrieve information from the mock
-    And there is "4" requests requested to the mock
+    And there is "4" requests sent to the mock
     And the "4" requests of the mock has the key "value" with the value "27"
     And print the information stored in the mock

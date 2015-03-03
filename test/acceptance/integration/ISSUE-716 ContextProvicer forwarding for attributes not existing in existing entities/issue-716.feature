@@ -64,7 +64,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
     # Mock information
     Then retrieve information from the mock
     And the path in the last mock request contains "service"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_716"
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CB
@@ -104,7 +104,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
     When a standard query context is asked with the before information
     # Mock information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_716"
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CP but in other subservice (Not found is ok)
@@ -144,7 +144,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
     When a standard query context is asked with the before information
     # Mock information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_716"
     And check the response has the key "errorCode"
 
@@ -185,7 +185,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
     When a standard query context is asked with the before information
     # Mock information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_716"
     And clean the mongo database of the service "issue_716_2"
     And check the response has the key "errorCode"
@@ -231,7 +231,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
     # Mock information
     Then retrieve information from the mock
     And the path in the last mock request contains "service"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_716"
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CB
@@ -272,7 +272,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
     When a standard context entity update is asked with the before information
     # Mock information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_716"
 
   Scenario: Query an entity in the CB and in the CP with the attributes in the CP but in other subservice (Not found is ok)
@@ -313,7 +313,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
     When a standard context entity update is asked with the before information
     # Mock information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_716"
     And check the response has the key "code" with the value "472"
 
@@ -355,7 +355,7 @@ Feature: Context Provider forwarding for attributes not existing in existing ent
     When a standard context entity update is asked with the before information
     # Mock information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_716"
     And clean the mongo database of the service "issue_716_2"
     And check the response has the key "code" with the value "404"

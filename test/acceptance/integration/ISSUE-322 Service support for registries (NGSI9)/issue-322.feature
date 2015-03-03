@@ -108,7 +108,7 @@ Feature: Service support for registries (NGSI9)
     #Mock information
     Then retrieve information from the mock
     And the path in the last mock request contains "service2"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And  clean the mongo database of the service "issue_322"
     And  clean the mongo database of the service "issue_322_2"
 
@@ -154,7 +154,7 @@ Feature: Service support for registries (NGSI9)
     When a standard context entity update is asked with the before information
     Then retrieve information from the mock
     And the path in the last mock request contains "service1"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
@@ -197,7 +197,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard entity creation payload with the previous data
     When a standard context entity creation is asked with the before information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
@@ -241,7 +241,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard entity delete payload with the previous data
     When a standard context entity delete is asked with the before information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
@@ -291,7 +291,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard query context payload with the previous data
     And a standard query context is asked with the before information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
 
@@ -343,7 +343,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard query context payload with the previous data
     And a standard query context is asked with the before information
     Then retrieve information from the mock
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And the path in the last mock request contains "service2"
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service "issue_322_2"
@@ -396,7 +396,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard query context payload with the previous data
     And a standard query context is asked with the before information
     Then retrieve information from the mock
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And the path in the last mock request contains "service2"
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service ""
@@ -449,7 +449,7 @@ Feature: Service support for registries (NGSI9)
     And build the standard query context payload with the previous data
     And a standard query context is asked with the before information
     Then retrieve information from the mock
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And the path in the last mock request contains "service2"
     And clean the mongo database of the service "issue_322"
     And clean the mongo database of the service ""

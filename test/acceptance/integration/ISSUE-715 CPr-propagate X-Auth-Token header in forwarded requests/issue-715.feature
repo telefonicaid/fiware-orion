@@ -56,7 +56,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     Then retrieve information from the mock
     And headers of the last mock request contains the head "X-Auth-Token" with the value "aaaa"
     And the path in the last mock request contains "service"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_715"
 
   Scenario: Forward the X-Auth-Token for the context provider in an update operation
@@ -92,7 +92,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     Then retrieve information from the mock
     And headers of the last mock request contains the head "X-Auth-Token" with the value "aaaa"
     And the path in the last mock request contains "service"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_715"
 
   Scenario: Do not forward the X-Auth-Token for the context provider in a query operation
@@ -122,7 +122,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     Then retrieve information from the mock
     And headers of the last mock request not contains the head "X-Auth-Token"
     And the path in the last mock request contains "service"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_715"
 
   Scenario: Do not forward the X-Auth-Token for the context provider in a update operation
@@ -155,7 +155,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     Then retrieve information from the mock
     And headers of the last mock request not contains the head "X-Auth-Token"
     And the path in the last mock request contains "service"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_715"
 
 #Fixme: Repeat all tests with convenience operation, when developed. This is pending on the "big refactoring" in CPr funciontality being done in 1Q2015"

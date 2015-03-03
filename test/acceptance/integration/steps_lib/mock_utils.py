@@ -97,7 +97,7 @@ def the_path_in_the_last_request_contains(step, head):
         raise e
 
 
-@step('there is "([^"]*)" requests requested to the mock')
+@step('there is "([^"]*)" requests sent to the mock')
 def there_is_requests_requested_to_the_mock(step, number_requests):
     check_world_attribute_is_not_none(['mock_data'])
     requests = json.loads(world.mock_data.text)['requests']

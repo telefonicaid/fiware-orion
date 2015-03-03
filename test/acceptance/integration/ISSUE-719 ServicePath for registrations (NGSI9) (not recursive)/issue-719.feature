@@ -105,7 +105,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     #Mock information
     Then retrieve information from the mock
     And the path in the last mock request contains "service2"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And  clean the mongo database of the service "issue_719"
 
   Scenario: Update an entity in a context provider, having other context provider with the same entity in other subservice
@@ -150,7 +150,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     When a standard context entity update is asked with the before information
     Then retrieve information from the mock
     And the path in the last mock request contains "service1"
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_719"
 
   Scenario: Append an entity in a context broker, having context providers with the same entity in the same subservice and other in other subservice
@@ -192,7 +192,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard entity creation payload with the previous data
     When a standard context entity creation is asked with the before information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_719"
 
   @issue_755
@@ -235,7 +235,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard entity delete payload with the previous data
     When a standard context entity delete is asked with the before information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_719"
 
   Scenario: Entity in CB and in CP with the same subervice, and in other CP with other subservice.
@@ -284,7 +284,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard query context payload with the previous data
     And a standard query context is asked with the before information
     Then retrieve information from the mock
-    And there is "0" requests requested to the mock
+    And there is "0" requests sent to the mock
     And clean the mongo database of the service "issue_719"
 
   Scenario: Entity in CB and in CP with the same subervice, and in other CP with other subservice.
@@ -335,7 +335,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard query context payload with the previous data
     And a standard query context is asked with the before information
     Then retrieve information from the mock
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And the path in the last mock request contains "service2"
     And clean the mongo database of the service "issue_719"
 
@@ -387,7 +387,7 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
     And build the standard query context payload with the previous data
     And a standard query context is asked with the before information
     Then retrieve information from the mock
-    And there is "1" requests requested to the mock
+    And there is "1" requests sent to the mock
     And the path in the last mock request contains "service2"
     And clean the mongo database of the service "issue_719"
 
@@ -441,6 +441,6 @@ Feature: ServicePath for registrations (NGSI9) (not recursive)
 #    And build the standard query context payload with the previous data
 #    And a standard query context is asked with the before information
 #    Then retrieve information from the mock
-#    And there is "1" requests requested to the mock
+#    And there is "1" requests sent to the mock
 #    And the path in the last mock request contains "service2"
 #    And clean the mongo database of the service "issue_719"
