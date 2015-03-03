@@ -518,20 +518,16 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
     BSONArrayBuilder newAttrsBuilder;
     actualUpdate = false;
     bool updated = false;
-
-
     for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
+
         BSONObjBuilder  newAttr;
         bool unitActualUpdate = false;
-
         if (checkAndUpdate(newAttr, i.next().embeddedObject(), *caP, &unitActualUpdate) && !updated) {
             updated = true;
         }
 
-        //
-        // If at least one actual update was done at checkAndUpdate() level, then updateAttribute()
-        // actual update is true 
-        //
+        /* If at least one actual update was done at checkAndUpdate() level, then updateAttribute()
+         * actual update is true */
         if (unitActualUpdate == true) {
             actualUpdate = true;
         }
@@ -541,6 +537,7 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
     newAttrs = newAttrsBuilder.arr();
 
     return updated;
+
 }
 
 /* ****************************************************************************
