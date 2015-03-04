@@ -20,6 +20,8 @@
     "ssh_port": "",
     "user": "",
     "password": "",
-    "bin_path": "/usr/bin/contextBroker"
+    "bin_path": "/usr/bin/contextBroker",
+    "log_path": "",
+    "pid_file": ""
   }
 }
