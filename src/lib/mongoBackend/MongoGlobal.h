@@ -295,6 +295,12 @@ extern void destroyAllOntimeIntervalThreads(std::string tenant);
 
 /* ****************************************************************************
 *
+* matchEntity -
+*/
+extern bool matchEntity(EntityId* en1, EntityId* en2);
+
+/* ****************************************************************************
+*
 * includedEntity -
 */
 extern bool includedEntity(EntityId en, EntityIdVector* entityIdV);

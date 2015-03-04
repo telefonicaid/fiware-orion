@@ -234,7 +234,8 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
     for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
     {
       EntityId* crEnP = cr.entityIdVector.get(jx);
-      if (crEnP->id == enP->id && (crEnP->type == enP->type || enP->type == ""))
+      //if (crEnP->id == enP->id && (crEnP->type == enP->type || enP->type == ""))
+      if (matchEntity(crEnP, enP))
       {
         found = true;
         break; /* jx */
@@ -308,6 +309,27 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
 
 /* ****************************************************************************
 *
+* processGenericEntities -
+*
+*
+* If the request included some "generic" entity, some additional CPr could be needed in the CER array. There are
+* three cases of "generic" entities: 1) not pattern + null type, 2) pattern + not null type, 3) pattern + null type
+*
+*/
+void processGenericEntities(EntityIdVector& enV, ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV)
+{
+  for (unsigned int ix = 0; ix < enV.size(); ++ix)
+  {
+    EntityId* enP = enV.get(ix);
+    if (enP->type == "" || isTrue(enP->isPattern))
+    {
+      addContextProviders(cerV, crrV, enP);
+    }
+  }
+}
+
+/* ****************************************************************************
+*
 * mongoQueryContext - 
 */
 HttpStatusCode mongoQueryContext
@@ -362,6 +384,24 @@ HttpStatusCode mongoQueryContext
 
     ContextRegistrationResponseVector crrV;
 
+    /* In the case of empty response, if only generic processing is needed */
+    if (rawCerV.size() == 0)
+    {
+      if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+      {
+        if (crrV.size() > 0)
+        {
+          processGenericEntities(requestP->entityIdVector, rawCerV, crrV);
+        }
+      }
+      else
+      {
+        /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+        LM_E(("Database Error (%s)", err.c_str()));
+      }
+      crrV.release();
+    }
+
     /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
     if (someContextElementNotFound(rawCerV))
     {
@@ -370,17 +410,7 @@ HttpStatusCode mongoQueryContext
         if (crrV.size() > 0)
         {
           fillContextProviders(rawCerV, crrV);
-
-          /* If the request included some "generic" entity, some additional CPr could be needed in the CER array. There are
-           * three cases of "generic" entities: 1) not pattern + null type, 2) pattern + not null type, 3) pattern + null type */
-          for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
-          {
-            EntityId* enP = requestP->entityIdVector.get(ix);
-            if (enP->type == "")
-            {
-              addContextProviders(rawCerV, crrV, enP);
-            }
-          }
+          processGenericEntities(requestP->entityIdVector, rawCerV, crrV);
         }
       }
       else

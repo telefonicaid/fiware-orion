@@ -598,38 +598,56 @@ void destroyAllOntimeIntervalThreads(std::string tenant)
 
 /* ****************************************************************************
 *
+* matchEntity -
+*
+* Taking into account null types and id patterns. Note this function is not
+* commutative: en1 is interpreted as the entity to match *in* en2 (i.e.
+* it is assumed that the pattern is in en2)
+*/
+bool matchEntity(EntityId* en1, EntityId* en2)
+{
+  bool idMatch;
+  if (isTrue(en2->isPattern))
+  {
+    regex_t regex;
+    if (regcomp(&regex, en2->id.c_str(), 0) != 0)
+    {
+      LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));
+      idMatch = false;
+    }
+    if (regexec(&regex, en1->id.c_str(), 0, NULL, 0) == 0)
+    {
+      idMatch = true;
+    }
+    else
+    {
+      idMatch = false;
+    }
+    regfree(&regex);
+  }
+  else  /* isPattern=false */
+  {
+    idMatch = (en2->id == en1->id);
+  }
+
+  /* Note that type == "" is like a * wildcard for type*/
+  return idMatch && (en1->type == "" || en2->type == "" || en2->type == en1->type);
+}
+
+/* ****************************************************************************
+*
 * includedEntity -
 */
 bool includedEntity(EntityId en, EntityIdVector* entityIdV) {
 
-    for (unsigned int ix = 0; ix < entityIdV->size(); ++ix) {
-        EntityId* en2 = entityIdV->get(ix);
-
-        bool idMatch;
-        if (isTrue(en2->isPattern)) {
-            regex_t regex;
-            if (regcomp(&regex, en2->id.c_str(), 0) != 0) {
-                LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));
-                continue;
-            }
-            if (regexec(&regex, en.id.c_str(), 0, NULL, 0) == 0) {
-                idMatch = true;
-            }
-            else {
-                idMatch = false;
-            }
-            regfree(&regex);
-        }
-        else {  /* isPattern=false */
-            idMatch = (en2->id == en.id);
-        }
-
-        /* Note that type == "" is like a * wildcard */
-        if (idMatch && (en.type == "" || en2->type == "" || en2->type == en.type)) {
-            return true;
-        }
-    }
-    return false;
+  for (unsigned int ix = 0; ix < entityIdV->size(); ++ix)
+  {
+    if (matchEntity(&en, entityIdV->get(ix)))
+      {
+        return true;
+      }
+  }
+  return false;
 }
 
 /* ****************************************************************************
