@@ -83,30 +83,30 @@ Date: REGEX(.*)
                 {
                     "metadatas": [
                         {
-                            "name": "ID",
-                            "type": "string",
+                            "name": "ID", 
+                            "type": "string", 
                             "value": "ground"
                         }
                     ],
-                    "name": "temperature",
-                    "type": "centigrade",
+                    "name": "temperature", 
+                    "type": "centigrade", 
                     "value": ""
                 },
                 {
                     "metadatas": [
                         {
-                            "name": "ID",
-                            "type": "string",
+                            "name": "ID", 
+                            "type": "string", 
                             "value": "wall"
                         }
                     ],
-                    "name": "temperature",
-                    "type": "centigrade",
+                    "name": "temperature", 
+                    "type": "centigrade", 
                     "value": ""
                 }
             ],
             "statusCode": {
-                "code": "200",
+                "code": "200", 
                 "reasonPhrase": "OK"
             }
         }
@@ -126,18 +126,18 @@ Date: REGEX(.*)
         {
             "metadatas": [
                 {
-                    "name": "ID",
-                    "type": "string",
+                    "name": "ID", 
+                    "type": "string", 
                     "value": "ground"
                 }
             ],
-            "name": "temperature",
-            "type": "centigrade",
+            "name": "temperature", 
+            "type": "centigrade", 
             "value": "23"
         }
     ],
     "statusCode": {
-        "code": "200",
+        "code": "200", 
         "reasonPhrase": "OK"
     }
 }
@@ -148,19 +148,19 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "code": "200",
+    "code": "200", 
     "reasonPhrase": "OK"
 }
 +++++ 4. lookup the attribute again +++++
 HTTP/1.1 200 OK
-Content-Length: 159
+Content-Length: 133
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "404",
-        "details": "Attribute-ValueID pair: /temperature-ground/",
+        "code": "404",  
+        "details": "Entity id: /Room1/", 
         "reasonPhrase": "No context element found"
     }
 }

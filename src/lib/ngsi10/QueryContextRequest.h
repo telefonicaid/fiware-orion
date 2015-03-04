@@ -54,7 +54,11 @@ typedef struct QueryContextRequest
   void          present(const std::string& indent);
   void          release(void);
   void          fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName);
-  void          fill(const std::string& entityId, const std::string& entityType, EntityTypeInfo typeInfo, const std::string& attributeName = "");
+  void          fill(const std::string&  entityId,
+                     const std::string&  entityType,
+                     EntityTypeInfo      typeInfo,
+                     const std::string&  attributeName = "",
+                     const std::string&  metaIdValue   = "");
 } QueryContextRequest;
 
 #endif

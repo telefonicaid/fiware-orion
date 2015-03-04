@@ -27,10 +27,12 @@
 
 #include "logMsg/logMsg.h"
 
-#include "mongoBackend/mongoQueryContext.h"
-#include "ngsi/ParseData.h"
 #include "convenience/ContextAttributeResponse.h"
+#include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
+#include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/getAttributeValueInstance.h"
 
 
@@ -39,7 +41,32 @@
 *
 * getAttributeValueInstance - 
 *
-* GET /ngsi10/contextEntities/{entityID}/attributes/{attributeName}/{valueID}
+* GET /ngsi10/contextEntities/{entityId::id}/attributes/{attribute::name}/{metadata::ID-value}
+* GET /v1/contextEntities/{entityId::id}/attributes/{attribute::name}/{metadata::ID-value}
+*
+* Payload In:  None
+* Payload Out: ContextAttributeResponse
+*
+* URI parameters:
+*   - entity::type=TYPE
+*   - exist=entity::type
+*   - !exist=entity::type
+*   - attributesFormat=object?
+*
+* 0. Take care of URI params
+* 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)
+* 2. Call standard operation
+* 3. Fill in ContextAttributeResponse from QueryContextResponse
+* 4. If 404 Not Found - enter request entity data into response StatusCode::details
+* 5. Render the ContextAttributeResponse
+* 6. Cleanup and return result
+*
+* FIXME P1
+* As the metadata ID matching is done outside mongoBackend, context provider forwarding 
+* is not supported. This problem could be solved adding the metadata ID value as a scope
+* in the restriction of the QueryContext.
+* Another option is to simply stop supporting this special metadata 'ID', however
+* I believe the iotBroker of NEC depends on this ... 
 */
 std::string getAttributeValueInstance
 (
@@ -49,57 +76,88 @@ std::string getAttributeValueInstance
   ParseData*                 parseDataP
 )
 {
-  QueryContextRequest      request;
-  QueryContextResponse     response;
-  std::string              entityId      = compV[2];
-  std::string              attributeName = compV[4];
-  std::string              valueID       = compV[5];
-  EntityId*                eP            = new EntityId(entityId, "", "false");
-  StatusCode               sc;
-  ContextAttributeResponse car;
+  std::string               answer;
+  std::string               entityId       = compV[2];
+  std::string               entityType     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string               attributeName  = compV[4];
+  std::string               metaIdValue    = compV[5];
+  EntityTypeInfo            typeInfo       = EntityTypeEmptyOrNotEmpty;
+  ContextAttributeResponse  response;
 
-  request.entityIdVector.push_back(eP);
-  request.attributeList.push_back(attributeName);
-
-  ciP->httpStatusCode = mongoQueryContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-
-  if (response.contextElementResponseVector.size() == 0)
+  // 0. Take care of URI params
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
   {
-     car.statusCode.fill(SccContextElementNotFound,
-                         std::string("Entity-Attribute pair: /") + entityId + "-" + attributeName + "/");
+    typeInfo = EntityTypeEmpty;
   }
-  else
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
   {
-    ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
-    ContextAttributeVector cav = cerP->contextElement.contextAttributeVector;
+    typeInfo = EntityTypeNotEmpty;
+  }
 
+
+  // 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)
+  parseDataP->qcr.res.fill(entityId, entityType, typeInfo, attributeName, metaIdValue);
+
+
+  // 2. Call standard operation
+  answer = postQueryContext(ciP, components, compV, parseDataP);
+
+
+  //
+  // 3. Fill in ContextAttributeResponse from QueryContextResponse.
+  //    Special care with metadata named ID (and type 'xsd:string').
+  //
+  if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)  
+  {
+    ContextElementResponse* cerP = parseDataP->qcrs.res.contextElementResponseVector.get(0);
+
+    //
     // FIXME P4: as long as mongoQueryContext() signature is based on NGSI standard operations and that
     // standard queryContext doesn't allow specify metadata for attributes (note that it uses xs:string,
     // not full fledge attribute types), we cannot pass the ID to mongoBackend so we need to do the for loop
     // to grep the right attribute among all the ones returned by mongoQueryContext. However, this involves
     // a suboptimal query at mongoBackend, which could be improved passing it the ID as a new parameter to
     // mongoQueryContext() (although breaking the design principle about mongo*() functions follow the NGSI
-    // standard). To think about it.
-    for (unsigned int i = 0; i < cav.size(); i++)
+    // standard). To think about ...
+    //
+    for (unsigned int i = 0; i < cerP->contextElement.contextAttributeVector.size(); i++)
     {
-      if (cav.get(i)->getId() == valueID)
+      if (cerP->contextElement.contextAttributeVector.get(i)->getId() == metaIdValue)
       {
-        car.contextAttributeVector.push_back(cav.get(i));
+        response.contextAttributeVector.push_back(cerP->contextElement.contextAttributeVector.get(i));
       }
     }
 
-    if (cav.size() > 0 && car.contextAttributeVector.size() == 0)
+    if (cerP->contextElement.contextAttributeVector.size() > 0 && response.contextAttributeVector.size() == 0)
     {
-      car.statusCode.fill(SccContextElementNotFound,
-                          std::string("Attribute-ValueID pair: /") + attributeName + "-" + valueID + "/");
+      response.statusCode.fill(SccContextElementNotFound,
+                               std::string("Attribute-ValueID pair: /") + attributeName + "-" + metaIdValue + "/");
     }
     else
     {
-      car.statusCode.fill(&cerP->statusCode);
+      response.statusCode.fill(&cerP->statusCode);
     }
   }
+  else
+  {
+    response.statusCode.fill(parseDataP->qcrs.res.errorCode);
+  }
 
-  request.release();
 
-  return car.render(ciP, AttributeValueInstance, "");
+  // 4. If 404 Not Found - enter request entity data into response StatusCode::details
+  if (response.statusCode.code == SccContextElementNotFound)
+  {
+    response.statusCode.details = "Entity id: /" + entityId + "/";
+  }
+
+
+  // 5. Render the ContextAttributeResponse
+  answer = response.render(ciP, IndividualContextEntityAttribute, "");
+
+
+  // 6. Cleanup and return result
+  // response.release();
+  // parseDataP->qcr.res.release();
+
+  return answer;
 }
