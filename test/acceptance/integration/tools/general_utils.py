@@ -162,7 +162,7 @@ def drop_all_test_databases(ip, port):
 def raise_property_bad_configuration(section):
     raise ValueError(
         'The {section} section in the properties.json is bad configured: {section_conf} \n Configuration: {config}'.format(
-            section=section, section_conf=world.confg[section], config=world.config))
+            section=section, section_conf=world.config[section], config=world.config))
 
 
 def check_properties():
@@ -210,7 +210,7 @@ def check_properties():
         if checking['host'] == "":
             raise_property_bad_configuration('deploy_data')
         else:
-            if not checking['host'] == 'localhost' or not checking['host'] == '127.0.0.1':
+            if checking['host'] != 'localhost' and checking['host'] != '127.0.0.1':
                 empty_attrs = ['ssh_port', 'user', 'password', 'bin_path']
                 for attr in empty_attrs:
                     if checking[attr] == "":
