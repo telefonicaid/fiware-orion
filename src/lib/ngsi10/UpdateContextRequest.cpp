@@ -34,6 +34,7 @@
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
+#include "ngsi/ContextAttribute.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "rest/ConnectionInfo.h"
@@ -182,6 +183,7 @@ void UpdateContextRequest::fill
   const std::string& entityId,
   const std::string& entityType,
   const std::string& isPattern,
+  const std::string& attributeName,
   const std::string& _updateActionType
 )
 {
@@ -191,6 +193,12 @@ void UpdateContextRequest::fill
   contextElementVector.push_back(ceP);
 
   updateActionType.set(_updateActionType);
+
+  if (attributeName != "")
+  {
+    ContextAttribute* caP = new ContextAttribute(attributeName, "", "");
+    ceP->contextAttributeVector.push_back(caP);
+  }
 }
 
 
