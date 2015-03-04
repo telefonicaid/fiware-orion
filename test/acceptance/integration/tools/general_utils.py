@@ -210,7 +210,7 @@ def check_properties():
         if checking['host'] == "":
             raise_property_bad_configuration('deploy_data')
         else:
-            if not checking['host'] == 'localhost' and not checking['host'] == '127.0.0.1':
+            if checking['host'] != 'localhost' and checking['host'] != '127.0.0.1':
                 empty_attrs = ['ssh_port', 'user', 'password', 'bin_path']
                 for attr in empty_attrs:
                     if checking[attr] == "":
