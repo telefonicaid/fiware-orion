@@ -541,8 +541,8 @@ static void prepareDatabaseSeveralCprs2(void)
 *
 * noPatternAttrsAll -
 *
-* Discover:  E3 - <null>
-* Result:    E3 - (A1, A2, A3) - http://cr1.com
+* Query:  E3 - <null>
+* Result: E3 - (A1, A2, A3) - http://cr1.com
 *
 */
 TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
@@ -609,8 +609,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
 *
 * noPatternAttrOneSingle -
 *
-* Discover:  E1 - A4
-* Result:    E1 - A4 - http://cr2.com
+* Query:  E1 - A4
+* Result: E1 - A4 - http://cr2.com
 */
 TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
 {
@@ -629,17 +629,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr2.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -679,14 +668,14 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
 *
 * noPatternAttrOneMulti -
 *
-* Discover:  E1 - A1
-* Result:    E1 - A1 - http://cr1.com
-*            E1 - A1 - http://cr2.com
+* Query:  E1 - A1
+* Result: E1 - A1 - http://cr1.com
+*         E1 - A1 - http://cr2.com
 *
 * In this case, htpt://cr2.com also matches, but current implementation of mongoBackend
 * returns only one of them (which one is not specified).
 *
-* This test also checks that discovering for type (E1) doesn't match with no-typed
+* This test also checks that querying for type (E1) doesn't match with no-typed
 * entities (E1** - cr5 is not returned)
 */
 TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
@@ -706,17 +695,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -757,8 +735,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
 *
 * noPatternAttrsSubset -
 *
-* Discover:  E3 - (A1, A2)
-* Result:    E3 - (A1, A2) - http://cr1.com
+* Query:  E3 - (A1, A2)
+* Result: E3 - (A1, A2) - http://cr1.com
 */
 TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
 {
@@ -778,17 +756,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -833,9 +800,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
 *
 * noPatternSeveralCREs -
 *
-* Discover:  E1 - no attrs
-* Result:    E1 -  A1, A2, A3 - http://cr1.com
-*                  A4         - http://cr2.com
+* Query:  E1 - no attrs
+* Result: E1 - A1, A2, A3 - http://cr1.com
+*              A4         - http://cr2.com
 *
 * For A1 two CPrs overlap and mongoBacken takes http://cr1.com
 *
@@ -856,17 +823,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -921,9 +877,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
 *
 * noPatternSeveralRegistrations -
 *
-* Discover:  E2 - no attrs
-* Result:    E2 - (A1, A2, A3) - http://cr1.com
-*            E2 - (A2, A3)     - http://cr3.com
+* Query:  E2 - no attrs
+* Result: E2 - (A1, A2, A3) - http://cr1.com
+*         E2 - (A2, A3)     - http://cr3.com
 *
 * For A2 and A3 is there overlap with http:;//cr3.com, but mongoBackend sets http://cr1.com
 *
@@ -944,17 +900,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1004,8 +949,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
 *
 * noPatternNoEntity -
 *
-* Discover:  E4 - no attrs
-* Result:    none
+* Query:  E4 - no attrs
+* Result: none
 */
 TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
 {
@@ -1023,16 +968,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-  EXPECT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1052,8 +987,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
 *
 * noPatternNoAttribute -
 *
-* Discover:  E1 - A5
-* Result:    none
+* Query:  E1 - A5
+* Result: none
 */
 TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
 {
@@ -1073,16 +1008,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-  EXPECT_EQ(0,res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1106,10 +1031,10 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
 *
 * noPatternMultiEntity -
 *
-* Discover:  (E1, E2) - no attrs
-* Result:    E1 - A1, A2, A3 - http://cr1.com
-*                 A4         - http://cr2.com
-*            E2 - A1, A2, A3 - http://cr1.com
+* Query:  (E1, E2) - no attrs
+* Result: E1 - A1, A2, A3 - http://cr1.com
+*              A4         - http://cr2.com
+*         E2 - A1, A2, A3 - http://cr1.com
 *
 * Overlaps:
 *    E1-A1: cr1 and cr2
@@ -1134,17 +1059,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1225,9 +1139,9 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
 *
 * noPatternMultiAttr -
 *
-* Discover:  E1 - (A3, A4, A5)
-* Result:    E1 - A3 - http://cr1.com
-*                 A4 - http://cr2.com
+* Query:  E1 - (A3, A4, A5)
+* Result: E1 - A3 - http://cr1.com
+*              A4 - http://cr2.com
 */
 TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 {
@@ -1248,17 +1162,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1303,10 +1206,10 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 *
 * noPatternMultiEntityAttrs -
 *
-* Discover:  (E1, E2) - (A3, A4, A5)
-* Result:    E1 - A3 - http://cr1.com
-*                 A4 - http://cr2.com
-*            E2 - A3 - http://cr1.com
+* Query:  (E1, E2) - (A3, A4, A5)
+* Result: E1 - A3 - http://cr1.com
+*              A4 - http://cr2.com
+*         E2 - A3 - http://cr1.com
 *
 * E2-A3 is also provided by http://cr3.com, but mongoBackend choses cr1
 *
@@ -1332,17 +1235,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1403,12 +1295,12 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
 *
 * noPatternNoType -
 *
-* Discover:  E1** - A1
-* Result:    E1   - A1 - http://cr1.com
-*            E1*  - A1*- http://cr4.com
-*            E1** - A1 - http://cr5.com
+* Query:  E1** - A1
+* Result: E1   - A1 - http://cr1.com
+*         E1*  - A1*- http://cr4.com
+*         E1** - A1 - http://cr5.com
 *
-* Note that this case checks matching of no-type in the discover for both the case in
+* Note that this case checks matching of no-type in the query for both the case in
 * which the returned CR has type (cr1, cr4) and the case in which it has no type (cr5).
 *
 * Note also that for E1-A1 there are two possibilities in the registrations database (cr1 and cr2)
@@ -1432,17 +1324,6 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1514,13 +1395,13 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
 *
 * pattern0Attr -
 *
-* Discover:  E[2-3] - none
-* Result:    E2 - (A1, A2, A3) - http://cr1.com
-*            E2 - (A1, A2, A3) - http://cr1.com
+* Query:  E[2-3] - none
+* Result: E2 - (A1, A2, A3) - http://cr1.com
+*         E2 - (A1, A2, A3) - http://cr1.com
 *
 * There is overlap in some CPrs (e.g. E1-A1,A4-cr2) but monboBacken only returns one.
 *
-* This test also checks that discovering for type (E[2-3]) doesn't match with no-typed
+* This test also checks that querying for type (E[2-3]) doesn't match with no-typed
 * entities (E3** - cr5 is not returned)
 *
 */
@@ -1540,17 +1421,6 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1622,8 +1492,8 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
 *
 * pattern1AttrSingle -
 *
-* Discover:  E[1-3] - A4
-* Result:    E1 - A4 - http://cr2.com
+* Query:  E[1-3] - A4
+* Result: E1 - A4 - http://cr2.com
 */
 TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
 {
@@ -1642,17 +1512,6 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr2.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1692,9 +1551,9 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
 *
 * pattern1AttrMulti -
 *
-* Discover:  E[1-2] - A1
-* Result:    E1     - A1 - http://cr1.com
-*            E2     - A2 - http://cr1.com
+* Query:  E[1-2] - A1
+* Result: E1     - A1 - http://cr1.com
+*         E2     - A2 - http://cr1.com
 *
 * There is overlap for E1-A1 (cr1 and cr2) than mongoBackend resolves to cr1
 *
@@ -1716,17 +1575,6 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1782,9 +1630,9 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
 *
 * patternNAttr -
 *
-* Discover:  E[1-2] - (A1, A2)
-* Result:    E1     - (A1, A2) - http://cr1.com
-*            E2     - (A1, A2) - http://cr1.com
+* Query:  E[1-2] - (A1, A2)
+* Result: E1     - (A1, A2) - http://cr1.com
+*         E2     - (A1, A2) - http://cr1.com
 *
 * There is overlap in some CPrs (e.g. E2-A2-cr3) but monboBacken only returns one.
 *
@@ -1807,17 +1655,6 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1883,8 +1720,8 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
 *
 * patternFail -
 *
-* Discover:  R.* - none
-* Result:    none
+* Query:  R.* - none
+* Result: none
 */
 TEST(mongoContextProvidersQueryRequest, patternFail)
 {
@@ -1902,16 +1739,6 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccContextElementNotFound, res.errorCode.code);
-  EXPECT_EQ("No context element found", res.errorCode.reasonPhrase);
-  EXPECT_EQ(0, res.errorCode.details.size());
-  EXPECT_EQ(0,res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1935,11 +1762,11 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
 *
 * patternNoType -
 *
-* Discover:  E[2-3]** - A2
-* Result:    E2       - A2  - http://cr1.com
-*            E3       - A2  - http://cr1.com
-*            E2*      - A2* - http://cr4.com
-*            E3**     - A2  - http://cr5.com
+* Query:  E[2-3]** - A2
+* Result: E2       - A2  - http://cr1.com
+*         E3       - A2  - http://cr1.com
+*         E2*      - A2* - http://cr4.com
+*         E3**     - A2  - http://cr5.com
 *
 * Overlaps: E2-A2-cr3
 *
@@ -1961,17 +1788,6 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2059,11 +1875,11 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
 *
 * mixPatternAndNotPattern -
 *
-* Discover:  (E[2-3]. E1) - none
-* Result:    E1           - (A1, A2, A3) - http://cr1.com
-*                            A4          - http://cr2.com
-*            E2           - (A1 ,A2, A3) - http://cr1.com
-*            E3           - (A1, A2, A3) - http://cr1.com
+* Query:  (E[2-3]. E1) - none
+* Result: E1           - (A1, A2, A3) - http://cr1.com
+*                         A4          - http://cr2.com
+*         E2           - (A1 ,A2, A3) - http://cr1.com
+*         E3           - (A1, A2, A3) - http://cr1.com
 *
 * Overlaps: E1           - A1 - http://cr2.com
 *           E2           - (A2, A3) - http://cr3.com
@@ -2086,17 +1902,6 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccFound, res.errorCode.code);
-  EXPECT_EQ("Found", res.errorCode.reasonPhrase);
-  EXPECT_EQ("http://cr1.com", res.errorCode.details);
-
-  ASSERT_EQ(0, res.contextElementResponseVector.size());
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
