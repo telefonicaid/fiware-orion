@@ -114,9 +114,6 @@ void searchCprForAttribute(EntityId& en, std::string attrName, ContextRegistrati
 * vector passes as argument. If a suitable CPr is found, it is added to the CER (and the 'found' field
 * changed to true)
 *
-* FIXME P10: this function is very complex (9-10 nested blocks... wow!) It should be refactored into several
-* functions one #787 is ready
-*
 */
 void fillContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV)
 {
@@ -213,6 +210,64 @@ void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* e
   cerV.push_back(cerP);
 }
 
+/* ****************************************************************************
+*
+* addContextProviders -
+*
+*
+* This functions takes a CRR vector and adds the Context Providers in the CER vector
+* (except the ones corresponding to some locally found attribute, i.e. info already in the
+* CER vector)
+*
+* FIXME P10: refactor this with the other addContextProvider() function
+*
+*/
+void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, EntityId* enP)
+{
+  for (unsigned int ix = 0; ix < crrV.size(); ++ix)
+  {
+    ContextRegistration cr = crrV.get(ix)->contextRegistration;
+
+    /* Matching crr? */
+    // FIXME: refactor to an external function
+    bool found = false;
+    for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
+    {
+      EntityId* crEnP = cr.entityIdVector.get(jx);
+      if (crEnP->id == enP->id && (crEnP->type == enP->type || enP->type == ""))
+      {
+        found = true;
+        break; /* jx */
+      }
+    }
+    if (!found)
+    {
+      continue; /* ix */
+    }
+
+    if (cr.contextRegistrationAttributeVector.size() == 0)
+    {
+      /* Registration without attributes */
+      for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
+      {
+        addContextProviderEntity(cerV, cr.entityIdVector.get(jx), cr.providingApplication.get());
+      }
+    }
+    else
+    {
+      /* Registration with attributes */
+      for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
+      {
+        for (unsigned int kx = 0; kx < cr.contextRegistrationAttributeVector.size(); ++kx)
+        {
+          addContextProviderAttribute(cerV, cr.entityIdVector.get(jx), cr.contextRegistrationAttributeVector.get(kx), cr.providingApplication.get());
+        }
+      }
+    }
+  }
+}
+
+
 
 /* ****************************************************************************
 *
@@ -308,12 +363,24 @@ HttpStatusCode mongoQueryContext
     ContextRegistrationResponseVector crrV;
 
     /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
-    if (someContextElementNotFound(rawCerV)) {
+    if (someContextElementNotFound(rawCerV))
+    {
       if (registrationsQuery(requestP->entityIdVector, requestP->attributeList, &crrV, &err, tenant, servicePathV, 0, 0, false))
       {
         if (crrV.size() > 0)
         {
           fillContextProviders(rawCerV, crrV);
+
+          /* If the request included some "generic" entity, some additional CPr could be needed in the CER array. There are
+           * three cases of "generic" entities: 1) not pattern + null type, 2) pattern + not null type, 3) pattern + null type */
+          for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
+          {
+            EntityId* enP = requestP->entityIdVector.get(ix);
+            if (enP->type == "")
+            {
+              addContextProviders(rawCerV, crrV, enP);
+            }
+          }
         }
       }
       else
@@ -366,7 +433,7 @@ HttpStatusCode mongoQueryContext
     /* Prune "not found" CERs */
     pruneNotFoundContextElements(rawCerV, &responseP->contextElementResponseVector);
 
-    // FIXME: details and pagination suff has to be re-thought */
+    /* Pagination stuff */
     if (responseP->contextElementResponseVector.size() == 0)
     {
 
