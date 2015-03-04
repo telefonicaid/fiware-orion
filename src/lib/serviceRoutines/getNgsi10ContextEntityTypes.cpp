@@ -39,7 +39,22 @@
 *
 * getNgsi10ContextEntityTypes - 
 *
+* GET /v1/contextEntityTypes/{typeName}
 * GET /ngsi10/contextEntityTypes/{typeName}
+*
+* Payload In:  None
+* Payload Out: QueryContextResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+*   [ since the entityId::type is in the URL (and cannot be empty),
+*     the URI parameters dealing with entity-type are rendered meaningless ]
+*
+* 00. Get values from URL (entityId::type)
+* 01. Fill in QueryContextRequest
+* 02. Call standard operation postQueryContext (that renders the QueryContextResponse)
+* 03. If 404 Not Found - enter request entityId::type into response context element
+* 04. Cleanup and return result
 */
 std::string getNgsi10ContextEntityTypes
 (
@@ -49,11 +64,26 @@ std::string getNgsi10ContextEntityTypes
   ParseData*                 parseDataP
 )
 {
+  std::string answer;
   std::string typeName = compV[2];
 
+  // 01. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(".*", typeName, "");
-  std::string answer = postQueryContext(ciP, components, compV, parseDataP);
-  parseDataP->qcr.res.release();
 
+
+  // 02. Call standard operation postQueryContext (that renders the QueryContextResponse)
+  answer = postQueryContext(ciP, components, compV, parseDataP);
+
+
+  // 03. If 404 Not Found - enter request entityId::type into response context element
+  if (parseDataP->qcrs.res.errorCode.code == 404)
+  {
+    parseDataP->qcrs.res.errorCode.details = std::string("entityId::type /") + typeName + "/ non-existent";
+    answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, "");
+  }
+
+
+  // 04. Cleanup and return result
+  parseDataP->qcr.res.release();
   return answer;
 }
