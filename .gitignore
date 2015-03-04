@@ -43,4 +43,4 @@ rpm/BUILDROOT/
 rpm/src/
 
 *.pyc
-properties.json
+test/acceptance/properties.json
