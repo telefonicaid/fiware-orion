@@ -145,7 +145,7 @@ Date: REGEX(.*)
 </statusCode>
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 253
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -155,7 +155,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity-Attribute pair: /E01-A1/</details>
+    <details>Entity id: /E01/</details>
   </statusCode>
 </contextAttributeResponse>
 2: ++++++++++++++++++++
@@ -273,7 +273,7 @@ Date: REGEX(.*)
 </statusCode>
 9: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 268
+Content-Length: 253
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -283,7 +283,7 @@ Date: REGEX(.*)
   <statusCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Entity-Attribute pair: /E01-A1/</details>
+    <details>Entity id: /E01/</details>
   </statusCode>
 </contextAttributeResponse>
 --TEARDOWN--
