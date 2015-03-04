@@ -210,66 +210,26 @@ void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* e
   cerV.push_back(cerP);
 }
 
+
 /* ****************************************************************************
 *
-* addContextProviders -
-*
-*
-* This functions takes a CRR vector and adds the Context Providers in the CER vector
-* (except the ones corresponding to some locally found attribute, i.e. info already in the
-* CER vector)
-*
-* FIXME P10: refactor this with the other addContextProvider() function
+* matchEntityInCrr -
 *
 */
-void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, EntityId* enP)
+bool matchEntityInCrr(ContextRegistration& cr, EntityId* enP)
 {
-  for (unsigned int ix = 0; ix < crrV.size(); ++ix)
+  for (unsigned int ix = 0; ix < cr.entityIdVector.size(); ++ix)
   {
-    ContextRegistration cr = crrV.get(ix)->contextRegistration;
-
-    /* Matching crr? */
-    // FIXME: refactor to an external function
-    bool found = false;
-    for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
+    EntityId* crEnP = cr.entityIdVector.get(ix);
+    if (matchEntity(crEnP, enP))
     {
-      EntityId* crEnP = cr.entityIdVector.get(jx);
-      //if (crEnP->id == enP->id && (crEnP->type == enP->type || enP->type == ""))
-      if (matchEntity(crEnP, enP))
-      {
-        found = true;
-        break; /* jx */
-      }
-    }
-    if (!found)
-    {
-      continue; /* ix */
-    }
-
-    if (cr.contextRegistrationAttributeVector.size() == 0)
-    {
-      /* Registration without attributes */
-      for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
-      {
-        addContextProviderEntity(cerV, cr.entityIdVector.get(jx), cr.providingApplication.get());
-      }
-    }
-    else
-    {
-      /* Registration with attributes */
-      for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
-      {
-        for (unsigned int kx = 0; kx < cr.contextRegistrationAttributeVector.size(); ++kx)
-        {
-          addContextProviderAttribute(cerV, cr.entityIdVector.get(jx), cr.contextRegistrationAttributeVector.get(kx), cr.providingApplication.get());
-        }
-      }
+      return true;
     }
   }
+  return false;
 }
 
 
-
 /* ****************************************************************************
 *
 * addContextProviders -
@@ -279,12 +239,22 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
 * (except the ones corresponding to some locally found attribute, i.e. info already in the
 * CER vector)
 *
+* The enP paramter is optional. If not NULL, then before adding a CPr the function check that the
+* containting CRR match the entiy (this is used for funcionality related with "generic queries", see
+* processGenericEntities() function)
+*
 */
-void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV)
+void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, EntityId* enP = NULL)
 {
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
     ContextRegistration cr = crrV.get(ix)->contextRegistration;
+
+    /* In the case a "filtering" entity was provided, check that the current CRR match or skip to need CRR */
+    if (enP != NULL && !matchEntityInCrr(cr, enP)) {
+      continue;
+    }
+
     if (cr.contextRegistrationAttributeVector.size() == 0)
     {
       /* Registration without attributes */
