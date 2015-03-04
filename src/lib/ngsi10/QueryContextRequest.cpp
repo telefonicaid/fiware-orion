@@ -155,10 +155,10 @@ void QueryContextRequest::fill(const std::string& entityId, const std::string& e
 */
 void QueryContextRequest::fill
 (
-  const std::string&  entityId,
-  const std::string&  entityType,
-  EntityTypeInfo      typeInfo,
-  const std::string&  attributeName
+  const std::string& entityId,
+  const std::string& entityType,
+  EntityTypeInfo     typeInfo,
+  const std::string& attributeName
 )
 {
   EntityId* eidP = new EntityId(entityId, entityType, "false");
