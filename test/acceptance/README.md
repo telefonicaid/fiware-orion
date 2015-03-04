@@ -50,7 +50,7 @@ Some examples:
 
 ### properties.json
 
-Config the environment to execute the test.
+Copy the "properties_base.json" config file and config the environment to execute the test.
 Its needed:
 ```
 {
