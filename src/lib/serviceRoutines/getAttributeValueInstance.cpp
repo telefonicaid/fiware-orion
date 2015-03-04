@@ -96,7 +96,7 @@ std::string getAttributeValueInstance
 
 
   // 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)
-  parseDataP->qcr.res.fill(entityId, entityType, typeInfo, attributeName, metaIdValue);
+  parseDataP->qcr.res.fill(entityId, entityType, typeInfo, attributeName);
 
 
   // 2. Call standard operation

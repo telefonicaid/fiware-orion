@@ -159,7 +159,7 @@ Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "404",  
+        "code": "404", 
         "details": "Entity id: /Room1/", 
         "reasonPhrase": "No context element found"
     }

@@ -158,8 +158,7 @@ void QueryContextRequest::fill
   const std::string&  entityId,
   const std::string&  entityType,
   EntityTypeInfo      typeInfo,
-  const std::string&  attributeName,
-  const std::string&  metaIdValue
+  const std::string&  attributeName
 )
 {
   EntityId* eidP = new EntityId(entityId, entityType, "false");
@@ -178,7 +177,5 @@ void QueryContextRequest::fill
   if (attributeName != "")
   {
     attributeList.push_back(attributeName);
-
-    // FIXME P6: should metaIdValue go into a Scope in Restriction?
   }
 }
