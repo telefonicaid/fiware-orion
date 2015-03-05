@@ -2,5 +2,6 @@
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type /entity11/ non-existent</details>
   </errorCode>
 </queryContextResponse>

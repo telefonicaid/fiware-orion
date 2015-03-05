@@ -78,7 +78,7 @@ orionCurl --url "/v1/contextEntityTypes/Room/attributes" -X "DELETE"
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 213
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -87,6 +87,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type /Room/ non-existent</details>
   </errorCode>
 </queryContextResponse>
 2: ++++++++++++++++++++
@@ -163,7 +164,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 4: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 214
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -172,6 +173,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type /Room2/ non-existent</details>
   </errorCode>
 </queryContextResponse>
 5: ++++++++++++++++++++
