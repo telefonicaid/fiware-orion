@@ -1104,7 +1104,7 @@ Date: REGEX(.*)
 12.1. GET /ngsi10/contextEntityTypes/typeName/attributes/A1
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 224
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -1113,6 +1113,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type/attribute::name pair not found</details>
   </errorCode>
 </queryContextResponse>
 
