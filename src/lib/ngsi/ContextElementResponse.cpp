@@ -37,7 +37,7 @@
 */
 ContextElementResponse::ContextElementResponse()
 {
-  notPrune = true;
+  prune = false;
 }
 
 

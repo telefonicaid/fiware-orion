@@ -65,7 +65,7 @@
 * - queryGivenTypeGenericException
 *
 * (*) FIXME: currently mongoBackend doesn't interprets collapse parameter (considering
-* that the "collapse prunning" is done at render layer). However, if in the future
+* that the "collapse pruning" is done at render layer). However, if in the future
 * we change this operation, a new case has to be added to test that mongoBackend honour
 * the collapse parameter.
 *

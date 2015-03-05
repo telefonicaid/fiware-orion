@@ -143,7 +143,7 @@ HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const 
     }
 
     /* Prune "not found" CERs */
-    pruneNotFoundContextElements(rawCerV, cerV);
+    pruneContextElements(rawCerV, cerV);
 
     reqSemGive(__FUNCTION__, "get context-element responses");
     return SccOk;

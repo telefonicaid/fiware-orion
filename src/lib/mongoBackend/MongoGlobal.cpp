@@ -1304,14 +1304,12 @@ bool entitiesQuery
             cer->contextElement.contextAttributeVector.push_back(caP);
           }
         }
-
         cer->statusCode.fill(SccOk);
-
         cerV->push_back(cer);
     }
 
     /* All the not-patterned entities in the request not in the response are added (without attributes), as they are
-     * used before prunning in the CPr calculation logic */
+     * used before pruning in the CPr calculation logic */
     for (unsigned int ix = 0; ix < enV.size(); ++ix)
     {
       if (enV.get(ix)->isPattern != "true")
@@ -1332,14 +1330,13 @@ bool entitiesQuery
           cerP->contextElement.entityId.type = enV.get(ix)->type;
           cerP->contextElement.entityId.isPattern = "false";
 
-          /* This entity has to be prunned if after CPr searching no attribute is "added" to it. The notPrune attribute distinguish this kind of
+          /* This entity has to be pruned if after CPr searching no attribute is "added" to it. The prune attribute distinguish this kind of
            * entities from the "real ones" that are without attributes in the Orion local database (a rare case, but may happen) */
-          cerP->notPrune = false;
+          cerP->prune = true;
 
           for (unsigned int jx = 0; jx < attrL.size(); ++jx)
           {
-            ContextAttribute* caP = new ContextAttribute(attrL.get(jx), "", "");
-            caP->found = false;
+            ContextAttribute* caP = new ContextAttribute(attrL.get(jx), "", "", false);
             cerP->contextElement.contextAttributeVector.push_back(caP);
           }
 
@@ -1355,12 +1352,12 @@ bool entitiesQuery
 
 /* ****************************************************************************
 *
-* pruneNotFoundContextElements -
+* pruneContextElements -
 *
 * Remove attributes in the vector with 'found' value is 'false'
 *
 */
-void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP)
+void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP)
 {
   for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
   {
@@ -1374,11 +1371,11 @@ void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, Context
     newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;  // FIXME P10: not sure if this is the right way of doing, maybe we need a fill() method for this
     newCerP->statusCode.fill(&cerP->statusCode);
 
-    bool notPruneEntity = cerP->notPrune;
+    bool pruneEntity = cerP->prune;
 
     for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); ++jx)
     {
-      ContextAttribute* caP = cerP->contextElement.contextAttributeVector.get(jx);
+      ContextAttribute* caP = cerP->contextElement.contextAttributeVector[jx];
       if (caP->found)
       {
         ContextAttribute* newCaP = new ContextAttribute(caP);
@@ -1387,9 +1384,9 @@ void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, Context
 
     }
 
-    /* If after prunning the entity has no attribute and no CPr information, then it is not included
-     * in the output vector, except if "notPrune" is set to true */
-    if (!notPruneEntity && newCerP->contextElement.contextAttributeVector.size() == 0 && newCerP->contextElement.providingApplicationList.size() == 0)
+    /* If after pruning the entity has no attribute and no CPr information, then it is not included
+     * in the output vector, except if "prune" is set to false */
+    if (pruneEntity && newCerP->contextElement.contextAttributeVector.size() == 0 && newCerP->contextElement.providingApplicationList.size() == 0)
     {
       newCerP->release();
       delete newCerP;
@@ -1769,7 +1766,7 @@ bool processOnChangeCondition
     }
 
     /* Prune "not found" CERs */
-    pruneNotFoundContextElements(rawCerV, &ncr.contextElementResponseVector);
+    pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
 
     if (ncr.contextElementResponseVector.size() > 0)
     {
@@ -1781,7 +1778,8 @@ bool processOnChangeCondition
         if (condValues != NULL) {
             /* Check if some of the attributes in the NotifyCondition values list are in the entity.
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
-            ContextElementResponseVector rawCerV, allCerV;
+            ContextElementResponseVector rawCerV;
+            ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
             // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
@@ -1793,7 +1791,7 @@ bool processOnChangeCondition
             }
 
             /* Prune "not found" CERs */
-            pruneNotFoundContextElements(rawCerV, &allCerV);
+            pruneContextElements(rawCerV, &allCerV);
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */

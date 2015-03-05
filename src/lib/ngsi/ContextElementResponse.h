@@ -42,7 +42,7 @@ typedef struct ContextElementResponse
   ContextElement   contextElement;             // Mandatory
   StatusCode       statusCode;                 // Mandatory
 
-  bool             notPrune;                   // operational attribute used internally by the queryContext logic for not deleting entities that were
+  bool             prune;                      // operational attribute used internally by the queryContext logic for not deleting entities that were
                                                // without attributes in the Orion DB
 
   ContextElementResponse();

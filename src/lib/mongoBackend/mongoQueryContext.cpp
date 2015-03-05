@@ -40,7 +40,7 @@
 *
 * someContextElementNotFound -
 *
-* Returns true if some attribut with 'found' set to 'false' is found in the CER vector passed
+* Returns true if some attribute with 'found' set to 'false' is found in the CER vector passed
 * as argument
 *
 */
@@ -50,7 +50,7 @@ bool someContextElementNotFound(ContextElementResponseVector& cerV)
   {
     for (unsigned int jx = 0; jx < cerV.get(ix)->contextElement.contextAttributeVector.size(); ++jx)
     {
-      if (!cerV.get(ix)->contextElement.contextAttributeVector.get(jx)->found)
+      if (!cerV.get(ix)->contextElement.contextAttributeVector[jx]->found)
       {
         return true;
       }
@@ -77,29 +77,30 @@ void searchCprForAttribute(EntityId& en, std::string attrName, ContextRegistrati
     ContextRegistrationResponse* crr = crrV.get(ix);
     /* Is there a matching entity in the CRR? */
     for (unsigned jx = 0; jx < crr->contextRegistration.entityIdVector.size(); ++jx)
-    {
+    {      
       EntityId* regEn = crr->contextRegistration.entityIdVector.get(jx);
-      if (regEn->id == en.id && (regEn->type == en.type || regEn->type == ""))
+      /* No match (keep searching in other CRR) */
+      if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
       {
-        if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
+        continue;
+      }
+
+      /* CRR without attributes (keep searching in other CRR) */
+      if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
+      {
+        perEntPa = crr->contextRegistration.providingApplication.get();
+        break; /* jx */
+      }
+
+      /* Is there a matching entity or the abcense of attributes? */
+      for (unsigned kx = 0; kx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++kx)
+      {
+        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector.get(kx)->name;
+        if (regAttrName == attrName)
         {
-          /* CRR without attributes (we need to keep searching in other CRR) */
-          perEntPa = crr->contextRegistration.providingApplication.get();
-          break; /* jx */
-        }
-        else
-        {
-          /* Is there a matching entity or the abcense of attributes? */
-          for (unsigned kx = 0; kx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++kx)
-          {
-            std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector.get(kx)->name;
-            if (regAttrName == attrName)
-            {
-              /* We cannot "improve" this result keep searching in CRR vector, so we return */
-              perAttrPa = crr->contextRegistration.providingApplication.get();
-              return;
-            }
-          }
+          /* We cannot "improve" this result keep searching in CRR vector, so we return */
+          perAttrPa = crr->contextRegistration.providingApplication.get();
+          return;
         }
       }
     }
@@ -111,8 +112,8 @@ void searchCprForAttribute(EntityId& en, std::string attrName, ContextRegistrati
 * fillContextProviders -
 *
 * Looks in the elements of the CER vector passed as argument, searching for a suitable CPr in the CRR
-* vector passes as argument. If a suitable CPr is found, it is added to the CER (and the 'found' field
-* changed to true)
+* vector passed as argument. If a suitable CPr is found, it is added to the CER (and the 'found' field
+* is changed to true)
 *
 */
 void fillContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV)
@@ -123,16 +124,17 @@ void fillContextProviders(ContextElementResponseVector& cerV, ContextRegistratio
     for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
     {
       ContextAttribute* ca = cer->contextElement.contextAttributeVector.get(jx);
-      if (!ca->found)
-      {        
-        /* Search for some CPr in crrV */
-        std::string perEntPa, perAttrPa;
-        searchCprForAttribute(cer->contextElement.entityId, ca->name, crrV, perEntPa, perAttrPa);
-
-        /* Looking results after crrV processing */
-        ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
-        ca->found = (ca->providingApplication != "");
+      if (ca->found)
+      {
+        continue;
       }
+      /* Search for some CPr in crrV */
+      std::string perEntPa, perAttrPa;
+      searchCprForAttribute(cer->contextElement.entityId, ca->name, crrV, perEntPa, perAttrPa);
+
+      /* Looking results after crrV processing */
+      ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
+      ca->found = (ca->providingApplication != "");
     }
   }
 }
@@ -154,14 +156,13 @@ void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP,
   }
 
   /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
-  ContextElementResponse* cerP = new ContextElementResponse();
-  cerP->contextElement.entityId.id = enP->id;
-  cerP->contextElement.entityId.type = enP->type;
+  ContextElementResponse* cerP            = new ContextElementResponse();
+  cerP->contextElement.entityId.id        = enP->id;
+  cerP->contextElement.entityId.type      = enP->type;
   cerP->contextElement.entityId.isPattern = "false";
   cerP->contextElement.providingApplicationList.push_back(pa);
 
   cerP->statusCode.fill(SccOk);
-
   cerV.push_back(cerP);
 
 }
@@ -176,23 +177,27 @@ void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* e
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if (cerV.get(ix)->contextElement.entityId.id == enP->id && cerV.get(ix)->contextElement.entityId.type == enP->type)
+    if ((cerV.get(ix)->contextElement.entityId.id != enP->id) ||
+        (cerV.get(ix)->contextElement.entityId.type != enP->type))
     {
-      for (unsigned int jx = 0; jx < cerV.get(ix)->contextElement.contextAttributeVector.size(); ++jx)
-      {
-        std::string attrName = cerV.get(ix)->contextElement.contextAttributeVector.get(jx)->name;
-        if (attrName == craP->name)
-        {
-          /* In this case, the attribute has been already found in local database. CPr is unnecessary */
-          return;
-        }
-      }
-      /* Reached this point, no attribute was found, so adding it with corresponding CPr info */
-      ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
-      caP->providingApplication = pa;
-      cerV.get(ix)->contextElement.contextAttributeVector.push_back(caP);
-      return;
+     continue;
     }
+
+    for (unsigned int jx = 0; jx < cerV.get(ix)->contextElement.contextAttributeVector.size(); ++jx)
+    {
+      std::string attrName = cerV.get(ix)->contextElement.contextAttributeVector.get(jx)->name;
+      if (attrName == craP->name)
+      {
+        /* In this case, the attribute has been already found in local database. CPr is unnecessary */
+        return;
+      }
+    }
+    /* Reached this point, no attribute was found, so adding it with corresponding CPr info */
+    ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
+    caP->providingApplication = pa;
+    cerV.get(ix)->contextElement.contextAttributeVector.push_back(caP);
+    return;
+
   }
 
   /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
@@ -431,7 +436,7 @@ HttpStatusCode mongoQueryContext
     }
 
     /* Prune "not found" CERs */
-    pruneNotFoundContextElements(rawCerV, &responseP->contextElementResponseVector);
+    pruneContextElements(rawCerV, &responseP->contextElementResponseVector);
 
     /* Pagination stuff */
     if (responseP->contextElementResponseVector.size() == 0)

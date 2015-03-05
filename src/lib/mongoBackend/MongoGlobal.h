@@ -340,10 +340,10 @@ extern bool entitiesQuery
 
 /* ****************************************************************************
 *
-* pruneNotFoundContextElements -
+* pruneContextElements -
 *
 */
-extern void pruneNotFoundContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
+extern void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
 
 /* ****************************************************************************
 *
