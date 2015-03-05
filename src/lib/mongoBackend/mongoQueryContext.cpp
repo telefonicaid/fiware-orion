@@ -68,10 +68,13 @@ bool someContextElementNotFound(ContextElementResponseVector& cerV)
 * the "general" one at entity level or the "specific" one at attribute level
 *
 */
-void searchCprForAttribute(EntityId& en, std::string attrName, ContextRegistrationResponseVector& crrV, std::string& perEntPa, std::string& perAttrPa)
+void searchCprForAttribute(EntityId& en, std::string attrName,
+                           ContextRegistrationResponseVector& crrV,
+                           std::string* perEntPa,
+                           std::string* perAttrPa)
 {
-  perEntPa  = "";
-  perAttrPa = "";
+  *perEntPa  = "";
+  *perAttrPa = "";
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
     ContextRegistrationResponse* crr = crrV.get(ix);
@@ -88,7 +91,7 @@ void searchCprForAttribute(EntityId& en, std::string attrName, ContextRegistrati
       /* CRR without attributes (keep searching in other CRR) */
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
-        perEntPa = crr->contextRegistration.providingApplication.get();
+        *perEntPa = crr->contextRegistration.providingApplication.get();
         break; /* jx */
       }
 
@@ -99,7 +102,7 @@ void searchCprForAttribute(EntityId& en, std::string attrName, ContextRegistrati
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result keep searching in CRR vector, so we return */
-          perAttrPa = crr->contextRegistration.providingApplication.get();
+          *perAttrPa = crr->contextRegistration.providingApplication.get();
           return;
         }
       }
@@ -129,8 +132,9 @@ void fillContextProviders(ContextElementResponseVector& cerV, ContextRegistratio
         continue;
       }
       /* Search for some CPr in crrV */
-      std::string perEntPa, perAttrPa;
-      searchCprForAttribute(cer->contextElement.entityId, ca->name, crrV, perEntPa, perAttrPa);
+      std::string perEntPa;
+      std::string perAttrPa;
+      searchCprForAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
 
       /* Looking results after crrV processing */
       ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
@@ -173,7 +177,7 @@ void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP,
 *
 *
 */
-void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* enP, ContextRegistrationAttribute* craP, std::string pa)
+void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* enP, ContextRegistrationAttribute* craP, const std::string& pa)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
@@ -201,9 +205,9 @@ void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* e
   }
 
   /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
-  ContextElementResponse* cerP = new ContextElementResponse();
-  cerP->contextElement.entityId.id = enP->id;
-  cerP->contextElement.entityId.type = enP->type;
+  ContextElementResponse* cerP            = new ContextElementResponse();
+  cerP->contextElement.entityId.id        = enP->id;
+  cerP->contextElement.entityId.type      = enP->type;
   cerP->contextElement.entityId.isPattern = "false";
 
   cerP->statusCode.fill(SccOk);
@@ -239,13 +243,12 @@ bool matchEntityInCrr(ContextRegistration& cr, EntityId* enP)
 *
 * addContextProviders -
 *
-*
-* This functions takes a CRR vector and adds the Context Providers in the CER vector
+* This function takes a CRR vector and adds the Context Providers in the CER vector
 * (except the ones corresponding to some locally found attribute, i.e. info already in the
 * CER vector)
 *
-* The enP paramter is optional. If not NULL, then before adding a CPr the function check that the
-* containting CRR match the entiy (this is used for funcionality related with "generic queries", see
+* The enP parameter is optional. If not NULL, then before adding a CPr the function checks that the
+* containting CRR matches the entity (this is used for funcionality related to  "generic queries", see
 * processGenericEntities() function)
 *
 */
@@ -255,7 +258,7 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
   {
     ContextRegistration cr = crrV.get(ix)->contextRegistration;
 
-    /* In the case a "filtering" entity was provided, check that the current CRR match or skip to need CRR */
+    /* In the case a "filtering" entity was provided, check that the current CRR matches or skip to next CRR */
     if (enP != NULL && !matchEntityInCrr(cr, enP)) {
       continue;
     }
@@ -285,7 +288,6 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
 /* ****************************************************************************
 *
 * processGenericEntities -
-*
 *
 * If the request included some "generic" entity, some additional CPr could be needed in the CER array. There are
 * three cases of "generic" entities: 1) not pattern + null type, 2) pattern + not null type, 3) pattern + null type
@@ -371,7 +373,7 @@ HttpStatusCode mongoQueryContext
       }
       else
       {
-        /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+        /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
         LM_E(("Database Error (%s)", err.c_str()));
       }
       crrV.release();
@@ -390,7 +392,7 @@ HttpStatusCode mongoQueryContext
       }
       else
       {
-        /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+        /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
         LM_E(("Database Error (%s)", err.c_str()));
       }
       crrV.release();
@@ -409,7 +411,7 @@ HttpStatusCode mongoQueryContext
       }
       else
       {
-        /* Different from fails in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+        /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
         LM_E(("Database Error (%s)", err.c_str()));
       }
       crrV.release();
