@@ -76,7 +76,7 @@ Its needed:
     "user": "", # Ssh user of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
     "password": "" # Ssh password of the host where the CB is deployed (if localhost or 127.0.0.1 is set in host, this is not used)
     "bin_path": "" # Path where the bin file of CB is located.
-    "log_path": "", # Path where the Context Broker log where be stored. If its empty, the path will be in /tmp/acceptance
+    "log_path": "", # Path where the Context Broker log will be stored. If its empty, the path will be in /tmp/acceptance
     "pid_file": "" # Path where the Context Broker pid file will be stored. If its empty, the path will be in /tmp/acceptance/contextBorker.pid
   }
 }
