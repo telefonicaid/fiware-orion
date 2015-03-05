@@ -138,7 +138,7 @@ HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const 
     if (!entitiesQuery(enV, attrL, res, &rawCerV, err, true, tenant, servicePath))
     {
         reqSemGive(__FUNCTION__, "get context-element responses (no entities found)");
-        cerV->release();
+        rawCerV->release();
         return SccOk;
     }
 

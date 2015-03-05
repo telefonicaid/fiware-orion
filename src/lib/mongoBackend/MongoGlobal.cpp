@@ -1785,7 +1785,7 @@ bool processOnChangeCondition
             // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
             if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
             {
-                allCerV.release();
+                rawCerV.release();
                 ncr.contextElementResponseVector.release();
                 return false;
             }
