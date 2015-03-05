@@ -189,9 +189,10 @@ void EntityId::fill(const std::string& _id, const std::string& _type, const std:
 */
 void EntityId::fill(const struct EntityId* eidP)
 {
-  id        = eidP->id;
-  type      = eidP->type;
-  isPattern = eidP->isPattern;
+  id          = eidP->id;
+  type        = eidP->type;
+  isPattern   = eidP->isPattern;
+  servicePath = eidP->servicePath;
 }
 
 
