@@ -295,9 +295,15 @@ extern void destroyAllOntimeIntervalThreads(std::string tenant);
 
 /* ****************************************************************************
 *
+* matchEntity -
+*/
+extern bool matchEntity(EntityId* en1, EntityId* en2);
+
+/* ****************************************************************************
+*
 * includedEntity -
 */
-extern bool includedEntity(EntityId en, EntityIdVector* entityIdV);
+extern bool includedEntity(EntityId en, EntityIdVector& entityIdV);
 
 /* ****************************************************************************
 *
@@ -331,6 +337,13 @@ extern bool entitiesQuery
   bool                             details = false,
   long long*                       countP  = NULL
 );
+
+/* ****************************************************************************
+*
+* pruneContextElements -
+*
+*/
+extern void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
 
 /* ****************************************************************************
 *

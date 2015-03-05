@@ -36,6 +36,7 @@ typedef enum HttpStatusCode
 {
   SccNone                   = 0,     // Undefined
   SccOk                     = 200,   // Success
+  // FIXME P10: SccFound 302 will be removed at the end once #787 gets implemented
   SccFound                  = 302,   // Found
   SccBadRequest             = 400,   // The request is not well formed
   SccForbidden              = 403,   // The request is not allowed

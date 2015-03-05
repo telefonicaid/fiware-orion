@@ -95,7 +95,8 @@ ContextAttribute::ContextAttribute
 (
   const std::string&  _name,
   const std::string&  _type,
-  const std::string&  _value
+  const std::string&  _value,
+  bool                _found
 )
 {
   LM_T(LmtClone, ("Creating a ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
@@ -109,7 +110,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   providingApplication  = "";
-  found                 = true;
+  found                 = _found;
 }
 
 

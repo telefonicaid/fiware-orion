@@ -74,7 +74,7 @@ HttpStatusCode mongoEntityTypes
    *                })
    *
    * The $cond part is hard... more information at http://stackoverflow.com/questions/27510143/empty-array-prevents-document-to-appear-in-query
-   * As a consequence, some "null" values may appear in the resulting attrs vector, which are prunned by the result processing logic.
+   * As a consequence, some "null" values may appear in the resulting attrs vector, which are pruned by the result processing logic.
    *
    * FIXME P6: in the future, we can interpret the collapse parameter at this layer. If collapse=true so we don't need attributes, the
    * following command can be used:
@@ -174,7 +174,7 @@ HttpStatusCode mongoEntityTypes
     {
       for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
       {
-        /* This is the place in which null elements in the resulting attrs vector are prunned */
+        /* This is the place in which null elements in the resulting attrs vector are pruned */
         if (attrsArray[jx].isNull())
         {
           continue;
