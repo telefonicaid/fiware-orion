@@ -155,7 +155,7 @@ def drop_all_test_databases(ip, port):
     db = pymongo.Connection(ip, port)
     for db_name in db.database_names():
         if db_name.find('acceptance') >= 0:
-            print "Droping database: {db_name}".format(db_name=db_name)
+            world.log.debug("Droping database: {db_name}".format(db_name=db_name))
             db.drop_database(db_name)
 
 
@@ -183,7 +183,7 @@ def check_properties():
             try:
                 int(checking['port'])
             except ValueError:
-                print 'The port has to be a string with numbers, but is {port}'.format(port=checking['port'])
+                world.log.error('The port has to be a string with numbers, but is {port}'.format(port=checking['port']))
                 raise_property_bad_configuration('context_broker')
         # Mock
         checking = world.config['mock']
@@ -193,7 +193,7 @@ def check_properties():
             try:
                 int(checking['port'])
             except ValueError:
-                print 'The port has to be a string with numbers, but is {port}'.format(port=checking['port'])
+                world.log.error('The port has to be a string with numbers, but is {port}'.format(port=checking['port']))
                 raise_property_bad_configuration('mock')
         # Mongo
         checking = world.config['mock']
@@ -203,7 +203,7 @@ def check_properties():
             try:
                 int(checking['port'])
             except ValueError:
-                print 'The port has to be a string with numbers, but is {port}'.format(port=checking['port'])
+                world.log.error('The port has to be a string with numbers, but is {port}'.format(port=checking['port']))
                 raise_property_bad_configuration('mongo')
         # Deploy data
         checking = world.config['deploy_data']
@@ -218,10 +218,10 @@ def check_properties():
                 try:
                     int(checking['ssh_port'])
                 except ValueError:
-                    print 'The port has to be a string with numbers, but is {port}'.format(port=checking['ssh_port'])
+                    world.log.error('The port has to be a string with numbers, but is {port}'.format(port=checking['ssh_port']))
                     raise_property_bad_configuration('deploy_data')
     except KeyError as e:
-        print "There is a property bad configured/set: properties: {config}".format(config=world.config)
+        world.log.error("There is a property bad configured/set: properties: {config}".format(config=world.config))
         raise e
 
 
@@ -243,9 +243,10 @@ def set_ssh_config(localhost):
             env.sudo_password = config['password']
             env.warn_only = True
     except KeyError as e:
-        print 'set_ssh_config: In the properties file there is not definition about the deploy information. Config: {config}\n'.format(
-            config=world.config)
+        world.log.error('set_ssh_config: In the properties file there is not definition about the deploy information. Config: {config}\n'.format(
+            config=world.config))
         raise e
+
 
 def get_cb_pid():
     """
@@ -260,20 +261,23 @@ def get_cb_pid():
         runner = 'local'
         localhost = True
     set_ssh_config(localhost)
-    if exists('/tmp/contextBroker.pid'):
-        pid_number = getattr(api, runner)('cat /tmp/contextBroker.pid')
+    if config['pid_file'] == '':
+        pid_path = '/tmp/acceptance/contextBroker.pid'
+    else:
+        pid_path = config['pid_file']
+    if exists(pid_path):
+        pid_number = getattr(api, runner)('cat {pid_path}'.format(pid_path=pid_path))
         cmd_line = getattr(api, runner)('cat /proc/{pid_number}/cmdline'.format(pid_number=pid_number))
         if cmd_line == 'contextBroker':
-            if getattr(api, runner)('ps -p {pid_number} | grep bin/contextBroker'.format(pid_number=pid_number)) != '':
+            if getattr(api, runner)('ps -p {pid_number} | grep {bin_path}'.format(pid_number=pid_number, bin_path=config['bin_path'])) != '':
                 return pid_number
             else:
-                return getattr(api, runner)("ps -ef | grep bin/contextBroker | grep -v grep | awk '{print $2}'")
+                return getattr(api, runner)("ps -ef | grep {bin_path} | grep -v grep | awk '{{print $2}}'".format(bin_path=config['bin_path']))
         else:
-            return getattr(api, runner)("ps -ef | grep bin/contextBroker | grep -v grep | awk '{print $2}'")
+            return getattr(api, runner)("ps -ef | grep {bin_path} | grep -v grep | awk '{{print $2}}'".format(bin_path=config['bin_path']))
     else:
-        return getattr(api, runner)("ps -ef | grep bin/contextBroker | grep -v grep | awk '{print $2}'")
+        return getattr(api, runner)("ps -ef | grep {bin_path} | grep -v grep | awk '{{print $2}}'".format(bin_path=config['bin_path']))
 
-        
 
 def start_cb(parms):
     """
@@ -291,7 +295,19 @@ def start_cb(parms):
     set_ssh_config(localhost)
     if world.cb_pid != '':
         stop_cb()
-    getattr(api, runner)('{bin_path} {parms} >> /tmp/cb_acceptance_test.log'.format(bin_path=config['bin_path'], parms=parms))
+    if config['log_path'] == '':
+        log_path = '/tmp/acceptance'
+    else:
+        log_path = config['log_path']
+    getattr(api, runner)('mkdir -p {log_path}'.format(log_path=log_path))
+    if config['pid_file'] == '':
+        pid_path = '/tmp/acceptance/contextBroker.pid'
+    else:
+        pid_path = config['pid_file']
+    getattr(api, runner)('mkdir -p {pid_dir}'.format(pid_dir=pid_path[:pid_path.rfind('/')]))
+    command = '{bin_path} {parms} -logDir {log_path} -pidpath {pid_path}'.\
+        format(bin_path=config['bin_path'], parms=parms, log_path=log_path, pid_path=pid_path)
+    getattr(api, runner)(command)
     world.cb_pid = get_cb_pid()
 
 
@@ -310,19 +326,16 @@ def stop_cb():
     set_ssh_config(localhost)
     # Check if there is CB running
     if get_cb_pid() != '':
-        print get_cb_pid()
         getattr(api, runner)('kill -15 {pid} && sleep 5'.format(pid=get_cb_pid()))
         if get_cb_pid() != '':
-            print get_cb_pid()
             getattr(api, runner)('kill -9 {pid} && sleep 5'.format(pid=get_cb_pid()))
             if get_cb_pid() != '':
-                print get_cb_pid()
                 raise EnvironmentError('After try to kill the Context Broker process, is still running, kill it manually')
     world.cb_pid = get_cb_pid() # It should be '' (empty)
 
 
 def pretty(json_pret):
-    print json.dumps(json_pret, sort_keys=True, indent=4, separators=(',', ': '))
+    return json.dumps(json_pret, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 

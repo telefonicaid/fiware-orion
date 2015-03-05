@@ -61,7 +61,7 @@ def the_path_in_the_last_request_contains(step, content):
             content) >= 0, 'The content "{content}" is not in the path of the last request in the mock "{path}"'.format(
             content=str(content), path=str(path))
     except KeyError as e:
-        print mock_response
+        world.log.error(mock_response)
         raise e
 
 
@@ -77,7 +77,7 @@ def the_path_in_the_last_request_contains(step, head, value):
              check the headers forwarded {headers}' \
                 .format(head=head, value=value, headers=headers)
     except KeyError as e:
-        print 'The response received is: {response}'.format(response=mock_response)
+        world.log.error('The response received is: {response}'.format(response=mock_response))
         raise e
 
 
@@ -93,7 +93,7 @@ def the_path_in_the_last_request_contains(step, head):
              check the headers forwarded {headers}' \
                 .format(head=head.lower(), headers=headers)
     except KeyError as e:
-        print 'The response received is: {response}'.format(response=mock_response)
+        world.log.error('The response received is: {response}'.format(response=mock_response))
         raise e
 
 
@@ -110,7 +110,7 @@ def there_is_requests_requested_to_the_mock(step, number_requests):
 
 @step('print the information stored in the mock')
 def print_the_information_stored_in_the_mock(step):
-    pretty(json.loads(world.mock_data.text))
+    print pretty(json.loads(world.mock_data.text))
 
 @step('the "([^"]*)" requests of the mock has the key "([^"]*)" with the value "([^"]*)"')
 def the_requests_of_the_mock_has_the_key_with_the_value(step, number_request, key, value):

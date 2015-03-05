@@ -25,9 +25,11 @@ __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 from lettuce import before, world, after
 from integration.tools.general_utils import stop_mock, drop_all_test_databases, check_properties, get_cb_pid, stop_cb
+from iotqautils.iotqaLogger import get_logger
 
 @before.all
 def before_all():
+    world.log = get_logger('lettuce', 'DEBUG', True, True, 'logs/lettuce.log')
     check_properties()
     world.entities = None
     world.attributes_consult = None

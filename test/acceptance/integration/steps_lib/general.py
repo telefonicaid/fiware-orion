@@ -52,10 +52,10 @@ def a_new_request_with_the_service_and_the_subservice(step, ngsi_version, servic
     if ngsi_version == 'NGSI10':
         world.cb[world.cb_count] = CbNgsi10Utils(world.config['context_broker']['host'], world.service,
                                                  world.subservice,
-                                                 port=world.config['context_broker']['port'], log_verbosity='ERROR')
+                                                 port=world.config['context_broker']['port'], log_verbosity='ERROR', log_instance=world.log)
     elif ngsi_version == 'NGSI9':
         world.cb[world.cb_count] = CbNgsi9Utils(world.config['context_broker']['host'], world.service, world.subservice,
-                                                port=world.config['context_broker']['port'], log_verbosity='ERROR')
+                                                port=world.config['context_broker']['port'], log_verbosity='ERROR', log_instance=world.log)
     else:
         raise ValueError(
             'The version of ngsi api have to be \'NGSI9\' or \'NGSI10\', not {ngsi_version}'.format(ngsi_version=ngsi_version))
