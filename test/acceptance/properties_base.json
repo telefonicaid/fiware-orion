@@ -21,7 +21,7 @@
     "user": "",
     "password": "",
     "bin_path": "/usr/bin/contextBroker",
-    "log_path": "",
-    "pid_file": ""
+    "log_path": "/tmp/acceptance",
+    "pid_file": "/tmp/acceptance/contextBroker.pid"
   }
 }
