@@ -40,6 +40,10 @@ brokerStart CB 0
 # 05. GET /v1/contextEntityTypes/ET1 and see 1 response
 # 06. GET /v1/contextEntityTypes/ET2 and see 1 response
 # 07. GET /v1/contextEntityTypes/ET1?attributesFormat=object
+# 08. GET /v1/contextEntityTypes/ET1?entity::type=ET1 and see 1 response
+# 09. GET /v1/contextEntityTypes/ET1?exist=entity::type and see 1 response
+# 10. GET /v1/contextEntityTypes/ET1?!exist=entity::type end see it fail
+# 11. GET /v1/contextEntityTypes/ET1?entity::type=ET2 and see it fail
 #
 
 echo "01. GET /v1/contextEntityTypes/ET1 and see 0 responses"
@@ -121,6 +125,34 @@ echo
 echo "07. GET /v1/contextEntityTypes/ET1?attributesFormat=object"
 echo "=========================================================="
 orionCurl --url /v1/contextEntityTypes/ET1?attributesFormat=object --json
+echo
+echo
+
+
+echo "08. GET /v1/contextEntityTypes/ET1?entity::type=ET1 and see 1 response"
+echo "======================================================================"
+orionCurl --url /v1/contextEntityTypes/ET1?entity::type=ET1 --json
+echo
+echo
+
+
+echo "09. GET /v1/contextEntityTypes/ET1?exist=entity::type and see 1 response"
+echo "========================================================================"
+orionCurl --url /v1/contextEntityTypes/ET1?exist=entity::type --json
+echo
+echo
+
+
+echo "10. GET /v1/contextEntityTypes/ET1?!exist=entity::type end see it fail"
+echo "======================================================================"
+orionCurl --url /v1/contextEntityTypes/ET1?!exist=entity::type --json
+echo
+echo
+
+
+echo "11. GET /v1/contextEntityTypes/ET1?entity::type=ET2 and see it fail"
+echo "==================================================================="
+orionCurl --url /v1/contextEntityTypes/ET1?entity::type=ET2 --json
 echo
 echo
 
@@ -324,6 +356,100 @@ Date: REGEX(.*)
             }
         }
     ]
+}
+
+
+08. GET /v1/contextEntityTypes/ET1?entity::type=ET1 and see 1 response
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "a", 
+                        "value": "1"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "ET1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+09. GET /v1/contextEntityTypes/ET1?exist=entity::type and see 1 response
+========================================================================
+HTTP/1.1 200 OK
+Content-Length: 380
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "a", 
+                        "value": "1"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "ET1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+10. GET /v1/contextEntityTypes/ET1?!exist=entity::type end see it fail
+======================================================================
+HTTP/1.1 200 OK
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "entity::type cannot be empty for this request", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+11. GET /v1/contextEntityTypes/ET1?entity::type=ET2 and see it fail
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "non-matching entity::types in URL", 
+        "reasonPhrase": "Bad Request"
+    }
 }
 
 
