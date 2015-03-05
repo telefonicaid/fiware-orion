@@ -305,7 +305,7 @@ def start_cb(parms):
     else:
         pid_path = config['pid_file']
     getattr(api, runner)('mkdir -p {pid_dir}'.format(pid_dir=pid_path[:pid_path.rfind('/')]))
-    command = '{bin_path} {parms} -logDir {log_path} -pidpath {pid_path} >> /tmp/cb_acceptance_test.log'.\
+    command = '{bin_path} {parms} -logDir {log_path} -pidpath {pid_path}'.\
         format(bin_path=config['bin_path'], parms=parms, log_path=log_path, pid_path=pid_path)
     getattr(api, runner)(command)
     world.cb_pid = get_cb_pid()
