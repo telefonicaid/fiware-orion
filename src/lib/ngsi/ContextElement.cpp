@@ -157,7 +157,9 @@ void ContextElement::fill(const struct ContextElement& ce)
   attributeDomainName.fill(ce.attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ce.contextAttributeVector);
   domainMetadataVector.fill((MetadataVector*) &ce.domainMetadataVector);
-  providingApplicationList = ce.providingApplicationList;  // FIXME P10: not sure if this is the right way of doing, taking into account how the same is done for contextAttributeVector in its own fill() method...
+  /* Note that according to http://www.cplusplus.com/reference/vector/vector/operator=/, it is
+   * safe to copy vectors of std::string using '=' */
+  providingApplicationList = ce.providingApplicationList;
 }
 
 
@@ -172,5 +174,7 @@ void ContextElement::fill(ContextElement* ceP)
   attributeDomainName.fill(ceP->attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector);
   domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
-  providingApplicationList = ceP->providingApplicationList; // FIXME P10: not sure if this is the right way of doing, taking into account how the same is done for contextAttributeVector in its own fill() method...
+  /* Note that according to http://www.cplusplus.com/reference/vector/vector/operator=/, it is
+   * safe to copy vectors of std::string using '=' */
+  providingApplicationList = ceP->providingApplicationList;
 }

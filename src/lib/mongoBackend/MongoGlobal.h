@@ -303,7 +303,7 @@ extern bool matchEntity(EntityId* en1, EntityId* en2);
 *
 * includedEntity -
 */
-extern bool includedEntity(EntityId en, EntityIdVector* entityIdV);
+extern bool includedEntity(EntityId en, EntityIdVector& entityIdV);
 
 /* ****************************************************************************
 *

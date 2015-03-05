@@ -609,19 +609,15 @@ bool matchEntity(EntityId* en1, EntityId* en2)
   bool idMatch;
   if (isTrue(en2->isPattern))
   {
+    idMatch = false;
     regex_t regex;
     if (regcomp(&regex, en2->id.c_str(), 0) != 0)
     {
-      LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));
-      idMatch = false;
-    }
-    if (regexec(&regex, en1->id.c_str(), 0, NULL, 0) == 0)
-    {
-      idMatch = true;
+      LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));      
     }
     else
     {
-      idMatch = false;
+      idMatch = (regexec(&regex, en1->id.c_str(), 0, NULL, 0) == 0);
     }
     regfree(&regex);
   }
@@ -638,14 +634,15 @@ bool matchEntity(EntityId* en1, EntityId* en2)
 *
 * includedEntity -
 */
-bool includedEntity(EntityId en, EntityIdVector* entityIdV) {
+bool includedEntity(EntityId en, EntityIdVector& entityIdV)
+{
 
-  for (unsigned int ix = 0; ix < entityIdV->size(); ++ix)
+  for (unsigned int ix = 0; ix < entityIdV.size(); ++ix)
   {
-    if (matchEntity(&en, entityIdV->get(ix)))
-      {
-        return true;
-      }
+    if (matchEntity(&en, entityIdV[ix]))
+    {
+      return true;
+    }
   }
   return false;
 }
@@ -1419,7 +1416,7 @@ static void processEntity(ContextRegistrationResponse* crr, EntityIdVector enV, 
      * with NGSI spec */
     en.isPattern = std::string("false");
 
-    if (includedEntity(en, &enV)) {       
+    if (includedEntity(en, enV)) {
         EntityId* enP = new EntityId(en.id, en.type, en.isPattern);
         crr->contextRegistration.entityIdVector.push_back(enP);
     }
