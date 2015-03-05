@@ -274,11 +274,11 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
     else
     {
       /* Registration with attributes */
-      for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
+      for (unsigned int eIx = 0; eIx < cr.entityIdVector.size(); ++eIx)
       {
-        for (unsigned int kx = 0; kx < cr.contextRegistrationAttributeVector.size(); ++kx)
+        for (unsigned int aIx = 0; aIx < cr.contextRegistrationAttributeVector.size(); ++aIx)
         {
-          addContextProviderAttribute(cerV, cr.entityIdVector.get(jx), cr.contextRegistrationAttributeVector.get(kx), cr.providingApplication.get());
+          addContextProviderAttribute(cerV, cr.entityIdVector.get(eIx), cr.contextRegistrationAttributeVector.get(aIx), cr.providingApplication.get());
         }
       }
     }
