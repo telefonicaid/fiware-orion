@@ -39,8 +39,8 @@
 *
 * getNgsi10ContextEntityTypes - 
 *
-* GET /v1/contextEntityTypes/{typeName}
-* GET /ngsi10/contextEntityTypes/{typeName}
+* GET /v1/contextEntityTypes/{entity::type}
+* GET /ngsi10/contextEntityTypes/{entity::type}
 *
 * Payload In:  None
 * Payload Out: QueryContextResponse
