@@ -29,7 +29,7 @@ from iotqautils.iotqaLogger import get_logger
 
 @before.all
 def before_all():
-    world.log = get_logger('lettuce', 'DEBUG', True, True, 'logs/lettuce.log')
+    world.log = get_logger('lettuce', world.config['environment']['log_level'], True, True, 'logs/lettuce.log')
     check_properties()
     world.entities = None
     world.attributes_consult = None

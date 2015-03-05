@@ -173,7 +173,7 @@ def check_properties():
     try:
         # Environment
         checking = world.config['environment']
-        if checking['name'] == "" or checking['logs_path'] == "":
+        if checking['name'] == "" or checking['logs_path'] == "" or checking['log_level'] == "":
             raise_property_bad_configuration('environment')
         # Context Broker
         checking = world.config['context_broker']
@@ -230,6 +230,7 @@ def set_ssh_config(localhost):
     Config fabric parms
     :return:
     """
+    world.log.info('Setting context broker ssh config')
     output['stdout'] = False
     output['running'] = False
     output['warnings'] = False
@@ -253,6 +254,7 @@ def get_cb_pid():
     Get the cb pid, if its running
     :return:
     """
+    world.log.info('Getting Context Broker pid')
     config = world.config['deploy_data']
     if not config['host'] == 'localhost' or not config['host'] == '127.0.0.1':
         localhost = False
@@ -285,13 +287,16 @@ def start_cb(parms):
     :param parms:
     :return:
     """
+    world.log.info('Starting cb')
     config = world.config['deploy_data']
     if not config['host'] == 'localhost' or not config['host'] == '127.0.0.1':
         localhost = False
         runner = 'run'
+        world.log.debug('Context Broker in remote')
     else:
         runner = 'local'
         localhost = True
+        world.log.debug('Context Broker in local')
     set_ssh_config(localhost)
     if world.cb_pid != '':
         stop_cb()
@@ -299,15 +304,18 @@ def start_cb(parms):
         log_path = '/tmp/acceptance'
     else:
         log_path = config['log_path']
+    world.log.debug('Log path set to: {log_path}'.format(log_path=log_path))
     getattr(api, runner)('mkdir -p {log_path}'.format(log_path=log_path))
     if config['pid_file'] == '':
         pid_path = '/tmp/acceptance/contextBroker.pid'
     else:
         pid_path = config['pid_file']
+    world.log.debug('Pid path set to: {pid_path}'.format(pid_path=pid_path))
     getattr(api, runner)('mkdir -p {pid_dir}'.format(pid_dir=pid_path[:pid_path.rfind('/')]))
     command = '{bin_path} {parms} -logDir {log_path} -pidpath {pid_path}'.\
         format(bin_path=config['bin_path'], parms=parms, log_path=log_path, pid_path=pid_path)
-    getattr(api, runner)(command)
+    resp = getattr(api, runner)(command)
+    world.log.debug('The response of the starting Context Broker command is: {response}'.format(response=resp))
     world.cb_pid = get_cb_pid()
 
 
@@ -316,6 +324,7 @@ def stop_cb():
     Stop a cb instance with the pid in world.cb_pid
     :return:
     """
+    world.log.info('Stopping Context Broker')
     config = world.config['deploy_data']
     if not config['host'] == 'localhost' or not config['host'] == '127.0.0.1':
         localhost = False
@@ -332,6 +341,7 @@ def stop_cb():
             if get_cb_pid() != '':
                 raise EnvironmentError('After try to kill the Context Broker process, is still running, kill it manually')
     world.cb_pid = get_cb_pid() # It should be '' (empty)
+    return True
 
 
 def pretty(json_pret):
