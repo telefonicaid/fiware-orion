@@ -106,11 +106,8 @@ TEST(putAttributeValueInstance, notFound)
 /* ****************************************************************************
 *
 * found - 
-*
-* FIXME P7: enable again once tghe convop for /ngsi10/contextEntities/E1/attributes/A1/left
-*           is transformed to use Standard Operations.
 */
-TEST(putAttributeValueInstance,  DISABLED_found)
+TEST(putAttributeValueInstance, found)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes",          "POST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/left",  "PUT", "1.1");
@@ -121,6 +118,8 @@ TEST(putAttributeValueInstance,  DISABLED_found)
   std::string    out;
 
   utInit();
+
+  ci2.servicePathV.push_back("/");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
