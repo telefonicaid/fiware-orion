@@ -1,7 +1,8 @@
 {
   "environment": {
     "name": "orion",
-    "logs_path": "logs"
+    "logs_path": "logs",
+    "log_level" : "ERROR"
   },
   "context_broker": {
     "host": "localhost",
