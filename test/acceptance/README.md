@@ -57,7 +57,7 @@ Its needed:
   "environment": {
     "name": "orion",
     "logs_path": "logs" # Path where the logs will be stored
-    "log_level": "ERROR" # Level of the logs inside the tests
+    "log_level": "ERROR" # Level of the logs inside the tests ('CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG')
   },
   "context_broker": {
     "host": "", # Ip where Orion is running

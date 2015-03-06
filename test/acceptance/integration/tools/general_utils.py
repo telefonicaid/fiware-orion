@@ -341,7 +341,6 @@ def stop_cb():
             if get_cb_pid() != '':
                 raise EnvironmentError('After try to kill the Context Broker process, is still running, kill it manually')
     world.cb_pid = get_cb_pid() # It should be '' (empty)
-    return True
 
 
 def pretty(json_pret):
