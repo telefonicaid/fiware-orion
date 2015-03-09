@@ -85,6 +85,7 @@ const char* requestType(RequestType rt)
   case RtUnsubscribeContextResponse:                     return "UnsubscribeContextResponse";
   case RtSubscribeResponse:                              return "SubscribeResponse";
   case RtSubscribeError:                                 return "SubscribeError";
+  case RtContextElementResponse:                         return "ContextElementResponse";
   case RtEntityTypesResponse:                            return "EntityTypesResponse";
   case RtAttributesForEntityTypeResponse:                return "AttributesForEntityTypeResponse";
   case EntityTypes:                                      return "EntityTypes";

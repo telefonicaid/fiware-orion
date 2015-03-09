@@ -118,7 +118,7 @@ void ContextElementResponse::present(const std::string& indent, int ix)
 *
 * ContextElementResponse::fill - 
 */
-void ContextElementResponse::fill(QueryContextResponse* qcrP)
+void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string& entityId, const std::string& entityType)
 {
   if (qcrP == NULL)
   {
@@ -129,6 +129,13 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP)
   if (qcrP->contextElementResponseVector.size() == 0)
   {
     statusCode.fill(&qcrP->errorCode);
+    contextElement.entityId.fill(entityId, entityType, "false");
+
+    if ((statusCode.code != SccOk) && (statusCode.details == ""))
+    {
+      statusCode.details = "Entity id: /" + entityId + "/";
+    }
+
     return;
   }
 
