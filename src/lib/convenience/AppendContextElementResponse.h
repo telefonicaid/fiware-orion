@@ -80,7 +80,7 @@ typedef struct AppendContextElementResponse
                      std::string      indent,
                      std::string      predetectedError,
                      int              counter);
-  void         fill(UpdateContextResponse* ucrsP);
+  void         fill(UpdateContextResponse* ucrsP, const std::string& entityId = "", const std::string& entityType = "");
 } AppendContextElementResponse;
 
 #endif  // SRC_LIB_CONVENIENCE_APPENDCONTEXTELEMENTRESPONSE_H_

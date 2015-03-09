@@ -136,16 +136,21 @@ void AppendContextElementResponse::release(void)
 * This method is used in the service routine of 'POST /v1/contextEntities/{entityId::id} et al.
 * Only ONE response in the vector contextElementResponseVector of UpdateContextResponse is possible.
 */
-void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP)
+void AppendContextElementResponse::fill(UpdateContextResponse* ucrsP, const std::string& entityId, const std::string& entityType)
 {
-  ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
-
   if (ucrsP->contextElementResponseVector.size() != 0)
   {
+    ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
+
     contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
+    
+    entity.fill(&cerP->contextElement.entityId);
+  }
+  else
+  {
+    entity.fill(entityId, entityType, "false");
   }
 
-  entity.fill(&cerP->contextElement.entityId);
   errorCode.fill(ucrsP->errorCode);
 
   //
