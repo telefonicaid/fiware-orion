@@ -144,15 +144,11 @@ std::string postIndividualContextEntity
   // Now, forward Entity to response
   response.entity.fill(entityId, entityType, "false");
 
-  // Also, add entity::id and entity::type to the payload. The UpdateContextRequest::fill method needs this
-  reqP->entity.id   = entityId;
-  reqP->entity.type = entityType;
-
 
   //
   // 02. Fill in UpdateContextRequest from AppendContextElementRequest + URL-data + URI params
   //
-  parseDataP->upcr.res.fill(&parseDataP->acer.res);
+  parseDataP->upcr.res.fill(&parseDataP->acer.res, entityId, entityType);
 
 
   // 03. Call postUpdateContext standard service routine
