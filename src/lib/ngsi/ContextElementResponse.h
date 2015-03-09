@@ -59,7 +59,7 @@ typedef struct ContextElementResponse
                      const std::string&  predetectedError,
                      int                 counter);
 
-  void         fill(struct QueryContextResponse* qcrP);
+  void         fill(struct QueryContextResponse* qcrP, const std::string& entityId = "", const std::string& entityType = "");
 
 } ContextElementResponse;
 
