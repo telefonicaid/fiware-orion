@@ -30,9 +30,9 @@
 
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
+#include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
-#include "ngsi10/QueryContextRequest.h"
-#include "convenienceMap/mapDeleteIndividualContextEntity.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/deleteAllEntitiesWithTypeAndId.h"
 
 
@@ -40,6 +40,19 @@
 /* ****************************************************************************
 *
 * deleteAllEntitiesWithTypeAndId - 
+*
+* DELETE /v1/contextEntities/type/{entity::type}/id/{entity::id}
+*
+* Payload In:  None
+* Payload Out: StatusCode
+*
+* URI parameters:
+*   None
+*
+* 01. Fill in UpdateContextRequest
+* 02. Call Standard Operation
+* 03. Fill in response from UpdateContextResponse
+* 04. Cleanup and return result
 */
 extern std::string deleteAllEntitiesWithTypeAndId
 (
@@ -49,13 +62,22 @@ extern std::string deleteAllEntitiesWithTypeAndId
   ParseData*                 parseDataP
 )
 {
-  std::string  enType = compV[3];
-  std::string  enId   = compV[5];
+  std::string  entityType  = compV[3];
+  std::string  entityId    = compV[5];
   std::string  answer;
   StatusCode   response;
 
-  ciP->httpStatusCode = mapDeleteIndividualContextEntity(enId, enType, &response, ciP);
-  answer = response.render(ciP->outFormat, "", false, false);
+  // 01. Fill in UpdateContextRequest
+  parseDataP->upcr.res.fill(entityId, entityType, false, "", "DELETE");
+
+  // 02. Call Standard Operation
+  postUpdateContext(ciP, components, compV, parseDataP);
+
+  // 03. Fill in response from UpdateContextResponse
+  response.fill(parseDataP->upcrs.res);
+
+  // 04. Cleanup and return result
+  answer = response.render(ciP->outFormat, "");
   response.release();
 
   return answer;
