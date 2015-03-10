@@ -53,8 +53,18 @@
 *   - entity::type=XXX     (must coincide with entity::type in URL)
 *   - !exist=entity::type  (if set - error -- entity::type cannot be empty)
 *   - exist=entity::type   (not supported - ok if present, ok if not present ...)
+*
+* 00. Default value for response: OK
+* 01. Get values from URL (entityId::type, esist, !exist)
+* 02. Check validity of URI params
+* 03. Fill in QueryContextRequest
+* 04. Call standard operation postQueryContext
+* 05. If 404 Not Found - enter request info into response context element
+* 06. Translate QueryContextResponse to ContextElementResponse
+* 07. Cleanup and return result
+*
 */
-extern std::string getAllEntitiesWithTypeAndId
+std::string getAllEntitiesWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,

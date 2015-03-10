@@ -37,6 +37,14 @@
 
 /* ****************************************************************************
 *
+* Forward declarations
+*/
+struct QueryContextResponse;
+
+
+
+/* ****************************************************************************
+*
 * ContextAttributeResponse - 
 */
 typedef struct ContextAttributeResponse
@@ -53,6 +61,7 @@ typedef struct ContextAttributeResponse
                     std::string      predetectedError,
                     int              counter);
   void        fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode);
+  void        fill(QueryContextResponse* qcrP, const std::string& entityId, const std::string& entityType);
 } ContextAttributeResponse;
 
 #endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSE_H_
