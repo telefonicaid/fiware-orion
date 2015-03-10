@@ -57,6 +57,14 @@
 * NOTE:
 *   This service routine responds with an error if any part of the EntityId in
 *   the payload is filled in.
+*
+* 01. Get values from URL (entityId::type, esist, !exist)
+* 02. Check that the entity is NOT filled in in the payload
+* 03. Check validity of URI params
+* 04. Fill in UpdateContextRequest
+* 05. Call Standard Operation
+* 06. Fill in response from UpdateContextReSponse
+* 07. Cleanup and return result
 */
 std::string postAllEntitiesWithTypeAndId
 (
@@ -136,14 +144,11 @@ std::string postAllEntitiesWithTypeAndId
   answer = postUpdateContext(ciP, components, compV, parseDataP);
 
 
-  // 06. Any added error-returns here?
-
-
-  // 07. Fill in response from UpdateContextReSponse
+  // 06. Fill in response from UpdateContextReSponse
   response.fill(&parseDataP->upcrs.res, entityId, entityType);
 
 
-  // 08. Cleanup and return result
+  // 07. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 
