@@ -47,7 +47,9 @@
 * Payload Out: StatusCode
 *
 * URI parameters:
-*   None
+*   - entity::type=TYPE (must coincide with type in URL-path)
+*   - !exist=entity::type  (if set - error -- entity::type cannot be empty)
+*   - exist=entity::type   (not supported - ok if present, ok if not present ...)
 *
 * 01. Fill in UpdateContextRequest
 * 02. Call Standard Operation
