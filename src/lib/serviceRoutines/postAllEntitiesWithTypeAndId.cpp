@@ -58,7 +58,7 @@
 *   This service routine responds with an error if any part of the EntityId in
 *   the payload is filled in.
 *
-* 01. Get values from URL (entityId::type, esist, !exist)
+* 01. Get values from URL (entityId::type, exist, !exist)
 * 02. Check that the entity is NOT filled in in the payload
 * 03. Check validity of URI params
 * 04. Fill in UpdateContextRequest

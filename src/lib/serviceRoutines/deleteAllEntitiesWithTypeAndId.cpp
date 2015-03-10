@@ -30,9 +30,11 @@
 
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
+#include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
-#include "ngsi10/QueryContextRequest.h"
-#include "convenienceMap/mapDeleteIndividualContextEntity.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/deleteAllEntitiesWithTypeAndId.h"
 
 
@@ -40,8 +42,25 @@
 /* ****************************************************************************
 *
 * deleteAllEntitiesWithTypeAndId - 
+*
+* DELETE /v1/contextEntities/type/{entity::type}/id/{entity::id}
+*
+* Payload In:  None
+* Payload Out: StatusCode
+*
+* URI parameters:
+*   - entity::type=TYPE (must coincide with type in URL-path)
+*   - !exist=entity::type  (if set - error -- entity::type cannot be empty)
+*   - exist=entity::type   (not supported - ok if present, ok if not present ...)
+*
+* 01. Get values from URL (+ entityId::type, exist, !exist)
+* 02. Check validity of URI params
+* 03. Fill in UpdateContextRequest
+* 04. Call Standard Operation
+* 05. Fill in response from UpdateContextResponse
+* 06. Cleanup and return result
 */
-extern std::string deleteAllEntitiesWithTypeAndId
+std::string deleteAllEntitiesWithTypeAndId
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -49,14 +68,61 @@ extern std::string deleteAllEntitiesWithTypeAndId
   ParseData*                 parseDataP
 )
 {
-  std::string  enType = compV[3];
-  std::string  enId   = compV[5];
-  std::string  answer;
-  StatusCode   response;
+  std::string     entityType            = compV[3];
+  std::string     entityId              = compV[5];
+  EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
+  std::string     typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  std::string     answer;
+  StatusCode      response;
 
-  ciP->httpStatusCode = mapDeleteIndividualContextEntity(enId, enType, &response, ciP);
+  // 01. Get values from URL (+ entityId::type, exist, !exist)
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+
+
+  // 02. Check validity of URI params
+  if (typeInfo == EntityTypeEmpty)
+  {
+    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+
+    response.fill(SccBadRequest, "entity::type cannot be empty for this request");
+
+    answer = response.render(ciP->outFormat, "", false, false);
+
+    return answer;
+  }
+  else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
+  {
+    LM_W(("Bad Input non-matching entity::types in URL"));
+
+    response.fill(SccBadRequest, "non-matching entity::types in URL");
+
+    answer = response.render(ciP->outFormat, "", false, false);
+
+    return answer;
+  }
+
+
+  // 03. Fill in UpdateContextRequest
+  parseDataP->upcr.res.fill(entityId, entityType, "", "", "DELETE");
+
+
+  // 04. Call Standard Operation
+  postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 05. Fill in response from UpdateContextResponse
+  response.fill(parseDataP->upcrs.res);
+
+
+  // 06. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
-  response.release();
 
   return answer;
 }

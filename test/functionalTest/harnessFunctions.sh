@@ -103,9 +103,12 @@ function dbDrop()
 {
   db=$1
 
-  if [ "$db" != "" ]
+  if [ "$CB_DB_DROP" != "No" ]
   then
-    dbInit $db
+    if [ "$db" != "" ]
+    then
+      dbInit $db
+    fi
   fi
 }
 
