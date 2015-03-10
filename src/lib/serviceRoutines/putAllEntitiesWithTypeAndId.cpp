@@ -34,12 +34,26 @@
 #include "convenience/UpdateContextElementResponse.h"
 #include "convenienceMap/mapPutIndividualContextEntity.h"
 #include "serviceRoutines/putAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/postUpdateContext.h"
 
 
 
 /* ****************************************************************************
 *
 * putAllEntitiesWithTypeAndId - 
+*
+* PUT /v1/contextEntities/type/{entity::type}/id/{entity::id}
+*
+* Payload In:  UpdateContextElementRequest
+* Payload Out: UpdateContextElementResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+*
+* 01. Fill in UpdateContextRequest
+* 02. Call Standard Operation
+* 03. Fill in response from UpdateContextResponse
+* 04. Cleanup and return result
 */
 extern std::string putAllEntitiesWithTypeAndId
 (
@@ -49,12 +63,28 @@ extern std::string putAllEntitiesWithTypeAndId
   ParseData*                 parseDataP
 )
 {
-  std::string                   enType = compV[3];
-  std::string                   enId   = compV[5];
+  std::string                   entityType            = compV[3];
+  std::string                   entityId              = compV[5];
   std::string                   answer;
   UpdateContextElementResponse  response;
 
-  ciP->httpStatusCode = mapPutIndividualContextEntity(enId, enType, &parseDataP->ucer.res, &response, ciP);
+  // FIXME P1: AttributeDomainName skipped
+  // FIXME P1: domainMetadataVector skipped
+
+
+  // 01. Fill in UpdateContextRequest
+  parseDataP->upcr.res.fill(&parseDataP->ucer.res, entityId, entityType);
+
+
+  // 02. Call Standard Operation
+  answer = postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 03. Fill in response from UpdateContextResponse
+  response.fill(&parseDataP->upcrs.res);
+
+
+  // 04. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 
