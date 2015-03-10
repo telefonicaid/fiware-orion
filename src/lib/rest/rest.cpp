@@ -733,12 +733,13 @@ static int connectionTreat
     const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
     if (mciP != NULL)
     {
-      port = (mciP->client_addr->sa_data[0] << 8) + mciP->client_addr->sa_data[1];
+      struct sockaddr* addr = (struct sockaddr*)mciP->client_addr;
+      port = (addr->sa_data[0] << 8) + addr->sa_data[1];
       snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
-               mciP->client_addr->sa_data[2] & 0xFF,
-               mciP->client_addr->sa_data[3] & 0xFF,
-               mciP->client_addr->sa_data[4] & 0xFF,
-               mciP->client_addr->sa_data[5] & 0xFF);
+               addr->sa_data[2] & 0xFF,
+               addr->sa_data[3] & 0xFF,
+               addr->sa_data[4] & 0xFF,
+               addr->sa_data[5] & 0xFF);
     }
     else
     {
