@@ -36,10 +36,14 @@ brokerStart CP1 0
 # 02. Update/APPEND E1-T1
 # 03. PUT /v1/contextEntities/type/T1/id/E1,A1=3 see it work
 # 04. PUT /v1/contextEntities/type/T1/id/E1?attributeFormat=object,A1=4 see it work
-# 05. Register E2-T1 in CB for CP1
-# 06. PUT /v1/contextEntities/type/T1/id/E2, see it fail (does not exist in CP1)
-# 07. Update/APPEND E2-T1 in CP1
-# 08. PUT /v1/contextEntities/type/T1/id/E2, see it work
+# 05. PUT /v1/contextEntities/type/T1/id/E1?entity::type=T1,A1=5 see it work
+# 06. PUT /v1/contextEntities/type/T1/id/E1?entity::type=T2, and see it fail
+# 07. PUT /v1/contextEntities/type/T1/id/E1?!exist=entity::type and see it fail
+# 08. PUT /v1/contextEntities/type/T1/id/E1?exist=entity::type and see it work
+# 09. Register E2-T1 in CB for CP1
+# 10. PUT /v1/contextEntities/type/T1/id/E2, see it fail (does not exist in CP1)
+# 11. Update/APPEND E2-T1 in CP1
+# 12. PUT /v1/contextEntities/type/T1/id/E2, see it work
 #
 
 echo "01. PUT /v1/contextEntities/type/T1/id/E1, see it fail"
@@ -109,7 +113,67 @@ echo
 echo
 
 
-echo "05. Register E2-T1 in CB for CP1"
+echo "05. PUT /v1/contextEntities/type/T1/id/E1?entity::type=T1,A1=5 see it work"
+echo "=========================================================================="
+payload='{
+  "attributes": [
+    {
+      "name": "A1",
+      "value": 5
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1?entity::type=T1 --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "06. PUT /v1/contextEntities/type/T1/id/E1?entity::type=T2, and see it fail"
+echo "=========================================================================="
+payload='{
+  "attributes": [
+    {
+      "name": "A1",
+      "value": 6
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1?entity::type=T2 --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "07. PUT /v1/contextEntities/type/T1/id/E1?!exist=entity::type and see it fail"
+echo "============================================================================="
+payload='{
+  "attributes": [
+    {
+      "name": "A1",
+      "value": 7
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1?!exist=entity::type --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "08. PUT /v1/contextEntities/type/T1/id/E1?exist=entity::type and see it work"
+echo "============================================================================"
+payload='{
+  "attributes": [
+    {
+      "name": "A1",
+      "value": 8
+    }
+  ]
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1?exist=entity::type --payload "$payload" -X PUT --json
+echo
+echo
+
+
+echo "09. Register E2-T1 in CB for CP1"
 echo "================================"
 payload='{
   "contextRegistrations": [
@@ -136,7 +200,7 @@ echo
 echo
 
 
-echo "06. PUT /v1/contextEntities/type/T1/id/E2, see it fail (does not exist in CP1)"
+echo "10. PUT /v1/contextEntities/type/T1/id/E2, see it fail (does not exist in CP1)"
 echo "=============================================================================="
 payload='{
   "attributes": [
@@ -151,7 +215,7 @@ echo
 echo
 
 
-echo "07. Update/APPEND E2-T1 in CP1"
+echo "11. Update/APPEND E2-T1 in CP1"
 echo "=============================="
 payload='{
   "contextElements": [
@@ -173,7 +237,7 @@ echo
 echo
 
 
-echo "08. PUT /v1/contextEntities/type/T1/id/E2, see it work"
+echo "12. PUT /v1/contextEntities/type/T1/id/E2, see it work"
 echo "======================================================"
 payload='{
   "attributes": [
@@ -287,7 +351,91 @@ Date: REGEX(.*)
 }
 
 
-05. Register E2-T1 in CB for CP1
+05. PUT /v1/contextEntities/type/T1/id/E1?entity::type=T1,A1=5 see it work
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1", 
+                    "type": "", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. PUT /v1/contextEntities/type/T1/id/E1?entity::type=T2, and see it fail
+==========================================================================
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "non-matching entity::types in URL", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+07. PUT /v1/contextEntities/type/T1/id/E1?!exist=entity::type and see it fail
+=============================================================================
+HTTP/1.1 200 OK
+Content-Length: 146
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "400", 
+        "details": "entity::type cannot be empty for this request", 
+        "reasonPhrase": "Bad Request"
+    }
+}
+
+
+08. PUT /v1/contextEntities/type/T1/id/E1?exist=entity::type and see it work
+============================================================================
+HTTP/1.1 200 OK
+Content-Length: 253
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "A1", 
+                    "type": "", 
+                    "value": ""
+                }
+            ], 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+09. Register E2-T1 in CB for CP1
 ================================
 HTTP/1.1 200 OK
 Content-Length: 74
@@ -300,7 +448,7 @@ Date: REGEX(.*)
 }
 
 
-06. PUT /v1/contextEntities/type/T1/id/E2, see it fail (does not exist in CP1)
+10. PUT /v1/contextEntities/type/T1/id/E2, see it fail (does not exist in CP1)
 ==============================================================================
 HTTP/1.1 200 OK
 Content-Length: 116
@@ -316,7 +464,7 @@ Date: REGEX(.*)
 }
 
 
-07. Update/APPEND E2-T1 in CP1
+11. Update/APPEND E2-T1 in CP1
 ==============================
 HTTP/1.1 200 OK
 Content-Length: 377
@@ -347,7 +495,7 @@ Date: REGEX(.*)
 }
 
 
-08. PUT /v1/contextEntities/type/T1/id/E2, see it work
+12. PUT /v1/contextEntities/type/T1/id/E2, see it work
 ======================================================
 HTTP/1.1 200 OK
 Content-Length: 325

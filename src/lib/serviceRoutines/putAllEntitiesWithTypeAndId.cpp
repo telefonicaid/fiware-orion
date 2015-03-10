@@ -49,11 +49,16 @@
 *
 * URI parameters:
 *   - attributesFormat=object
+*   - entity::type=TYPE (must coincide with type in URL-path)
+*   - !exist=entity::type  (if set - error -- entity::type cannot be empty)
+*   - exist=entity::type   (not supported - ok if present, ok if not present ...)
 *
-* 01. Fill in UpdateContextRequest
-* 02. Call Standard Operation
-* 03. Fill in response from UpdateContextResponse
-* 04. Cleanup and return result
+* 01. Get values from URL (entityId::type, exist, !exist)
+* 02. Check validity of URI params
+* 03. Fill in UpdateContextRequest
+* 04. Call Standard Operation
+* 05. Fill in response from UpdateContextResponse
+* 06. Cleanup and return result
 */
 extern std::string putAllEntitiesWithTypeAndId
 (
@@ -65,6 +70,8 @@ extern std::string putAllEntitiesWithTypeAndId
 {
   std::string                   entityType            = compV[3];
   std::string                   entityId              = compV[5];
+  EntityTypeInfo                typeInfo              = EntityTypeEmptyOrNotEmpty;
+  std::string                   typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string                   answer;
   UpdateContextElementResponse  response;
 
@@ -72,19 +79,51 @@ extern std::string putAllEntitiesWithTypeAndId
   // FIXME P1: domainMetadataVector skipped
 
 
-  // 01. Fill in UpdateContextRequest
+  // 01. Get values from URL (entityId::type, esist, !exist)
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+
+
+  // 02. Check validity of URI params
+  if (typeInfo == EntityTypeEmpty)
+  {
+    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+
+    response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
+
+    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    return answer;
+  }
+  else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
+  {
+    LM_W(("Bad Input non-matching entity::types in URL"));
+
+    response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
+
+    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    return answer;
+  }
+
+
+  // 03. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(&parseDataP->ucer.res, entityId, entityType);
 
 
-  // 02. Call Standard Operation
+  // 04. Call Standard Operation
   answer = postUpdateContext(ciP, components, compV, parseDataP);
 
 
-  // 03. Fill in response from UpdateContextResponse
+  // 05. Fill in response from UpdateContextResponse
   response.fill(&parseDataP->upcrs.res);
 
 
-  // 04. Cleanup and return result
+  // 06. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
 
