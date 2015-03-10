@@ -1159,8 +1159,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                            double&                                    coordLat,
                                            double&                                    coordLong,
                                            std::string                                tenant,
-                                           const std::vector<std::string>&            servicePathV,
-                                           int*                                       why)
+                                           const std::vector<std::string>&            servicePathV, int* why)
 {
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
@@ -1172,11 +1171,9 @@ static bool processContextAttributeVector (ContextElement*                      
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
 
         ContextAttribute* targetAttr = ceP->contextAttributeVector.get(ix);
-
         /* No matter if success or fail, we have to include the attribute in the response */
         ContextAttribute* ca = new ContextAttribute(targetAttr->name, targetAttr->type);
-        setResponseMetadata(targetAttr, ca);
-        cerP->contextElement.contextAttributeVector.push_back(ca);
+        setResponseMetadata(targetAttr, ca);        
 
         /* actualUpdate could be changed to false in the "update" case. For "delete" and
          * "append" it would keep the true value untouched */
@@ -1193,8 +1190,10 @@ static bool processContextAttributeVector (ContextElement*                      
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
                                       " - entity: [" + eP->toString() + "]" +
-                                      " - offending attribute: " + targetAttr->toString());
+                                      " - offending attribute: " + targetAttr->toString());                
+                ca->found = false;
                 *why = ATTRIBUTE_NOT_FOUND;
+                cerP->contextElement.contextAttributeVector.push_back(ca);
                 return false;
 
             }
@@ -1206,6 +1205,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() +
                                       " - location nature of an attribute has to be defined at creation time, with APPEND");
+                cerP->contextElement.contextAttributeVector.push_back(ca);
                 return false;
             }
 
@@ -1216,6 +1216,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
                                               " - error parsing location attribute, value: <" + targetAttr->value + ">");
+                        cerP->contextElement.contextAttributeVector.push_back(ca);
                         return false;
                 }
 
@@ -1236,6 +1237,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
                                               " - attempt to define a location attribute [" + targetAttr->name + "] when another one has been previously defined [" + locAttr + "]");
+                        cerP->contextElement.contextAttributeVector.push_back(ca);
                         return false;
                     }
 
@@ -1245,6 +1247,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
                                               " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
+                        cerP->contextElement.contextAttributeVector.push_back(ca);
                         return false;
                     }
 
@@ -1254,6 +1257,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                                   " - entity: [" + eP->toString() + "]" +
                                                   " - offending attribute: " + targetAttr->toString() +
                                                   " - error parsing location attribute, value: [" + targetAttr->value + "]");
+                            cerP->contextElement.contextAttributeVector.push_back(ca);
                             return false;
                     }
                     locAttr = targetAttr->name;
@@ -1271,6 +1275,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
                                       " - attribute can not be appended");
+                cerP->contextElement.contextAttributeVector.push_back(ca);
                 return false;
             }
         }
@@ -1286,6 +1291,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                           " - entity: [" + eP->toString() + "]" +
                                           " - offending attribute: " + targetAttr->toString() +
                                           " - location attribute has to be defined at creation time, with APPEND");
+                    cerP->contextElement.contextAttributeVector.push_back(ca);
                     return false;
                 }
 
@@ -1305,6 +1311,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
                                       " - attribute not found");
+                cerP->contextElement.contextAttributeVector.push_back(ca);
                 return false;
 
             }
@@ -1314,6 +1321,7 @@ static bool processContextAttributeVector (ContextElement*                      
           cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
           // This is a BUG in the parse layer checks
           LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));
+          cerP->contextElement.contextAttributeVector.push_back(ca);
           return false;
         }
 
@@ -1325,9 +1333,12 @@ static bool processContextAttributeVector (ContextElement*                      
             if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant, servicePathV))
             {
               cerP->statusCode.fill(SccReceiverInternalError, err);
+              cerP->contextElement.contextAttributeVector.push_back(ca);
               return false;
             }
         }
+
+        cerP->contextElement.contextAttributeVector.push_back(ca);
 
     }
 
