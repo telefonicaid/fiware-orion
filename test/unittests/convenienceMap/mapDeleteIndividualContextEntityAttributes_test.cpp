@@ -36,6 +36,7 @@
 #include "rest/ConnectionInfo.h"
 
 #include "testInit.h"
+#include "unittest.h"
 
 
 
@@ -83,6 +84,8 @@ TEST(mapDeleteIndividualContextEntityAttributes, notFound)
   std::string     id = "XXX";
   ConnectionInfo  ci;
 
+  utInit();
+
   prepareDatabase("ID", "TYPE");
 
   mapDeleteIndividualContextEntityAttributes(id, &sc, &ci);
@@ -90,6 +93,8 @@ TEST(mapDeleteIndividualContextEntityAttributes, notFound)
   EXPECT_EQ(SccContextElementNotFound, sc.code);
   EXPECT_STREQ("No context element found", sc.reasonPhrase.c_str());
   EXPECT_STREQ("XXX", sc.details.c_str());
+
+  utExit();
 }
 
 

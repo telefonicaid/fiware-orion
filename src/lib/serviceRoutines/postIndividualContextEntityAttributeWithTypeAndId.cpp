@@ -28,10 +28,12 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapPostIndividualContextEntityAttribute.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/EntityTypeInfo.h"
+#include "rest/uriParamNames.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/postIndividualContextEntityAttribute.h"
 
 
@@ -39,6 +41,24 @@
 /* ****************************************************************************
 *
 * postIndividualContextEntityAttributeWithTypeAndId - 
+*
+* POST /v1/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}
+*
+* Payload In:  UpdateContextAttributeRequest
+* Payload Out: StatusCode
+* 
+* URI parameters:
+*   - entity::type=XXX        (must coincide with entity::type in URL)
+*   - !exist=entity::type     (if set - error -- entity::type cannot be empty)
+*   - exist=entity::type      (not supported - ok if present, ok if not present ...)
+*   x attributesFormat=object (cannot be supported as the response is a StatusCode)
+*
+* 01. Get values from URL (entityId::type, esist, !exist)
+* 02. Check validity of URI params
+* 03. Fill in UpdateContextRequest
+* 04. Call standard operation postUpdateContext
+* 05. Translate UpdateContextResponse to StatusCode
+* 06. Cleanup and return result
 */
 std::string postIndividualContextEntityAttributeWithTypeAndId
 (
@@ -48,19 +68,57 @@ std::string postIndividualContextEntityAttributeWithTypeAndId
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
-  std::string  entityType    = compV[3];
-  std::string  entityId      = compV[5];
-  std::string  attributeName = compV[7];
-  StatusCode   response;
+  std::string     entityType              = compV[3];
+  std::string     entityId                = compV[5];
+  std::string     attributeName           = compV[7];
+  std::string     entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  EntityTypeInfo  typeInfo                = EntityTypeEmptyOrNotEmpty;
+  std::string     answer;
+  StatusCode      response;
 
-  ciP->httpStatusCode = mapPostIndividualContextEntityAttribute(entityId,
-                                                                entityType,
-                                                                attributeName,
-                                                                &parseDataP->upcar.res,
-                                                                &response,
-                                                                ciP);
+  // 01. Get values from URL (entityId::type, esist, !exist)
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+
+
+  // 02. Check validity of URI params ...
+  //     And if OK;
+  // 03. Fill in UpdateContextRequest
+  // 04. Call standard operation postUpdateContext
+  // 05. Translate UpdateContextResponse to StatusCode
+  //
+  if (typeInfo == EntityTypeEmpty)
+  {
+    response.fill(SccBadRequest, "entity::type cannot be empty for this request");
+    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+  }
+  else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
+  {
+    response.fill(SccBadRequest, "non-matching entity::types in URL");
+    LM_W(("Bad Input non-matching entity::types in URL"));
+  }
+  else
+  {
+    // 03. Fill in UpdateContextRequest
+    parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "APPEND");
+
+    // 04. Call standard operation postUpdateContext
+    postUpdateContext(ciP, components, compV, parseDataP);
+
+    // 05. Translate UpdateContextResponse to StatusCode
+    response.fill(parseDataP->upcrs.res);
+  }
+
+
+  // 06. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
-
+  parseDataP->upcar.res.release();
+  parseDataP->upcrs.res.release();
   return answer;
 }
