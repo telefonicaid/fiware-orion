@@ -1548,6 +1548,132 @@ static bool removeEntity
 
 /* ****************************************************************************
 *
+* fillContextProviders -
+*
+* This functions is very similar the one with the same name in mongoQueryContext.cpp
+* but acting on a single CER instead that on a complete vector of them.
+*
+* Looks in the CER passed as argument, searching for a suitable CPr in the CRR
+* vector passed as argument. If a suitable CPr is found, it is set in the CER (and the 'found' field
+* is changed to true)
+*
+* FIXME P10: thing if makes sense to refactor, so vector-wide fillContextProviders() is based
+* on element-wide fillContextProviders()
+*
+*/
+void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV)
+{
+
+  for (unsigned int ix = 0; ix < cer->contextElement.contextAttributeVector.size(); ++ix)
+  {
+    ContextAttribute* ca = cer->contextElement.contextAttributeVector.get(ix);
+    if (ca->found)
+    {
+      continue;
+    }
+    /* Search for some CPr in crrV */
+    std::string perEntPa;
+    std::string perAttrPa;
+    searchCprForAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
+
+    /* Looking results after crrV processing */
+    ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
+    ca->found = (ca->providingApplication != "");
+  }
+
+}
+
+/* ****************************************************************************
+*
+* someContextElementNotFound -
+*
+* This functions is very similar the one with the same name in mongoQueryContext.cpp
+* but acting on a single CER instead that on a complete vector of them.
+*
+* Returns true if some attribute with 'found' set to 'false' is found in the CER passed
+* as argument
+*
+* FIXME P10: thing if makes sense to refactor, so vector-wide someContextElementNotFound() is based
+* on element-wide someContextElementNotFound()
+*
+*/
+bool someContextElementNotFound(ContextElementResponse* cerP) // FIXME P5: according to "style" this should be EntityId& as this is a read-only parameter
+{
+
+  for (unsigned int ix = 0; ix < cerP->contextElement.contextAttributeVector.size(); ++ix)
+  {
+    if (!cerP->contextElement.contextAttributeVector[ix]->found)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ****************************************************************************
+*
+* searchContextProviders -
+*
+*/
+void searchContextProviders(const std::string&              tenant,
+                            const std::vector<std::string>& servicePathV,
+                            EntityId*                       enP, // FIXME P5: according to "style" this should be EntityId& as this is a read-only parameter
+                            ContextAttributeVector&         caV,
+                            ContextElementResponse*         cerP)
+{
+
+  ContextRegistrationResponseVector  crrV;
+  EntityIdVector                     enV;
+  AttributeList                      attrL;
+  std::string                        err;
+
+  /* Fill input data for registrationsQuery() */
+  enV.push_back(enP);
+  for (unsigned int ix = 0; ix < caV.size(); ++ix)
+  {
+    attrL.push_back(caV.get(ix)->name);
+  }
+
+  /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
+  if (someContextElementNotFound(cerP))
+  {
+    if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    {
+      if (crrV.size() > 0)
+      {
+        fillContextProviders(cerP, crrV);
+      }
+    }
+    else
+    {
+      /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+      LM_E(("Database Error (%s)", err.c_str()));
+    }
+    crrV.release();
+  }
+
+  /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
+  AttributeList attrNullList;
+  if (someContextElementNotFound(cerP))
+  {
+    if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    {
+      if (crrV.size() > 0)
+      {
+        fillContextProviders(cerP, crrV);
+      }
+    }
+    else
+    {
+      /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+      LM_E(("Database Error (%s)", err.c_str()));
+    }
+    crrV.release();
+  }
+}
+
+/* ****************************************************************************
+*
 * processContextElement -
 *
 * 0. Preparations
@@ -1755,6 +1881,7 @@ void processContextElement(ContextElement*                      ceP,
         if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
         {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
+            searchContextProviders(tenant, servicePathV, enP, ceP->contextAttributeVector, cerP);
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
 #if 0
@@ -1916,8 +2043,12 @@ void processContextElement(ContextElement*                      ceP,
           cerP->contextElement.contextAttributeVector.push_back(caP);
         }
 
+        searchContextProviders(tenant, servicePathV, enP, ceP->contextAttributeVector, cerP);
+        responseP->contextElementResponseVector.push_back(cerP);
+
         /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for a context
          * provider or (if there is no context provider) return a not found error */
+#if 0
         ContextRegistrationResponseVector  crrV;
         EntityIdVector                     enV;
         AttributeList                      attrL;
@@ -1927,11 +2058,8 @@ void processContextElement(ContextElement*                      ceP,
         for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
         {
           attrL.push_back(ceP->contextAttributeVector.get(ix)->name);
-        }
+        }        
 
-        responseP->contextElementResponseVector.push_back(cerP);
-
-#if 0
         //
         // For now, we use limit=1. That ensures that maximum one providing application is returned. In the future,
         // we will consider leaving this limit open and define an algorithm to pick the right one, and ordered list, etc.

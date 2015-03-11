@@ -460,4 +460,14 @@ extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscri
 */
 extern BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
 
+/* ****************************************************************************
+*
+* searchCprForAttribute -
+*
+*/
+extern void searchCprForAttribute(EntityId& en, std::string attrName,
+                                  ContextRegistrationResponseVector& crrV,
+                                  std::string* perEntPa,
+                                  std::string* perAttrPa);
+
 #endif

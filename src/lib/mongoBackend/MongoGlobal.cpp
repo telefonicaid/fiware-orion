@@ -2045,3 +2045,53 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
   }
   subs.clear();
 }
+
+/* ****************************************************************************
+*
+* searchCprForAttribute -
+*
+* Search the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned
+* the "general" one at entity level or the "specific" one at attribute level
+*
+*/
+void searchCprForAttribute(EntityId& en, std::string attrName,
+                           ContextRegistrationResponseVector& crrV,
+                           std::string* perEntPa,
+                           std::string* perAttrPa)
+{
+  *perEntPa  = "";
+  *perAttrPa = "";
+  for (unsigned int ix = 0; ix < crrV.size(); ++ix)
+  {
+    ContextRegistrationResponse* crr = crrV.get(ix);
+    /* Is there a matching entity in the CRR? */
+    for (unsigned jx = 0; jx < crr->contextRegistration.entityIdVector.size(); ++jx)
+    {
+      EntityId* regEn = crr->contextRegistration.entityIdVector.get(jx);
+      /* No match (keep searching in other CRR) */
+      if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
+      {
+        continue;
+      }
+
+      /* CRR without attributes (keep searching in other CRR) */
+      if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
+      {
+        *perEntPa = crr->contextRegistration.providingApplication.get();
+        break; /* jx */
+      }
+
+      /* Is there a matching entity or the abcense of attributes? */
+      for (unsigned kx = 0; kx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++kx)
+      {
+        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector.get(kx)->name;
+        if (regAttrName == attrName)
+        {
+          /* We cannot "improve" this result keep searching in CRR vector, so we return */
+          *perAttrPa = crr->contextRegistration.providingApplication.get();
+          return;
+        }
+      }
+    }
+  }
+}

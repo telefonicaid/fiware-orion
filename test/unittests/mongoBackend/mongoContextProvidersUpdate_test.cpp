@@ -393,7 +393,7 @@ static void prepareDatabaseSeveralCprs(void)
                          BSON("name" << "A4" << "type" << "T" << "isDomain" << "false")
                          )
                      );
-  BSONObj cr3 = BSON("providingApplication" << "http://cpr1.com" <<
+  BSONObj cr3 = BSON("providingApplication" << "http://cpr2.com" <<
                      "entities" << BSON_ARRAY(
                          BSON("id" << "E3" << "type" << "T")
                          ) <<
@@ -1551,8 +1551,8 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ(SccOk, ms);
 
   EXPECT_EQ(0, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(4, res.contextElementResponseVector.size());
   /* Context Element response # 1 */
@@ -1563,7 +1563,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-  EXPECT_EQ("T1", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
@@ -1576,9 +1576,9 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
 
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+  EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ("action: UPDATE - entity: [E1, T] - offending attribute: A2", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1601,9 +1601,9 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_TRUE(RES_CER_ATTR(1, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(1, 1)->metadataVector.size());
 
-  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+  EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(1).code);
+  EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ("action: UPDATE - entity: [E2, T] - offending attribute: A4", RES_CER_STATUS(1).details);
 
   /* Context Element response # 3 */
   EXPECT_EQ("E3", RES_CER(2).entityId.id);
@@ -1613,41 +1613,40 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ASSERT_EQ(2, RES_CER(2).contextAttributeVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(2, 0)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(2, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(2, 0)->value.size());
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(2, 0)->providingApplication);
   EXPECT_TRUE(RES_CER_ATTR(2, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(2, 0)->metadataVector.size());
 
   EXPECT_EQ("A6", RES_CER_ATTR(2, 1)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(2, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(2, 1)->type);
   EXPECT_EQ(0, RES_CER_ATTR(2, 1)->value.size());
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->providingApplication);
   EXPECT_FALSE(RES_CER_ATTR(2, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(2, 1)->metadataVector.size());
 
-  /* FIXME: how to mark that A6 is not found in the same Scc that is shared with A5? */
-  EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
+  EXPECT_EQ(SccNone, RES_CER_STATUS(2).code);
+  EXPECT_EQ("", RES_CER_STATUS(2).reasonPhrase);
+  EXPECT_EQ("", RES_CER_STATUS(2).details);
 
   /* Context Element response # 4 */
-  EXPECT_EQ("E3", RES_CER(3).entityId.id);
+  EXPECT_EQ("E4", RES_CER(3).entityId.id);
   EXPECT_EQ("T", RES_CER(3).entityId.type);
   EXPECT_EQ("false", RES_CER(3).entityId.isPattern);
   EXPECT_EQ(0, RES_CER(3).providingApplicationList.size());
   ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
 
   EXPECT_EQ("A7", RES_CER_ATTR(3, 0)->name);
-  EXPECT_EQ("T", RES_CER_ATTR(3, 0)->type);
+  EXPECT_EQ("", RES_CER_ATTR(3, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(3, 0)->value.size());
   EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(3, 0)->providingApplication);
   EXPECT_TRUE(RES_CER_ATTR(3, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(3, 0)->metadataVector.size());
 
-  EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
+  EXPECT_EQ(SccNone, RES_CER_STATUS(3).code);
+  EXPECT_EQ("", RES_CER_STATUS(3).reasonPhrase);
+  EXPECT_EQ("", RES_CER_STATUS(3).details);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1660,7 +1659,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   std::vector<BSONElement> attrs;
   ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
-  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T"));
   EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
   EXPECT_STREQ("T", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
@@ -1672,7 +1671,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_STREQ("10", C_STR_FIELD(a1, "value"));
   EXPECT_EQ(1360232700, a1.getIntField("modDate"));
 
-  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T1"));
+  ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T"));
   EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
   EXPECT_STREQ("T", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
