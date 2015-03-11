@@ -4015,6 +4015,33 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ("", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E4", RES_CER(0).entityId.id);
+    EXPECT_EQ("T4", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+    EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+#if 0
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -4027,6 +4054,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
     EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("E4", RES_CER_STATUS(0).details);
+#endif
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -4937,6 +4965,33 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_EQ(SccOk, ms);
 
     EXPECT_EQ(0, res.errorCode.code);
+    EXPECT_EQ("", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+
+    EXPECT_EQ("A8", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+    EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+#if 0
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(0, res.errorCode.code);
     EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
     EXPECT_EQ(0, res.errorCode.details.size());
 
@@ -4953,6 +5008,8 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A8", RES_CER_STATUS(0).details);
+#endif
+
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string

@@ -1626,8 +1626,8 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_FALSE(RES_CER_ATTR(2, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(2, 1)->metadataVector.size());
 
-  EXPECT_EQ(SccNone, RES_CER_STATUS(2).code);
-  EXPECT_EQ("", RES_CER_STATUS(2).reasonPhrase);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(2).details);
 
   /* Context Element response # 4 */
@@ -1644,8 +1644,8 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_TRUE(RES_CER_ATTR(3, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(3, 0)->metadataVector.size());
 
-  EXPECT_EQ(SccNone, RES_CER_STATUS(3).code);
-  EXPECT_EQ("", RES_CER_STATUS(3).reasonPhrase);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(3).details);
 
   /* Check that every involved collection at MongoDB is as expected */

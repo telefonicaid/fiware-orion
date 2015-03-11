@@ -2044,6 +2044,7 @@ void processContextElement(ContextElement*                      ceP,
         }
 
         searchContextProviders(tenant, servicePathV, enP, ceP->contextAttributeVector, cerP);
+        cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
 
         /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for a context
