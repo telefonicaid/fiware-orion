@@ -33,13 +33,14 @@ brokerStart CB 0
 # 01. POST /v1/contextEntities/type/T1/id/E1/attributes/A1, A1=1
 # 02. GET /v1/contextEntities/type/T1/id/E1/attributes/A1
 # 03. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2, and see it fail
-# 04. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type, and see it fail
-# 05. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?exist=entity::type, A1=2
-# 06. GET /v1/contextEntities/type/T1/id/E1/attributes/A1
-# 07. POST /v1/contextEntities/type/T1/id/E1/attributes/A1, A1=s1, with servicePath=/s1
-# 08. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/s1
-# 09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/
-# 10. POST /v1/queryContext, without servicePath, see two results
+# 04. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T1, and see it work
+# 05. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type, and see it fail
+# 06. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?exist=entity::type, A1=2
+# 07. GET /v1/contextEntities/type/T1/id/E1/attributes/A1
+# 08. POST /v1/contextEntities/type/T1/id/E1/attributes/A1, A1=s1, with servicePath=/s1
+# 09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/s1
+# 10. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/
+# 11. POST /v1/queryContext, without servicePath, see two results
 #
 
 echo "01. POST /v1/contextEntities/type/T1/id/E1/attributes/A1, A1=1"
@@ -62,14 +63,24 @@ echo
 echo "03. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2, and see it fail"
 echo "========================================================================================="
 payload='{
-  "value": 1
+  "value": 3
 }'
 orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2 --payload "$payload" --json
 echo
 echo
 
 
-echo "04. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type, and see it fail"
+echo "04. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T1, and see it work"
+echo "========================================================================================="
+payload='{
+  "value": 4
+}'
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T1 --payload "$payload" --json
+echo
+echo
+
+
+echo "05. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type, and see it fail"
 echo "============================================================================================="
 payload='{
   "value": 1
@@ -79,7 +90,7 @@ echo
 echo
 
 
-echo "05. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?exist=entity::type, A1=2"
+echo "06. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?exist=entity::type, A1=2"
 echo "================================================================================="
 payload='{
   "value": 2
@@ -89,14 +100,14 @@ echo
 echo
 
 
-echo "06. GET /v1/contextEntities/type/T1/id/E1/attributes/A1"
+echo "07. GET /v1/contextEntities/type/T1/id/E1/attributes/A1"
 echo "======================================================="
 orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json
 echo
 echo
 
 
-echo "07. POST /v1/contextEntities/type/T1/id/E1/attributes/A1, A1=s1, with servicePath=/s1"
+echo "08. POST /v1/contextEntities/type/T1/id/E1/attributes/A1, A1=s1, with servicePath=/s1"
 echo "====================================================================================="
 payload='{
   "value": "s1"
@@ -106,21 +117,21 @@ echo
 echo
 
 
-echo "08. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/s1"
+echo "09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/s1"
 echo "============================================================================="
 orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json --servicePath /s1
 echo
 echo
 
 
-echo "09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/"
+echo "10. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/"
 echo "==========================================================================="
 orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1 --json --servicePath /
 echo
 echo
 
 
-echo "10. POST /v1/queryContext, without servicePath, see two results"
+echo "11. POST /v1/queryContext, without servicePath, see two results"
 echo "==============================================================="
 payload='{
   "entities": [
@@ -185,7 +196,20 @@ Date: REGEX(.*)
 }
 
 
-04. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type, and see it fail
+04. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T1, and see it work
+=========================================================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
+05. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type, and see it fail
 =============================================================================================
 HTTP/1.1 200 OK
 Content-Length: 118
@@ -199,7 +223,7 @@ Date: REGEX(.*)
 }
 
 
-05. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?exist=entity::type, A1=2
+06. POST /v1/contextEntities/type/T1/id/E1/attributes/A1?exist=entity::type, A1=2
 =================================================================================
 HTTP/1.1 200 OK
 Content-Length: 46
@@ -212,7 +236,7 @@ Date: REGEX(.*)
 }
 
 
-06. GET /v1/contextEntities/type/T1/id/E1/attributes/A1
+07. GET /v1/contextEntities/type/T1/id/E1/attributes/A1
 =======================================================
 HTTP/1.1 200 OK
 Content-Length: 169
@@ -234,7 +258,7 @@ Date: REGEX(.*)
 }
 
 
-07. POST /v1/contextEntities/type/T1/id/E1/attributes/A1, A1=s1, with servicePath=/s1
+08. POST /v1/contextEntities/type/T1/id/E1/attributes/A1, A1=s1, with servicePath=/s1
 =====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 46
@@ -247,7 +271,7 @@ Date: REGEX(.*)
 }
 
 
-08. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/s1
+09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/s1
 =============================================================================
 HTTP/1.1 200 OK
 Content-Length: 170
@@ -269,7 +293,7 @@ Date: REGEX(.*)
 }
 
 
-09. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/
+10. GET /v1/contextEntities/type/T1/id/E1/attributes/A1, with servicePath=/
 ===========================================================================
 HTTP/1.1 200 OK
 Content-Length: 169
@@ -291,7 +315,7 @@ Date: REGEX(.*)
 }
 
 
-10. POST /v1/queryContext, without servicePath, see two results
+11. POST /v1/queryContext, without servicePath, see two results
 ===============================================================
 HTTP/1.1 200 OK
 Content-Length: 725
