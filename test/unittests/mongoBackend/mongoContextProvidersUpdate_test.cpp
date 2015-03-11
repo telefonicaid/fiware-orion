@@ -1526,8 +1526,8 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ce1.contextAttributeVector.push_back(&ca1);
   ce1.contextAttributeVector.push_back(&ca2);
   ce2.entityId.fill("E2", "T", "false");
-  ContextAttribute ca3("A3", "T", "30");
-  ContextAttribute ca4("A4", "T", "40");
+  ContextAttribute ca3("A4", "T", "40");
+  ContextAttribute ca4("A3", "T", "30");
   ce2.contextAttributeVector.push_back(&ca3);
   ce2.contextAttributeVector.push_back(&ca4);
   ce3.entityId.fill("E3", "T", "false");
@@ -1576,9 +1576,9 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
 
-  EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-  EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("action: UPDATE - entity: [E1, T] - offending attribute: A2", RES_CER_STATUS(0).details);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1587,23 +1587,23 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
   ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
 
-  EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
+  EXPECT_EQ("A4", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
-  EXPECT_EQ("", RES_CER_ATTR(1, 0)->providingApplication);
+  EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(1, 0)->providingApplication);
   EXPECT_TRUE(RES_CER_ATTR(1, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(1, 0)->metadataVector.size());
 
-  EXPECT_EQ("A4", RES_CER_ATTR(1, 1)->name);
+  EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ(0, RES_CER_ATTR(1, 1)->value.size());
-  EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(1, 1)->providingApplication);
+  EXPECT_EQ("", RES_CER_ATTR(1, 1)->providingApplication);
   EXPECT_TRUE(RES_CER_ATTR(1, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(1, 1)->metadataVector.size());
 
-  EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(1).code);
-  EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(1).reasonPhrase);
-  EXPECT_EQ("action: UPDATE - entity: [E2, T] - offending attribute: A4", RES_CER_STATUS(1).details);
+  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ("", RES_CER_STATUS(1).details);
 
   /* Context Element response # 3 */
   EXPECT_EQ("E3", RES_CER(2).entityId.id);

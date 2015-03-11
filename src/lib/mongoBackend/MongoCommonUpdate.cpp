@@ -1191,8 +1191,8 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());                
                 ca->found = false;
-                cerP->contextElement.contextAttributeVector.push_back(ca);
-                return false;
+                //cerP->contextElement.contextAttributeVector.push_back(ca);
+                //return false;
 
             }
 
@@ -1880,8 +1880,7 @@ void processContextElement(ContextElement*                      ceP,
 
         if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
         {
-            /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
-            searchContextProviders(tenant, servicePathV, enP, ceP->contextAttributeVector, cerP);
+            /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */            
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
 #if 0
@@ -2013,8 +2012,9 @@ void processContextElement(ContextElement*                      ceP,
         //
         releaseTriggeredSubscriptions(subsToNotify);
 
-        /* To finish with this entity processing, add the corresponding ContextElementResponse to
-         * the global response */
+        /* To finish with this entity processing, search for CPrs in not found attrinuts and
+         * add the corresponding ContextElementResponse to the global response */
+        searchContextProviders(tenant, servicePathV, enP, ceP->contextAttributeVector, cerP);
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
     }
