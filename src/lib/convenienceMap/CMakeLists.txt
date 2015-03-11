@@ -28,9 +28,7 @@ SET (SOURCES
     mapPostIndividualContextEntity.cpp
     mapDeleteIndividualContextEntity.cpp
     mapPutIndividualContextEntityAttributes.cpp
-    mapDeleteIndividualContextEntityAttributes.cpp
     mapPutIndividualContextEntityAttribute.cpp
-    mapDeleteIndividualContextEntityAttribute.cpp
 )
 
 SET (HEADERS
@@ -41,9 +39,7 @@ SET (HEADERS
     mapPostIndividualContextEntity.h
     mapDeleteIndividualContextEntity.h
     mapPutIndividualContextEntityAttributes.h
-    mapDeleteIndividualContextEntityAttributes.h
     mapPutIndividualContextEntityAttribute.h
-    mapDeleteIndividualContextEntityAttribute.h
 )
 
 
