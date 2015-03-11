@@ -1845,7 +1845,6 @@ void processContextElement(ContextElement*                      ceP,
             LM_T(LmtServicePath, ("Removing entity"));
             removeEntity(entityId, entityType, cerP, tenant, entitySPath);
             responseP->contextElementResponseVector.push_back(cerP);
-            //++docs;
             continue;
         }
 
@@ -1883,33 +1882,8 @@ void processContextElement(ContextElement*                      ceP,
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */            
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
-#if 0
-            //
-            // FIXME P6: Temporary hack for 'Entity found but Attribute not found':
-            //           If caller is 'postContextUpdate' then we need to keep 'docs' at zero for 'Attribute Not Found'
-            //           as to force the call to lookup ngsi9 registrations to do the forward of the message.
-            //           For all other combinations, add to 'docs'.
-            //
-            //           This hack makes 'mongoUpdateContext' return TWO responses for this circumstance, one saying
-            //           "Error: Attribute Not Found", the other indicating that it can be found in a Context Provider.
-            //           This is true only for calls from the function 'postUpdateContext'.
-            //           That function remedies this situation by removiong ther unwanted response (the first one),
-            //           and then overwriting the second one with the response of the Context Provider.
-            //
-            //           This is just a temporary fix.
-            //           The real fix will probably be a rewrite of this piece of code,
-            //           implemented when fixing 'definitely' the issue #716
-            //
-            if ((why != ATTRIBUTE_NOT_FOUND) || (caller != "postUpdateContext"))
-            {
-              ++docs;
-            }
-#endif
-
             continue;
         }
-
-        //++docs;
 
         /* Now that attrs contains the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
@@ -2043,50 +2017,12 @@ void processContextElement(ContextElement*                      ceP,
           cerP->contextElement.contextAttributeVector.push_back(caP);
         }
 
+        /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for context
+         * providers */
         searchContextProviders(tenant, servicePathV, enP, ceP->contextAttributeVector, cerP);
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
 
-        /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for a context
-         * provider or (if there is no context provider) return a not found error */
-#if 0
-        ContextRegistrationResponseVector  crrV;
-        EntityIdVector                     enV;
-        AttributeList                      attrL;
-        std::string                        err;
-
-        enV.push_back(enP);
-        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
-        {
-          attrL.push_back(ceP->contextAttributeVector.get(ix)->name);
-        }        
-
-        //
-        // For now, we use limit=1. That ensures that maximum one providing application is returned. In the future,
-        // we will consider leaving this limit open and define an algorithm to pick the right one, and ordered list, etc.
-        //
-        if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 1, false))
-        {
-          if (crrV.size() > 0)
-          {
-            // Suitable CProvider has been found: creating response and returning
-            std::string prApp = crrV[0]->contextRegistration.providingApplication.get();
-            LM_T(LmtCtxProviders, ("context provider found: %s", prApp.c_str()));
-            buildGeneralErrorResponse(ceP, NULL, responseP, SccFound, prApp, &ceP->contextAttributeVector);
-          }
-          else
-          {
-            buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
-          }
-        }
-        else
-        {
-          LM_E(("Database Error (%s)", err.c_str()));
-          buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
-        }
-
-        crrV.release();       
-#endif
       }
       else
       {

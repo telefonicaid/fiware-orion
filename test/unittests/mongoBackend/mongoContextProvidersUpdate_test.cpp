@@ -524,26 +524,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
-  EXPECT_EQ("TA4", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("http://cr2.com", RES_CER_STATUS(0).details);
-#endif
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -610,26 +590,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-  EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
-#endif
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -693,28 +653,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
-  EXPECT_EQ("E3", RES_CER(0).entityId.id);
-  EXPECT_EQ("T3", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-  EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
-  EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -787,24 +725,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralCREs)
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
-#endif
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -859,24 +779,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternSeveralRegistrations)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
-  EXPECT_EQ("E2", RES_CER(0).entityId.id);
-  EXPECT_EQ("T2", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -933,24 +835,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoEntity)
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
-  EXPECT_EQ("E4", RES_CER(0).entityId.id);
-  EXPECT_EQ("T4", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("E4", RES_CER_STATUS(0).details);
-#endif
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -1003,24 +887,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(1,res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("E1", RES_CER_STATUS(0).details);
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1090,34 +956,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(2,res.contextElementResponseVector.size());
-  /* Context element response #1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
-
-  /* Context element response #2 */
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("T2", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-  ASSERT_EQ(0, RES_CER(1).contextAttributeVector.size());
-  EXPECT_EQ(SccFound, RES_CER_STATUS(1).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(1).reasonPhrase);
-  EXPECT_EQ("http://cr1.com", RES_CER_STATUS(1).details);
-#endif
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -1184,30 +1022,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(1, res.contextElementResponseVector.size());
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
-  EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
-  EXPECT_EQ("TA4", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ("A5", RES_CER_ATTR(0, 2)->name);
-  EXPECT_EQ("TA5", RES_CER_ATTR(0, 2)->type);
-  EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -1304,46 +1118,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
-
-#if 0
-  /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
-
-  ASSERT_EQ(2, res.contextElementResponseVector.size());
-  /* Context Element Response #1 */
-  EXPECT_EQ("E1", RES_CER(0).entityId.id);
-  EXPECT_EQ("T1", RES_CER(0).entityId.type);
-  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
-  EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
-  EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
-  EXPECT_EQ("TA4", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ("A5", RES_CER_ATTR(0, 2)->name);
-  EXPECT_EQ("TA5", RES_CER_ATTR(0, 2)->type);
-  EXPECT_EQ(SccFound, RES_CER_STATUS(0).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("http://cr1.com", RES_CER_STATUS(0).details);
-
-  /* Context Element Response #2 */
-  EXPECT_EQ("E2", RES_CER(1).entityId.id);
-  EXPECT_EQ("T2", RES_CER(1).entityId.type);
-  EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-  ASSERT_EQ(3, RES_CER(1).contextAttributeVector.size());
-  EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
-  EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("A4", RES_CER_ATTR(1, 1)->name);
-  EXPECT_EQ("TA4", RES_CER_ATTR(1, 1)->type);
-  EXPECT_EQ("A5", RES_CER_ATTR(1, 2)->name);
-  EXPECT_EQ("TA5", RES_CER_ATTR(1, 2)->type);
-  EXPECT_EQ(SccFound, RES_CER_STATUS(1).code);
-  EXPECT_EQ("Found", RES_CER_STATUS(1).reasonPhrase);
-  EXPECT_EQ("http://cr1.com", RES_CER_STATUS(1).details);
-#endif
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
