@@ -488,7 +488,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_fail)
 * mongoGetContextElementResponses_dbfail -
 *
 * FIXME: not sure if this test should exist... it should be include in unit testing
-* for entityQuery()
+* for entitiesQuery()
 */
 TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
 {
