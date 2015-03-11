@@ -1148,7 +1148,6 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 * Returns true if entity was actually modified, false otherwise (including fail cases)
 *
 */
-#define ATTRIBUTE_NOT_FOUND 1
 
 static bool processContextAttributeVector (ContextElement*                            ceP,
                                            std::string                                action,
@@ -1159,7 +1158,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                            double&                                    coordLat,
                                            double&                                    coordLong,
                                            std::string                                tenant,
-                                           const std::vector<std::string>&            servicePathV, int* why)
+                                           const std::vector<std::string>&            servicePathV)
 {
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
@@ -1192,7 +1191,6 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());                
                 ca->found = false;
-                *why = ATTRIBUTE_NOT_FOUND;
                 cerP->contextElement.contextAttributeVector.push_back(ca);
                 return false;
 
@@ -1691,6 +1689,7 @@ void processContextElement(ContextElement*                      ceP,
     while (cursor->more()) {
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+        ++docs;
 
         BSONElement idField = r.getField("_id");
 
@@ -1720,7 +1719,7 @@ void processContextElement(ContextElement*                      ceP,
             LM_T(LmtServicePath, ("Removing entity"));
             removeEntity(entityId, entityType, cerP, tenant, entitySPath);
             responseP->contextElementResponseVector.push_back(cerP);
-            ++docs;
+            //++docs;
             continue;
         }
 
@@ -1753,13 +1752,12 @@ void processContextElement(ContextElement*                      ceP,
             coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
         }
 
-        int why = 0;
-        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV, &why))
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
         {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
-
+#if 0
             //
             // FIXME P6: Temporary hack for 'Entity found but Attribute not found':
             //           If caller is 'postContextUpdate' then we need to keep 'docs' at zero for 'Attribute Not Found'
@@ -1780,11 +1778,12 @@ void processContextElement(ContextElement*                      ceP,
             {
               ++docs;
             }
+#endif
 
             continue;
         }
 
-        ++docs;
+        //++docs;
 
         /* Now that attrs contains the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
@@ -1907,6 +1906,16 @@ void processContextElement(ContextElement*                      ceP,
     {
       if (strcasecmp(action.c_str(), "append") != 0)
       {
+        /* All the attributes existing in the request are added to the response with 'found' set to false */
+        ContextElementResponse* cerP = new ContextElementResponse();
+        cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
+
+        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+        {
+          ContextAttribute* caP = new ContextAttribute(ceP->contextAttributeVector.get(ix)->name, "", "", false);
+          cerP->contextElement.contextAttributeVector.push_back(caP);
+        }
+
         /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for a context
          * provider or (if there is no context provider) return a not found error */
         ContextRegistrationResponseVector  crrV;
@@ -1920,6 +1929,9 @@ void processContextElement(ContextElement*                      ceP,
           attrL.push_back(ceP->contextAttributeVector.get(ix)->name);
         }
 
+        responseP->contextElementResponseVector.push_back(cerP);
+
+#if 0
         //
         // For now, we use limit=1. That ensures that maximum one providing application is returned. In the future,
         // we will consider leaving this limit open and define an algorithm to pick the right one, and ordered list, etc.
@@ -1944,7 +1956,8 @@ void processContextElement(ContextElement*                      ceP,
           buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
         }
 
-        crrV.release();
+        crrV.release();       
+#endif
       }
       else
       {

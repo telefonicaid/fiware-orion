@@ -1528,13 +1528,13 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ce2.entityId.fill("E2", "T", "false");
   ContextAttribute ca3("A3", "T", "30");
   ContextAttribute ca4("A4", "T", "40");
-  ce2.contextAttributeVector.push_back(&ca1);
-  ce2.contextAttributeVector.push_back(&ca2);
+  ce2.contextAttributeVector.push_back(&ca3);
+  ce2.contextAttributeVector.push_back(&ca4);
   ce3.entityId.fill("E3", "T", "false");
   ContextAttribute ca5("A5", "T", "50");
   ContextAttribute ca6("A6", "T", "60");
-  ce3.contextAttributeVector.push_back(&ca1);
-  ce3.contextAttributeVector.push_back(&ca2);
+  ce3.contextAttributeVector.push_back(&ca5);
+  ce3.contextAttributeVector.push_back(&ca6);
   ce4.entityId.fill("E4", "T", "false");
   ContextAttribute ca7("A7", "T", "70");
   ce4.contextAttributeVector.push_back(&ca7);
