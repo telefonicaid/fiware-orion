@@ -2048,6 +2048,65 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
 
 /* ****************************************************************************
 *
+* fillContextProviders -
+*
+* This functions is very similar the one with the same name in mongoQueryContext.cpp
+* but acting on a single CER instead that on a complete vector of them.
+*
+* Looks in the CER passed as argument, searching for a suitable CPr in the CRR
+* vector passed as argument. If a suitable CPr is found, it is set in the CER (and the 'found' field
+* is changed to true)
+*
+*/
+void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV)
+{
+
+  for (unsigned int ix = 0; ix < cer->contextElement.contextAttributeVector.size(); ++ix)
+  {
+    ContextAttribute* ca = cer->contextElement.contextAttributeVector.get(ix);
+    if (ca->found)
+    {
+      continue;
+    }
+    /* Search for some CPr in crrV */
+    std::string perEntPa;
+    std::string perAttrPa;
+    searchCprForAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
+
+    /* Looking results after crrV processing */
+    ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
+    ca->found = (ca->providingApplication != "");
+  }
+
+}
+
+/* ****************************************************************************
+*
+* someContextElementNotFound -
+*
+* This functions is very similar the one with the same name in mongoQueryContext.cpp
+* but acting on a single CER instead that on a complete vector of them.
+*
+* Returns true if some attribute with 'found' set to 'false' is found in the CER passed
+* as argument
+*
+*/
+bool someContextElementNotFound(ContextElementResponse* cerP) // FIXME P5: according to "style" this should be EntityId& as this is a read-only parameter
+{
+
+  for (unsigned int ix = 0; ix < cerP->contextElement.contextAttributeVector.size(); ++ix)
+  {
+    if (!cerP->contextElement.contextAttributeVector[ix]->found)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+/* ****************************************************************************
+*
 * searchCprForAttribute -
 *
 * Search the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned

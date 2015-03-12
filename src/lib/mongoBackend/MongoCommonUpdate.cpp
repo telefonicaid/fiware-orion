@@ -1186,13 +1186,14 @@ static bool processContextAttributeVector (ContextElement*                      
                 /* If updateAttribute() returns false, then that particular attribute has not
                  * been found. In this case, we interrupt the processing and early return with
                  * an error StatusCode */
+                // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
+                // another .fill() in this function caller. We keep it by the moment, but it probably
+                // will removed when we refactor this function
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());                
                 ca->found = false;
-                //cerP->contextElement.contextAttributeVector.push_back(ca);
-                //return false;
 
             }
 
@@ -1545,70 +1546,6 @@ static bool removeEntity
     cerP->statusCode.fill(SccOk);
     return true;
 } 
-
-/* ****************************************************************************
-*
-* fillContextProviders -
-*
-* This functions is very similar the one with the same name in mongoQueryContext.cpp
-* but acting on a single CER instead that on a complete vector of them.
-*
-* Looks in the CER passed as argument, searching for a suitable CPr in the CRR
-* vector passed as argument. If a suitable CPr is found, it is set in the CER (and the 'found' field
-* is changed to true)
-*
-* FIXME P10: thing if makes sense to refactor, so vector-wide fillContextProviders() is based
-* on element-wide fillContextProviders()
-*
-*/
-void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV)
-{
-
-  for (unsigned int ix = 0; ix < cer->contextElement.contextAttributeVector.size(); ++ix)
-  {
-    ContextAttribute* ca = cer->contextElement.contextAttributeVector.get(ix);
-    if (ca->found)
-    {
-      continue;
-    }
-    /* Search for some CPr in crrV */
-    std::string perEntPa;
-    std::string perAttrPa;
-    searchCprForAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
-
-    /* Looking results after crrV processing */
-    ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
-    ca->found = (ca->providingApplication != "");
-  }
-
-}
-
-/* ****************************************************************************
-*
-* someContextElementNotFound -
-*
-* This functions is very similar the one with the same name in mongoQueryContext.cpp
-* but acting on a single CER instead that on a complete vector of them.
-*
-* Returns true if some attribute with 'found' set to 'false' is found in the CER passed
-* as argument
-*
-* FIXME P10: thing if makes sense to refactor, so vector-wide someContextElementNotFound() is based
-* on element-wide someContextElementNotFound()
-*
-*/
-bool someContextElementNotFound(ContextElementResponse* cerP) // FIXME P5: according to "style" this should be EntityId& as this is a read-only parameter
-{
-
-  for (unsigned int ix = 0; ix < cerP->contextElement.contextAttributeVector.size(); ++ix)
-  {
-    if (!cerP->contextElement.contextAttributeVector[ix]->found)
-    {
-      return true;
-    }
-  }
-  return false;
-}
 
 /* ****************************************************************************
 *

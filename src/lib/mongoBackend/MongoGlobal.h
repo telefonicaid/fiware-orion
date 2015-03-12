@@ -462,6 +462,20 @@ extern BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 
 /* ****************************************************************************
 *
+* fillContextProviders -
+*
+*/
+extern void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV);
+
+/* ****************************************************************************
+*
+* someContextElementNotFound -
+*
+*/
+extern bool someContextElementNotFound(ContextElementResponse* cerP);
+
+/* ****************************************************************************
+*
 * searchCprForAttribute -
 *
 */

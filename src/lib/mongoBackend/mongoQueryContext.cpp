@@ -48,12 +48,9 @@ bool someContextElementNotFound(ContextElementResponseVector& cerV)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    for (unsigned int jx = 0; jx < cerV.get(ix)->contextElement.contextAttributeVector.size(); ++jx)
+    if (someContextElementNotFound(cerV.get(ix)))
     {
-      if (!cerV.get(ix)->contextElement.contextAttributeVector[jx]->found)
-      {
-        return true;
-      }
+      return true;
     }
   }
   return false;
@@ -72,23 +69,7 @@ void fillContextProviders(ContextElementResponseVector& cerV, ContextRegistratio
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    ContextElementResponse* cer = cerV.get(ix);
-    for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
-    {
-      ContextAttribute* ca = cer->contextElement.contextAttributeVector.get(jx);
-      if (ca->found)
-      {
-        continue;
-      }
-      /* Search for some CPr in crrV */
-      std::string perEntPa;
-      std::string perAttrPa;
-      searchCprForAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
-
-      /* Looking results after crrV processing */
-      ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
-      ca->found = (ca->providingApplication != "");
-    }
+    fillContextProviders(cerV.get(ix), crrV);
   }
 }
 
