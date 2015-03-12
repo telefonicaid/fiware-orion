@@ -154,6 +154,3 @@ std::string postAllEntitiesWithTypeAndId
 
   return answer;
 }
-
-
-// ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, entityType, &parseDataP->acer.res, &response, ciP);
