@@ -472,16 +472,17 @@ extern void fillContextProviders(ContextElementResponse* cer, ContextRegistratio
 * someContextElementNotFound -
 *
 */
-extern bool someContextElementNotFound(ContextElementResponse* cerP);
+extern bool someContextElementNotFound(ContextElementResponse& cer);
 
 /* ****************************************************************************
 *
 * searchCprForAttribute -
 *
 */
-extern void searchCprForAttribute(EntityId& en, std::string attrName,
+extern void searchCprForAttribute(EntityId&                          en,
+                                  const std::string&                 attrName,
                                   ContextRegistrationResponseVector& crrV,
-                                  std::string* perEntPa,
-                                  std::string* perAttrPa);
+                                  std::string*                       perEntPa,
+                                  std::string*                       perAttrPa);
 
 #endif

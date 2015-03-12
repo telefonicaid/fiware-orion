@@ -2091,12 +2091,12 @@ void fillContextProviders(ContextElementResponse* cer, ContextRegistrationRespon
 * as argument
 *
 */
-bool someContextElementNotFound(ContextElementResponse* cerP) // FIXME P5: according to "style" this should be EntityId& as this is a read-only parameter
+bool someContextElementNotFound(ContextElementResponse& cer)
 {
 
-  for (unsigned int ix = 0; ix < cerP->contextElement.contextAttributeVector.size(); ++ix)
+  for (unsigned int ix = 0; ix < cer.contextElement.contextAttributeVector.size(); ++ix)
   {
-    if (!cerP->contextElement.contextAttributeVector[ix]->found)
+    if (!cer.contextElement.contextAttributeVector[ix]->found)
     {
       return true;
     }
@@ -2113,10 +2113,11 @@ bool someContextElementNotFound(ContextElementResponse* cerP) // FIXME P5: accor
 * the "general" one at entity level or the "specific" one at attribute level
 *
 */
-void searchCprForAttribute(EntityId& en, std::string attrName,
+void searchCprForAttribute(EntityId&                          en,
+                           const std::string&                 attrName,
                            ContextRegistrationResponseVector& crrV,
-                           std::string* perEntPa,
-                           std::string* perAttrPa)
+                           std::string*                       perEntPa,
+                           std::string*                       perAttrPa)
 {
   *perEntPa  = "";
   *perAttrPa = "";

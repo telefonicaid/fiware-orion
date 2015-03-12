@@ -48,7 +48,7 @@ bool someContextElementNotFound(ContextElementResponseVector& cerV)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
-    if (someContextElementNotFound(cerV.get(ix)))
+    if (someContextElementNotFound(*cerV.get(ix)))
     {
       return true;
     }

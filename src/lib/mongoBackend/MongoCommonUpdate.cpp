@@ -1554,7 +1554,7 @@ static bool removeEntity
 */
 void searchContextProviders(const std::string&              tenant,
                             const std::vector<std::string>& servicePathV,
-                            EntityId*                       enP, // FIXME P5: according to "style" this should be EntityId& as this is a read-only parameter
+                            EntityId&                       en,
                             ContextAttributeVector&         caV,
                             ContextElementResponse*         cerP)
 {
@@ -1565,14 +1565,14 @@ void searchContextProviders(const std::string&              tenant,
   std::string                        err;
 
   /* Fill input data for registrationsQuery() */
-  enV.push_back(enP);
+  enV.push_back(&en);
   for (unsigned int ix = 0; ix < caV.size(); ++ix)
   {
     attrL.push_back(caV.get(ix)->name);
   }
 
   /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
-  if (someContextElementNotFound(cerP))
+  if (someContextElementNotFound(*cerP))
   {
     if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
@@ -1591,7 +1591,7 @@ void searchContextProviders(const std::string&              tenant,
 
   /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
   AttributeList attrNullList;
-  if (someContextElementNotFound(cerP))
+  if (someContextElementNotFound(*cerP))
   {
     if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
     {
@@ -1925,7 +1925,7 @@ void processContextElement(ContextElement*                      ceP,
 
         /* To finish with this entity processing, search for CPrs in not found attrinuts and
          * add the corresponding ContextElementResponse to the global response */
-        searchContextProviders(tenant, servicePathV, enP, ceP->contextAttributeVector, cerP);
+        searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
     }
@@ -1956,7 +1956,7 @@ void processContextElement(ContextElement*                      ceP,
 
         /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for context
          * providers */
-        searchContextProviders(tenant, servicePathV, enP, ceP->contextAttributeVector, cerP);
+        searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
 
