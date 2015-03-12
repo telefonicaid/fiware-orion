@@ -123,3 +123,16 @@ void DiscoverContextAvailabilityRequest::fill
 
   // FIXME P9: restriction with scope-vector must be copied to this->restriction
 }
+
+
+
+/* ****************************************************************************
+*
+* DiscoverContextAvailabilityRequest::fill - 
+*/
+void DiscoverContextAvailabilityRequest::fill(const std::string& entityId, const std::string& entityType)
+{
+  EntityId* eidP = new EntityId(entityId, entityType, "false");
+
+  entityIdVector.push_back(eidP);
+}

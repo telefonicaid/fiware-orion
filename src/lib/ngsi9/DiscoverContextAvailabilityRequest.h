@@ -60,6 +60,7 @@ typedef struct DiscoverContextAvailabilityRequest
   void                 fill(EntityId&                        eid,
                             const std::vector<std::string>&  attributeV,
                             const Restriction&               restriction);
+  void                 fill(const std::string& entityId, const std::string& entityType);
 } DiscoverContextAvailabilityRequest;
 
 #endif

@@ -37,6 +37,7 @@
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
 #include "ngsi9/DiscoverContextAvailabilityRequest.h"
+#include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/UnsubscribeContextAvailabilityRequest.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionRequest.h"
@@ -94,6 +95,17 @@ typedef struct DiscoverContextAvailabilityData
   EntityId*                           entityIdP;
   Scope*                              scopeP;
 } DiscoverContextAvailabilityData;
+
+
+
+/* ****************************************************************************
+*
+* DiscoverContextAvailabilityResponseData -
+*/
+typedef struct DiscoverContextAvailabilityResponseData
+{
+  DiscoverContextAvailabilityResponse  res;
+} DiscoverContextAvailabilityResponseData;
 
 
 
@@ -352,6 +364,7 @@ typedef struct ParseData
   UpdateContextAttributeData                  upcar;
 
   RegisterContextResponseData                 rcrs;
+  DiscoverContextAvailabilityResponseData     dcars;
   QueryContextResponseData                    qcrs;
   UpdateContextResponseData                   upcrs;
 } ParseData;
