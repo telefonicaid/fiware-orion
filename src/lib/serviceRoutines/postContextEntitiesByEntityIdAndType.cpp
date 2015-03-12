@@ -48,10 +48,15 @@
 * Payload Out: RegisterContextResponse
 *
 * URI parameters:
-*   - attributesFormat=object
 *   - entity::type=TYPE (must coincide with type in URL-path)
 *   - !exist=entity::type  (if set - error -- entity::type cannot be empty)
 *   - exist=entity::type   (not supported - ok if present, ok if not present ...)
+*
+* 01. Get values from URL (entityId::type, exist, !exist)
+* 02. Check validity of URI params
+* 03. Fill in RegisterContextRequest from RegisterProviderRequest
+* 04. Call standard op postRegisterContext
+* 05. Cleanup and return answer
 */
 std::string postContextEntitiesByEntityIdAndType
 (
