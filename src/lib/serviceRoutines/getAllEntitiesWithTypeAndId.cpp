@@ -96,7 +96,7 @@ std::string getAllEntitiesWithTypeAndId
 
   //
   // 02. Check validity of URI params ...
-  //     and if OK;
+  //     and if OK:
   // 03. Fill in QueryContextRequest
   // 04. Call standard operation postQueryContext
   //

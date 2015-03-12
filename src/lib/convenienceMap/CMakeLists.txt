@@ -21,7 +21,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
-    mapGetContextEntitiesByEntityId.cpp
     mapGetEntityByIdAttributeByName.cpp
     mapGetIndividualContextEntity.cpp
     mapPutIndividualContextEntity.cpp
@@ -32,7 +31,6 @@ SET (SOURCES
 )
 
 SET (HEADERS
-    mapGetContextEntitiesByEntityId.h
     mapGetEntityByIdAttributeByName.h
     mapGetIndividualContextEntity.h
     mapPutIndividualContextEntity.h

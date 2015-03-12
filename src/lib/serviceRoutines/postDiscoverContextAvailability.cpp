@@ -48,11 +48,11 @@ std::string postDiscoverContextAvailability
   ParseData*                 parseDataP
 )
 {
-  DiscoverContextAvailabilityResponse  dcar;
-  std::string                          answer;
+  DiscoverContextAvailabilityResponse*  dcarP = &parseDataP->dcars.res;
+  std::string                           answer;
 
-  ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, &dcar, ciP->tenant, ciP->uriParam, ciP->servicePathV);
-  answer = dcar.render(DiscoverContextAvailability, ciP->outFormat, "");
+  ciP->httpStatusCode = mongoDiscoverContextAvailability(&parseDataP->dcar.res, dcarP, ciP->tenant, ciP->uriParam, ciP->servicePathV);
+  answer = dcarP->render(DiscoverContextAvailability, ciP->outFormat, "");
 
   return answer;
 }
