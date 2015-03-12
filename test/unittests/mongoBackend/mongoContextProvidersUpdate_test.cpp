@@ -1035,16 +1035,18 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 * Discover:  E1** - A1
 * Result:    E1** - A1 - http://cr5.com
 *
-* FIXME P10 (reserach on this)
 * Note that registration database has:
 *            E1   - A1 - http://cr1.com
 *            E1   - A1 - http://cr2.com
 *            E1*  - A1*- http://cr4.com
 *            E1** - A1 - http://cr5.com
 *
-* All them match E1 "no type" thus, should use http://cr1.com? (the first one in the
-* registrations returned by registrationsQuery()). Right now, it seems to work as an
-* exact match
+* However, considering the following match condition in searchContextProviders()
+*
+*  (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
+*
+* an registration without type match any type but the opposite is not true: an entity
+* without type does *not* match any registration.
 *
 */
 TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
