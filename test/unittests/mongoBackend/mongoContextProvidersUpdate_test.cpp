@@ -522,7 +522,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -588,7 +588,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -652,7 +652,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -721,7 +721,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -856,7 +856,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -952,7 +952,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1073,7 +1073,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
@@ -1477,7 +1477,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(0, res.errorCode.code);
+  EXPECT_EQ(SccNone, res.errorCode.code);
   EXPECT_EQ("", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
