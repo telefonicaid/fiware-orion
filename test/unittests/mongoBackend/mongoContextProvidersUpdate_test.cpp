@@ -471,9 +471,9 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(1,res.contextElementResponseVector.size());
   EXPECT_EQ("E3", RES_CER(0).entityId.id);
@@ -522,8 +522,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -588,8 +588,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -652,8 +652,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -721,8 +721,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -789,9 +789,9 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-  EXPECT_EQ(0, res.errorCode.details.size());
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(2,res.contextElementResponseVector.size());
   EXPECT_EQ("E1", RES_CER(0).entityId.id);
@@ -856,8 +856,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -952,8 +952,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(2, res.contextElementResponseVector.size());
@@ -1073,8 +1073,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(1, res.contextElementResponseVector.size());
@@ -1477,8 +1477,8 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
-  EXPECT_EQ(SccNone, res.errorCode.code);
-  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ(SccOk, res.errorCode.code);
+  EXPECT_EQ("OK", res.errorCode.reasonPhrase);
   EXPECT_EQ("", res.errorCode.details);
 
   ASSERT_EQ(4, res.contextElementResponseVector.size());
