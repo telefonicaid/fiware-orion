@@ -2060,7 +2060,6 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
 */
 void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV)
 {
-
   for (unsigned int ix = 0; ix < cer->contextElement.contextAttributeVector.size(); ++ix)
   {
     ContextAttribute* ca = cer->contextElement.contextAttributeVector.get(ix);
@@ -2071,13 +2070,12 @@ void fillContextProviders(ContextElementResponse* cer, ContextRegistrationRespon
     /* Search for some CPr in crrV */
     std::string perEntPa;
     std::string perAttrPa;
-    searchCprForAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
+    cprLookupByAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
 
     /* Looking results after crrV processing */
     ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
     ca->found = (ca->providingApplication != "");
   }
-
 }
 
 /* ****************************************************************************
@@ -2107,30 +2105,30 @@ bool someContextElementNotFound(ContextElementResponse& cer)
 
 /* ****************************************************************************
 *
-* searchCprForAttribute -
+* cprLookupByAttribute -
 *
-* Search the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned
+* Search for the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned
 * the "general" one at entity level or the "specific" one at attribute level
 *
 */
-void searchCprForAttribute(EntityId&                          en,
-                           const std::string&                 attrName,
-                           ContextRegistrationResponseVector& crrV,
-                           std::string*                       perEntPa,
-                           std::string*                       perAttrPa)
+void cprLookupByAttribute(EntityId&                          en,
+                          const std::string&                 attrName,
+                          ContextRegistrationResponseVector& crrV,
+                          std::string*                       perEntPa,
+                          std::string*                       perAttrPa)
 {
   *perEntPa  = "";
   *perAttrPa = "";
-  for (unsigned int ix = 0; ix < crrV.size(); ++ix)
+  for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
   {
-    ContextRegistrationResponse* crr = crrV.get(ix);
+    ContextRegistrationResponse* crr = crrV.get(crrIx);
     /* Is there a matching entity in the CRR? */
-    for (unsigned jx = 0; jx < crr->contextRegistration.entityIdVector.size(); ++jx)
+    for (unsigned enIx = 0; enIx < crr->contextRegistration.entityIdVector.size(); ++enIx)
     {
-      EntityId* regEn = crr->contextRegistration.entityIdVector.get(jx);
-      /* No match (keep searching in other CRR) */
+      EntityId* regEn = crr->contextRegistration.entityIdVector.get(enIx);
       if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
       {
+        /* No match (keep searching the CRR) */
         continue;
       }
 
@@ -2138,13 +2136,13 @@ void searchCprForAttribute(EntityId&                          en,
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
         *perEntPa = crr->contextRegistration.providingApplication.get();
-        break; /* jx */
+        break; /* enIx */
       }
 
-      /* Is there a matching entity or the abcense of attributes? */
-      for (unsigned kx = 0; kx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++kx)
+      /* Is there a matching entity or the absence of attributes? */
+      for (unsigned attrIx = 0; attrIx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++attrIx)
       {
-        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector.get(kx)->name;
+        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector.get(attrIx)->name;
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result keep searching in CRR vector, so we return */

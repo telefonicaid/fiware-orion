@@ -1923,7 +1923,7 @@ void processContextElement(ContextElement*                      ceP,
         //
         releaseTriggeredSubscriptions(subsToNotify);
 
-        /* To finish with this entity processing, search for CPrs in not found attrinuts and
+        /* To finish with this entity processing, search for CPrs in not found attributes and
          * add the corresponding ContextElementResponse to the global response */
         searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
         cerP->statusCode.fill(SccOk);

@@ -476,13 +476,13 @@ extern bool someContextElementNotFound(ContextElementResponse& cer);
 
 /* ****************************************************************************
 *
-* searchCprForAttribute -
+* cprLookupByAttribute -
 *
 */
-extern void searchCprForAttribute(EntityId&                          en,
-                                  const std::string&                 attrName,
-                                  ContextRegistrationResponseVector& crrV,
-                                  std::string*                       perEntPa,
-                                  std::string*                       perAttrPa);
+extern void cprLookupByAttribute(EntityId&                          en,
+                                 const std::string&                 attrName,
+                                 ContextRegistrationResponseVector& crrV,
+                                 std::string*                       perEntPa,
+                                 std::string*                       perAttrPa);
 
 #endif
