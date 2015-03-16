@@ -583,10 +583,10 @@ JsonNode jsonRcrParseVector[] =
   { CR "/contextRegistration/metadatas/metadata/value/target/type",                     targetEntityIdType       },
   { CR "/contextRegistration/metadatas/metadata/value/target/isPattern",                targetEntityIdIsPattern  },
 
-  { CR "/contextRegistration/metadatas/metadata/value/associations",                    jsonNullTreat            },
-  { CR "/contextRegistration/metadatas/metadata/value/associations/association",        attributeAssociation     },
-  { CR "/contextRegistration/metadatas/metadata/value/associations/association/source", sourceAttribute          },
-  { CR "/contextRegistration/metadatas/metadata/value/associations/association/target", targetAttribute          },
+  { CR "/contextRegistration/metadatas/metadata/value/attributeAssociations",                    jsonNullTreat            },
+  { CR "/contextRegistration/metadatas/metadata/value/attributeAssociations/attributeAssociation",        attributeAssociation     },
+  { CR "/contextRegistration/metadatas/metadata/value/attributeAssociations/attributeAssociation/source", sourceAttribute          },
+  { CR "/contextRegistration/metadatas/metadata/value/attributeAssociations/attributeAssociation/target", targetAttribute          },
 
   { CR "/contextRegistration/providingApplication",                                     providingApplication     },
   { "/duration",                                                                        duration                 },
