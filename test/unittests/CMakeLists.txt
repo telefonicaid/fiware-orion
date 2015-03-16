@@ -110,19 +110,11 @@ SET (SOURCES
     serviceRoutines/putAttributeValueInstance_test.cpp
     serviceRoutines/getAttributeValueInstance_test.cpp
 
-    convenience/Convenience_test.cpp
     convenienceMap/mapDeleteIndividualContextEntity_test.cpp
     convenienceMap/mapGetIndividualContextEntity_test.cpp
-    convenienceMap/mapPostIndividualContextEntity_test.cpp
     convenienceMap/mapPutIndividualContextEntity_test.cpp
 
-    convenienceMap/mapGetIndividualContextEntityAttribute_test.cpp
-
-    convenienceMap/mapDeleteIndividualContextEntityAttributes_test.cpp
-    convenienceMap/mapGetIndividualContextEntityAttributes_test.cpp
-    convenienceMap/mapPostIndividualContextEntityAttributes_test.cpp
-    convenienceMap/mapDeleteIndividualContextEntityAttribute_test.cpp
-
+    convenience/Convenience_test.cpp
     convenience/AppendContextElementRequest_test.cpp
     convenience/AppendContextElementResponse_test.cpp
     convenience/ContextAttributeResponse_test.cpp

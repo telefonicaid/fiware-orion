@@ -173,7 +173,7 @@ void StatusCode::fill(const struct UpdateContextResponse& ucrs)
   }
   else if (ucrs.contextElementResponseVector.vec.size() > 1)
   {
-    LM_W(("Filling StatusCode from UpdateContextResponse with morethan one contextElementResponse, picking one of them ..."));
+    LM_W(("Filling StatusCode from UpdateContextResponse with more than one contextElementResponse, picking one of them ..."));
     fill(ucrs.contextElementResponseVector.vec[0]->statusCode);
   }
   else

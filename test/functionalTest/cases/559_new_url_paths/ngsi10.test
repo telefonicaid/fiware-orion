@@ -1052,7 +1052,7 @@ Date: REGEX(.*)
 10.1. GET /ngsi10/contextEntityTypes/T
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 210
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -1061,6 +1061,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type /T/ non-existent</details>
   </errorCode>
 </queryContextResponse>
 
@@ -1077,7 +1078,7 @@ Date: REGEX(.*)
 11.1. GET /ngsi10/contextEntityTypes/typeName/attributes
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 217
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -1086,6 +1087,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type /typeName/ non-existent</details>
   </errorCode>
 </queryContextResponse>
 
@@ -1102,7 +1104,7 @@ Date: REGEX(.*)
 12.1. GET /ngsi10/contextEntityTypes/typeName/attributes/A1
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 224
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -1111,6 +1113,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type/attribute::name pair not found</details>
   </errorCode>
 </queryContextResponse>
 

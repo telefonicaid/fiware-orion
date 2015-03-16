@@ -79,11 +79,8 @@ TEST(deleteAttributeValueInstance, notFound)
 /* ****************************************************************************
 *
 * found - 
-*
-* FIXME P7: enable again once tghe convop for /ngsi10/contextEntities/E1/attributes/A1/left
-*           is transformed to use Standard Operations.
 */
-TEST(deleteAttributeValueInstance, DISABLED_found)
+TEST(deleteAttributeValueInstance, found)
 {
   ConnectionInfo ci1("/ngsi10/contextEntities/E1/attributes",          "POST", "1.1");
   ConnectionInfo ci2("/ngsi10/contextEntities/E1/attributes/A1/left",  "DELETE", "1.1");
@@ -93,6 +90,8 @@ TEST(deleteAttributeValueInstance, DISABLED_found)
   std::string    out;
 
   utInit();
+
+  ci2.servicePathV.push_back("/");
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile)) << "Error getting test data from '" << infile << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";

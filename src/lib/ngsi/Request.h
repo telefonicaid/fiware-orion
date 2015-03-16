@@ -89,6 +89,8 @@ typedef enum RequestType
   RegisterResponse,
   RtSubscribeResponse,
   RtSubscribeError,
+  RtContextElementResponse,
+  RtContextAttributeResponse,
 
   EntityTypes = 61,
   AttributesForEntityType,

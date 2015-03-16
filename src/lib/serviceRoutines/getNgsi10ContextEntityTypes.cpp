@@ -30,6 +30,8 @@
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
 
@@ -39,7 +41,24 @@
 *
 * getNgsi10ContextEntityTypes - 
 *
-* GET /ngsi10/contextEntityTypes/{typeName}
+* GET /v1/contextEntityTypes/{entity::type}
+* GET /ngsi10/contextEntityTypes/{entity::type}
+*
+* Payload In:  None
+* Payload Out: QueryContextResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+*   - entity::type=XXX     (must coincide with entity::type in URL)
+*   - !exist=entity::type  (if set - error -- entity::type cannot be empty)
+*   - exist=entity::type   (not supported - ok if present, ok if not present ...)
+*
+* 01. Get values from URL (entityId::type, esist, !exist)
+* 02. Check validity of URI params
+* 03. Fill in QueryContextRequest
+* 04. Call standard operation postQueryContext (that renders the QueryContextResponse)
+* 05. If 404 Not Found - enter request entityId::type into response context element
+* 06. Cleanup and return result
 */
 std::string getNgsi10ContextEntityTypes
 (
@@ -49,11 +68,59 @@ std::string getNgsi10ContextEntityTypes
   ParseData*                 parseDataP
 )
 {
-  std::string typeName = compV[2];
+  std::string     answer;
+  std::string     typeName              = compV[2];
+  EntityTypeInfo  typeInfo              = EntityTypeEmptyOrNotEmpty;
+  std::string     typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
+
+  // 01. Get values from URL (entityId::type, esist, !exist)
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+
+
+  // 02. Check validity of URI params
+  if (typeInfo == EntityTypeEmpty)
+  {
+    parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
+    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, "");
+    parseDataP->qcr.res.release();
+    return answer;
+  }
+  else if ((typeNameFromUriParam != typeName) && (typeNameFromUriParam != ""))
+  {
+    parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
+    LM_W(("Bad Input non-matching entity::types in URL"));
+    answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, "");
+    parseDataP->qcr.res.release();
+    return answer;
+  }
+
+
+  // 03. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(".*", typeName, "");
-  std::string answer = postQueryContext(ciP, components, compV, parseDataP);
-  parseDataP->qcr.res.release();
 
+
+  // 04. Call standard operation postQueryContext (that renders the QueryContextResponse)
+  answer = postQueryContext(ciP, components, compV, parseDataP);
+
+
+  // 05. If 404 Not Found - enter request entityId::type into response context element
+  if (parseDataP->qcrs.res.errorCode.code == SccContextElementNotFound)
+  {
+    parseDataP->qcrs.res.errorCode.details = std::string("entityId::type /") + typeName + "/ non-existent";
+    answer = parseDataP->qcrs.res.render(ciP, Ngsi10ContextEntityTypes, "");
+  }
+
+
+  // 06. Cleanup and return result
+  parseDataP->qcr.res.release();
   return answer;
 }

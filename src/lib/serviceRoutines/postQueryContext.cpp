@@ -247,19 +247,18 @@ std::string postQueryContext
   //
   // Returning 'redirected to' in StatusCode::details
   //
-  if (((qcrsP->errorCode.code != SccOk) && (qcrsP->errorCode.code != SccNone)) && (qcrsP->errorCode.details == ""))
+  if ((qcrsP->errorCode.code == SccOk) || (qcrsP->errorCode.details == ""))
   {
-    qcrsP->errorCode.details = "Redirected to context provider " + ip + ":" + portV + prefix;
+    qcrsP->errorCode.details = std::string("Redirected to context provider ") + ip + ":" + portV + prefix;
   }
-  else if ((qcrsP->contextElementResponseVector.size() > 0) &&
-           (qcrsP->contextElementResponseVector[0]->statusCode.details == ""))
-  {
-    qcrsP->contextElementResponseVector[0]->statusCode.details =
-      "Redirected to context provider " + ip + ":" + portV + prefix;
-  }
-  else if (qcrsP->errorCode.details == "")
+  else if (qcrsP->errorCode.code == SccNone)
   {
     qcrsP->errorCode.fill(SccOk, std::string("Redirected to context provider ") + ip + ":" + portV + prefix);
+  }
+
+  if (qcrsP->contextElementResponseVector.size() > 0)
+  {
+    qcrsP->contextElementResponseVector[0]->statusCode.details = std::string("Redirected to context provider ") + ip + ":" + portV + prefix;
   }
 
   answer = qcrsP->render(ciP, QueryContext, "");
