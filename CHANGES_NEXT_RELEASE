@@ -7,3 +7,4 @@
        convenience operations "/v1/contextAttributes/{entity::id}" and are thus 100% identical.
 - Fix: The convenience operation "PUT /v1/contextAttributes/{entity::id}/attributes/{attribute::name}" had a bug
        about the metadata in the update, this error has been fixed.
+- Fix: A registerContext request that uses associations must specify "attributeAssociations" instead of "attributes" to be consistent with DiscoveContextAvailability messages (Issue #823).
