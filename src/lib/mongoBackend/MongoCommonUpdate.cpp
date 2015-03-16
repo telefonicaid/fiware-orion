@@ -1172,7 +1172,8 @@ static bool processContextAttributeVector (ContextElement*                      
         ContextAttribute* targetAttr = ceP->contextAttributeVector.get(ix);
         /* No matter if success or fail, we have to include the attribute in the response */
         ContextAttribute* ca = new ContextAttribute(targetAttr->name, targetAttr->type);
-        setResponseMetadata(targetAttr, ca);        
+        setResponseMetadata(targetAttr, ca);
+        cerP->contextElement.contextAttributeVector.push_back(ca);
 
         /* actualUpdate could be changed to false in the "update" case. For "delete" and
          * "append" it would keep the true value untouched */
@@ -1193,6 +1194,8 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: UPDATE") + 
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());                
+
+                /* Although ca has been already pushed into cerP, it can be used */
                 ca->found = false;
 
             }
@@ -1203,8 +1206,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: UPDATE") +
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() +
-                                      " - location nature of an attribute has to be defined at creation time, with APPEND");
-                cerP->contextElement.contextAttributeVector.push_back(ca);
+                                      " - location nature of an attribute has to be defined at creation time, with APPEND");                
                 return false;
             }
 
@@ -1214,8 +1216,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               std::string("action: UPDATE") +
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - error parsing location attribute, value: <" + targetAttr->value + ">");
-                        cerP->contextElement.contextAttributeVector.push_back(ca);
+                                              " - error parsing location attribute, value: <" + targetAttr->value + ">");                        
                         return false;
                 }
 
@@ -1235,8 +1236,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               std::string("action: APPEND") +
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - attempt to define a location attribute [" + targetAttr->name + "] when another one has been previously defined [" + locAttr + "]");
-                        cerP->contextElement.contextAttributeVector.push_back(ca);
+                                              " - attempt to define a location attribute [" + targetAttr->name + "] when another one has been previously defined [" + locAttr + "]");                        
                         return false;
                     }
 
@@ -1245,8 +1245,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               std::string("action: APPEND") +
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
-                        cerP->contextElement.contextAttributeVector.push_back(ca);
+                                              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");                        
                         return false;
                     }
 
@@ -1255,8 +1254,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                                   std::string("action: APPEND") +
                                                   " - entity: [" + eP->toString() + "]" +
                                                   " - offending attribute: " + targetAttr->toString() +
-                                                  " - error parsing location attribute, value: [" + targetAttr->value + "]");
-                            cerP->contextElement.contextAttributeVector.push_back(ca);
+                                                  " - error parsing location attribute, value: [" + targetAttr->value + "]");                            
                             return false;
                     }
                     locAttr = targetAttr->name;
@@ -1273,8 +1271,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: APPEND") +
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
-                                      " - attribute can not be appended");
-                cerP->contextElement.contextAttributeVector.push_back(ca);
+                                      " - attribute can not be appended");                
                 return false;
             }
         }
@@ -1289,8 +1286,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                           std::string("action: DELETE") +
                                           " - entity: [" + eP->toString() + "]" +
                                           " - offending attribute: " + targetAttr->toString() +
-                                          " - location attribute has to be defined at creation time, with APPEND");
-                    cerP->contextElement.contextAttributeVector.push_back(ca);
+                                          " - location attribute has to be defined at creation time, with APPEND");                    
                     return false;
                 }
 
@@ -1309,8 +1305,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: DELETE") +
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
-                                      " - attribute not found");
-                cerP->contextElement.contextAttributeVector.push_back(ca);
+                                      " - attribute not found");                
                 return false;
 
             }
@@ -1319,8 +1314,7 @@ static bool processContextAttributeVector (ContextElement*                      
         {
           cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
           // This is a BUG in the parse layer checks
-          LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));
-          cerP->contextElement.contextAttributeVector.push_back(ca);
+          LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));          
           return false;
         }
 
@@ -1331,13 +1325,10 @@ static bool processContextAttributeVector (ContextElement*                      
             std::string err;
             if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant, servicePathV))
             {
-              cerP->statusCode.fill(SccReceiverInternalError, err);
-              cerP->contextElement.contextAttributeVector.push_back(ca);
+              cerP->statusCode.fill(SccReceiverInternalError, err);              
               return false;
             }
-        }
-
-        cerP->contextElement.contextAttributeVector.push_back(ca);
+        }        
 
     }
 
