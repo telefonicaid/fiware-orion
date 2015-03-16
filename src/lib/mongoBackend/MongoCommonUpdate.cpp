@@ -1193,7 +1193,7 @@ static bool processContextAttributeVector (ContextElement*                      
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
                                       " - entity: [" + eP->toString() + "]" +
-                                      " - offending attribute: " + targetAttr->toString());                
+                                      " - offending attribute: " + targetAttr->toString());
 
                 /* Although ca has been already pushed into cerP, it can be used */
                 ca->found = false;
@@ -1206,7 +1206,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: UPDATE") +
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() +
-                                      " - location nature of an attribute has to be defined at creation time, with APPEND");                
+                                      " - location nature of an attribute has to be defined at creation time, with APPEND");
                 return false;
             }
 
@@ -1216,7 +1216,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               std::string("action: UPDATE") +
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - error parsing location attribute, value: <" + targetAttr->value + ">");                        
+                                              " - error parsing location attribute, value: <" + targetAttr->value + ">");
                         return false;
                 }
 
@@ -1236,7 +1236,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               std::string("action: APPEND") +
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - attempt to define a location attribute [" + targetAttr->name + "] when another one has been previously defined [" + locAttr + "]");                        
+                                              " - attempt to define a location attribute [" + targetAttr->name + "] when another one has been previously defined [" + locAttr + "]");
                         return false;
                     }
 
@@ -1245,7 +1245,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                               std::string("action: APPEND") +
                                               " - entity: [" + eP->toString() + "]" +
                                               " - offending attribute: " + targetAttr->toString() +
-                                              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");                        
+                                              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
                         return false;
                     }
 
@@ -1254,7 +1254,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                                   std::string("action: APPEND") +
                                                   " - entity: [" + eP->toString() + "]" +
                                                   " - offending attribute: " + targetAttr->toString() +
-                                                  " - error parsing location attribute, value: [" + targetAttr->value + "]");                            
+                                                  " - error parsing location attribute, value: [" + targetAttr->value + "]");
                             return false;
                     }
                     locAttr = targetAttr->name;
@@ -1271,7 +1271,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: APPEND") +
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
-                                      " - attribute can not be appended");                
+                                      " - attribute can not be appended");
                 return false;
             }
         }
@@ -1286,7 +1286,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                           std::string("action: DELETE") +
                                           " - entity: [" + eP->toString() + "]" +
                                           " - offending attribute: " + targetAttr->toString() +
-                                          " - location attribute has to be defined at creation time, with APPEND");                    
+                                          " - location attribute has to be defined at creation time, with APPEND");
                     return false;
                 }
 
@@ -1305,7 +1305,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                       std::string("action: DELETE") +
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString() + 
-                                      " - attribute not found");                
+                                      " - attribute not found");
                 return false;
 
             }
@@ -1325,7 +1325,7 @@ static bool processContextAttributeVector (ContextElement*                      
             std::string err;
             if (!addTriggeredSubscriptions(entityId, entityType, ca->name, subsToNotify, err, tenant, servicePathV))
             {
-              cerP->statusCode.fill(SccReceiverInternalError, err);              
+              cerP->statusCode.fill(SccReceiverInternalError, err);
               return false;
             }
         }        
