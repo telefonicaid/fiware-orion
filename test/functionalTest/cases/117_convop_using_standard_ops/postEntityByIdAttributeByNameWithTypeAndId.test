@@ -34,16 +34,17 @@ brokerStart CB 0
 # 02. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?!exist=entity::type and see it fail
 # 03. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A1 and see it work
 # 04. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A2?exist=entity::type and see it work
-# 05. Discover E1-T1, get two hits
-# 06. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, without service-path
-# 07. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1
-# 08. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s2
-# 09. Discover E1-T1-A3, without service-path, get three hits
-# 10. Discover E1-T1-A3, with service-path /#, get three hits
-# 11. Discover E1-T1-A3, with service-path /, get one hit
-# 12. Discover E1-T1-A3, with service-path /s1, get one hit
-# 13. Discover E1-T1-A3, with service-path /s2, get one hit
-# 14. Discover E1-T1-A3, with service-path /s3, get zero hits
+# 05. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A4?entity::type=T1 and see it work
+# 06. Discover E1-T1, get three hits
+# 07. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, without service-path
+# 08. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1
+# 09. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s2
+# 10. Discover E1-T1-A3, without service-path, get three hits
+# 11. Discover E1-T1-A3, with service-path /#, get three hits
+# 12. Discover E1-T1-A3, with service-path /, get one hit
+# 13. Discover E1-T1-A3, with service-path /s1, get one hit
+# 14. Discover E1-T1-A3, with service-path /s2, get one hit
+# 15. Discover E1-T1-A3, with service-path /s3, get zero hits
 #
 
 echo "01. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A1?entity::type=T2 and see it fail"
@@ -118,8 +119,26 @@ echo
 echo
 
 
-echo "05. Discover E1-T1, get two hits"
-echo "================================"
+echo "05. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A4?entity::type=T1 and see it work"
+echo "================================================================================================="
+payload='{
+  "metadatas": [
+    {
+      "name": "md",
+      "type": "string",
+      "value": "X5"
+    }
+  ],
+  "duration": "PT1H",
+  "providingApplication": "http://kz.tid.es/part05"
+}'
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1/attributes/A4?entity::type=T1 --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Discover E1-T1, get three hits"
+echo "=================================="
 payload='{
   "entities": [
     {
@@ -134,26 +153,8 @@ echo
 echo
 
 
-echo "06. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, without service-path"
+echo "07. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, without service-path"
 echo "======================================================================================="
-payload='{
-  "metadatas": [
-    {
-      "name": "md",
-      "type": "string",
-      "value": "X6"
-    }
-  ],
-  "duration": "PT1H",
-  "providingApplication": "http://kz.tid.es/part06"
-}'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1/attributes/A3 --payload "$payload" --json
-echo
-echo
-
-
-echo "07. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1"
-echo "==================================================================================="
 payload='{
   "metadatas": [
     {
@@ -165,12 +166,12 @@ payload='{
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part07"
 }'
-orionCurl --url /v1/registry/contextEntities/type/T1/id/E1/attributes/A3 --payload "$payload" --json --servicePath /s1
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1/attributes/A3 --payload "$payload" --json
 echo
 echo
 
 
-echo "08. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s2"
+echo "08. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1"
 echo "==================================================================================="
 payload='{
   "metadatas": [
@@ -183,12 +184,30 @@ payload='{
   "duration": "PT1H",
   "providingApplication": "http://kz.tid.es/part08"
 }'
+orionCurl --url /v1/registry/contextEntities/type/T1/id/E1/attributes/A3 --payload "$payload" --json --servicePath /s1
+echo
+echo
+
+
+echo "09. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s2"
+echo "==================================================================================="
+payload='{
+  "metadatas": [
+    {
+      "name": "md",
+      "type": "string",
+      "value": "X9"
+    }
+  ],
+  "duration": "PT1H",
+  "providingApplication": "http://kz.tid.es/part09"
+}'
 orionCurl --url /v1/registry/contextEntities/type/T1/id/E1/attributes/A3 --payload "$payload" --json --servicePath /s2
 echo
 echo
 
 
-echo "09. Discover E1-T1-A3, without service-path, get three hits"
+echo "10. Discover E1-T1-A3, without service-path, get three hits"
 echo "==========================================================="
 payload='{
   "entities": [
@@ -207,7 +226,7 @@ echo
 echo
 
 
-echo "10. Discover E1-T1-A3, with service-path /#, get three hits"
+echo "11. Discover E1-T1-A3, with service-path /#, get three hits"
 echo "==========================================================="
 payload='{
   "entities": [
@@ -226,7 +245,7 @@ echo
 echo
 
 
-echo "11. Discover E1-T1-A3, with service-path /, get one hit"
+echo "12. Discover E1-T1-A3, with service-path /, get one hit"
 echo "======================================================="
 payload='{
   "entities": [
@@ -245,7 +264,7 @@ echo
 echo
 
 
-echo "12. Discover E1-T1-A3, with service-path /s1, get one hit"
+echo "13. Discover E1-T1-A3, with service-path /s1, get one hit"
 echo "========================================================="
 payload='{
   "entities": [
@@ -264,7 +283,7 @@ echo
 echo
 
 
-echo "13. Discover E1-T1-A3, with service-path /s2, get one hit"
+echo "14. Discover E1-T1-A3, with service-path /s2, get one hit"
 echo "========================================================="
 payload='{
   "entities": [
@@ -283,7 +302,7 @@ echo
 echo
 
 
-echo "14. Discover E1-T1-A3, with service-path /s3, get zero hits"
+echo "15. Discover E1-T1-A3, with service-path /s3, get zero hits"
 echo "==========================================================="
 payload='{
   "entities": [
@@ -362,10 +381,23 @@ Date: REGEX(.*)
 }
 
 
-05. Discover E1-T1, get two hits
-================================
+05. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A4?entity::type=T1 and see it work
+=================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 846
+Content-Length: 75
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "PT1H", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+06. Discover E1-T1, get three hits
+==================================
+HTTP/1.1 200 OK
+Content-Length: 1247
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -408,12 +440,31 @@ Date: REGEX(.*)
                 ], 
                 "providingApplication": "http://kz.tid.es/part04"
             }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A4", 
+                        "type": ""
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/part05"
+            }
         }
     ]
 }
 
 
-06. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, without service-path
+07. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, without service-path
 =======================================================================================
 HTTP/1.1 200 OK
 Content-Length: 75
@@ -426,7 +477,7 @@ Date: REGEX(.*)
 }
 
 
-07. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1
+08. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s1
 ===================================================================================
 HTTP/1.1 200 OK
 Content-Length: 75
@@ -439,7 +490,7 @@ Date: REGEX(.*)
 }
 
 
-08. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s2
+09. POST /v1/registry/contextEntities/type/T1/id/E1/attributes/A3, service-path /s2
 ===================================================================================
 HTTP/1.1 200 OK
 Content-Length: 75
@@ -452,7 +503,7 @@ Date: REGEX(.*)
 }
 
 
-09. Discover E1-T1-A3, without service-path, get three hits
+10. Discover E1-T1-A3, without service-path, get three hits
 ===========================================================
 HTTP/1.1 200 OK
 Content-Length: 1247
@@ -461,25 +512,6 @@ Date: REGEX(.*)
 
 {
     "contextRegistrationResponses": [
-        {
-            "contextRegistration": {
-                "attributes": [
-                    {
-                        "isDomain": "false", 
-                        "name": "A3", 
-                        "type": ""
-                    }
-                ], 
-                "entities": [
-                    {
-                        "id": "E1", 
-                        "isPattern": "false", 
-                        "type": "T1"
-                    }
-                ], 
-                "providingApplication": "http://kz.tid.es/part06"
-            }
-        }, 
         {
             "contextRegistration": {
                 "attributes": [
@@ -517,20 +549,7 @@ Date: REGEX(.*)
                 ], 
                 "providingApplication": "http://kz.tid.es/part08"
             }
-        }
-    ]
-}
-
-
-10. Discover E1-T1-A3, with service-path /#, get three hits
-===========================================================
-HTTP/1.1 200 OK
-Content-Length: 1247
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextRegistrationResponses": [
+        }, 
         {
             "contextRegistration": {
                 "attributes": [
@@ -547,9 +566,22 @@ Date: REGEX(.*)
                         "type": "T1"
                     }
                 ], 
-                "providingApplication": "http://kz.tid.es/part06"
+                "providingApplication": "http://kz.tid.es/part09"
             }
-        }, 
+        }
+    ]
+}
+
+
+11. Discover E1-T1-A3, with service-path /#, get three hits
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 1247
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
         {
             "contextRegistration": {
                 "attributes": [
@@ -587,12 +619,31 @@ Date: REGEX(.*)
                 ], 
                 "providingApplication": "http://kz.tid.es/part08"
             }
+        }, 
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A3", 
+                        "type": ""
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/part09"
+            }
         }
     ]
 }
 
 
-11. Discover E1-T1-A3, with service-path /, get one hit
+12. Discover E1-T1-A3, with service-path /, get one hit
 =======================================================
 HTTP/1.1 200 OK
 Content-Length: 445
@@ -617,38 +668,6 @@ Date: REGEX(.*)
                         "type": "T1"
                     }
                 ], 
-                "providingApplication": "http://kz.tid.es/part06"
-            }
-        }
-    ]
-}
-
-
-12. Discover E1-T1-A3, with service-path /s1, get one hit
-=========================================================
-HTTP/1.1 200 OK
-Content-Length: 445
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextRegistrationResponses": [
-        {
-            "contextRegistration": {
-                "attributes": [
-                    {
-                        "isDomain": "false", 
-                        "name": "A3", 
-                        "type": ""
-                    }
-                ], 
-                "entities": [
-                    {
-                        "id": "E1", 
-                        "isPattern": "false", 
-                        "type": "T1"
-                    }
-                ], 
                 "providingApplication": "http://kz.tid.es/part07"
             }
         }
@@ -656,7 +675,7 @@ Date: REGEX(.*)
 }
 
 
-13. Discover E1-T1-A3, with service-path /s2, get one hit
+13. Discover E1-T1-A3, with service-path /s1, get one hit
 =========================================================
 HTTP/1.1 200 OK
 Content-Length: 445
@@ -688,7 +707,39 @@ Date: REGEX(.*)
 }
 
 
-14. Discover E1-T1-A3, with service-path /s3, get zero hits
+14. Discover E1-T1-A3, with service-path /s2, get one hit
+=========================================================
+HTTP/1.1 200 OK
+Content-Length: 445
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false", 
+                        "name": "A3", 
+                        "type": ""
+                    }
+                ], 
+                "entities": [
+                    {
+                        "id": "E1", 
+                        "isPattern": "false", 
+                        "type": "T1"
+                    }
+                ], 
+                "providingApplication": "http://kz.tid.es/part09"
+            }
+        }
+    ]
+}
+
+
+15. Discover E1-T1-A3, with service-path /s3, get zero hits
 ===========================================================
 HTTP/1.1 200 OK
 Content-Length: 94
