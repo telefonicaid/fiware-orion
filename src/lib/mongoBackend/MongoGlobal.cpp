@@ -2045,3 +2045,111 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
   }
   subs.clear();
 }
+
+/* ****************************************************************************
+*
+* fillContextProviders -
+*
+* This functions is very similar the one with the same name in mongoQueryContext.cpp
+* but acting on a single CER instead that on a complete vector of them.
+*
+* Looks in the CER passed as argument, searching for a suitable CPr in the CRR
+* vector passed as argument. If a suitable CPr is found, it is set in the CER (and the 'found' field
+* is changed to true)
+*
+*/
+void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV)
+{
+  for (unsigned int ix = 0; ix < cer->contextElement.contextAttributeVector.size(); ++ix)
+  {
+    ContextAttribute* ca = cer->contextElement.contextAttributeVector.get(ix);
+    if (ca->found)
+    {
+      continue;
+    }
+    /* Search for some CPr in crrV */
+    std::string perEntPa;
+    std::string perAttrPa;
+    cprLookupByAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
+
+    /* Looking results after crrV processing */
+    ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
+    ca->found = (ca->providingApplication != "");
+  }
+}
+
+/* ****************************************************************************
+*
+* someContextElementNotFound -
+*
+* This functions is very similar the one with the same name in mongoQueryContext.cpp
+* but acting on a single CER instead that on a complete vector of them.
+*
+* Returns true if some attribute with 'found' set to 'false' is found in the CER passed
+* as argument
+*
+*/
+bool someContextElementNotFound(ContextElementResponse& cer)
+{
+
+  for (unsigned int ix = 0; ix < cer.contextElement.contextAttributeVector.size(); ++ix)
+  {
+    if (!cer.contextElement.contextAttributeVector[ix]->found)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+/* ****************************************************************************
+*
+* cprLookupByAttribute -
+*
+* Search for the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned
+* the "general" one at entity level or the "specific" one at attribute level
+*
+*/
+void cprLookupByAttribute(EntityId&                          en,
+                          const std::string&                 attrName,
+                          ContextRegistrationResponseVector& crrV,
+                          std::string*                       perEntPa,
+                          std::string*                       perAttrPa)
+{
+  *perEntPa  = "";
+  *perAttrPa = "";
+  for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
+  {
+    ContextRegistrationResponse* crr = crrV.get(crrIx);
+    /* Is there a matching entity in the CRR? */
+    for (unsigned enIx = 0; enIx < crr->contextRegistration.entityIdVector.size(); ++enIx)
+    {
+      EntityId* regEn = crr->contextRegistration.entityIdVector.get(enIx);
+      if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
+      {
+        /* No match (keep searching the CRR) */
+        continue;
+      }
+
+      /* CRR without attributes (keep searching in other CRR) */
+      if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
+      {
+        *perEntPa = crr->contextRegistration.providingApplication.get();
+        break; /* enIx */
+      }
+
+      /* Is there a matching entity or the absence of attributes? */
+      for (unsigned attrIx = 0; attrIx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++attrIx)
+      {
+        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector.get(attrIx)->name;
+        if (regAttrName == attrName)
+        {
+          /* We cannot "improve" this result keep searching in CRR vector, so we return */
+          *perAttrPa = crr->contextRegistration.providingApplication.get();
+          return;
+        }
+      }
+    }
+  }
+}

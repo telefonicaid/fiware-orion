@@ -460,4 +460,29 @@ extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscri
 */
 extern BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
 
+/* ****************************************************************************
+*
+* fillContextProviders -
+*
+*/
+extern void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV);
+
+/* ****************************************************************************
+*
+* someContextElementNotFound -
+*
+*/
+extern bool someContextElementNotFound(ContextElementResponse& cer);
+
+/* ****************************************************************************
+*
+* cprLookupByAttribute -
+*
+*/
+extern void cprLookupByAttribute(EntityId&                          en,
+                                 const std::string&                 attrName,
+                                 ContextRegistrationResponseVector& crrV,
+                                 std::string*                       perEntPa,
+                                 std::string*                       perAttrPa);
+
 #endif
