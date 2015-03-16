@@ -28,10 +28,12 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "convenience/AppendContextElementRequest.h"
 #include "convenience/AppendContextElementResponse.h"
-#include "convenienceMap/mapPostIndividualContextEntity.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/postIndividualContextEntity.h"
 
 
@@ -40,15 +42,38 @@
 *
 * postIndividualContextEntity -
 *
-* NOTE
-* This function is used for two requests:
-* o POST /v1/contextEntities  and
-* o POST /v1/contextEntities/{entityId::id}
+* Corresponding Standard Operation: UpdateContext/APPEND
 *
-* In the latter case, the payload (AppendContextElementRequest) cannot contain any
+* NOTE
+*   This function is used for two different URLs:
+*     o /v1/contextEntities
+*     o /v1/contextEntities/{entityId::id}
+*
+* In the longer URL (with entityId::id), the payload (AppendContextElementRequest) cannot contain any
 * entityId data (id, type, isPattern).
 * In the first case, the entityId data of the payload is mandatory.
 * entityId::type can be empty, as always, but entityId::id MUST be filled in.
+*
+* POST /v1/contextEntities
+* POST /ngsi10/contextEntities
+* POST /v1/contextEntities/{entityId::id}
+* POST /ngsi10/contextEntities/{entityId::id}
+*
+* Payload In:  AppendContextElementRequest
+* Payload Out: AppendContextElementResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+*   - entity::type=TYPE
+*   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
+*     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
+*
+* 00. Take care of URI params
+* 01. Check that total input in consistent and correct
+* 02. Fill in UpdateContextRequest from AppendContextElementRequest + URL-data + URI params
+* 03. Call postUpdateContext standard service routine
+* 04. Translate UpdateContextResponse to AppendContextElementResponse
+* 05. Cleanup and return result
 */
 std::string postIndividualContextEntity
 (
@@ -58,44 +83,85 @@ std::string postIndividualContextEntity
   ParseData*                 parseDataP
 )
 {
+  AppendContextElementRequest*  reqP                  = &parseDataP->acer.res;
+  AppendContextElementResponse  response;
+  std::string                   entityIdFromPayload   = reqP->entity.id;
+  std::string                   entityIdFromURL       = ((compV.size() == 3) || (compV.size() == 4))? compV[2] : "";
   std::string                   entityId;
+  std::string                   entityTypeFromPayload = reqP->entity.type;
+  std::string                   entityTypeFromURL     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string                   entityType;
   std::string                   answer;
-  AppendContextElementRequest*  reqP       = &parseDataP->acer.res;
-  AppendContextElementResponse  response;
 
-  response.entity = reqP->entity;
 
-  if (compV.size() == 3)  // /v1/contextEntities/{entityId}
+  //
+  // 01. Check that total input in consistent and correct
+  //
+
+  // 01.01. entityId::id
+  if ((entityIdFromPayload != "") && (entityIdFromURL != "") && (entityIdFromPayload != entityIdFromURL))
   {
-    entityId   = compV[2];
-    entityType = "";
+    std::string error = "entityId::id differs in URL and payload";
 
-    if ((reqP->entity.id != "") || (reqP->entity.type != "") || (reqP->entity.isPattern != ""))
-    {
-      LM_W(("Bad Input (unknown field)"));
-      response.errorCode.fill(SccBadRequest, "invalid payload: unknown fields");
-      return response.render(ciP, IndividualContextEntity, "");
-    }
-  }
-  else if (compV.size() == 2)  // /v1/contextEntities
+    LM_W(("Bad Input (%s)", error.c_str()));
+    response.errorCode.fill(SccBadRequest, error);
+    return response.render(ciP, IndividualContextEntity, "");
+  }  
+  entityId = (entityIdFromPayload != "")? entityIdFromPayload : entityIdFromURL;
+
+  // 01.02. entityId::type
+  if ((entityTypeFromPayload != "") && (entityTypeFromURL != "") && (entityTypeFromPayload != entityTypeFromURL))
   {
-    entityId   = reqP->entity.id;
-    entityType = reqP->entity.type;
+    std::string error = "entityId::type differs in URL and payload";
 
-    if ((entityId == "") && (entityType == ""))
-    {
-      LM_W(("Bad Input (mandatory entityId::id missing)"));
-      response.errorCode.fill(SccBadRequest, "invalid payload: mandatory entityId::id missing");
-      return response.render(ciP, IndividualContextEntity, "");
-    }
+    LM_W(("Bad Input (%s)", error.c_str()));
+    response.errorCode.fill(SccBadRequest, error);
+    return response.render(ciP, IndividualContextEntity, "");
+  }
+  entityType = (entityTypeFromPayload != "")? entityTypeFromPayload :entityTypeFromURL;
+
+
+  // 01.03. entityId::isPattern
+  if (reqP->entity.isPattern == "true")
+  {
+    std::string error = "entityId::isPattern set to true in contextUpdate convenience operation";
+
+    LM_W(("Bad Input (%s)", error.c_str()));
+    response.errorCode.fill(SccBadRequest, error);
+    return response.render(ciP, IndividualContextEntity, "");
   }
 
-  ciP->httpStatusCode = mapPostIndividualContextEntity(entityId, entityType, &parseDataP->acer.res, &response, ciP);
+  // 01.04. Entity::id must be present, somewhere ...
+  if (entityId == "")
+  {
+    std::string error = "invalid request: mandatory entityId::id missing";
 
+    LM_W(("Bad Input (%s)", error.c_str()));
+    response.errorCode.fill(SccBadRequest, error);
+    return response.render(ciP, IndividualContextEntity, "");
+  }
+
+  // Now, forward Entity to response
   response.entity.fill(entityId, entityType, "false");
+
+
+  //
+  // 02. Fill in UpdateContextRequest from AppendContextElementRequest + URL-data + URI params
+  //
+  parseDataP->upcr.res.fill(&parseDataP->acer.res, entityId, entityType);
+
+
+  // 03. Call postUpdateContext standard service routine
+  answer = postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 04. Translate UpdateContextResponse to AppendContextElementResponse
+  response.fill(&parseDataP->upcrs.res);
+
+  // 05. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
   response.release();
+  parseDataP->upcr.res.release();
 
   return answer;
 }

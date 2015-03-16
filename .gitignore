@@ -42,3 +42,5 @@ rpm/SOURCES/
 rpm/BUILDROOT/
 rpm/src/
 
+*.pyc
+test/acceptance/properties.json

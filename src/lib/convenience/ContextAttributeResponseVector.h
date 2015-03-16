@@ -52,6 +52,17 @@ typedef struct ContextAttributeResponseVector
                                    std::string      indent,
                                    std::string      predetectedError,
                                    int              counter);
+  void                       fill(ContextAttributeVector* cavP, const StatusCode& statusCode);
+
+  ContextAttributeResponse*  operator[](unsigned int ix)
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;
+  }
 } ContextAttributeResponseVector;
 
 #endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSEVECTOR_H_

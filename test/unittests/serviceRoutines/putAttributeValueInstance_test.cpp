@@ -24,7 +24,7 @@
 */
 #include "logMsg/logMsg.h"
 
-#include "serviceRoutines/postIndividualContextEntityAttributes.h"
+#include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/getAttributeValueInstance.h"
 #include "serviceRoutines/putAttributeValueInstance.h"
 #include "serviceRoutines/deleteAttributeValueInstance.h"
@@ -42,7 +42,7 @@
 */
 static RestService rs[] = 
 {
-  { "POST",   IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes"           }, "appendContextElementRequest",   postIndividualContextEntityAttributes },
+  { "POST",   IndividualContextEntityAttributes, 4, { "ngsi10", "contextEntities", "*", "attributes"           }, "appendContextElementRequest",   postIndividualContextEntity           },
   { "GET",    AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              getAttributeValueInstance             },
   { "PUT",    AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "updateContextAttributeRequest", putAttributeValueInstance             },
   { "DELETE", AttributeValueInstance,            6, { "ngsi10", "contextEntities", "*", "attributes", "*", "*" }, "",                              deleteAttributeValueInstance          },
@@ -119,6 +119,8 @@ TEST(putAttributeValueInstance, found)
 
   utInit();
 
+  ci2.servicePathV.push_back("/");
+
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   ci1.outFormat    = XML;
@@ -135,7 +137,7 @@ TEST(putAttributeValueInstance, found)
   ci2.payload      = testBuf;
   ci2.payloadSize  = strlen(testBuf);
   out              = restService(&ci2, rs);
-  EXPECT_STREQ(expectedBuf, out.c_str());
+  EXPECT_STREQ(expectedBuf, out.c_str());  // THIS LINE FAILS !!!
 
   utExit();
 }

@@ -203,6 +203,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(json.loads(body))
             except:
                 self.wfile.write(str(body))
+        else:
+            self.wfile.write(str(""))
 
     def get_queues(self):
         """Get the requests and responses queues."""

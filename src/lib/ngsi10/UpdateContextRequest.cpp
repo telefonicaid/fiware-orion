@@ -31,10 +31,14 @@
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
+#include "convenience/UpdateContextElementRequest.h"
+#include "convenience/AppendContextElementRequest.h"
 #include "ngsi/ContextElement.h"
+#include "ngsi/ContextAttribute.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "convenience/UpdateContextAttributeRequest.h"
 
 
 
@@ -120,4 +124,120 @@ void UpdateContextRequest::present(const std::string& indent)
   PRINTF("\n\n");
   contextElementVector.present(indent);
   updateActionType.present(indent);
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill
+(
+  const UpdateContextElementRequest* ucerP,
+  const std::string&                 entityId,
+  const std::string&                 entityType
+)
+{
+  ContextElement* ceP = new ContextElement();
+
+  ceP->entityId.fill(entityId, entityType, "false");
+
+  ceP->attributeDomainName.fill(ucerP->attributeDomainName);
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &ucerP->contextAttributeVector);
+  ceP->domainMetadataVector.fill((MetadataVector*) &ucerP->domainMetadataVector);
+
+  contextElementVector.push_back(ceP);
+
+  updateActionType.set("UPDATE");  // Coming from an UpdateContextElementRequest (PUT), must be UPDATE
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill
+(
+  const AppendContextElementRequest*  acerP,
+  const std::string&                  entityId,
+  const std::string&                  entityType
+)
+{
+  ContextElement* ceP = new ContextElement();
+
+  ceP->entityId.fill(entityId, entityType, "false");
+
+  ceP->attributeDomainName.fill(acerP->attributeDomainName);
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &acerP->contextAttributeVector);
+  ceP->domainMetadataVector.fill((MetadataVector*) &acerP->domainMetadataVector);
+
+  contextElementVector.push_back(ceP);
+  updateActionType.set("APPEND");  // Coming from an AppendContextElementRequest (POST), must be APPEND
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill
+(
+  const std::string& entityId,
+  const std::string& entityType,
+  const std::string& isPattern,
+  const std::string& attributeName,
+  const std::string& _updateActionType
+)
+{
+  ContextElement* ceP = new ContextElement();
+
+  ceP->entityId.fill(entityId, entityType, isPattern);
+  contextElementVector.push_back(ceP);
+
+  updateActionType.set(_updateActionType);
+
+  if (attributeName != "")
+  {
+    ContextAttribute* caP = new ContextAttribute(attributeName, "", "");
+    ceP->contextAttributeVector.push_back(caP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill
+(
+  const UpdateContextAttributeRequest* ucarP,
+  const std::string&                   entityId,
+  const std::string&                   entityType,
+  const std::string&                   attributeName,
+  const std::string&                   _updateActionType
+)
+{
+  ContextElement*   ceP = new ContextElement();
+  ContextAttribute* caP;
+
+  if (ucarP->compoundValueP != NULL)
+  {
+    caP = new ContextAttribute(attributeName, ucarP->type, ucarP->compoundValueP);
+  }
+  else
+  {
+    caP = new ContextAttribute(attributeName, ucarP->type, ucarP->contextValue);
+  }
+
+  caP->metadataVector.fill((MetadataVector*) &ucarP->metadataVector);
+  ceP->contextAttributeVector.push_back(caP);
+  ceP->entityId.fill(entityId, entityType, "false");
+
+  contextElementVector.push_back(ceP);
+  
+  updateActionType.set(_updateActionType);
 }

@@ -29,6 +29,7 @@
 #include "common/Format.h"
 #include "common/tag.h"
 #include "ngsi/ContextElementResponse.h"
+#include "ngsi10/QueryContextResponse.h"
 #include "rest/ConnectionInfo.h"
 
 /* ****************************************************************************
@@ -117,4 +118,53 @@ void ContextElementResponse::present(const std::string& indent, int ix)
 {
   contextElement.present(indent, ix);
   statusCode.present(indent);
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::fill - 
+*/
+void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string& entityId, const std::string& entityType)
+{
+  if (qcrP == NULL)
+  {
+    statusCode.fill(SccContextElementNotFound);
+    return;
+  }
+
+  if (qcrP->contextElementResponseVector.size() == 0)
+  {
+    statusCode.fill(&qcrP->errorCode);
+    contextElement.entityId.fill(entityId, entityType, "false");
+
+    if ((statusCode.code != SccOk) && (statusCode.details == ""))
+    {
+      statusCode.details = "Entity id: /" + entityId + "/";
+    }
+
+    return;
+  }
+
+  //
+  // FIXME P7: If more than one context element is found, we simply select the first one.
+  //           A better approach would be to change this convop to return a vector of responses.
+  //           Adding a warning with 'Bad Input' - with this I mean that the user that sends the 
+  //           query needs to avoid using this conv op to make any queries that can give more than
+  //           one unique context element :-).
+  //           This FIXME is related to github issue #588 and (probably) #650.
+  //           Also, optimizing this would be part of issue #768
+  //
+  if (qcrP->contextElementResponseVector.size() > 1)
+  {
+    LM_W(("Bad Input (more than one context element found the this query - selecting the first one"));
+  }
+
+  contextElement.fill(&qcrP->contextElementResponseVector[0]->contextElement);
+
+  if (qcrP->errorCode.code != SccNone)
+  {
+    statusCode.fill(&qcrP->errorCode);
+  }
 }

@@ -123,3 +123,49 @@ void DiscoverContextAvailabilityRequest::fill
 
   // FIXME P9: restriction with scope-vector must be copied to this->restriction
 }
+
+
+
+/* ****************************************************************************
+*
+* DiscoverContextAvailabilityRequest::fill - 
+*/
+void DiscoverContextAvailabilityRequest::fill(const std::string& entityId, const std::string& entityType)
+{
+  EntityId* eidP = new EntityId(entityId, entityType, "false");
+
+  entityIdVector.push_back(eidP);
+}
+
+
+
+/* ****************************************************************************
+*
+* DiscoverContextAvailabilityRequest::fill - 
+*/
+void DiscoverContextAvailabilityRequest::fill
+(
+  const std::string&  entityId,
+  const std::string&  entityType,
+  EntityTypeInfo      typeInfo,
+  const std::string&  attributeName
+)
+{
+  EntityId* eidP = new EntityId(entityId, entityType, "false");
+
+  entityIdVector.push_back(eidP);
+
+  if ((typeInfo == EntityTypeEmpty) || (typeInfo == EntityTypeNotEmpty))
+  {
+    Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
+
+    scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
+      
+    restriction.scopeVector.push_back(scopeP);
+  }
+
+  if (attributeName != "")
+  {
+    attributeList.push_back(attributeName);
+  }
+}

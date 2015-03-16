@@ -31,19 +31,7 @@
 #include "ngsi/ContextElementResponse.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/HttpStatusCode.h"
-
-
-
-/* ****************************************************************************
-*
-* EntityTypeInfo - entity::type empty, not empty OR both 
-*/
-typedef enum EntityTypeInfo
-{
-  EntityTypeEmptyOrNotEmpty,
-  EntityTypeEmpty,
-  EntityTypeNotEmpty
-} EntityTypeInfo;
+#include "rest/EntityTypeInfo.h"
 
 
 

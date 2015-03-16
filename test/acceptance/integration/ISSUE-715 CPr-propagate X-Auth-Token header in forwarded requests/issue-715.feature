@@ -23,11 +23,14 @@
 @issue-715
 Feature: CPr: propagate X-Auth-Token header in forwarded requests
 
+  Background:
+    Given the Context Broker started with multitenancy
+
   Scenario: Forward the X-Auth-Token for the context provider in a query operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_715" and the subservice "/subservice"
+    And a new "NGSI9" api request with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -40,8 +43,8 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Query consult
-    And a new NGSI version "10" petition with the service "issue_715" and the subservice "/subservice"
-    And add the following headers to the petition
+    And a new "NGSI10" api request with the service "issue_715" and the subservice "/subservice"
+    And add the following headers to the request
       | header       | value |
       | X-Auth-Token | aaaa  |
     And the following entities to consult
@@ -51,16 +54,16 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     When a standard query context is asked with the before information
     #Mock information
     Then retrieve information from the mock
-    And headers of the last mock petition contains the head "X-Auth-Token" with the value "aaaa"
-    And the path in the last mock petition contains "service"
-    And there is "1" petitions requested to the mock
+    And headers of the last mock request contains the head "X-Auth-Token" with the value "aaaa"
+    And the path in the last mock request contains "service"
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_715"
 
   Scenario: Forward the X-Auth-Token for the context provider in an update operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_715" and the subservice "/subservice"
+    And a new "NGSI9" api request with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -73,8 +76,8 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "issue_715" and the subservice "/subservice"
-    And add the following headers to the petition
+    And a new "NGSI10" api request with the service "issue_715" and the subservice "/subservice"
+    And add the following headers to the request
       | header       | value |
       | X-Auth-Token | aaaa  |
     And the following attributes to create
@@ -87,16 +90,16 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     When a standard context entity update is asked with the before information
     #Mock information
     Then retrieve information from the mock
-    And headers of the last mock petition contains the head "X-Auth-Token" with the value "aaaa"
-    And the path in the last mock petition contains "service"
-    And there is "1" petitions requested to the mock
+    And headers of the last mock request contains the head "X-Auth-Token" with the value "aaaa"
+    And the path in the last mock request contains "service"
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_715"
 
   Scenario: Do not forward the X-Auth-Token for the context provider in a query operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/queryContext" as "query_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_715" and the subservice "/subservice"
+    And a new "NGSI9" api request with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -109,7 +112,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Query consult
-    And a new NGSI version "10" petition with the service "issue_715" and the subservice "/subservice"
+    And a new "NGSI10" api request with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -117,16 +120,16 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     When a standard query context is asked with the before information
     #Mock information
     Then retrieve information from the mock
-    And headers of the last mock petition not contains the head "X-Auth-Token"
-    And the path in the last mock petition contains "service"
-    And there is "1" petitions requested to the mock
+    And headers of the last mock request not contains the head "X-Auth-Token"
+    And the path in the last mock request contains "service"
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_715"
 
   Scenario: Do not forward the X-Auth-Token for the context provider in a update operation
     Given a started mock
-    And set the response of the context provider mock in path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
+    And set the response of the mock in the path "/context_provider/service/updateContext" as "update_context_response_from_context_provider_xml"
     # First registration
-    And a new NGSI version "9" petition with the service "issue_715" and the subservice "/subservice"
+    And a new "NGSI9" api request with the service "issue_715" and the subservice "/subservice"
     And the following entities to consult
       | entity_id | entity_type |
       | Room1     | Room        |
@@ -139,7 +142,7 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     And build the standard context registration payload with the previous data and duration "P1M"
     And a standard context registration is asked with the before information
     # Update operation
-    And a new NGSI version "10" petition with the service "issue_715" and the subservice "/subservice"
+    And a new "NGSI10" api request with the service "issue_715" and the subservice "/subservice"
     And the following attributes to create
       | attribute_name | attribute_type | attribute_value |
       | att1           | att_type_1     | 25              |
@@ -150,9 +153,9 @@ Feature: CPr: propagate X-Auth-Token header in forwarded requests
     When a standard context entity update is asked with the before information
     #Mock information
     Then retrieve information from the mock
-    And headers of the last mock petition not contains the head "X-Auth-Token"
-    And the path in the last mock petition contains "service"
-    And there is "1" petitions requested to the mock
+    And headers of the last mock request not contains the head "X-Auth-Token"
+    And the path in the last mock request contains "service"
+    And there is "1" requests sent to the mock
     And clean the mongo database of the service "issue_715"
 
 #Fixme: Repeat all tests with convenience operation, when developed. This is pending on the "big refactoring" in CPr funciontality being done in 1Q2015"

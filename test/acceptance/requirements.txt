@@ -4,3 +4,4 @@ flask==0.10.1
 lettuce==0.2.20
 requests==2.5.0
 psutil==2.2.1
+fabric==1.10.0

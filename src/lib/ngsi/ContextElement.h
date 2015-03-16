@@ -50,6 +50,8 @@ typedef struct ContextElement
 
   std::vector<std::string> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
 
+  ContextElement();
+
   std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma);
   void         present(const std::string& indent, int ix);
   void         release(void);

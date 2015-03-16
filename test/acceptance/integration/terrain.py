@@ -24,10 +24,13 @@
 __author__ = 'Jon Calderin Goñi (jon.caldering@gmail.com)'
 
 from lettuce import before, world, after
-from integration.tools.general_utils import stop_mock
+from integration.tools.general_utils import stop_mock, drop_all_test_databases, check_properties, get_cb_pid, stop_cb
+from iotqautils.iotqaLogger import get_logger
 
 @before.all
 def before_all():
+    world.log = get_logger('lettuce', world.config['environment']['log_level'], True, True, 'logs/lettuce.log')
+    check_properties()
     world.entities = None
     world.attributes_consult = None
     world.attributes_creation = None
@@ -44,8 +47,18 @@ def before_all():
     world.cb = {}
     world.payloads = {}
     world.responses = {}
+    world.cb_config_to_start = ''
+    world.cb_pid = get_cb_pid()
+    world.bin_parms = None
+    drop_all_test_databases(world.config['mongo']['host'], int(world.config['mongo']['port']))
 
 
 @after.each_scenario
 def after_each_scenario(scenario):
     stop_mock()
+    world.cb[world.cb_count].log = None
+
+@after.all
+def after_all(total):
+    drop_all_test_databases(world.config['mongo']['host'], int(world.config['mongo']['port']))
+    stop_cb()

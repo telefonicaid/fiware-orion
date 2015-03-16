@@ -32,10 +32,11 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
-#include "ngsi/Request.h"
 #include "common/Format.h"
-#include "rest/HttpStatusCode.h"
+#include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
+#include "ngsi10/UpdateContextResponse.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -141,6 +142,46 @@ void StatusCode::fill(HttpStatusCode _code, const std::string& _details)
 void StatusCode::fill(StatusCode* scP)
 {
   fill(scP->code, scP->details);
+}
+
+
+
+/* ****************************************************************************
+*
+* StatusCode::fill -
+*/
+void StatusCode::fill(const StatusCode& sc)
+{
+  fill(sc.code, sc.details);
+}
+
+
+
+/* ****************************************************************************
+*
+* StatusCode::fill - 
+*/
+void StatusCode::fill(const struct UpdateContextResponse& ucrs)
+{
+  if ((ucrs.errorCode.code != SccOk) && (ucrs.errorCode.code != SccNone))
+  {
+    fill(ucrs.errorCode);
+  }
+  else if (ucrs.contextElementResponseVector.vec.size() == 1)
+  {
+    fill(ucrs.contextElementResponseVector.vec[0]->statusCode);
+  }
+  else if (ucrs.contextElementResponseVector.vec.size() > 1)
+  {
+    LM_W(("Filling StatusCode from UpdateContextResponse with more than one contextElementResponse, picking one of them ..."));
+    fill(ucrs.contextElementResponseVector.vec[0]->statusCode);
+  }
+  else
+  {
+    // Empty UpdateContextResponse::contextElementResponseVector AND unfilled UpdateContextResponse::errorCode
+    LM_E(("Internal Error (can't fill StatusCode from UpdateContextResponse)"));
+    fill(SccReceiverInternalError, "can't fill StatusCode from UpdateContextResponse");
+  }
 }
 
 

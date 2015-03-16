@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: TID Developer
+* Author: Ken Zangelin
 */
 #include <string>
 #include <vector>
@@ -28,10 +28,13 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenience/UpdateContextElementResponse.h"
-#include "convenienceMap/mapPutIndividualContextEntityAttribute.h"
 #include "ngsi/ParseData.h"
+#include "ngsi/StatusCode.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
 #include "rest/ConnectionInfo.h"
+#include "ngsi10/UpdateContextRequest.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 
 
@@ -39,6 +42,24 @@
 /* ****************************************************************************
 *
 * putIndividualContextEntityAttribute -
+*
+* PUT /v1/contextEntities/{entityId::id}/attributes/{attributeName}
+* PUT /ngsi10/contextEntities/{entityId::id}/attributes/{attributeName}
+*
+* Payload In:  UpdateContextAttributeRequest
+* Payload Out: StatusCode
+*
+* URI parameters:
+*   - entity::type=TYPE
+*   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
+*     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
+*   [ attributesFormat=object: makes no sense for this operation as StatusCode is returned ]
+*   
+* 0. Take care of URI params
+* 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
+* 2. Call postUpdateContext standard service routine
+* 3. Translate UpdateContextResponse to StatusCode
+* 4. Cleanup and return result
 */
 std::string putIndividualContextEntityAttribute
 (
@@ -50,16 +71,24 @@ std::string putIndividualContextEntityAttribute
 {
   std::string  answer;
   std::string  entityId      = compV[2];
+  std::string  entityType    = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string  attributeName = compV[4];
   StatusCode   response;
+  
 
-  ciP->httpStatusCode = mapPutIndividualContextEntityAttribute(entityId,
-                                                               "",
-                                                               attributeName,
-                                                               &parseDataP->upcar.res,
-                                                               &response,
-                                                               ciP);
+  // 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
+  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "UPDATE");
+  
 
+  // 2. Call postUpdateContext standard service routine
+  answer = postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 3. Translate UpdateContextResponse to StatusCode
+  response.fill(parseDataP->upcrs.res);
+
+
+  // 4. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
 

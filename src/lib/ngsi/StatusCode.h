@@ -35,6 +35,14 @@
 
 /* ****************************************************************************
 *
+* Incomplete type declarations
+*/
+struct UpdateContextResponse;
+
+
+
+/* ****************************************************************************
+*
 * StatusCode - 
 */
 typedef struct StatusCode
@@ -52,6 +60,8 @@ typedef struct StatusCode
   std::string  render(Format format, const std::string& indent, bool comma = false, bool showTag = true);
   void         fill(HttpStatusCode _code, const std::string& _details = "");
   void         fill(StatusCode* scP);
+  void         fill(const StatusCode& scP);
+  void         fill(const struct UpdateContextResponse& ucrs);
   void         present(const std::string& indent);
   void         release(void);
   void         tagSet(const std::string& _tag);

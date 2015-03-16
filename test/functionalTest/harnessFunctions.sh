@@ -103,9 +103,12 @@ function dbDrop()
 {
   db=$1
 
-  if [ "$db" != "" ]
+  if [ "$CB_DB_DROP" != "No" ]
   then
-    dbInit $db
+    if [ "$db" != "" ]
+    then
+      dbInit $db
+    fi
   fi
 }
 
@@ -503,7 +506,8 @@ function dbInsertEntity()
 #   --servicePath <path>           (Service Path in HTTP header)
 #   --urlParams   <params>         (URI parameters 'in' URL-string)
 #   --xauthToken  <token>          (X-Auth token value)
-#   --verbose                      
+#   --verbose                      (verbose output)
+#   --noPayloadCheck               (don't check the payload)
 #
 # Any parameters are sent as is to 'curl'
 # 

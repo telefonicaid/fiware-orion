@@ -32,6 +32,13 @@
 #include "rest/ConnectionInfo.h"
 
 
+/* ****************************************************************************
+*
+* Forward declarations
+*/
+struct QueryContextResponse;
+
+
 
 /* ****************************************************************************
 *
@@ -55,6 +62,9 @@ typedef struct ContextElementResponse
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
+
+  void         fill(struct QueryContextResponse* qcrP, const std::string& entityId = "", const std::string& entityType = "");
+
 } ContextElementResponse;
 
 #endif  // SRC_LIB_NGSI_CONTEXTELEMENTRESPONSE_H_

@@ -34,6 +34,15 @@
 #include "rest/ConnectionInfo.h"
 
 
+/* ****************************************************************************
+*
+* Forward declarations
+*/
+struct UpdateContextElementRequest;
+struct AppendContextElementRequest;
+struct UpdateContextAttributeRequest;
+
+
 
 /* ****************************************************************************
 *
@@ -49,6 +58,26 @@ typedef struct UpdateContextRequest
   std::string  check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void         release(void);
   void         present(const std::string& indent);
+
+  void         fill(const UpdateContextElementRequest* ucerP,
+                    const std::string&                 entityId,
+                    const std::string&                 entityType);
+
+  void         fill(const AppendContextElementRequest* acerP,
+                    const std::string&                 entityId,
+                    const std::string&                 entityType);
+
+  void         fill(const std::string& entityId,
+                    const std::string& entityType,
+                    const std::string& isPattern,
+                    const std::string& attributeName,
+                    const std::string& _updateActionType);
+
+  void         fill(const UpdateContextAttributeRequest* ucarP,
+                    const std::string&                   entityId,
+                    const std::string&                   entityType,
+                    const std::string&                   attributeName,
+                    const std::string&                   _updateActionType);
 } UpdateContextRequest;
 
 #endif

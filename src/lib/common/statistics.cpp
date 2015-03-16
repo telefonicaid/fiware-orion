@@ -104,6 +104,8 @@ int noOfRtUnsubscribeContextAvailabilityResponse         = -1;
 int noOfRtUnsubscribeContextResponse                     = -1;
 int noOfRtSubscribeResponse                              = -1;
 int noOfRtSubscribeError                                 = -1;
+int noOfContextElementResponse                           = -1;
+int noOfContextAttributeResponse                         = -1;
 
 int noOfEntityTypesRequest                               = -1;
 int noOfEntityTypesResponse                              = -1;
@@ -192,7 +194,8 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case RtUnsubscribeContextResponse:                     ++noOfRtUnsubscribeContextResponse; break;
   case RtSubscribeResponse:                              ++noOfRtSubscribeResponse; break;
   case RtSubscribeError:                                 ++noOfRtSubscribeError; break;
-
+  case RtContextElementResponse:                         ++noOfContextElementResponse; break;
+  case RtContextAttributeResponse:                       ++noOfContextAttributeResponse; break;
   case EntityTypes:                                      ++noOfEntityTypesRequest; break;
   case AttributesForEntityType:                          ++noOfAttributesForEntityTypeRequest; break;
   case RtEntityTypesResponse:                            ++noOfEntityTypesResponse; break;

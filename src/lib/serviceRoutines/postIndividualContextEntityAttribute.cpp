@@ -28,10 +28,12 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapPostIndividualContextEntityAttribute.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/postIndividualContextEntityAttribute.h"
 
 
@@ -39,6 +41,24 @@
 /* ****************************************************************************
 *
 * postIndividualContextEntityAttribute - 
+*
+* POST /v1/contextEntities/{entityId::id}/attributes/{attributeName}
+* POST /ngsi10/contextEntities/{entityId::id}/attributes/{attributeName}
+*
+* Payload In:  UpdateContextAttributeRequest
+* Payload Out: StatusCode
+*
+* URI parameters:
+*   - entity::type=TYPE
+*   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
+*     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
+*   [ attributesFormat=object: makes no sense for this operation as StatusCode is returned ]
+*   
+* 0. Take care of URI params
+* 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
+* 2. Call postUpdateContext standard service routine
+* 3. Translate UpdateContextResponse to StatusCode
+* 4. Cleanup and return result
 */
 std::string postIndividualContextEntityAttribute
 (
@@ -50,17 +70,25 @@ std::string postIndividualContextEntityAttribute
 {
   std::string  answer;
   std::string  entityId      = compV[2];
+  std::string  entityType    = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string  attributeName = compV[4];
   StatusCode   response;
 
-  ciP->httpStatusCode = mapPostIndividualContextEntityAttribute(entityId,
-                                                                "",
-                                                                attributeName,
-                                                                &parseDataP->upcar.res,
-                                                                &response,
-                                                                ciP);
+  // 1. Fill in UpdateContextRequest from UpdateContextAttributeRequest and URL-path components
+  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "APPEND");
+  
 
+  // 2. Call postUpdateContext standard service routine
+  answer = postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 3. Translate UpdateContextResponse to StatusCode
+  response.fill(parseDataP->upcrs.res);
+
+
+  // 4. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
+  response.release();
 
   return answer;
 }

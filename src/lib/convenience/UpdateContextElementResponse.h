@@ -37,6 +37,14 @@
 
 /* ****************************************************************************
 *
+* Forward declaration
+*/
+struct UpdateContextResponse;
+
+
+
+/* ****************************************************************************
+*
 * UpdateContextElementResponse - 
 *
 * FIXME P5: AppendContextElementResponse and UpdateContextElementResponse are
@@ -59,6 +67,7 @@ typedef struct UpdateContextElementResponse
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
+  void         fill(UpdateContextResponse* ucrsP);
 } UpdateContextElementResponse;
 
 #endif  // SRC_LIB_CONVENIENCE_UPDATECONTEXTELEMENTRESPONSE_H_

@@ -90,8 +90,7 @@ std::string putAttributeValueInstance
     }
   }
 
-
-  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", upcarP->contextValue);
+  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, upcarP->type, upcarP->contextValue);
   ContextElement*                 ceP           = new ContextElement();
 
   // Copy the metadata vector of the input payload
@@ -112,6 +111,7 @@ std::string putAttributeValueInstance
   request.updateActionType.set("UPDATE");
 
   response.errorCode.code = SccNone;
+
   ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
 
   StatusCode statusCode;

@@ -34,6 +34,7 @@
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/EntityTypeInfo.h"
 
 
 
@@ -139,6 +140,39 @@ void QueryContextRequest::fill(const std::string& entityId, const std::string& e
   EntityId* eidP = new EntityId(entityId, entityType, "true");
 
   entityIdVector.push_back(eidP);
+
+  if (attributeName != "")
+  {
+    attributeList.push_back(attributeName);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextRequest::fill - 
+*/
+void QueryContextRequest::fill
+(
+  const std::string& entityId,
+  const std::string& entityType,
+  EntityTypeInfo     typeInfo,
+  const std::string& attributeName
+)
+{
+  EntityId* eidP = new EntityId(entityId, entityType, "false");
+
+  entityIdVector.push_back(eidP);
+
+  if ((typeInfo == EntityTypeEmpty) || (typeInfo == EntityTypeNotEmpty))
+  {
+    Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
+
+    scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
+      
+    restriction.scopeVector.push_back(scopeP);
+  }
 
   if (attributeName != "")
   {
