@@ -126,7 +126,7 @@ orionCurl --json --url "/v1/registry/registerContext" --payload '{
               "type": "House",
               "isPattern": "false"
             },
-            "associations": [
+            "attributeAssociations": [
               {
                 "source": "measurement",
                 "target": "temperature"
@@ -148,7 +148,7 @@ orionCurl --json --url "/v1/registry/registerContext" --payload '{
               "type": "House",
               "isPattern": "false"
             },
-            "associations": [
+            "attributeAssociations": [
               {
                 "source": "humidity",
                 "target": "humidity"
