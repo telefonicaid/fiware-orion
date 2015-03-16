@@ -31,6 +31,7 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
 #include "ngsi/Restriction.h"
+#include "rest/EntityTypeInfo.h"
 
 
 
@@ -60,7 +61,15 @@ typedef struct DiscoverContextAvailabilityRequest
   void                 fill(EntityId&                        eid,
                             const std::vector<std::string>&  attributeV,
                             const Restriction&               restriction);
-  void                 fill(const std::string& entityId, const std::string& entityType);
+
+  void                 fill(const std::string&  entityId,
+                            const std::string&  entityType);
+
+  void                 fill(const std::string&  entityId,
+                            const std::string&  entityType,
+                            EntityTypeInfo      typeInfo,
+                            const std::string&  attributeName);
+
 } DiscoverContextAvailabilityRequest;
 
 #endif

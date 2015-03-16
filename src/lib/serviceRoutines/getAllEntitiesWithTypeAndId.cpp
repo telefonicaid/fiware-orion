@@ -83,7 +83,7 @@ std::string getAllEntitiesWithTypeAndId
   response.statusCode.fill(SccOk);
 
 
-  // 01. Get values from URL (entityId::type, esist, !exist)
+  // 01. Get values from URL (entityId::type, exist, !exist)
   if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
   {
     typeInfo = EntityTypeEmpty;
