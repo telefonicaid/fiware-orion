@@ -29,7 +29,7 @@ Comments:
 is made to not constantly access and penalizes the test times. We only store datas manually when finished test. So "xxxxxxxxxxxxxxxxxxx" is a hash value.
 
 #### Scripts:
-1. **orionPerformanceTest.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
+1. **orionPerformanceTest_v1.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
 	 
         Properties:
 
@@ -49,7 +49,7 @@ is made to not constantly access and penalizes the test times. We only store dat
 
 Example:
 ```
-./jmeter.sh -n -t orionPerformanceTest.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
+./jmeter.sh -n -t orionPerformanceTest_v1.0.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
 ```
   		 
 2. **orionPerformanceOnlyQueries_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate only queries.
