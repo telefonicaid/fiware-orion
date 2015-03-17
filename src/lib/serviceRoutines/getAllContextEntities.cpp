@@ -82,7 +82,6 @@ std::string getAllContextEntities
 
 
   // 03. Fill in QueryContextRequest
-  LM_M(("KZ: typeInfo: %d", typeInfo));
   parseDataP->qcr.res.fill(".*", typeName, "true", typeInfo, "");
   
 

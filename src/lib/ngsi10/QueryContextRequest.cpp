@@ -173,7 +173,6 @@ void QueryContextRequest::fill
     scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
       
     restriction.scopeVector.push_back(scopeP);
-    LM_M(("KZ: Added a scope of type %s", (typeInfo == EntityTypeEmpty)? "empty" : "non-empty"));
   }
 
   if (attributeName != "")
