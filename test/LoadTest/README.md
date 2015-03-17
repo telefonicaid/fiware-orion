@@ -20,12 +20,13 @@ nohup sh startAgent.sh --udp-port 0 --tcp-port 3450 > monitor.log &
 ```
 * Launch jmeter script "orionPerfTest_cluster_v1.2.jmx" in Launcher VM
 ```
-./jmeter.sh -n -t orionPerformanceTest.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X 
--JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report_YYYYMMDD.log
+./jmeter.sh -n -t <script>.jmx -J<property>=value > /<path>/jmeter_report__`date +%Y%m%d%H`.log
 ```
-* Move /tmp/Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz file (where "xxxxxxxxxxxxxxxxxxx" is a hash value) into /tmp/JMeter_result/result_[today]-[now] folder.
-* Copy folder in local
-* Upload in Loadosophia Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz and perfmon_xxxxxxxxxxxxxxxxxxxx.jtl.gz. 
+* Upload in Loadosophia Loadosophia_xxxxxxxxxxxxxxxxxxxxx.jtl.gz and perfmon_xxxxxxxxxxxxxxxxxxxx.jtl.gz (where "xxxxxxxxxxxxxxxxxxx" is a hash value).
+
+Comments:
+    /tmp/error_xxxxxxxxxxxxxxxxxxx.html is created, because does not have access at loadosophia, the token is wrong intentionally 
+is made to not constantly access and penalizes the test times. We only store datas manually when finished test. So "xxxxxxxxxxxxxxxxxxx" is a hash value.
 
 #### Scripts:
 1. **orionPerformanceTest.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It can used for one standalone VM or a balanced cluster of VM with 4 nodes maximum.
@@ -45,14 +46,91 @@ nohup sh startAgent.sh --udp-port 0 --tcp-port 3450 > monitor.log &
 		* Node_4     - IP or hostname for Node 4, only for monitoring (127.0.0.1 by default)
 		* PORT       - ContextBroker port (1026 by default)
 		* MON_PORT   - serverAgent port for Monitoring (3450 by default)
-		
- Comments:
-    /tmp/error_xxxxxxxxxxxxxxxxxxx.html is created, because does not have access at loadosophia, the token is wrong intentionally 
-is made to not constantly access and penalizes the test times. We only store datas manually when finished test. So "xxxxxxxxxxxxxxxxxxx" is a hash value.
-	
-2. **multiplesAttributes_bug_memory_leak.jmx** (used by simulate some problems reported by users, see http://stackoverflow.com/questions/23386094/orion-context-broker-possible-memory-leak)
 
-	Properties:
+Example:
+```
+./jmeter.sh -n -t orionPerformanceTest.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
+```
+  		 
+2. **orionPerformanceOnlyQueries_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate only queries.
+	 
+        Properties:
+
+		* PROJECT    - project name (DEFAULT by default)
+		* TESTNAME   - test name (onlyQueriesTest by default)
+		* RUNTIME    - test duration time (3 Sec by default)
+		* THREADS    - number of concurrent threads (1 by default)
+		* RAMPUP     - the amount of time for creating the total number of threads (0 by default)
+		* ITERATIONS - number of repetitions of each thread (1 by default)
+		* HOST       - IP or hostname (in case of clusters is Nginx)  (127.0.0.1 by default)
+		* Node_1     - IP or hostname for Node 1, only for monitoring (127.0.0.1 by default)
+		* Node_2     - IP or hostname for Node 2, only for monitoring (127.0.0.1 by default)		
+		* Node_3     - IP or hostname for Node 3, only for monitoring (127.0.0.1 by default)		
+		* Node_4     - IP or hostname for Node 4, only for monitoring (127.0.0.1 by default)
+		* PORT       - ContextBroker port (1026 by default)
+		* MON_PORT   - serverAgent port for Monitoring (3450 by default)
+
+Example:
+```
+./jmeter.sh -n -t orionPerformanceOnlyQueries_v2.0.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
+```
+ 
+3. **orionPerformanceOnlyAppends_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate only appends.
+	 
+        Properties:
+
+		* PROJECT    - project name (DEFAULT by default)
+		* TESTNAME   - test name (onlyQueriesTest by default)
+		* RUNTIME    - test duration time (3 Sec by default)
+		* THREADS    - number of concurrent threads (1 by default)
+		* RAMPUP     - the amount of time for creating the total number of threads (0 by default)
+		* ITERATIONS - number of repetitions of each thread (1 by default)
+		* HOST       - IP or hostname (in case of clusters is Nginx)  (127.0.0.1 by default)
+		* Node_1     - IP or hostname for Node 1, only for monitoring (127.0.0.1 by default)
+		* Node_2     - IP or hostname for Node 2, only for monitoring (127.0.0.1 by default)		
+		* Node_3     - IP or hostname for Node 3, only for monitoring (127.0.0.1 by default)		
+		* Node_4     - IP or hostname for Node 4, only for monitoring (127.0.0.1 by default)
+		* PORT       - ContextBroker port (1026 by default)
+		* MON_PORT   - serverAgent port for Monitoring (3450 by default)
+
+Example:
+```
+./jmeter.sh -n -t orionPerformanceOnlyAppends_v2.0.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
+```
+
+4. **orionPerformanceOnlyAppendsAndUpdates_v2.0.jmx**   (used by Max Performance, Mongo Impact, Scale UP, Scale OUT). It is used for generate appends and updates.
+	 
+        Properties:
+
+		* PROJECT    - project name (DEFAULT by default)
+		* TESTNAME   - test name (onlyQueriesTest by default)
+		* RUNTIME    - test duration time (3 Sec by default)
+		* THREADS    - number of concurrent threads (1 by default)
+		* RAMPUP     - the amount of time for creating the total number of threads (0 by default)
+		* ITERATIONS - number of repetitions of each thread (1 by default)
+		* HOST       - IP or hostname (in case of clusters is Nginx)  (127.0.0.1 by default)
+		* Node_1     - IP or hostname for Node 1, only for monitoring (127.0.0.1 by default)
+		* Node_2     - IP or hostname for Node 2, only for monitoring (127.0.0.1 by default)		
+		* Node_3     - IP or hostname for Node 3, only for monitoring (127.0.0.1 by default)		
+		* Node_4     - IP or hostname for Node 4, only for monitoring (127.0.0.1 by default)
+		* PORT       - ContextBroker port (1026 by default)
+		* MON_PORT   - serverAgent port for Monitoring (3450 by default)
+
+Example:
+```
+./jmeter.sh -n -t orionPerformanceAppendsAndUpdates_v2.0.jmx -JPROJECT="XXX" -JTEST_NAME="XXXX" -JHOST=X.X.X.X -JNODE_1=X.X.X.X -JPORT=1026 -JTHREADS=XXXX -JRAMPUP=XXX -JRUNTIME=XXXX >> /<path>/jmeter_report__`date +%Y%m%d%H`.log
+```
+
+5. **populateDB_v1.0.sh** (used by populate a mongoDB wint N context and with a step)
+   
+```
+It is necesary to define url, tenant, elements_number and step
+usage:  populateDB_v1.0.sh <http://hostname:port> <tenant> <100000> <10>
+```
+	
+6. **multiplesAttributes_bug_memory_leak.jmx** (used by simulate some problems reported by users, see http://stackoverflow.com/questions/23386094/orion-context-broker-possible-memory-leak)
+
+	    Properties:
 	
 		* OPERATION: SUBSCRIBER or nothing (default) (used only one time for create subscriptions)
 		* HOST     : IP or hostname of ContextBroker VM (127.0.0.1 by default)
