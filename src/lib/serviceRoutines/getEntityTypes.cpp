@@ -29,12 +29,22 @@
 #include "ngsi/ParseData.h"
 #include "orionTypes/EntityTypesResponse.h"
 #include "serviceRoutines/getEntityTypes.h"
-
 #include "mongoBackend/mongoQueryTypes.h"
+
+
 
 /* ****************************************************************************
 *
 * getEntityTypes - 
+*
+* GET /v1/contextTypes
+*
+* Payload In:  None
+* Payload Out: EntityTypesResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+* 
 */
 std::string getEntityTypes
 (
