@@ -105,7 +105,7 @@ bool mongoConnect(const char* host,
     std::string err;
     multitenant = _multitenant;
 
-    LM_T(LmtBug, ("dbName: '%s', rplSet: '%s', timeout: %d", db, rplSet, timeout));
+    LM_T(LmtBug, ("dbName: '%s', rplSet: '%s', timeout: %f", db, rplSet, timeout));
 
     mongoSemTake(__FUNCTION__, "connecting to mongo");
 
