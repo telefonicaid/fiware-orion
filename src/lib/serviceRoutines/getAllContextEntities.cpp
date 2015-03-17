@@ -52,10 +52,9 @@
 *   - exist=entity::type
 *
 * 01. Get values from URL (entityId::type, exist, !exist
-* 02. Check validity of URI params
-* 03. Fill in QueryContextRequest
-* 04. Call standard op postQueryContext
-* 05. Cleanup and return result
+* 02. Fill in QueryContextRequest
+* 03. Call standard op postQueryContext
+* 04. Cleanup and return result
 */
 std::string getAllContextEntities
 (
@@ -81,14 +80,14 @@ std::string getAllContextEntities
   }
 
 
-  // 03. Fill in QueryContextRequest
+  // 02. Fill in QueryContextRequest
   parseDataP->qcr.res.fill(".*", typeName, "true", typeInfo, "");
   
 
-  // 04. Call standard op postQueryContext
+  // 03. Call standard op postQueryContext
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
 
-  // 05. Cleanup and return result
+  // 04. Cleanup and return result
   return answer;
 }
