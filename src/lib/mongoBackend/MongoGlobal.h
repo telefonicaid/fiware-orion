@@ -150,9 +150,15 @@ using namespace mongo;
 *
 * mongoConnect -
 */
-extern bool mongoConnect(const char* host, const char* db, const char* rplSet, const char* username, const char* passwd, bool multitenant);
-extern bool mongoConnect(const char* host);
+extern bool mongoConnect(const char* host,
+                         const char* db,
+                         const char* rplSet,
+                         const char* username,
+                         const char* passwd,
+                         bool        _multitenant,
+                         double      timeout);
 #ifdef UNIT_TEST
+extern bool mongoConnect(const char* host);
 extern bool mongoConnect(DBClientConnection* c);
 #endif
 
