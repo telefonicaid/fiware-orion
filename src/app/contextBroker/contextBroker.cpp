@@ -227,7 +227,7 @@ double          timeout;
 #define DBUSER_DESC         "database user"
 #define DBPASSWORD_DESC     "database password"
 #define DB_DESC             "database name"
-#define TIMEOUT_DESC        "replica set timeout"
+#define TIMEOUT_DESC        "timeout in seconds for connections to the replica set (ignored in the case of not using replica set)"
 #define FWDHOST_DESC        "host for forwarding NGSI9 regs"
 #define FWDPORT_DESC        "port for forwarding NGSI9 regs"
 #define NGSI9_DESC          "run as Configuration Manager"
@@ -1140,7 +1140,6 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 */
 static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, double timeout)
 {
-  LM_T(LmtBug, ("dbName: '%s'", dbName.c_str()));
 
   if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, timeout))
   {
@@ -1336,8 +1335,6 @@ int main(int argC, char* argV[])
   //
   lmTraceLevelSet(LmtBug, true);
 #endif
-
-  LM_T(LmtBug, ("dbName: '%s'", dbName));
 
   if (strlen(dbName) > DB_NAME_MAX_LEN)
   {
