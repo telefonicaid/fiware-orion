@@ -258,7 +258,7 @@ PaArgument paArgs[] =
   { "-dbuser",       user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
   { "-dbpwd",        pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
   { "-db",           dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
-  { "-timeout",      &timeout,      "TIMEOUT",        PaDouble, PaOpt, 0,          PaNL,   PaNL,  TIMEOUT_DESC       },
+  { "-timeout",      &timeout,      "TIMEOUT",        PaDouble, PaOpt, 10,         PaNL,   PaNL,  TIMEOUT_DESC       },
 
   { "-fwdHost",      fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
   { "-fwdPort",      &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
