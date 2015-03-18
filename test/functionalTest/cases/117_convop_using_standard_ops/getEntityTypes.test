@@ -41,6 +41,7 @@ brokerStart CB 0
 # 09. GET /v1/contextTypes, servicePath /s1 and see a list of one type (T4)
 # 10. GET /v1/contextTypes, servicePath /s2 and see a list of one type (T5)
 # 11. GET /v1/contextTypes and see a list of five types
+# 12. GET /v1/contextTypes?collapse and see the list without attributes
 #
 
 echo "01. GET /v1/contextTypes and see a list of zero types"
@@ -206,6 +207,12 @@ echo
 echo "11. GET /v1/contextTypes and see a list of five types"
 echo "====================================================="
 orionCurl --url /v1/contextTypes --json
+echo
+echo
+
+echo "12. GET /v1/contextTypes?collapse and see the list without attributes"
+echo "====================================================================="
+orionCurl --url /v1/contextTypes?collapse=true --json
 echo
 echo
 
@@ -606,6 +613,38 @@ Date: REGEX(.*)
                     "type": "string"
                 }
             ], 
+            "name": "T5"
+        }
+    ]
+}
+
+
+12. GET /v1/contextTypes?collapse and see the list without attributes
+=====================================================================
+HTTP/1.1 200 OK
+Content-Length: 256
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }, 
+    "types": [
+        {
+            "name": "T1"
+        }, 
+        {
+            "name": "T2"
+        }, 
+        {
+            "name": "T3"
+        }, 
+        {
+            "name": "T4"
+        }, 
+        {
             "name": "T5"
         }
     ]
