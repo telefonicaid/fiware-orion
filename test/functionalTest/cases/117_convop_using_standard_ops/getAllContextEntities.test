@@ -209,7 +209,7 @@ echo "========================"
 payload='{
   "contextElements": [
     {
-      "id":   "E5",
+      "id": "E5",
       "attributes": [
         {
           "name": "A1",
@@ -228,8 +228,9 @@ echo
 
 echo "15. GET /v1/contextEntities?!exist=entity::type and see it work"
 echo "==============================================================="
-orionCurl --url '/v1/contextEntities?offset=2&!exist=entity::type' --json
-
+orionCurl --url /v1/contextEntities?!exist=entity::type --json
+echo
+echo
 
 
 --REGEXPECT--
