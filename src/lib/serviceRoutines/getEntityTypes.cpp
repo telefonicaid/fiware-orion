@@ -44,7 +44,7 @@
 *
 * URI parameters:
 *   - attributesFormat=object
-* 
+*   - collapse=true
 */
 std::string getEntityTypes
 (
