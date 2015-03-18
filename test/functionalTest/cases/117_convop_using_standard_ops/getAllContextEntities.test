@@ -45,6 +45,8 @@ brokerStart CP1
 # 11. Update/APPEND E4/T1/A1
 # 12. GET /v1/contextEntities?limit=2&details=on
 # 13. GET /v1/contextEntities?offset=2&details=on
+# 14. Update/APPEND E5//A1
+# 15. GET /v1/contextEntities?!exist=entity::type and see it work
 #
 
 echo "01. GET /v1/contextEntities and see it fail"
@@ -200,6 +202,34 @@ echo "==============================================="
 orionCurl --url '/v1/contextEntities?offset=2&details=on' --json
 echo
 echo
+
+
+echo "14. Update/APPEND E5//A1"
+echo "========================"
+payload='{
+  "contextElements": [
+    {
+      "id":   "E5",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "15"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "15. GET /v1/contextEntities?!exist=entity::type and see it work"
+echo "==============================================================="
+orionCurl --url '/v1/contextEntities?offset=2&!exist=entity::type' --json
+
 
 
 --REGEXPECT--
@@ -600,6 +630,68 @@ Date: REGEX(.*)
         "details": "Count: 4", 
         "reasonPhrase": "OK"
     }
+}
+
+
+14. Update/APPEND E5//A1
+========================
+HTTP/1.1 200 OK
+Content-Length: 381
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E5", 
+                "isPattern": "false", 
+                "type": ""
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+15. GET /v1/contextEntities?!exist=entity::type and see it work
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "15"
+                    }
+                ], 
+                "id": "E5", 
+                "isPattern": "false", 
+                "type": ""
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 
 
