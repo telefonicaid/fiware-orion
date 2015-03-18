@@ -93,12 +93,19 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 *
 * mongoConnect -
 */
-bool mongoConnect(const char* host, const char* db, const char* rplSet, const char* username, const char* passwd, bool _multitenant) {
+bool mongoConnect(const char* host,
+                  const char* db,
+                  const char* rplSet,
+                  const char* username,
+                  const char* passwd,
+                  bool        _multitenant,
+                  double      timeout)
+{
 
     std::string err;
     multitenant = _multitenant;
 
-    LM_T(LmtBug, ("dbName: '%s'", db));
+    LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
 
     mongoSemTake(__FUNCTION__, "connecting to mongo");
 
@@ -142,7 +149,7 @@ bool mongoConnect(const char* host, const char* db, const char* rplSet, const ch
           rplSetHosts.push_back(HostAndPort(hostTokens[ix]));
       }
 
-      connection = new DBClientReplicaSet(rplSet, rplSetHosts, 0);
+      connection = new DBClientReplicaSet(rplSet, rplSetHosts, timeout);
 
       /* Not sure of to generalize the following code, given that DBClientBase class hasn't a common connect() method (surprisingly) */
       for (int tryNo = 0; tryNo < retries; ++tryNo)
@@ -221,11 +228,10 @@ bool mongoConnect(const char* host, const char* db, const char* rplSet, const ch
 * mongoConnect -
 *
 * Version of the functions that doesn't uses authentication parameters
-*
 */
 bool mongoConnect(const char* host) {
 
-    return mongoConnect(host, "", "", "", "", false);
+    return mongoConnect(host, "", "", "", "", false, 0);
 }
 
 /* ****************************************************************************
