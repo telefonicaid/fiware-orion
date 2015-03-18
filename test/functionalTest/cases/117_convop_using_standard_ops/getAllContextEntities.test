@@ -32,23 +32,24 @@ brokerStart CP1
 --SHELL--
 
 #
-# 01. GET /v1/contextEntities/E1 and see it fail
+# 01. GET /v1/contextEntities and see it fail
 # 02. Update/APPEND E1/T1/A1
-# 03. GET /v1/contextEntities/E1 and see it work
-# 04. GET /v1/contextEntities/E1?attributesFormat=object and see it work
-# 05. GET /v1/contextEntities/E1?entity::type=T1 and see it work
-# 06. GET /v1/contextEntities/E1?exist=entity::type and see it work
-# 07. GET /v1/contextEntities/E1?entity::type=T2 and see it fail
-# 08. GET /v1/contextEntities/E1?!exist=entity::type and see it fail
-# 09. Register E1/T2/A1 for CP1
-# 10. GET /v1/contextEntities/E1?entity::type=T2 and see it fail (not found on CP1)
-# 11. Update/APPEND E1/T2/A1 on CP1
-# 12. GET /v1/contextEntities/E1?entity::type=T2 and see it work
+# 03. GET /v1/contextEntities and see it work
+# 04. GET /v1/contextEntities?attributesFormat=object and see it work
+# 05. GET /v1/contextEntities?entity::type=T1 and see it work
+# 06. GET /v1/contextEntities?exist=entity::type and see it work
+# 07. GET /v1/contextEntities?entity::type=T2 and see it fail
+# 08. GET /v1/contextEntities?!exist=entity::type and see it fail
+# 09. Update/APPEND E2/T1/A1
+# 10. Update/APPEND E3/T1/A1
+# 11. Update/APPEND E4/T1/A1
+# 12. GET /v1/contextEntities?limit=2&details=on
+# 13. GET /v1/contextEntities?offset=2&details=on
 #
 
-echo "01. GET /v1/contextEntities/E1 and see it fail"
-echo "=============================================="
-orionCurl --url /v1/contextEntities/E1 --json
+echo "01. GET /v1/contextEntities and see it fail"
+echo "==========================================="
+orionCurl --url /v1/contextEntities --json
 echo
 echo
 
@@ -76,132 +77,142 @@ echo
 echo
 
 
-echo "03. GET /v1/contextEntities/E1 and see it work"
-echo "=============================================="
-orionCurl --url /v1/contextEntities/E1 --json
+echo "03. GET /v1/contextEntities and see it work"
+echo "==========================================="
+orionCurl --url /v1/contextEntities --json
 echo
 echo
 
 
-echo "04. GET /v1/contextEntities/E1?attributesFormat=object and see it work"
-echo "======================================================================"
-orionCurl --url /v1/contextEntities/E1?attributesFormat=object --json
+echo "04. GET /v1/contextEntities?attributesFormat=object and see it work"
+echo "==================================================================="
+orionCurl --url /v1/contextEntities?attributesFormat=object --json
 echo
 echo
 
 
-echo "05. GET /v1/contextEntities/E1?entity::type=T1 and see it work"
+echo "05. GET /v1/contextEntities?entity::type=T1 and see it work"
+echo "==========================================================="
+orionCurl --url /v1/contextEntities?entity::type=T1 --json
+echo
+echo
+
+
+echo "06. GET /v1/contextEntities?exist=entity::type and see it work"
 echo "=============================================================="
-orionCurl --url /v1/contextEntities/E1?entity::type=T1 --json
+orionCurl --url /v1/contextEntities?exist=entity::type --json
 echo
 echo
 
 
-echo "06. GET /v1/contextEntities/E1?exist=entity::type and see it work"
-echo "================================================================="
-orionCurl --url /v1/contextEntities/E1?exist=entity::type --json
+echo "07. GET /v1/contextEntities?entity::type=T2 and see it fail"
+echo "==========================================================="
+orionCurl --url /v1/contextEntities?entity::type=T2 --json
 echo
 echo
 
 
-echo "07. GET /v1/contextEntities/E1?entity::type=T2 and see it fail"
-echo "=============================================================="
-orionCurl --url /v1/contextEntities/E1?entity::type=T2 --json
+echo "08. GET /v1/contextEntities?!exist=entity::type and see it fail"
+echo "==============================================================="
+orionCurl --url /v1/contextEntities?!exist=entity::type --json
 echo
 echo
 
 
-echo "08. GET /v1/contextEntities/E1?!exist=entity::type and see it fail"
-echo "=================================================================="
-orionCurl --url /v1/contextEntities/E1?!exist=entity::type --json
-echo
-echo
-
-
-echo "09. Register E1/T2/A1 for CP1"
-echo "============================="
+echo "09. Update/APPEND E2/T1/A1"
+echo "=========================="
 payload='{
-  "contextRegistrations": [
-  {
-    "entities": [
-      {
-         "type": "T2",
-         "isPattern": "false",
-         "id": "E1"
-      }
-    ],
-    "attributes": [
-      {
-        "name": "A1",
-        "type": "string",
-        "isDomain": "false"
-      }
-    ],
-    "providingApplication": "http://kz.tid.es/abc"
-    }
- ],
- "duration": "P1M"
-}'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --port $CP1_PORT --json
-echo
-echo
-
-
-echo "10. GET /v1/contextEntities/E1?entity::type=T2 and see it fail (not found on CP1)"
-echo "================================================================================="
-orionCurl --url /v1/contextEntities/E1?entity::type=T2 --json
-echo
-echo
-
-
-echo "11. Update/APPEND E1/T2/A1 on CP1"
-echo "================================="
-payload='{
-    "contextElements": [
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E2",
+      "attributes": [
         {
-            "type" : "T2",
-            "isPattern" : "false",
-            "id" : "E1",
-            "attributes" : [
-                {
-                    "name" : "A1",
-                    "type" : "a",
-                    "value" : "on CP1"
-                }
-            ]
+          "name": "A1",
+          "type": "string",
+          "value": "02"
         }
-    ],
-    "updateAction": "APPEND"
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
 }'
 orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
 
-echo "12. GET /v1/contextEntities/E1?entity::type=T2 and see it work"
-echo "=============================================================="
-orionCurl --url /v1/contextEntities/E1?entity::type=T2 --json
+echo "10. Update/APPEND E3/T1/A1"
+echo "=========================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E3",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "02"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Update/APPEND E4/T1/A1"
+echo "=========================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E4",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "02"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "12. GET /v1/contextEntities?limit=2&details=on"
+echo "=============================================="
+orionCurl --url '/v1/contextEntities?limit=2&details=on' --json
+echo
+echo
+
+
+echo "13. GET /v1/contextEntities?offset=2&details=on"
+echo "==============================================="
+orionCurl --url '/v1/contextEntities?offset=2&details=on' --json
 echo
 echo
 
 
 --REGEXPECT--
-01. GET /v1/contextEntities/E1 and see it fail
-==============================================
+01. GET /v1/contextEntities and see it fail
+===========================================
 HTTP/1.1 200 OK
-Content-Length: 218
+Content-Length: 94
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
-        "type": ""
-    }, 
-    "statusCode": {
+    "errorCode": {
         "code": "404", 
-        "details": "Entity id: /E1/", 
         "reasonPhrase": "No context element found"
     }
 }
@@ -238,193 +249,10 @@ Date: REGEX(.*)
 }
 
 
-03. GET /v1/contextEntities/E1 and see it work
-==============================================
+03. GET /v1/contextEntities and see it work
+===========================================
 HTTP/1.1 200 OK
-Content-Length: 280
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextElement": {
-        "attributes": [
-            {
-                "name": "A1", 
-                "type": "string", 
-                "value": "02"
-            }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
-        "type": "T1"
-    }, 
-    "statusCode": {
-        "code": "200", 
-        "reasonPhrase": "OK"
-    }
-}
-
-
-04. GET /v1/contextEntities/E1?attributesFormat=object and see it work
-======================================================================
-HTTP/1.1 200 OK
-Content-Length: 264
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextElement": {
-        "attributes": {
-            "A1": {
-                "type": "string", 
-                "value": "02"
-            }
-        }, 
-        "id": "E1", 
-        "isPattern": "false", 
-        "type": "T1"
-    }, 
-    "statusCode": {
-        "code": "200", 
-        "reasonPhrase": "OK"
-    }
-}
-
-
-05. GET /v1/contextEntities/E1?entity::type=T1 and see it work
-==============================================================
-HTTP/1.1 200 OK
-Content-Length: 280
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextElement": {
-        "attributes": [
-            {
-                "name": "A1", 
-                "type": "string", 
-                "value": "02"
-            }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
-        "type": "T1"
-    }, 
-    "statusCode": {
-        "code": "200", 
-        "reasonPhrase": "OK"
-    }
-}
-
-
-06. GET /v1/contextEntities/E1?exist=entity::type and see it work
-=================================================================
-HTTP/1.1 200 OK
-Content-Length: 280
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextElement": {
-        "attributes": [
-            {
-                "name": "A1", 
-                "type": "string", 
-                "value": "02"
-            }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
-        "type": "T1"
-    }, 
-    "statusCode": {
-        "code": "200", 
-        "reasonPhrase": "OK"
-    }
-}
-
-
-07. GET /v1/contextEntities/E1?entity::type=T2 and see it fail
-==============================================================
-HTTP/1.1 200 OK
-Content-Length: 220
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
-        "type": "T2"
-    }, 
-    "statusCode": {
-        "code": "404", 
-        "details": "Entity id: /E1/", 
-        "reasonPhrase": "No context element found"
-    }
-}
-
-
-08. GET /v1/contextEntities/E1?!exist=entity::type and see it fail
-==================================================================
-HTTP/1.1 200 OK
-Content-Length: 218
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
-        "type": ""
-    }, 
-    "statusCode": {
-        "code": "404", 
-        "details": "Entity id: /E1/", 
-        "reasonPhrase": "No context element found"
-    }
-}
-
-
-09. Register E1/T2/A1 for CP1
-=============================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-10. GET /v1/contextEntities/E1?entity::type=T2 and see it fail (not found on CP1)
-=================================================================================
-HTTP/1.1 200 OK
-Content-Length: 220
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextElement": {
-        "id": "E1", 
-        "isPattern": "false", 
-        "type": "T2"
-    }, 
-    "statusCode": {
-        "code": "404", 
-        "details": "Entity id: /E1/", 
-        "reasonPhrase": "No context element found"
-    }
-}
-
-
-11. Update/APPEND E1/T2/A1 on CP1
-=================================
-HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 385
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -435,13 +263,13 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "A1", 
-                        "type": "a", 
-                        "value": ""
+                        "type": "string", 
+                        "value": "02"
                     }
                 ], 
                 "id": "E1", 
                 "isPattern": "false", 
-                "type": "T2"
+                "type": "T1"
             }, 
             "statusCode": {
                 "code": "200", 
@@ -452,28 +280,324 @@ Date: REGEX(.*)
 }
 
 
-12. GET /v1/contextEntities/E1?entity::type=T2 and see it work
-==============================================================
+04. GET /v1/contextEntities?attributesFormat=object and see it work
+===================================================================
 HTTP/1.1 200 OK
-Content-Length: 279
+Content-Length: 365
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "contextElement": {
-        "attributes": [
-            {
-                "name": "A1", 
-                "type": "a", 
-                "value": "on CP1"
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": {
+                    "A1": {
+                        "type": "string", 
+                        "value": "02"
+                    }
+                }, 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
             }
-        ], 
-        "id": "E1", 
-        "isPattern": "false", 
-        "type": "T2"
-    }, 
-    "statusCode": {
+        }
+    ]
+}
+
+
+05. GET /v1/contextEntities?entity::type=T1 and see it work
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 385
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "02"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. GET /v1/contextEntities?exist=entity::type and see it work
+==============================================================
+HTTP/1.1 200 OK
+Content-Length: 385
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "02"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+07. GET /v1/contextEntities?entity::type=T2 and see it fail
+===========================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+08. GET /v1/contextEntities?!exist=entity::type and see it fail
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
+}
+
+
+09. Update/APPEND E2/T1/A1
+==========================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+10. Update/APPEND E3/T1/A1
+==========================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E3", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+11. Update/APPEND E4/T1/A1
+==========================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E4", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+12. GET /v1/contextEntities?limit=2&details=on
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 835
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "02"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "02"
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "errorCode": {
         "code": "200", 
+        "details": "Count: 4", 
+        "reasonPhrase": "OK"
+    }
+}
+
+
+13. GET /v1/contextEntities?offset=2&details=on
+===============================================
+HTTP/1.1 200 OK
+Content-Length: 835
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "02"
+                    }
+                ], 
+                "id": "E3", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "02"
+                    }
+                ], 
+                "id": "E4", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ], 
+    "errorCode": {
+        "code": "200", 
+        "details": "Count: 4", 
         "reasonPhrase": "OK"
     }
 }

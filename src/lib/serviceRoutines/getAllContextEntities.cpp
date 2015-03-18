@@ -50,6 +50,9 @@
 *   - entity::type=XXX
 *   - !exist=entity::type
 *   - exist=entity::type
+*   - offset=XXX
+*   - limit=XXX
+*   - details=on
 *
 * 01. Get values from URL (entityId::type, exist, !exist
 * 02. Fill in QueryContextRequest
