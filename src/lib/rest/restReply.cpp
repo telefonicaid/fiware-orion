@@ -53,6 +53,8 @@
 
 
 static int replyIx = 0;
+// This value is got from the command line
+extern char allowedOrigin[64];
 /* ****************************************************************************
 *
 * restReply - 
@@ -85,6 +87,20 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
       MHD_add_response_header(response, "Content-Type", "application/xml");
     else if (ciP->outFormat == JSON)
       MHD_add_response_header(response, "Content-Type", "application/json");
+
+    if (strlen(allowedOrigin) > 0)
+    {
+      // If any origin is allowed the header is sent always with "any" as value
+      if (strcmp(allowedOrigin, "*") == 0)
+      {
+        MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
+      }
+      // If an specific origin is allowed the header is only sent if the origins match
+      else if (strcmp(ciP->httpHeaders.origin.c_str(), allowedOrigin) == 0)
+      {
+        MHD_add_response_header(response, "Access-Control-Allow-Origin", allowedOrigin);
+      }
+    }
   }
 
   MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);

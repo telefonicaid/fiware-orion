@@ -207,6 +207,7 @@ bool            https;
 bool            mtenant;
 char            rush[256];
 double          timeout;
+char            allowedOrigin[64];
 
 
 
@@ -239,7 +240,7 @@ double          timeout;
 #define HTTPSCERTFILE_DESC  "certificate key file (for https)"
 #define RUSH_DESC           "rush host (IP:port)"
 #define MULTISERVICE_DESC   "service multi tenancy mode"
-
+#define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '*' for any"
 
 
 /* ****************************************************************************
@@ -274,6 +275,8 @@ PaArgument paArgs[] =
   { "-rush",         rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
   { "-multiservice", &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
+
+  { "-corsOrigin",   allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
 
   PA_END_OF_ARGS
 };
