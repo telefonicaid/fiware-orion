@@ -86,7 +86,6 @@ class CompoundValueNode
   };
 
   // Tree fields
-  std::string                        allocated;
   std::string                        name;
   Type                               type;
   std::string                        value;

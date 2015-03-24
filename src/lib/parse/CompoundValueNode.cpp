@@ -50,7 +50,6 @@ CompoundValueNode::CompoundValueNode()
   name       = "Unset";
   path       = "Unset";
   siblingNo  = 0;
-  allocated  = "ALLOCATED";
 
   LM_T(LmtCompoundValue, ("Created EMPTY compound node at %p", this));
 }
@@ -70,7 +69,6 @@ CompoundValueNode::CompoundValueNode(Type _type)
   name       = "toplevel";
   path       = "/";
   siblingNo  = 0;
-  allocated  = "ALLOCATED";
 
   LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s) at %p", (type == Vector)? "Vector" : "Object", this));
 }
@@ -100,7 +98,6 @@ CompoundValueNode::CompoundValueNode
   level     = container->level + 1;
   siblingNo = _siblingNo;
   type      = _type;
-  allocated = "ALLOCATED";
 
   LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
                           name.c_str(),
@@ -120,12 +117,6 @@ CompoundValueNode::~CompoundValueNode()
 {
   LM_T(LmtCompoundValue, ("Destroying node %p: name: '%s', path '%s' at %p (with %d children)", this, name.c_str(), path.c_str(), this, childV.size()));
 
-  if (allocated != "ALLOCATED")
-  {
-    LM_W(("Freeing CompoundValueNode again ..."));
-    return;
-  }
-
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
   {
     if (childV[ix] != NULL)
@@ -137,7 +128,6 @@ CompoundValueNode::~CompoundValueNode()
   }
 
   childV.clear();
-  allocated = "DELETED";
 }
 
 
