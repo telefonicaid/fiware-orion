@@ -112,6 +112,7 @@
 #include "serviceRoutines/postNotifyContext.h"
 #include "serviceRoutines/postNotifyContextAvailability.h"
 
+#include "serviceRoutines/postSubscribeContextConvOp.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
 #include "serviceRoutines/postContextEntitiesByEntityId.h"
 #include "serviceRoutines/getContextEntityAttributes.h"
@@ -712,7 +713,7 @@ PaArgument paArgs[] =
   { "GET",    CETAA, CETAA_COMPS_V0,       "",              getNgsi10ContextEntityTypesAttribute      }, \
   { "*",      CETAA, CETAA_COMPS_V0,       "",              badVerbGetOnly                            }, \
                                                                                                          \
-  { "POST",   SC,    SC_COMPS_V0,          SC_POST_WORD,    postSubscribeContext                      }, \
+  { "POST",   SC,    SC_COMPS_V0,          SC_POST_WORD,    postSubscribeContextConvOp                }, \
   { "*",      SC,    SC_COMPS_V0,          "",              badVerbPostOnly                           }, \
                                                                                                          \
   { "PUT",    SCS,   SCS_COMPS_V0,         SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
@@ -754,7 +755,7 @@ PaArgument paArgs[] =
   { "GET",    CETAA, CETAA_COMPS_V1,         "",              getNgsi10ContextEntityTypesAttribute      }, \
   { "*",      CETAA, CETAA_COMPS_V1,         "",              badVerbGetOnly                            }, \
                                                                                                            \
-  { "POST",   SC,    SC_COMPS_V1,            SC_POST_WORD,    postSubscribeContext                      }, \
+  { "POST",   SC,    SC_COMPS_V1,            SC_POST_WORD,    postSubscribeContextConvOp                }, \
   { "*",      SC,    SC_COMPS_V1,            "",              badVerbPostOnly                           }, \
                                                                                                            \
   { "PUT",    SCS,   SCS_COMPS_V1,           SCS_PUT_WORD,    putSubscriptionConvOp                     }, \

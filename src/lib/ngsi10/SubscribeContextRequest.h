@@ -35,6 +35,7 @@
 #include "ngsi/Reference.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/Throttling.h"
+#include "rest/EntityTypeInfo.h"
 
 
 
@@ -60,6 +61,8 @@ typedef struct SubscribeContextRequest
   std::string  check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void         present(const std::string& indent);
   void         release(void);
+
+  void         fill(const std::string& entityType, EntityTypeInfo typeInfo);
 } SubscribeContextRequest;
 
 #endif
