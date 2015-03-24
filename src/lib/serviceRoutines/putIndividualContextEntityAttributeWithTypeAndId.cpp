@@ -114,5 +114,7 @@ std::string putIndividualContextEntityAttributeWithTypeAndId
   answer = response.render(ciP->outFormat, "", false, false);
   parseDataP->upcar.res.release();
   parseDataP->upcrs.res.release();
+  parseDataP->upcr.res.release();
+
   return answer;
 }
