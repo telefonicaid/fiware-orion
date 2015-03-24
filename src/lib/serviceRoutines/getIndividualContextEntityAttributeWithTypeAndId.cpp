@@ -132,6 +132,7 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
   answer = response.render(ciP, RtContextAttributeResponse, "");
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();
+  response.release();
 
   return answer;
 }

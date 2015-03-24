@@ -92,5 +92,6 @@ std::string getAllContextEntities
 
 
   // 04. Cleanup and return result
+  parseDataP->qcr.res.release();
   return answer;
 }

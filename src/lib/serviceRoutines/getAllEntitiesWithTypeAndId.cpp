@@ -136,6 +136,7 @@ std::string getAllEntitiesWithTypeAndId
   // 07. Cleanup and return result
   parseDataP->qcr.res.release();
   parseDataP->qcrs.res.release();
+  response.release();
 
   return answer;
 }

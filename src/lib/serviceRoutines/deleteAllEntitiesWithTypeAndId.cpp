@@ -123,6 +123,8 @@ std::string deleteAllEntitiesWithTypeAndId
 
   // 06. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
+  parseDataP->upcr.res.release();
+  response.release();
 
   return answer;
 }
