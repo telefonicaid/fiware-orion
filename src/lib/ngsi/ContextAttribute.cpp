@@ -42,7 +42,6 @@
 */
 ContextAttribute::~ContextAttribute()
 {
-  LM_M(("KZ: ContextAttribute destructor"));
 }
 
 
@@ -86,7 +85,6 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
     LM_T(LmtClone, ("Copying metadata %d", mIx));
     Metadata* mP = new Metadata(caP->metadataVector.get(mIx));
     metadataVector.push_back(mP);
-    LM_M(("KZ: pushed back metadata '%s'", mP->name.c_str()));
   }
 }
 
@@ -352,15 +350,11 @@ void ContextAttribute::release(void)
 {
   if (compoundValueP != NULL)
   {
-    LM_M(("KZ: deleting compoundValue at %p", compoundValueP));
     delete compoundValueP;
-    LM_M(("KZ: deleted compoundValue at %p", compoundValueP));
     compoundValueP = NULL;
   }
 
-  LM_M(("KZ: releasing metadata-vector for attribute '%s'", name.c_str()));
   metadataVector.release();
-  LM_M(("KZ: ContextAttribute 100% released"));
 }
 
 
