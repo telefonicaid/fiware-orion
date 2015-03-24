@@ -38,6 +38,16 @@
 
 /* ****************************************************************************
 *
+* ContextAttribute::~ContextAttribute - 
+*/
+ContextAttribute::~ContextAttribute()
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::ContextAttribute - 
 */
 ContextAttribute::ContextAttribute()
@@ -120,7 +130,7 @@ ContextAttribute::ContextAttribute
 
   name                  = _name;
   type                  = _type;
-  compoundValueP        = _compoundValueP;
+  compoundValueP        = _compoundValueP->clone();
   typeFromXmlAttribute  = "";
 }
 

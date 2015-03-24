@@ -89,6 +89,7 @@ std::string postIndividualContextEntityAttribute
   // 4. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
+  parseDataP->upcr.res.release();
 
   return answer;
 }

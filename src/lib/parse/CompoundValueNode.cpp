@@ -51,7 +51,7 @@ CompoundValueNode::CompoundValueNode()
   path       = "Unset";
   siblingNo  = 0;
 
-  LM_T(LmtCompoundValue, ("Created EMPTY compound node"));
+  LM_T(LmtCompoundValue, ("Created EMPTY compound node at %p", this));
 }
 
 
@@ -70,7 +70,7 @@ CompoundValueNode::CompoundValueNode(Type _type)
   path       = "/";
   siblingNo  = 0;
 
-  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s)", (type == Vector)? "Vector" : "Object"));
+  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s) at %p", (type == Vector)? "Vector" : "Object", this));
 }
 
 
@@ -99,11 +99,12 @@ CompoundValueNode::CompoundValueNode
   siblingNo = _siblingNo;
   type      = _type;
 
-  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s",
+  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
                           name.c_str(),
                           level,
                           siblingNo,
-                          typeName(type)));
+                          typeName(type),
+                          this));
 }
 
 
@@ -114,10 +115,17 @@ CompoundValueNode::CompoundValueNode
 */
 CompoundValueNode::~CompoundValueNode()
 {
-  LM_T(LmtCompoundValue, ("Destroying node '%s', path '%s'", name.c_str(), path.c_str()));
+  LM_T(LmtCompoundValue, ("Destroying node %p: name: '%s', path '%s' at %p (with %d children)", this, name.c_str(), path.c_str(), this, childV.size()));
 
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    delete childV[ix];
+  {
+    if (childV[ix] != NULL)
+    {
+      LM_T(LmtCompoundValue, ("Deleting child %d, at %p", ix, childV[ix]));
+      delete childV[ix];
+      childV[ix] = NULL;
+    }
+  }
 
   childV.clear();
 }
@@ -179,7 +187,7 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
                                node->name.c_str(),
                                node->value.c_str(),
                                node->container->path.c_str(),
-                                node->container->name.c_str()));
+                               node->container->name.c_str()));
   else
     LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(),
                                node->container->path.c_str(),

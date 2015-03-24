@@ -52,6 +52,7 @@ typedef struct ContextAttribute
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
 
+  ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP);
   ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value = "");

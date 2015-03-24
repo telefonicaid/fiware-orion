@@ -91,6 +91,8 @@ std::string putIndividualContextEntityAttribute
   // 4. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
   response.release();
+  parseDataP->upcr.res.release();  // This call to release() crashed the functional test
+                                   // 647_crash_with_compounds/PUT_v1_contextEntities_E1_attributes_A1.test
 
   return answer;
 }
