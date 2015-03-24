@@ -62,7 +62,7 @@ typedef struct SubscribeContextRequest
   void         present(const std::string& indent);
   void         release(void);
 
-  void         fill(const std::string& entityType, EntityTypeInfo typeInfo);
+  void         fill(EntityTypeInfo typeInfo);
 } SubscribeContextRequest;
 
 #endif

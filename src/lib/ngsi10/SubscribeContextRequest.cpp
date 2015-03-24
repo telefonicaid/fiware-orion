@@ -147,16 +147,8 @@ void SubscribeContextRequest::release(void)
 *
 * SubscribeContextRequest::fill - 
 */
-void SubscribeContextRequest::fill(const std::string& entityType, EntityTypeInfo typeInfo)
+void SubscribeContextRequest::fill(EntityTypeInfo typeInfo)
 {
-  if (entityType != "")
-  {
-    for (unsigned int ix = 0; ix < entityIdVector.size(); ++ix)
-    {
-      entityIdVector[ix]->type = entityType;
-    }
-  }
-
   if ((typeInfo == EntityTypeEmpty) || (typeInfo == EntityTypeNotEmpty))
   {
     Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);

@@ -47,10 +47,10 @@
 * Payload Out: SubscribeContextResponse
 *
 * URI parameters
-*   - entity::type=TYPE    (entity-types in payload are overwritten with this entity::type)
 *   - !exist=entity::type
 *   - exist=entity::type
 *   - notifyFormat=XXX     (handled by std-op postSubscribeContext)
+*   x entity::type=TYPE    (NOT TREATED)
 */
 std::string postSubscribeContextConvOp
 (
@@ -60,9 +60,8 @@ std::string postSubscribeContextConvOp
   ParseData*                 parseDataP
 )
 {
-  std::string               answer;
-  std::string               entityType     = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
-  EntityTypeInfo            typeInfo       = EntityTypeEmptyOrNotEmpty;
+  std::string     answer;
+  EntityTypeInfo  typeInfo       = EntityTypeEmptyOrNotEmpty;
 
 
   // 01. Take care of URI params
@@ -77,7 +76,7 @@ std::string postSubscribeContextConvOp
 
 
   // 02. Fill in SubscribeContextRequest (actually, modify it)
-  parseDataP->scr.res.fill(entityType, typeInfo);
+  parseDataP->scr.res.fill(typeInfo);
 
 
   // 03. Call standard operation
