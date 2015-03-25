@@ -203,7 +203,6 @@ std::string sendHttpSocket
     return "error";
   }
 
-
   // Allocate to hold HTTP response
   httpResponse = new MemoryStruct;
   httpResponse->memory = (char*) malloc(1); // will grow as needed
@@ -333,12 +332,27 @@ std::string sendHttpSocket
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, (u_int8_t*) payload);
 
   // Set up URL
-  std::string url;
+  std::string url = "";
+
+  if (protocol == "https:")
+  {
+    url += protocol + "//";
+  }
+
   if (isIPv6(ip))
-    url = "[" + ip + "]";
+  {
+    url += "[" + ip + "]";
+  }
   else
-    url = ip;
+  {
+    url += ip;
+  }
+
   url = url + ":" + portAsString + (resource.at(0) == '/'? "" : "/") + resource;
+
+  // FIXME: I wonder if these next two should be disabled by default.
+  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L); // ignore self-signed certificates for SSL end-points
+  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
 
   // Prepare CURL handle with obtained options
   curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
