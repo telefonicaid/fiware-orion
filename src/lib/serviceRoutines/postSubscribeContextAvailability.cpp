@@ -48,7 +48,7 @@ std::string postSubscribeContextAvailability
   SubscribeContextAvailabilityResponse  scar;
   std::string                           answer;
 
-  ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->inFormat, ciP->tenant);
+  ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->uriParam, ciP->inFormat, ciP->tenant);
   answer = scar.render(SubscribeContextAvailability, ciP->outFormat, "");
 
   return answer;

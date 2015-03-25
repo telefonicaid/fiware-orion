@@ -23,6 +23,7 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <map>
 
 #include "common/globals.h"
 
@@ -33,6 +34,7 @@
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
+#include "rest/uriParamNames.h"
 
 #include "common/Format.h"
 #include "common/sem.h"
@@ -41,11 +43,31 @@
 *
 * mongoSubscribeContextAvailability - 
 */
-HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat, const std::string& tenant)
+HttpStatusCode mongoSubscribeContextAvailability
+(
+  SubscribeContextAvailabilityRequest*   requestP,
+  SubscribeContextAvailabilityResponse*  responseP,
+  std::map<std::string, std::string>&    uriParam,
+  Format                                 inFormat,
+  const std::string&                     tenant
+)
 {
-    reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
+    std::string notifyFormat       = uriParam[URI_PARAM_NOTIFY_FORMAT];
+    Format      notifyFormatBinary = XML;
+
+    if (notifyFormat == "")
+    {
+      notifyFormat = (inFormat == XML)? "XML" : "JSON";
+    }
+
+    if (notifyFormat == "JSON")
+    {
+      notifyFormatBinary = JSON;
+    }
 
     LM_T(LmtMongo, ("Subscribe Context Availability Request"));
+
+    reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
 
     DBClientBase* connection = getMongoConnection();
 
@@ -91,7 +113,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     sub.append(CASUB_ATTRS, attrs.arr());
 
     /* Adding format to use in notifications */
-    sub.append(CASUB_FORMAT, std::string(formatToString(inFormat)));
+    sub.append(CASUB_FORMAT, notifyFormat);
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
@@ -128,7 +150,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     }
 
     /* Send notifications for matching context registrations */
-    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), inFormat, tenant);
+    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), notifyFormatBinary, tenant);
 
     /* Fill the response element */
     responseP->duration = requestP->duration;
