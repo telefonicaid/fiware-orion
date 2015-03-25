@@ -39,7 +39,7 @@ accumulatorStart
 # 06. Subscribe to E1/T1, forcing XML notifications (POST /v1/registry/contextAvailabilitySubscriptions?notifyFormat=XML)
 # 07. Dump accumulator to see E1/T1, one in JSON, one in XML
 #
-# FIXME: Once NGSI10 Subscriptions implement Restrictions 'exist=entity::type' and '!exist=entity::type'
+# FIXME: Once NGSI9 Subscriptions implement Restrictions 'exist=entity::type' and '!exist=entity::type'
 # 08. Subscribe to E2/<empty> (POST /v1/registry/contextAvailabilitySubscriptions?!exist=entity::type)
 # 09. Register E2/<empty>
 # 10. Register E2/T1
