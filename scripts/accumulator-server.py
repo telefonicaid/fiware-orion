@@ -72,9 +72,7 @@ https = 0
 if args.cert or args.key:
     if args.cert and args.key:
         https = 1
-        context = SSL.Context(SSL.SSLv23_METHOD)
-        context.use_certificate_file(args.cert)
-        context.use_privatekey_file(args.key)
+	context = (args.cert, args.key)
     else:
         print "Error: You must specify both a certificate and a key to use SSL"
         sys.exit(1)
