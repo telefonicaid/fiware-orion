@@ -39,12 +39,7 @@
 
 #include "mongo/client/dbclient.h"
 
-#include "commonMocks.h"
-
-using ::testing::_;
-using ::testing::MatchesRegex;
-using ::testing::Throw;
-using ::testing::Return;
+#include "unittest.h"
 
 
 /* ****************************************************************************
@@ -349,7 +344,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -425,7 +420,9 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res, JSON);
+    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "JSON";
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams, JSON);
+    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "XML";
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -502,7 +499,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_AttrN_noPattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -581,7 +578,7 @@ TEST(mongoSubscribeContextAvailability, EntN_Attr0_noPattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -664,7 +661,7 @@ TEST(mongoSubscribeContextAvailability, EntN_AttrN_noPattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -748,7 +745,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_pattern)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -839,7 +836,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -930,7 +927,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res, JSON);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams, JSON);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1018,7 +1015,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneSingle)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1116,7 +1113,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneMulti)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1209,7 +1206,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsSubset)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1308,7 +1305,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralCREs)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1404,7 +1401,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralRegistrations)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1511,7 +1508,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntity)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1610,7 +1607,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiAttr)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1717,7 +1714,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntityAttrs)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1833,7 +1830,7 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1936,7 +1933,7 @@ TEST(mongoSubscribeContextAvailability, pattern0Attr)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2022,7 +2019,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrSingle)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2116,7 +2113,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrMulti)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2218,7 +2215,7 @@ TEST(mongoSubscribeContextAvailability, patternNAttr)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2330,7 +2327,7 @@ TEST(mongoSubscribeContextAvailability, patternNoType)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2439,7 +2436,7 @@ TEST(mongoSubscribeContextAvailability, mixPatternAndNotPattern)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2516,7 +2513,7 @@ TEST(mongoSubscribeContextAvailability, defaultDuration)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2597,7 +2594,7 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     mongoConnect(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
