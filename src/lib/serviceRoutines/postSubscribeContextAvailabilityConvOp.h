@@ -1,5 +1,5 @@
-#ifndef MONGO_SUBSCRIBE_CONTEXT_AVAILABILITY_H
-#define MONGO_SUBSCRIBE_CONTEXT_AVAILABILITY_H
+#ifndef SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTAVAILABILITYCONVOP_H_
+#define SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTAVAILABILITYCONVOP_H_
 
 /*
 *
@@ -23,28 +23,26 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan Marquez
+* Author: Ken Zangelin
 */
 #include <string>
-#include <map>
+#include <vector>
 
-#include "common/Format.h"
-#include "ngsi9/SubscribeContextAvailabilityRequest.h"
-#include "ngsi9/SubscribeContextAvailabilityResponse.h"
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* mongoSubscribeContextAvailability - 
+* postSubscribeContextAvailabilityConvOp - 
 */
-extern HttpStatusCode mongoSubscribeContextAvailability
+extern std::string postSubscribeContextAvailabilityConvOp
 (
-  SubscribeContextAvailabilityRequest*   requestP,
-  SubscribeContextAvailabilityResponse*  responseP,
-  std::map<std::string, std::string>&    uriParam,
-  Format                                 inFormat = XML,
-  const std::string&                     tenant = ""
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 );
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTAVAILABILITYCONVOP_H_

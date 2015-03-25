@@ -36,6 +36,8 @@ accumulatorStart
 # 03. Dump accumulator to see NOTHING
 # 04. Create E1/T1
 # 05. Dump accumulator to see E1/T1
+# 06. Subscribe to E1/T1, forcing XML notifications (POST /v1/contextSubscriptions?notifyFormat=XML)
+# 07. Dump accumulator to see E1/T1, one in JSON, one in XML
 #
 # FIXME: Once NGSI10 Subscriptions implement Restrictions 'exist=entity::type' and '!exist=entity::type'
 # 06. Subscribe to E2/<empty>:ONCHANGE (POST /v1/contextSubscriptions?!exist=entity::type)
@@ -134,6 +136,38 @@ echo
 
 echo "05. Dump accumulator to see E1/T1"
 echo "================================="
+curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+echo
+echo
+
+
+echo "06. Subscribe to E1/T1, forcing XML notifications (POST /v1/contextSubscriptions?notifyFormat=XML)"
+echo "=================================================================================================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ],
+  "reference": "http://localhost:'$LISTENER_PORT'/notify",
+  "duration": "P5Y",
+  "throttling": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "A1"
+      ]
+    }
+  ]
+}'
+orionCurl --url /v1/contextSubscriptions?notifyFormat=XML --payload "$payload" --json
+echo
+echo
+
+echo "07. Dump accumulator to see E1/T1, one in JSON, one in XML"
+echo "=========================================================="
 curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
 echo
 echo
@@ -255,6 +289,90 @@ Content-Type: application/json
     }
   ]
 }
+=======================================
+
+
+06. Subscribe to E1/T1, forcing XML notifications (POST /v1/contextSubscriptions?notifyFormat=XML)
+==================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y", 
+        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "throttling": "P5Y"
+    }
+}
+
+
+07. Dump accumulator to see E1/T1, one in JSON, one in XML
+==========================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 465
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T1",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "a",
+            "value" : "E1/T1/A1"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 719
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T1" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>a</type>
+            <contextValue>E1/T1/A1</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
 =======================================
 
 

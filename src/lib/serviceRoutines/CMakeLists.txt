@@ -96,6 +96,7 @@ postContextEntitiesByEntityIdAndType.cpp
 getEntityByIdAttributeByNameWithTypeAndId.cpp
 postEntityByIdAttributeByNameWithTypeAndId.cpp
 postSubscribeContextConvOp.cpp
+postSubscribeContextAvailabilityConvOp.cpp
 )
 
 SET (HEADERS
