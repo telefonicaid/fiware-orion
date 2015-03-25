@@ -334,7 +334,7 @@ std::string sendHttpSocket
   // Set up URL
   std::string url = "";
 
-  if (protocol == "https:")
+  if (protocol == "https:" && !useRush)
   {
     url += protocol + "//";
   }
