@@ -113,6 +113,7 @@
 #include "serviceRoutines/postNotifyContextAvailability.h"
 
 #include "serviceRoutines/postSubscribeContextConvOp.h"
+#include "serviceRoutines/postSubscribeContextAvailabilityConvOp.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
 #include "serviceRoutines/postContextEntitiesByEntityId.h"
 #include "serviceRoutines/getContextEntityAttributes.h"
@@ -637,7 +638,7 @@ PaArgument paArgs[] =
   { "POST",   CTAA,  CTAA_COMPS_V0,        CTAA_POST_WORD,  postContextEntityTypeAttribute            }, \
   { "*",      CTAA,  CTAA_COMPS_V0,        "",              badVerbGetPostOnly                        }, \
                                                                                                          \
-  { "POST",   SCA,   SCA_COMPS_V0,         SCA_POST_WORD,   postSubscribeContextAvailability          }, \
+  { "POST",   SCA,   SCA_COMPS_V0,         SCA_POST_WORD,   postSubscribeContextAvailabilityConvOp    }, \
   { "*",      SCA,   SCA_COMPS_V0,         "",              badVerbPostOnly                           }, \
                                                                                                          \
   { "PUT",    SCAS,  SCAS_COMPS_V0,        SCAS_PUT_WORD,   putAvailabilitySubscriptionConvOp         }, \
