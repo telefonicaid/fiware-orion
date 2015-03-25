@@ -10,3 +10,4 @@
 - Fix: A registerContext request that uses associations must specify "attributeAssociations" instead of "attributes" to be consistent with DiscoveContextAvailability messages (Issue #823).
 - Add: new CLI parameter '-timeout' to specify DB connection timeout in the case of using MongoDB replica sets (Issue #589).
 - Fix: Fixed a bug that made the broker crash when compound attribute values were used in convenience operations.
+- Fix: Implemented URI-parameter 'notifyFormat=XML/JSON' for NGSI9 subscriptions.
