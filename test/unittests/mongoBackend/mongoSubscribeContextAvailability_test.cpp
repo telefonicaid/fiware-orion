@@ -420,7 +420,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "JSON";
+    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "";
     ms = mongoSubscribeContextAvailability(&req, &res, uriParams, JSON);
     uriParams[URI_PARAM_NOTIFY_FORMAT]       = "XML";
 
@@ -927,7 +927,9 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
+    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "";
     ms = mongoSubscribeContextAvailability(&req, &res, uriParams, JSON);
+    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "XML";
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
