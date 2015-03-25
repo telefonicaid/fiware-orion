@@ -28,6 +28,7 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
+#include "rest/EntityTypeInfo.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi10/SubscribeContextRequest.h"
 
@@ -138,4 +139,22 @@ void SubscribeContextRequest::release(void)
   attributeList.release();
   restriction.release();
   notifyConditionVector.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscribeContextRequest::fill - 
+*/
+void SubscribeContextRequest::fill(EntityTypeInfo typeInfo)
+{
+  if ((typeInfo == EntityTypeEmpty) || (typeInfo == EntityTypeNotEmpty))
+  {
+    Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
+
+    scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
+      
+    restriction.scopeVector.push_back(scopeP);
+  }
 }

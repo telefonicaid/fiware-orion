@@ -123,6 +123,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
   // 06. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
+  parseDataP->upcr.res.release();
 
   return answer;
 }

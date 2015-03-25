@@ -113,6 +113,7 @@ std::string postIndividualContextEntityAttributeWithTypeAndId
 
     // 05. Translate UpdateContextResponse to StatusCode
     response.fill(parseDataP->upcrs.res);
+    parseDataP->upcr.res.release();
   }
 
 
@@ -120,5 +121,6 @@ std::string postIndividualContextEntityAttributeWithTypeAndId
   answer = response.render(ciP->outFormat, "", false, false);
   parseDataP->upcar.res.release();
   parseDataP->upcrs.res.release();
+
   return answer;
 }

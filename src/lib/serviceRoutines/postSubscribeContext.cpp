@@ -36,6 +36,15 @@
 /* ****************************************************************************
 *
 * postSubscribeContext - 
+*
+* POST /v1/subscribeContext
+* POST /ngsi10/subscribeContext
+*
+* Payload In:  SubscribeContextRequest
+* Payload Out: SubscribeContextResponse
+*
+* URI parameters
+*   - notifyFormat=XXX    (handled by mongoBackend)
 */
 std::string postSubscribeContext
 (
@@ -49,7 +58,7 @@ std::string postSubscribeContext
   std::string               answer;
 
   //
-  // FIXME P6: for the moment, we are assuming that notification will be sent in the same format as the one
+  // FIXME P6: at the moment, we are assuming that notification are sent in the same format as the one
   // used to do the subscription, so we are passing ciP->inFormat. This is just an heuristic, the client could want
   // for example to use XML in the subscription message but wants notifications in JSON. We need a more
   // flexible approach, to be implemented
@@ -57,7 +66,7 @@ std::string postSubscribeContext
 
   //
   // FIXME P0: Only *one* service path is allowed for subscriptions.
-  //           Personally (kz) I kind ot like that. If you want additional service-path, just add another subscription!
+  //           Personally (kz) I kind of like that. If you want additional service-paths, just add another subscription!
   //           However, we need to at least state that HERE is where we limit the number of service paths to *one*.
   //
   if (ciP->servicePathV.size() > 1)
