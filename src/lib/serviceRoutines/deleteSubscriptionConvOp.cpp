@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "logMsg/logMsg.h"
-
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/postUnsubscribeContext.h"
