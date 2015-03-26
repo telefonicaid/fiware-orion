@@ -71,6 +71,7 @@ typedef struct UpdateContextRequest
                     const std::string& entityType,
                     const std::string& isPattern,
                     const std::string& attributeName,
+                    const std::string& metaID,
                     const std::string& _updateActionType);
 
   void         fill(const UpdateContextAttributeRequest* ucarP,

@@ -189,6 +189,7 @@ void UpdateContextRequest::fill
   const std::string& entityType,
   const std::string& isPattern,
   const std::string& attributeName,
+  const std::string& metaID,
   const std::string& _updateActionType
 )
 {
@@ -203,6 +204,13 @@ void UpdateContextRequest::fill
   {
     ContextAttribute* caP = new ContextAttribute(attributeName, "", "");
     ceP->contextAttributeVector.push_back(caP);
+
+    if (metaID != "")
+    {
+      Metadata* mP = new Metadata("ID", "", metaID);
+
+      caP->metadataVector.push_back(mP);
+    }
   }
 }
 
