@@ -25,7 +25,7 @@ Rush with HTTPS
 
 --SHELL-INIT--
 dbInit CB
-accumulatorStart localhost $LISTENER_PORT
+accumulatorStart --host localhost --port $LISTENER_PORT
 brokerStart CB 0-255 IPV4 -rush localhost:$LISTENER_PORT
 
 --SHELL--
@@ -91,7 +91,7 @@ if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
 then
   sleep 2
 fi
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+curl http://localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
 
 --REGEXPECT--
 1. Subscribe to changes in E/att
@@ -182,3 +182,4 @@ Content-Type: application/xml
 brokerStop CB
 accumulatorStop
 dbDrop CB
+rm -f /tmp/harnessTest.key /tmp/harnessTest.pem

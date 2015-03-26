@@ -64,6 +64,17 @@ export LISTENER2_PORT=${LISTENER2_PORT:-9977}
 
 # -----------------------------------------------------------------------------
 #
+# Accumulator
+#
+# o ACCUM_RESOURCE   - Resource to be accessed during notification tests
+# o ACCUM_HOST       - Host to be accessed during notification tests
+#
+export ACCUM_RESOURCE=${ACCUM_RESOURCE:-/notify}
+export ACCUM_HOST=${ACCUM_HOST:-0.0.0.0}
+
+
+# -----------------------------------------------------------------------------
+#
 # Log directories
 #
 # o CB_LOG_DIR        - directory where the 'main' broker keeps its log file

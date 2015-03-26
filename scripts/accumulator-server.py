@@ -33,10 +33,9 @@ __author__ = 'fermin'
 # * Curl users: use -H "Expect:" (default "Expect: 100-continue" used by curl has been problematic
 #   in the past)
 # * Curl users: use -H "Content-Type: application/xml"  for XML payload (the default:
-#   "Content-Type: application/x-www-form-urlencoded" has been problematic in the pass)
+#   "Content-Type: application/x-www-form-urlencoded" has been problematic in the past)
 
 from flask import Flask, request, Response
-from sys import argv, exit
 from datetime import datetime
 from math import trunc
 from time import sleep
@@ -44,34 +43,40 @@ import os
 import atexit
 import string
 import signal
-
+import argparse
+import sys
+from OpenSSL import SSL
 
 # This function is registered to be called upon termination
 def all_done():
     os.unlink(pidfile)
 
-# Default arguments
-port = 1028
-host='0.0.0.0'
-server_url = '/accumulate'
-verbose = 0
+# Parse arguments from command line
+parser = argparse.ArgumentParser()
+parser.add_argument("--port", help='The port that will be listened to', type=int, default=1028)
+parser.add_argument("--host", help='The host that will represent the accumulator', default='0.0.0.0')
+parser.add_argument("--url", help='The URL that will hold the test resource (i.e. "/notify"',default='/accumulate')
+parser.add_argument("--verbose", help='Verbosity on or off', default=0)
+parser.add_argument("--cert", help='Certificate to use for the server (PEM)')
+parser.add_argument("--key", help='Private key to use for the server (PEM)')
+args = parser.parse_args()
 
-# Arguments from command line
-if len(argv) > 2:
-    port = int(argv[1])
-    server_url = argv[2]
+# Get arguments from command-line parameters
+port = args.port
+host = args.host
+server_url = args.url
+verbose = args.verbose
+https = 0
 
-if len(argv) > 3:
-    if argv[3] == 'on':
-        print 'verbose mode is on'
-        verbose = 1
+# If we are provided both key and cert we launch in SSL mode
+if args.cert or args.key:
+    if args.cert and args.key:
+        https = 1
+	context = (args.cert, args.key)
     else:
-        host = argv[3]
+        print "Error: You must specify both a certificate and a key to use SSL"
+        sys.exit(1)
 
-if len(argv) > 4:
-    if argv[4] == 'on':
-        print 'verbose mode is on'
-        verbose = 1
 
 pid = str(os.getpid())
 pidfile = "/tmp/accumulator." + str(port) + ".pid"
@@ -202,4 +207,7 @@ if __name__ == '__main__':
     # Note that using debug=True breaks the the procedure to write the PID into a file. In particular
     # makes the calle os.path.isfile(pidfile) return True, even if the file doesn't exist. Thus,
     # use debug=True below with care :)
-    app.run(host=host, port=port)
+    if https == 1:
+        app.run(host=host, port=port, ssl_context=context)
+    else:
+        app.run(host=host, port=port)

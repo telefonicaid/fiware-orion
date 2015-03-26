@@ -24,6 +24,8 @@
 */
 #include <string>
 #include <map>
+#include <curl/curl.h>
+#include <openssl/ssl.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -962,7 +964,7 @@ static int restStart(IpVersion ipVersion, const char* httpsKey = NULL, const cha
   }  
 
   if ((ipVersion == IPV6) || (ipVersion == IPDUAL))
-  { 
+  {
     memset(&sad_v6, 0, sizeof(sad_v6));
     if (inet_pton(AF_INET6, bindIPv6, &(sad_v6.sin6_addr.s6_addr)) != 1)
     {
@@ -1066,6 +1068,15 @@ void restInit
 
   if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
      strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
+
+  SSL_library_init();
+
+  // Startup libcurl
+  if (curl_global_init(CURL_GLOBAL_DEFAULT) != 0)
+  {
+    fprintf(stderr, "restStart: error, could not init curl\n");
+    orionExitFunction(1, "restStart: error, could not init curl");
+  }
 
   // Starting REST interface
   int r;
