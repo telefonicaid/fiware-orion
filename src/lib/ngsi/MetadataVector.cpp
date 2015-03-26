@@ -196,3 +196,22 @@ void MetadataVector::fill(MetadataVector* mvP)
     push_back(mP);
   }
 }
+
+
+
+/* ****************************************************************************
+*
+* MetadataVector::lookupByName - 
+*/
+Metadata* MetadataVector::lookupByName(const std::string& _name)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->name == _name)
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
+}

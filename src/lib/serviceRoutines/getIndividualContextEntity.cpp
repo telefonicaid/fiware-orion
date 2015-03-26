@@ -89,7 +89,7 @@ std::string getIndividualContextEntity
 
 
   // 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)
-  parseDataP->qcr.res.fill(entityId, entityType, "false", typeInfo);
+  parseDataP->qcr.res.fill(entityId, entityType, "false", typeInfo, "");
 
 
   // 2. Call standard operation
