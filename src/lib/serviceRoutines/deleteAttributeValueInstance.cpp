@@ -27,11 +27,11 @@
 
 #include "logMsg/logMsg.h"
 
-#include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/deleteAttributeValueInstance.h"
 
 
@@ -40,7 +40,18 @@
 *
 * deleteAttributeValueInstance - 
 *
-* DELETE /ngsi10/contextEntities/{entityID}/attributes/{attributeName}/{valueID}
+* DELETE /v1/contextEntities/{entity::id}/attributes/{attribute::name}/{metaID}
+* DELETE /ngsi10/contextEntities/{entity::id}/attributes/{attribute::name}/{metaID}
+*
+* Payload In:  None
+* Payload Out: StatusCode
+*
+* Mapped Standard Operation: UpdateContextRequest/DELETE;
+*
+* URI params:
+*   - entity::type=TYPE
+*   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
+*     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
 */
 std::string deleteAttributeValueInstance
 (
@@ -50,13 +61,37 @@ std::string deleteAttributeValueInstance
   ParseData*                 parseDataP
 )
 {
-  UpdateContextRequest            request;
-  UpdateContextResponse           response;
-  std::string                     entityId      = compV[2];
-  std::string                     attributeName = compV[4];
-  std::string                     valueId       = compV[5];
-  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
-  Metadata*                       mP            = new Metadata("ID", "", valueId);
+  StatusCode              response;
+  std::string             answer;
+  std::string             entityId      = compV[2];
+  std::string             attributeName = compV[4];
+  std::string             metaId        = compV[5];
+  std::string             entityType;
+
+  // 01. URI parameters
+  entityType    = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+
+  // 02. Fill in UpdateContextRequest
+  parseDataP->upcr.res.fill(entityId, entityType, "false", attributeName, metaId, "DELETE");
+
+  // 03. Call postUpdateContext standard service routine
+  answer = postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 04. Translate UpdateContextResponse to StatusCode
+  response.fill(parseDataP->upcrs.res);
+
+
+  // 05. Cleanup and return result
+  answer = response.render(ciP->outFormat, "", false, false);
+  response.release();
+  parseDataP->upcr.res.release();
+
+  return answer;
+}
+
+#if 0
+  Contextattribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
   ContextElement*                 ceP           = new ContextElement();
 
   attributeP->metadataVector.push_back(mP);
@@ -69,6 +104,7 @@ std::string deleteAttributeValueInstance
   request.updateActionType.set("DELETE");
 
   response.errorCode.code = SccNone;
+
   ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
 
   StatusCode statusCode;
@@ -104,3 +140,4 @@ std::string deleteAttributeValueInstance
 
   return statusCode.render(ciP->outFormat, "", false, false);
 }
+#endif
