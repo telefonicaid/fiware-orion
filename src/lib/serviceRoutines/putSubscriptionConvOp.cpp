@@ -42,7 +42,7 @@
 * Payload In:  UpdateContextSubscriptionRequest
 * Payload Out: UpdateContextSubscriptionResponse
 *
-* URL parameters
+* URI parameters
 *   - notifyFormat=XXX     (handled by std-op postUpdateContextSubscription)
 *   x entity::type=TYPE    (NOT TREATED)
 *   x !exist=entity::type  (NOT TREATED)

@@ -35,6 +35,15 @@
 /* ****************************************************************************
 *
 * deleteSubscriptionConvOp - 
+*
+* DELETE /v1/contextSubscriptions/{subscriptionId}
+* DELETE /ngsi10/contextSubscriptions/{subscriptionId}
+*
+* Payload In:  None
+* Payload Out: UnsubscribeContextResponse
+*
+* URI parameters:
+*   NONE 
 */
 std::string deleteSubscriptionConvOp
 (
@@ -44,10 +53,10 @@ std::string deleteSubscriptionConvOp
   ParseData*                 parseDataP
 )
 {
-  std::string                        subscriptionId = compV[2];
-  UnsubscribeContextRequest*         uncrP          = &parseDataP->uncr.res;
+  std::string  subscriptionId = compV[2];
 
-  uncrP->subscriptionId = subscriptionId;
+  // 'Fill In' UnsubscribeContextRequest
+  parseDataP->uncr.res.subscriptionId.set(subscriptionId);
 
   return postUnsubscribeContext(ciP, components, compV, parseDataP);
 }
