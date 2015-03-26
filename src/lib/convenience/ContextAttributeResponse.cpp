@@ -157,6 +157,11 @@ void ContextAttributeResponse::fill
   {
     statusCode.fill(&qcrP->errorCode);
 
+    if ((statusCode.code == SccOk) || (statusCode.code == SccNone))
+    {
+      statusCode.fill(SccContextElementNotFound, "");
+    }
+
     if ((statusCode.code != SccOk) && (statusCode.details == ""))
     {
       if (metaID == "")
@@ -167,6 +172,7 @@ void ContextAttributeResponse::fill
 
     return;
   }
+
 
   //
   // FIXME P7: If more than one context element is found, we simply select the first one.
@@ -199,8 +205,13 @@ void ContextAttributeResponse::fill
       {
         continue;
       }
-
       contextAttributeVector.push_back(caP->clone());
+    }
+
+    if (contextAttributeVector.size() == 0)
+    {
+      std::string details = "Entity-Attribute-MetaID triplet: /" + entityId + "-" + attributeName + "-" + metaID + "/";
+      statusCode.fill(SccContextElementNotFound, details);
     }
   }
   else
@@ -208,11 +219,14 @@ void ContextAttributeResponse::fill
     contextAttributeVector.fill(&qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector);
   }
 
-  if (qcrP->errorCode.code == SccNone)
+  if ((statusCode.code == SccNone) || (statusCode.code == SccOk))
   {
-    // Fix code, preserve details
-    qcrP->errorCode.fill(SccOk, qcrP->errorCode.details);
-  }
+    if (qcrP->errorCode.code == SccNone)
+    {
+      // Fix code, preserve details
+      qcrP->errorCode.fill(SccOk, qcrP->errorCode.details);
+    }
 
-  statusCode.fill(&qcrP->errorCode);
+    statusCode.fill(&qcrP->errorCode);
+  }
 }
