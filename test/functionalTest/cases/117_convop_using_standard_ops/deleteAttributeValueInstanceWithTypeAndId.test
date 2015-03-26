@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-ConvOp deleteAttributeValueInstance: DELETE /v1/contextEntities/{entity::id}/attributes/{attribute::name}/{metaID}
+ConvOp deleteAttributeValueInstanceWithTypeAndId: DELETE /v1/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
 
 --SHELL-INIT--
 dbInit CB
@@ -39,9 +39,11 @@ brokerStart CB
 # 03. CREATE E1/T2/A1/M1
 # 04. CREATE E1/T2/A1/M2
 # 05. Make sure all four are present
-# 06. DELETE E1/T1/A1/M1
-# 07. DELETE E1//A1/M2
-# 08. Make sure only E1/T2/A1/M1 is left
+# 06. DELETE E1/T1/A1/M1, with entity::type mismatch and see it fail
+# 07. DELETE E1/T1/A1/M1
+# 08. DELETE E1/T2/A1/M2
+# 09. Make sure only E1/T1/A1/M2 and E1/T2/A1/M1 are left
+# 10. DELETE E1/T1/A1/M1 and see it fail
 #
 
 echo "01. CREATE E1/T1/A1/M1"
@@ -175,22 +177,29 @@ echo
 echo
 
 
-echo "06. DELETE E1/T1/A1/M1"
+echo "06. DELETE E1/T1/A1/M1, with entity::type mismatch and see it fail"
+echo "=================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/M1?entity::type=T3 --json -X DELETE
+echo
+echo
+
+
+echo "07. DELETE E1/T1/A1/M1"
 echo "======================"
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M1?entity::type=T1 --json -X DELETE
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/M1 --json -X DELETE
 echo
 echo
 
 
-echo "07. DELETE E1//A1/M2"
+echo "08. DELETE E1/T2/A1/M2"
 echo "===================="
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M2 --json -X DELETE
+orionCurl --url /v1/contextEntities/type/T2/id/E1/attributes/A1/M2 --json -X DELETE
 echo
 echo
 
 
-echo "08. Make sure only E1/T2/A1/M1 is left"
-echo "======================================"
+echo "09. Make sure only E1/T1/A1/M2 and E1/T2/A1/M1 are left"
+echo "======================================================="
 payload='{
   "entities": [
     {
@@ -203,6 +212,12 @@ orionCurl --url /v1/queryContext --payload "${payload}" --json
 echo
 echo
 
+
+echo "10. DELETE E1/T1/A1/M1 and see it fail"
+echo "======================================"
+orionCurl --url /v1/contextEntities/type/T1/id/E1/attributes/A1/M1 --json -X DELETE
+echo
+echo
 
 --REGEXPECT--
 01. CREATE E1/T1/A1/M1
@@ -444,7 +459,21 @@ Date: REGEX(.*)
 }
 
 
-06. DELETE E1/T1/A1/M1
+06. DELETE E1/T1/A1/M1, with entity::type mismatch and see it fail
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 106
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "400", 
+    "details": "non-matching entity::types in URL", 
+    "reasonPhrase": "Bad Request"
+}
+
+
+07. DELETE E1/T1/A1/M1
 ======================
 HTTP/1.1 200 OK
 Content-Length: 46
@@ -457,7 +486,7 @@ Date: REGEX(.*)
 }
 
 
-07. DELETE E1//A1/M2
+08. DELETE E1/T2/A1/M2
 ====================
 HTTP/1.1 200 OK
 Content-Length: 46
@@ -470,10 +499,10 @@ Date: REGEX(.*)
 }
 
 
-08. Make sure only E1/T2/A1/M1 is left
-======================================
+09. Make sure only E1/T1/A1/M2 and E1/T2/A1/M1 are left
+=======================================================
 HTTP/1.1 200 OK
-Content-Length: 769
+Content-Length: 1090
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -481,6 +510,20 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
+                "attributes": [
+                    {
+                        "metadatas": [
+                            {
+                                "name": "ID", 
+                                "type": "string", 
+                                "value": "M2"
+                            }
+                        ], 
+                        "name": "A1", 
+                        "type": "a", 
+                        "value": "E1/T1/A1/M2"
+                    }
+                ], 
                 "id": "E1", 
                 "isPattern": "false", 
                 "type": "T1"
@@ -516,6 +559,20 @@ Date: REGEX(.*)
             }
         }
     ]
+}
+
+
+10. DELETE E1/T1/A1/M1 and see it fail
+======================================
+HTTP/1.1 200 OK
+Content-Length: 183
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "472", 
+    "details": "action: DELETE - entity: [E1, T1] - offending attribute: A1 - attribute not found", 
+    "reasonPhrase": "request parameter is invalid/not allowed"
 }
 
 

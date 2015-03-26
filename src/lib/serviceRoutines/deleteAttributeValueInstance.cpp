@@ -46,7 +46,7 @@
 * Payload In:  None
 * Payload Out: StatusCode
 *
-* Mapped Standard Operation: UpdateContextRequest/DELETE;
+* Mapped Standard Operation: UpdateContextRequest/DELETE
 *
 * URI params:
 *   - entity::type=TYPE

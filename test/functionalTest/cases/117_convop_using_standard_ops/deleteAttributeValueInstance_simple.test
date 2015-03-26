@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-ConvOp deleteAttributeValueInstance:: DELETE /v1/contextEntities/{entity::id}/attributes/{attribute::name}/{metaID}
+ConvOp deleteAttributeValueInstance: DELETE /v1/contextEntities/{entity::id}/attributes/{attribute::name}/{metaID}
 
 --SHELL-INIT--
 dbInit CB
