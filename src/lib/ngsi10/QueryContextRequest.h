@@ -58,7 +58,7 @@ typedef struct QueryContextRequest
                      const std::string&  entityType,
                      const std::string&  isPattern,
                      EntityTypeInfo      typeInfo,
-                     const std::string&  attributeName = "");
+                     const std::string&  attributeName);
 } QueryContextRequest;
 
 #endif

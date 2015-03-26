@@ -27,10 +27,12 @@
 
 #include "logMsg/logMsg.h"
 
-#include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
-#include "convenience/ContextAttributeResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/EntityTypeInfo.h"
+#include "rest/uriParamNames.h"
+#include "convenience/ContextAttributeResponse.h"
+#include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/getAttributeValueInstanceWithTypeAndId.h"
 
 
@@ -39,7 +41,28 @@
 *
 * getAttributeValueInstanceWithTypeAndId - 
 *
-* GET /v1/contextEntities/type/{type}/id/{id}/attributes/{attributeName}/{valueID}
+* GET /v1/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
+*
+* Payload In:  None
+* Payload Out: ContextAttributeResponse
+*
+* Mapped Standard Operation: POST QueryContextRequest
+*
+* URI parameters:
+*   - attributesFormat=object
+*   - entity::type=XXX          (must coincide with entity::type in URI PATH)
+*   - !exist=entity::type       (cannot be set)
+*   - exist=entity::type        (ignored)
+*   - offset=XXX
+*   - limit=XXX
+*   - details=on
+*
+* 01. Get values from URL (path and parameters)
+* 02. Check consistency for entity::type
+* 03. Fill in QueryContextRequest
+* 04. Call standard operation postQueryContext
+* 05. Fill in ContextElementResponse
+* 06. Cleanup and return result
 */
 std::string getAttributeValueInstanceWithTypeAndId
 (
@@ -49,58 +72,57 @@ std::string getAttributeValueInstanceWithTypeAndId
   ParseData*                 parseDataP
 )
 {
-  QueryContextRequest      request;
-  QueryContextResponse     response;
-  std::string              entityType    = compV[3];
-  std::string              entityId      = compV[5];
-  std::string              attributeName = compV[7];
-  std::string              valueID       = compV[8];
-  EntityId*                eP            = new EntityId(entityId, entityType, "false");
-  StatusCode               sc;
-  ContextAttributeResponse car;
+  ContextAttributeResponse response;
+  std::string              answer;
+  std::string              entityTypeFromPath   = compV[3];
+  std::string              entityId             = compV[5];
+  std::string              attributeName        = compV[7];
+  std::string              metaID               = compV[8];
+  std::string              entityTypeFromParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  EntityTypeInfo           typeInfo             = EntityTypeEmptyOrNotEmpty;
 
-  request.entityIdVector.push_back(eP);
-  request.attributeList.push_back(attributeName);
 
-  ciP->httpStatusCode = mongoQueryContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-
-  if (response.contextElementResponseVector.size() == 0)
+  // 01. Get values from URL (entityId::type, exist, !exist)
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
   {
-     car.statusCode.fill(SccContextElementNotFound,
-                         std::string("Entity-Attribute pair: /") + entityId + "-" + attributeName + "/");
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+
+
+  // 02. Check consistency for entity::type
+  if (typeInfo == EntityTypeEmpty)
+  {
+    response.statusCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
+    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+  }  
+  else if ((entityTypeFromParam != "") && (entityTypeFromParam != entityTypeFromPath))
+  {
+    response.statusCode.fill(SccBadRequest, "non-matching entity::types in URL");
+    LM_W(("Bad Input non-matching entity::types in URL"));
   }
   else
   {
-    ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
-    ContextAttributeVector cav = cerP->contextElement.contextAttributeVector;
+    // 03. Fill in QueryContextRequest
+    parseDataP->qcr.res.fill(entityId, entityTypeFromParam, "false", typeInfo, attributeName);
 
-    // FIXME P4: as long as mongoQueryContext() signature is based on NGSI standard operations and that
-    // standard queryContext doesn't allow specify metadata for attributes (note that it uses xs:string,
-    // not full fledge attribute types), we cannot pass the ID to mongoBackend so we need to do the for loop
-    // to grep the right attribute among all the ones returned by mongoQueryContext. However, this involves
-    // a suboptimal query at mongoBackend, which could be improved passing it the ID as a new parameter to
-    // mongoQueryContext() (although breaking the design principle about mongo*() functions follow the NGSI
-    // standard). To think about it.
-    for (unsigned int i = 0; i < cav.size(); i++)
-    {
-      if (cav.get(i)->getId() == valueID)
-      {
-        car.contextAttributeVector.push_back(cav.get(i));
-      }
-    }
 
-    if (cav.size() > 0 && car.contextAttributeVector.size() == 0)
-    {
-      car.statusCode.fill(SccContextElementNotFound,
-                          std::string("Attribute-ValueID pair: /") + attributeName + "-" + valueID + "/");
-    }
-    else
-    {
-      car.statusCode.fill(&cerP->statusCode);
-    }
+    // 04. Call standard operation postQueryContext
+    postQueryContext(ciP, components, compV, parseDataP);
+
+
+    // 05. Fill in response
+    response.fill(&parseDataP->qcrs.res, entityId, entityTypeFromPath, attributeName, metaID);
   }
 
-  request.release();
 
-  return car.render(ciP, AttributeValueInstance, "");
+  answer = response.render(ciP, AttributeValueInstance, "");
+  parseDataP->qcr.res.release();
+  parseDataP->qcrs.res.release();
+  response.release();
+
+  return answer;
 }

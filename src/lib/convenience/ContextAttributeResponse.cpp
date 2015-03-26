@@ -138,7 +138,14 @@ void ContextAttributeResponse::fill(ContextAttributeVector* _cavP, const StatusC
 *
 * ContextAttributeResponse::fill - 
 */
-void ContextAttributeResponse::fill(QueryContextResponse* qcrP, const std::string& entityId, const std::string& entityType)
+void ContextAttributeResponse::fill
+(
+  QueryContextResponse*  qcrP,
+  const std::string&     entityId,
+  const std::string&     entityType,
+  const std::string&     attributeName,
+  const std::string&     metaID
+)
 {
   if (qcrP == NULL)
   {
@@ -152,7 +159,10 @@ void ContextAttributeResponse::fill(QueryContextResponse* qcrP, const std::strin
 
     if ((statusCode.code != SccOk) && (statusCode.details == ""))
     {
-      statusCode.details = "Entity id: /" + entityId + "/";
+      if (metaID == "")
+        statusCode.details = "Entity-Attribute pair: /" + entityId + "-" + attributeName + "/";
+      else
+        statusCode.details = "Entity-Attribute-MetaID triplet: /" + entityId + "-" + attributeName + "-" + metaID + "/";
     }
 
     return;
@@ -172,7 +182,31 @@ void ContextAttributeResponse::fill(QueryContextResponse* qcrP, const std::strin
     LM_W(("Bad Input (more than one context element found in this query - selecting the first one"));
   }
 
-  contextAttributeVector.fill(&qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector);
+  //
+  // If we have to match against Metadata::ID, then we have to through the entire ContextAttribute vector
+  // of the Context Element to find matches.
+  //
+  // If there is no metaID (metaID == ""), then we simply copy the vector
+  //
+  if (metaID != "")
+  {
+    for (unsigned int aIx = 0; aIx < qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* caP  = qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector[aIx];
+      Metadata*         mP   = caP->metadataVector.lookupByName("ID");
+
+      if ((mP == NULL) || (mP->value != metaID))
+      {
+        continue;
+      }
+
+      contextAttributeVector.push_back(caP->clone());
+    }
+  }
+  else
+  {
+    contextAttributeVector.fill(&qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector);
+  }
 
   if (qcrP->errorCode.code == SccNone)
   {

@@ -73,6 +73,7 @@ typedef struct ContextAttribute
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
+  ContextAttribute* clone();
 } ContextAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTE_H_

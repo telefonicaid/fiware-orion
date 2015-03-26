@@ -367,3 +367,14 @@ std::string ContextAttribute::toString(void)
 {
   return name;
 }
+
+
+
+/* ****************************************************************************
+*
+* clone - 
+*/
+ContextAttribute* ContextAttribute::clone(void)
+{
+  return new ContextAttribute(this);
+}
