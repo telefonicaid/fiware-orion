@@ -52,6 +52,13 @@
 *   - entity::type=TYPE
 *   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
 *     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
+*
+* 01. URI parameters
+* 02. Fill in UpdateContextRequest
+* 03. Call postUpdateContext standard service routine
+* 04. Translate UpdateContextResponse to StatusCode
+* 05. Cleanup and return result
+*
 */
 std::string deleteAttributeValueInstance
 (
@@ -89,55 +96,3 @@ std::string deleteAttributeValueInstance
 
   return answer;
 }
-
-#if 0
-  Contextattribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
-  ContextElement*                 ceP           = new ContextElement();
-
-  attributeP->metadataVector.push_back(mP);
-
-  ceP->entityId.fill(entityId, "", "false");
-  ceP->attributeDomainName.set("");
-  ceP->contextAttributeVector.push_back(attributeP);
-
-  request.contextElementVector.push_back(ceP);
-  request.updateActionType.set("DELETE");
-
-  response.errorCode.code = SccNone;
-
-  ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken);
-
-  StatusCode statusCode;
-  if (response.contextElementResponseVector.size() == 0)
-  {
-    statusCode.fill(SccContextElementNotFound,
-                    std::string("Entity-Attribute pair: /") + entityId + "-" + attributeName + "/");
-  }
-  else if (response.contextElementResponseVector.size() == 1)
-  {
-     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
-
-    if (response.errorCode.code != SccNone)
-    {
-      statusCode.fill(&response.errorCode);
-    }
-    else if (cerP->statusCode.code != SccNone)
-    {
-      statusCode.fill(&cerP->statusCode);
-    }
-    else
-    {
-      statusCode.fill(SccOk);
-    }
-  }
-  else
-  {
-    statusCode.fill(SccReceiverInternalError,
-                    "More than one response from deleteAttributeValueInstance::mongoUpdateContext");
-  }
-
-  request.release();
-
-  return statusCode.render(ciP->outFormat, "", false, false);
-}
-#endif
