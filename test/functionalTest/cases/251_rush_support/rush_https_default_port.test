@@ -25,8 +25,7 @@ Rush with HTTPS
 
 --SHELL-INIT--
 dbInit CB
-${SCRIPT_HOME}/../../scripts/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
-accumulatorStart --host localhost --port $LISTENER_PORT --cert /tmp/harnessTest.pem --key /tmp/harnessTest.key
+accumulatorStart --host localhost --port $LISTENER_PORT
 brokerStart CB 0-255 IPV4 -rush localhost:$LISTENER_PORT
 
 --SHELL--
@@ -92,7 +91,7 @@ if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
 then
   sleep 2
 fi
-curl -k https://localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+curl http://localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
 
 --REGEXPECT--
 1. Subscribe to changes in E/att
@@ -145,7 +144,7 @@ Date: REGEX(.*)
 
 3. Accumulator dump
 +++++++++++++++++++
-POST https://localhost:REGEX(\d+)/notify
+POST http://localhost:REGEX(\d+)/notify
 Content-Length: 717
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 X-Relayer-Protocol: https
