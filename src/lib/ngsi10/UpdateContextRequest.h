@@ -78,6 +78,7 @@ typedef struct UpdateContextRequest
                     const std::string&                   entityId,
                     const std::string&                   entityType,
                     const std::string&                   attributeName,
+                    const std::string&                   metaID,
                     const std::string&                   _updateActionType);
 } UpdateContextRequest;
 
