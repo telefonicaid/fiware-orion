@@ -27,11 +27,11 @@
 
 #include "logMsg/logMsg.h"
 
-#include "mongoBackend/mongoUpdateContext.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/restReply.h"
 #include "ngsi/ParseData.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "rest/restReply.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/postAttributeValueInstanceWithTypeAndId.h"
 
 
@@ -40,9 +40,27 @@
 *
 * postAttributeValueInstanceWithTypeAndId - 
 *
-* POST /ngsi10/contextEntities/type/{type}/id/{id}/attributes/{attributeName}/{valueID}
+* POST /ngsi10/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
 *
-* Payload: UpdateContextAttributeRequest
+* Payload In:  UpdateContextAttributeRequest
+* Payload Out: StatusCode
+*
+* Mapped Standard Operation: UpdateContextRequest/APPEND
+*
+* URI parameters
+*   - entity::type=TYPE
+*   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
+*     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
+* 
+* 00. Get values from URI path
+* 01. Get values URI parameters
+* 02. Check validity of URI params VS URI path components
+* 03. Check validity of path components VS payload
+* 04. Fill in UpdateContextRequest
+* 05. Call postUpdateContext
+* 06. Fill in StatusCode from UpdateContextResponse
+* 07. Render result
+* 08. Cleanup and return result
 */
 std::string postAttributeValueInstanceWithTypeAndId
 (
@@ -52,43 +70,85 @@ std::string postAttributeValueInstanceWithTypeAndId
   ParseData*                 parseDataP
 )
 {
-  UpdateContextRequest            request;
-  UpdateContextResponse           response;
-  std::string                     entityType    = compV[3];
-  std::string                     entityId      = compV[5];
-  std::string                     attributeName = compV[7];
-  std::string                     valueId       = compV[8];
-  UpdateContextAttributeRequest*  upcarP        = &parseDataP->upcar.res;
-  bool                            idFound       = false;
+  std::string     entityType              = compV[3];
+  std::string     entityId                = compV[5];
+  std::string     attributeName           = compV[7];
+  std::string     metaID                  = compV[8];
+  std::string     entityTypeFromUriParam;
+  StatusCode      response;
+  std::string     answer;
 
-  //
-  // Any metadata ID in the payload?
-  //
-  // If so, the value must be equal to the {valueID} of the URL
-  //
-  for (unsigned int ix = 0; ix < upcarP->metadataVector.size(); ++ix)
+
+  // 01. Get values URI parameters
+  entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+
+
+  // 02. Check validity of URI params VS URI path components
+  if ((entityTypeFromUriParam != "") && (entityTypeFromUriParam != entityType))
   {
-    Metadata* mP = upcarP->metadataVector.get(ix);
+    LM_W(("Bad Input non-matching entity::types in URL"));
+    response.fill(SccBadRequest, "non-matching entity::types in URL");
+    answer = response.render(ciP->outFormat, "", false, false);
 
-    if (mP->name == "ID")
-    {
-      if (mP->value != valueId)
-      {
+    parseDataP->upcar.res.release();
+    return answer;
+  }
+
+
+  // 03. Check validity of path components VS payload
+  Metadata* mP = parseDataP->upcar.res.metadataVector.lookupByName("ID");
+
+  if ((mP != NULL) && (mP->value != metaID))
+  {
+    std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->value + "/";
+    
+    response.fill(SccBadRequest, details);
+    answer = response.render(ciP->outFormat, "", false, false);
+    parseDataP->upcar.res.release();
+
+    return answer;
+  }
+
+
+  // 04. Fill in UpdateContextRequest
+  parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, metaID, "APPEND");
+
+
+  // 05. Call postUpdateContext
+  postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 06. Fill in StatusCode from UpdateContextResponse
+  response.fill(parseDataP->upcrs.res);
+
+
+  // 07. Render result
+  answer = response.render(ciP->outFormat, "", false, false);
+
+
+  // 08. Cleanup and return result
+  response.release();
+  parseDataP->upcar.res.release();
+  parseDataP->upcr.res.release();
+  parseDataP->upcrs.res.release();
+
+  return answer;
+}
+
+
+#if 0
+  // Any metadata ID in the payload?
+  // If so, the value must be equal to the {metaID} of the URL
+  //
+  Metadata* mP = upcarP->metadataVector.lookupByName("ID");
+
+  if ((mP != NULL) && (mP->value != metaID))
+  {
         std::string out;
 
-        out = restErrorReplyGet(ciP,
-                                ciP->outFormat,
-                                "", "StatusCode",
-                                SccBadRequest,
-                                std::string("unmatching metadata ID value URI/payload: /") +
-                                  valueId + "/ vs /" + mP->value + "/");
+        out = restErrorReplyGet(ciP, ciP->outFormat, "", "StatusCode", SccBadRequest,
+                                std::string("unmatching metadata ID value URI/payload: /") + metaID + "/ vs /" + mP->value + "/");
         return out;
-      }
-      else
-      {
-        idFound = true;
-      }
-    }
   }
 
 
@@ -99,11 +159,13 @@ std::string postAttributeValueInstanceWithTypeAndId
   attributeP->metadataVector.fill((MetadataVector*) &upcarP->metadataVector);
 
   // If no "ID" metadata was in the payload, add it
-  if (idFound == false)
+  if (mP == NULL)
   {
-    Metadata* mP = new Metadata("ID", "", valueId);
-    attributeP->metadataVector.push_back(mP);
+    mP = new Metadata("ID", "", metaID);
   }
+
+  attributeP->metadataVector.push_back(mP);
+
 
   // Filling the rest of the structure for mongoUpdateContext
   ceP->entityId.fill(entityId, entityType, "false");
@@ -147,3 +209,4 @@ std::string postAttributeValueInstanceWithTypeAndId
   request.release();
   return statusCode.render(ciP->outFormat, "", false, false);
 }
+#endif
