@@ -142,24 +142,6 @@ Test suite for %{name}
 
 %files tests -f MANIFEST.broker-tests
 
-%package -n %{name}-fiware
-Requires: %{name} = %{broker_version}-%{broker_release}, %{name}-tests = %{broker_version}-%{broker_release}
-Summary: FI-WARE NGSI Broker - Telefónica I+D Implementation
-Version: %{fiware_version}
-Release: %{fiware_release}
-%description -n %{name}-fiware
-The Orion Context Broker is an implementation of the NGSI9 and NGSI10 interfaces. 
-Using these interfaces, clients can do several operations:
-* Register context producer applications, e.g. a temperature sensor within a room.
-* Update context information, e.g. send updates of temperature.
-* Being notified when changes on context information take place (e.g. the
-  temperature has changed) or with a given frecuency (e.g. get the temperature
-  each minute).
-* Query context information. The Orion Context Broker stores context information
-  updated from applications, so queries are resolved based on that information.
-
-%files -n %{name}-fiware
-
 %preun
 if [ "$1" == "0" ]; then
   /etc/init.d/%{name} stop
@@ -167,12 +149,6 @@ if [ "$1" == "0" ]; then
 fi
 
 %preun tests
-
-%preun -n %{name}-fiware
-if [ "$1" == "0" ]; then
-  /etc/init.d/%{name} stop
-  /sbin/chkconfig --del %{name}
-fi
 
 %postun 
 if [ "$1" == "0" ]; then
@@ -183,12 +159,6 @@ fi
 %postun tests
 if [ "$1" == "0" ]; then
   rm -rf  /usr/share/contextBroker/tests
-fi
-
-%postun -n %{name}-fiware
-if [ "$1" == "0" ]; then
-  rm -rf  /usr/share/contextBroker
-  /usr/sbin/userdel -f %{owner}
 fi
 
 %changelog

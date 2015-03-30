@@ -31,7 +31,7 @@ progName=$0
 #
 function usage
 {
-  echo "$progName <NEW_VERSION> <BROKER_RELEASE> <FIWARE_VERSION> <FIWARE_RELEASE> <changelog-file>"
+  echo "$progName <NEW_VERSION> <BROKER_RELEASE> <changelog-file>"
   exit 1
 }
 
@@ -56,9 +56,7 @@ fi
 #
 export NEW_VERSION=$1
 export BROKER_RELEASE=$2
-export FIWARE_VERSION=$3
-export FIWARE_RELEASE=$4
-export CHANGELOG_FILE=$5
+export CHANGELOG_FILE=$3
 
 
 
@@ -66,7 +64,7 @@ export CHANGELOG_FILE=$5
 # correct date format
 #
 DATE=$(LANG=C date +"%a %b %d %Y")
-export dateLine="$DATE Fermin Galan <fermin@tid.es> ${NEW_VERSION}-${BROKER_RELEASE} (FIWARE-${FIWARE_VERSION}-${FIWARE_RELEASE})"
+export dateLine="$DATE Fermin Galan <fermin.galanmarquez@telefonica.com> ${NEW_VERSION}-${BROKER_RELEASE}"
 
 
 # Modify rpm/SPECS/contextBroker.spec only when step to a non-deve release
@@ -180,7 +178,7 @@ then
        git checkout -b release/$NEW_VERSION
        # FIXME: disabled so the releasing script doesn't automatically produce a tag, according to
        # REL procedures
-       #git tag $NEW_VERSION-FIWARE-$FIWARE_VERSION
+       #git tag $NEW_VERSION
        #git push --tags origin release/$NEW_VERSION
        git push origin release/$NEW_VERSION
 
