@@ -28,10 +28,10 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenience/UpdateContextElementResponse.h"
-#include "convenienceMap/mapPutIndividualContextEntity.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "convenience/UpdateContextElementResponse.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 
