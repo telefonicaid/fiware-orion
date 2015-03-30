@@ -40,6 +40,7 @@
 *
 * postAttributeValueInstanceWithTypeAndId - 
 *
+* POST /v1/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
 * POST /ngsi10/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
 *
 * Payload In:  UpdateContextAttributeRequest
