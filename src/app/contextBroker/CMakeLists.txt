@@ -31,7 +31,6 @@ SET (STATIC_LIBS
     mongoBackend
     ngsiNotify
     serviceRoutines
-    convenienceMap
     mongoBackend
     rest
     jsonParse
