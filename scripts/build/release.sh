@@ -169,15 +169,11 @@ then
     # We do the tag only and merge to master only in the case of  non "dev" release
     if [ "$BROKER_RELEASE" != "dev" ]
     then
-       # FIXME: disabled so the releasing script doesn't automatically produce a merge commit into
-       # master, according to REL procedures
        git checkout master
        git pull
        git merge develop
        git push origin master
        git checkout -b release/$NEW_VERSION
-       # FIXME: disabled so the releasing script doesn't automatically produce a tag, according to
-       # REL procedures
        git tag $NEW_VERSION
        git push --tags origin release/$NEW_VERSION
        git push origin release/$NEW_VERSION
