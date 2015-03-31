@@ -89,6 +89,12 @@ function dbInit()
   elif [ "$role" == "CP3" ]
   then
     echo 'db.dropDatabase()' | mongo ${CP3_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP4" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP4_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP5" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP5_DATABASE_NAME} --quiet
   else
     echo 'db.dropDatabase()' | mongo $db --quiet
   fi
@@ -164,6 +170,16 @@ function localBrokerStart()
     mkdir -p $CP3_LOG_DIR
     port=$CP3_PORT
     CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -db $CP3_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
+  elif [ "$role" == "CP4" ]
+  then
+    mkdir -p $CP4_LOG_DIR
+    port=$CP4_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP4_PORT -pidpath $CP4_PID_FILE -db $CP4_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
+  elif [ "$role" == "CP5" ]
+  then
+    mkdir -p $CP5_LOG_DIR
+    port=$CP5_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP5_PORT -pidpath $CP5_PID_FILE -db $CP5_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -209,6 +225,12 @@ function localBrokerStop
   elif [ "$role" == "CP3" ]
   then
     port=$CP3_PORT
+  elif [ "$role" == "CP4" ]
+  then
+    port=$CP4_PORT
+  elif [ "$role" == "CP5" ]
+  then
+    port=$CP5_PORT
   fi
 
   # Test to see if we have a broker running on $port if so kill it!
@@ -294,6 +316,14 @@ function brokerStop
   then
     pidFile=$CP3_PID_FILE
     port=$CP3_PORT
+  elif [ "$role" == "CP4" ]
+  then
+    pidFile=$CP4_PID_FILE
+    port=$CP4_PORT
+  elif [ "$role" == "CP5" ]
+  then
+    pidFile=$CP5_PID_FILE
+    port=$CP5_PORT
   fi
 
   if [ "$VALGRIND" == "" ]; then

@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 
+#include "parseArgs/baStd.h"    // BA_FT for temporal debugging purposes
+
 #include "common/string.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
@@ -67,6 +69,26 @@ std::string postQueryContext
   std::string            answer;
 
   ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, qcrP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+
+  LM_M(("KZ: Got a reply from mongoQueryContext with %d contextElementResponses", qcrP->contextElementResponseVector.size()));
+  for (unsigned int ix = 0 ; ix < qcrP->contextElementResponseVector.size(); ++ix)
+  {
+    ContextElementResponse* cerP = qcrP->contextElementResponseVector[ix];
+
+    LM_M(("KZ: contextElement %d contains %d attributes", ix, cerP->contextElement.contextAttributeVector.size()));
+
+    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP = cerP->contextElement.contextAttributeVector[aIx];
+
+      LM_M(("KZ: Attribute %d in contextElement %d:", aIx, ix));
+      LM_M(("KZ:   name:      '%s'", aP->name.c_str()));
+      LM_M(("KZ:   type:      '%s'", aP->type.c_str()));
+      LM_M(("KZ:   value:     '%s'", aP->value.c_str()));
+      LM_M(("KZ:   found:     '%s'", BA_FT(aP->found)));
+      LM_M(("KZ:   provApp:   '%s'", aP->providingApplication.c_str()));
+    }
+  }
 
   // If no redirectioning is necessary, just return the result
   if (qcrP->errorCode.code != SccFound)

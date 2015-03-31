@@ -47,6 +47,7 @@ typedef struct QueryContextRequest
   Restriction       restriction;    // Optional
 
   int               restrictions;
+  std::string       contextProvider;  // Not part of the payload - used internally only
 
   QueryContextRequest();
   std::string   render(RequestType requestType, Format format, const std::string& indent);
