@@ -451,12 +451,14 @@ function accumulatorStart()
 #
 function accumulatorDump()
 {
-  if [ "$VALGRIND" == "1" ]
-  then
-    sleep 2
-  fi
+  valgrindSleep 2
 
-  curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER_PORT}/dump -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+  fi
 }
 
 
@@ -466,12 +468,14 @@ function accumulatorDump()
 #
 function accumulator2Dump()
 {
-  if [ "$VALGRIND" == "1" ]
-  then
-    sleep 2
-  fi
+  valgrindSleep 2
 
-  curl localhost:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+  fi
 }
 
 

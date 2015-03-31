@@ -125,11 +125,12 @@ orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
 echo "6: ++++++++++++++++++++"
 #Get accumulated data
 valgrindSleep 2
-curl -g [::1]:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+accumulator2Dump IPV6
 
 echo "7: ++++++++++++++++++++"
 #Get accumulated data
-curl 127.0.0.1:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
+
 
 --REGEXPECT--
 1: ++++++++++++++++++++
