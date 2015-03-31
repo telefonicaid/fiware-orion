@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITY_H_
-#define SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITY_H_
+#ifndef SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTAVAILABILITYCONVOP_H_
+#define SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTAVAILABILITYCONVOP_H_
 
 /*
 *
@@ -26,26 +26,23 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "mongoBackend/MongoGlobal.h"
-#include "ngsi/ContextElementResponse.h"
+#include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpStatusCode.h"
-#include "rest/EntityTypeInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* mapGetIndividualContextEntity - 
+* postSubscribeContextAvailabilityConvOp - 
 */
-extern HttpStatusCode mapGetIndividualContextEntity
+extern std::string postSubscribeContextAvailabilityConvOp
 (
-  const std::string&       entityId,
-  const std::string&       entityType,
-  EntityTypeInfo           typeInfo,
-  ContextElementResponse*  response,
-  ConnectionInfo*          ciP
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 );
 
-#endif  // SRC_LIB_CONVENIENCEMAP_MAPGETINDIVIDUALCONTEXTENTITY_H_
+#endif  // SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTAVAILABILITYCONVOP_H_

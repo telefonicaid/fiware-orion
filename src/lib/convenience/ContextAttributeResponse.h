@@ -61,7 +61,11 @@ typedef struct ContextAttributeResponse
                     std::string      predetectedError,
                     int              counter);
   void        fill(ContextAttributeVector* _cavP, const StatusCode& _statusCode);
-  void        fill(QueryContextResponse* qcrP, const std::string& entityId, const std::string& entityType);
+  void        fill(QueryContextResponse*  qcrP,
+                   const std::string&     entityId,
+                   const std::string&     entityType,
+                   const std::string&     attributeName,
+                   const std::string&     metaID);
 } ContextAttributeResponse;
 
 #endif  // SRC_LIB_CONVENIENCE_CONTEXTATTRIBUTERESPONSE_H_

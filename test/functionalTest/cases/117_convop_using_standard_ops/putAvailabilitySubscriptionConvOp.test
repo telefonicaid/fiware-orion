@@ -26,6 +26,7 @@ ConvOp putAvailabilitySubscriptionConvOp: PUT /v1/registry/contextAvailabilitySu
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+accumulatorStart
 
 --SHELL--
 
@@ -34,7 +35,11 @@ brokerStart CB
 # 02. subscriptionId in payload not matching subscriptionId in URL
 # 03. Invalid subscriptionId
 # 04. Subscribe to E1/A1
-# 05. Update the subscription to E1/A1
+# 05. Update the subscription to E1/A1 to be E1/A2 instead
+# 06. Register E1/A2
+# 07. See notification of E1/A2 in accumulator
+# 08. Register E1/A1
+# 09. See no notification of E1/A1 in accumulator
 #
 
 
@@ -43,7 +48,7 @@ echo "============================================="
 payload='{
   "entities": [
     {
-      "type": "",
+      "type": "T1",
       "isPattern": "false",
       "id": "E1"
     }
@@ -64,7 +69,7 @@ echo "================================================================"
 payload='{
   "entities": [
     {
-      "type": "",
+      "type": "T1",
       "isPattern": "false",
       "id": "E1"
     }
@@ -85,7 +90,7 @@ echo "=========================="
 payload='{
   "entities": [
     {
-      "type": "",
+      "type": "T1",
       "isPattern": "false",
       "id": "E1"
     }
@@ -106,7 +111,7 @@ echo "======================"
 payload='{
   "entities": [
     {
-      "type": "",
+      "type": "T1",
       "isPattern": "false",
       "id": "E1"
     }
@@ -114,7 +119,7 @@ payload='{
   "attributes": [
     "A1"
   ], 
-  "reference": "http://10.1.1.1:80/test/interfaceNotification", 
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
   "duration": "PT1M"
 }'
 orionCurl --url /v1/registry/subscribeContextAvailability --payload "$payload" --json
@@ -123,12 +128,12 @@ echo
 echo
 
 
-echo "05. Update the subscription to E1/A1"
-echo "===================================="
+echo "05. Update the subscription to E1/A1 to be E1/A2 instead"
+echo "========================================================"
 payload='{
   "entities": [
     {
-      "type": "",
+      "type": "T1",
       "isPattern": "false",
       "id": "E1"
     }
@@ -140,6 +145,79 @@ payload='{
   "subscriptionId" : "'$SUB_ID'"
 }'
 orionCurl --url /v1/registry/contextAvailabilitySubscriptions/$SUB_ID --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "06. Register E1/A2"
+echo "=================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A2",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${LISTENER_PORT}'/notify"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "07. See notification of E1/A2 in accumulator"
+echo "============================================"
+curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+echo
+echo
+
+
+
+echo "08. Register E1/A1"
+echo "=================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${LISTENER_PORT}'/notify"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "09. See no notification of E1/A1 in accumulator"
+echo "==============================================="
+curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
 echo
 echo
 
@@ -208,8 +286,8 @@ Date: REGEX(.*)
 }
 
 
-05. Update the subscription to E1/A1
-====================================
+05. Update the subscription to E1/A1 to be E1/A2 instead
+========================================================
 HTTP/1.1 200 OK
 Content-Length: 75
 Content-Type: application/json
@@ -221,6 +299,105 @@ Date: REGEX(.*)
 }
 
 
+06. Register E1/A2
+==================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+07. See notification of E1/A2 in accumulator
+============================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 505
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "contextRegistrationResponses" : [
+    {
+      "contextRegistration" : {
+        "entities" : [
+          {
+            "type" : "T1",
+            "isPattern" : "false",
+            "id" : "E1"
+          }
+        ],
+        "attributes" : [
+          {
+            "name" : "A2",
+            "type" : "string",
+            "isDomain" : "false"
+          }
+        ],
+        "providingApplication" : "http://localhost:9997/notify"
+      }
+    }
+  ]
+}
+=======================================
+
+
+08. Register E1/A1
+==================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+09. See no notification of E1/A1 in accumulator
+===============================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 505
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "contextRegistrationResponses" : [
+    {
+      "contextRegistration" : {
+        "entities" : [
+          {
+            "type" : "T1",
+            "isPattern" : "false",
+            "id" : "E1"
+          }
+        ],
+        "attributes" : [
+          {
+            "name" : "A2",
+            "type" : "string",
+            "isDomain" : "false"
+          }
+        ],
+        "providingApplication" : "http://localhost:9997/notify"
+      }
+    }
+  ]
+}
+=======================================
+
+
 --TEARDOWN--
 brokerStop CB
+accumulatorStop
 dbDrop CB

@@ -110,7 +110,7 @@ std::string deleteAllEntitiesWithTypeAndId
 
 
   // 03. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(entityId, entityType, "", "", "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityType, "", "", "", "DELETE");
 
 
   // 04. Call Standard Operation
@@ -123,6 +123,8 @@ std::string deleteAllEntitiesWithTypeAndId
 
   // 06. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
+  parseDataP->upcr.res.release();
+  response.release();
 
   return answer;
 }

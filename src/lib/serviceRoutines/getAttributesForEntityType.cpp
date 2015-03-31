@@ -37,6 +37,15 @@
 /* ****************************************************************************
 *
 * getAttributesForEntityType -
+*
+* GET /v1/contextTypes/{entity::type}
+*
+* Payload In:  None
+* Payload Out: EntityTypeAttributesResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+*
 */
 std::string getAttributesForEntityType
 (

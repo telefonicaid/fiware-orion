@@ -157,11 +157,12 @@ void QueryContextRequest::fill
 (
   const std::string& entityId,
   const std::string& entityType,
+  const std::string& isPattern,
   EntityTypeInfo     typeInfo,
   const std::string& attributeName
 )
 {
-  EntityId* eidP = new EntityId(entityId, entityType, "false");
+  EntityId* eidP = new EntityId(entityId, entityType, isPattern);
 
   entityIdVector.push_back(eidP);
 

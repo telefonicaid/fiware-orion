@@ -29,6 +29,7 @@
 #include "ngsi/EntityId.h"
 #include "ngsi10/QueryContextRequest.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/EntityTypeInfo.h"
 #include "rest/uriParamNames.h"
 #include "serviceRoutines/getAllContextEntities.h"
 #include "serviceRoutines/postQueryContext.h"
@@ -38,6 +39,25 @@
 /* ****************************************************************************
 *
 * getAllContextEntities - 
+*
+* GET /v1/contextEntities
+*
+* Payload In:  None
+* Payload Out: QueryContextResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+*   - entity::type=XXX
+*   - !exist=entity::type
+*   - exist=entity::type
+*   - offset=XXX
+*   - limit=XXX
+*   - details=on
+*
+* 01. Get values from URL (entityId::type, exist, !exist
+* 02. Fill in QueryContextRequest
+* 03. Call standard op postQueryContext
+* 04. Cleanup and return result
 */
 std::string getAllContextEntities
 (
@@ -47,16 +67,31 @@ std::string getAllContextEntities
   ParseData*                 parseDataP
 )
 {
-  QueryContextRequest*  reqP   = &parseDataP->qcr.res;
-  EntityId*             eP     = new EntityId(".*", "", "true");
-  std::string           res;
+  std::string     typeName  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  EntityTypeInfo  typeInfo  = EntityTypeEmptyOrNotEmpty;
+  std::string     answer;
 
-  eP->type = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
-  reqP->entityIdVector.push_back(eP);
+  // 01. Get values from URL (entityId::type, exist, !exist)
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
 
-  res = postQueryContext(ciP, components, compV, parseDataP);
-  delete eP;
 
-  return res;
+  // 02. Fill in QueryContextRequest
+  parseDataP->qcr.res.fill(".*", typeName, "true", typeInfo, "");
+  
+
+  // 03. Call standard op postQueryContext
+  answer = postQueryContext(ciP, components, compV, parseDataP);
+
+
+  // 04. Cleanup and return result
+  parseDataP->qcr.res.release();
+  return answer;
 }

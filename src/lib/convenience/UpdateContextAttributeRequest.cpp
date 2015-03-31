@@ -167,7 +167,7 @@ void UpdateContextAttributeRequest::release(void)
 
   if (compoundValueP != NULL)
   {
-   delete compoundValueP;
-   compoundValueP = NULL;
+    delete compoundValueP;
+    compoundValueP = NULL;
   }
 }

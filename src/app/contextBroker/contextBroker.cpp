@@ -112,6 +112,8 @@
 #include "serviceRoutines/postNotifyContext.h"
 #include "serviceRoutines/postNotifyContextAvailability.h"
 
+#include "serviceRoutines/postSubscribeContextConvOp.h"
+#include "serviceRoutines/postSubscribeContextAvailabilityConvOp.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
 #include "serviceRoutines/postContextEntitiesByEntityId.h"
 #include "serviceRoutines/getContextEntityAttributes.h"
@@ -206,6 +208,7 @@ char            httpsCertFile[1024];
 bool            https;
 bool            mtenant;
 char            rush[256];
+double          timeout;
 
 
 
@@ -226,6 +229,7 @@ char            rush[256];
 #define DBUSER_DESC         "database user"
 #define DBPASSWORD_DESC     "database password"
 #define DB_DESC             "database name"
+#define TIMEOUT_DESC        "timeout in seconds for connections to the replica set (ignored in the case of not using replica set)"
 #define FWDHOST_DESC        "host for forwarding NGSI9 regs"
 #define FWDPORT_DESC        "port for forwarding NGSI9 regs"
 #define NGSI9_DESC          "run as Configuration Manager"
@@ -256,6 +260,7 @@ PaArgument paArgs[] =
   { "-dbuser",       user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
   { "-dbpwd",        pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
   { "-db",           dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
+  { "-timeout",      &timeout,      "TIMEOUT",        PaDouble, PaOpt, 10,         PaNL,   PaNL,  TIMEOUT_DESC       },
 
   { "-fwdHost",      fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
   { "-fwdPort",      &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
@@ -633,7 +638,7 @@ PaArgument paArgs[] =
   { "POST",   CTAA,  CTAA_COMPS_V0,        CTAA_POST_WORD,  postContextEntityTypeAttribute            }, \
   { "*",      CTAA,  CTAA_COMPS_V0,        "",              badVerbGetPostOnly                        }, \
                                                                                                          \
-  { "POST",   SCA,   SCA_COMPS_V0,         SCA_POST_WORD,   postSubscribeContextAvailability          }, \
+  { "POST",   SCA,   SCA_COMPS_V0,         SCA_POST_WORD,   postSubscribeContextAvailabilityConvOp    }, \
   { "*",      SCA,   SCA_COMPS_V0,         "",              badVerbPostOnly                           }, \
                                                                                                          \
   { "PUT",    SCAS,  SCAS_COMPS_V0,        SCAS_PUT_WORD,   putAvailabilitySubscriptionConvOp         }, \
@@ -709,7 +714,7 @@ PaArgument paArgs[] =
   { "GET",    CETAA, CETAA_COMPS_V0,       "",              getNgsi10ContextEntityTypesAttribute      }, \
   { "*",      CETAA, CETAA_COMPS_V0,       "",              badVerbGetOnly                            }, \
                                                                                                          \
-  { "POST",   SC,    SC_COMPS_V0,          SC_POST_WORD,    postSubscribeContext                      }, \
+  { "POST",   SC,    SC_COMPS_V0,          SC_POST_WORD,    postSubscribeContextConvOp                }, \
   { "*",      SC,    SC_COMPS_V0,          "",              badVerbPostOnly                           }, \
                                                                                                          \
   { "PUT",    SCS,   SCS_COMPS_V0,         SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
@@ -751,7 +756,7 @@ PaArgument paArgs[] =
   { "GET",    CETAA, CETAA_COMPS_V1,         "",              getNgsi10ContextEntityTypesAttribute      }, \
   { "*",      CETAA, CETAA_COMPS_V1,         "",              badVerbGetOnly                            }, \
                                                                                                            \
-  { "POST",   SC,    SC_COMPS_V1,            SC_POST_WORD,    postSubscribeContext                      }, \
+  { "POST",   SC,    SC_COMPS_V1,            SC_POST_WORD,    postSubscribeContextConvOp                }, \
   { "*",      SC,    SC_COMPS_V1,            "",              badVerbPostOnly                           }, \
                                                                                                            \
   { "PUT",    SCS,   SCS_COMPS_V1,           SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
@@ -1135,11 +1140,10 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 *
 * mongoInit -
 */
-static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd)
+static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, double timeout)
 {
-  LM_T(LmtBug, ("dbName: '%s'", dbName.c_str()));
 
-  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant))
+  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, timeout))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -1334,8 +1338,6 @@ int main(int argC, char* argV[])
   lmTraceLevelSet(LmtBug, true);
 #endif
 
-  LM_T(LmtBug, ("dbName: '%s'", dbName));
-
   if (strlen(dbName) > DB_NAME_MAX_LEN)
   {
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
@@ -1391,7 +1393,7 @@ int main(int argC, char* argV[])
 
   pidFile();
   orionInit(orionExit, ORION_VERSION);
-  mongoInit(dbHost, rplSet, dbName, user, pwd);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, timeout);
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 

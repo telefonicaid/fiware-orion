@@ -170,9 +170,12 @@ void MetadataVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    LM_T(LmtRelease, ("Releasing Metadata %d", ix));
-    vec[ix]->release();
-    delete vec[ix];
+    if (vec[ix] != NULL)
+    {
+      vec[ix]->release();
+      delete vec[ix];
+      vec[ix] = NULL;
+    }
   }
 
   vec.clear();
@@ -192,4 +195,23 @@ void MetadataVector::fill(MetadataVector* mvP)
 
     push_back(mP);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* MetadataVector::lookupByName - 
+*/
+Metadata* MetadataVector::lookupByName(const std::string& _name)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->name == _name)
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
 }

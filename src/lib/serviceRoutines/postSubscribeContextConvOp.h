@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITY_H_
-#define SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITY_H_
+#ifndef SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTCONVOP_H_
+#define SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTCONVOP_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -26,26 +26,24 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "convenience/UpdateContextElementRequest.h"
-#include "convenience/UpdateContextElementResponse.h"
-#include "mongoBackend/MongoGlobal.h"
+
 #include "rest/ConnectionInfo.h"
-#include "rest/HttpStatusCode.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* mapPutIndividualContextEntity - 
+* postSubscribeContextConvOp - 
 */
-extern HttpStatusCode mapPutIndividualContextEntity
+extern std::string postSubscribeContextConvOp
 (
-  const std::string&             entityId,
-  const std::string&             entityType,
-  UpdateContextElementRequest*   ucerP,
-  UpdateContextElementResponse*  response,
-  ConnectionInfo*                ciP
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 );
 
-#endif  // SRC_LIB_CONVENIENCEMAP_MAPPUTINDIVIDUALCONTEXTENTITY_H_
+#endif  // SRC_LIB_SERVICEROUTINES_POSTSUBSCRIBECONTEXTCONVOP_H_

@@ -142,24 +142,6 @@ Test suite for %{name}
 
 %files tests -f MANIFEST.broker-tests
 
-%package -n %{name}-fiware
-Requires: %{name} = %{broker_version}-%{broker_release}, %{name}-tests = %{broker_version}-%{broker_release}
-Summary: FI-WARE NGSI Broker - Telefónica I+D Implementation
-Version: %{fiware_version}
-Release: %{fiware_release}
-%description -n %{name}-fiware
-The Orion Context Broker is an implementation of the NGSI9 and NGSI10 interfaces. 
-Using these interfaces, clients can do several operations:
-* Register context producer applications, e.g. a temperature sensor within a room.
-* Update context information, e.g. send updates of temperature.
-* Being notified when changes on context information take place (e.g. the
-  temperature has changed) or with a given frecuency (e.g. get the temperature
-  each minute).
-* Query context information. The Orion Context Broker stores context information
-  updated from applications, so queries are resolved based on that information.
-
-%files -n %{name}-fiware
-
 %preun
 if [ "$1" == "0" ]; then
   /etc/init.d/%{name} stop
@@ -167,12 +149,6 @@ if [ "$1" == "0" ]; then
 fi
 
 %preun tests
-
-%preun -n %{name}-fiware
-if [ "$1" == "0" ]; then
-  /etc/init.d/%{name} stop
-  /sbin/chkconfig --del %{name}
-fi
 
 %postun 
 if [ "$1" == "0" ]; then
@@ -185,13 +161,22 @@ if [ "$1" == "0" ]; then
   rm -rf  /usr/share/contextBroker/tests
 fi
 
-%postun -n %{name}-fiware
-if [ "$1" == "0" ]; then
-  rm -rf  /usr/share/contextBroker
-  /usr/sbin/userdel -f %{owner}
-fi
-
 %changelog
+* Tue Mar 31 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.20.0-1
+- Add: new CLI parameter '-timeout' to specify DB connection timeout in the case of using MongoDB replica sets (Issue #589).
+- Fix: All convenience operations to use the service routines of standard operations (Issue #117)
+- Fix: Correct rendering of response to convop "POST /v1/contextEntities/{entityId::id}/attributes/{attributeName} (Issue #772)
+- Fix: Made 'POST /v1/contextEntities/{entityId::id}' and 'POST /v1/contextEntities' accept entity::id and entity::type
+       in both payload and URL, as long as the values coincide.
+- Fix: A few more of the 'responses without entityId::type filled in' found and fixed (Issue #585)
+- Fix: The convenience operations "/v1/contextAttributes/{entity::id}/attributes" now share implementation with
+       convenience operations "/v1/contextAttributes/{entity::id}" and are thus 100% identical.
+- Fix: The convenience operation "PUT /v1/contextAttributes/{entity::id}/attributes/{attribute::name}" had a bug
+       about the metadata in the update, this error has been fixed.
+- Fix: A registerContext request that uses associations must specify "attributeAssociations" instead of "attributes" to be consistent with DiscoveContextAvailability messages (Issue #823).
+- Fix: Fixed a bug that made the broker crash when compound attribute values were used in convenience operations.
+- Fix: Implemented URI-parameter 'notifyFormat=XML/JSON' for NGSI9 subscriptions.
+
 * Wed Feb 11 2015 Fermin Galan <fermin@tid.es> 0.19.0-1 (FIWARE-4.2.2-1)
 - Fix: The option '-multiservice' was ignored and the broker ran always in multiservice mode. Now the option is taken taken into account (Issue #725)
 - Fix: Forwarded requests always in XML (Issue #703)

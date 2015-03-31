@@ -41,6 +41,16 @@
 
 /* ****************************************************************************
 *
+* ContextAttribute::~ContextAttribute - 
+*/
+ContextAttribute::~ContextAttribute()
+{
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::ContextAttribute - 
 */
 ContextAttribute::ContextAttribute()
@@ -130,7 +140,7 @@ ContextAttribute::ContextAttribute
 
   name                  = _name;
   type                  = _type;
-  compoundValueP        = _compoundValueP;
+  compoundValueP        = _compoundValueP->clone();
   typeFromXmlAttribute  = "";
   providingApplication  = "";
   found                 = true;
@@ -371,4 +381,15 @@ void ContextAttribute::release(void)
 std::string ContextAttribute::toString(void)
 {
   return name;
+}
+
+
+
+/* ****************************************************************************
+*
+* clone - 
+*/
+ContextAttribute* ContextAttribute::clone(void)
+{
+  return new ContextAttribute(this);
 }

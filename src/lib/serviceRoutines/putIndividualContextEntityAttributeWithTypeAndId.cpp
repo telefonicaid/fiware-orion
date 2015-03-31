@@ -100,7 +100,7 @@ std::string putIndividualContextEntityAttributeWithTypeAndId
   else
   {
     // 03. Fill in UpdateContextRequest
-    parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "UPDATE");
+    parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, "", "UPDATE");
 
     // 04. Call standard operation postUpdateContext
     postUpdateContext(ciP, components, compV, parseDataP);
@@ -114,5 +114,7 @@ std::string putIndividualContextEntityAttributeWithTypeAndId
   answer = response.render(ciP->outFormat, "", false, false);
   parseDataP->upcar.res.release();
   parseDataP->upcrs.res.release();
+  parseDataP->upcr.res.release();
+
   return answer;
 }

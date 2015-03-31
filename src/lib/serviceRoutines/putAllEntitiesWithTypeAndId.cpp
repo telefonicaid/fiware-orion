@@ -31,8 +31,8 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 #include "convenience/UpdateContextElementResponse.h"
-#include "convenienceMap/mapPutIndividualContextEntity.h"
 #include "serviceRoutines/putAllEntitiesWithTypeAndId.h"
 #include "serviceRoutines/postUpdateContext.h"
 
@@ -125,6 +125,7 @@ extern std::string putAllEntitiesWithTypeAndId
 
   // 06. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
+  parseDataP->upcr.res.release();
   response.release();
 
   return answer;

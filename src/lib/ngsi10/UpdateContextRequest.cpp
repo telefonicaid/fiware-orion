@@ -189,6 +189,7 @@ void UpdateContextRequest::fill
   const std::string& entityType,
   const std::string& isPattern,
   const std::string& attributeName,
+  const std::string& metaID,
   const std::string& _updateActionType
 )
 {
@@ -203,6 +204,13 @@ void UpdateContextRequest::fill
   {
     ContextAttribute* caP = new ContextAttribute(attributeName, "", "");
     ceP->contextAttributeVector.push_back(caP);
+
+    if (metaID != "")
+    {
+      Metadata* mP = new Metadata("ID", "", metaID);
+
+      caP->metadataVector.push_back(mP);
+    }
   }
 }
 
@@ -218,6 +226,7 @@ void UpdateContextRequest::fill
   const std::string&                   entityId,
   const std::string&                   entityType,
   const std::string&                   attributeName,
+  const std::string&                   metaID,
   const std::string&                   _updateActionType
 )
 {
@@ -238,6 +247,25 @@ void UpdateContextRequest::fill
   ceP->entityId.fill(entityId, entityType, "false");
 
   contextElementVector.push_back(ceP);
-  
+
+  //
+  // If there is a metaID, then the metadata named ID must exist.
+  // If it doesn't exist already, it must be created
+  //
+  if (metaID != "")
+  {
+    Metadata* mP = caP->metadataVector.lookupByName("ID");
+
+    if (mP == NULL)
+    {
+      mP = new Metadata("ID", "", metaID);
+      caP->metadataVector.push_back(mP);
+    }
+    else if (mP->value != metaID)
+    {
+      LM_W(("Bad Input (metaID differs in URI and payload"));
+    }
+  }
+
   updateActionType.set(_updateActionType);
 }
