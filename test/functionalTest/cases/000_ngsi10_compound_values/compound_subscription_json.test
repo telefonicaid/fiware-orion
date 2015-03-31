@@ -120,7 +120,8 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 
 #Get accumulated data
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
+
 
 --REGEXPECT--
 1: +++++++++ Prepare subscription +++++++++++

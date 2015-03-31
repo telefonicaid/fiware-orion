@@ -200,7 +200,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 sleep 1
 
 echo "=== Get accumulated data (4 messages)"
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 
 --REGEXPECT--
 === 1. Create ONTIMEINTERVAL subscription

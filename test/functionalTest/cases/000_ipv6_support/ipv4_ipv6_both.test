@@ -124,6 +124,7 @@ orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
 
 echo "6: ++++++++++++++++++++"
 #Get accumulated data
+valgrindSleep 2
 curl -g [::1]:${LISTENER2_PORT}/dump -s -S 2> /dev/null
 
 echo "7: ++++++++++++++++++++"

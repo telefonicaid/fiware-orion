@@ -254,7 +254,7 @@ echo
 
 echo "09. Dump accumulator, see A1 in JSON, A2 in XML, A3 in XML and A4 in JSON"
 echo "========================================================================="
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
 echo
 echo
 

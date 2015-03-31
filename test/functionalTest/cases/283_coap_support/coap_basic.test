@@ -26,10 +26,12 @@ Coap Basic interaction
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+valgrindSleep 2
 proxyCoapStart
 
 --SHELL--
 
+valgrindSleep 2
 echo "+++++++ Create entity +++++++++"
 url="/v1/contextEntities/Room1"
 payload='{
@@ -44,6 +46,7 @@ payload='{
 coapCurl --url "$url" --payload "$payload" --json -X post
 
 echo "+++++++ Query +++++++++"
+valgrindSleep 2
 coapCurl --url "/v1/contextEntities/Room1" --json
 
 echo "+++++++ Update +++++++++"
@@ -60,6 +63,7 @@ payload='{
 coapCurl --url "$url" --payload "$payload" --json -X put
 
 echo "+++++++ Query +++++++++"
+valgrindSleep 2
 coapCurl --url "/v1/contextEntities/Room1" --json
 
 --REGEXPECT--

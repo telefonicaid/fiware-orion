@@ -227,7 +227,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== Get accumulated data (4 messages)"
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 
 --REGEXPECT--

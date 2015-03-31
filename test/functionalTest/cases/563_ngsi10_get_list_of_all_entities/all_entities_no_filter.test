@@ -309,7 +309,7 @@ Date: REGEX(.*)
 5. Statistics
 =============
 HTTP/1.1 200 OK
-Content-Length: 275
+Content-Length: 27REGEX(\d+)
 Content-Type: application/xml
 Date: REGEX(.*)
 

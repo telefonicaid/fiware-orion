@@ -106,8 +106,8 @@ echo
 
 echo "05. Query accumulator"
 echo "====================="
-sleep 2
-curl localhost:${LISTENER_PORT}/dump -s -S
+# sleep 2
+accumulatorDump
 echo
 echo
 

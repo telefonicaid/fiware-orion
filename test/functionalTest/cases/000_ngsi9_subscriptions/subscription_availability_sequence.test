@@ -281,7 +281,7 @@ payload='<?xml version="1.0"?>
 orionCurl --url "$url" --payload "$payload"
 echo
 echo Accumulated data:
-curl localhost:${LISTENER_PORT}/dump -s -S 
+accumulatorDump
 echo
 
 --REGEXPECT--
