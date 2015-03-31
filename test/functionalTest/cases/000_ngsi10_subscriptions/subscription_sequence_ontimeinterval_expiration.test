@@ -55,10 +55,16 @@ echo "1: ++++++++++++++++++++"
 
 # to avoid a race condition in the order of notifications
 sleep 0.5s
-valgrindSleep 1
+valgrindSleep 2
 
 
-#Subscribe for 5 seconds
+#Subscribe for 5 seconds (7 if VALGRIND)
+sleepTime=PT5S
+if [ "$VALGRIND" == 1 ]
+then
+  sleepTime=PT7S
+fi
+
 url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
@@ -71,7 +77,7 @@ payload='<?xml version="1.0"?>
         <attribute>temperature</attribute>
   </attributeList>
   <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
-  <duration>PT5S</duration>
+  <duration>'${sleepTime}'</duration>
   <notifyConditions>
         <notifyCondition>
           <type>ONTIMEINTERVAL</type>
@@ -88,7 +94,6 @@ echo "2: ++++++++++++++++++++"
 
 #Sleep 10 seconds. Only 3 subscriptions arrive (at time 0, 2 and 4) as subscription expires at time=5s
 sleep 10s
-valgrindSleep 2
 accumulatorDump
 
 
@@ -131,7 +136,7 @@ Date: REGEX(.*)
 <subscribeContextResponse>
   <subscribeResponse>
     <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
-    <duration>PT5S</duration>
+    <duration>REGEX((PT5S|PT7S))</duration>
   </subscribeResponse>
 </subscribeContextResponse>
 2: ++++++++++++++++++++
