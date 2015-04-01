@@ -31,6 +31,7 @@
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextResponse.h"
+#include "ngsi10/QueryContextRequestVector.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/clientSocketHttp.h"
 #include "serviceRoutines/postQueryContext.h"
@@ -65,8 +66,9 @@ std::string postQueryContext
   // Convops calling this routine may need the response in digital
   // So, the digital response is passed back in parseDataP->qcrs.res
   //
-  QueryContextResponse*  qcrP = &parseDataP->qcrs.res;
-  std::string            answer;
+  QueryContextResponse*     qcrP = &parseDataP->qcrs.res;
+  std::string               answer;
+  QueryContextRequestVector requestV;
 
   ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, qcrP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
@@ -79,7 +81,19 @@ std::string postQueryContext
 
     for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
-      ContextAttribute* aP = cerP->contextElement.contextAttributeVector[aIx];
+      EntityId*            eP       = &cerP->contextElement.entityId;
+      ContextAttribute*    aP       = cerP->contextElement.contextAttributeVector[aIx];
+      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication);
+
+      if (requestP == NULL)
+      {
+        requestV.push_back(new QueryContextRequest(eP, aP->name));
+      }
+      else
+      {
+        requestP->attributeList.push_back_if_absent(aP->name);
+        requestP->entityIdVector.push_back_if_absent(eP);
+      }
 
       LM_M(("KZ: Attribute %d in contextElement %d:", aIx, ix));
       LM_M(("KZ:   name:      '%s'", aP->name.c_str()));

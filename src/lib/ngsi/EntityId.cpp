@@ -48,6 +48,16 @@ EntityId::EntityId() : tag("entityId")
 *
 * EntityId::EntityId -
 */
+EntityId::EntityId(EntityId* eP) : tag("entityId")
+{
+  fill(eP);
+}
+
+
+/* ****************************************************************************
+*
+* EntityId::EntityId -
+*/
 EntityId::EntityId
 (
   const std::string&  _id,

@@ -92,7 +92,9 @@ void AttributeList::present(const std::string& indent)
   PRINTF("%sAttribute List\n",    indent.c_str());
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  {
     PRINTF("%s  %s\n", indent.c_str(), attributeV[ix].c_str());
+  }
 }
 
 
@@ -110,11 +112,44 @@ void AttributeList::release(void)
 
 /* ****************************************************************************
 *
+* lookup - 
+*/
+bool AttributeList::lookup(const std::string& attributeName)
+{
+  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  {
+    if (attributeV[ix] == attributeName)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * push_back - 
 */
 void AttributeList::push_back(const std::string& attributeName)
 {
   attributeV.push_back(attributeName);
+}
+
+
+
+/* ****************************************************************************
+*
+* push_back_if_absent - 
+*/
+void AttributeList::push_back_if_absent(const std::string& attributeName)
+{
+  if (lookup(attributeName) == false)
+  {
+    attributeV.push_back(attributeName);
+  }
 }
 
 

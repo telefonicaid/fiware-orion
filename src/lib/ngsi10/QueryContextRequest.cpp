@@ -54,6 +54,18 @@ QueryContextRequest::QueryContextRequest()
 
 /* ****************************************************************************
 *
+* QueryContextRequest::QueryContextRequest
+*/
+QueryContextRequest::QueryContextRequest(EntityId* eP, const std::string& attributeName)
+{
+  entityIdVector.push_back(new EntityId(eP));
+  attributeList.push_back(attributeName);
+}
+
+
+
+/* ****************************************************************************
+*
 * QueryContextRequest::render - 
 */
 std::string QueryContextRequest::render(RequestType requestType, Format format, const std::string& indent)

@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_NGSI_ENTITYIDVECTOR_H_
-#define SRC_LIB_NGSI_ENTITYIDVECTOR_H_
+#ifndef SRC_LIB_NGSI10_QUERYCONTEXTREQUESTVECTOR_H_
+#define SRC_LIB_NGSI10_QUERYCONTEXTREQUESTVECTOR_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -28,28 +28,24 @@
 #include <string>
 #include <vector>
 
-#include "ngsi/EntityId.h"
+#include "ngsi10/QueryContextRequest.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityIdVector - 
+* QueryContextRequestVector - 
 */
-typedef struct EntityIdVector
+typedef struct QueryContextRequestVector
 {
-  std::vector<EntityId*>  vec;
+  std::vector<QueryContextRequest*>  vec;
 
-  std::string  render(Format format, const std::string& indent, bool comma = false);
-  void         present(const std::string& indent);
-  void         push_back(EntityId* item);
-  void         push_back_if_absent(EntityId* item);
-  unsigned int size(void);
-  EntityId*    get(int ix);
-  EntityId*    lookup(const std::string& name, const std::string& type, const std::string& isPattern);
-  void         release();
+  unsigned int          size(void);
+  void                  push_back(QueryContextRequest* item);
+  QueryContextRequest*  lookup(const std::string& contextProvider);
+  void                  release();
 
-  EntityId*    operator[](unsigned int ix)
+  QueryContextRequest*  operator[](unsigned int ix)
   {
     if (ix < vec.size())
     {
@@ -58,12 +54,6 @@ typedef struct EntityIdVector
 
     return NULL;
   }
+} QueryContextRequestVector;
 
-  std::string  check(RequestType         requestType,
-                     Format              format,
-                     const std::string&  indent,
-                     const std::string&  predetectedError,
-                     int                 counter);
-} EntityIdVector;
-
-#endif  // SRC_LIB_NGSI_ENTITYIDVECTOR_H_
+#endif  // SRC_LIB_NGSI10_QUERYCONTEXTREQUESTVECTOR_H_
