@@ -116,6 +116,21 @@ function dbDrop()
 
 # ------------------------------------------------------------------------------
 #
+# dbResetAll - 
+#
+function dbResetAll()
+{
+  all=$(echo show dbs | mongo --quiet | grep ftest | awk '{ print $1 }')
+  for db in $all
+  do
+    dbDrop $db
+  done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # localBrokerStart
 #
 function localBrokerStart()
@@ -427,6 +442,56 @@ function accumulatorStart()
    port_not_ok=$?
   done
 }
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorDump
+#
+function accumulatorDump()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER_PORT}/dump -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+  fi
+}
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulator2Dump
+#
+function accumulator2Dump()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+  fi
+}
+
+
+# ------------------------------------------------------------------------------
+#
+# valgrindSleep
+#
+function valgrindSleep()
+{
+  if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+  then
+    sleep $1
+  fi
+}
+
+
 
 # ------------------------------------------------------------------------------
 #
@@ -857,6 +922,7 @@ function coapCurl()
 
 export -f dbInit
 export -f dbDrop
+export -f dbResetAll
 export -f brokerStart
 export -f localBrokerStop
 export -f localBrokerStart
@@ -866,8 +932,11 @@ export -f proxyCoapStart
 export -f proxyCoapStop
 export -f accumulatorStart
 export -f accumulatorStop
+export -f accumulatorDump
+export -f accumulator2Dump
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
 export -f coapCurl
 export -f vMsg
+export -f valgrindSleep

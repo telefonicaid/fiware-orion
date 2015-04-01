@@ -131,7 +131,8 @@ orionCurl --url "$url" --payload "$payload"
 
 echo "4: ++++++++++++++++++++"
 #Get accumulated data
-curl localhost:${LISTENER_PORT}/dump -s -S 
+accumulatorDump
+
 
 --REGEXPECT--
 HTTP/1.1 200 OK

@@ -105,12 +105,7 @@ echo
 
 echo "05. Check that 2 notification arrived (initial one an the one due to step 3)"
 echo "============================================================================"
-# Get accumulated data - if running under valgrind, sleep 2 secs, to make sure the onchange notifications have time to arrive
-if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
-then
-  sleep 2
-fi
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 echo
 

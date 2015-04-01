@@ -89,7 +89,7 @@ echo
 
 echo "04. Query accumulator"
 echo "====================="
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 echo
 

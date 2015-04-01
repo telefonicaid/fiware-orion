@@ -26,6 +26,8 @@ Ignoring service header when not running in multiservice mode
 --SHELL-INIT--
 dbInit CB
 dbInit ${CB_DATABASE_NAME}-foo
+dbResetAll
+
 brokerStart CB 0-255 IPV4
 
 --SHELL--

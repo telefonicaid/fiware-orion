@@ -124,8 +124,7 @@ echo
 
 echo "04. Check that the X-Auth-Token from the subscribe request was propagated to accumulator"
 echo "========================================================================================"
-sleep 1
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 echo
 
@@ -161,8 +160,7 @@ echo
 
 echo "07. Make sure the accumulator receives the Update, with the correct X-Auth token"
 echo "================================================================================"
-sleep 1
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 echo
 

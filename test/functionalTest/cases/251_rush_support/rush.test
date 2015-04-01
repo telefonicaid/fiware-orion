@@ -86,11 +86,8 @@ echo
 
 echo "3. Accumulator dump"
 echo "+++++++++++++++++++"
-if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
-then
-  sleep 2
-fi
-curl localhost:$LISTENER_PORT/dump -s -S
+accumulatorDump
+
 
 --REGEXPECT--
 1. Subscribe to changes in  E/att
