@@ -124,7 +124,6 @@ orionCurl --url "$url" --payload "$payload" --host "[::1]" -g 2> /dev/null
 
 echo "6: ++++++++++++++++++++"
 #Get accumulated data
-valgrindSleep 2
 accumulator2Dump IPV6
 
 echo "7: ++++++++++++++++++++"
