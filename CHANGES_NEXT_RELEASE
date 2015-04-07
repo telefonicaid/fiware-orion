@@ -1,1 +1,2 @@
 - Add: context providers full functionality (Issue #787)
+- Fix: using proper GJSON for location.coords entities information (Issue #415)

@@ -1440,7 +1440,8 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     /* Add location information in the case it was found */
     if (locAttr.length() > 0) {
         insertedDocB.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                              ENT_LOCATION_COORDS << BSON_ARRAY(coordLong << coordLat)));
+                                               ENT_LOCATION_COORDS   << BSON("type" << "Point" <<
+                                                                             "coordinates" << BSON_ARRAY(coordLong << coordLat))));
     }
 
     BSONObj insertedDoc = insertedDocB.obj();
@@ -1810,8 +1811,8 @@ void processContextElement(ContextElement*                      ceP,
             // will be needed. This is a general comment, applicable to many places in the mongoBackend code
             BSONObj loc = r.getObjectField(ENT_LOCATION);
             locAttr  = loc.getStringField(ENT_LOCATION_ATTRNAME);
-            coordLong  = loc.getField(ENT_LOCATION_COORDS).Array()[0].Double();
-            coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
+            coordLong  = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[0].Double();
+            coordLat = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[1].Double();
         }
 
         if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
@@ -1830,7 +1831,8 @@ void processContextElement(ContextElement*                      ceP,
         updateSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
         if (locAttr.length() > 0) {
             updateSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                                           ENT_LOCATION_COORDS << BSON_ARRAY(coordLong << coordLat)));
+                                                ENT_LOCATION_COORDS   << BSON("type" << "Point" <<
+                                                                              "coordinates" << BSON_ARRAY(coordLong << coordLat))));
         } else {
             updateUnset.append(ENT_LOCATION, 1);
         }

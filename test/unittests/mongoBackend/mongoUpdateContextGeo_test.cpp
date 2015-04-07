@@ -77,7 +77,9 @@ static void prepareDatabase(void) {
                         BSON("name" << "A1" << "type" << "TA1" << "value" << "-5, 2") <<
                         BSON("name" << "A2" << "type" << "TA2" << "value" << "noloc")
                         ) <<
-                     "location" << BSON("attrName" << "A1" << "coords" << BSON_ARRAY(2.0 << -5.0))
+                     "location" << BSON("attrName" << "A1" <<
+                                        "coords" << BSON("type" << "Point" <<
+                                                         "coordinates" << BSON_ARRAY(2.0 << -5.0)))
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
@@ -91,8 +93,8 @@ static void prepareDatabase(void) {
 
 }
 
-#define coordX(e) e.getObjectField("location").getField("coords").Array()[0].Double()
-#define coordY(e) e.getObjectField("location").getField("coords").Array()[1].Double()
+#define coordX(e) e.getObjectField("location").getObjectField("coords").getField("coordinates").Array()[0].Double()
+#define coordY(e) e.getObjectField("location").getObjectField("coords").getField("coordinates").Array()[1].Double()
 
 /* ****************************************************************************
 *
