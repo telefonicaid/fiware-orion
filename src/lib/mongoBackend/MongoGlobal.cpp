@@ -927,7 +927,9 @@ static bool processAreaScope(Scope* scoP, BSONObj &areaQuery) {
   }
 
   if (inverted) {
-    areaQuery = BSON("$not" << BSON("$geoWithin" << geoWithin));
+    /* The "$exist: true" was added to make this work with MongoDB 2.6. Surprisingly, MongoDB 2.4
+     * doesn't need it. See http://stackoverflow.com/questions/29388981/different-semantics-in-not-geowithin-with-polygon-geometries-between-mongodb-2 */
+    areaQuery = BSON("$exists" << true << "$not" << BSON("$geoWithin" << geoWithin));
   }
   else {
     areaQuery = BSON("$geoWithin" << geoWithin);
