@@ -242,7 +242,7 @@ std::string postQueryContext
       {
         if (aP->found == false)
         {
-          continue;  // Non-found en/at are thrown away
+          continue;  // Non-found pairs of entity/attribute are thrown away
         }
 
         QueryContextResponse* qP = new QueryContextResponse(eP, aP);

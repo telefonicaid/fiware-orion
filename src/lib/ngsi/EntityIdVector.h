@@ -35,6 +35,14 @@
 /* ****************************************************************************
 *
 * EntityIdVector - 
+*
+* NOTE
+* The method 'lookup' looks up an *exact* match for an entity.
+* I.e. the id must be exactly the same, the type exactly the same and isPattern, exactly the same.
+* This is not a *match* method that would find 'matching' entityIds.
+*
+* If you need an entity-matching method, then a new method, called 'match' should be implemented.
+*
 */
 typedef struct EntityIdVector
 {
