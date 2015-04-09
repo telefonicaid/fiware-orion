@@ -124,8 +124,6 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
   //
 
 
-  LM_M(("******************************************************************************************************************"));
-
   //
   // Special case: vector is empty: translate to 404
   //
@@ -140,16 +138,12 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
   //
   if ((vec.size() == 1) && (vec[0]->contextElementResponseVector.size() == 0))
   {
-    LM_M(("KZ: Filling in errorCode: SccContextElementNotFound"));
     responseP->errorCode.fill(SccContextElementNotFound);
     vec[0]->errorCode.fill(SccContextElementNotFound);
   }
 
-  LM_M(("KZ: QueryContextResponseVector of %d QueryContextResponses", vec.size()));
   for (unsigned int qIx = 0; qIx < vec.size(); ++qIx)
   {
-    LM_M(("KZ: %d contextElementResponses in  QueryContextResponse %d", vec[qIx]->contextElementResponseVector.size(), qIx));
-
     //
     // If the response vector is empty and the errorCode also, then a 404 Not Found
     // is inserted.
@@ -158,8 +152,6 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
     {
       if ((vec[qIx]->errorCode.code == SccOk) || (vec[qIx]->errorCode.code == SccNone))
       {
-        LM_M(("KZ: Setting statusCode to 404 for empty vector"));
-
         ContextElementResponse* cerP = new ContextElementResponse();
 
         cerP->statusCode.fill(SccContextElementNotFound);
@@ -171,26 +163,18 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
     {
       ContextElementResponse* cerP = vec[qIx]->contextElementResponseVector[cerIx];
 
-      LM_M(("KZ: statusCode.code == %d", cerP->statusCode.code));
       if ((cerP->statusCode.code == SccOk) || (cerP->statusCode.code == SccNone))  // No error
       {
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
       }
-      else
-      {
-        LM_M(("KZ: statusCode.code == %d - not pushed", cerP->statusCode.code));
-      }
     }
   }
-  LM_M(("******************************************************************************************************************"));
 
 
-  LM_M(("KZ: We have a QueryContextResponse with %d items in contextElementResponseVector", responseP->contextElementResponseVector.size()));
   responseP->present("", "QueryContextResponseVector::render");
 
   answer = responseP->render(ciP, QueryContext, "");
-  LM_M(("Rendered QueryContextResponse: %s", answer.c_str()));
   responseP->release();
   delete responseP;
 

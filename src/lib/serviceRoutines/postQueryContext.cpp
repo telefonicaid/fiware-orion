@@ -87,7 +87,6 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
     qcrsP->errorCode.fill(SccContextElementNotFound, "");
     return;
   }
-  LM_M(("KZ: Forwarding query to IP: '%s', port: %d, prefix: '%s':\n%s", ip.c_str(), port, prefix.c_str(), qcrP->render(QueryContext, ciP->outFormat, "KZ").c_str()));
 
 
   //
@@ -126,7 +125,6 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
                        payload,
                        false,
                        true);
-  LM_M(("KZ: sendHttpSocket: %s", out.c_str()));
 
   if ((out == "error") || (out == ""))
   {
@@ -164,11 +162,9 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   //
   ParseData parseData;
 
-  LM_M(("parseData at %p", &parseData));
   ciP->verb   = POST;
   ciP->method = "POST";
 
-  LM_M(("KZ: calling xmlTreat"));
   s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
   if (s != "OK")
   {
@@ -185,10 +181,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   snprintf(portV, sizeof(portV), "%d", port);
 
   // Fill in the response from the redirection into the response
-  LM_M(("KZ: Fill in the response from the redirection into the response"));
-  LM_M(("Filling QueryContextResponse at %p", &parseData.qcrs.res));
   qcrsP->fill(&parseData.qcrs.res);
-  LM_M(("KZ: size of response vector: %d", qcrsP->contextElementResponseVector.size()));
   qcrsP->present("", "queryForward, after filling qcrsP");
 
   //
@@ -229,23 +222,13 @@ std::string postQueryContext
   QueryContextRequestVector   requestV;
   QueryContextResponseVector  responseV;
 
-  LM_M(("qcrsP should be empty ... (%d)", qcrsP->contextElementResponseVector.size()));
   qcrsP->errorCode.fill(SccOk);
   ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
   qcrsP->present("", "postQueryContext");
 
-  LM_M(("KZ: Got a reply from mongoQueryContext with %d contextElementResponses", qcrsP->contextElementResponseVector.size()));
-  for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
-  {
-    LM_M(("KZ: contextElementResponse %d has %d attributes", ix, qcrsP->contextElementResponseVector[ix]->contextElement.contextAttributeVector.size()));
-  }
-
   for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
     ContextElementResponse* cerP       = qcrsP->contextElementResponseVector[ix]->clone();
-
-    LM_M(("ContextElementResponse at %p", cerP));
-    LM_M(("KZ: contextElement %d contains %d attributes", ix, cerP->contextElement.contextAttributeVector.size()));
 
     for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
@@ -264,13 +247,11 @@ std::string postQueryContext
           continue;  // Non-found en/at are thrown away
         }
 
-        LM_M(("KZ: %s/%s (%s) found locally - pushing to responseV", eP->id.c_str(), aP->name.c_str(), aP->value.c_str()));
         QueryContextResponse* qP = new QueryContextResponse(eP, aP);
         responseV.push_back(qP);
       }
       else if (requestP == NULL)
       {
-        LM_M(("KZ: No matching request found for providingApplication '%s' and entity '%s'", aP->providingApplication.c_str(), eP->id.c_str()));
         requestP = new QueryContextRequest(aP->providingApplication, eP, aP->name);
         requestV.push_back(requestP);
         ++noOfForwards;
@@ -280,13 +261,6 @@ std::string postQueryContext
         requestP->attributeList.push_back_if_absent(aP->name);
         requestP->entityIdVector.push_back_if_absent(eP);
       }
-
-      LM_M(("KZ: Attribute %d in contextElement %d:", aIx, ix));
-      LM_M(("KZ:   name:      '%s'", aP->name.c_str()));
-      LM_M(("KZ:   type:      '%s'", aP->type.c_str()));
-      LM_M(("KZ:   value:     '%s'", aP->value.c_str()));
-      LM_M(("KZ:   found:     '%s'", BA_FT(aP->found)));
-      LM_M(("KZ:   provApp:   '%s'", aP->providingApplication.c_str()));
     }
   }
 
@@ -295,7 +269,6 @@ std::string postQueryContext
   //
   if (noOfForwards == 0)
   {
-    LM_M(("KZ: no redirectioning necessary"));
     //
     // In case the response is empty, fill response with the entity we looked for
     //
@@ -317,9 +290,7 @@ std::string postQueryContext
       qcrsP->errorCode.fill(SccContextElementNotFound);
     }
 
-    LM_M(("KZ: rendering the result"));
     answer = qcrsP->render(ciP, QueryContext, "");
-    LM_M(("KZ: result: %s", answer.c_str()));
     return answer;
   }
 
@@ -327,7 +298,6 @@ std::string postQueryContext
   //
   // DEBUG - present the vector prepared for Context Provider Forwarding
   //
-  LM_M(("vector prepared for Context Provider Forwarding"));
   requestV.present();
 
 
@@ -350,25 +320,17 @@ std::string postQueryContext
       continue;
     }
 
-    LM_M(("KZ: contextProvider: '%s'", requestV[fIx]->contextProvider.c_str()));
-
     QueryContextResponse* qP = new QueryContextResponse();
     queryForward(ciP, requestV[fIx], qP);
-    LM_M(("KZ: Added Response of %d items", qP->contextElementResponseVector.size()));
-    LM_M(("KZ: Added Response with errorCode.code %d", qP->errorCode.code));
     responseV.push_back(qP);
-    LM_M(("KZ: Added result %d of forwarding to response-vector", fIx));
   }
-  LM_M(("KZ: ok"));
-  LM_M(("KZ: Number of QueryContextResponses: %d", responseV.size()));
+
   responseV.present();
 
   //
   // Is qcrsAccumulatedP OK? Without doing anything special here ... ?
   //
-  LM_M(("KZ: Rendering 1"));
   answer = responseV.render(ciP, "");
-  LM_M(("KZ: Rendered: %s", answer.c_str()));
 
   // requestV.release();
 
