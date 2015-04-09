@@ -25,6 +25,7 @@
 # The list of checks (to be extended):
 #
 # 1. Check that there is no more than one attribute with the same name in a given entity document
+# 2. Check that there is no duplication in _id fields (for mongo {_id: {x: 1, y: 2}} and {_id: {y:2, x:1}} are different documents)
 
 __author__ = 'fermin'
 
@@ -72,4 +73,24 @@ def check_dup_attrs():
 
         duplicated_attr_name(id, type, sp, doc['attrs'])
 
+def check_dup_id_subfields():
+
+    for doc in db[COL].find():
+        query = {'_id.id': doc['_id']['id']}
+
+        if 'type' in doc['_id']:
+            query['_id.type'] = doc['_id']['type']
+        else:
+            query['_id.type'] = {'$exists': False}
+        
+        if 'servicePath' in doc['_id']:
+            query['_id.servicePath'] = doc['_id']['servicePath']
+        else:
+            query['_id.servicePath'] = {'$exists': False}
+
+        c = db[COL].find(query).count()
+        if c > 1:
+            warn('<%s> has duplicated entities with same _id subfields: %d' % (str(doc['_id']), c))
+
 check_dup_attrs()
+check_dup_id_subfields()
