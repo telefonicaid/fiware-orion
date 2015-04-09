@@ -60,13 +60,34 @@ void QueryContextRequestVector::push_back(QueryContextRequest* item)
 
 /* ****************************************************************************
 *
+* entityIdMatch - 
+*/
+static bool entityIdMatch(EntityId* e1, EntityId* e2)
+{
+  if (e1->id != e2->id)
+  {
+    return false;
+  }
+
+  if ((e2->type != "") && (e1->type != e2->type))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+
+
+/* ****************************************************************************
+*
 * QueryContextRequestVector::lookup -
 */
-QueryContextRequest* QueryContextRequestVector::lookup(const std::string& contextProvider)
+QueryContextRequest* QueryContextRequestVector::lookup(const std::string& contextProvider, EntityId* eP)
 {
   for (unsigned int ix = 0; ix < size(); ++ix)
   {
-    if (vec[ix]->contextProvider == contextProvider)
+    if ((vec[ix]->contextProvider == contextProvider) && (entityIdMatch(vec[ix]->entityIdVector[0], eP) == true))
     {
       return vec[ix];
     }
@@ -89,4 +110,32 @@ void QueryContextRequestVector::release(void)
   }
 
   vec.clear();
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextRequestVector::present -
+*/
+void QueryContextRequestVector::present(void)
+{
+  LM_F(("Presenting QueryContextRequestVector of %d QueryContextRequests", vec.size()));
+  for (unsigned int qcrIx = 0; qcrIx < vec.size(); ++qcrIx)
+  {
+    LM_F(("QueryContextRequest %d:", qcrIx));
+    LM_F(("  context provider:    %s", vec[qcrIx]->contextProvider.c_str()));
+
+    for (unsigned int eIx = 0; eIx < vec[qcrIx]->entityIdVector.size(); ++eIx)
+    {
+      EntityId* eP = vec[qcrIx]->entityIdVector[eIx];
+
+      LM_F(("  entity %0d: { '%s', '%s', '%s' }", eIx, eP->id.c_str(),  eP->type.c_str(),  eP->isPattern.c_str()));
+    }
+
+    for (unsigned int aIx = 0; aIx < vec[qcrIx]->attributeList.size(); ++aIx)
+    {
+      LM_F(("  attribute %02d: %s", aIx, vec[qcrIx]->attributeList[aIx].c_str()));
+    }
+  }
 }

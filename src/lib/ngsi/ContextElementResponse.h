@@ -63,8 +63,11 @@ typedef struct ContextElementResponse
                      const std::string&  predetectedError,
                      int                 counter);
 
-  void         fill(struct QueryContextResponse* qcrP, const std::string& entityId = "", const std::string& entityType = "");
-
+  void                     fill(struct QueryContextResponse*  qcrP,
+                                const std::string&            entityId = "",
+                                const std::string&            entityType = "");
+  void                     fill(ContextElementResponse* cerP);
+  ContextElementResponse*  clone(void);
 } ContextElementResponse;
 
 #endif  // SRC_LIB_NGSI_CONTEXTELEMENTRESPONSE_H_

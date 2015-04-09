@@ -34,7 +34,7 @@
 
 /* ****************************************************************************
 *
-* ContextElementResponse::render -
+* ContextElementResponse::ContextElementResponse -
 */
 ContextElementResponse::ContextElementResponse()
 {
@@ -116,8 +116,9 @@ std::string ContextElementResponse::check
 */
 void ContextElementResponse::present(const std::string& indent, int ix)
 {
-  contextElement.present(indent, ix);
-  statusCode.present(indent);
+  LM_F(("%sContextElementResponse %d:", indent.c_str(), ix));
+  contextElement.present(indent + "  ", ix);
+  statusCode.present(indent + "  ");
 }
 
 
@@ -167,4 +168,31 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
   {
     statusCode.fill(&qcrP->errorCode);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::fill - 
+*/
+void ContextElementResponse::fill(ContextElementResponse* cerP)
+{
+  contextElement.fill(cerP->contextElement);
+  statusCode.fill(cerP->statusCode);
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::clone - 
+*/
+ContextElementResponse* ContextElementResponse::clone(void)
+{
+  ContextElementResponse* cerP = new ContextElementResponse();
+
+  cerP->fill(this);
+
+  return cerP;
 }

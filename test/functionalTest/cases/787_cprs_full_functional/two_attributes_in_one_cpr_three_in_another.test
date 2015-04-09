@@ -27,15 +27,9 @@ Two Attributes In One CPr Three In Another
 dbInit CB
 dbInit CP1
 dbInit CP2
-dbInit CP3
-dbInit CP4
-dbInit CP5
 brokerStart CB
 brokerStart CP1
 brokerStart CP2
-brokerStart CP3
-brokerStart CP4
-brokerStart CP5
 
 --SHELL--
 
@@ -50,7 +44,7 @@ brokerStart CP5
 # 08. Register E1/T1/A3 in CB, provApp: CP1
 # 09. Register E1/T1/A4 in CB, provApp: CP2
 # 10. Register E1/T1/A5 in CB, provApp: CP2
-# 11. Query E1/T1/A1+A2+A3+A4+A5
+# 11. Query E1/T1/A1+A2+A3+A4+A5 (A1-A3 in CP1, A4-A5 in CP2)
 #
 
 
@@ -314,8 +308,8 @@ echo
 echo
 
 
-echo "11. Query E1/T1/A1+A2+A3+A4+A5"
-echo "=============================="
+echo "11. Query E1/T1/A1+A2+A3+A4+A5 (A1-A3 in CP1, A4-A5 in CP2)"
+echo "==========================================================="
 payload='{
   "entities": [
     {
@@ -368,7 +362,7 @@ Date: REGEX(.*)
 }
 
 
-02. Update/APPEND E1/T1/A2 in CP2
+02. Update/APPEND E1/T1/A2 in CP1
 =================================
 HTTP/1.1 200 OK
 Content-Length: 383
@@ -399,7 +393,7 @@ Date: REGEX(.*)
 }
 
 
-03. Update/APPEND E1/T1/A3 in CP3
+03. Update/APPEND E1/T1/A3 in CP1
 =================================
 HTTP/1.1 200 OK
 Content-Length: 383
@@ -430,7 +424,7 @@ Date: REGEX(.*)
 }
 
 
-04. Update/APPEND E1/T1/A4 in CP4
+04. Update/APPEND E1/T1/A4 in CP2
 =================================
 HTTP/1.1 200 OK
 Content-Length: 383
@@ -461,7 +455,7 @@ Date: REGEX(.*)
 }
 
 
-05. Update/APPEND E1/T1/A5 in CP5
+05. Update/APPEND E1/T1/A5 in CP2
 =================================
 HTTP/1.1 200 OK
 Content-Length: 383
@@ -500,12 +494,12 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "duration": "P1M",
+    "duration": "P1M", 
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
 
-07. Register E1/T1/A2 in CB, provApp: CP2
+07. Register E1/T1/A2 in CB, provApp: CP1
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 74
@@ -513,12 +507,12 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "duration": "P1M",
+    "duration": "P1M", 
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
 
-08. Register E1/T1/A3 in CB, provApp: CP3
+08. Register E1/T1/A3 in CB, provApp: CP1
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 74
@@ -526,12 +520,12 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "duration": "P1M",
+    "duration": "P1M", 
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
 
-09. Register E1/T1/A4 in CB, provApp: CP4
+09. Register E1/T1/A4 in CB, provApp: CP2
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 74
@@ -539,12 +533,12 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "duration": "P1M",
+    "duration": "P1M", 
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
 
-10. Register E1/T1/A5 in CB, provApp: CP5
+10. Register E1/T1/A5 in CB, provApp: CP2
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 74
@@ -552,19 +546,72 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "duration": "P1M",
+    "duration": "P1M", 
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
 
-11. Query E1/T1/A1+A2+A3+A4+A5
-==============================
+11. Query E1/T1/A1+A2+A3+A4+A5 (A1-A3 in CP1, A4-A5 in CP2)
+===========================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 1103
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "A1 in CP1"
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": "A2 in CP1"
+                    }, 
+                    {
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": "A3 in CP1"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": "A4 in CP2"
+                    }, 
+                    {
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": "A5 in CP2"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 
 
@@ -572,12 +619,6 @@ Date: REGEX(.*)
 brokerStop CB
 brokerStop CP1
 brokerStop CP2
-brokerStop CP3
-brokerStop CP4
-brokerStop CP5
 dbDrop CB
 dbDrop CP1
 dbDrop CP2
-dbDrop CP3
-dbDrop CP4
-dbDrop CP5

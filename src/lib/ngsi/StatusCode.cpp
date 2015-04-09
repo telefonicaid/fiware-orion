@@ -220,10 +220,10 @@ std::string StatusCode::check
 */
 void StatusCode::present(const std::string& indent)
 {
-  PRINTF("%sCode:            %d\n",   indent.c_str(), code);
-  PRINTF("%sReasonPhrase:    '%s'\n", indent.c_str(), reasonPhrase.c_str());
-  PRINTF("%sDetail:          '%s'\n", indent.c_str(), details.c_str());
-  PRINTF("%sTag:             '%s'\n", indent.c_str(), tag.c_str());
+  LM_F(("%s%s:", indent.c_str(), tag.c_str()));
+  LM_F(("%s  Code:            %d",   indent.c_str(), code));
+  LM_F(("%s  ReasonPhrase:    '%s'", indent.c_str(), reasonPhrase.c_str()));
+  LM_F(("%s  Detail:          '%s'", indent.c_str(), details.c_str()));
 }
 
 

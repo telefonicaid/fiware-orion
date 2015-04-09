@@ -336,21 +336,21 @@ std::string ContextAttribute::check
 */
 void ContextAttribute::present(const std::string& indent, int ix)
 {
-  PRINTF("%sAttribute %d:\n",    indent.c_str(), ix);
-  PRINTF("%s  Name:       %s\n", indent.c_str(), name.c_str());
-  PRINTF("%s  Type:       %s\n", indent.c_str(), type.c_str());
+  LM_F(("%sAttribute %d:",    indent.c_str(), ix));
+  LM_F(("%s  Name:       %s", indent.c_str(), name.c_str()));
+  LM_F(("%s  Type:       %s", indent.c_str(), type.c_str()));
 
   if (compoundValueP == NULL)
   {
-    PRINTF("%s  Value:      %s\n", indent.c_str(), value.c_str());
+    LM_F(("%s  Value:      %s", indent.c_str(), value.c_str()));
   }
   else
   {
     compoundValueP->show(indent + "  ");
   }
 
-  PRINTF("%s  PA:       %s\n", indent.c_str(), providingApplication.c_str());
-  PRINTF("%s  found:    %s\n", indent.c_str(), FT(found));
+  LM_F(("%s  PA:       %s", indent.c_str(), providingApplication.c_str()));
+  LM_F(("%s  found:    %s", indent.c_str(), FT(found)));
 
   metadataVector.present("Attribute", indent + "  ");
 }

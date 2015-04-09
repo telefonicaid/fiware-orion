@@ -215,16 +215,16 @@ void EntityId::present(const std::string& indent, int ix)
 {
   if (ix == -1)
   {
-    PRINTF("%sEntity Id:\n",       indent.c_str());
+    LM_F(("%sEntity Id:",       indent.c_str()));
   }
   else
   {
-    PRINTF("%sEntity Id %d:\n",       indent.c_str(), ix);
+    LM_F(("%sEntity Id %d:",       indent.c_str(), ix));
   }
 
-  PRINTF("%s  Id:         '%s'\n", indent.c_str(), id.c_str());
-  PRINTF("%s  Type:       '%s'\n", indent.c_str(), type.c_str());
-  PRINTF("%s  isPattern:  '%s'\n", indent.c_str(), isPattern.c_str());
+  LM_F(("%s  Id:         '%s'", indent.c_str(), id.c_str()));
+  LM_F(("%s  Type:       '%s'", indent.c_str(), type.c_str()));
+  LM_F(("%s  isPattern:  '%s'", indent.c_str(), isPattern.c_str()));
 }
 
 

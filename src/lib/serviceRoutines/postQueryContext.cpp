@@ -32,6 +32,8 @@
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextResponse.h"
 #include "ngsi10/QueryContextRequestVector.h"
+#include "ngsi10/QueryContextResponse.h"
+#include "ngsi10/QueryContextResponseVector.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/clientSocketHttp.h"
 #include "serviceRoutines/postQueryContext.h"
@@ -52,148 +54,58 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 
 /* ****************************************************************************
 *
-* postQueryContext -
+* queryForward - 
+*
+* An entity/attribute has been found on some context provider.
+* We need to forward the query request to the context provider, indicated in qcrsP->contextProvider
+*
+* 1. Parse the providing application to extract IP, port and URI-path
+* 2. Render an XML-string of the request we want to forward
+* 3. Send the request to the providing application (and await the response)
+* 4. Parse the XML response and fill in a binary QueryContextResponse
+* 5. Render QueryContextResponse from the providing application
+*
 */
-std::string postQueryContext
-(
-  ConnectionInfo*            ciP,
-  int                        components,
-  std::vector<std::string>&  compV,
-  ParseData*                 parseDataP
-)
+static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryContextResponse* qcrsP)
 {
-  //
-  // Convops calling this routine may need the response in digital
-  // So, the digital response is passed back in parseDataP->qcrs.res
-  //
-  QueryContextResponse*     qcrP = &parseDataP->qcrs.res;
-  std::string               answer;
-  QueryContextRequestVector requestV;
-
-  ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, qcrP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-
-  LM_M(("KZ: Got a reply from mongoQueryContext with %d contextElementResponses", qcrP->contextElementResponseVector.size()));
-  for (unsigned int ix = 0 ; ix < qcrP->contextElementResponseVector.size(); ++ix)
-  {
-    ContextElementResponse* cerP = qcrP->contextElementResponseVector[ix];
-
-    LM_M(("KZ: contextElement %d contains %d attributes", ix, cerP->contextElement.contextAttributeVector.size()));
-
-    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
-    {
-      EntityId*            eP       = &cerP->contextElement.entityId;
-      ContextAttribute*    aP       = cerP->contextElement.contextAttributeVector[aIx];
-      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication);
-
-      if (requestP == NULL)
-      {
-        requestV.push_back(new QueryContextRequest(eP, aP->name));
-      }
-      else
-      {
-        requestP->attributeList.push_back_if_absent(aP->name);
-        requestP->entityIdVector.push_back_if_absent(eP);
-      }
-
-      LM_M(("KZ: Attribute %d in contextElement %d:", aIx, ix));
-      LM_M(("KZ:   name:      '%s'", aP->name.c_str()));
-      LM_M(("KZ:   type:      '%s'", aP->type.c_str()));
-      LM_M(("KZ:   value:     '%s'", aP->value.c_str()));
-      LM_M(("KZ:   found:     '%s'", BA_FT(aP->found)));
-      LM_M(("KZ:   provApp:   '%s'", aP->providingApplication.c_str()));
-    }
-  }
-
-  // If no redirectioning is necessary, just return the result
-  if (qcrP->errorCode.code != SccFound)
-  {
-    //
-    // In case the response is empty, fill response with the entity we looked for
-    //
-    if (qcrP->contextElementResponseVector.size() == 0)
-    {
-      //
-      // FIXME P6: What do we do if we have more than one entity in incoming entityIdVector?
-      //           Push each entityId in a separate contextElementResponse?
-      //           Also, perhaps mongoQueryContext should implement this and not postQueryContext
-      //           This FIXME is related to github issue #588 and (probably) #650.
-      //           Also, optimizing this would be part of issue #768
-      //
-
-
-      //
-      // It's better not to give any details here as we'd have to choose ONE of the entities in the vector ...
-      // std::string details = "Entity id: /" + parseDataP->qcr.res.entityIdVector[0]->id + "/";
-      //
-      qcrP->errorCode.fill(SccContextElementNotFound);
-    }
-
-    answer = qcrP->render(ciP, QueryContext, "");
-    return answer;
-  }
-
-
-
   std::string     ip;
   std::string     protocol;
   int             port;
   std::string     prefix;
-
-  //
-  // An entity/attribute has been found on some context provider.
-  // We need to forward the query request to the context provider, indicated in qcrP->errorCode.details.
-  //
-  // 1. Parse the providing application to extract IP, port and URI-path
-  // 2. The exact same QueryContextRequest will be used for the query-forwarding
-  // 3. Render an XML-string of the request we want to forward
-  // 4. Send the request to the providing application (and await the response)
-  // 5. Parse the XML response and fill in a binary QueryContextResponse
-  // 6. Render QueryContextResponse from the providing application
-  //
+  std::string     answer;
 
 
   //
   // 1. Parse the providing application to extract IP, port and URI-path
   //
-  if (parseUrl(qcrP->errorCode.details, ip, port, prefix, protocol) == false)
+  if (parseUrl(qcrP->contextProvider, ip, port, prefix, protocol) == false)
   {
-    QueryContextResponse qcrs;
-
-    LM_W(("Bad Input (invalid proving application '%s')", qcrP->errorCode.details.c_str()));
+    LM_W(("Bad Input (invalid providing application '%s')", qcrP->contextProvider.c_str()));
     //  Somehow, if we accepted this providing application, it is the brokers fault ...
     //  SccBadRequest should have been returned before, when it was registered!
 
-    qcrP->errorCode.fill(SccContextElementNotFound, "");
-    answer = qcrP->render(ciP, QueryContext, "");
-    return answer;
+    qcrsP->errorCode.fill(SccContextElementNotFound, "");
+    return;
   }
+  LM_M(("KZ: Forwarding query to IP: '%s', port: %d, prefix: '%s':\n%s", ip.c_str(), port, prefix.c_str(), qcrP->render(QueryContext, ciP->outFormat, "KZ").c_str()));
 
 
   //
-  // 2. The exact same QueryContextRequest will be used for the query-forwarding
+  // 2. Render an XML-string of the request we want to forward
   //
-  QueryContextRequest* qcReqP = &parseDataP->qcr.res;
-
-
-  //
-  // 3. Render an XML-string of the request we want to forward
-  //
-  std::string payload = qcReqP->render(QueryContext, XML, "");
-  char*       cleanPayload;
+  std::string  payload = qcrP->render(QueryContext, XML, "");
+  char*        cleanPayload;
 
   if ((cleanPayload = xmlPayloadClean(payload.c_str(), "<queryContextRequest>")) == NULL)
   {
-    QueryContextResponse qcrs;
-
     LM_E(("Runtime Error (error rendering forward-request)"));
-    qcrs.errorCode.fill(SccContextElementNotFound, "");
-    answer = qcrs.render(ciP, QueryContext, "");
-    return answer;
+    qcrsP->errorCode.fill(SccContextElementNotFound, "");
+    return;
   }
 
 
   //
-  // 4. Send the request to the providing application (and await the reply)
+  // 3. Send the request to the Context Provider (and await the reply)
   // FIXME P7: Should Rush be used?
   //
   std::string     out;
@@ -214,15 +126,13 @@ std::string postQueryContext
                        payload,
                        false,
                        true);
+  LM_M(("KZ: sendHttpSocket: %s", out.c_str()));
 
   if ((out == "error") || (out == ""))
   {
-    QueryContextResponse qcrs;
-
-    qcrs.errorCode.fill(SccContextElementNotFound, "");
-    answer = qcrs.render(ciP, QueryContext, "");
+    qcrsP->errorCode.fill(SccContextElementNotFound, "");
     LM_E(("Runtime Error (error forwarding 'Query' to providing application)"));
-    return answer;
+    return;
   }
 
 
@@ -236,17 +146,13 @@ std::string postQueryContext
 
   if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
   {
-    QueryContextResponse qcrs;
-
     //
     // This is really an internal error in the Context Provider
     // It is not in the orion broker though, so 404 is returned
     //
-    qcrs.errorCode.fill(SccContextElementNotFound, "invalid context provider response");
-
     LM_W(("Other Error (context provider response to QueryContext is empty)"));
-    answer = qcrs.render(ciP, QueryContext, "");
-    return answer;
+    qcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+    return;
   }
 
   //
@@ -256,18 +162,19 @@ std::string postQueryContext
   // POST /v1/queryContext. 
   // So, here we change the verb/method for POST.
   //
+  ParseData parseData;
+
+  LM_M(("parseData at %p", &parseData));
   ciP->verb   = POST;
   ciP->method = "POST";
 
-  s = xmlTreat(cleanPayload, ciP, parseDataP, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
+  LM_M(("KZ: calling xmlTreat"));
+  s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
   if (s != "OK")
   {
-    QueryContextResponse qcrs;
-
-    qcrs.errorCode.fill(SccContextElementNotFound, "");
     LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
-    answer = qcrs.render(ciP, QueryContext, "");
-    return answer;
+    qcrsP->errorCode.fill(SccContextElementNotFound, "");
+    return;
   }
 
 
@@ -277,26 +184,193 @@ std::string postQueryContext
   char portV[16];
   snprintf(portV, sizeof(portV), "%d", port);
 
-  // Fill in the response from the redirection into the response to the originator of this request
-  QueryContextResponse* qcrsP = &parseDataP->qcrs.res;
+  // Fill in the response from the redirection into the response
+  LM_M(("KZ: Fill in the response from the redirection into the response"));
+  LM_M(("Filling QueryContextResponse at %p", &parseData.qcrs.res));
+  qcrsP->fill(&parseData.qcrs.res);
+  LM_M(("KZ: size of response vector: %d", qcrsP->contextElementResponseVector.size()));
+  qcrsP->present("", "queryForward, after filling qcrsP");
 
   //
-  // Returning 'redirected to' in StatusCode::details
+  // 'Fixing' StatusCode
   //
-  if ((qcrsP->errorCode.code == SccOk) || (qcrsP->errorCode.details == ""))
+  if (qcrsP->errorCode.code == SccNone)
   {
-    qcrsP->errorCode.details = std::string("Redirected to context provider ") + ip + ":" + portV + prefix;
-  }
-  else if (qcrsP->errorCode.code == SccNone)
-  {
-    qcrsP->errorCode.fill(SccOk, std::string("Redirected to context provider ") + ip + ":" + portV + prefix);
+    qcrsP->errorCode.fill(SccOk);
   }
 
-  if (qcrsP->contextElementResponseVector.size() > 0)
+  if ((qcrsP->contextElementResponseVector.size() == 1) && (qcrsP->contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound))
   {
-    qcrsP->contextElementResponseVector[0]->statusCode.details = std::string("Redirected to context provider ") + ip + ":" + portV + prefix;
+    qcrsP->errorCode.fill(SccContextElementNotFound);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* postQueryContext -
+*/
+std::string postQueryContext
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
+{
+  //
+  // Convops calling this routine may need the response in digital
+  // So, the digital response is passed back in parseDataP->qcrs.res
+  //
+  QueryContextResponse*       qcrsP = &parseDataP->qcrs.res;
+  std::string                 answer;
+  int                         noOfForwards = 0;
+  QueryContextRequestVector   requestV;
+  QueryContextResponseVector  responseV;
+
+  LM_M(("qcrsP should be empty ... (%d)", qcrsP->contextElementResponseVector.size()));
+  qcrsP->errorCode.fill(SccOk);
+  ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  qcrsP->present("", "postQueryContext");
+
+  LM_M(("KZ: Got a reply from mongoQueryContext with %d contextElementResponses", qcrsP->contextElementResponseVector.size()));
+  for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
+  {
+    LM_M(("KZ: contextElementResponse %d has %d attributes", ix, qcrsP->contextElementResponseVector[ix]->contextElement.contextAttributeVector.size()));
   }
 
-  answer = qcrsP->render(ciP, QueryContext, "");
+  for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
+  {
+    ContextElementResponse* cerP       = qcrsP->contextElementResponseVector[ix]->clone();
+
+    LM_M(("ContextElementResponse at %p", cerP));
+    LM_M(("KZ: contextElement %d contains %d attributes", ix, cerP->contextElement.contextAttributeVector.size()));
+
+    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    {
+      EntityId*            eP       = &cerP->contextElement.entityId;
+      ContextAttribute*    aP       = cerP->contextElement.contextAttributeVector[aIx];
+      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication, eP);   // No need to lookup if providingApplication == "" ...
+      
+      //
+      // An empty providingApplication means the attribute is local
+      // In such a case, the response is already in our hand, we just need to forward it to responseV
+      //
+      if (aP->providingApplication == "")
+      {
+        if (aP->found == false)
+        {
+          continue;  // Non-found en/at are thrown away
+        }
+
+        LM_M(("KZ: %s/%s (%s) found locally - pushing to responseV", eP->id.c_str(), aP->name.c_str(), aP->value.c_str()));
+        QueryContextResponse* qP = new QueryContextResponse(eP, aP);
+        responseV.push_back(qP);
+      }
+      else if (requestP == NULL)
+      {
+        LM_M(("KZ: No matching request found for providingApplication '%s' and entity '%s'", aP->providingApplication.c_str(), eP->id.c_str()));
+        requestP = new QueryContextRequest(aP->providingApplication, eP, aP->name);
+        requestV.push_back(requestP);
+        ++noOfForwards;
+      }
+      else
+      {
+        requestP->attributeList.push_back_if_absent(aP->name);
+        requestP->entityIdVector.push_back_if_absent(eP);
+      }
+
+      LM_M(("KZ: Attribute %d in contextElement %d:", aIx, ix));
+      LM_M(("KZ:   name:      '%s'", aP->name.c_str()));
+      LM_M(("KZ:   type:      '%s'", aP->type.c_str()));
+      LM_M(("KZ:   value:     '%s'", aP->value.c_str()));
+      LM_M(("KZ:   found:     '%s'", BA_FT(aP->found)));
+      LM_M(("KZ:   provApp:   '%s'", aP->providingApplication.c_str()));
+    }
+  }
+
+  //
+  // If no redirectioning is necessary, just return the result
+  //
+  if (noOfForwards == 0)
+  {
+    LM_M(("KZ: no redirectioning necessary"));
+    //
+    // In case the response is empty, fill response with the entity we looked for
+    //
+    if (qcrsP->contextElementResponseVector.size() == 0)
+    {
+      //
+      // FIXME P6: What do we do if we have more than one entity in incoming entityIdVector?
+      //           Push each entityId in a separate contextElementResponse?
+      //           Also, perhaps mongoQueryContext should implement this and not postQueryContext
+      //           This FIXME is related to github issue #588 and (probably) #650.
+      //           Also, optimizing this would be part of issue #768
+      //
+
+
+      //
+      // It's better not to give any details here as we'd have to choose ONE of the entities in the vector ...
+      // std::string details = "Entity id: /" + parseDataP->qcr.res.entityIdVector[0]->id + "/";
+      //
+      qcrsP->errorCode.fill(SccContextElementNotFound);
+    }
+
+    LM_M(("KZ: rendering the result"));
+    answer = qcrsP->render(ciP, QueryContext, "");
+    LM_M(("KZ: result: %s", answer.c_str()));
+    return answer;
+  }
+
+
+  //
+  // DEBUG - present the vector prepared for Context Provider Forwarding
+  //
+  LM_M(("vector prepared for Context Provider Forwarding"));
+  requestV.present();
+
+
+  //
+  // Now, send 'noOfForwards' Query requests, each in a separate thread and
+  // await all the responses.
+  // Actually, if there is only ONE forward to be done then there is no reason to
+  // do the forward in a separate shell. Better to do it inside the current thread.
+  //
+  // If providingApplication is empty then that part of the query has been performed already, locally.
+  // 
+  //
+  for (unsigned int fIx = 0; fIx < requestV.size(); ++fIx)
+  {
+    if (requestV[fIx]->contextProvider == "")
+    {
+      //
+      // No forward, we already have the result in responseV
+      //
+      continue;
+    }
+
+    LM_M(("KZ: contextProvider: '%s'", requestV[fIx]->contextProvider.c_str()));
+
+    QueryContextResponse* qP = new QueryContextResponse();
+    queryForward(ciP, requestV[fIx], qP);
+    LM_M(("KZ: Added Response of %d items", qP->contextElementResponseVector.size()));
+    LM_M(("KZ: Added Response with errorCode.code %d", qP->errorCode.code));
+    responseV.push_back(qP);
+    LM_M(("KZ: Added result %d of forwarding to response-vector", fIx));
+  }
+  LM_M(("KZ: ok"));
+  LM_M(("KZ: Number of QueryContextResponses: %d", responseV.size()));
+  responseV.present();
+
+  //
+  // Is qcrsAccumulatedP OK? Without doing anything special here ... ?
+  //
+  LM_M(("KZ: Rendering 1"));
+  answer = responseV.render(ciP, "");
+  LM_M(("KZ: Rendered: %s", answer.c_str()));
+
+  // requestV.release();
+
   return answer;
 }

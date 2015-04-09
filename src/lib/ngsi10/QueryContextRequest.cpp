@@ -56,10 +56,14 @@ QueryContextRequest::QueryContextRequest()
 *
 * QueryContextRequest::QueryContextRequest
 */
-QueryContextRequest::QueryContextRequest(EntityId* eP, const std::string& attributeName)
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName)
 {
+  contextProvider = _contextProvider;
+
   entityIdVector.push_back(new EntityId(eP));
   attributeList.push_back(attributeName);
+
+  restrictions = 0;
 }
 
 
