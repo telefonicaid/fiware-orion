@@ -31,7 +31,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi10/QueryContextResponseVector.h"
+#include "orionTypes/QueryContextResponseVector.h"
 #include "ngsi/Request.h"
 
 

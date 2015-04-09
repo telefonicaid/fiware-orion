@@ -26,6 +26,8 @@ SET (SOURCES
     TypeEntityVector.cpp
     EntityTypesResponse.cpp
     EntityTypeAttributesResponse.cpp
+    QueryContextRequestVector.cpp
+    QueryContextResponseVector.cpp
 )
 
 SET (HEADERS
@@ -34,6 +36,8 @@ SET (HEADERS
     TypeEntityVector.h
     EntityTypesResponse.h
     EntityTypeAttributesResponse.h
+    QueryContextRequestVector.h
+    QueryContextResponseVector.h
 )
 
 

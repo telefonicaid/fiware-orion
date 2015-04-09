@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_NGSI10_QUERYCONTEXTRESPONSEVECTOR_H_
-#define SRC_LIB_NGSI10_QUERYCONTEXTRESPONSEVECTOR_H_
+#ifndef SRC_LIB_ORIONTYPES_QUERYCONTEXTREQUESTVECTOR_H_
+#define SRC_LIB_ORIONTYPES_QUERYCONTEXTREQUESTVECTOR_H_
 
 /*
 *
@@ -28,24 +28,25 @@
 #include <string>
 #include <vector>
 
-#include "ngsi10/QueryContextResponse.h"
+#include "ngsi10/QueryContextRequest.h"
 
 
 
 /* ****************************************************************************
 *
-* QueryContextResponseVector - 
+* QueryContextRequestVector - 
 */
-typedef struct QueryContextResponseVector
+typedef struct QueryContextRequestVector
 {
-  std::vector<QueryContextResponse*>  vec;
+  std::vector<QueryContextRequest*>  vec;
 
-  unsigned int           size(void);
-  void                   push_back(QueryContextResponse* item);
-  void                   release(void);
-  void                   present(void);
-  std::string            render(ConnectionInfo* ciP, const std::string& indent);
-  QueryContextResponse*  operator[](unsigned int ix)
+  unsigned int          size(void);
+  void                  push_back(QueryContextRequest* item);
+  QueryContextRequest*  lookup(const std::string& contextProvider, EntityId* eP);
+  void                  release(void);
+  void                  present(void);
+
+  QueryContextRequest*  operator[](unsigned int ix)
   {
     if (ix < vec.size())
     {
@@ -54,6 +55,6 @@ typedef struct QueryContextResponseVector
 
     return NULL;
   }
-} QueryContextResponseVector;
+} QueryContextRequestVector;
 
-#endif  // SRC_LIB_NGSI10_QUERYCONTEXTRESPONSEVECTOR_H_
+#endif  // SRC_LIB_ORIONTYPES_QUERYCONTEXTREQUESTVECTOR_H_

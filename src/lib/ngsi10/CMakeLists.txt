@@ -33,8 +33,6 @@ SET (SOURCES
     UpdateContextResponse.cpp
     UpdateContextSubscriptionRequest.cpp
     UpdateContextSubscriptionResponse.cpp
-    QueryContextRequestVector.cpp
-    QueryContextResponseVector.cpp
 )
 
 SET (HEADERS
@@ -50,8 +48,6 @@ SET (HEADERS
     UpdateContextResponse.h
     UpdateContextSubscriptionRequest.h
     UpdateContextSubscriptionResponse.h
-    QueryContextRequestVector.h
-    QueryContextResponseVector.h
 )
 
 

@@ -28,10 +28,10 @@
 #include "common/string.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
+#include "ngsi10/QueryContextRequest.h"
 #include "ngsi10/QueryContextResponse.h"
-#include "ngsi10/QueryContextRequestVector.h"
-#include "ngsi10/QueryContextResponse.h"
-#include "ngsi10/QueryContextResponseVector.h"
+#include "orionTypes/QueryContextRequestVector.h"
+#include "orionTypes/QueryContextResponseVector.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/clientSocketHttp.h"
 #include "serviceRoutines/postQueryContext.h"
@@ -180,7 +180,6 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
   // Fill in the response from the redirection into the response
   qcrsP->fill(&parseData.qcrs.res);
-  qcrsP->present("", "queryForward, after filling qcrsP");
 
   //
   // 'Fixing' StatusCode
@@ -216,13 +215,11 @@ std::string postQueryContext
   //
   QueryContextResponse*       qcrsP = &parseDataP->qcrs.res;
   std::string                 answer;
-  int                         noOfForwards = 0;
   QueryContextRequestVector   requestV;
   QueryContextResponseVector  responseV;
 
   qcrsP->errorCode.fill(SccOk);
   ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-  qcrsP->present("", "postQueryContext");
 
   for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
@@ -236,7 +233,7 @@ std::string postQueryContext
       
       //
       // An empty providingApplication means the attribute is local
-      // In such a case, the response is already in our hand, we just need to forward it to responseV
+      // In such a case, the response is already in our hand, we just need to copy it to responseV
       //
       if (aP->providingApplication == "")
       {
@@ -252,7 +249,6 @@ std::string postQueryContext
       {
         requestP = new QueryContextRequest(aP->providingApplication, eP, aP->name);
         requestV.push_back(requestP);
-        ++noOfForwards;
       }
       else
       {
@@ -265,7 +261,7 @@ std::string postQueryContext
   //
   // If no redirectioning is necessary, just return the result
   //
-  if (noOfForwards == 0)
+  if (requestV.size() == 0)
   {
     //
     // In case the response is empty, fill response with the entity we looked for
@@ -294,13 +290,7 @@ std::string postQueryContext
 
 
   //
-  // DEBUG - present the vector prepared for Context Provider Forwarding
-  //
-  requestV.present();
-
-
-  //
-  // Now, send 'noOfForwards' Query requests, each in a separate thread and
+  // Now, forward the Query requests, each in a separate thread (to be implemented) and
   // await all the responses.
   // Actually, if there is only ONE forward to be done then there is no reason to
   // do the forward in a separate shell. Better to do it inside the current thread.
@@ -312,9 +302,7 @@ std::string postQueryContext
   {
     if (requestV[fIx]->contextProvider == "")
     {
-      //
-      // No forward, we already have the result in responseV
-      //
+      LM_E(("Internal Error (empty context provider string)"));
       continue;
     }
 
@@ -323,11 +311,6 @@ std::string postQueryContext
     responseV.push_back(qP);
   }
 
-  responseV.present();
-
-  //
-  // Is qcrsAccumulatedP OK? Without doing anything special here ... ?
-  //
   answer = responseV.render(ciP, "");
 
   // requestV.release();
