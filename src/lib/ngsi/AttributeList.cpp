@@ -89,11 +89,11 @@ std::string AttributeList::check
 */
 void AttributeList::present(const std::string& indent)
 {
-  PRINTF("%sAttribute List\n",    indent.c_str());
+  LM_F(("%sAttribute List",    indent.c_str()));
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
   {
-    PRINTF("%s  %s\n", indent.c_str(), attributeV[ix].c_str());
+    LM_F(("%s  %s", indent.c_str(), attributeV[ix].c_str()));
   }
 }
 

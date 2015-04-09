@@ -25,8 +25,6 @@
 #include <string>
 #include <vector>
 
-#include "parseArgs/baStd.h"    // BA_FT for temporal debugging purposes
-
 #include "common/string.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
