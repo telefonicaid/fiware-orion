@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Query With Empty Attribute Vector
+Query With Empty Attribute Vector, Results From CP1 and CP2
 
 --SHELL-INIT--
 dbInit CB
@@ -352,4 +352,3 @@ brokerStop CP2
 dbDrop CB
 dbDrop CP1
 dbDrop CP2
-
