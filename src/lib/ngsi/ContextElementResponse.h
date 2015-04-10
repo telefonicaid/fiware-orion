@@ -53,6 +53,8 @@ typedef struct ContextElementResponse
                                                // without attributes in the Orion DB
 
   ContextElementResponse();
+  ContextElementResponse(EntityId* eP, ContextAttribute* aP);
+
   std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma = false);
   void         present(const std::string& indent, int ix);
   void         release(void);

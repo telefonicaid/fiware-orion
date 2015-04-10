@@ -60,6 +60,8 @@ class EntityId
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
+  bool         equal(EntityId* eP);
+  bool         isPatternIsTrue(void);
 
   std::string  render(Format              format,
                       const std::string&  indent,

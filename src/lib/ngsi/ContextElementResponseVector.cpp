@@ -166,3 +166,20 @@ void ContextElementResponseVector::release(void)
 
   vec.clear();
 }
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponseVector::lookup -
+*/
+ContextElementResponse* ContextElementResponseVector::lookup(EntityId* eP)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->contextElement.entityId.equal(eP) == true)
+      return vec[ix];
+  }
+
+  return NULL;
+}

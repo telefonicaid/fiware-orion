@@ -221,6 +221,22 @@ std::string postQueryContext
   qcrsP->errorCode.fill(SccOk);
   ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
+  //
+  // In this loop the output from mongoQueryContext is examines and the attributes are sorted
+  // by their providing application, in requestV, later to be used to forward the queries to their
+  // respective Context Providers.
+  //
+  // The local part of the query is already tken care of by mongoQueryContext and the result must be moved
+  // to the response vector.
+  // All the local response will be gathered in one single instance of QueryContextResponse.
+  // As a "QueryContextResponse::ContextElementResponse::ContextElement" can contain only ONE entity,
+  // we will need a separate ContextElementResponse for each distinct EntityId in the local response.
+  // All attributes that belong to the same EntityId will be gathered in one unique instance of
+  // ContextElementResponse - so, the correct ContextElementResponse must be looked up and if not found,
+  // it must be created and added to the QueryContextResponse of the local response
+  //
+  QueryContextResponse* localQcrsP = new QueryContextResponse();
+
   for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
     ContextElementResponse* cerP       = qcrsP->contextElementResponseVector[ix]->clone();
@@ -229,7 +245,6 @@ std::string postQueryContext
     {
       EntityId*            eP       = &cerP->contextElement.entityId;
       ContextAttribute*    aP       = cerP->contextElement.contextAttributeVector[aIx];
-      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication, eP);   // No need to lookup if providingApplication == "" ...
       
       //
       // An empty providingApplication means the attribute is local
@@ -242,10 +257,30 @@ std::string postQueryContext
           continue;  // Non-found pairs of entity/attribute are thrown away
         }
 
-        QueryContextResponse* qP = new QueryContextResponse(eP, aP);
-        responseV.push_back(qP);
+        
+        //
+        // So, where can we put this attribute?
+        // If we find a suitable existing contextElementResponse, we put it there,
+        // otherwise, we have to create a new contextElementResponse.
+        //
+        ContextElementResponse* cerP = localQcrsP->contextElementResponseVector.lookup(eP);
+
+        if (cerP == NULL)
+        {
+          cerP = new ContextElementResponse(eP, aP);
+          localQcrsP->contextElementResponseVector.push_back(cerP);
+        }
+        else
+        {
+          cerP->contextElement.contextAttributeVector.push_back(aP);
+        }
+
+        continue;
       }
-      else if (requestP == NULL)
+
+      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication, eP);
+
+      if (requestP == NULL)
       {
         requestP = new QueryContextRequest(aP->providingApplication, eP, aP->name);
         requestV.push_back(requestP);
@@ -257,6 +292,18 @@ std::string postQueryContext
       }
     }
   }
+
+
+  //
+  // Any local results in localQcrsP?
+  //
+  // If so, localQcrsP must be pushed to the response vector 'responseV'.
+  //
+  if (localQcrsP->contextElementResponseVector.size() != 0)
+  {
+    responseV.push_back(localQcrsP);
+  }
+
 
   //
   // If no redirectioning is necessary, just return the result

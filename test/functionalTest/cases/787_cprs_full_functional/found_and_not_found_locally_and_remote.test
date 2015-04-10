@@ -1041,7 +1041,7 @@ Date: REGEX(.*)
 15. Query E1-E8/A1-A3
 =====================
 HTTP/1.1 200 OK
-Content-Length: 5342
+Content-Length: 4370
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -1054,38 +1054,12 @@ Date: REGEX(.*)
                         "name": "A1", 
                         "type": "string", 
                         "value": "E7/A1 in CB"
-                    }
-                ], 
-                "id": "E7", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
+                    }, 
                     {
                         "name": "A2", 
                         "type": "string", 
                         "value": "E7/A2 in CB"
-                    }
-                ], 
-                "id": "E7", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
+                    }, 
                     {
                         "name": "A3", 
                         "type": "string", 
@@ -1108,38 +1082,12 @@ Date: REGEX(.*)
                         "name": "A1", 
                         "type": "string", 
                         "value": "E8/A1 in CB"
-                    }
-                ], 
-                "id": "E8", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
+                    }, 
                     {
                         "name": "A2", 
                         "type": "string", 
                         "value": "E8/A2 in CB"
-                    }
-                ], 
-                "id": "E8", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
+                    }, 
                     {
                         "name": "A3", 
                         "type": "string", 

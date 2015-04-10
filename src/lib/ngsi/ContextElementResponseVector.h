@@ -50,6 +50,7 @@ typedef struct ContextElementResponseVector
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void);
   ContextElementResponse*  get(unsigned int ix);
+  ContextElementResponse*  lookup(EntityId* eP);
   void                     release();
 
   ContextElementResponse*  operator[](unsigned int ix)

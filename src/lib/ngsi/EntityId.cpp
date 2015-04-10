@@ -257,3 +257,40 @@ std::string EntityId::toString(bool useIsPattern, const std::string& delimiter)
 
   return s;
 }
+
+
+
+/* ****************************************************************************
+*
+* EntityId::equal - return TRUE if EXACT match
+*/
+bool EntityId::equal(EntityId* eP)
+{
+  if (eP->id != id)
+  {
+    return false;
+  }
+
+  if (eP->type != type)
+  {
+    return false;
+  }
+
+  if (eP->isPatternIsTrue() == isPatternIsTrue())
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* isPatternIsTrue - 
+*/
+bool EntityId::isPatternIsTrue(void)
+{
+  return isTrue(isPattern);
+}

@@ -32,6 +32,8 @@
 #include "ngsi10/QueryContextResponse.h"
 #include "rest/ConnectionInfo.h"
 
+
+
 /* ****************************************************************************
 *
 * ContextElementResponse::ContextElementResponse -
@@ -40,6 +42,21 @@ ContextElementResponse::ContextElementResponse()
 {
   prune = false;
 }
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::ContextElementResponse - 
+*/
+ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* aP)
+{
+  prune = false;
+
+  contextElement.entityId.fill(eP);
+  contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+}
+
 
 
 /* ****************************************************************************
