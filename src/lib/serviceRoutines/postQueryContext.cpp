@@ -226,7 +226,7 @@ std::string postQueryContext
   // by their providing application, in requestV, later to be used to forward the queries to their
   // respective Context Providers.
   //
-  // The local part of the query is already tken care of by mongoQueryContext and the result must be moved
+  // The local part of the query is already taken care of by mongoQueryContext and the result must be moved
   // to the response vector.
   // All the local response will be gathered in one single instance of QueryContextResponse.
   // As a "QueryContextResponse::ContextElementResponse::ContextElement" can contain only ONE entity,
@@ -369,7 +369,7 @@ std::string postQueryContext
 
   answer = responseV.render(ciP, "");
 
-  // requestV.release();
+  requestV.release();
 
   return answer;
 }
