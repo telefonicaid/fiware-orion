@@ -61,6 +61,20 @@ ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* a
 
 /* ****************************************************************************
 *
+* ContextElementResponse::ContextElementResponse - 
+*/
+ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
+{
+  prune = false;
+
+  contextElement.fill(cerP->contextElement);
+  statusCode.fill(cerP->statusCode);
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElementResponse::render - 
 */
 std::string ContextElementResponse::render

@@ -207,6 +207,19 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
 
 /* ****************************************************************************
 *
+* ContextAttributeVector::push_back - 
+*/
+void ContextAttributeVector::push_back(ContextAttributeVector* aVec)
+{
+  for (unsigned int ix = 0; ix < aVec->size(); ++ix)
+  {
+    vec.push_back(new ContextAttribute((*aVec)[ix]));
+  }
+}
+
+
+/* ****************************************************************************
+*
 * ContextAttributeVector::get - 
 */
 ContextAttribute* ContextAttributeVector::get(unsigned int ix)

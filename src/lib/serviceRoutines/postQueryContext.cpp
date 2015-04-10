@@ -239,12 +239,12 @@ std::string postQueryContext
 
   for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
-    ContextElementResponse* cerP       = qcrsP->contextElementResponseVector[ix]->clone();
+    ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix]->clone();
 
     for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
-      EntityId*            eP       = &cerP->contextElement.entityId;
-      ContextAttribute*    aP       = cerP->contextElement.contextAttributeVector[aIx];
+      EntityId*            eP  = &cerP->contextElement.entityId;
+      ContextAttribute*    aP  = cerP->contextElement.contextAttributeVector[aIx];
       
       //
       // An empty providingApplication means the attribute is local
@@ -303,6 +303,10 @@ std::string postQueryContext
   {
     responseV.push_back(localQcrsP);
   }
+  else
+  {
+    delete localQcrsP;
+  }
 
 
   //
@@ -354,7 +358,12 @@ std::string postQueryContext
     }
 
     QueryContextResponse* qP = new QueryContextResponse();
+    qP->errorCode.fill(SccOk);
     queryForward(ciP, requestV[fIx], qP);
+
+    //
+    // Now, each ContextElementResponse of qP should be tested to see whether there
+    // is already an existing ContextElementResponse in responseV
     responseV.push_back(qP);
   }
 

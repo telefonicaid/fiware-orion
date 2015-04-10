@@ -124,22 +124,28 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
   //
 
 
-  //
-  // Special case: vector is empty: translate to 404
-  //
   if (vec.size() == 0)
   {
+    //
+    // Special case: vector is empty: translate to 404
+    //
     responseP->errorCode.fill(SccContextElementNotFound);
   }
-
-  //
-  // Special case: only one QueryContextResponse in vec, and it has 0 contextElementResponses
-  // This is clearly a not found ...
-  //
-  if ((vec.size() == 1) && (vec[0]->contextElementResponseVector.size() == 0))
+  else if ((vec.size() == 1) && (vec[0]->contextElementResponseVector.size() == 0))
   {
+    //
+    // Special case: only one QueryContextResponse in vec, and it has 0 contextElementResponses
+    // This is clearly a Not Found ...
+    //
     responseP->errorCode.fill(SccContextElementNotFound);
     vec[0]->errorCode.fill(SccContextElementNotFound);
+  }
+  else
+  {
+    //
+    // We have found something, so, all good
+    //
+    responseP->errorCode.fill(SccOk);
   }
 
   for (unsigned int qIx = 0; qIx < vec.size(); ++qIx)
@@ -163,10 +169,27 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
     {
       ContextElementResponse* cerP = vec[qIx]->contextElementResponseVector[cerIx];
 
-      if ((cerP->statusCode.code == SccOk) || (cerP->statusCode.code == SccNone))  // No error
+      if ((cerP->statusCode.code != SccOk) && (cerP->statusCode.code != SccNone))  // Error - not to be added to output
       {
-        cerP->statusCode.fill(SccOk);
-        responseP->contextElementResponseVector.push_back(cerP);
+        continue;
+      }
+
+      //
+      // Does the EntityId of cerP already exist in any of the contextElementResponses in the contextElementResponseVector?
+      // If so, we just add the attributes of cerP to that contextElementResponse
+      //
+      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->contextElement.entityId);
+
+      if (targetCerP != NULL)
+      {
+        targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
+      }
+      else  // Not found so we will have to create a new ContextElementResponse 
+      {
+        ContextElementResponse* newCerP = new ContextElementResponse(cerP);
+
+        newCerP->statusCode.fill(SccOk);
+        responseP->contextElementResponseVector.push_back(newCerP);
       }
     }
   }

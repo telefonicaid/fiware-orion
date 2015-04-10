@@ -439,7 +439,7 @@ Date: REGEX(.*)
 08. Query CB for E1/A1+A2+A3+A4+A5+A6+A7
 ========================================
 HTTP/1.1 200 OK
-Content-Length: 1705
+Content-Length: 976
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -452,20 +452,7 @@ Date: REGEX(.*)
                         "name": "A1", 
                         "type": "string", 
                         "value": "A1 in CB"
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
+                    }, 
                     {
                         "name": "A2", 
                         "type": "string", 
@@ -475,20 +462,7 @@ Date: REGEX(.*)
                         "name": "A4", 
                         "type": "string", 
                         "value": "A4 in CP1"
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
+                    }, 
                     {
                         "name": "A3", 
                         "type": "string", 
@@ -498,20 +472,7 @@ Date: REGEX(.*)
                         "name": "A5", 
                         "type": "string", 
                         "value": "A5 in CP2"
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
+                    }, 
                     {
                         "name": "A6", 
                         "type": "string", 

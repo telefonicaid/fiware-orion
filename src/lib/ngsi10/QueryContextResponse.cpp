@@ -102,11 +102,11 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
 
   if (contextElementResponseVector.size() > 0)
   {
-    bool commaNeeded = (errorCode.code != SccNone);
+    bool commaNeeded = (errorCode.code != SccNone) && (errorCode.code != SccOk);
     out += contextElementResponseVector.render(ciP, QueryContext, indent + "  ", commaNeeded);
   }
 
-  if (errorCode.code != SccNone)
+  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
   {
     out += errorCode.render(ciP->outFormat, indent + "  ");
   }

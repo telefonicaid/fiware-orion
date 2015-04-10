@@ -111,7 +111,7 @@ Date: REGEX(.*)
 02. Query E1/T1/A1
 ==================
 HTTP/1.1 200 OK
-Content-Length: 460
+Content-Length: 391
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -135,11 +135,7 @@ Date: REGEX(.*)
                 "reasonPhrase": "OK"
             }
         }
-    ], 
-    "errorCode": {
-        "code": "200", 
-        "reasonPhrase": "OK"
-    }
+    ]
 }
 
 

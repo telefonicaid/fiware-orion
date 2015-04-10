@@ -416,7 +416,7 @@ Date: REGEX(.*)
 08. Query E1+E2/T1/A1+A2+A3+A4 (Find E1-A3 in CB, E1-A1+A2 in CP1, E2-A4 in CP2)
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1228
+Content-Length: 985
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -429,20 +429,7 @@ Date: REGEX(.*)
                         "name": "A3", 
                         "type": "string", 
                         "value": "A3 in CB"
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
+                    }, 
                     {
                         "name": "A1", 
                         "type": "string", 
