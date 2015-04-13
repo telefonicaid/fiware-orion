@@ -65,6 +65,7 @@ then
   sleepTime=PT7S
 fi
 
+#INVALID_XML
 url="/v1/subscribeContext"
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
