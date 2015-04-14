@@ -1453,11 +1453,12 @@ static void processAttribute(ContextRegistrationResponse* crr, AttributeList att
 *
 * processContextRegistrationElement -
 */
-static void processContextRegistrationElement (BSONObj cr, EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* crrV) {
+static void processContextRegistrationElement (BSONObj cr, EntityIdVector enV, AttributeList attrL, ContextRegistrationResponseVector* crrV, Format format) {
 
     ContextRegistrationResponse crr;
 
     crr.contextRegistration.providingApplication.set(STR_FIELD(cr, REG_PROVIDING_APPLICATION));
+    crr.contextRegistration.providingApplication.setFormat(format);
 
     std::vector<BSONElement> queryEntityV = cr.getField(REG_ENTITIES).Array();
     for (unsigned int ix = 0; ix < queryEntityV.size(); ++ix) {
@@ -1648,10 +1649,13 @@ bool registrationsQuery
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
+        /* Default format is XML, in the case the field ins not found in the registrations document (for pre-0.21.0 versions) */
+        Format format = r.hasField(REG_FORMAT) ? stringToFormat(STR_FIELD(r, REG_FORMAT)) : XML;
+
         std::vector<BSONElement> queryContextRegistrationV = r.getField(REG_CONTEXT_REGISTRATION).Array();
         for (unsigned int ix = 0 ; ix < queryContextRegistrationV.size(); ++ix)
         {
-            processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV);
+            processContextRegistrationElement(queryContextRegistrationV[ix].embeddedObject(), enV, attrL, crrV, format);
         }
 
         /* FIXME: note that given the response doesn't distinguish from which registration ID the
