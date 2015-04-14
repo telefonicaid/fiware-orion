@@ -72,6 +72,7 @@ using namespace mongo;
 #define REG_ATTRS_TYPE              "type"
 #define REG_ATTRS_ISDOMAIN          "isDomain"
 #define REG_SERVICE_PATH            "servicePath"
+#define REG_FORMAT                  "format"
 
 #define ENT_ATTRS                    "attrs"
 #define ENT_ENTITY_ID                "id"

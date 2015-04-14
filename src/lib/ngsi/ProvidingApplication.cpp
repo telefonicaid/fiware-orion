@@ -77,6 +77,15 @@ void ProvidingApplication::set(const std::string& value)
   string = value;
 }
 
+/* ****************************************************************************
+*
+* ProvidingApplication::setFormat -
+*/
+void ProvidingApplication::setFormat(const Format& f)
+{
+  format = f;
+}
+
 
 
 /* ****************************************************************************
@@ -86,6 +95,15 @@ void ProvidingApplication::set(const std::string& value)
 std::string ProvidingApplication::get(void)
 {
   return string;
+}
+
+/* ****************************************************************************
+*
+* ProvidingApplication::getFormat -
+*/
+Format ProvidingApplication::getFormat(void)
+{
+  return format;
 }
 
 

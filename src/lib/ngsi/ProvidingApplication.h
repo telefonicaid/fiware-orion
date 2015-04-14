@@ -39,9 +39,12 @@
 typedef struct ProvidingApplication
 {
   std::string   string;
+  Format        format;                  // Not par of NGSI itself, used by the CB to specify the preferred format for CPr interaction
 
   void          set(const std::string& value);
+  void          setFormat(const Format& f);
   std::string   get(void);
+  Format        getFormat(void);
   bool          isEmpty(void);
   std::string   render(Format format, const std::string& indent, bool comma);
   void          present(const std::string& indent);

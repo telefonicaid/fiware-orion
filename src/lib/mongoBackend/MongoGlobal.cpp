@@ -2081,8 +2081,8 @@ void fillContextProviders(ContextElementResponse* cer, ContextRegistrationRespon
     cprLookupByAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
 
     /* Looking results after crrV processing */
-    ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
-    ca->found = (ca->providingApplication != "");
+    ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
+    ca->found = (ca->providingApplication.get() != "");
   }
 }
 
