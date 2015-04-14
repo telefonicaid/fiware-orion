@@ -32,14 +32,45 @@
 #include "ngsi10/QueryContextResponse.h"
 #include "rest/ConnectionInfo.h"
 
+
+
 /* ****************************************************************************
 *
-* ContextElementResponse::render -
+* ContextElementResponse::ContextElementResponse -
 */
 ContextElementResponse::ContextElementResponse()
 {
   prune = false;
 }
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::ContextElementResponse - 
+*/
+ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* aP)
+{
+  prune = false;
+
+  contextElement.entityId.fill(eP);
+  contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::ContextElementResponse - 
+*/
+ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
+{
+  prune = false;
+
+  contextElement.fill(cerP->contextElement);
+  statusCode.fill(cerP->statusCode);
+}
+
 
 
 /* ****************************************************************************
@@ -116,8 +147,9 @@ std::string ContextElementResponse::check
 */
 void ContextElementResponse::present(const std::string& indent, int ix)
 {
-  contextElement.present(indent, ix);
-  statusCode.present(indent);
+  LM_F(("%sContextElementResponse %d:", indent.c_str(), ix));
+  contextElement.present(indent + "  ", ix);
+  statusCode.present(indent + "  ");
 }
 
 
@@ -167,4 +199,31 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
   {
     statusCode.fill(&qcrP->errorCode);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::fill - 
+*/
+void ContextElementResponse::fill(ContextElementResponse* cerP)
+{
+  contextElement.fill(cerP->contextElement);
+  statusCode.fill(cerP->statusCode);
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::clone - 
+*/
+ContextElementResponse* ContextElementResponse::clone(void)
+{
+  ContextElementResponse* cerP = new ContextElementResponse();
+
+  cerP->fill(this);
+
+  return cerP;
 }

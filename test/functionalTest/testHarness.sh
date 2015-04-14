@@ -70,7 +70,11 @@ function usage()
   echo "$empty [--dir <directory>]"
   echo "$empty [--stopOnError (stop at first error encountered)]"
   echo "$empty [--no-duration (removes duration mark on successful tests)]"
-  echo "$empty [ <directory or file> ]"
+  echo "$empty [ <directory or file> ]*"
+  echo
+  echo "* Please note that if a directory is passed as parameter, its entire path must be given, not only the directory-name"
+  echo "* If a file is passed as parameter, its entire file-name must be given, including '.test'"
+  echo
   exit $1
 }
 
@@ -186,6 +190,7 @@ do
   shift
 done
 
+vMsg "options parsed"
 
 
 # ------------------------------------------------------------------------------
@@ -300,11 +305,16 @@ fi
 #
 # Preparations - cd to the test directory
 #
-if [ ! -d "$dir" ]
+if [ "$dirOrFile" != "" ] && [ -d "$dirOrFile" ]
+then
+  cd $dirOrFile
+elif [ ! -d "$dir" ]
 then
   exitFunction 1 "$dir is not a directory" "HARNESS" "$dir" "" DIE
+else
+  cd $dir
 fi
-cd $dir
+
 
 echo "Orion Functional tests starting" > /tmp/orionFuncTestLog
 date >> /tmp/orionFuncTestLog
@@ -322,7 +332,7 @@ then
 else
   fileList=$(find . -name "$testFilter" | grep "$match" | sort | sed 's/^.\///')
 fi
-
+vMsg "fileList: $fileList"
 typeset -i noOfTests
 typeset -i testNo
 
@@ -582,6 +592,8 @@ function partExecute()
 function runTest()
 {
   path=$1
+
+  vMsg path=$path
   dirname=$(dirname $path)
   filename=$(basename $path .test)
   dir=""
@@ -664,6 +676,11 @@ vMsg Total number of tests: $noOfTests
 testNo=1
 for testFile in $fileList
 do
+  if [ -d "$testFile" ]
+  then
+    continue
+  fi
+
   if [ "$verbose" == "off" ]
   then
     init=$testFile" ................................................................................................................."

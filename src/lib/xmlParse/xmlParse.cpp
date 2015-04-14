@@ -113,9 +113,8 @@ static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path
       int r;
 
       //
-      // Before treating a node, a check is made that the value of the node has no forbidden
-      // characters.
-      // However, if the the node has attributes, then the values of the attributes are checked instead
+      // Before treating a node, a check is made that the value of the node has no forbidden characters.
+      // However, if the the node has attributes, then the values of the attributes are checked instead.
       //
       if (node->first_attribute() == NULL)
       {

@@ -46,6 +46,7 @@ typedef struct ContextAttributeVector
 
   void               present(const std::string& indent);
   void               push_back(ContextAttribute* item);
+  void               push_back(ContextAttributeVector* aVec);
   unsigned int       size(void);
   ContextAttribute*  get(unsigned int ix);
   void               release(void);

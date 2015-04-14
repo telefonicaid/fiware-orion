@@ -1,4 +1,4 @@
-# Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -18,35 +18,56 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
-SET (SOURCES
-    areas.cpp
-    TypeEntity.cpp
-    TypeEntityVector.cpp
-    EntityTypesResponse.cpp
-    EntityTypeAttributesResponse.cpp
-    QueryContextRequestVector.cpp
-    QueryContextResponseVector.cpp
-)
+--NAME--
+Plain local query that fails
 
-SET (HEADERS
-    areas.h
-    TypeEntity.h
-    TypeEntityVector.h
-    EntityTypesResponse.h
-    EntityTypeAttributesResponse.h
-    QueryContextRequestVector.h
-    QueryContextResponseVector.h
-)
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Query E1/T1/A1
+#
 
 
+echo "01. Query E1/T1/A1"
+echo "=================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
+echo
+echo
 
-# Include directories
-# -----------------------------------------------------------------
-include_directories("${PROJECT_SOURCE_DIR}/src/lib")
+
+--REGEXPECT--
+01. Query E1/T1/A1
+==================
+HTTP/1.1 200 OK
+Content-Length: 94
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "errorCode": {
+        "code": "404", 
+        "reasonPhrase": "No context element found"
+    }
+}
 
 
-# Library declaration
-# -----------------------------------------------------------------
-ADD_LIBRARY(orionTypes STATIC ${SOURCES} ${HEADERS})
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

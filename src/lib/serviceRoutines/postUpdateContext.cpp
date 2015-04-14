@@ -96,7 +96,17 @@ std::string postUpdateContext
     return answer;
   }
 
+  upcrsP->errorCode.fill(SccContextElementNotFound);
   ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
+  if (upcrsP->errorCode.code == SccContextElementNotFound)
+  {
+    if (upcrsP->contextElementResponseVector.size() == 1)
+    {
+      upcrsP->errorCode.details = upcrsP->contextElementResponseVector[0]->contextElement.entityId.id;
+    }
+  }
+  upcrsP->present("");
+
 
   //
   // Checking for SccFound in the ContextElementResponseVector
