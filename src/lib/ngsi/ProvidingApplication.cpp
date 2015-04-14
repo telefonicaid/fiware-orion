@@ -33,6 +33,16 @@
 #include "ngsi/ProvidingApplication.h"
 
 
+/* ****************************************************************************
+*
+* ProvidingApplication::ProvidingApplication -
+*/
+ProvidingApplication::ProvidingApplication()
+{
+  /* It is better to have a default constructor that leave format with a random value */
+  string = "";
+  format = NOFORMAT;
+}
 
 /* ****************************************************************************
 *

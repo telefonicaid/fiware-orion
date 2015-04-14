@@ -2082,10 +2082,13 @@ void fillContextProviders(ContextElementResponse* cer, ContextRegistrationRespon
     /* Search for some CPr in crrV */
     std::string perEntPa;
     std::string perAttrPa;
-    cprLookupByAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
+    Format      perEntPaFormat = NOFORMAT;
+    Format      perAttrPaFormat= NOFORMAT;
+    cprLookupByAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perEntPaFormat, &perAttrPa, &perAttrPaFormat);
 
     /* Looking results after crrV processing */
     ca->providingApplication.set(perAttrPa == "" ? perEntPa : perAttrPa);
+    ca->providingApplication.setFormat(perAttrPa == "" ? perEntPaFormat : perAttrPaFormat);
     ca->found = (ca->providingApplication.get() != "");
   }
 }
@@ -2127,7 +2130,9 @@ void cprLookupByAttribute(EntityId&                          en,
                           const std::string&                 attrName,
                           ContextRegistrationResponseVector& crrV,
                           std::string*                       perEntPa,
-                          std::string*                       perAttrPa)
+                          Format*                            perEntPaFormat,
+                          std::string*                       perAttrPa,
+                          Format*                            perAttrPaFormat)
 {
   *perEntPa  = "";
   *perAttrPa = "";
@@ -2147,7 +2152,8 @@ void cprLookupByAttribute(EntityId&                          en,
       /* CRR without attributes (keep searching in other CRR) */
       if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
       {
-        *perEntPa = crr->contextRegistration.providingApplication.get();
+        *perEntPa       = crr->contextRegistration.providingApplication.get();
+        *perEntPaFormat = crr->contextRegistration.providingApplication.getFormat();
         break; /* enIx */
       }
 
@@ -2158,7 +2164,8 @@ void cprLookupByAttribute(EntityId&                          en,
         if (regAttrName == attrName)
         {
           /* We cannot "improve" this result keep searching in CRR vector, so we return */
-          *perAttrPa = crr->contextRegistration.providingApplication.get();
+          *perAttrPa       = crr->contextRegistration.providingApplication.get();
+          *perAttrPaFormat = crr->contextRegistration.providingApplication.getFormat();
           return;
         }
       }

@@ -490,6 +490,8 @@ extern void cprLookupByAttribute(EntityId&                          en,
                                  const std::string&                 attrName,
                                  ContextRegistrationResponseVector& crrV,
                                  std::string*                       perEntPa,
-                                 std::string*                       perAttrPa);
+                                 Format*                            perEntPaFormat,
+                                 std::string*                       perAttrPa,
+                                 Format*                            perAttrPaFormat);
 
 #endif
