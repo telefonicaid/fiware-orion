@@ -210,6 +210,37 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
 /* ****************************************************************************
 *
+* forwardsPending - 
+*/
+static bool forwardsPending(QueryContextResponse* qcrsP)
+{
+  for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
+  {
+    ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
+
+    if (cerP->contextElement.providingApplicationList.size() != 0)
+    {
+      return true;
+    }
+
+    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
+      
+      if (aP->providingApplication != "")
+      {
+        return true;
+      }      
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * postQueryContext -
 */
 std::string postQueryContext
@@ -248,30 +279,7 @@ std::string postQueryContext
   // Now, the request is 'simple' if all providingApplicationLists of the ContextElements are empty and
   // no ContextAttribute has any providingApplication.
   //
-  bool requestDone = true;
-  for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
-  {
-    ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
-
-    if (cerP->contextElement.providingApplicationList.size() != 0)
-    {
-      requestDone = false;
-      break;
-    }
-
-    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
-    {
-      ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
-      
-      if (aP->providingApplication != "")
-      {
-        requestDone = false;
-        break;
-      }      
-    }
-  }
-
-  if (requestDone == true)
+  if (forwardsPending(qcrsP) == false)
   {
     answer = qcrsP->render(ciP, QueryContext, "");
     qcrP->release();
