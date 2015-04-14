@@ -45,6 +45,8 @@ typedef struct QueryContextResponseVector
   void                   release(void);
   void                   present(void);
   std::string            render(ConnectionInfo* ciP, const std::string& indent);
+  void                   populate(QueryContextResponse* responseP);
+
   QueryContextResponse*  operator[](unsigned int ix)
   {
     if (ix < vec.size())

@@ -62,7 +62,8 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 * 3. Send the request to the providing application (and await the response)
 * 4. Parse the XML response and fill in a binary QueryContextResponse
 * 5. Render QueryContextResponse from the providing application
-*
+* 6. 'Fixing' StatusCode
+* 7. Freeing memory
 */
 static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryContextResponse* qcrsP)
 {
@@ -133,7 +134,7 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
 
   //
-  // 5. Parse the XML response and fill in a binary QueryContextResponse
+  // 4. Parse the XML response and fill in a binary QueryContextResponse
   //
   std::string  s;
   std::string  errorMsg;
@@ -168,12 +169,14 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   {
     LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
     qcrsP->errorCode.fill(SccContextElementNotFound, "");
+    parseData.qcr.res.release();
+    parseData.qcrs.res.release();
     return;
   }
 
 
   //
-  // 6. Render QueryContextResponse from the providing application
+  // 5. Render QueryContextResponse from the providing application
   //
   char portV[16];
   snprintf(portV, sizeof(portV), "%d", port);
@@ -181,8 +184,9 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   // Fill in the response from the redirection into the response
   qcrsP->fill(&parseData.qcrs.res);
 
+
   //
-  // 'Fixing' StatusCode
+  // 6. 'Fixing' StatusCode
   //
   if (qcrsP->errorCode.code == SccNone)
   {
@@ -193,6 +197,13 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   {
     qcrsP->errorCode.fill(SccContextElementNotFound);
   }
+
+  
+  //
+  // 7. Freeing memory
+  //
+  parseData.qcr.res.release();
+  parseData.qcrs.res.release();
 }
 
 
@@ -211,18 +222,68 @@ std::string postQueryContext
 {
   //
   // Convops calling this routine may need the response in digital
-  // So, the digital response is passed back in parseDataP->qcrs.res
+  // So, the digital response is passed back in parseDataP->qcrs.res.
   //
   QueryContextResponse*       qcrsP = &parseDataP->qcrs.res;
+  QueryContextRequest*        qcrP  = &parseDataP->qcr.res;
   std::string                 answer;
   QueryContextRequestVector   requestV;
   QueryContextResponseVector  responseV;
 
-  qcrsP->errorCode.fill(SccOk);
-  ciP->httpStatusCode = mongoQueryContext(&parseDataP->qcr.res, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
   //
-  // In this loop the output from mongoQueryContext is examines and the attributes are sorted
+  // 01. Call mongoBackend/mongoQueryContext
+  //
+  qcrsP->errorCode.fill(SccOk);
+  ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+
+
+  //
+  // 02. Normal case (no requests to be forwarded)
+  //
+  // If the result from mongoBackend is a 'simple' result without any forwarding needed (this is the
+  // normal case), then there is no need to execute the special treatment that forwarding needs.
+  // It's better not to mix the two very different treatments of the output from mongoBackend.
+  //
+  // Now, the request is 'simple' if all providingApplicationLists of the ContextElements are empty and
+  // no ContextAttribute has any providingApplication.
+  //
+  bool requestDone = true;
+  for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
+  {
+    ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
+
+    if (cerP->contextElement.providingApplicationList.size() != 0)
+    {
+      requestDone = false;
+      break;
+    }
+
+    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
+      
+      if (aP->providingApplication != "")
+      {
+        requestDone = false;
+        break;
+      }      
+    }
+  }
+
+  if (requestDone == true)
+  {
+    answer = qcrsP->render(ciP, QueryContext, "");
+    qcrP->release();
+    return answer;
+  }
+
+
+
+  //
+  // 03. Complex case (queries to be forwarded)
+  //
+  // In this loop, the output from mongoQueryContext is examined and the attributes are sorted
   // by their providing application, in requestV, later to be used to forward the queries to their
   // respective Context Providers.
   //
@@ -239,11 +300,27 @@ std::string postQueryContext
 
   for (unsigned int ix = 0 ; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
-    ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix]->clone();
+    ContextElementResponse* cerP  = qcrsP->contextElementResponseVector[ix];
+    EntityId*               eP    = &cerP->contextElement.entityId;
+
+    //
+    // If a Context Provider has been registered with an empty attribute list for
+    // the EntityId in this ContextElement, then the ContextElement has this Context Provider
+    // in the providingApplicationList after the call to mongoQueryContext.
+    //
+    // When there is a Context Provider in ContextElement::providingApplicationList, then the
+    // request must be sent to that Context Provider also
+    //
+    for (unsigned int ix = 0; ix < cerP->contextElement.providingApplicationList.size(); ++ix)
+    {
+      QueryContextRequest* requestP;
+
+      requestP = new QueryContextRequest(cerP->contextElement.providingApplicationList[ix], eP, qcrP->attributeList);
+      requestV.push_back(requestP);
+    }
 
     for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
-      EntityId*            eP  = &cerP->contextElement.entityId;
       ContextAttribute*    aP  = cerP->contextElement.contextAttributeVector[aIx];
       
       //
@@ -257,27 +334,31 @@ std::string postQueryContext
           continue;  // Non-found pairs of entity/attribute are thrown away
         }
 
-        
+
         //
         // So, where can we put this attribute?
         // If we find a suitable existing contextElementResponse, we put it there,
         // otherwise, we have to create a new contextElementResponse.
         //
-        ContextElementResponse* cerP = localQcrsP->contextElementResponseVector.lookup(eP);
+        ContextElementResponse* contextElementResponseP = localQcrsP->contextElementResponseVector.lookup(eP);
 
-        if (cerP == NULL)
+        if (contextElementResponseP == NULL)
         {
-          cerP = new ContextElementResponse(eP, aP);
-          localQcrsP->contextElementResponseVector.push_back(cerP);
+          contextElementResponseP = new ContextElementResponse(eP, aP);
+          localQcrsP->contextElementResponseVector.push_back(contextElementResponseP);
         }
         else
         {
-          cerP->contextElement.contextAttributeVector.push_back(aP);
+          contextElementResponseP->contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
         }
 
         continue;
       }
 
+
+      //
+      // Not a local attribute - aP->providingApplication is not empty
+      //
       QueryContextRequest* requestP = requestV.lookup(aP->providingApplication, eP);
 
       if (requestP == NULL)
@@ -288,7 +369,7 @@ std::string postQueryContext
       else
       {
         requestP->attributeList.push_back_if_absent(aP->name);
-        requestP->entityIdVector.push_back_if_absent(eP);
+        requestP->entityIdVector.push_back_if_absent(new EntityId(eP));
       }
     }
   }
@@ -307,38 +388,6 @@ std::string postQueryContext
   {
     delete localQcrsP;
   }
-
-
-  //
-  // If no redirectioning is necessary, just return the result
-  //
-  if (requestV.size() == 0)
-  {
-    //
-    // In case the response is empty, fill response with the entity we looked for
-    //
-    if (qcrsP->contextElementResponseVector.size() == 0)
-    {
-      //
-      // FIXME P6: What do we do if we have more than one entity in incoming entityIdVector?
-      //           Push each entityId in a separate contextElementResponse?
-      //           Also, perhaps mongoQueryContext should implement this and not postQueryContext
-      //           This FIXME is related to github issue #588 and (probably) #650.
-      //           Also, optimizing this would be part of issue #768
-      //
-
-
-      //
-      // It's better not to give any details here as we'd have to choose ONE of the entities in the vector ...
-      // std::string details = "Entity id: /" + parseDataP->qcr.res.entityIdVector[0]->id + "/";
-      //
-      qcrsP->errorCode.fill(SccContextElementNotFound);
-    }
-
-    answer = qcrsP->render(ciP, QueryContext, "");
-    return answer;
-  }
-
 
   //
   // Now, forward the Query requests, each in a separate thread (to be implemented) and
@@ -369,7 +418,23 @@ std::string postQueryContext
 
   answer = responseV.render(ciP, "");
 
+  //
+  // Time to cleanup.
+  // But before doing that ...
+  // Some Convops calling this routine need the response in digital.
+  // The response is returned in parseDataP->qcrs.res (qcrsP).
+  // Right now, we have the response in responseV, so we have to migrate it
+  // from a vector of QueryContextResponse into one single QueryContextResponse.
+  // QueryContextResponseVector has a method 'populate' to do just that.
+  // Before populating qcrsP with what's in responseV, qcrsP must be cleaned so that
+  // we don't leak any memory.
+  //
+  qcrsP->release();
+  responseV.populate(qcrsP);
+
+  qcrP->release();
   requestV.release();
+  responseV.release();
 
   return answer;
 }

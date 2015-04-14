@@ -61,7 +61,28 @@ QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, En
   contextProvider = _contextProvider;
 
   entityIdVector.push_back(new EntityId(eP));
-  attributeList.push_back(attributeName);
+
+  if (attributeName != "")
+  {
+    attributeList.push_back(attributeName);
+  }
+
+  restrictions = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextRequest::QueryContextRequest
+*/
+QueryContextRequest::QueryContextRequest(const std::string& _contextProvider, EntityId* eP, AttributeList& _attributeList)
+{
+  contextProvider = _contextProvider;
+
+  entityIdVector.push_back(new EntityId(eP));
+  
+  attributeList.clone(_attributeList);
 
   restrictions = 0;
 }

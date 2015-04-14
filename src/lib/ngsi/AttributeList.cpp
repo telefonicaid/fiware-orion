@@ -173,3 +173,17 @@ std::string AttributeList::get(int ix)
 {
   return attributeV[ix];
 }
+
+
+
+/* ****************************************************************************
+*
+* AttributeList::clone - 
+*/
+void AttributeList::clone(AttributeList& aList)
+{
+  for (unsigned int ix = 0; ix < aList.size(); ++ix)
+  {
+    push_back(aList[ix]);
+  }
+}

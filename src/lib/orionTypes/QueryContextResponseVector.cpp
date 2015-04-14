@@ -195,11 +195,95 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
   }
 
 
-  responseP->present("", "QueryContextResponseVector::render");
-
   answer = responseP->render(ciP, QueryContext, "");
   responseP->release();
   delete responseP;
 
   return answer;
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextResponseVector::populate - 
+*/
+void QueryContextResponseVector::populate(QueryContextResponse* responseP)
+{
+  //
+  // We have a vector of QueryContextResponse.
+  // What we need is ONE QueryContextResponse, so, we'll take all the 
+  // contextElementResponses from each of the QueryContextResponses in the vector and
+  // move them to ONE QueryContextResponse (responseP)
+  // 
+
+  if (vec.size() == 0)
+  {
+    //
+    // Special case: vector is empty: translate to 404
+    //
+    responseP->errorCode.fill(SccContextElementNotFound);
+  }
+  else if ((vec.size() == 1) && (vec[0]->contextElementResponseVector.size() == 0))
+  {
+    //
+    // Special case: only one QueryContextResponse in vec, and it has 0 contextElementResponses
+    // This is clearly a Not Found ...
+    //
+    responseP->errorCode.fill(SccContextElementNotFound);
+    vec[0]->errorCode.fill(SccContextElementNotFound);
+  }
+  else
+  {
+    //
+    // We have found something, so, all good
+    //
+    responseP->errorCode.fill(SccOk);
+  }
+
+  for (unsigned int qIx = 0; qIx < vec.size(); ++qIx)
+  {
+    //
+    // If the response vector is empty and the errorCode also, then a 404 Not Found
+    // is inserted.
+    //
+    if (vec[qIx]->contextElementResponseVector.size() == 0)
+    {
+      if ((vec[qIx]->errorCode.code == SccOk) || (vec[qIx]->errorCode.code == SccNone))
+      {
+        ContextElementResponse* cerP = new ContextElementResponse();
+
+        cerP->statusCode.fill(SccContextElementNotFound);
+        responseP->contextElementResponseVector.push_back(cerP);
+      }
+    }
+
+    for (unsigned int cerIx = 0; cerIx < vec[qIx]->contextElementResponseVector.size(); ++cerIx)
+    {
+      ContextElementResponse* cerP = vec[qIx]->contextElementResponseVector[cerIx];
+
+      if ((cerP->statusCode.code != SccOk) && (cerP->statusCode.code != SccNone))  // Error - not to be added to output
+      {
+        continue;
+      }
+
+      //
+      // Does the EntityId of cerP already exist in any of the contextElementResponses in the contextElementResponseVector?
+      // If so, we just add the attributes of cerP to that contextElementResponse
+      //
+      ContextElementResponse* targetCerP = responseP->contextElementResponseVector.lookup(&cerP->contextElement.entityId);
+
+      if (targetCerP != NULL)
+      {
+        targetCerP->contextElement.contextAttributeVector.push_back(&cerP->contextElement.contextAttributeVector);
+      }
+      else  // Not found so we will have to create a new ContextElementResponse 
+      {
+        ContextElementResponse* newCerP = new ContextElementResponse(cerP);
+
+        newCerP->statusCode.fill(SccOk);
+        responseP->contextElementResponseVector.push_back(newCerP);
+      }
+    }
+  }
 }
