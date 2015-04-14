@@ -109,6 +109,16 @@ std::string postUpdateContext
   }
   upcrsP->present("KZ:");
 
+  //
+  // 02. Normal case - no forwards
+  //
+  // If there is nothing to forward, just return the result
+  //
+  bool forwarding = forwardsPending(upcrsP);
+  if (forwarding == false)
+  {
+  }
+
 
   //
   // Checking for SccFound in the ContextElementResponseVector
