@@ -1649,7 +1649,7 @@ bool registrationsQuery
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 
-        /* Default format is XML, in the case the field ins not found in the registrations document (for pre-0.21.0 versions) */
+        /* Default format is XML, in the case the field is not found in the registrations document (for pre-0.21.0 versions) */
         Format format = r.hasField(REG_FORMAT) ? stringToFormat(STR_FIELD(r, REG_FORMAT)) : XML;
 
         std::vector<BSONElement> queryContextRegistrationV = r.getField(REG_CONTEXT_REGISTRATION).Array();
