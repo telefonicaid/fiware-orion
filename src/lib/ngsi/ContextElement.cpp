@@ -153,7 +153,7 @@ void ContextElement::present(const std::string& indent, int ix)
   domainMetadataVector.present("Domain", indent + "  ");
   for (unsigned int ix = 0; ix < providingApplicationList.size(); ++ix)
   {
-    PRINTF("%s  PA: %s\n", indent.c_str(), providingApplicationList[ix].c_str());
+    PRINTF("%s  PA: %s (%s)\n", indent.c_str(), providingApplicationList[ix].get().c_str(), formatToString(providingApplicationList[ix].getFormat()));
   }
 }
 

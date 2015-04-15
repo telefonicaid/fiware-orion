@@ -78,6 +78,7 @@
 * - severalCprs1
 * - severalCprs2
 * - severalCprs3
+* - severalCprsFormat
 *
 * Note these tests are not "canonical" unit tests. Canon says that in this case we should have
 * mocked MongoDB. Actually, we think is very much powerful to check that everything is ok at
@@ -430,7 +431,7 @@ static void prepareDatabaseSeveralCprs1(bool addGenericRegistry)
 * prepareDatabaseSeveralCprs2 -
 *
 */
-static void prepareDatabaseSeveralCprs2(void)
+static void prepareDatabaseSeveralCprs2(bool withFormat = false)
 {
 
   /* Set database */
@@ -498,42 +499,61 @@ static void prepareDatabaseSeveralCprs2(void)
                      );
 
   /* 1879048191 corresponds to year 2029 so we avoid any expiration problem in the next 16 years :) */
-  BSONObj reg1 = BSON(
+  /*BSONObjBuilder reg1 = BSON(
               "_id" << OID("51307b66f481db11bf860001") <<
               "expiration" << 1879048191 <<
               "contextRegistration" << BSON_ARRAY(cr1)
-              );
+              );*/
+  BSONObjBuilder reg1;
+  reg1.appendElements(BSON(
+                        "_id" << OID("51307b66f481db11bf860001") <<
+                        "expiration" << 1879048191 <<
+                        "contextRegistration" << BSON_ARRAY(cr1)
+                        ));
 
-  BSONObj reg2 = BSON(
-              "_id" << OID("51307b66f481db11bf860002") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr2)
-              );
+  BSONObjBuilder reg2;
+  reg2.appendElements(BSON(
+                        "_id" << OID("51307b66f481db11bf860002") <<
+                        "expiration" << 1879048191 <<
+                        "contextRegistration" << BSON_ARRAY(cr2)
+                        ));
 
-  BSONObj reg3 = BSON(
-              "_id" << OID("51307b66f481db11bf860003") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr3)
-              );
+  BSONObjBuilder reg3;
+  reg3.appendElements(BSON(
+                        "_id" << OID("51307b66f481db11bf860003") <<
+                        "expiration" << 1879048191 <<
+                        "contextRegistration" << BSON_ARRAY(cr3)
+                        ));
 
-  BSONObj reg4 = BSON(
-              "_id" << OID("51307b66f481db11bf860004") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr4)
-              );
+  BSONObjBuilder reg4;
+  reg4.appendElements(BSON(
+                        "_id" << OID("51307b66f481db11bf860004") <<
+                        "expiration" << 1879048191 <<
+                        "contextRegistration" << BSON_ARRAY(cr4)
+                        ));
 
-  BSONObj reg5 = BSON(
-              "_id" << OID("51307b66f481db11bf860005") <<
-              "expiration" << 1879048191 <<
-              "contextRegistration" << BSON_ARRAY(cr5)
-              );
+  BSONObjBuilder reg5;
+  reg5.appendElements(BSON(
+                        "_id" << OID("51307b66f481db11bf860005") <<
+                        "expiration" << 1879048191 <<
+                        "contextRegistration" << BSON_ARRAY(cr5)
+                        ));
+
+  if (withFormat)
+  {
+    reg1.appendElements(BSON("format" << "XML"));
+    reg2.appendElements(BSON("format" << "JSON"));
+    reg3.appendElements(BSON("format" << "XML"));
+    reg4.appendElements(BSON("format" << "JSON"));
+    reg5.appendElements(BSON("format" << "XML"));
+  }
 
   connection->insert(ENTITIES_COLL, en1);
-  connection->insert(REGISTRATIONS_COLL, reg1);
-  connection->insert(REGISTRATIONS_COLL, reg2);
-  connection->insert(REGISTRATIONS_COLL, reg3);
-  connection->insert(REGISTRATIONS_COLL, reg4);
-  connection->insert(REGISTRATIONS_COLL, reg5);
+  connection->insert(REGISTRATIONS_COLL, reg1.obj());
+  connection->insert(REGISTRATIONS_COLL, reg2.obj());
+  connection->insert(REGISTRATIONS_COLL, reg3.obj());
+  connection->insert(REGISTRATIONS_COLL, reg4.obj());
+  connection->insert(REGISTRATIONS_COLL, reg5.obj());
 
 }
 
@@ -580,17 +600,20 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -649,7 +672,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -715,7 +739,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -776,12 +801,14 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -843,22 +870,26 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->value);
-  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication);
+  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -920,17 +951,20 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1079,22 +1113,26 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->value);
-  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication);
+  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   /* Context Element response # 1 */
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
@@ -1110,17 +1148,20 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 2)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1182,12 +1223,14 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1255,12 +1298,14 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1276,7 +1321,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1344,7 +1390,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr5.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr5.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1360,7 +1407,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1376,7 +1424,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->value);
-  EXPECT_EQ("http://cr4.com", RES_CER_ATTR(2, 0)->providingApplication);
+  EXPECT_EQ("http://cr4.com", RES_CER_ATTR(2, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
@@ -1441,17 +1490,20 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   /* Context Element response # 2 */
   EXPECT_EQ("E3", RES_CER(1).entityId.id);
@@ -1463,17 +1515,20 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 1)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 2)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1532,7 +1587,8 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1595,7 +1651,8 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1611,7 +1668,8 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1675,12 +1733,14 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1696,12 +1756,14 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(1, 1)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1808,7 +1870,8 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1824,7 +1887,8 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1840,7 +1904,8 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("A2", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->value);
-  EXPECT_EQ("http://cr4.com", RES_CER_ATTR(2, 0)->providingApplication);
+  EXPECT_EQ("http://cr4.com", RES_CER_ATTR(2, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
@@ -1856,7 +1921,8 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   EXPECT_EQ("A2", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(3, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(3, 0)->value);
-  EXPECT_EQ("http://cr5.com", RES_CER_ATTR(3, 0)->providingApplication);
+  EXPECT_EQ("http://cr5.com", RES_CER_ATTR(3, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(3, 0)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
@@ -1922,22 +1988,26 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->value);
-  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication);
+  EXPECT_EQ("http://cr2.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1953,17 +2023,20 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(1, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(1, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(1, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
@@ -1979,17 +2052,20 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 0)->value);
-  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(2, 0)->providingApplication);
+  EXPECT_EQ("http://cr1.com", RES_CER_ATTR(2, 0)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(2, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(2, 1)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(2, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(2, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(2, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(2, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(2, 2)->value);
-  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(2, 2)->providingApplication);
+  EXPECT_EQ("http://cr1.com",   RES_CER_ATTR(2, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(2, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
@@ -2062,32 +2138,38 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication);
+  EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->value);
-  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication);
+  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->value);
-  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication);
+  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 4)->providingApplication.getFormat());
 
   EXPECT_EQ("A6", RES_CER_ATTR(0, 5)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 5)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 5)->value);
-  EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(0, 5)->providingApplication);
+  EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(0, 5)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 5)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -2154,27 +2236,32 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication);
+  EXPECT_EQ("http://cpr2.com",   RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 3)->value);
-  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication);
+  EXPECT_EQ("http://cpr1.com",   RES_CER_ATTR(0, 3)->providingApplication.get());
+  EXPECT_EQ(XML,   RES_CER_ATTR(0, 3)->providingApplication.getFormat());
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 4)->value);
-  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication);
+  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 4)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 4)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -2226,25 +2313,105 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ("T", RES_CER(0).entityId.type);
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);  
   ASSERT_EQ(2, RES_CER(0).providingApplicationList.size());
-  EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplicationList[0]);
-  EXPECT_EQ("http://cpr3.com", RES_CER(0).providingApplicationList[1]);
+  EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplicationList[0].get());
+  EXPECT_EQ(XML, RES_CER(0).providingApplicationList[0].getFormat());
+  EXPECT_EQ("http://cpr3.com", RES_CER(0).providingApplicationList[1].get());
+  EXPECT_EQ(XML, RES_CER(0).providingApplicationList[1].getFormat());
 
   ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
-  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
-  EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(0, 1)->providingApplication);
+  EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
-  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 2)->providingApplication);
+  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
+
+  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+
+  utExit();
+
+}
+
+/* ****************************************************************************
+*
+* severalCprsFormat -
+*
+* Query:  E1 - <null>
+* Result: E1 - A1 - 1
+*              A2 - fwd CPR1 - JSON
+*              A3 - fwd CPR2 - XML
+*
+*         CPR vector: [CPR2-XML, CPR3-JSON]
+*/
+TEST(mongoContextProvidersQueryRequest, severalCprsFormat)
+{
+  HttpStatusCode        ms;
+  QueryContextRequest   req;
+  QueryContextResponse  res;
+
+  /* Prepare database */
+  utInit();
+  prepareDatabaseSeveralCprs2(true);
+
+  /* Forge the request (from "inside" to "outside") */
+  EntityId en("E1", "T", "false");
+  req.entityIdVector.push_back(&en);
+
+  /* Invoke the function in mongoBackend library */
+  ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+
+  EXPECT_EQ(SccNone, res.errorCode.code);
+  EXPECT_EQ("", res.errorCode.reasonPhrase);
+  EXPECT_EQ("", res.errorCode.details);
+
+  ASSERT_EQ(1, res.contextElementResponseVector.size());
+
+  /* Context Element response # 1 */
+  EXPECT_EQ("E1", RES_CER(0).entityId.id);
+  EXPECT_EQ("T", RES_CER(0).entityId.type);
+  EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+  ASSERT_EQ(2, RES_CER(0).providingApplicationList.size());
+  EXPECT_EQ("http://cpr2.com", RES_CER(0).providingApplicationList[0].get());
+  EXPECT_EQ(JSON, RES_CER(0).providingApplicationList[0].getFormat());
+  EXPECT_EQ("http://cpr3.com", RES_CER(0).providingApplicationList[1].get());
+  EXPECT_EQ(XML, RES_CER(0).providingApplicationList[1].getFormat());
+
+  ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+
+  EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+  EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
+  EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
+  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+
+  EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 1)->value);
+  EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(0, 1)->providingApplication.get());
+  EXPECT_EQ(JSON, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
+
+  EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->type);
+  EXPECT_EQ("", RES_CER_ATTR(0, 2)->value);
+  EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 2)->providingApplication.get());
+  EXPECT_EQ(XML, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);

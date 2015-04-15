@@ -43,7 +43,8 @@ extern HttpStatusCode processRegisterContext
   RegisterContextResponse*  responseP,
   OID*                      id,
   const std::string&        tenant,
-  const std::string&        servicePath
+  const std::string&        servicePath,
+  const std::string&        format
 );
 
 

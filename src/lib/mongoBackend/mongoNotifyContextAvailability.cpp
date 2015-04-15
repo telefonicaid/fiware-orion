@@ -24,6 +24,7 @@
 */
 
 #include "common/sem.h"
+#include "logMsg/traceLevels.h"
 
 #include "mongoBackend/mongoNotifyContextAvailability.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -37,12 +38,19 @@
 */
 HttpStatusCode mongoNotifyContextAvailability
 (
-  NotifyContextAvailabilityRequest*   requestP,
-  NotifyContextAvailabilityResponse*  responseP,
-  const std::string&                  tenant,
-  const std::string&                  servicePath
+  NotifyContextAvailabilityRequest*    requestP,
+  NotifyContextAvailabilityResponse*   responseP,
+  std::map<std::string, std::string>&  uriParam,
+  const std::string&                   tenant,
+  const std::string&                   servicePath
 )
 {
+    // FIXME P10: we have been discussing about changing the "notifyFormat" name for something more neutral and more
+    // meaningfull for *both* subscription notification and cpr forwards
+    std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
+
+    LM_T(LmtMongo, ("Notify Context Availability: '%s' format", notifyFormat.c_str()));
+
     reqSemTake(__FUNCTION__, "mongo ngsi9 notification");
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
@@ -63,7 +71,7 @@ HttpStatusCode mongoNotifyContextAvailability
      * point of view, notifyContextAvailability is considered as a new registration (as no registratinId is
      * received in the notification message) */
     RegisterContextResponse rcres;
-    processRegisterContext(&rcr, &rcres, NULL, tenant, servicePath);
+    processRegisterContext(&rcr, &rcres, NULL, tenant, servicePath, notifyFormat);
 
     responseP->responseCode.fill(SccOk);
 

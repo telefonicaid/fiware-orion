@@ -72,6 +72,7 @@ using namespace mongo;
 #define REG_ATTRS_TYPE              "type"
 #define REG_ATTRS_ISDOMAIN          "isDomain"
 #define REG_SERVICE_PATH            "servicePath"
+#define REG_FORMAT                  "format"
 
 #define ENT_ATTRS                    "attrs"
 #define ENT_ENTITY_ID                "id"
@@ -489,6 +490,8 @@ extern void cprLookupByAttribute(EntityId&                          en,
                                  const std::string&                 attrName,
                                  ContextRegistrationResponseVector& crrV,
                                  std::string*                       perEntPa,
-                                 std::string*                       perAttrPa);
+                                 Format*                            perEntPaFormat,
+                                 std::string*                       perAttrPa,
+                                 Format*                            perAttrPaFormat);
 
 #endif

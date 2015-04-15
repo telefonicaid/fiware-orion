@@ -48,7 +48,7 @@ typedef struct ContextElement
   ContextAttributeVector   contextAttributeVector;  // Optional
   MetadataVector           domainMetadataVector;    // Optional
 
-  std::vector<std::string> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
+  std::vector<ProvidingApplication> providingApplicationList;    // Not part of NGSI, used internally for CPr forwarding functionality
 
   ContextElement();
 
