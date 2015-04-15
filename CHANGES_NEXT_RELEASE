@@ -1,3 +1,4 @@
 - Add: support for MongoDB 2.6 (MongoDB 2.4 should *not* be used any longer as inverted geo-queries will not work in that version) (Issue #415)
 - Add: context providers full functionality (Issue #787)
+- Fix: unhardwire format to forward requests to context providers (Issue #722)
 - Fix: using proper GJSON for location.coords entities information (Issue #415)
