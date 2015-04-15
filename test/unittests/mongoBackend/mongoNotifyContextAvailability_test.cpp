@@ -25,6 +25,7 @@
 
 #include "gtest/gtest.h"
 #include "testInit.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -71,19 +72,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request */
   req.subscriptionId.set("51307b66f481db11bf860001");
@@ -95,7 +84,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -132,9 +121,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -148,19 +135,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
@@ -171,7 +146,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -208,9 +183,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -224,19 +197,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
@@ -251,7 +212,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -296,9 +257,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -312,19 +271,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
@@ -339,7 +286,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -384,9 +331,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -400,19 +345,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
@@ -427,7 +360,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -472,9 +405,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -488,19 +419,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
@@ -515,7 +434,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -560,9 +479,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -576,19 +493,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -601,7 +506,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -641,9 +546,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -657,19 +560,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -682,7 +573,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -722,9 +613,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -738,19 +627,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -767,7 +644,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -815,9 +692,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -831,19 +706,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -860,7 +723,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -908,9 +771,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -924,19 +785,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -953,7 +802,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1001,9 +850,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1017,19 +864,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1046,7 +881,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1094,9 +929,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1110,19 +943,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1138,7 +959,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1185,9 +1006,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1201,19 +1020,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1229,7 +1036,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1276,9 +1083,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1292,19 +1097,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1328,7 +1121,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1392,9 +1185,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1408,19 +1199,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1444,7 +1223,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1508,9 +1287,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utInit();
 
 }
 
@@ -1524,19 +1301,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1560,7 +1325,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1624,9 +1389,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1640,19 +1403,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1676,7 +1427,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1740,9 +1491,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1756,19 +1505,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1788,7 +1525,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1842,9 +1579,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1858,19 +1593,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1890,7 +1613,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1944,9 +1667,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1960,19 +1681,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -2000,7 +1709,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2070,9 +1779,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2086,19 +1793,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -2126,7 +1821,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2196,9 +1891,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2212,19 +1905,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -2252,7 +1933,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2322,9 +2003,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2338,19 +2017,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -2378,7 +2045,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2448,8 +2115,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }

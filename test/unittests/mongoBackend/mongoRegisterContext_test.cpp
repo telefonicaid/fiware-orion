@@ -24,6 +24,7 @@
 */
 #include "gtest/gtest.h"
 #include "testInit.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -131,16 +132,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
@@ -154,7 +146,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -193,9 +185,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -209,16 +199,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
@@ -232,7 +213,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -271,9 +252,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -287,16 +266,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
   RegisterContextRequest   req;
   RegisterContextResponse  res; 
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
@@ -314,7 +284,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -361,9 +331,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -377,16 +345,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
@@ -404,7 +363,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -451,9 +410,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -466,16 +423,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
@@ -493,7 +441,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  mongoRegisterContext(&req, &res);
+  mongoRegisterContext(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -532,9 +480,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -548,16 +494,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
@@ -575,7 +512,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -622,9 +559,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -638,16 +573,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -663,7 +589,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -705,9 +631,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -721,16 +645,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -746,7 +661,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -788,9 +703,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -804,16 +717,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;    
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -834,7 +738,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -884,9 +788,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -900,16 +802,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -930,7 +823,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -980,9 +873,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -996,16 +887,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1026,7 +908,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1076,9 +958,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1092,16 +972,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1122,7 +993,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1172,9 +1043,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1188,16 +1057,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;    
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1215,7 +1075,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1264,9 +1124,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1280,16 +1138,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1307,7 +1156,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1356,9 +1205,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1372,16 +1219,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1407,7 +1245,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1473,9 +1311,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1489,16 +1325,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1524,7 +1351,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1590,9 +1417,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1606,16 +1431,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1641,7 +1457,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1707,9 +1523,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1723,16 +1537,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1758,7 +1563,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1824,9 +1629,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1840,16 +1643,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_At0_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1871,7 +1665,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_At0_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1927,9 +1721,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1943,16 +1735,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_At0_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1974,7 +1757,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_At0_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2030,9 +1813,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2046,16 +1827,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -2085,7 +1857,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2157,9 +1929,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2173,16 +1943,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -2212,7 +1973,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2284,9 +2045,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2300,16 +2059,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -2339,7 +2089,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2411,9 +2161,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2427,16 +2175,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -2466,7 +2205,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2538,9 +2277,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2588,7 +2325,7 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2660,7 +2397,7 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2729,7 +2466,7 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2761,16 +2498,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   RegisterContextRequest   req;
   RegisterContextResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
@@ -2783,7 +2511,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   prepareDatabase();
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoRegisterContext(&req, &res);
+  ms = mongoRegisterContext(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2822,9 +2550,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -2839,15 +2565,9 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     RegisterContextRequest   req;
     RegisterContextResponse  res;   
 
-    /* Set database */
-    setupDatabase();
+    utInit();
 
     /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
     const DBException e = DBException("boom!!", 33);
     BSONObj fakeEntity = BSON("_id" << BSON("id" << "E1" << "type" << "T1"));
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
@@ -2863,11 +2583,6 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     ON_CALL(*connectionMock, _query("unittest.casubs",_,_,_,_,_,_))
             .WillByDefault(Return(cursorMockCAsub));
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
     ContextRegistration cr;
@@ -2880,7 +2595,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     mongoConnect(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2897,13 +2612,11 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     std::string s2 = res.errorCode.details.substr(71+24, res.errorCode.details.size()-71-24);
     EXPECT_EQ("collection: unittest.registrations "
               "- upsert update(): { _id: ObjectId('",s1);
-    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: {}, providingApplication: \"http://dummy.com\" } ] } "
+    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"XML\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: {}, providingApplication: \"http://dummy.com\" } ] } "
               "- exception: boom!!", s2);
 
     /* Release mock */
     delete connectionMock;
-    delete timerMock;
-    delete notifierMock;
 
     /* Reconnect to database in not-mocked way */
     mongoConnect("localhost");
@@ -2912,6 +2625,8 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     DBClientBase* connection = getMongoConnection();
     EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
     EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
+
+    utExit();
 
 }
 
@@ -2938,11 +2653,7 @@ TEST(mongoRegisterContextRequest, AssociationsOk)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     ContextRegistration cr;
@@ -2964,7 +2675,7 @@ TEST(mongoRegisterContextRequest, AssociationsOk)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2999,8 +2710,7 @@ TEST(mongoRegisterContextRequest, AssociationsOk)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
+    utExit();
 
 }
 
@@ -3014,12 +2724,9 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     RegisterContextRequest   req;
     RegisterContextResponse  res;
 
-    /* Prepare mock */
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
+    utInit();
 
+    /* Prepare mock */   
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
     ON_CALL(*connectionMock, insert("unittest.associations",_,_))
@@ -3048,7 +2755,7 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     mongoConnect(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoRegisterContext(&req, &res);
+    ms = mongoRegisterContext(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3056,11 +2763,10 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     EXPECT_TRUE(res.registrationId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("", res.errorCode.details);
+    EXPECT_EQ("", res.errorCode.details);    
 
     /* Release mock */
-    delete connectionMock;
-    delete timerMock;
+    delete connectionMock;    
 
     /* Reconnect to database in not-mocked way */
     mongoConnect("localhost");
@@ -3069,4 +2775,6 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     DBClientBase* connection = getMongoConnection();
     EXPECT_EQ(0, connection->count(ASSOCIATIONS_COLL, BSONObj()));
     EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
+
+    utExit();
 }
