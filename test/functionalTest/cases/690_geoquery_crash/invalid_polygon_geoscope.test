@@ -29,6 +29,34 @@ brokerStart CB 0-255
 
 --SHELL--
 
+# With MongoDB 2.4 the result of the query in this test is not 404, but 500:
+#
+# {
+#    "contextResponses": [
+#        {
+#            "contextElement": {
+#                "id": ".*",
+#                "isPattern": "true",
+#                "type": ""
+#            },
+#            "statusCode": {
+#                "code": "500",
+#                "details": "Exterior shell of polygon is invalid",
+#                "reasonPhrase": "Internal Server Error"
+#            }
+#        }
+#    ]
+# }
+#
+# It seems that the geolocation internals in MongoDB 2.6 has improved in order to detect
+# that abnormal polygon specification, at least in the case of this particular case. Thus, we
+# have improved a 500 to a 404, which is always better. The downside of this is that we have lost
+# the ability to exercise the code that capture "Exterior shell of polygon is invalid" (the code
+# shouldn't be removed, because other conditions, not modeled by this test, could raise that kind of
+# error).
+#
+# In any case, the original purpose of this test is achieved: to test that the broker doesn't crash
+
 #
 # 01. Make the issue 690 query with invalid polygon geoscope and make sure the broker does not crash
 #
@@ -74,25 +102,15 @@ echo
 01. Make the issue 690 query with invalid polygon geoscope and make sure the broker does not crash
 ==================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 316
+Content-Length: 94
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "contextResponses": [
-        {
-            "contextElement": {
-                "id": ".*", 
-                "isPattern": "true", 
-                "type": ""
-            }, 
-            "statusCode": {
-                "code": "500", 
-                "details": "Exterior shell of polygon is invalid", 
-                "reasonPhrase": "Internal Server Error"
-            }
-        }
-    ]
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
 }
 
 
