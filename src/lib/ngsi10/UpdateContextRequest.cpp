@@ -290,3 +290,36 @@ void UpdateContextRequest::fill
 
   updateActionType.set(_updateActionType);
 }
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::attributeLookup - 
+*/
+ContextAttribute* UpdateContextRequest::attributeLookup(EntityId* eP, const std::string& attributeName)
+{
+  for (unsigned int ceIx = 0; ceIx < contextElementVector.size(); ++ceIx)
+  {
+    EntityId* enP = &contextElementVector[ceIx]->entityId;
+ 
+    if ((enP->id != eP->id) || (enP->type != eP->type))
+    {
+      continue;
+    }
+
+    ContextElement* ceP = contextElementVector[ceIx];
+
+    for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP = ceP->contextAttributeVector[aIx];
+
+      if (aP->name == attributeName)
+      {
+        return aP;
+      }
+    }
+  }
+
+  return NULL;
+}

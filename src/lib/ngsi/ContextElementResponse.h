@@ -56,7 +56,7 @@ typedef struct ContextElementResponse
   ContextElementResponse(EntityId* eP, ContextAttribute* aP);
   ContextElementResponse(ContextElementResponse* cerP);
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma = false);
+  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma = false, bool omitAttributeValues = false);
   void         present(const std::string& indent, int ix);
   void         release(void);
 

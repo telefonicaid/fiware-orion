@@ -51,7 +51,9 @@ brokerStart CP3
 # 13. Register E2/T1/A4 in CB, provApp: CP3 (A4 does not exist in CP3)
 # 14. Update/UPDATE E1/T1/A4 in CB
 # 15. Update/UPDATE All seven attributes plus a few not found
-# 16. Query E1-E2/A1-A3
+# 16. Query E1-E2/{} in CP1
+# 17. Query E1-E2/{} in CP2
+# 18. Query E1-E2/{} in CP3
 #
 
 echo "01. Update/APPEND E1/T1/A1 in CP1"
@@ -492,8 +494,8 @@ echo
 echo
 
 
-echo "16. Query E1-E2/A1-A4"
-echo "====================="
+echo "16. Query E1-E2/{} in CP1"
+echo "========================="
 payload='{
   "entities": [
     {
@@ -504,15 +506,47 @@ payload='{
       "id":   "E2",
       "type": "T1"
     }
-  ],
-  "attributes": [
-    "A1"
-    "A2"
-    "A3"
-    "A4"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP1_PORT
+echo
+echo
+
+
+echo "17. Query E1-E2/{} in CP2"
+echo "========================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    },
+    {
+      "id":   "E2",
+      "type": "T1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP2_PORT
+echo
+echo
+
+
+echo "18. Query E1-E2/{} in CP3"
+echo "========================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    },
+    {
+      "id":   "E2",
+      "type": "T1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP3_PORT
 echo
 echo
 
@@ -782,8 +816,8 @@ Date: REGEX(.*)
 }
 
 
-13. Register E2/T1/A4 in CB, provApp: CP3
-=========================================
+13. Register E2/T1/A4 in CB, provApp: CP3 (A4 does not exist in CP3)
+====================================================================
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
@@ -829,22 +863,262 @@ Date: REGEX(.*)
 15. Update/UPDATE All seven attributes plus a few not found
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 2128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "404", 
+                "reasonPhrase": "No context element found"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "404", 
+                "reasonPhrase": "No context element found"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
+                    {
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 
 
-16. Query E1-E2/A1-A4
-=====================
+16. Query E1-E2/{} in CP1
+=========================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 752
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "A1 via CB"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "A1 via CB"
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+17. Query E1-E2/{} in CP2
+=========================
+HTTP/1.1 200 OK
+Content-Length: 752
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": "A2 via CB"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": "A2 via CB"
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+18. Query E1-E2/{} in CP3
+=========================
+HTTP/1.1 200 OK
+Content-Length: 752
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": "A3 via CB"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A3", 
+                        "type": "string", 
+                        "value": "A3 via CB"
+                    }
+                ], 
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 
 

@@ -58,10 +58,12 @@ typedef struct UpdateContextRequest
   UpdateContextRequest();
   UpdateContextRequest(const std::string _contextProvider, EntityId* eP);
 
-  void         init(void);
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string  check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
-  void         release(void);
+  void               init(void);
+  std::string        render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
+  std::string        check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  void               release(void);
+  ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);
+
   void         present(const std::string& indent);
 
   void         fill(const UpdateContextElementRequest* ucerP,

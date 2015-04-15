@@ -79,6 +79,175 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 
 /* ****************************************************************************
 *
+* updateForward - 
+*
+* An entity/attribute has been found on some context provider.
+* We need to forward the update request to the context provider, indicated in upcrsP->contextProvider
+*
+* 1. Parse the providing application to extract IP, port and URI-path
+* 2. Render an XML-string of the request we want to forward
+* 3. Send the request to the providing application (and await the response)
+* 4. Parse the XML response and fill in a binary UpdateContextResponse
+* 5. Render UpdateContextResponse from the providing application
+* 6. 'Fixing' StatusCode
+* 7. Freeing memory
+*/
+static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, UpdateContextResponse* upcrsP)
+{
+  std::string     ip;
+  std::string     protocol;
+  int             port;
+  std::string     prefix;
+  std::string     answer;
+
+
+  //
+  // 1. Parse the providing application to extract IP, port and URI-path
+  //
+  if (parseUrl(upcrP->contextProvider, ip, port, prefix, protocol) == false)
+  {
+    LM_W(("Bad Input (invalid providing application '%s')", upcrP->contextProvider.c_str()));
+    //  Somehow, if we accepted this providing application, it is the brokers fault ...
+    //  SccBadRequest should have been returned before, when it was registered!
+
+    upcrsP->errorCode.fill(SccContextElementNotFound, "");
+    return;
+  }
+
+
+  LM_M(("KZ: -----------------------------------------------"));
+  LM_M(("KZ: Forwarding to %s:%d", ip.c_str(), port));
+  upcrP->present("KZ1: ");
+
+
+  //
+  // 2. Render an XML-string of the request we want to forward
+  //
+  Format outFormat = ciP->outFormat;
+  ciP->outFormat = XML;
+  std::string  payload = upcrP->render(ciP, UpdateContext, "");
+  char*        cleanPayload;
+  ciP->outFormat = outFormat;
+
+  LM_M(("KZ: payload: %s", payload.c_str()));
+
+  if ((cleanPayload = xmlPayloadClean(payload.c_str(), "<updateContextRequest>")) == NULL)
+  {
+    LM_E(("Runtime Error (error rendering forward-request)"));
+    upcrsP->errorCode.fill(SccContextElementNotFound, "");
+    return;
+  }
+
+
+  //
+  // 3. Send the request to the Context Provider (and await the reply)
+  // FIXME P7: Should Rush be used?
+  //
+  std::string     out;
+  std::string     verb         = "POST";
+  std::string     resource     = prefix + "/updateContext";
+  std::string     tenant       = ciP->tenant;
+  std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
+
+  LM_M(("KZ: Forwarding request: %s", cleanPayload));
+  out = sendHttpSocket(ip,
+                       port,
+                       protocol,
+                       verb,
+                       tenant,
+                       servicePath,
+                       ciP->httpHeaders.xauthToken,
+                       resource,
+                       "application/xml",
+                       cleanPayload,
+                       false,
+                       true);
+
+  if ((out == "error") || (out == ""))
+  {
+    upcrsP->errorCode.fill(SccContextElementNotFound, "");
+    LM_E(("Runtime Error (error forwarding 'Update' to providing application)"));
+    return;
+  }
+
+
+  //
+  // 4. Parse the XML response and fill in a binary UpdateContextResponse
+  //
+  std::string  s;
+  std::string  errorMsg;
+
+  cleanPayload = xmlPayloadClean(out.c_str(), "<updateContextResponse>");
+
+  if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
+  {
+    //
+    // This is really an internal error in the Context Provider
+    // It is not in the orion broker though, so 404 is returned
+    //
+    LM_W(("Other Error (context provider response to UpdateContext is empty)"));
+    upcrsP->errorCode.fill(SccContextElementNotFound, "invalid context provider response");
+    return;
+  }
+
+  //
+  // NOTE
+  // When coming from a convenience operation, such as GET /v1/contextEntities/EID/attributes/attrName,
+  // the verb/method in ciP is GET. However, the parsing function expects a POST, as if it came from a 
+  // POST /v1/updateContext. 
+  // So, here we change the verb/method for POST.
+  //
+  ParseData parseData;
+
+  ciP->verb   = POST;
+  ciP->method = "POST";
+
+  s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
+  if (s != "OK")
+  {
+    LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
+    upcrsP->errorCode.fill(SccContextElementNotFound, "");
+    parseData.upcr.res.release();
+    parseData.upcrs.res.release();
+    return;
+  }
+
+
+  //
+  // 5. Render UpdateContextResponse from the providing application
+  //
+  char portV[16];
+  snprintf(portV, sizeof(portV), "%d", port);
+
+  // Fill in the response from the redirection into the response
+  upcrsP->fill(&parseData.upcrs.res);
+
+
+  //
+  // 6. 'Fixing' StatusCode
+  //
+  if (upcrsP->errorCode.code == SccNone)
+  {
+    upcrsP->errorCode.fill(SccOk);
+  }
+
+  if ((upcrsP->contextElementResponseVector.size() == 1) && (upcrsP->contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound))
+  {
+    upcrsP->errorCode.fill(SccContextElementNotFound);
+  }
+
+  
+  //
+  // 7. Freeing memory
+  //
+  parseData.upcr.res.release();
+  parseData.upcrs.res.release();
+}
+
+
+
+/* ****************************************************************************
+*
 * postUpdateContext -
 *
 * POST /v1/updateContext
@@ -141,7 +310,6 @@ std::string postUpdateContext
       upcrsP->errorCode.details = upcrsP->contextElementResponseVector[0]->contextElement.entityId.id;
     }
   }
-  upcrsP->present("KZ:");
 
 
   //
@@ -159,7 +327,38 @@ std::string postUpdateContext
 
 
   //
-  // 04. Forwards necessary - sort parts in outgoing requestV
+  // 04. mongoBackend doesn't give us the values of the attributes.
+  //     So, here we have to do a search inside the initial UpdateContextRequest to fill in all the
+  //     attribute-values in the output from mongoUpdateContext
+  //
+  for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
+  {
+    ContextElement* ceP = &upcrsP->contextElementResponseVector[cerIx]->contextElement;
+
+    for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP = upcrP->attributeLookup(&ceP->entityId, ceP->contextAttributeVector[aIx]->name);
+
+      if (aP == NULL)
+      {
+        LM_E(("Internal Error (attribute '%s' not found)", ceP->contextAttributeVector[aIx]->name.c_str()));
+      }
+      else
+      {
+        ceP->contextAttributeVector[aIx]->value = aP->value;
+        ceP->contextAttributeVector[aIx]->type  = aP->type;
+      }
+    }
+  }
+
+
+  upcrsP->present("KZ2: ");
+
+
+
+
+  //
+  // 05. Forwards necessary - sort parts in outgoing requestV
   //     requestV is a vector of UpdateContextRequests and each Context Provider
   //     will have a slot in the vector. 
   //     When a ContextElementResponse is found in the output from mongoUpdateContext, a
@@ -175,6 +374,7 @@ std::string postUpdateContext
   {
     ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
 
+    LM_M(("KZ: Treating ContextElementResponse %d", cerIx));
     if (cerP->contextElement.contextAttributeVector.size() == 0)
     {
       //
@@ -182,6 +382,7 @@ std::string postUpdateContext
       //
       // ContextElementResponse* errorResponse = new ContextElementResponse(cerP);
       // response.contextElementResponseVector.push_back(errorResponse);
+      LM_M(("KZ: Empty contextAttributeVector for ContextElementResponse %d", cerIx));
     }
     else
     {
@@ -189,39 +390,58 @@ std::string postUpdateContext
       {
         ContextAttribute* aP = cerP->contextElement.contextAttributeVector[aIx];
         
+        LM_M(("KZ: Treating Attribute %d (%s) of ContextElementResponse %d", aIx, aP->name.c_str(), cerIx));
+
         //
-        // 0. If the attribute is 'not-found', just add the attribute to the outgoing response
+        // 0. If the attribute is 'not-found' - just add the attribute to the outgoing response
         //
         if (aP->found == false)
         {
+          LM_M(("KZ: found == false - push attribute '%s' to response", aP->name.c_str()));
           response.notFoundPush(&cerP->contextElement.entityId, new ContextAttribute(aP));
+          continue;
+        }
+        else
+          LM_M(("KZ: found == true - find ContextElement for attribute '%s' ...", aP->name.c_str()));
+
+
+        //
+        // 1. If the attribute is found locally - just add the attribute to the outgoing response
+        //
+        if (aP->providingApplication == "")
+        {
+          LM_M(("KZ: found locally: attribute '%s'", aP->name.c_str()));
+          response.foundPush(&cerP->contextElement.entityId, new ContextAttribute(aP));
           continue;
         }
 
 
         //
-        // 1. Lookup UpdateContextRequest in requestV according to providingApplication.
+        // 2. Lookup UpdateContextRequest in requestV according to providingApplication.
         //    If not found, add one.
         UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication);
         if (reqP == NULL)
         {
           reqP = new UpdateContextRequest(aP->providingApplication, &cerP->contextElement.entityId);
+          reqP->updateActionType.set("UPDATE");
           requestV.push_back(reqP);
         }
 
+
         //
-        // 2. Lookup ContextElement in UpdateContextRequest according to EntityId.
-        //    If not found, add one.
+        // 3. Lookup ContextElement in UpdateContextRequest according to EntityId.
+        //    If not found, add one (to the ContextElementVector of the UpdateContextRequest).
         //
         ContextElement* ceP = reqP->contextElementVector.lookup(&cerP->contextElement.entityId);
         if (ceP == NULL)
         {
           ceP = new ContextElement(&cerP->contextElement.entityId);
+          reqP->contextElementVector.push_back(ceP);
         }
 
 
         //
-        // Add ContextAttribute to the ContextElement
+        // 4. Add ContextAttribute to the correct ContextElement in the correct UpdateContextRequest
         //
         ceP->contextAttributeVector.push_back(new ContextAttribute(aP));
       }
@@ -232,14 +452,51 @@ std::string postUpdateContext
   //
   // Now we are ready to forward the Updates
   //
-  LM_M(("ready to forward the Updates"));
-  requestV.present("KZ:");
+  LM_M(("KZ: ready to forward the Updates"));
+  LM_M(("KZ: ------------------------------------------------------"));
+  requestV.present("KZ3: ");
+  LM_M(("KZ: ------------------------------------------------------"));
+  LM_M(("KZ"));
+  LM_M(("KZ"));
+  LM_M(("KZ: Already in response:"));
+  LM_M(("KZ: ------------------------------------------------------"));
+  response.present("KZ4: ");
+  LM_M(("KZ: ------------------------------------------------------"));
 
-  LM_M(("Already in response:"));
-  response.present("KZ:");
+  //
+  // Calling each of the Context Providers, merging their results into the
+  // total response 'response'
+  //
+  for (unsigned int ix = 0; ix < requestV.size(); ++ix)
+  {
+    if (requestV[ix]->contextProvider == "")
+    {
+      LM_E(("Internal Error (empty context provider string)"));
+      continue;
+    }
 
-  return "OK";
+    UpdateContextResponse upcrs;
 
+    LM_M(("KZ: **************** Forwarding Update ****************** "));
+    updateForward(ciP, requestV[ix], &upcrs);
+
+    //
+    // Add the result from the forwarded update to the total response in 'response'
+    //
+    response.merge(&upcrs);
+  }
+
+  answer = response.render(ciP, UpdateContext, "");
+
+  //
+  // Cleanup
+  //
+  upcrsP->release();
+  upcrP->release();
+  requestV.release();
+
+  return answer;
+  
 #if 0
   //
   // Checking for SccFound in the ContextElementResponseVector

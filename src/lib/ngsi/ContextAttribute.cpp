@@ -274,8 +274,15 @@ std::string ContextAttribute::render
   {
     if (omitValue == false)
     {
+      LM_M(("KZ: omitValue == false: including attribute value"));
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
                       value, ciP->outFormat, commaAfterContextValue);
+    }
+    else
+    {
+      LM_M(("KZ: omitValue == true: NOT including attribute value"));
+      out += "," + valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                      "", ciP->outFormat, commaAfterContextValue);
     }
   }
   else
