@@ -52,6 +52,7 @@ typedef struct UpdateContextResponse
   std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   void          release(void);
+  void          notFoundPush(EntityId* eP, ContextAttribute* aP);
 } UpdateContextResponse;
 
 #endif

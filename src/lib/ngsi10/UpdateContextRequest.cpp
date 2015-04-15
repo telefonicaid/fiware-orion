@@ -44,6 +44,28 @@
 
 /* ****************************************************************************
 *
+* UpdateContextRequest::UpdateContextRequest - 
+*/
+UpdateContextRequest::UpdateContextRequest()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::UpdateContextRequest - 
+*/
+UpdateContextRequest::UpdateContextRequest(const std::string _contextProvider, EntityId* eP)
+{
+  contextProvider = _contextProvider;
+  contextElementVector.push_back(new ContextElement(eP));
+}
+
+
+
+/* ****************************************************************************
+*
 * UpdateContextRequest::init - 
 */
 void UpdateContextRequest::init(void)
@@ -121,7 +143,6 @@ void UpdateContextRequest::present(const std::string& indent)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  PRINTF("\n\n");
   contextElementVector.present(indent);
   updateActionType.present(indent);
 }

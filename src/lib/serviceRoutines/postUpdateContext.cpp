@@ -32,6 +32,7 @@
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
+#include "orionTypes/UpdateContextRequestVector.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/clientSocketHttp.h"
 #include "serviceRoutines/postUpdateContext.h"
@@ -43,9 +44,35 @@
 *
 * xmlPayloadClean -
 */
-static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
+char* xmlPayloadClean(const char*  payload, const char* payloadWord)  // FIXME: statis function
 {
   return (char*) strstr(payload, payloadWord);
+}
+
+
+
+/* ****************************************************************************
+*
+* forwardsPending - 
+*/
+static bool forwardsPending(UpdateContextResponse* upcrsP)
+{
+  for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
+  {
+    ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
+
+    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
+      
+      if (aP->providingApplication != "")
+      {
+        return true;
+      }      
+    }
+  }
+
+  return false;
 }
 
 
@@ -69,8 +96,11 @@ std::string postUpdateContext
 )
 {
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
+  UpdateContextRequest*   upcrP  = &parseDataP->upcr.res;
   std::string             answer;
 
+  //
+  // 01. Check service-path consistency
   //
   // If more than ONE service-path is input, an error is returned as response.
   // If NO service-path is issued, then the default service-path "/" is used.
@@ -96,9 +126,13 @@ std::string postUpdateContext
     return answer;
   }
 
+
+  //
+  // 02. Send the request to mongoBackend/mongoUpdateContext
+  //
   upcrsP->errorCode.fill(SccContextElementNotFound);
   LM_M(("KZ: Calling mongoUpdateContext"));
-  ciP->httpStatusCode = mongoUpdateContext(&parseDataP->upcr.res, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
+  ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
   LM_M(("KZ: mongoUpdateContext responded with a UpdateContextResponse of %d items", upcrsP->contextElementResponseVector.size()));
   if (upcrsP->errorCode.code == SccContextElementNotFound)
   {
@@ -109,17 +143,104 @@ std::string postUpdateContext
   }
   upcrsP->present("KZ:");
 
+
   //
-  // 02. Normal case - no forwards
+  // 03. Normal case - no forwards
   //
   // If there is nothing to forward, just return the result
   //
   bool forwarding = forwardsPending(upcrsP);
   if (forwarding == false)
   {
+    answer = upcrsP->render(ciP, UpdateContext, "");
+    upcrP->release();
+    return answer;
   }
 
 
+  //
+  // 04. Forwards necessary - sort parts in outgoing requestV
+  //     requestV is a vector of UpdateContextRequests and each Context Provider
+  //     will have a slot in the vector. 
+  //     When a ContextElementResponse is found in the output from mongoUpdateContext, a
+  //     UpdateContextRequest is to be found/created and inside that UpdateContextRequest
+  //     a ContextElement for the Entity of the ContextElementResponse.
+  //
+  //     Non-found parts go directly to 'response'.
+  //
+  UpdateContextRequestVector  requestV;
+  UpdateContextResponse       response;
+
+  for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
+  {
+    ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
+
+    if (cerP->contextElement.contextAttributeVector.size() == 0)
+    {
+      //
+      // What to do when finding a contextElement without attributes?
+      //
+      // ContextElementResponse* errorResponse = new ContextElementResponse(cerP);
+      // response.contextElementResponseVector.push_back(errorResponse);
+    }
+    else
+    {
+      for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+      {
+        ContextAttribute* aP = cerP->contextElement.contextAttributeVector[aIx];
+        
+        //
+        // 0. If the attribute is 'not-found', just add the attribute to the outgoing response
+        //
+        if (aP->found == false)
+        {
+          response.notFoundPush(&cerP->contextElement.entityId, new ContextAttribute(aP));
+          continue;
+        }
+
+
+        //
+        // 1. Lookup UpdateContextRequest in requestV according to providingApplication.
+        //    If not found, add one.
+        UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication);
+        if (reqP == NULL)
+        {
+          reqP = new UpdateContextRequest(aP->providingApplication, &cerP->contextElement.entityId);
+          requestV.push_back(reqP);
+        }
+
+        //
+        // 2. Lookup ContextElement in UpdateContextRequest according to EntityId.
+        //    If not found, add one.
+        //
+        ContextElement* ceP = reqP->contextElementVector.lookup(&cerP->contextElement.entityId);
+        if (ceP == NULL)
+        {
+          ceP = new ContextElement(&cerP->contextElement.entityId);
+        }
+
+
+        //
+        // Add ContextAttribute to the ContextElement
+        //
+        ceP->contextAttributeVector.push_back(new ContextAttribute(aP));
+      }
+    }
+  }
+
+
+  //
+  // Now we are ready to forward the Updates
+  //
+  LM_M(("ready to forward the Updates"));
+  requestV.present("KZ:");
+
+  LM_M(("Already in response:"));
+  response.present("KZ:");
+
+  return "OK";
+
+#if 0
   //
   // Checking for SccFound in the ContextElementResponseVector
   // Any 'Founds' must be forwarded to their respective providing applications
@@ -161,7 +282,7 @@ std::string postUpdateContext
   // 
   //
   
-  if (upcrsP->contextElementResponseVector.size() != parseDataP->upcr.res.contextElementVector.size())
+  if (upcrsP->contextElementResponseVector.size() != upcrP->contextElementVector.size())
   {
     // Note that the loop ends at the contextElementResponse BEFORE the last contextElementResponse in the vector
     for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size() - 1; ++ix)
@@ -212,6 +333,8 @@ std::string postUpdateContext
     {
       continue;
     }
+
+    updateForward(upcrsP->contextElementResponseVector[ix]);
 
     //
     // If the statusCode.code IS SccFound, it means we can find the contextElement elsewhere.
@@ -360,4 +483,5 @@ std::string postUpdateContext
 
   answer = upcrsP->render(ciP, UpdateContext, "");
   return answer;
+#endif
 }

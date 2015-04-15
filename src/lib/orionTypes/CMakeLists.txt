@@ -28,6 +28,7 @@ SET (SOURCES
     EntityTypeAttributesResponse.cpp
     QueryContextRequestVector.cpp
     QueryContextResponseVector.cpp
+    UpdateContextRequestVector.cpp
 )
 
 SET (HEADERS
@@ -38,6 +39,7 @@ SET (HEADERS
     EntityTypeAttributesResponse.h
     QueryContextRequestVector.h
     QueryContextResponseVector.h
+    UpdateContextRequestVector.h
 )
 
 

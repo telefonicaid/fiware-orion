@@ -163,3 +163,27 @@ void UpdateContextResponse::release(void)
   contextElementResponseVector.release();
   errorCode.release();
 }
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::notFoundPush - 
+*
+* 1. Find contextElementResponse in contextElementResponseVector and add the ContextAttribute.
+* 2. If not found: create a new one.
+*
+*/
+void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP)
+{
+  ContextElementResponse* cerP = contextElementResponseVector.lookup(eP);
+  if (cerP == NULL)
+  {
+    cerP = new ContextElementResponse(eP, aP);
+    cerP->statusCode.fill(SccContextElementNotFound);
+  }
+  else
+  {
+    cerP->contextElement.contextAttributeVector.push_back(aP);
+  }
+}
