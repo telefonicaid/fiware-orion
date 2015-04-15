@@ -39,7 +39,7 @@
 typedef struct ProvidingApplication
 {
   std::string   string;
-  Format        format;                  // Not par of NGSI itself, used by the CB to specify the preferred format for CPr interaction
+  Format        format;                  // Not part of NGSI itself, used by the CB to specify the preferred format for CPr interaction
 
   ProvidingApplication();
   void          set(const std::string& value);
