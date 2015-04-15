@@ -4030,6 +4030,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
+    EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
@@ -4961,6 +4962,7 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
+    EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 

@@ -2139,7 +2139,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
@@ -2237,7 +2237,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
@@ -2324,7 +2324,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);
@@ -2399,7 +2399,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprsFormat)
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ("1", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
-  EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
+  EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("", RES_CER_ATTR(0, 1)->type);

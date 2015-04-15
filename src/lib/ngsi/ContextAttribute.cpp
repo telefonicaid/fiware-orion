@@ -64,7 +64,7 @@ ContextAttribute::ContextAttribute()
   found                 = true;
 
   providingApplication.set("");
-  providingApplication.setFormat(XML);
+  providingApplication.setFormat(NOFORMAT);
 }
 
 
@@ -125,7 +125,7 @@ ContextAttribute::ContextAttribute
   found                 = _found;
 
   providingApplication.set("");
-  providingApplication.setFormat(XML);
+  providingApplication.setFormat(NOFORMAT);
 }
 
 
@@ -150,7 +150,7 @@ ContextAttribute::ContextAttribute
   found                 = true;
 
   providingApplication.set("");
-  providingApplication.setFormat(XML);
+  providingApplication.setFormat(NOFORMAT);
 }
 
 
