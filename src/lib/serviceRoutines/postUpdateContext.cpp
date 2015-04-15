@@ -303,6 +303,18 @@ std::string postUpdateContext
   LM_M(("KZ: Calling mongoUpdateContext"));
   ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
   LM_M(("KZ: mongoUpdateContext responded with a UpdateContextResponse of %d items", upcrsP->contextElementResponseVector.size()));
+  upcrsP->present("");
+  if (upcrsP->contextElementResponseVector.size() == 0)
+  {
+    if (upcrsP->errorCode.code == SccOk)
+    {
+      upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->contextElementVector[0]->entityId.id);
+    }
+  }
+
+  //
+  // Add entityId::id to details if Not Found and only one element in response
+  //
   if (upcrsP->errorCode.code == SccContextElementNotFound)
   {
     if (upcrsP->contextElementResponseVector.size() == 1)

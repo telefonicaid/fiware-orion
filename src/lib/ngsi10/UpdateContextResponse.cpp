@@ -99,7 +99,7 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
       out += errorCode.render(ciP->outFormat, indent + "  ");
     }
     else
-      out += contextElementResponseVector.render(ciP, UpdateContext, indent + "  ", false, true);
+      out += contextElementResponseVector.render(ciP, UpdateContext, indent + "  ", false);
   }
   
   out += endTag(indent, tag, ciP->outFormat);

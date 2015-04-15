@@ -257,7 +257,7 @@ std::string ContextAttribute::render
   std::string  jsonTag                = "attribute";
   bool         commaAfterContextValue = metadataVector.size() != 0;
   bool         commaAfterType         = !omitValue || commaAfterContextValue;
-  bool         commaAfterName         = commaAfterType || (type != "");
+  bool         commaAfterName         = true;  // attribute.type is always rendered
 
   metadataVector.tagSet("metadata");
 
@@ -274,14 +274,12 @@ std::string ContextAttribute::render
   {
     if (omitValue == false)
     {
-      LM_M(("KZ: omitValue == false: including attribute value"));
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
                       value, ciP->outFormat, commaAfterContextValue);
     }
     else
     {
-      LM_M(("KZ: omitValue == true: NOT including attribute value"));
-      out += "," + valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+      out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
                       "", ciP->outFormat, commaAfterContextValue);
     }
   }
