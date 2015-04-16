@@ -44,7 +44,7 @@
 *
 * xmlPayloadClean -
 */
-char* xmlPayloadClean(const char*  payload, const char* payloadWord)  // FIXME: statis function
+static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 {
   return (char*) strstr(payload, payloadWord);
 }
@@ -495,11 +495,9 @@ std::string postUpdateContext
     if (cerP->contextElement.contextAttributeVector.size() == 0)
     {
       //
-      // What to do when finding a contextElement without attributes?
+      // If we find a contextElement without attributes here, then something is wrong
       //
-      // ContextElementResponse* errorResponse = new ContextElementResponse(cerP);
-      // response.contextElementResponseVector.push_back(errorResponse);
-      LM_M(("KZ: Empty contextAttributeVector for ContextElementResponse %d", cerIx));
+      LM_E(("Orion Bug (empty contextAttributeVector for ContextElementResponse %d)", cerIx));
     }
     else
     {
