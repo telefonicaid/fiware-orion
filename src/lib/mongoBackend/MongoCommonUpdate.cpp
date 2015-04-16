@@ -1381,15 +1381,14 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
 
     int now = getCurrentTime();    
-    BSONArrayBuilder attrsToAdd;
+    BSONObjBuilder attrsToAdd;
 
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
         std::string attrId = attrsV.get(ix)->getId();
 
         BSONObjBuilder bsonAttr;
 
-        bsonAttr.appendElements(BSON(ENT_ATTRS_NAME << attrsV.get(ix)->name <<
-                                     ENT_ATTRS_TYPE << attrsV.get(ix)->type <<                                     
+        bsonAttr.appendElements(BSON(ENT_ATTRS_TYPE << attrsV.get(ix)->type <<
                                      ENT_ATTRS_CREATION_DATE << now <<
                                      ENT_ATTRS_MODIFICATION_DATE << now));
 
@@ -1415,7 +1414,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
         if (contextAttributeCustomMetadataToBson(mdV, attrsV.get(ix)))
             bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
 
-        attrsToAdd.append(bsonAttr.obj());
+        attrsToAdd.append(attrsV.get(ix)->name, bsonAttr.obj());
     }
 
     BSONObj bsonId;
@@ -1433,7 +1432,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
     BSONObjBuilder insertedDocB;
     insertedDocB.append("_id", bsonId);
-    insertedDocB.append(ENT_ATTRS, attrsToAdd.arr());
+    insertedDocB.append(ENT_ATTRS, attrsToAdd.obj());
     insertedDocB.append(ENT_CREATION_DATE, now);
     insertedDocB.append(ENT_MODIFICATION_DATE,now);
 
