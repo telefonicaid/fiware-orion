@@ -115,11 +115,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   }
 
 
-  LM_M(("KZ: -----------------------------------------------"));
-  LM_M(("KZ: Forwarding to %s:%d", ip.c_str(), port));
-  upcrP->present("KZ1: ");
-
-
   //
   // 2. Render an XML-string of the request we want to forward
   //
@@ -128,8 +123,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string  payload = upcrP->render(ciP, UpdateContext, "");
   char*        cleanPayload;
   ciP->outFormat = outFormat;
-
-  LM_M(("KZ: payload: %s", payload.c_str()));
 
   if ((cleanPayload = xmlPayloadClean(payload.c_str(), "<updateContextRequest>")) == NULL)
   {
@@ -149,7 +142,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
 
-  LM_M(("KZ: Forwarding request: %s", cleanPayload));
   out = sendHttpSocket(ip,
                        port,
                        protocol,
@@ -304,17 +296,13 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
       notFoundV.push_back(notFoundCerP);
 
       // Now moving the not-founds to notFoundCerP
-      LM_M(("KZ: moving the not-founds to notFoundCerP (vector of %d)", cerP->contextElement.contextAttributeVector.size()));
-
       std::vector<ContextAttribute*>::iterator iter;
       for (iter = cerP->contextElement.contextAttributeVector.vec.begin(); iter < cerP->contextElement.contextAttributeVector.vec.end();)
       {
         if ((*iter)->found == false)
         {
           // 1. Push to notFoundCerP
-          LM_M(("KZ: pushing attribute '%s' to notFoundCerP (having %d attributes)", (*iter)->name.c_str(), notFoundCerP->contextElement.contextAttributeVector.size()));
           notFoundCerP->contextElement.contextAttributeVector.push_back(*iter);
-          LM_M(("KZ: notFoundCerP now has %d attributes", notFoundCerP->contextElement.contextAttributeVector.size()));
 
           // 2. remove from cerP
           iter = cerP->contextElement.contextAttributeVector.vec.erase(iter);
@@ -334,7 +322,6 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
   {
     for (unsigned int ix = 0; ix < notFoundV.size(); ++ix)
     {
-      LM_M(("Adding notFoundCerP (of %d attributes) to upcrsP", notFoundV[ix]->contextElement.contextAttributeVector.size()));
       upcrsP->contextElementResponseVector.push_back(notFoundV[ix]);
     }
   }
@@ -420,9 +407,7 @@ std::string postUpdateContext
   // 02. Send the request to mongoBackend/mongoUpdateContext
   //
   upcrsP->errorCode.fill(SccContextElementNotFound);
-  LM_M(("KZ: Calling mongoUpdateContext"));
   ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
-  LM_M(("KZ: mongoUpdateContext responded with a UpdateContextResponse of %d items", upcrsP->contextElementResponseVector.size()));
   upcrsP->present("From mongoUpdateContext: ");
   foundAndNotFoundAttributeSeparation(upcrsP, upcrP);
   upcrsP->present("After foundAndNotFoundAttributeSeparation: ");
@@ -491,7 +476,6 @@ std::string postUpdateContext
   {
     ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
 
-    LM_M(("KZ: Treating ContextElementResponse %d", cerIx));
     if (cerP->contextElement.contextAttributeVector.size() == 0)
     {
       //
@@ -505,19 +489,14 @@ std::string postUpdateContext
       {
         ContextAttribute* aP = cerP->contextElement.contextAttributeVector[aIx];
         
-        LM_M(("KZ: Treating Attribute %d (%s) of ContextElementResponse %d", aIx, aP->name.c_str(), cerIx));
-
         //
         // 0. If the attribute is 'not-found' - just add the attribute to the outgoing response
         //
         if (aP->found == false)
         {
-          LM_M(("KZ: found == false - push attribute '%s' to response", aP->name.c_str()));
           response.notFoundPush(&cerP->contextElement.entityId, new ContextAttribute(aP));
           continue;
         }
-        else
-          LM_M(("KZ: found == true - find ContextElement for attribute '%s' ...", aP->name.c_str()));
 
 
         //
@@ -525,7 +504,6 @@ std::string postUpdateContext
         //
         if (aP->providingApplication == "")
         {
-          LM_M(("KZ: found locally: attribute '%s'", aP->name.c_str()));
           response.foundPush(&cerP->contextElement.entityId, new ContextAttribute(aP));
           continue;
         }
@@ -567,16 +545,7 @@ std::string postUpdateContext
   //
   // Now we are ready to forward the Updates
   //
-  LM_M(("KZ: ready to forward the Updates"));
-  LM_M(("KZ: ------------------------------------------------------"));
-  requestV.present("KZ3: ");
-  LM_M(("KZ: ------------------------------------------------------"));
-  LM_M(("KZ"));
-  LM_M(("KZ"));
-  LM_M(("KZ: Already in response:"));
-  LM_M(("KZ: ------------------------------------------------------"));
-  response.present("KZ4: ");
-  LM_M(("KZ: ------------------------------------------------------"));
+
 
   //
   // Calling each of the Context Providers, merging their results into the
@@ -592,7 +561,6 @@ std::string postUpdateContext
 
     UpdateContextResponse upcrs;
 
-    LM_M(("KZ: **************** Forwarding Update ****************** "));
     updateForward(ciP, requestV[ix], &upcrs);
 
     //
