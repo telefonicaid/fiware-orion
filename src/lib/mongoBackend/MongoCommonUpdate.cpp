@@ -649,6 +649,7 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttribute* caP, bool& actualUpdate)
 {
   actualUpdate = false;
+  LM_T(LmtMongo, ("==== %s", attrs.toString().c_str()));
   if (attrs.hasField(caP->name.c_str()))
   {
     BSONObj attr = attrs.getField(caP->name).embeddedObject();

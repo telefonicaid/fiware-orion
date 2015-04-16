@@ -235,8 +235,8 @@ static void prepareDatabaseMd(void) {
     /* Add an entity with custom metadata */
     DBClientBase* connection = getMongoConnection();
     BSONObj en = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "val1" <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "val1" <<
                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "MD1val") <<
                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "MD2val")
                                                  )
