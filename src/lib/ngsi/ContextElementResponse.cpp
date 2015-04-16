@@ -54,7 +54,11 @@ ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* a
   prune = false;
 
   contextElement.entityId.fill(eP);
-  contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+
+  if (aP != NULL)
+  {
+    contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+  }
 }
 
 

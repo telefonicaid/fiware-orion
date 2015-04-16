@@ -21,48 +21,28 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-One Forward Update To Context Provider
+Double Forward Update
 
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
+dbInit CP2
 brokerStart CB
 brokerStart CP1
+brokerStart CP2
 
 --SHELL--
 
 #
-# 01. Update/APPEND E1/T1/A1 in CP1
-# 02. Register E1/T1/A1 in CB, provApp: CP1
-# 03. Update/UPDATE E1/T1/A1
-# 04. Query E1/T1/A1
+# 01. Register E1/A1 on CB  with CP1 as providing application
+# 02. Register E1/A1 on CP1 with CP2 as providing application
+# 03. Update/APPEND E1/A1='On CP2' on CP2
+# 04. Update/UPDATE E1/A1='Via CB' on CB
+# 05. Query E1/A1 in CP2
 #
 
-echo "01. Update/APPEND E1/T1/A1 in CP1"
-echo "================================="
-payload='{
-  "contextElements": [
-    {
-      "type": "T1",
-      "id":   "E1",
-      "attributes": [
-        {
-          "name": "A1",
-          "type": "string",
-          "value": "A1 in CP1"
-        }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
-echo
-echo
-
-
-echo "02. Register E1/T1/A1 in CB, provApp: CP1"
-echo "========================================="
+echo "01. Register E1/A1 on CB  with CP1 as providing application"
+echo "==========================================================="
 payload='{
   "contextRegistrations": [
   {
@@ -90,8 +70,37 @@ echo
 echo
 
 
-echo "03. Update/UPDATE E1/T1/A1"
-echo "=========================="
+echo "02. Register E1/A1 on CP1  with CP2 as providing application"
+echo "============================================================"
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A1",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${CP2_PORT}'/v1"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json --port $CP1_PORT
+echo
+echo
+
+
+echo "03. Update/APPEND E1/A1='On CP2' on CP2"
+echo "======================================="
 payload='{
   "contextElements": [
     {
@@ -101,7 +110,30 @@ payload='{
         {
           "name": "A1",
           "type": "string",
-          "value": "A1 via CB"
+          "value": "On CP2"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP2_PORT
+echo
+echo
+
+
+echo "04. Update/UPDATE E1/A1='Via CB' on CB"
+echo "======================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "Via CB"
         }
       ]
     }
@@ -113,8 +145,8 @@ echo
 echo
 
 
-echo "04. Query E1/T1/A1"
-echo "=================="
+echo "05. Query E1/A1 in CP2"
+echo "======================"
 payload='{
   "entities": [
     {
@@ -126,58 +158,40 @@ payload='{
     "A1"
   ]
 }'
-orionCurl --url /v1/queryContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP2_PORT
 echo
 echo
 
 
 --REGEXPECT--
-01. Update/APPEND E1/T1/A1 in CP1
-=================================
-HTTP/1.1 200 OK
-Content-Length: 383
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-02. Register E1/T1/A1 in CB, provApp: CP1
-=========================================
+01. Register E1/A1 on CB  with CP1 as providing application
+===========================================================
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "duration": "P1M",
+    "duration": "P1M", 
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
 
-03. Update/UPDATE E1/T1/A1
-==========================
+02. Register E1/A1 on CP1  with CP2 as providing application
+============================================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M", 
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+03. Update/APPEND E1/A1='On CP2' on CP2
+=======================================
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
@@ -207,10 +221,10 @@ Date: REGEX(.*)
 }
 
 
-04. Query E1/T1/A1
-==================
+04. Update/UPDATE E1/A1='Via CB' on CB
+======================================
 HTTP/1.1 200 OK
-Content-Length: 392
+Content-Length: 383
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -222,7 +236,38 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "string", 
-                        "value": "A1 via CB"
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Query E1/A1 in CP2
+======================
+HTTP/1.1 200 OK
+Content-Length: 389
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "Via CB"
                     }
                 ], 
                 "id": "E1", 
@@ -241,5 +286,7 @@ Date: REGEX(.*)
 --TEARDOWN--
 brokerStop CB
 brokerStop CP1
+brokerStop CP2
 dbDrop CB
 dbDrop CP1
+dbDrop CP2

@@ -5728,7 +5728,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
 *
 * updateAttrWithAndWithoutId -
 */
-TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
+TEST(mongoUpdateContextRequest, DISABLED_updateAttrWithAndWithoutId)
 {
     HttpStatusCode         ms;
     UpdateContextRequest   req;
