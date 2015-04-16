@@ -666,31 +666,6 @@ static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttrib
     return false;
   }
 
-#if 0
-    BSONArrayBuilder newAttrsBuilder;
-    actualUpdate = false;
-    bool updated = false;
-    for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
-
-      i.next().embeddedObject()
-        BSONObjBuilder newAttr;
-        bool unitActualUpdate = false;
-        if (checkAndUpdate(newAttr, i.next().embeddedObject(), *caP, &unitActualUpdate) && !updated) {
-            updated = true;
-        }
-        /* If at least one actual update was done at checkAndUpdate() level, then updateAttribute()
-         * actual update is true */
-        if (unitActualUpdate == true) {
-            actualUpdate = true;
-        }
-
-        newAttrsBuilder.append(newAttr.obj());       
-    }
-    newAttrs = newAttrsBuilder.arr();
-
-    return updated;
-#endif
-
 }
 
 /* ****************************************************************************
@@ -1337,8 +1312,7 @@ static bool processContextAttributeVector (ContextElement*                      
         bool actualUpdate = true;
         if (strcasecmp(action.c_str(), "update") == 0) {
             if (updateAttribute(attrs, toSet, targetAttr, actualUpdate)) {
-                entityModified = actualUpdate || entityModified;
-                attrs = newAttrs;
+                entityModified = actualUpdate || entityModified;                
             }
             else {
                 /* If updateAttribute() returns false, then that particular attribute has not
