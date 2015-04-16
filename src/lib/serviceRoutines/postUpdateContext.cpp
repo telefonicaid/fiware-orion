@@ -248,12 +248,12 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
 /* ****************************************************************************
 *
-* foundAndNotFound - 
+* foundAndNotFoundAttributeSeparation - 
 *
 * Examine the response from mongo to find out what has really happened ...
 *
 */
-static void foundAndNotFound(UpdateContextResponse* upcrsP, UpdateContextRequest* upcrP)
+static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, UpdateContextRequest* upcrP)
 {
   ContextElementResponseVector  notFoundV;
 
@@ -424,8 +424,8 @@ std::string postUpdateContext
   ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
   LM_M(("KZ: mongoUpdateContext responded with a UpdateContextResponse of %d items", upcrsP->contextElementResponseVector.size()));
   upcrsP->present("From mongoUpdateContext: ");
-  foundAndNotFound(upcrsP, upcrP);
-  upcrsP->present("After foundAndNotFound: ");
+  foundAndNotFoundAttributeSeparation(upcrsP, upcrP);
+  upcrsP->present("After foundAndNotFoundAttributeSeparation: ");
 
 
 
