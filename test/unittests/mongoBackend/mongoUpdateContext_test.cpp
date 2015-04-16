@@ -288,18 +288,17 @@ static void prepareDatabaseWithServicePaths(void) {
     /* Set database */
     setupDatabase();
 
-
     /* Create entities with service path */
     DBClientBase* connection = getMongoConnection();
     BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1" << "servicePath" << "/home/kz/01") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "kz01")
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "kz01")
                           )
                       );
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E1" << "type" << "T1" << "servicePath" << "/home/kz/02") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "kz02")
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "kz02")
                           )
                       );
     connection->insert(ENTITIES_COLL, en1);
@@ -7945,9 +7944,9 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
      * functionality in the DBClientConnectionMockUpdateContext declaration */
     const DBException e = DBException("boom!!", 33);
     BSONObj fakeEn = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "val1") <<
-                          BSON("name" << "A2" << "type" << "TA2")
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "val1") <<
+                          "A2" << BSON("type" << "TA2")
                           )
                      );
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();    
@@ -8003,7 +8002,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
 
     EXPECT_EQ("collection: unittest.entities "
               "- update() query: { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } "
-              "- update() doc: { $set: { attrs: [ { name: \"A1\", value: \"new_val\", type: \"TA1\", modDate: 1360232700 }, { name: \"A2\", type: \"TA2\" } ], modDate: 1360232700 }, $unset: { location: 1 } } "
+              "- update() doc: { $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", modDate: 1360232700 }, modDate: 1360232700 }, $unset: { location: 1 } } "
               "- exception: boom!!", RES_CER_STATUS(0).details);
 
     /* Release mocks */
@@ -8076,7 +8075,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 
 /* ****************************************************************************
 *
-* servicePathEntityUpdates_3levels -
+* servicePathEntityUpdate_3levels -
 *
 */
 TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
