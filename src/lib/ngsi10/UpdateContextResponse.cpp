@@ -233,7 +233,7 @@ void UpdateContextResponse::fill(UpdateContextResponse* upcrsP)
 * UpdateContextResponse::merge - 
 *
 * For each attribute in upcrsP::ContextElementResponse[cerIx]::ContextElement::ContextAttributeVector
-*   - if found: use foundPush to add the atrtribute to its correct place
+*   - if found: use foundPush to add the attribute to its correct place
 *   - if not found, use notFoundPush
 *
 */
