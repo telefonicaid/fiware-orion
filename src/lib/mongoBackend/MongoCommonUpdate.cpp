@@ -1289,27 +1289,23 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
         valueBson(attrsV.get(ix), bsonAttr);
 
-        if (attrId.length() == 0) {
-            LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
-                            attrsV.get(ix)->name.c_str(),
-                            attrsV.get(ix)->type.c_str(),
-                            attrsV.get(ix)->value.c_str()));
+        std::string effectiveName = attrsV.get(ix)->name;
+        if (attrId.length() != 0)
+        {
+          effectiveName += "__" + attrId;
         }
-        else {
-            bsonAttr.append(ENT_ATTRS_ID, attrId);
-            LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s, id: %s}",
-                            attrsV.get(ix)->name.c_str(),
-                            attrsV.get(ix)->type.c_str(),
-                            attrsV.get(ix)->value.c_str(),
-                            attrId.c_str()));
-        }        
+
+        LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
+                        effectiveName.c_str(),
+                        attrsV.get(ix)->type.c_str(),
+                        attrsV.get(ix)->value.c_str()));
 
         /* Custom metadata */
         BSONObj mdV;
         if (contextAttributeCustomMetadataToBson(mdV, attrsV.get(ix)))
             bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
 
-        attrsToAdd.append(attrsV.get(ix)->name, bsonAttr.obj());
+        attrsToAdd.append(effectiveName, bsonAttr.obj());
     }
 
     BSONObj bsonId;

@@ -4150,10 +4150,9 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     ASSERT_EQ(1, attrs.nFields());
-    a1 = attrs.getField("A1").embeddedObject();
+    a1 = attrs.getField("A1__ID1").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
-    EXPECT_STREQ("ID1", C_STR_FIELD(a1, "id"));
     EXPECT_TRUE(a1.hasField("creDate"));
     EXPECT_TRUE(a1.hasField("modDate"));
 
