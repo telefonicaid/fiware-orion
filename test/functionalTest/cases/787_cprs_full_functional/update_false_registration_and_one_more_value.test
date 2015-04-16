@@ -35,6 +35,7 @@ brokerStart CP1
 # 01. Register E1/T1/A1-CP1 in CB
 # 02. Update/APPEND E1/T1/A2 in CB
 # 03. Update/UPDATE E1/T1/A1+A2 in CB
+# 04. Query E1/T1/{} in CB - see only E1/T1/A2
 #
 
 echo "01. Register E1/T1/A1-CP1 in CB"
@@ -113,6 +114,21 @@ payload='{
   "updateAction": "UPDATE"
 }'
 orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Query E1/T1/{} in CB - see only E1/T1/A2"
+echo "============================================"
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json
 echo
 echo
 
@@ -205,6 +221,37 @@ Date: REGEX(.*)
             "statusCode": {
                 "code": "404", 
                 "reasonPhrase": "No context element found"
+            }
+        }
+    ]
+}
+
+
+04. Query E1/T1/{} in CB - see only E1/T1/A2
+============================================
+HTTP/1.1 200 OK
+Content-Length: 391
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A2", 
+                        "type": "string", 
+                        "value": "A2 in CB"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
             }
         }
     ]
