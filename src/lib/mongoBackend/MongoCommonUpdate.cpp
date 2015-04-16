@@ -295,7 +295,9 @@ static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
 *
 * mergeAttrInfo -
 *
-* TBD
+* Takes as input the information of a given attribute, both in database (attr) and
+* request (caP), and merged them producing the mergedAttr output. The function returns
+* true if it was an actual update, false otherwise.
 *
 */
 static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr)
@@ -427,174 +429,6 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
 /* ****************************************************************************
 *
-* checkAndUpdate -
-*
-* Add the 'attr' attribute to the BSONObjBuilder (which is passed by reference), doing
-* the actual update in the case of ContextAttribute matches.
-*
-* Returns true if the update was done, false if only a "attribute copy" was done. If true,
-* the "actualUpdate" argument (passed by reference) is set to true in the case that the
-* original value of the attribute was different that the one used in the update (this is
-* important for ONCHANGE notifications).
-*/
-static bool checkAndUpdate (BSONObjBuilder& newAttr, BSONObj attr, ContextAttribute ca, bool* actualUpdate) {
-
-    bool updated = false;
-    *actualUpdate = false;
-
-    newAttr.append(ENT_ATTRS_NAME, STR_FIELD(attr, ENT_ATTRS_NAME));
-    /* The hasField() check is needed to preserve compatibility with entities that were created
-     * in database by a CB instance previous to the support of creation and modification dates */
-    if (attr.hasField(ENT_ATTRS_CREATION_DATE)) {
-        newAttr.append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
-    }
-    if (STR_FIELD(attr, ENT_ATTRS_ID) != "") {
-        newAttr.append(ENT_ATTRS_ID, STR_FIELD(attr, ENT_ATTRS_ID));
-    }
-    if (smartAttrMatch(STR_FIELD(attr, ENT_ATTRS_NAME), STR_FIELD(attr, ENT_ATTRS_ID), ca.name, ca.getId()))
-    {
-        updated = true;
-
-        /* Update value */
-        valueBson(&ca, newAttr);
-
-        /* Update type (only if type is not empty, otherwise, we leave type untouched) */
-        if (ca.type != "")
-        {
-            newAttr.append(ENT_ATTRS_TYPE, ca.type);
-        }
-        else
-        {
-            if (attr.hasField(ENT_ATTRS_TYPE))
-            {
-                newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
-            }
-        }
-
-        /* Update metadata */
-        BSONArrayBuilder mdNewVBuilder;
-
-        /* First add the metadata elements coming in the request */
-        for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
-            Metadata* md = ca.metadataVector.get(ix);
-            /* Skip not custom metadata */
-            if (isNotCustomMetadata(md->name)) {
-                continue;
-            }
-            if (md->type == "") {
-                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_VALUE << md->value));
-            }
-            else {
-                mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_TYPE << md->type << ENT_ATTRS_MD_VALUE << md->value));
-            }
-        }
-
-        /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
-        int mdVSize = 0;
-        BSONObj mdV;
-        if (attr.hasField(ENT_ATTRS_MD)) {
-            mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
-            for( BSONObj::iterator i = mdV.begin(); i.more(); ) {
-                BSONObj md = i.next().embeddedObject();
-                mdVSize++;
-                if (!hasMetadata(md.getStringField(ENT_ATTRS_MD_NAME), md.getStringField(ENT_ATTRS_MD_TYPE), ca)) {
-                    if (md.hasField(ENT_ATTRS_MD_TYPE)) {
-                        mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                           ENT_ATTRS_MD_TYPE << md.getStringField(ENT_ATTRS_MD_TYPE) <<
-                                           ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-                    }
-                    else {
-                        mdNewVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                           ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-                    }
-                }
-            }
-        }
-
-        BSONObj mdNewV = mdNewVBuilder.arr();
-        if (mdNewVBuilder.arrSize() > 0) {
-            newAttr.appendArray(ENT_ATTRS_MD, mdNewV);
-        }
-
-        /* It was an actual update? */
-        if (ca.compoundValueP == NULL)
-        {
-            /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
-             *
-             * 1) the value of the attribute changed (probably the !attr.hasField(ENT_ATTRS_VALUE) is not needed, as any
-             *    attribute is supposed to have a value (according to NGSI spec), but it doesn't hurt anyway and makes CB
-             *    stronger)
-             * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
-             *    type is optional according to NGSI and the attribute may not have that field in the BSON)
-             * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
-             *    different and, if they are of the same size, checking if the vectors are not equal)
-             */
-            *actualUpdate = (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != ca.value ||
-                            ((ca.type != "") && (!attr.hasField(ENT_ATTRS_TYPE) || STR_FIELD(attr, ENT_ATTRS_TYPE) != ca.type) ) ||
-                            mdNewVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
-
-        }
-        else
-        {
-            // FIXME P6: in the case of compound value, it's more difficult to know if an attribute
-            // has really changed its value (many levels have to be traversed). Until we can develop the
-            // matching logic, we consider actualUpdate always true.
-            *actualUpdate = true;
-        }
-
-    }
-    else {
-        /* Attribute doesn't match */
-
-        /* Value is included "as is", taking into account it can be a compound value */
-        if (attr.hasField(ENT_ATTRS_VALUE)) {
-            BSONElement value = attr.getField(ENT_ATTRS_VALUE);
-            if (value.type() == String) {
-                newAttr.append(ENT_ATTRS_VALUE, value.String());
-            }
-            else if (attr.getField(ENT_ATTRS_VALUE).type() == Object) {
-                newAttr.append(ENT_ATTRS_VALUE, value.embeddedObject());
-            }
-            else if (attr.getField(ENT_ATTRS_VALUE).type() == Array) {
-                newAttr.appendArray(ENT_ATTRS_VALUE, value.embeddedObject());
-            }
-            else
-            {
-              LM_T(LmtMongo, ("unknown BSON type"));
-            }
-
-        }
-
-        /* Type included "as is" */
-        if (attr.hasField(ENT_ATTRS_TYPE))
-        {
-            newAttr.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
-        }
-
-        /* Metadata is included "as is" */
-        BSONObj mdV;
-        if (bsonCustomMetadataToBson(mdV, attr)) {
-            newAttr.appendArray(ENT_ATTRS_MD, mdV);
-        }
-    }
-
-    /* In the case of actual update, we update also the modification date; otherwise we include the previous existing one */
-    if (*actualUpdate) {
-        newAttr.append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
-    }
-    else {
-        /* The hasField() check is needed to preserve compatibility with entities that were created
-         * in database by a CB instance previous to the support of creation and modification dates */
-        if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE)) {
-            newAttr.append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
-        }
-    }
-
-    return updated;
-}
-
-/* ****************************************************************************
-*
 * checkAndDelete -
 *
 * Add the 'attr' attribute to the BSONObjBuilder (which is passed by reference), doing
@@ -640,7 +474,7 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 *
 * updateAttribute -
 *
-* Returns true if an attribute was found and replaced, false otherwise. If true,
+* Returns true if an attribute was found, false otherwise. If true,
 * the "actualUpdate" argument (passed by reference) is set to true in the case that the
 * original value of the attribute was different that the one used in the update (this is
 * important for ONCHANGE notifications)
@@ -649,7 +483,7 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttribute* caP, bool& actualUpdate)
 {
   actualUpdate = false;
-  LM_T(LmtMongo, ("==== %s", attrs.toString().c_str()));
+  //LM_T(LmtMongo, ("==== %s", attrs.toString().c_str()));
   if (attrs.hasField(caP->name.c_str()))
   {
     BSONObj attr = attrs.getField(caP->name).embeddedObject();
@@ -706,8 +540,42 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 * false othewise (i.e. when the new value equals to the existing one)
 *
 */
-static bool appendAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute* caP) {
+static bool appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttribute* caP) {
 
+  /* APPEND with existing attribute equals to UPDATE */
+  if (attrs.hasField(caP->name.c_str()))
+  {
+    bool actualUpdate;
+    updateAttribute(attrs, toSet, caP, actualUpdate);
+    return actualUpdate;
+  }
+
+  /* Build the attribute to append */
+  BSONObjBuilder ab;
+
+  /* 1. Value */
+  valueBson(caP, ab);
+
+  /* 2. Type */
+  ab.append(ENT_ATTRS_TYPE, caP->type);
+
+  /* 3. Metadata */
+  BSONObj mdV;
+  if (contextAttributeCustomMetadataToBson(mdV, caP)) {
+      ab.appendArray(ENT_ATTRS_MD, mdV);
+  }
+
+  /* 4. Dates */
+  int now = getCurrentTime();
+  ab.append(ENT_ATTRS_CREATION_DATE, now);
+  ab.append(ENT_ATTRS_MODIFICATION_DATE, now);
+
+  const std::string composedName = std::string(ENT_ATTRS) + "." + caP->name;
+  toSet->append(composedName, ab.obj());
+  return true;
+
+
+#if 0
     /* APPEND with existing attribute equals to UPDATE */
     BSONArrayBuilder newAttrsBuilder;
     bool updated = false;
@@ -748,7 +616,7 @@ static bool appendAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
         newAttrs = newAttrsBuilder.arr();
         return actualUpdate;
     }
-
+#endif
 
 }
 
@@ -1360,8 +1228,7 @@ static bool processContextAttributeVector (ContextElement*                      
         }
         else if (strcasecmp(action.c_str(), "append") == 0) {
             if (legalIdUsage(attrs, targetAttr)) {
-                entityModified = appendAttribute(attrs, newAttrs, targetAttr) || entityModified;
-                attrs = newAttrs;
+                entityModified = appendAttribute(attrs, toSet, targetAttr) || entityModified;
 
                 /* Check aspects related with location */
                 if (targetAttr->getLocation().length() > 0 ) {
