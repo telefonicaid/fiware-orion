@@ -169,3 +169,21 @@ std::string ContextElementVector::check
 
   return "OK";
 }
+
+
+/* ****************************************************************************
+*
+* ContextElementVector::lookup - 
+*/
+ContextElement* ContextElementVector::lookup(EntityId* eP)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if ((vec[ix]->entityId.id == eP->id) && (vec[ix]->entityId.type == eP->type))
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
+}

@@ -99,7 +99,7 @@ std::string UpdateContextResponse::render(ConnectionInfo* ciP, RequestType reque
       out += errorCode.render(ciP->outFormat, indent + "  ");
     }
     else
-      out += contextElementResponseVector.render(ciP, UpdateContext, indent + "  ");
+      out += contextElementResponseVector.render(ciP, RtUpdateContextResponse, indent + "  ", false);
   }
   
   out += endTag(indent, tag, ciP->outFormat);
@@ -147,6 +147,7 @@ std::string UpdateContextResponse::check
 */
 void UpdateContextResponse::present(const std::string& indent)
 {
+  LM_F(("%sUpdateContextResponse", indent.c_str()));
   contextElementResponseVector.present(indent + "  ");
   errorCode.present(indent + "  ");
 }
@@ -162,4 +163,98 @@ void UpdateContextResponse::release(void)
   LM_T(LmtRelease, ("In UpdateContextResponse::release"));
   contextElementResponseVector.release();
   errorCode.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::notFoundPush - 
+*
+* 1. Find contextElementResponse in contextElementResponseVector and add the ContextAttribute.
+* 2. If not found: create a new one.
+*
+*/
+void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP)
+{
+  ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccContextElementNotFound);
+  if (cerP == NULL)
+  {
+    cerP = new ContextElementResponse(eP, aP);
+    cerP->statusCode.fill(SccContextElementNotFound);
+    contextElementResponseVector.push_back(cerP);
+  }
+  else
+  {
+    cerP->contextElement.contextAttributeVector.push_back(aP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::foundPush - 
+*
+* 1. Find contextElementResponse in contextElementResponseVector and add the ContextAttribute.
+* 2. If no contextElementResponse is found for this Entity (eP), then create a new
+*    contextElementResponse and push the attribute onto it.
+*
+*/
+void UpdateContextResponse::foundPush(EntityId* eP, ContextAttribute* aP)
+{
+  ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccOk);
+  if (cerP == NULL)
+  {
+    cerP = new ContextElementResponse(eP, aP);
+    cerP->statusCode.fill(SccOk);
+    contextElementResponseVector.push_back(cerP);
+  }
+  else
+  {
+    cerP->contextElement.contextAttributeVector.push_back(aP);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::fill - 
+*/
+void UpdateContextResponse::fill(UpdateContextResponse* upcrsP)
+{
+  contextElementResponseVector.fill(upcrsP->contextElementResponseVector);
+  errorCode.fill(upcrsP->errorCode);
+}
+
+
+/* ****************************************************************************
+*
+* UpdateContextResponse::merge - 
+*
+* For each attribute in upcrsP::ContextElementResponse[cerIx]::ContextElement::ContextAttributeVector
+*   - if found: use foundPush to add the attribute to its correct place
+*   - if not found, use notFoundPush
+*
+*/
+void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
+{
+  for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
+  {
+    ContextElement* ceP = &upcrsP->contextElementResponseVector[cerIx]->contextElement;
+    StatusCode*     scP = &upcrsP->contextElementResponseVector[cerIx]->statusCode;
+
+    for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
+    {
+      if (scP->code == SccContextElementNotFound)
+      {
+        notFoundPush(&ceP->entityId, new ContextAttribute(ceP->contextAttributeVector[aIx]));
+      }
+      else
+      {
+        foundPush(&ceP->entityId, new ContextAttribute(ceP->contextAttributeVector[aIx]));
+      }
+    }
+  }
 }

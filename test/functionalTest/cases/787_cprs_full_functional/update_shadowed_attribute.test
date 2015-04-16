@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-One Forward Query To Context Provider
+Update With Shadowed Attribute
 
 --SHELL-INIT--
 dbInit CB
@@ -33,8 +33,11 @@ brokerStart CP1
 
 #
 # 01. Update/APPEND E1/T1/A1 in CP1
-# 02. Register E1/T1/A1 in CB, provApp: CP1
-# 03. Query E1/T1/A1
+# 02. Update/APPEND E1/T1/A1 in CB
+# 03. Register E1/T1/A1 in CB, provApp: CP1
+# 04. Update/UPDATE E1/T1/A1 in CB
+# 05. Query E1/T1/A1 in CP1 (untouched by 04)
+# 06. Query E1/T1/A1 in CB (modified by 04)
 #
 
 echo "01. Update/APPEND E1/T1/A1 in CP1"
@@ -60,7 +63,30 @@ echo
 echo
 
 
-echo "02. Register E1/T1/A1 in CB, provApp: CP1"
+echo "02. Update/APPEND E1/T1/A1 in CB"
+echo "================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "A1 in CB"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. Register E1/T1/A1 in CB, provApp: CP1"
 echo "========================================="
 payload='{
   "contextRegistrations": [
@@ -89,8 +115,49 @@ echo
 echo
 
 
-echo "03. Query E1/T1/A1"
-echo "=================="
+echo "04. Update/UPDATE E1/T1/A1 in CB"
+echo "================================"
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "A1 modified by 04"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Query E1/T1/A1 in CP1 (untouched by 04)"
+echo "==========================================="
+payload='{
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP1_PORT
+echo
+echo
+
+
+echo "06. Query E1/T1/A1 in CB (modified by 04)"
+echo "========================================="
 payload='{
   "entities": [
     {
@@ -139,7 +206,38 @@ Date: REGEX(.*)
 }
 
 
-02. Register E1/T1/A1 in CB, provApp: CP1
+02. Update/APPEND E1/T1/A1 in CB
+================================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Register E1/T1/A1 in CB, provApp: CP1
 =========================================
 HTTP/1.1 200 OK
 Content-Length: 74
@@ -147,13 +245,44 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "duration": "P1M",
+    "duration": "P1M", 
     "registrationId": "REGEX([0-9a-f]{24})"
 }
 
 
-03. Query E1/T1/A1
-==================
+04. Update/UPDATE E1/T1/A1 in CB
+================================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+05. Query E1/T1/A1 in CP1 (untouched by 04)
+===========================================
 HTTP/1.1 200 OK
 Content-Length: 392
 Content-Type: application/json
@@ -168,6 +297,37 @@ Date: REGEX(.*)
                         "name": "A1", 
                         "type": "string", 
                         "value": "A1 in CP1"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. Query E1/T1/A1 in CB (modified by 04)
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 400
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "A1 modified by 04"
                     }
                 ], 
                 "id": "E1", 

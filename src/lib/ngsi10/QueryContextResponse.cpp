@@ -110,6 +110,10 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   {
     out += errorCode.render(ciP->outFormat, indent + "  ");
   }
+  else if (contextElementResponseVector.size() == 0)
+  {
+    out += errorCode.render(ciP->outFormat, indent + "  ");
+  }
 
   /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
   if ((errorCode.code == SccNone) && (contextElementResponseVector.size() == 0))

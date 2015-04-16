@@ -44,6 +44,28 @@
 
 /* ****************************************************************************
 *
+* UpdateContextRequest::UpdateContextRequest - 
+*/
+UpdateContextRequest::UpdateContextRequest()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::UpdateContextRequest - 
+*/
+UpdateContextRequest::UpdateContextRequest(const std::string _contextProvider, EntityId* eP)
+{
+  contextProvider = _contextProvider;
+  contextElementVector.push_back(new ContextElement(eP));
+}
+
+
+
+/* ****************************************************************************
+*
 * UpdateContextRequest::init - 
 */
 void UpdateContextRequest::init(void)
@@ -121,7 +143,6 @@ void UpdateContextRequest::present(const std::string& indent)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  PRINTF("\n\n");
   contextElementVector.present(indent);
   updateActionType.present(indent);
 }
@@ -268,4 +289,37 @@ void UpdateContextRequest::fill
   }
 
   updateActionType.set(_updateActionType);
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::attributeLookup - 
+*/
+ContextAttribute* UpdateContextRequest::attributeLookup(EntityId* eP, const std::string& attributeName)
+{
+  for (unsigned int ceIx = 0; ceIx < contextElementVector.size(); ++ceIx)
+  {
+    EntityId* enP = &contextElementVector[ceIx]->entityId;
+ 
+    if ((enP->id != eP->id) || (enP->type != eP->type))
+    {
+      continue;
+    }
+
+    ContextElement* ceP = contextElementVector[ceIx];
+
+    for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP = ceP->contextAttributeVector[aIx];
+
+      if (aP->name == attributeName)
+      {
+        return aP;
+      }
+    }
+  }
+
+  return NULL;
 }

@@ -21,24 +21,23 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-One Forward Query To Context Provider
+Plain local update
 
 --SHELL-INIT--
 dbInit CB
-dbInit CP1
 brokerStart CB
-brokerStart CP1
 
 --SHELL--
 
 #
-# 01. Update/APPEND E1/T1/A1 in CP1
-# 02. Register E1/T1/A1 in CB, provApp: CP1
-# 03. Query E1/T1/A1
+# 01. Update/APPEND E1/T1/A1=1 in CB
+# 02. Query E1/T1/A1 (A1 == 1)
+# 03. Update/UPDATE E1/T1/A1=2 in CB
+# 04. Query E1/T1/A1 (A1 == 2)
 #
 
-echo "01. Update/APPEND E1/T1/A1 in CP1"
-echo "================================="
+echo "01. Update/APPEND E1/T1/A1=1 in CB"
+echo "=================================="
 payload='{
   "contextElements": [
     {
@@ -48,49 +47,61 @@ payload='{
         {
           "name": "A1",
           "type": "string",
-          "value": "A1 in CP1"
+          "value": "1"
         }
       ]
     }
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
 
-echo "02. Register E1/T1/A1 in CB, provApp: CP1"
-echo "========================================="
+echo "02. Query E1/T1/A1 (A1 == 1)"
+echo "============================"
 payload='{
-  "contextRegistrations": [
-  {
-    "entities": [
-      {
-         "type": "T1",
-         "isPattern": "false",
-         "id": "E1"
-      }
-    ],
-    "attributes": [
-      {
-        "name": "A1",
-        "type": "string",
-        "isDomain": "false"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
+  "entities": [
+    {
+      "id":   "E1",
+      "type": "T1"
     }
- ],
- "duration": "P1M"
+  ],
+  "attributes": [
+    "A1"
+  ]
 }'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+orionCurl --url /v1/queryContext --payload "$payload" --json
 echo
 echo
 
 
-echo "03. Query E1/T1/A1"
-echo "=================="
+echo "03. Update/UPDATE E1/T1/A1=2 in CB"
+echo "=================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "2"
+        }
+      ]
+    }
+  ],
+  "updateAction": "UPDATE"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Query E1/T1/A1 (A1 == 2)"
+echo "============================"
 payload='{
   "entities": [
     {
@@ -108,8 +119,8 @@ echo
 
 
 --REGEXPECT--
-01. Update/APPEND E1/T1/A1 in CP1
-=================================
+01. Update/APPEND E1/T1/A1=1 in CB
+==================================
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
@@ -139,23 +150,10 @@ Date: REGEX(.*)
 }
 
 
-02. Register E1/T1/A1 in CB, provApp: CP1
-=========================================
+02. Query E1/T1/A1 (A1 == 1)
+============================
 HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "P1M",
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-03. Query E1/T1/A1
-==================
-HTTP/1.1 200 OK
-Content-Length: 392
+Content-Length: 384
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -167,7 +165,69 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "string", 
-                        "value": "A1 in CP1"
+                        "value": "1"
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. Update/UPDATE E1/T1/A1=2 in CB
+==================================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+04. Query E1/T1/A1 (A1 == 2)
+============================
+HTTP/1.1 200 OK
+Content-Length: 384
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": "2"
                     }
                 ], 
                 "id": "E1", 
@@ -185,6 +245,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-brokerStop CP1
 dbDrop CB
-dbDrop CP1

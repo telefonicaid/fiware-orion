@@ -51,9 +51,20 @@ ContextElement::ContextElement()
 
 /* ****************************************************************************
 *
+* ContextElement::ContextElement - 
+*/
+ContextElement::ContextElement(EntityId* eP)
+{
+  entityId.fill(eP);
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElement::render - 
 */
-std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma)
+std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
 {
   std::string  out                              = "";
   std::string  xmlTag                           = "contextElement";
@@ -71,7 +82,7 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
 
   out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
   out += attributeDomainName.render(ciP->outFormat, indent + "  ", commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector);
+  out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
   out += domainMetadataVector.render(ciP->outFormat, indent + "  ", commaAfterDomainMetadataVector);
 
   out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
