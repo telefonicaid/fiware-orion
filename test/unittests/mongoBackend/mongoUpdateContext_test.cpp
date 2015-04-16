@@ -255,7 +255,6 @@ static void prepareDatabaseMd(void) {
 * This function is called before every test, to populate some information in the
 * entities collection.
 */
-#if 0
 static void prepareDatabaseWithAttributeIds(void) {
 
     /* Start with the base entities */
@@ -265,16 +264,15 @@ static void prepareDatabaseWithAttributeIds(void) {
 
     DBClientBase* connection = getMongoConnection();
     BSONObj en = BSON("_id" << BSON("id" << "E10" << "type" << "T10") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "val11" << "id" << "ID1") <<
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "val12" << "id" << "ID2") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "val2")
+                       "attrs" << BSON(
+                          "A1__ID1" << BSON("type" << "TA1" << "value" << "val11") <<
+                          "A1__ID2" << BSON("type" << "TA1" << "value" << "val12") <<
+                          "A2" << BSON("type" << "TA2" << "value" << "val2")
                           )
                       );
     connection->insert(ENTITIES_COLL, en);
 
 }
-#endif
 
 /* ****************************************************************************
 *
@@ -353,7 +351,7 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -490,7 +488,7 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -628,7 +626,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -792,7 +790,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -959,7 +957,7 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1115,7 +1113,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -1265,7 +1263,7 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1419,7 +1417,7 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1560,7 +1558,7 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1701,7 +1699,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -1876,7 +1874,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -2055,7 +2053,7 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -2219,7 +2217,7 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2376,7 +2374,7 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -2393,7 +2391,7 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_EQ(0, RES_CER_ATTR(1, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -2541,7 +2539,7 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2663,7 +2661,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2796,7 +2794,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2923,7 +2921,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -3036,7 +3034,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -3191,7 +3189,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -3350,7 +3348,7 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 2 */
@@ -3500,7 +3498,7 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -3641,7 +3639,7 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     ASSERT_EQ(2, res.contextElementResponseVector.size());
     /* Context Element response # 2 */
@@ -3922,7 +3920,7 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -4077,7 +4075,7 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -4931,7 +4929,7 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response #2 (create) */
     EXPECT_EQ("E5", RES_CER(1).entityId.id);
@@ -5094,7 +5092,7 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -5189,7 +5187,6 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
 *
 * updateAttrWithId -
 */
-#if 0
 TEST(mongoUpdateContextRequest, updateAttrWithId)
 {
     HttpStatusCode         ms;
@@ -5237,7 +5234,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -5336,16 +5333,14 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     ASSERT_EQ(3, attrs.nFields());
-    BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");    
+    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1id1, "value"));
-    EXPECT_STREQ("ID1", C_STR_FIELD(a1id1, "id"));
     EXPECT_EQ(1360232700, a1id1.getIntField("modDate"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -5358,9 +5353,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     utExit();
 
 }
-#endif
 
-#if 0
 /* ****************************************************************************
 *
 * updateAttrWithAndWithoutId -
@@ -5427,7 +5420,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent, attrs;:
+    BSONObj ent, attrs;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -5517,16 +5510,14 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     ASSERT_EQ(3, attrs.nFields());
-    BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");    
+    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1id1, "value"));
-    EXPECT_STREQ("ID1", C_STR_FIELD(a1id1, "id"));
     EXPECT_EQ(1360232700, a1id1.getIntField("modDate"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
     EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
@@ -5540,13 +5531,11 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     utExit();
 
 }
-#endif
 
 /* ****************************************************************************
 *
 * appendAttrWithId -
 */
-#if 0
 TEST(mongoUpdateContextRequest, appendAttrWithId)
 {
     HttpStatusCode         ms;
@@ -5594,7 +5583,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_EQ("ID3", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -5693,21 +5682,18 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     ASSERT_EQ(4, attrs.nFields());
-    BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    BSONObj a1id3 = getAttr(attrs, "A1", "TA1", "ID3");    
+    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
+    BSONObj a1id3 = attrs.getField("A1__ID3").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
-    EXPECT_STREQ("ID1", C_STR_FIELD(a1id1, "id"));
     EXPECT_FALSE(a1id1.hasField("modDate"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id3, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1id3, "value"));
-    EXPECT_STREQ("ID3", C_STR_FIELD(a1id3, "id"));
     EXPECT_EQ(1360232700, a1id3.getIntField("modDate"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -5720,13 +5706,11 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     utExit();
 
 }
-#endif
 
 /* ****************************************************************************
 *
 * appendAttrWithAndWithoutId -
 */
-#if 0
 TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
 {
     HttpStatusCode         ms;
@@ -5879,22 +5863,19 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     ASSERT_EQ(5, attrs.nFields());
-    BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
-    BSONObj a1id3 = getAttr(attrs, "A1", "TA1", "ID3");
+    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
+    BSONObj a1id3 = attrs.getField("A1__ID3").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     a3 = attrs.getField("A3").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
-    EXPECT_STREQ("ID1", C_STR_FIELD(a1id1, "id"));
     EXPECT_FALSE(a1id1.hasField("modDate"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id3, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1id3, "value"));
-    EXPECT_STREQ("ID3", C_STR_FIELD(a1id3, "id"));
     EXPECT_EQ(1360232700, a1id3.getIntField("modDate"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -5911,9 +5892,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     utExit();
 
 }
-#endif
 
-#if 0
 /* ****************************************************************************
 *
 * appendAttrWithIdFails -
@@ -6064,16 +6043,14 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     ASSERT_EQ(3, attrs.nFields());
-    BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
+    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
-    EXPECT_STREQ("ID1", C_STR_FIELD(a1id1, "id"));
     EXPECT_FALSE(a1id1.hasField("modDate"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -6086,13 +6063,11 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     utExit();
 
 }
-#endif
 
 /* ****************************************************************************
 *
 * appendAttrWithoutIdFails -
 */
-#if 0
 TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
 {
     HttpStatusCode         ms;
@@ -6234,16 +6209,14 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     ASSERT_EQ(3, attrs.nFields());
-    BSONObj a1id1 = getAttr(attrs, "A1", "TA1", "ID1");
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
+    BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
+    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
-    EXPECT_STREQ("ID1", C_STR_FIELD(a1id1, "id"));
     EXPECT_FALSE(a1id1.hasField("modDate"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -6256,13 +6229,11 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     utExit();
 
 }
-#endif
 
 /* ****************************************************************************
 *
 * deleteAttrWithId -
 */
-#if 0
 TEST(mongoUpdateContextRequest, deleteAttrWithId)
 {
     HttpStatusCode         ms;
@@ -6310,7 +6281,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -6409,11 +6380,10 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     ASSERT_EQ(2, attrs.nFields());
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
+    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
-    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
+    EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));    
     EXPECT_FALSE(a1id2.hasField("modDate"));    
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
@@ -6426,13 +6396,11 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     utExit();
 
 }
-#endif
 
 /* ****************************************************************************
 *
 * deleteAttrWithAndWithoutId -
 */
-#if 0
 TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
 {
     HttpStatusCode         ms;
@@ -6585,10 +6553,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
     ASSERT_EQ(1, attrs.nFields());
-    BSONObj a1id2 = getAttr(attrs, "A1", "TA1", "ID2");
+    BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_STREQ("ID2", C_STR_FIELD(a1id2, "id"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
 
     /* Release connection */
@@ -6597,7 +6564,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     utExit();
 
 }
-#endif
 
 /* ****************************************************************************
 *
@@ -6655,7 +6621,7 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     EXPECT_EQ("MD2val", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -6745,7 +6711,7 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     EXPECT_EQ("new_val", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -6835,7 +6801,7 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     EXPECT_EQ("new_val", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -6925,7 +6891,7 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     EXPECT_EQ("new_val3", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7017,7 +6983,7 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     EXPECT_EQ("new_val3", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7114,7 +7080,7 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     EXPECT_EQ("new_val3", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7211,7 +7177,7 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     EXPECT_EQ("new_val3", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7303,7 +7269,7 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     EXPECT_EQ("new_val", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7393,7 +7359,7 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     EXPECT_EQ("new_val", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7484,7 +7450,7 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     EXPECT_EQ("MD1val", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7574,7 +7540,7 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     EXPECT_EQ("MD1val", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -7664,7 +7630,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E[2-3]", RES_CER(1).entityId.id);
@@ -7814,7 +7780,7 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -8120,7 +8086,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -8204,7 +8170,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_2levels)
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -8301,7 +8267,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -8390,7 +8356,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_2levels)
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -8497,7 +8463,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -8595,7 +8561,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -8687,7 +8653,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_2levels)
     ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -8752,7 +8718,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     ASSERT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
