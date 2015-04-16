@@ -293,6 +293,140 @@ static bool bsonCustomMetadataToBson(BSONObj& newMdV, BSONObj& attr) {
 
 /* ****************************************************************************
 *
+* mergeAttrInfo -
+*
+* TBD
+*
+*/
+static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr)
+{
+  BSONObjBuilder ab;
+
+  /* 1. Add value */
+  valueBson(caP, ab);
+
+  /* 2. Add type (only if type is not empty in the request, otherwise, we leave type untouched) */
+  if (caP->type != "")
+  {
+    ab.append(ENT_ATTRS_TYPE, caP->type);
+  }
+  else
+  {
+    if (attr.hasField(ENT_ATTRS_TYPE))
+    {
+      ab.append(ENT_ATTRS_TYPE, STR_FIELD(attr, ENT_ATTRS_TYPE));
+    }
+  }
+
+  /* 3. Add metadata */
+  BSONArrayBuilder mdVBuilder;
+
+  /* First add the metadata elements coming in the request */
+  for (unsigned int ix = 0; ix < caP->metadataVector.size() ; ++ix)
+  {
+    Metadata* md = caP->metadataVector.get(ix);
+    /* Skip not custom metadata */
+    if (isNotCustomMetadata(md->name))
+    {
+      continue;
+    }
+    if (md->type == "")
+    {
+      mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_VALUE << md->value));
+    }
+    else
+    {
+      mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_TYPE << md->type << ENT_ATTRS_MD_VALUE << md->value));
+    }
+  }
+
+  /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
+  int mdVSize = 0;
+  BSONObj mdV;
+  if (attr.hasField(ENT_ATTRS_MD))
+  {
+    mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
+    for( BSONObj::iterator i = mdV.begin(); i.more(); )
+    {
+      BSONObj md = i.next().embeddedObject();
+      mdVSize++;
+      if (!hasMetadata(md.getStringField(ENT_ATTRS_MD_NAME), md.getStringField(ENT_ATTRS_MD_TYPE), caP))
+      {
+        if (md.hasField(ENT_ATTRS_MD_TYPE))
+        {
+          mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME  << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                 ENT_ATTRS_MD_TYPE  << md.getStringField(ENT_ATTRS_MD_TYPE) <<
+                                 ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+        }
+        else
+        {
+          mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME  << md.getStringField(ENT_ATTRS_MD_NAME) <<
+                                 ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
+        }
+      }
+    }
+  }
+
+  BSONObj mdNewV = mdVBuilder.arr();
+  if (mdVBuilder.arrSize() > 0)
+  {
+    ab.appendArray(ENT_ATTRS_MD, mdNewV);
+  }
+
+  /* 4. Add creation date */
+  if (attr.hasField(ENT_ATTRS_CREATION_DATE))
+  {
+    ab.append(ENT_ATTRS_CREATION_DATE, attr.getIntField(ENT_ATTRS_CREATION_DATE));
+  }
+
+  /* It was an actual update? */
+  bool actualUpdate;
+  if (caP->compoundValueP == NULL)
+  {
+    /* In the case of simple value, we consider there is an actual change if one or more of the following are true:
+     *
+     * 1) the value of the attribute changed (probably the !attr.hasField(ENT_ATTRS_VALUE) is not needed, as any
+     *    attribute is supposed to have a value (according to NGSI spec), but it doesn't hurt anyway and makes CB
+     *    stronger)
+     * 2) the type of the attribute changed (in this case, !attr.hasField(ENT_ATTRS_TYPE) is needed, as attribute
+     *    type is optional according to NGSI and the attribute may not have that field in the BSON)
+     * 3) the metadata changed (this is done checking if the size of the original and final metadata vectors is
+     *    different and, if they are of the same size, checking if the vectors are not equal)
+     */
+      actualUpdate = (!attr.hasField(ENT_ATTRS_VALUE) || STR_FIELD(attr, ENT_ATTRS_VALUE) != caP->value ||
+                     ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) || STR_FIELD(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
+                     mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
+
+  }
+  else
+  {
+      // FIXME P6: in the case of compound value, it's more difficult to know if an attribute
+      // has really changed its value (many levels have to be traversed). Until we can develop the
+      // matching logic, we consider actualUpdate always true.
+      actualUpdate = true;
+  }
+
+  /* 5. Add modification date (actual change only if actual update) */
+  if (actualUpdate)
+  {
+    ab.append(ENT_ATTRS_MODIFICATION_DATE, getCurrentTime());
+  }
+  else
+  {
+    /* The hasField() check is needed to preserve compatibility with entities that were created
+     * in database by a CB instance previous to the support of creation and modification dates */
+    if (attr.hasField(ENT_ATTRS_MODIFICATION_DATE))
+    {
+      ab.append(ENT_ATTRS_MODIFICATION_DATE, attr.getIntField(ENT_ATTRS_MODIFICATION_DATE));
+    }
+  }
+
+  *mergedAttr = ab.obj();
+  return actualUpdate;
+}
+
+/* ****************************************************************************
+*
 * checkAndUpdate -
 *
 * Add the 'attr' attribute to the BSONObjBuilder (which is passed by reference), doing
@@ -512,13 +646,33 @@ static bool checkAndDelete (BSONObjBuilder* newAttr, BSONObj attr, ContextAttrib
 * important for ONCHANGE notifications)
 *
 */
-static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute* caP, bool& actualUpdate) {
+static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttribute* caP, bool& actualUpdate)
+{
+  actualUpdate = false;
+  if (attrs.hasField(caP->name.c_str()))
+  {
+    BSONObj attr = attrs.getField(caP->name).embeddedObject();
+    BSONObj newAttr;
+    actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
+    if (actualUpdate)
+    {
+      const std::string composedName = std::string(ENT_ATTRS) + "." + caP->name;
+      toSet->append(composedName, newAttr);
+    }
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 
+#if 0
     BSONArrayBuilder newAttrsBuilder;
     actualUpdate = false;
     bool updated = false;
     for( BSONObj::iterator i = attrs.begin(); i.more(); ) {
 
+      i.next().embeddedObject()
         BSONObjBuilder newAttr;
         bool unitActualUpdate = false;
         if (checkAndUpdate(newAttr, i.next().embeddedObject(), *caP, &unitActualUpdate) && !updated) {
@@ -530,11 +684,12 @@ static bool updateAttribute(BSONObj& attrs, BSONObj& newAttrs, ContextAttribute*
             actualUpdate = true;
         }
 
-        newAttrsBuilder.append(newAttr.obj());
+        newAttrsBuilder.append(newAttr.obj());       
     }
     newAttrs = newAttrsBuilder.arr();
 
     return updated;
+#endif
 
 }
 
@@ -1153,6 +1308,8 @@ static bool processContextAttributeVector (ContextElement*                      
                                            std::string                                action,
                                            std::map<string, TriggeredSubscription*>&  subsToNotify,
                                            BSONObj&                                   attrs,
+                                           BSONObjBuilder*                            toSet,
+                                           BSONObjBuilder*                            toUnset,
                                            ContextElementResponse*                    cerP,
                                            std::string&                               locAttr,
                                            double&                                    coordLat,
@@ -1179,7 +1336,7 @@ static bool processContextAttributeVector (ContextElement*                      
          * "append" it would keep the true value untouched */
         bool actualUpdate = true;
         if (strcasecmp(action.c_str(), "update") == 0) {
-            if (updateAttribute(attrs, newAttrs, targetAttr, actualUpdate)) {
+            if (updateAttribute(attrs, toSet, targetAttr, actualUpdate)) {
                 entityModified = actualUpdate || entityModified;
                 attrs = newAttrs;
             }
@@ -1786,14 +1943,12 @@ void processContextElement(ContextElement*                      ceP,
         }
 
         LM_T(LmtServicePath, ("ceP->contextAttributeVector.size: %d", ceP->contextAttributeVector.size()));
-        /* We start with the attrs array in the entity document, which is manipulated by the
-         * {update|delete|append}Attrsr() function for each one of the attributes in the
-         * contextElement being processed. Then, we replace the resulting attrs array in the
-         * BSON document and the entity document is updated. It would be more efficient to map the
-         * entity attrs to something like a hash map and manipulate it there, but it does not seem
-         * easy, using the mongo driver BSON API. Note that we need to use newAttrs, given that attrs is
-         * BSONObj, which is an inmutable type. FIXME P6: try to improve this */
+        /* We take as input the attrs array in the entity document and generate two outputs: a
+         * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
+         * the request one of the BSON objects could be empty (it use to be the $unset one) */
         BSONObj attrs = r.getField(ENT_ATTRS).embeddedObject();
+        BSONObjBuilder toSet;
+        BSONObjBuilder toUnset;
 
         /* We accumulate the subscriptions in a map. The key of the map is the string representing
          * subscription id */
@@ -1814,7 +1969,7 @@ void processContextElement(ContextElement*                      ceP,
             coordLat = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, &toSet, &toUnset, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
         {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */            
             responseP->contextElementResponseVector.push_back(cerP);
@@ -1822,29 +1977,32 @@ void processContextElement(ContextElement*                      ceP,
             continue;
         }
 
-        /* Now that attrs contains the final status of the attributes after processing the whole
-         * list of attributes in the ContextElement, update entity attributes in database */
+        /* Compose the final update on database */
         LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
-        BSONObjBuilder updateSet, updateUnset;
-        updateSet.appendArray(ENT_ATTRS, attrs);
-        updateSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
+
+        toSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
         if (locAttr.length() > 0) {
-            updateSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                                ENT_LOCATION_COORDS   << BSON("type" << "Point" <<
-                                                                              "coordinates" << BSON_ARRAY(coordLong << coordLat))));
+            toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
+                                            ENT_LOCATION_COORDS   << BSON("type" << "Point" <<
+                                                                          "coordinates" << BSON_ARRAY(coordLong << coordLat))));
         } else {
-            updateUnset.append(ENT_LOCATION, 1);
+            toUnset.append(ENT_LOCATION, 1);
         }
 
-        /* We use $set/$unset to avoid doing a global update that will lose the creation date field. Set if always
-           present, unset only if locAttr was erased */
-        BSONObj updatedEntity;
-        if (locAttr.length() > 0) {
-            updatedEntity = BSON("$set" << updateSet.obj());
+        /* FIXME: I don't like the obj() step, but it could be the only possible way, let's wait for the answer to
+         * http://stackoverflow.com/questions/29668439/get-number-of-fields-in-bsonobjbuilder-object */
+        BSONObjBuilder updatedEntity;
+        BSONObj toSetObj = toSet.obj();
+        BSONObj toUnsetObj = toUnset.obj();
+        if (toSetObj.nFields() > 0)
+        {
+          updatedEntity.append("$set", toSetObj);
         }
-        else {
-            updatedEntity = BSON("$set" << updateSet.obj() << "$unset" << updateUnset.obj());
+        if (toUnsetObj.nFields() > 0)
+        {
+          updatedEntity.append("$unset", toUnsetObj);
         }
+        BSONObj updatedEntityObj = updatedEntity.obj();
 
         /* Note that the query that we build for updating is slighty different than the query used
          * for selecting the entities to process. In particular, the "no type" branch in the if
@@ -1875,9 +2033,9 @@ void processContextElement(ContextElement*                      ceP,
         {
             LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getEntitiesCollectionName(tenant).c_str(),
                             query.toString().c_str(),
-                            updatedEntity.toString().c_str()));
+                            updatedEntityObj.toString().c_str()));
             mongoSemTake(__FUNCTION__, "update in EntitiesCollection");
-            connection->update(getEntitiesCollectionName(tenant).c_str(), query, updatedEntity);
+            connection->update(getEntitiesCollectionName(tenant).c_str(), query, updatedEntityObj);
             mongoSemGive(__FUNCTION__, "update in EntitiesCollection");
             LM_I(("Database Operation Successful (update %s)", query.toString().c_str()));
         }
@@ -1887,7 +2045,7 @@ void processContextElement(ContextElement*                      ceP,
             cerP->statusCode.fill(SccReceiverInternalError,
                std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                " - update() query: " + query.toString() +
-               " - update() doc: " + updatedEntity.toString() +
+               " - update() doc: " + updatedEntityObj.toString() +
                " - exception: " + e.what());
 
             responseP->contextElementResponseVector.push_back(cerP);
@@ -1901,7 +2059,7 @@ void processContextElement(ContextElement*                      ceP,
             cerP->statusCode.fill(SccReceiverInternalError,
                std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                " - update() query: " + query.toString() +
-               " - update() doc: " + updatedEntity.toString() +
+               " - update() doc: " + updatedEntityObj.toString() +
                " - exception: " + "generic");
 
             responseP->contextElementResponseVector.push_back(cerP);
