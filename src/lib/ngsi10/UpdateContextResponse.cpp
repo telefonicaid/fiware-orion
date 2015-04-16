@@ -197,7 +197,8 @@ void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP)
 * UpdateContextResponse::foundPush - 
 *
 * 1. Find contextElementResponse in contextElementResponseVector and add the ContextAttribute.
-* 2. If not found: create a new one.
+* 2. If no contextElementResponse is found for this Entity (eP), then create a new
+*    contextElementResponse and push the attribute onto it.
 *
 */
 void UpdateContextResponse::foundPush(EntityId* eP, ContextAttribute* aP)
