@@ -182,6 +182,7 @@ static void prepareDatabase(void) {
    */
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
+                     "attrNames" << BSON_ARRAY("A1" << "A2") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "val1") <<
                         "A2" << BSON("type" << "TA2")
@@ -189,6 +190,7 @@ static void prepareDatabase(void) {
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
+                     "attrNames" << BSON_ARRAY("A3" << "A4") <<
                      "attrs" << BSON(
                         "A3" << BSON("type" << "TA3" << "value" << "val3") <<
                         "A4" << BSON("type" << "TA4")
@@ -196,6 +198,7 @@ static void prepareDatabase(void) {
                     );
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T3") <<
+                     "attrNames" << BSON_ARRAY("A5" << "A6") <<
                      "attrs" << BSON(
                         "A5" << BSON("type" << "TA5" << "value" << "val5") <<
                         "A6" << BSON("type" << "TA6")
@@ -203,12 +206,14 @@ static void prepareDatabase(void) {
                     );
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E1" << "type" << "T1bis") <<
+                     "attrNames" << BSON_ARRAY("A1") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "val1bis2")
                         )
                     );
 
   BSONObj en1nt = BSON("_id" << BSON("id" << "E1") <<
+                     "attrNames" << BSON_ARRAY("A1" << "A2") <<
                      "attrs" << BSON(
                         "A1" << BSON("type" << "TA1" << "value" << "val1-nt") <<
                         "A2" << BSON("type" << "TA2")
@@ -307,6 +312,25 @@ static void prepareDatabaseWithServicePaths(void) {
 
 /* ****************************************************************************
 *
+* findAttr -
+*
+*/
+static bool findAttr(std::vector<BSONElement> attrs, std::string name)
+{
+
+  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
+  {
+    if (attrs[ix].str() == name)
+    {
+      return true;
+    }
+  }
+  return false;
+
+}
+
+/* ****************************************************************************
+*
 * update1Ent1Attr -
 */
 TEST(mongoUpdateContextRequest, update1Ent1Attr)
@@ -362,6 +386,7 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));    
@@ -369,9 +394,13 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -384,9 +413,13 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -399,9 +432,13 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -414,8 +451,11 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -426,9 +466,13 @@ TEST(mongoUpdateContextRequest, update1Ent1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
