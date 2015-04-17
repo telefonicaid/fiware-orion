@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update At Attribute That Does Not Exist
+Append Attribute That Does Not Exist
 
 --SHELL-INIT--
 dbInit CB
@@ -30,8 +30,8 @@ brokerStart CB
 
 --SHELL--
 
-echo "01. Update E1/T1/A1"
-echo "==================="
+echo "01. Update/APPEND E1/T1/A1"
+echo "=========================="
 payload='{
   "contextElements": [
     {
@@ -46,7 +46,7 @@ payload='{
       ]
     }
   ],
-  "updateAction": "UPDATE"
+  "updateAction": "APPEND"
 }'
 orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
@@ -54,10 +54,10 @@ echo
 
 
 --REGEXPECT--
-01. Update E1/T1/A1
-===================
+01. Update/APPEND E1/T1/A1
+==========================
 HTTP/1.1 200 OK
-Content-Length: 431
+Content-Length: 383
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -77,9 +77,8 @@ Date: REGEX(.*)
                 "type": "T1"
             }, 
             "statusCode": {
-                "code": "404", 
-                "details": "E1", 
-                "reasonPhrase": "No context element found"
+                "code": "200", 
+                "reasonPhrase": "OK"
             }
         }
     ]

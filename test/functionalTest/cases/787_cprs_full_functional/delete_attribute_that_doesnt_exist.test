@@ -57,7 +57,7 @@ echo
 01. Delete E1/T1/A1
 ===================
 HTTP/1.1 200 OK
-Content-Length: 425
+Content-Length: 431
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -68,7 +68,7 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "A1", 
-                        "type": "", 
+                        "type": "string", 
                         "value": ""
                     }
                 ], 

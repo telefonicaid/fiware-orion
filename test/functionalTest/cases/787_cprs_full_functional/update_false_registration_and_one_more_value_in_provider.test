@@ -229,7 +229,7 @@ Date: REGEX(.*)
 04. Update/UPDATE E1/T1/A1+A2 in CB (A2 OK, A1 NOT OK)
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 750
+Content-Length: 756
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -240,7 +240,7 @@ Date: REGEX(.*)
                 "attributes": [
                     {
                         "name": "A1", 
-                        "type": "", 
+                        "type": "string", 
                         "value": ""
                     }
                 ], 

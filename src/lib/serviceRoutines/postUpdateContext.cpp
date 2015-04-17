@@ -283,6 +283,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
       }
     }
 
+    LM_M(("KZ: %d attributes found, %d not-found", noOfFounds, noOfNotFounds));
     //
     // Now, if we have ONLY FOUNDS, then things stay the way they are, one response with '200 OK'
     // If we have ONLY NOT-FOUNDS, the we have one response with '404 Not Found'
@@ -290,7 +291,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     // Just one detail - if we have ZERO FOUNDS and ZERO NOT-FOUNDS, then keep the 200 OK
     //
-    if ((noOfFounds == 0) && (noOfFounds != 0))
+    if ((noOfFounds == 0) && (noOfNotFounds > 0))
     {
       LM_M(("KZ: Setting errorCode.code to 404"));
       cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
@@ -320,6 +321,14 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
           ++iter;
         }
       }
+    }
+
+    //
+    // Add EntityId::id to StatusCode::details if 404, but only if StatusCode::details is empty
+    //
+    if ((cerP->statusCode.code == SccContextElementNotFound) && (cerP->statusCode.details == ""))
+    {
+      cerP->statusCode.details = cerP->contextElement.entityId.id;
     }
   }
 
@@ -351,15 +360,20 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     }
   }
 
-
+  
   //
-  // Add entityId::id to details if Not Found and only one element in response
+  // Add entityId::id to details if Not Found and only one element in response.
+  // And, if 0 elements in response, take entityId::id from the request.
   //
   if (upcrsP->errorCode.code == SccContextElementNotFound)
   {
     if (upcrsP->contextElementResponseVector.size() == 1)
     {
       upcrsP->errorCode.details = upcrsP->contextElementResponseVector[0]->contextElement.entityId.id;
+    }
+    else if (upcrsP->contextElementResponseVector.size() == 0)
+    {
+      upcrsP->errorCode.details = upcrP->contextElementVector[0]->entityId.id;
     }
   }
 }
