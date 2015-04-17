@@ -245,7 +245,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 * Examine the response from mongo to find out what has really happened ...
 *
 */
-static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, UpdateContextRequest* upcrP)
+static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, UpdateContextRequest* upcrP, ConnectionInfo* ciP)
 {
   ContextElementResponseVector  notFoundV;
 
@@ -255,11 +255,16 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
 
     //
     // Empty attribute-vector?
+    // If not a DELETE request - set statusCode to 404
     //
-    if (cerP->contextElement.contextAttributeVector.size() == 0)
-    {
-      cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
-    }
+    // if (cerP->contextElement.contextAttributeVector.size() == 0)
+    // {
+    //   if (ciP->method != "DELETE")
+    //   {
+    //     LM_M(("KZ: Setting errorCode.code to 404"));
+    //     cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
+    //   }
+    // }
 
     //
     // All attributes with found == false?
@@ -283,8 +288,11 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     // If we have ONLY NOT-FOUNDS, the we have one response with '404 Not Found'
     // If we have a mix, then we need to add a response for the not founds, with '404 Not Found'
     //
-    if (noOfFounds == 0)
+    // Just one detail - if we have ZERO FOUNDS and ZERO NOT-FOUNDS, then keep the 200 OK
+    //
+    if ((noOfFounds == 0) && (noOfFounds != 0))
     {
+      LM_M(("KZ: Setting errorCode.code to 404"));
       cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
     }
     else if ((noOfFounds > 0) && (noOfNotFounds > 0))
@@ -328,13 +336,18 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
 
 
   //
-  // If nothing at all in response vector, mark as not found
+  // If nothing at all in response vector, mark as not found (but not if DELETE request)
   //
-  if (upcrsP->contextElementResponseVector.size() == 0)
+  LM_M(("KZ: ciP->method == '%s'", ciP->method.c_str()));
+  if (ciP->method != "DELETE")
   {
-    if (upcrsP->errorCode.code == SccOk)
+    if (upcrsP->contextElementResponseVector.size() == 0)
     {
-      upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->contextElementVector[0]->entityId.id);
+      if (upcrsP->errorCode.code == SccOk)
+      {
+        LM_M(("KZ: Setting errorCode.code to 404"));
+        upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->contextElementVector[0]->entityId.id);
+      }
     }
   }
 
@@ -407,9 +420,10 @@ std::string postUpdateContext
   // 02. Send the request to mongoBackend/mongoUpdateContext
   //
   upcrsP->errorCode.fill(SccContextElementNotFound);
+  upcrP->present("To mongoUpdateContext: ");
   ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
   upcrsP->present("From mongoUpdateContext: ");
-  foundAndNotFoundAttributeSeparation(upcrsP, upcrP);
+  foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
   upcrsP->present("After foundAndNotFoundAttributeSeparation: ");
 
 
