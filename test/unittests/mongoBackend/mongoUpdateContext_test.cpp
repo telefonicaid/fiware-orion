@@ -4027,7 +4027,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
 
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);

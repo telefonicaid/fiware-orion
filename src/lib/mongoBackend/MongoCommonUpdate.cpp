@@ -1944,40 +1944,36 @@ void processContextElement(ContextElement*                      ceP,
      */
     if (docs == 0)
     {
-      if (strcasecmp(action.c_str(), "append") != 0)
+      /* Creating the common par of the response that doesn't depend on the case */
+      ContextElementResponse* cerP = new ContextElementResponse();
+      cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
+
+      /* All the attributes existing in the request are added to the response with 'found' set to false
+       * (allthough the found processing is only meaninful in the case of UPDATE, doesn't hurt in the case
+       * of APPEND/DELETE) */
+      for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
       {
-        /* All the attributes existing in the request are added to the response with 'found' set to false */
-        ContextElementResponse* cerP = new ContextElementResponse();
-        cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
+        ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
+        ContextAttribute* ca = new ContextAttribute(caP->name, caP->type, "", false);
+        setResponseMetadata(caP, ca);
+        cerP->contextElement.contextAttributeVector.push_back(ca);
+      }
 
-        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
-        {
-          ContextAttribute* caP = new ContextAttribute(ceP->contextAttributeVector.get(ix)->name, "", "", false);
-          cerP->contextElement.contextAttributeVector.push_back(caP);
-        }
-
-        /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for context
-         * providers */
+      if (strcasecmp(action.c_str(), "update") == 0)
+      {
+        /* In the case of UPDATE or DELETE we look for context providers */
         searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
 
       }
-      else
+      else if (strcasecmp(action.c_str(), "delete") == 0)
       {
-        /* Creating the part of the response that doesn't depend on success or failure */
-        ContextElementResponse* cerP = new ContextElementResponse();
-
-        cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
-
-        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
-        {
-          ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-          ContextAttribute* ca  = new ContextAttribute(caP->name, caP->type);                
-          setResponseMetadata(caP, ca);
-          cerP->contextElement.contextAttributeVector.push_back(ca);
-        }
-
+        cerP->statusCode.fill(SccContextElementNotFound);
+        responseP->contextElementResponseVector.push_back(cerP);
+      }
+      else   /* APPEND */
+      {
         std::string errReason, errDetail;
         if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV))
         {
