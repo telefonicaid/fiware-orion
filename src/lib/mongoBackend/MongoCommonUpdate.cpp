@@ -1949,12 +1949,12 @@ void processContextElement(ContextElement*                      ceP,
       cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
 
       /* All the attributes existing in the request are added to the response with 'found' set to false
-       * (allthough the found processing is only meaninful in the case of UPDATE, doesn't hurt in the case
-       * of APPEND/DELETE) */
+       * in the of UPDATE or true in the case of APPEND/DELETE */
+      bool foundValue = (strcasecmp(action.c_str(), "update") != 0);
       for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
       {
         ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-        ContextAttribute* ca = new ContextAttribute(caP->name, caP->type, "", false);
+        ContextAttribute* ca = new ContextAttribute(caP->name, caP->type, "", foundValue);
         setResponseMetadata(caP, ca);
         cerP->contextElement.contextAttributeVector.push_back(ca);
       }
