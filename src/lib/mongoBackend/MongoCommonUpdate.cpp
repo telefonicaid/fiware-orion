@@ -1340,12 +1340,19 @@ static bool processContextAttributeVector (ContextElement*                      
 
     }
 
+#if 0
     if (!entityModified)
     {
         /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
          * do a 'continue' without setting it. */
         //FIXME P5: this is ugly, our code should be improved to set cerP in a common place for the "happy case"
         cerP->statusCode.fill(SccOk);
+    }
+#endif
+    /* If the status code was not touched (filled with an error), then set it with Ok */
+    if (cerP->statusCode.code == SccNone)
+    {
+      cerP->statusCode.fill(SccOk);
     }
 
     return entityModified;
@@ -1928,7 +1935,12 @@ void processContextElement(ContextElement*                      ceP,
         /* To finish with this entity processing, search for CPrs in not found attributes and
          * add the corresponding ContextElementResponse to the global response */
         searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-        cerP->statusCode.fill(SccOk);
+        if (cerP->statusCode.code == SccNone)
+        {
+          /* It could happend that the StatusCode has already be set, in which case we should
+           * keep the existing value */
+          cerP->statusCode.fill(SccOk);
+        }
         responseP->contextElementResponseVector.push_back(cerP);
     }
     LM_T(LmtServicePath, ("Docs found: %d", docs));
