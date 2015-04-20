@@ -1824,7 +1824,10 @@ void processContextElement(ContextElement*                      ceP,
 
         if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
         {
-            /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */            
+            /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
+            // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
+            // in only one place
+            searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
             continue;
