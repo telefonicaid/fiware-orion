@@ -241,6 +241,7 @@ static void prepareDatabaseMd(void) {
     /* Add an entity with custom metadata */
     DBClientBase* connection = getMongoConnection();
     BSONObj en = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
+                      "attrNames" << BSON_ARRAY("A1") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "val1" <<
                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "MD1val") <<
@@ -270,6 +271,7 @@ static void prepareDatabaseWithAttributeIds(void) {
 
     DBClientBase* connection = getMongoConnection();
     BSONObj en = BSON("_id" << BSON("id" << "E10" << "type" << "T10") <<
+                      "attrNames" << BSON_ARRAY("A1" << "A2") <<
                        "attrs" << BSON(
                           "A1__ID1" << BSON("type" << "TA1" << "value" << "val11") <<
                           "A1__ID2" << BSON("type" << "TA1" << "value" << "val12") <<
@@ -295,12 +297,14 @@ static void prepareDatabaseWithServicePaths(void) {
     /* Create entities with service path */
     DBClientBase* connection = getMongoConnection();
     BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1" << "servicePath" << "/home/kz/01") <<
+                       "attrNames" << BSON_ARRAY("A1") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "kz01")
                           )
                       );
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E1" << "type" << "T1" << "servicePath" << "/home/kz/02") <<
+                       "attrNames" << BSON_ARRAY("A1") <<
                        "attrs" << BSON(
                           "A1" << BSON("type" << "TA1" << "value" << "kz02")
                           )
@@ -543,16 +547,21 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
-    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));           
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -565,9 +574,13 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -580,9 +593,13 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -595,8 +612,11 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -607,9 +627,13 @@ TEST(mongoUpdateContextRequest, update1Ent1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -707,6 +731,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -714,9 +739,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -729,9 +758,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -744,9 +777,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -759,8 +796,11 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -771,9 +811,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -871,6 +915,7 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -878,9 +923,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -893,9 +942,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -908,9 +961,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -923,8 +980,11 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrNames.size());
     ASSERT_EQ(1, attrs.nFields());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -935,9 +995,13 @@ TEST(mongoUpdateContextRequest, update1EntNoType1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -1025,6 +1089,7 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1032,9 +1097,13 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -1047,9 +1116,13 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("new_val3", C_STR_FIELD(a3, "value"));
     EXPECT_EQ(1360232700, a3.getIntField("modDate"));
@@ -1062,9 +1135,13 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -1077,8 +1154,11 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1089,9 +1169,13 @@ TEST(mongoUpdateContextRequest, updateNEnt1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1169,6 +1253,7 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1176,9 +1261,13 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -1191,9 +1280,13 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -1206,9 +1299,13 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -1221,8 +1318,11 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1233,9 +1333,13 @@ TEST(mongoUpdateContextRequest, update1EntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1335,6 +1439,7 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1342,9 +1447,13 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -1357,9 +1466,13 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("new_val3", C_STR_FIELD(a3, "value"));
     EXPECT_EQ(1360232700, a3.getIntField("modDate"));
@@ -1372,9 +1485,13 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -1387,8 +1504,11 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1399,9 +1519,13 @@ TEST(mongoUpdateContextRequest, updateNEntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1472,6 +1596,7 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1479,10 +1604,15 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     BSONObj a8 = attrs.getField("A8").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1498,9 +1628,13 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -1513,9 +1647,13 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -1528,8 +1666,11 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1540,9 +1681,13 @@ TEST(mongoUpdateContextRequest, append1Ent1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1613,6 +1758,7 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1620,10 +1766,15 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     BSONObj a8 = attrs.getField("A8").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1639,9 +1790,13 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -1654,9 +1809,13 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -1669,8 +1828,11 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1681,9 +1843,13 @@ TEST(mongoUpdateContextRequest, append1Ent1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1780,6 +1946,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1787,10 +1954,15 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     BSONObj a8 = attrs.getField("A8").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1806,9 +1978,13 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -1821,9 +1997,13 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -1836,9 +2016,13 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a8 = attrs.getField("A8").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1852,10 +2036,15 @@ TEST(mongoUpdateContextRequest, append1EntNoType1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     a8 = attrs.getField("A8").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1955,6 +2144,7 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1962,10 +2152,15 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     BSONObj a8 = attrs.getField("A8").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -1981,9 +2176,13 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -1996,9 +2195,13 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -2011,9 +2214,13 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a8 = attrs.getField("A8").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2027,10 +2234,15 @@ TEST(mongoUpdateContextRequest, append1EntNoType1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     a8 = attrs.getField("A8").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2121,6 +2333,7 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -2128,10 +2341,15 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     BSONObj a8 = attrs.getField("A8").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2147,10 +2365,15 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
     BSONObj a9 = attrs.getField("A9").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
+    EXPECT_TRUE(findAttr(attrNames, "A9"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -2166,9 +2389,13 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -2181,8 +2408,11 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2193,9 +2423,13 @@ TEST(mongoUpdateContextRequest, appendNEnt1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2272,6 +2506,7 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -2279,11 +2514,17 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(4, attrs.nFields());
+    ASSERT_EQ(4, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     BSONObj a8 = attrs.getField("A8").embeddedObject();
     BSONObj a9 = attrs.getField("A9").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
+    EXPECT_TRUE(findAttr(attrNames, "A9"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2302,9 +2543,13 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -2317,9 +2562,13 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -2332,8 +2581,11 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2344,9 +2596,13 @@ TEST(mongoUpdateContextRequest, append1EntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2447,6 +2703,7 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -2454,11 +2711,17 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(4, attrs.nFields());
+    ASSERT_EQ(4, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     BSONObj a8 = attrs.getField("A8").embeddedObject();
     BSONObj a9 = attrs.getField("A9").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A8"));
+    EXPECT_TRUE(findAttr(attrNames, "A9"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2477,11 +2740,17 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(4, attrs.nFields());
+    ASSERT_EQ(4, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
     BSONObj a10 = attrs.getField("A10").embeddedObject();
     BSONObj a11 = attrs.getField("A11").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
+    EXPECT_TRUE(findAttr(attrNames, "A10"));
+    EXPECT_TRUE(findAttr(attrNames, "A11"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));    
@@ -2500,9 +2769,13 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -2515,8 +2788,11 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2527,9 +2803,13 @@ TEST(mongoUpdateContextRequest, appendNEntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2594,6 +2874,7 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(4, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
@@ -2601,9 +2882,13 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -2616,9 +2901,13 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -2631,8 +2920,11 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2643,8 +2935,11 @@ TEST(mongoUpdateContextRequest, delete1Ent0Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -2716,6 +3011,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -2723,8 +3019,11 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2734,9 +3033,13 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -2749,9 +3052,13 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -2764,8 +3071,11 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2776,8 +3086,11 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
@@ -2849,6 +3162,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -2856,8 +3170,11 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2867,9 +3184,13 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -2882,9 +3203,13 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -2897,8 +3222,11 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2909,9 +3237,13 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -2994,6 +3326,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
@@ -3001,9 +3334,13 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -3016,9 +3353,13 @@ TEST(mongoUpdateContextRequest, delete1EntNoType0Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -3115,6 +3456,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -3122,8 +3464,11 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3133,9 +3478,13 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -3148,9 +3497,13 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -3163,8 +3516,11 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3175,8 +3531,11 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3270,6 +3629,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -3277,8 +3637,11 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3288,9 +3651,13 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -3303,9 +3670,13 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -3318,8 +3689,11 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3330,8 +3704,11 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3417,6 +3794,7 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -3424,8 +3802,11 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3435,8 +3816,10 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -3446,9 +3829,13 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -3461,8 +3848,11 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3473,9 +3863,12 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3553,6 +3946,7 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -3560,16 +3954,22 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(0, attrs.nFields());
+    ASSERT_EQ(0, attrNames.size());
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -3582,9 +3982,13 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -3597,8 +4001,11 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3609,9 +4016,13 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3712,6 +4123,7 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -3719,6 +4131,8 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(0, attrNames.size());
     ASSERT_EQ(0, attrs.nFields());
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));    
@@ -3726,6 +4140,8 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(0, attrNames.size());
     EXPECT_EQ(0, attrs.nFields());
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
@@ -3733,9 +4149,13 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -3748,8 +4168,11 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3760,9 +4183,13 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3838,6 +4265,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -3845,9 +4273,13 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3860,9 +4292,13 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -3875,9 +4311,13 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -3890,8 +4330,11 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3902,9 +4345,13 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3975,6 +4422,7 @@ TEST(mongoUpdateContextRequest, createEntity)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -3982,9 +4430,13 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -3997,9 +4449,13 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));    
@@ -4012,9 +4468,13 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));    
@@ -4027,8 +4487,11 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4039,8 +4502,11 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_TRUE(ent.hasField("creDate"));
     EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_TRUE(a1.hasField("creDate"));
@@ -4052,9 +4518,13 @@ TEST(mongoUpdateContextRequest, createEntity)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));    
@@ -4130,6 +4600,7 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -4137,9 +4608,13 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4152,9 +4627,13 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -4167,9 +4646,13 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -4182,8 +4665,11 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4194,8 +4680,11 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_TRUE(ent.hasField("creDate"));
     EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1__ID1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_TRUE(a1.hasField("creDate"));
@@ -4207,9 +4696,13 @@ TEST(mongoUpdateContextRequest, createEntityWithId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4291,6 +4784,7 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -4298,9 +4792,13 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4313,9 +4811,13 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -4328,9 +4830,13 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -4343,8 +4849,11 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4355,9 +4864,13 @@ TEST(mongoUpdateContextRequest, createEntityMixIdNoIdFails)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4437,6 +4950,7 @@ TEST(mongoUpdateContextRequest, createEntityMd)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -4444,9 +4958,13 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4459,9 +4977,13 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -4474,9 +4996,13 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -4489,8 +5015,11 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4501,8 +5030,11 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     EXPECT_TRUE(ent.hasField("creDate"));
     EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_TRUE(a1.hasField("creDate"));
@@ -4522,9 +5054,13 @@ TEST(mongoUpdateContextRequest, createEntityMd)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4595,6 +5131,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -4602,9 +5139,13 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4617,9 +5158,13 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -4632,9 +5177,13 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -4647,8 +5196,11 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4659,9 +5211,13 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4732,6 +5288,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -4739,9 +5296,13 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4754,9 +5315,13 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -4769,9 +5334,13 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -4784,8 +5353,11 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4796,9 +5368,13 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4874,6 +5450,7 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -4881,9 +5458,13 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4896,9 +5477,13 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -4911,9 +5496,13 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
@@ -4925,8 +5514,11 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -4937,9 +5529,13 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5010,6 +5606,7 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -5017,9 +5614,13 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5032,9 +5633,13 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -5047,9 +5652,13 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -5062,8 +5671,11 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5074,9 +5686,13 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5164,6 +5780,7 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -5171,9 +5788,13 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -5186,9 +5807,13 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -5201,9 +5826,13 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -5216,8 +5845,11 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5228,8 +5860,11 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_TRUE(ent.hasField("creDate"));
     EXPECT_TRUE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a3 = attrs.getField("A3").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
     EXPECT_STREQ("TA3",C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("new_val13", C_STR_FIELD(a3, "value"));
     EXPECT_TRUE(a3.hasField("creDate"));
@@ -5241,9 +5876,13 @@ TEST(mongoUpdateContextRequest, mixUpdateAndCreate)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5314,6 +5953,7 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -5321,9 +5961,13 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -5336,9 +5980,13 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -5351,9 +5999,13 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -5366,8 +6018,11 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5378,9 +6033,13 @@ TEST(mongoUpdateContextRequest, appendExistingAttr)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5456,6 +6115,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -5463,9 +6123,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5480,9 +6144,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -5497,9 +6165,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -5514,8 +6186,11 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5527,9 +6202,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5544,10 +6223,14 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
     BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1id1, "value"));
     EXPECT_EQ(1360232700, a1id1.getIntField("modDate"));
@@ -5633,6 +6316,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -5640,9 +6324,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5657,9 +6345,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -5674,9 +6366,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -5691,8 +6387,11 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5704,9 +6403,13 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5721,10 +6424,14 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
     BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1id1, "value"));
     EXPECT_EQ(1360232700, a1id1.getIntField("modDate"));
@@ -5805,6 +6512,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -5812,9 +6520,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5829,9 +6541,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -5846,9 +6562,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -5863,8 +6583,11 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5876,9 +6599,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -5893,11 +6620,15 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(4, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
     BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     BSONObj a1id3 = attrs.getField("A1__ID3").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
     EXPECT_FALSE(a1id1.hasField("modDate"));
@@ -5986,6 +6717,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -5993,9 +6725,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6010,9 +6746,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -6027,9 +6767,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -6044,8 +6788,11 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6057,9 +6804,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6074,12 +6825,17 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(5, attrs.nFields());
+    ASSERT_EQ(3, attrNames.size());
     BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
     BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     BSONObj a1id3 = attrs.getField("A1__ID3").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
     a3 = attrs.getField("A3").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
     EXPECT_FALSE(a1id1.hasField("modDate"));
@@ -6166,6 +6922,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -6173,9 +6930,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6190,9 +6951,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -6207,9 +6972,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -6224,8 +6993,11 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6237,9 +7009,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6254,10 +7030,14 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
     BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
     EXPECT_FALSE(a1id1.hasField("modDate"));
@@ -6332,6 +7112,7 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -6339,9 +7120,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6356,9 +7141,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -6373,9 +7162,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -6390,8 +7183,11 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6403,9 +7199,13 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6420,10 +7220,14 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(3, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1id1 = attrs.getField("A1__ID1").embeddedObject();
     BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id1, "type"));
     EXPECT_STREQ("val11", C_STR_FIELD(a1id1, "value"));
     EXPECT_FALSE(a1id1.hasField("modDate"));
@@ -6503,6 +7307,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -6510,9 +7315,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6527,9 +7336,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -6544,9 +7357,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -6561,8 +7378,10 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
-    ASSERT_EQ(1, attrs.nFields());
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6574,9 +7393,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6591,9 +7414,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));    
     EXPECT_FALSE(a1id2.hasField("modDate"));    
@@ -6676,6 +7503,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(6, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -6683,9 +7511,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6700,9 +7532,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -6717,9 +7553,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -6734,8 +7574,11 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6747,9 +7590,13 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -6764,8 +7611,11 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("T10", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1id2 = attrs.getField("A1__ID2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
     EXPECT_FALSE(a1id2.hasField("modDate"));
@@ -6843,6 +7693,7 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -6851,8 +7702,11 @@ TEST(mongoUpdateContextRequest, appendCreateEntWithMd)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_EQ(1360232700, ent.getIntField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -6933,6 +7787,7 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -6941,8 +7796,11 @@ TEST(mongoUpdateContextRequest, appendMdAllExisting)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -7023,6 +7881,7 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7031,8 +7890,11 @@ TEST(mongoUpdateContextRequest, updateMdAllExisting)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -7113,6 +7975,7 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7121,8 +7984,11 @@ TEST(mongoUpdateContextRequest, appendMdAllNew)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -7205,6 +8071,7 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7213,8 +8080,11 @@ TEST(mongoUpdateContextRequest, updateMdAllNew)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -7302,6 +8172,7 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7310,8 +8181,11 @@ TEST(mongoUpdateContextRequest, appendMdSomeNew)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -7399,6 +8273,7 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7407,8 +8282,11 @@ TEST(mongoUpdateContextRequest, updateMdSomeNew)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -7491,6 +8369,7 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7499,8 +8378,11 @@ TEST(mongoUpdateContextRequest, appendValueAndMd)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("attr_new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -7581,6 +8463,7 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7589,8 +8472,11 @@ TEST(mongoUpdateContextRequest, updateValueAndMd)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("attr_new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -7672,6 +8558,7 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7680,8 +8567,11 @@ TEST(mongoUpdateContextRequest, appendMdNoActualChanges)
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -7762,6 +8652,7 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7770,8 +8661,11 @@ TEST(mongoUpdateContextRequest, updateMdNoActualChanges)
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -7861,6 +8755,7 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -7868,9 +8763,13 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val1", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -7883,9 +8782,13 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -7898,9 +8801,13 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -7913,8 +8820,11 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -7925,9 +8835,13 @@ TEST(mongoUpdateContextRequest, patternUnsupported)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -8002,6 +8916,7 @@ TEST(mongoUpdateContextRequest, notExistFilter)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -8009,9 +8924,13 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
     BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -8024,9 +8943,13 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a3 = attrs.getField("A3").embeddedObject();
     BSONObj a4 = attrs.getField("A4").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
@@ -8039,9 +8962,13 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     BSONObj a5 = attrs.getField("A5").embeddedObject();
     BSONObj a6 = attrs.getField("A6").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_TRUE(findAttr(attrNames, "A6"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
@@ -8054,8 +8981,11 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -8066,9 +8996,13 @@ TEST(mongoUpdateContextRequest, notExistFilter)
     EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
     a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("new_val", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -8308,6 +9242,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
 
   /* entities collection */
   BSONObj ent, attrs;
+  std::vector<BSONElement> attrNames;
   ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
   ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
@@ -8315,8 +9250,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(1, attrs.nFields());
+  ASSERT_EQ(1, attrNames.size());
   BSONObj a1 = attrs.getField("A1").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz01-modified", C_STR_FIELD(a1, "value"));
   EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -8326,8 +9264,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_3levels)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_FALSE(ent.hasField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(1, attrs.nFields());
+  ASSERT_EQ(1, attrNames.size());
   a1 = attrs.getField("A1").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
   EXPECT_FALSE(a1.hasField("modDate"));
@@ -8405,6 +9346,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_2levels)
 
   /* entities collection */
   BSONObj ent, attrs;
+  std::vector<BSONElement> attrNames;
   ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
   ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
@@ -8412,8 +9354,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_2levels)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(1, attrs.nFields());
+  ASSERT_EQ(1, attrNames.size());
   BSONObj a1 = attrs.getField("A1").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz-modified", C_STR_FIELD(a1, "value"));
   EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -8423,7 +9368,10 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_2levels)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
+  ASSERT_EQ(1, attrNames.size());
   ASSERT_EQ(1, attrs.nFields());
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
   a1 = attrs.getField("A1").embeddedObject();
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz-modified", C_STR_FIELD(a1, "value"));
@@ -8489,6 +9437,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
 
   /* entities collection */
   BSONObj ent, attrs;
+  std::vector<BSONElement> attrNames;
   ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
   ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
@@ -8496,9 +9445,13 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(2, attrs.nFields());
+  ASSERT_EQ(2, attrNames.size());
   BSONObj a1 = attrs.getField("A1").embeddedObject();
   BSONObj a2 = attrs.getField("A2").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
+  EXPECT_TRUE(findAttr(attrNames, "A2"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz01", C_STR_FIELD(a1, "value"));
   EXPECT_FALSE(a1.hasField("modDate"));
@@ -8512,8 +9465,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_3levels)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_FALSE(ent.hasField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(1, attrs.nFields());
+  ASSERT_EQ(1, attrNames.size());
   a1 = attrs.getField("A1").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
   EXPECT_FALSE(a1.hasField("modDate"));
@@ -8591,6 +9547,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_2levels)
 
   /* entities collection */
   BSONObj ent, attrs;
+  std::vector<BSONElement> attrNames;
   ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
   ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
@@ -8598,9 +9555,13 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_2levels)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(2, attrs.nFields());
+  ASSERT_EQ(2, attrNames.size());
   BSONObj a1 = attrs.getField("A1").embeddedObject();
   BSONObj a2 = attrs.getField("A2").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
+  EXPECT_TRUE(findAttr(attrNames, "A2"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz01", C_STR_FIELD(a1, "value"));
   EXPECT_FALSE(a1.hasField("modDate"));
@@ -8614,9 +9575,13 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_2levels)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(2, attrs.nFields());
+  ASSERT_EQ(2, attrNames.size());
   a1 = attrs.getField("A1").embeddedObject();
   a2 = attrs.getField("A2").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
+  EXPECT_TRUE(findAttr(attrNames, "A2"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
   EXPECT_FALSE(a1.hasField("modDate"));
@@ -8685,6 +9650,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(3, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
@@ -8692,8 +9658,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("kz01", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -8703,8 +9672,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -8715,8 +9687,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_2levels)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_EQ(1360232700, ent.getIntField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("fg", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -8783,6 +9758,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(3, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/01"));
@@ -8790,8 +9766,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("kz01", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -8801,8 +9780,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -8813,8 +9795,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityCreation_3levels)
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_EQ(1360232700, ent.getIntField("creDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("fg", C_STR_FIELD(a1, "value"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -8940,6 +9925,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
 
     /* entities collection */
     BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1" << "_id.servicePath" << "/home/kz/02"));
@@ -8947,8 +9933,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_3levels)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
     ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
     BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("kz02", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
@@ -9002,6 +9991,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
 
   /* entities collection */
   BSONObj ent, attrs;
+  std::vector<BSONElement> attrNames;
   ASSERT_EQ(5, connection->count(ENTITIES_COLL, BSONObj()));
 
   ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -9009,9 +9999,13 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_FALSE(ent.hasField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(2, attrs.nFields());
+  ASSERT_EQ(2, attrNames.size());
   BSONObj a1 = attrs.getField("A1").embeddedObject();
   BSONObj a2 = attrs.getField("A2").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
+  EXPECT_TRUE(findAttr(attrNames, "A2"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
   EXPECT_FALSE(a1.hasField("modDate"));
@@ -9024,9 +10018,13 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_FALSE(ent.hasField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(2, attrs.nFields());
+  ASSERT_EQ(2, attrNames.size());
   BSONObj a3 = attrs.getField("A3").embeddedObject();
   BSONObj a4 = attrs.getField("A4").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A3"));
+  EXPECT_TRUE(findAttr(attrNames, "A4"));
   EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
   EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
   EXPECT_FALSE(a3.hasField("modDate"));
@@ -9039,9 +10037,13 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_FALSE(ent.hasField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(2, attrs.nFields());
+  ASSERT_EQ(2, attrNames.size());
   BSONObj a5 = attrs.getField("A5").embeddedObject();
   BSONObj a6 = attrs.getField("A6").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A5"));
+  EXPECT_TRUE(findAttr(attrNames, "A6"));
   EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
   EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
   EXPECT_FALSE(a5.hasField("modDate"));
@@ -9054,8 +10056,11 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_STREQ("T1bis", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_FALSE(ent.hasField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(1, attrs.nFields());
+  ASSERT_EQ(1, attrNames.size());
   a1 = attrs.getField("A1").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
   EXPECT_FALSE(a1.hasField("modDate"));
@@ -9066,9 +10071,13 @@ TEST(mongoUpdateContextRequest, servicePathEntityVectorNotAllowed)
   EXPECT_FALSE(ent.getObjectField("_id").hasField("type"));
   EXPECT_FALSE(ent.hasField("modDate"));
   attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
   ASSERT_EQ(2, attrs.nFields());
+  ASSERT_EQ(2, attrNames.size());
   a1 = attrs.getField("A1").embeddedObject();
   a2 = attrs.getField("A2").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
+  EXPECT_TRUE(findAttr(attrNames, "A2"));
   EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
   EXPECT_FALSE(a1.hasField("modDate"));

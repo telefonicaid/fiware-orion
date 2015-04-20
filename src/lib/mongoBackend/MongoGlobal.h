@@ -491,4 +491,44 @@ extern void cprLookupByAttribute(EntityId&                          en,
                                  std::string*                       perEntPa,
                                  std::string*                       perAttrPa);
 
+
+/* ****************************************************************************
+*
+* basePart, idPart -
+*
+* Helper functions for entitysQuery to split the attribute name string into part,
+* e.g. "A1__ID1" into "A1" and "ID1"
+*/
+inline std::string basePart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just 'name' */
+    return name;
+  }
+  else
+  {
+    /* If found, return substring */
+    return name.substr(0, pos);
+  }
+}
+
+inline std::string idPart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just "" */
+    return "";
+  }
+  else
+  {
+    /* If found, return substring */
+    return name.substr(pos + 2, name.length());
+  }
+}
+
 #endif

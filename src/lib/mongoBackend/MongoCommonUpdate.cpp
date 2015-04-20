@@ -453,7 +453,7 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 * false othewise (i.e. when the new value equals to the existing one)
 *
 */
-static bool appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttribute* caP)
+static bool appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuilder* toPush, ContextAttribute* caP)
 {
 
   /* Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document */
@@ -493,6 +493,7 @@ static bool appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttrib
 
   const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
   toSet->append(composedName, ab.obj());
+  toPush->append(caP->name);
   return true;
 
 }
@@ -628,7 +629,7 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
 * Returns true if an attribute was deleted, false otherwise
 *
 */
-static bool deleteAttribute(BSONObj& attrs, BSONObjBuilder* toUnset, ContextAttribute* caP)
+static bool deleteAttribute(BSONObj& attrs, BSONObjBuilder* toUnset, std::map<std::string, unsigned int>* deleted, ContextAttribute* caP)
 {
 
   /* Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document */
@@ -642,6 +643,18 @@ static bool deleteAttribute(BSONObj& attrs, BSONObjBuilder* toUnset, ContextAttr
   {
     const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
     toUnset->append(composedName, 1);
+
+    /* Record the ocurrence of this attribute. Only attributes using ID may have a value greater than 1 */
+    if (deleted->count(caP->name))
+    {
+      std::map<std::string, unsigned int>::iterator it = deleted->find(caP->name);
+      it->second++;
+    }
+    else
+    {
+      deleted->insert(std::make_pair(caP->name, 1));
+    }
+
     return true;
   }
   else
@@ -1040,6 +1053,29 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 
 /* ****************************************************************************
 *
+* howManyAttrs -
+*
+* Returns the number of occurences of the attrName attribute (e.g. "A1") in the attrs
+* BSON (taken from DB). This use to be 1, except in the case of using ID.
+*
+*/
+static unsigned int howManyAttrs(BSONObj& attrs, std::string& attrName)
+{
+  unsigned int c = 0;
+  std::set<std::string> attrNames;
+  attrs.getFieldNames(attrNames);
+  for(std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
+  {
+    if(basePart(*i) == attrName)
+    {
+      c++;
+    }
+  }
+  return c;
+}
+
+/* ****************************************************************************
+*
 * processContextAttributeVector -
 *
 * Returns true if entity was actually modified, false otherwise (including fail cases)
@@ -1052,6 +1088,8 @@ static bool processContextAttributeVector (ContextElement*                      
                                            BSONObj&                                   attrs,
                                            BSONObjBuilder*                            toSet,
                                            BSONObjBuilder*                            toUnset,
+                                           BSONArrayBuilder*                          toPush,
+                                           BSONArrayBuilder*                          toPull,
                                            ContextElementResponse*                    cerP,
                                            std::string&                               locAttr,
                                            double&                                    coordLat,
@@ -1062,6 +1100,9 @@ static bool processContextAttributeVector (ContextElement*                      
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
     std::string entityType = cerP->contextElement.entityId.type;
+
+    /* Helper variable used in the case of DELETE operations */
+    std::map<std::string, unsigned int> deletedAttributesCounter;
 
     bool entityModified = false;
 
@@ -1125,7 +1166,7 @@ static bool processContextAttributeVector (ContextElement*                      
         }
         else if (strcasecmp(action.c_str(), "append") == 0) {
             if (legalIdUsage(attrs, targetAttr)) {
-                entityModified = appendAttribute(attrs, toSet, targetAttr) || entityModified;
+                entityModified = appendAttribute(attrs, toSet, toPush, targetAttr) || entityModified;
 
                 /* Check aspects related with location */
                 if (targetAttr->getLocation().length() > 0 ) {
@@ -1178,7 +1219,7 @@ static bool processContextAttributeVector (ContextElement*                      
             }
         }
         else if (strcasecmp(action.c_str(), "delete") == 0) {
-            if (deleteAttribute(attrs, toUnset, targetAttr)) {
+            if (deleteAttribute(attrs, toUnset, &deletedAttributesCounter, targetAttr)) {
                 entityModified = true;
 
                 /* Check aspects related with location */
@@ -1235,6 +1276,27 @@ static bool processContextAttributeVector (ContextElement*                      
 
     }
 
+    /* Special processing in the case of DELETE, to avoid "deleting too much" in the case of using
+     * metadata ID. If metadata ID feature were removed this ugly piece of code wouldn't be needed ;)
+     * FIXME P3: note that in the case of Active/Active configuration it could happen that
+     * the attrsName get desyncrhonized, e.g. starting situation is A-ID1 and A-ID2, node
+     * #1 process DELETE A-ID1 and node #2 process DELETE A-ID2, each one thinking than the
+     * other A-IDx copy will be there at the end, thus nobody includes it in the toPull array
+     */
+    if (strcasecmp(action.c_str(), "delete") == 0)
+    {
+      for (std::map<string, unsigned int>::iterator it = deletedAttributesCounter.begin(); it != deletedAttributesCounter.end(); ++it)
+      {
+          std::string  attrName     = it->first;
+          unsigned int deletedTimes = it->second;
+
+          if (howManyAttrs(attrs, attrName) <= deletedTimes)
+          {
+            toPull->append(attrName);
+          }
+      }
+    }
+
     if (!entityModified)
     {
         /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
@@ -1277,6 +1339,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
     int now = getCurrentTime();    
     BSONObjBuilder attrsToAdd;
+    BSONArrayBuilder attrNamesToAdd;
 
     for (unsigned int ix = 0; ix < attrsV.size(); ++ix) {
         std::string attrId = attrsV.get(ix)->getId();
@@ -1306,6 +1369,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
             bsonAttr.appendArray(ENT_ATTRS_MD, mdV);
 
         attrsToAdd.append(effectiveName, bsonAttr.obj());
+        attrNamesToAdd.append(attrsV.get(ix)->name);
     }
 
     BSONObj bsonId;
@@ -1323,6 +1387,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
     BSONObjBuilder insertedDocB;
     insertedDocB.append("_id", bsonId);
+    insertedDocB.append(ENT_ATTRNAMES, attrNamesToAdd.arr());
     insertedDocB.append(ENT_ATTRS, attrsToAdd.obj());
     insertedDocB.append(ENT_CREATION_DATE, now);
     insertedDocB.append(ENT_MODIFICATION_DATE,now);
@@ -1679,10 +1744,13 @@ void processContextElement(ContextElement*                      ceP,
         LM_T(LmtServicePath, ("ceP->contextAttributeVector.size: %d", ceP->contextAttributeVector.size()));
         /* We take as input the attrs array in the entity document and generate two outputs: a
          * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
-         * the request one of the BSON objects could be empty (it use to be the $unset one) */
+         * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
+         * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
         BSONObj attrs = r.getField(ENT_ATTRS).embeddedObject();
         BSONObjBuilder toSet;
         BSONObjBuilder toUnset;
+        BSONArrayBuilder toPush;
+        BSONArrayBuilder toPull;
 
         /* We accumulate the subscriptions in a map. The key of the map is the string representing
          * subscription id */
@@ -1703,7 +1771,7 @@ void processContextElement(ContextElement*                      ceP,
             coordLat = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[1].Double();
         }
 
-        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, &toSet, &toUnset, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, &toSet, &toUnset, &toPush, &toPull, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
         {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */            
             responseP->contextElementResponseVector.push_back(cerP);
@@ -1728,6 +1796,8 @@ void processContextElement(ContextElement*                      ceP,
         BSONObjBuilder updatedEntity;
         BSONObj toSetObj = toSet.obj();
         BSONObj toUnsetObj = toUnset.obj();
+        BSONArray toPushArr = toPush.arr();
+        BSONArray toPullArr = toPull.arr();
         if (toSetObj.nFields() > 0)
         {
           updatedEntity.append("$set", toSetObj);
@@ -1735,6 +1805,14 @@ void processContextElement(ContextElement*                      ceP,
         if (toUnsetObj.nFields() > 0)
         {
           updatedEntity.append("$unset", toUnsetObj);
+        }
+        if (toPushArr.nFields() > 0)
+        {
+          updatedEntity.append("$addToSet", BSON(ENT_ATTRNAMES << BSON("$each" << toPushArr)));
+        }
+        if (toPullArr.nFields() > 0)
+        {
+          updatedEntity.append("$pullAll", BSON(ENT_ATTRNAMES << toPullArr));
         }
         BSONObj updatedEntityObj = updatedEntity.obj();
 
