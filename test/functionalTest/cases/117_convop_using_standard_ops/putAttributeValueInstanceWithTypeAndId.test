@@ -496,14 +496,14 @@ Date: REGEX(.*)
 12. GET /v1/contextEntities/type/T1/id/E2/attributes/A1/M1 and see it fail (remotely)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 163
+Content-Length: 158
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "404", 
-        "details": "Redirected to context provider localhost:9801/v1", 
+        "details": "Entity-Attribute-MetaID triplet: /E2-A1-M1/",
         "reasonPhrase": "No context element found"
     }
 }
@@ -550,7 +550,7 @@ Date: REGEX(.*)
 14. GET /v1/contextEntities/type/T1/id/E2/attributes/A1/M1 and see it work (remotely)
 =====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 368
+Content-Length: 300
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -571,7 +571,6 @@ Date: REGEX(.*)
     ], 
     "statusCode": {
         "code": "200", 
-        "details": "Redirected to context provider localhost:9801/v1", 
         "reasonPhrase": "OK"
     }
 }
@@ -580,13 +579,12 @@ Date: REGEX(.*)
 15. PUT /v1/contextEntities/type/T1/id/E2/attributes/A1/M1, see it work
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 112
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "code": "200", 
-    "details": "Redirected to context provider localhost:9801/v1", 
     "reasonPhrase": "OK"
 }
 
@@ -608,7 +606,7 @@ Date: REGEX(.*)
 17. Query E2-T1, see E2-T1-A1-M1 (A1 == 15)
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 623
+Content-Length: 551
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -636,7 +634,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }

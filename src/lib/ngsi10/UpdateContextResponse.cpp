@@ -175,13 +175,22 @@ void UpdateContextResponse::release(void)
 * 2. If not found: create a new one.
 *
 */
-void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP)
+void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP, StatusCode* scP)
 {
   ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccContextElementNotFound);
   if (cerP == NULL)
   {
     cerP = new ContextElementResponse(eP, aP);
-    cerP->statusCode.fill(SccContextElementNotFound);
+
+    if (scP != NULL)
+    {
+      cerP->statusCode.fill(scP);
+    }
+    else
+    {
+      cerP->statusCode.fill(SccContextElementNotFound, eP->id);
+    }
+
     contextElementResponseVector.push_back(cerP);
   }
   else
@@ -247,13 +256,15 @@ void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
 
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
     {
-      if (scP->code == SccContextElementNotFound)
+      ContextAttribute* aP = new ContextAttribute(ceP->contextAttributeVector[aIx]);
+
+      if (scP->code != SccOk)
       {
-        notFoundPush(&ceP->entityId, new ContextAttribute(ceP->contextAttributeVector[aIx]));
+        notFoundPush(&ceP->entityId, aP, scP);
       }
       else
       {
-        foundPush(&ceP->entityId, new ContextAttribute(ceP->contextAttributeVector[aIx]));
+        foundPush(&ceP->entityId, aP);
       }
     }
   }

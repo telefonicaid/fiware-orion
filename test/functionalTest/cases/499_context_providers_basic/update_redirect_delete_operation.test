@@ -215,7 +215,7 @@ Date: REGEX(.*)
 
 05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
 HTTP/1.1 200 OK
-Content-Length: 692
+Content-Length: 616
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -238,7 +238,6 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -247,7 +246,7 @@ Date: REGEX(.*)
 
 06. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1(=CP-2) will be removed)
 HTTP/1.1 200 OK
-Content-Length: 692
+Content-Length: 
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -270,7 +269,6 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -279,7 +277,7 @@ Date: REGEX(.*)
 
 07. Query broker for E1/A1 (will go to CP but but nothing is found)
 HTTP/1.1 200 OK
-Content-Length: 227
+Content-Length: 
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -288,7 +286,6 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
   </errorCode>
 </queryContextResponse>
 

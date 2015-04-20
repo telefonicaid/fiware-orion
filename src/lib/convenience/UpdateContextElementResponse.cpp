@@ -135,12 +135,28 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
 {
   ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
 
+  ucrsP->present("UpdateContextResponse to fill from: ");
+
+  errorCode.fill(ucrsP->errorCode);
+  if (errorCode.code == SccNone)
+  {
+    LM_M(("Filling errorCode with code SccOk"));
+    errorCode.fill(SccOk, errorCode.details);
+  }
+
   if (ucrsP->contextElementResponseVector.size() != 0)
   {
+    //
+    // Remove values from the context attributes
+    //
+    for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    {
+      cerP->contextElement.contextAttributeVector[aIx]->value = "";
+    }
+
     contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
   }
 
-  errorCode.fill(ucrsP->errorCode);
 
   //
   // Special treatment if only one contextElementResponse that is NOT FOUND and if
@@ -152,10 +168,12 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
   //
   if ((errorCode.code != SccContextElementNotFound) && (contextAttributeResponseVector.size() == 1) && (contextAttributeResponseVector[0]->statusCode.code == SccContextElementNotFound))
   {
+    LM_M(("Filling errorCode with code SccContextElementNotFound (1)"));
     errorCode.fill(SccContextElementNotFound);
   }
   else if ((errorCode.code != SccContextElementNotFound) && (contextAttributeResponseVector.size() == 0))
   {
+    LM_M(("Filling errorCode with code SccContextElementNotFound (2)"));
     errorCode.fill(SccContextElementNotFound);
   }
   else if (contextAttributeResponseVector.size() == 1)
@@ -167,6 +185,7 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
     if (((errorCode.code == SccNone) || (errorCode.code == SccOk)) && 
         ((contextAttributeResponseVector[0]->statusCode.code != SccNone) && (contextAttributeResponseVector[0]->statusCode.code != SccOk)))
     {
+      LM_M(("Filling errorCode with code %d", contextAttributeResponseVector[0]->statusCode.code));
       errorCode.fill(contextAttributeResponseVector[0]->statusCode);
     }
   }
@@ -179,4 +198,19 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
       errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
     }
   }
+
+  present("Filled from UpdateContextResponse");
+}
+
+
+
+/* ****************************************************************************
+*
+* present - 
+*/
+void UpdateContextElementResponse::present(const std::string& indent)
+{
+  LM_F(("%sUpdateContextElementResponse:", indent.c_str()));
+  contextAttributeResponseVector.present(indent + "  ");
+  errorCode.present(indent + "  ");
 }

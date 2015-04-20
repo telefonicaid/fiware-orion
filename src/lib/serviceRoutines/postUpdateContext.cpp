@@ -142,6 +142,8 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
 
+  LM_M(("KZ: Forwarding %s request to %s:%d", resource.c_str(), ip.c_str(), port));
+
   out = sendHttpSocket(ip,
                        port,
                        protocol,
@@ -194,6 +196,9 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   ciP->verb   = POST;
   ciP->method = "POST";
 
+  parseData.upcrs.res.errorCode.fill(SccOk);
+
+  LM_M(("KZ: parsing response to forward: %s", cleanPayload));
   s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
   if (s != "OK")
   {
@@ -213,7 +218,7 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   // Fill in the response from the redirection into the response
   upcrsP->fill(&parseData.upcrs.res);
-
+  upcrsP->present("replyToForward1: ");
 
   //
   // 6. 'Fixing' StatusCode
@@ -223,10 +228,12 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     upcrsP->errorCode.fill(SccOk);
   }
 
+  upcrsP->present("replyToForward2: ");
   if ((upcrsP->contextElementResponseVector.size() == 1) && (upcrsP->contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound))
   {
     upcrsP->errorCode.fill(SccContextElementNotFound);
   }
+  upcrsP->present("replyToForward3: ");
 
   
   //
@@ -293,8 +300,11 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     if ((noOfFounds == 0) && (noOfNotFounds > 0))
     {
-      LM_M(("KZ: Setting errorCode.code to 404"));
-      cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
+      if ((cerP->statusCode.code == SccOk) || (cerP->statusCode.code == SccNone))
+      {
+        LM_M(("KZ: Setting errorCode.code to 404"));
+        cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
+      }
     }
     else if ((noOfFounds > 0) && (noOfNotFounds > 0))
     {
@@ -500,6 +510,7 @@ std::string postUpdateContext
   UpdateContextRequestVector  requestV;
   UpdateContextResponse       response;
 
+  response.errorCode.fill(SccOk);
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
     ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
@@ -522,7 +533,7 @@ std::string postUpdateContext
         //
         if (aP->found == false)
         {
-          response.notFoundPush(&cerP->contextElement.entityId, new ContextAttribute(aP));
+          response.notFoundPush(&cerP->contextElement.entityId, new ContextAttribute(aP), NULL);
           continue;
         }
 
@@ -594,7 +605,10 @@ std::string postUpdateContext
     //
     // Add the result from the forwarded update to the total response in 'response'
     //
+    response.present("response before merge: ");
+    upcrs.present("upcrs before merge: ");
     response.merge(&upcrs);
+    response.present("response after merge: ");
   }
 
   answer = response.render(ciP, UpdateContext, "");
@@ -602,9 +616,12 @@ std::string postUpdateContext
   //
   // Cleanup
   //
-  upcrsP->release();
   upcrP->release();
   requestV.release();
+  upcrsP->release();
+  upcrsP->fill(&response);
 
+  LM_M(("postUpdateContext @%p returns answer: %s", postUpdateContext, answer.c_str()));
+  upcrsP->present("Response from postUpdateContext");
   return answer;
 }
