@@ -67,9 +67,9 @@ static void prepareDatabase(void) {
   DBClientBase* connection = getMongoConnection();
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" <<
-                             "type" << "TA1" <<
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" <<
                              "value" << BSON_ARRAY("22" <<
                                                    BSON("x" << BSON_ARRAY("x1" << "x2") <<
                                                         "y" << "3") <<
@@ -80,9 +80,9 @@ static void prepareDatabase(void) {
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A2" <<
-                             "type" << "TA2" <<
+                     "attrNames" << BSON_ARRAY("A2") <<
+                     "attrs" << BSON(
+                        "A2" << BSON("type" << "TA2" <<
                              "value" << BSON("x" << BSON("x1" << "a" << "x2" << "b") <<
                                              "y" << BSON_ARRAY("y1" << "y2")
                                              )
@@ -91,28 +91,28 @@ static void prepareDatabase(void) {
                     );
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T3") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A3" <<
-                             "type" << "TA3" <<
+                     "attrNames" << BSON_ARRAY("A3" << "A3bis") <<
+                     "attrs" << BSON(
+                        "A3" << BSON("type" << "TA3" <<
                              "value" << BSON_ARRAY("22" <<
                                                    BSON("x" << BSON_ARRAY("x1" << "x2") <<
                                                         "y" << "3") <<
                                                    BSON_ARRAY("z1" << "z2")
                                                    )
                              ) <<
-                        BSON("name" << "A3bis" << "type" << "TA3" << "value" << "val3")
+                        "A3bis" << BSON("type" << "TA3" << "value" << "val3")
                         )
                     );
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T4") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A4" <<
-                             "type" << "TA4" <<
+                     "attrNames" << BSON_ARRAY("A4" << "A4bis") <<
+                     "attrs" << BSON(
+                        "A4" << BSON("type" << "TA4" <<
                              "value" << BSON("x" << BSON("x1" << "a" << "x2" << "b") <<
                                              "y" << BSON_ARRAY("y1" << "y2")
                                              )
                              ) <<
-                        BSON("name" << "A4bis" << "type" << "TA4" << "value" << "val4")
+                        "A4bis" << BSON("type" << "TA4" << "value" << "val4")
                         )
                     );
 

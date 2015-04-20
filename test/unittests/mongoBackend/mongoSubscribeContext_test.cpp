@@ -171,16 +171,14 @@ static void prepareDatabase(void) {
     /* We create the following entities:
      *
      * - E1:
-     *     A1: X
-     *     A1*: Y
+     *     A1: X     
      *     A2: Z
      *     A3: W
      * - E2
      *     A2: R
      *     A3: S
      * - E1*
-     *     A1: T
-     *     A1*: U
+     *     A1: T     
      * - E1**
      *     A1: P
      *     A2: Q
@@ -191,31 +189,34 @@ static void prepareDatabase(void) {
      */
 
     BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                          BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                          BSON("name" << "A3" << "type" << "TA3" << "value" << "W")
+                       "attrNames" << BSON_ARRAY("A1" << "A2" << "A3") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                          "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                          "A3" << BSON("type" << "TA3" << "value" << "W")
                           )
                       );
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "R") <<
-                          BSON("name" << "A3" << "type" << "TA3" << "value" << "S")
+                       "attrNames" << BSON_ARRAY("A2" << "A3") <<
+                       "attrs" << BSON(
+                          "A2" << BSON("type" << "TA2" << "value" << "R") <<
+                          "A3" << BSON("type" << "TA3" << "value" << "S")
                           )
                       );
 
     BSONObj en3 = BSON("_id" << BSON("id" << "E1" << "type" << "T1bis") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "T") <<
-                          BSON("name" << "A1" << "type" << "TA1bis" << "value" << "U")
+                       "attrNames" << BSON_ARRAY("A1") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "T")
                           )
                       );
+
     BSONObj en4 = BSON("_id" << BSON("id" << "E1") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "P") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "Q")
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "P") <<
+                          "A2" << BSON("type" << "TA2" << "value" << "Q")
                           )
                       );
 
@@ -244,8 +245,7 @@ static void prepareDatabasePatternTrue(void) {
     /* We create the following entities:
      *
      * - E1:
-     *     A1: X
-     *     A1*: Y
+     *     A1: X     
      *     A2: Z
      *     A3: W
      * - E2
@@ -253,7 +253,6 @@ static void prepareDatabasePatternTrue(void) {
      *     A3: S
      * - E2*
      *     A1: T
-     *     A1*: U
      * - E1**
      *     A1: P
      *     A2: Q
@@ -267,38 +266,42 @@ static void prepareDatabasePatternTrue(void) {
      */
 
     BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                          BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                          BSON("name" << "A3" << "type" << "TA3" << "value" << "W")
+                       "attrNames" << BSON_ARRAY("A1" << "A2" << "A3") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                          "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                          "A3" << BSON("type" << "TA3" << "value" << "W")
                           )
                       );
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "R") <<
-                          BSON("name" << "A3" << "type" << "TA3" << "value" << "S")
+                       "attrNames" << BSON_ARRAY("A2" << "A3") <<
+                       "attrs" << BSON(
+                          "A2" << BSON("type" << "TA2" << "value" << "R") <<
+                          "A3" << BSON("type" << "TA3" << "value" << "S")
                           )
                       );
 
     BSONObj en3 = BSON("_id" << BSON("id" << "E2" << "type" << "Tbis") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "T") <<
-                          BSON("name" << "A1" << "type" << "TA1bis" << "value" << "U")
+                       "attrNames" << BSON_ARRAY("A1") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "T")
                           )
                       );
+
     BSONObj en4 = BSON("_id" << BSON("id" << "E1") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "P") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "Q")
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "P") <<
+                          "A2" << BSON("type" << "TA2" << "value" << "Q")
                           )
                       );
 
     BSONObj en5 = BSON("_id" << BSON("id" << "E3") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "noise") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "noise")
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "noise") <<
+                          "A2" << BSON("type" << "TA2" << "value" << "noise")
                           )
                       );
 

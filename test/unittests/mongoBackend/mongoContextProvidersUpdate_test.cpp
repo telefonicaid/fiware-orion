@@ -361,14 +361,16 @@ static void prepareDatabaseSeveralCprs(void)
    */
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "T" << "value" << "1")
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "T" << "value" << "1")
                         )
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A3" << "type" << "T" << "value" << "3")
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A3" << BSON("type" << "T" << "value" << "3")
                         )
                     );
 

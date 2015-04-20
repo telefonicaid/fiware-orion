@@ -76,7 +76,6 @@ static void prepareDatabase(void) {
      *
      * - E1:
      *     A1:  X
-     *     A1*: Y
      *     A2:  Z
      *     A3:  W
      *     A7:  R
@@ -92,9 +91,6 @@ static void prepareDatabase(void) {
      *     A4:  noise
      *     A6:  noise
      *     A7:  noise
-     *
-     * (*) Means that entity/type is using same name but different type. This is included to check that type
-     *     is taken into account.
      *
      * We create the following subscriptions:
      *
@@ -113,32 +109,33 @@ static void prepareDatabase(void) {
      */
 
     BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                          BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                          BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
-                          BSON("name" << "A7" << "type" << "TA7" << "value" << "R")
+                       "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                          "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                          "A3" << BSON("type" << "TA3" << "value" << "W") <<
+                          "A7" << BSON("type" << "TA7" << "value" << "R")
                           )
                       );
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "S") <<
-                          BSON("name" << "A4" << "type" << "TA4" << "value" << "T") <<
-                          BSON("name" << "A6" << "type" << "TA6" << "value" << "U")
+                       "attrNames" << BSON_ARRAY("A1" << "A4" << "A6") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "S") <<
+                          "A4" << BSON("type" << "TA4" << "value" << "T") <<
+                          "A6" << BSON("type" << "TA6" << "value" << "U")
                           )
                       );
 
     BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                           BSON("name" << "A1" << "type" << "TA1" << "value" << "noise") <<
-                           BSON("name" << "A1" << "type" << "TA1bis" << "value" << "noise") <<
-                           BSON("name" << "A2" << "type" << "TA2" << "value" << "noise") <<
-                           BSON("name" << "A3" << "type" << "TA3" << "value" << "noise") <<
-                           BSON("name" << "A4" << "type" << "TA4" << "value" << "noise") <<
-                           BSON("name" << "A6" << "type" << "TA6" << "value" << "noise") <<
-                           BSON("name" << "A7" << "type" << "TA7" << "value" << "noise")
+                       "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A4" << "A6" << "A7") <<
+                       "attrs" << BSON(
+                           "A1" << BSON("type" << "TA1" << "value" << "noise") <<
+                           "A2" << BSON("type" << "TA2" << "value" << "noise") <<
+                           "A3" << BSON("type" << "TA3" << "value" << "noise") <<
+                           "A4" << BSON("type" << "TA4" << "value" << "noise") <<
+                           "A6" << BSON("type" << "TA6" << "value" << "noise") <<
+                           "A7" << BSON("type" << "TA7" << "value" << "noise")
                           )
                       );
 

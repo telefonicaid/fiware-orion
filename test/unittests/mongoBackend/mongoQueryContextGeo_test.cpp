@@ -70,25 +70,28 @@ static void prepareDatabase(void) {
   connection->ensureIndex("unittest.entities", BSON("location.coords" << "2dsphere" ));
 
   BSONObj A = BSON("_id" << BSON("id" << "A" << "type" << "Point") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "2, 3") <<
-                        BSON("name" << "foo" << "type" << "string" << "value" << "attr_A")
+                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                     "attrs" << BSON(
+                        "pos" << BSON("type" << "location" << "value" << "2, 3") <<
+                        "foo" << BSON("type" << "string" << "value" << "attr_A")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(3.0 << 2.0))
                     );
 
   BSONObj B = BSON("_id" << BSON("id" << "B" << "type" << "Point") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "5, 5") <<
-                        BSON("name" << "foo" << "type" << "string" << "value" << "attr_B")
+                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                     "attrs" << BSON(
+                        "pos" << BSON("type" << "location" << "value" << "5, 5") <<
+                        "foo" << BSON("type" << "string" << "value" << "attr_B")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(5.0 << 5.0))
                     );
 
   BSONObj C = BSON("_id" << BSON("id" << "C" << "type" << "Point") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "4, 7") <<
-                        BSON("name" << "foo" << "type" << "string" << "value" << "attr_C")
+                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                     "attrs" << BSON(
+                        "pos" << BSON("type" << "location" << "value" << "4, 7") <<
+                        "foo" << BSON("type" << "string" << "value" << "attr_C")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(7.0 << 4.0))
                     );
@@ -96,32 +99,36 @@ static void prepareDatabase(void) {
   // Entity D hasn't a location attribute (i.e. no location field). This entity will be never returned
   // when a geoscope is defined
   BSONObj D = BSON("_id" << BSON("id" << "D" << "type" << "Point") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "4, 7") <<
-                        BSON("name" << "foo" << "type" << "string" << "value" << "attr_C")
+                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
+                     "attrs" << BSON(
+                        "pos" << BSON("type" << "location" << "value" << "4, 7") <<
+                        "foo" << BSON("type" << "string" << "value" << "attr_C")
                         )
                     );
 
   BSONObj city1 = BSON("_id" << BSON("id" << "Madrid" << "type" << "City") <<
+                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "40.418889, -3.691944") <<
-                        BSON("name" << "foo" << "type" << "string" << "value" << "attr_Mad")
+                        "pos" << BSON("type" << "location" << "value" << "40.418889, -3.691944") <<
+                        "foo" << BSON("type" << "string" << "value" << "attr_Mad")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.691944 << 40.418889))
                     );
 
   BSONObj city2 = BSON("_id" << BSON("id" << "Alcobendas" << "type" << "City") <<
+                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "40.533333, -3.633333") <<
-                        BSON("name" << "foo" << "type" << "string" << "value" << "attr_Alc")
+                        "pos" << BSON("type" << "location" << "value" << "40.533333, -3.633333") <<
+                        "foo" << BSON("type" << "string" << "value" << "attr_Alc")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.633333 << 40.533333))
                     );
 
   BSONObj city3 = BSON("_id" << BSON("id" << "Leganes" << "type" << "City") <<
+                     "attrNames" << BSON_ARRAY("pos" << "foo") <<
                      "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "location" << "value" << "40.316667, -3.75") <<
-                        BSON("name" << "foo" << "type" << "string" << "value" << "attr_Leg")
+                        "pos" << BSON("type" << "location" << "value" << "40.316667, -3.75") <<
+                        "foo" << BSON("type" << "string" << "value" << "attr_Leg")
                         ) <<
                      "location" << BSON("attrName" << "pos" << "coords" << BSON_ARRAY(-3.75 << 40.316667))
                     );

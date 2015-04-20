@@ -105,46 +105,52 @@ static void prepareDatabase(void) {
    */
 
   BSONObj en1 = BSON("_id" << BSON("id" << "Car1" << "type" << "Car") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "1") <<
-                        BSON("name" << "temp" << "type" << "temp_T" << "value" << "2") <<
-                        BSON("name" << "plate" << "type" << "plate_T" << "value" << "3")
+                     "attrNames" << BSON_ARRAY("pos" << "temp" << "plate") <<
+                     "attrs" << BSON(
+                        "pos"   << BSON("type" << "pos_T" << "value" << "1") <<
+                        "temp"  << BSON("type" << "temp_T" << "value" << "2") <<
+                        "plate" << BSON("type" << "plate_T" << "value" << "3")
                         )
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "Car2" << "type" << "Car") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "4") <<
-                        BSON("name" << "plate" << "type" << "plate_T2" << "value" << "5") <<
-                        BSON("name" << "fuel" << "type" << "fuel_T" << "value" << "6")
+                     "attrNames" << BSON_ARRAY("pos" << "plate" << "fuel") <<
+                     "attrs" << BSON(
+                        "pos"   << BSON("type" << "pos_T" << "value" << "4") <<
+                        "plate" << BSON("type" << "plate_T2" << "value" << "5") <<
+                        "fuel"  << BSON("type" << "fuel_T" << "value" << "6")
                         )
                     );
 
   BSONObj en3 = BSON("_id" << BSON("id" << "Car3" << "type" << "Car") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "7") <<
-                        BSON("name" << "colour" << "type" << "colour_T" << "value" << "8")
+                     "attrNames" << BSON_ARRAY("pos" << "colour") <<
+                     "attrs" << BSON(
+                        "pos"    << BSON("type" << "pos_T" << "value" << "7") <<
+                        "colour" << BSON("type" << "colour_T" << "value" << "8")
                         )
                     );
 
   BSONObj en4 = BSON("_id" << BSON("id" << "Room1" << "type" << "Room") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "9") <<
-                        BSON("name" << "temp" << "type" << "temp_T" << "value" << "10")
+                     "attrNames" << BSON_ARRAY("pos" << "temp") <<
+                     "attrs" << BSON(
+                        "pos"  << BSON("type" << "pos_T" << "value" << "9") <<
+                        "temp" << BSON("type" << "temp_T" << "value" << "10")
                         )
                     );
 
   BSONObj en5 = BSON("_id" << BSON("id" << "Room2" << "type" << "Room") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "pos" << "type" << "pos_T" << "value" << "11") <<
-                        BSON("name" << "humidity" << "type" << "humidity_T" << "value" << "12")
+                     "attrNames" << BSON_ARRAY("pos" << "humidity") <<
+                     "attrs" << BSON(
+                        "pos"      << BSON("type" << "pos_T" << "value" << "11") <<
+                        "humidity" << BSON("type" << "humidity_T" << "value" << "12")
                         )
                     );
 
   BSONObj en6 = BSON("_id" << BSON("id" << "Lamp1" << "type" << "Lamp") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "battery" << "type" << "battery_T" << "value" << "13") <<
-                        BSON("name" << "status" << "type" << "status_T" << "value" << "14")
+                     "attrNames" << BSON_ARRAY("battery" << "status") <<
+                     "attrs" << BSON(
+                        "battery" << BSON("type" << "battery_T" << "value" << "13") <<
+                        "status"  << BSON("type" << "status_T" << "value" << "14")
                         )
                     );
 
