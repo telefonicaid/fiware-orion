@@ -1726,7 +1726,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
-  EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
+  EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
   EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
