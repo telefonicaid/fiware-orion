@@ -227,7 +227,7 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
     {
       ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
       
-      if (aP->providingApplication != "")
+      if (aP->providingApplication.get() != "")
       {
         return true;
       }      
@@ -323,7 +323,7 @@ std::string postQueryContext
     {
       QueryContextRequest* requestP;
 
-      requestP = new QueryContextRequest(cerP->contextElement.providingApplicationList[ix], eP, qcrP->attributeList);
+      requestP = new QueryContextRequest(cerP->contextElement.providingApplicationList[ix].get(), eP, qcrP->attributeList);
       requestV.push_back(requestP);
     }
 
@@ -335,7 +335,7 @@ std::string postQueryContext
       // An empty providingApplication means the attribute is local
       // In such a case, the response is already in our hand, we just need to copy it to responseV
       //
-      if (aP->providingApplication == "")
+      if (aP->providingApplication.get() == "")
       {
         if (aP->found == false)
         {
@@ -367,11 +367,11 @@ std::string postQueryContext
       //
       // Not a local attribute - aP->providingApplication is not empty
       //
-      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication, eP);
+      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication.get(), eP);
 
       if (requestP == NULL)
       {
-        requestP = new QueryContextRequest(aP->providingApplication, eP, aP->name);
+        requestP = new QueryContextRequest(aP->providingApplication.get(), eP, aP->name);
         requestV.push_back(requestP);
       }
       else

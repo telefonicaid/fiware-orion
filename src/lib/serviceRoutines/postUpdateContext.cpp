@@ -65,7 +65,7 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
     {
       ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
       
-      if (aP->providingApplication != "")
+      if (aP->providingApplication.get() != "")
       {
         return true;
       }      
@@ -544,7 +544,7 @@ std::string postUpdateContext
         //
         // 1. If the attribute is found locally - just add the attribute to the outgoing response
         //
-        if (aP->providingApplication == "")
+        if (aP->providingApplication.get() == "")
         {
           response.foundPush(&cerP->contextElement.entityId, new ContextAttribute(aP));
           continue;
@@ -554,10 +554,10 @@ std::string postUpdateContext
         //
         // 2. Lookup UpdateContextRequest in requestV according to providingApplication.
         //    If not found, add one.
-        UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication);
+        UpdateContextRequest*  reqP = requestV.lookup(aP->providingApplication.get());
         if (reqP == NULL)
         {
-          reqP = new UpdateContextRequest(aP->providingApplication, &cerP->contextElement.entityId);
+          reqP = new UpdateContextRequest(aP->providingApplication.get(), &cerP->contextElement.entityId);
           reqP->updateActionType.set("UPDATE");
           requestV.push_back(reqP);
         }

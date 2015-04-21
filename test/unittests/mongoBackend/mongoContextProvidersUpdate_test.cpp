@@ -1540,9 +1540,9 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
 
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ("", RES_CER_STATUS(0).details);
+  EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+  EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ("action: UPDATE - entity: [E1, T] - offending attribute: A2", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1567,9 +1567,9 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_TRUE(RES_CER_ATTR(1, 1)->found);
   EXPECT_EQ(0, RES_CER_ATTR(1, 1)->metadataVector.size());
 
-  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
-  EXPECT_EQ("", RES_CER_STATUS(1).details);
+  EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(1).code);
+  EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ("action: UPDATE - entity: [E2, T] - offending attribute: A4", RES_CER_STATUS(1).details);
 
   /* Context Element response # 3 */
   EXPECT_EQ("E3", RES_CER(2).entityId.id);
@@ -1579,7 +1579,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ASSERT_EQ(2, RES_CER(2).contextAttributeVector.size());
 
   EXPECT_EQ("A5", RES_CER_ATTR(2, 0)->name);
-  EXPECT_EQ("", RES_CER_ATTR(2, 0)->type);
+  EXPECT_EQ("T", RES_CER_ATTR(2, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(2, 0)->value.size());
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(2, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
@@ -1587,7 +1587,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ(0, RES_CER_ATTR(2, 0)->metadataVector.size());
 
   EXPECT_EQ("A6", RES_CER_ATTR(2, 1)->name);
-  EXPECT_EQ("", RES_CER_ATTR(2, 1)->type);
+  EXPECT_EQ("T", RES_CER_ATTR(2, 1)->type);
   EXPECT_EQ(0, RES_CER_ATTR(2, 1)->value.size());
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(2, 1)->providingApplication.getFormat());
@@ -1606,7 +1606,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
 
   EXPECT_EQ("A7", RES_CER_ATTR(3, 0)->name);
-  EXPECT_EQ("", RES_CER_ATTR(3, 0)->type);
+  EXPECT_EQ("T", RES_CER_ATTR(3, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(3, 0)->value.size());
   EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(3, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(3, 0)->providingApplication.getFormat());
@@ -1910,7 +1910,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
-  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
@@ -1968,7 +1968,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
-  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
+  EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
