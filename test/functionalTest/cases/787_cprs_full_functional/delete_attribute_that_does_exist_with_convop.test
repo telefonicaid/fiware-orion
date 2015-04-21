@@ -21,91 +21,63 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update With a False Registration
+Delete Attribute That Does Exist With Convop
 
 --SHELL-INIT--
 dbInit CB
-dbInit CP1
 brokerStart CB
-brokerStart CP1
+
 
 --SHELL--
 
 #
-# 01. Register E1/T1/A1-CP1 in CB
-# 02. Update/UPDATE E1/T1/A1 in CB
+# 01. Update/APPEND E1//A1
+# 02. Delete E1//A1, using Convop DELETE /v1/contextEntities/ENTITY_ID
+# 03. Delete E1//A1 again, using Convop DELETE /v1/contextEntities/ENTITY_ID
 #
 
-echo "01. Register E1/T1/A1-CP1 in CB"
-echo "==============================="
-payload='{
-  "contextRegistrations": [
-    {
-      "entities": [
-        {
-           "type": "T1",
-           "isPattern": "false",
-           "id": "E1"
-        }
-      ],
-      "attributes": [
-        {
-          "name": "A1",
-          "type": "string",
-          "isDomain": "false"
-        }
-      ],
-      "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
-    }
- ],
- "duration": "P1M"
-}'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
-echo
-echo
-
-
-echo "02. Update/UPDATE E1/T1/A1 in CB"
-echo "================================"
+echo "01. Update/APPEND E1//A1"
+echo "========================"
 payload='{
   "contextElements": [
     {
-      "type": "T1",
+      "type": "",
       "id":   "E1",
       "attributes": [
         {
           "name": "A1",
           "type": "string",
-          "value": "Via CB"
+          "value": "XXX"
         }
       ]
     }
   ],
-  "updateAction": "UPDATE"
+  "updateAction": "APPEND"
 }'
 orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
 
+echo "02. Delete E1//A1, using Convop DELETE /v1/contextEntities/E1"
+echo "============================================================="
+orionCurl --url /v1/contextEntities/E1 -X DELETE --json
+echo
+echo
+
+
+#echo "03. Delete E1//A1 again, using Convop DELETE /v1/contextEntities/E1"
+#echo "==================================================================="
+#orionCurl --url /v1/contextEntities/E1 -X DELETE --json
+#echo
+#echo
+
+
 --REGEXPECT--
-01. Register E1/T1/A1-CP1 in CB
-===============================
+01. Update/APPEND E1//A1
+========================
 HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-02. Update/UPDATE E1/T1/A1 in CB
-================================
-HTTP/1.1 200 OK
-Content-Length: 431
+Content-Length: 381
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -122,20 +94,30 @@ Date: REGEX(.*)
                 ], 
                 "id": "E1", 
                 "isPattern": "false", 
-                "type": "T1"
+                "type": ""
             }, 
             "statusCode": {
-                "code": "404", 
-                "details": "E1", 
-                "reasonPhrase": "No context element found"
+                "code": "200", 
+                "reasonPhrase": "OK"
             }
         }
     ]
 }
 
 
+02. Delete E1//A1, using Convop DELETE /v1/contextEntities/E1
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 46
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "code": "200", 
+    "reasonPhrase": "OK"
+}
+
+
 --TEARDOWN--
 brokerStop CB
-brokerStop CP1
 dbDrop CB
-dbDrop CP1

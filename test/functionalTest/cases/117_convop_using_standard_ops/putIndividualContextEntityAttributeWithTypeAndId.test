@@ -378,13 +378,12 @@ Date: REGEX(.*)
 11. PUT /v1/contextEntities/type/T1/id/E2/attributes/A1, see it work
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 112
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "code": "200", 
-    "details": "Redirected to context provider localhost:9801/v1", 
     "reasonPhrase": "OK"
 }
 
@@ -392,7 +391,7 @@ Date: REGEX(.*)
 12. Query E2-T1-A1 to make sure the update took place
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 238
+Content-Length: 170
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -406,7 +405,6 @@ Date: REGEX(.*)
     ], 
     "statusCode": {
         "code": "200", 
-        "details": "Redirected to context provider localhost:9801/v1", 
         "reasonPhrase": "OK"
     }
 }

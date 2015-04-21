@@ -565,14 +565,14 @@ Date: REGEX(.*)
 15. GET /v1/contextEntities/type/T1/id/E2/attributes/A1 and see it fail, as E2/T1/A1 does not exist in CP1
 ==========================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 163
+Content-Length: 145
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "404", 
-        "details": "Redirected to context provider localhost:9801/v1", 
+        "details": "Entity-Attribute pair: /E2-A1/", 
         "reasonPhrase": "No context element found"
     }
 }
@@ -612,7 +612,7 @@ Date: REGEX(.*)
 17. GET /v1/contextEntities/type/T1/id/E2/attributes/A1 and see it work
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 252
+Content-Length: 184
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -626,7 +626,6 @@ Date: REGEX(.*)
     ], 
     "statusCode": {
         "code": "200", 
-        "details": "Redirected to context provider localhost:9801/v1", 
         "reasonPhrase": "OK"
     }
 }

@@ -406,6 +406,7 @@ std::string postQueryContext
   // If providingApplication is empty then that part of the query has been performed already, locally.
   // 
   //
+  QueryContextResponse* qP;
   for (unsigned int fIx = 0; fIx < requestV.size(); ++fIx)
   {
     if (requestV[fIx]->contextProvider == "")
@@ -414,7 +415,7 @@ std::string postQueryContext
       continue;
     }
 
-    QueryContextResponse* qP = new QueryContextResponse();
+    qP = new QueryContextResponse();
     qP->errorCode.fill(SccOk);
     queryForward(ciP, requestV[fIx], qP);
 

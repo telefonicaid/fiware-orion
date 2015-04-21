@@ -105,11 +105,11 @@ void UpdateActionType::present(const std::string& indent)
 {
   if (string != "")
   {
-    PRINTF("%sUpdateActionType: %s\n", indent.c_str(), string.c_str());
+    LM_F(("%sUpdateActionType: %s\n", indent.c_str(), string.c_str()));
   }
   else
   {
-    PRINTF("%sNo UpdateActionType\n", indent.c_str());
+    LM_F(("%sNo UpdateActionType\n", indent.c_str()));
   }
 }
 

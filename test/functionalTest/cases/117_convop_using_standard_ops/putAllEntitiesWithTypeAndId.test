@@ -498,7 +498,7 @@ Date: REGEX(.*)
 12. PUT /v1/contextEntities/type/T1/id/E2, see it work
 ======================================================
 HTTP/1.1 200 OK
-Content-Length: 325
+Content-Length: 253
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -514,7 +514,6 @@ Date: REGEX(.*)
             ], 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }

@@ -175,13 +175,23 @@ void UpdateContextResponse::release(void)
 * 2. If not found: create a new one.
 *
 */
-void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP)
+void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP, StatusCode* scP)
 {
   ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccContextElementNotFound);
+
   if (cerP == NULL)
   {
     cerP = new ContextElementResponse(eP, aP);
-    cerP->statusCode.fill(SccContextElementNotFound);
+
+    if (scP != NULL)
+    {
+      cerP->statusCode.fill(scP);
+    }
+    else
+    {
+      cerP->statusCode.fill(SccContextElementNotFound, eP->id);
+    }
+
     contextElementResponseVector.push_back(cerP);
   }
   else
@@ -204,6 +214,7 @@ void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP)
 void UpdateContextResponse::foundPush(EntityId* eP, ContextAttribute* aP)
 {
   ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccOk);
+
   if (cerP == NULL)
   {
     cerP = new ContextElementResponse(eP, aP);
@@ -240,6 +251,19 @@ void UpdateContextResponse::fill(UpdateContextResponse* upcrsP)
 */
 void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
 {
+  if (upcrsP->contextElementResponseVector.size() == 0)
+  {
+    // If no contextElementResponses, copy errorCode if empty
+    if ((errorCode.code == SccNone) || (errorCode.code == SccOk))
+    {
+      errorCode.fill(upcrsP->errorCode);
+    }
+    else if (errorCode.details == "")
+    {
+      errorCode.details = upcrsP->errorCode.details;
+    }
+  }
+
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
     ContextElement* ceP = &upcrsP->contextElementResponseVector[cerIx]->contextElement;
@@ -247,13 +271,15 @@ void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
 
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
     {
-      if (scP->code == SccContextElementNotFound)
+      ContextAttribute* aP = new ContextAttribute(ceP->contextAttributeVector[aIx]);
+
+      if (scP->code != SccOk)
       {
-        notFoundPush(&ceP->entityId, new ContextAttribute(ceP->contextAttributeVector[aIx]));
+        notFoundPush(&ceP->entityId, aP, scP);
       }
       else
       {
-        foundPush(&ceP->entityId, new ContextAttribute(ceP->contextAttributeVector[aIx]));
+        foundPush(&ceP->entityId, aP);
       }
     }
   }

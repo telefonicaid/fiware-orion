@@ -53,7 +53,7 @@ typedef struct UpdateContextResponse
   void          present(const std::string& indent);
   void          release(void);
   void          fill(UpdateContextResponse* upcrsP);
-  void          notFoundPush(EntityId* eP, ContextAttribute* aP);
+  void          notFoundPush(EntityId* eP, ContextAttribute* aP, StatusCode* scP);
   void          foundPush(EntityId* eP, ContextAttribute* aP);
   void          merge(UpdateContextResponse* upcrsP);
 } UpdateContextResponse;

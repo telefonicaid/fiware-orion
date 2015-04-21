@@ -21,121 +21,95 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Forward non-existing attribute in existing entity for query in context provider
+Delete Attribute That Does Exist
 
 --SHELL-INIT--
 dbInit CB
-dbInit CP1
-brokerStart CB 0
-brokerStart CP1 0
+brokerStart CB
+
 
 --SHELL--
 
 #
-# 01. Update/APPEND E1/A1 in CP1
-# 02. Update/APPEND E1/A2 in CB
-# 03. Register E1/A1 in CB for CP1
-# 04. Query E1/A1 in CB
+# 01. Update/APPEND E1/T1/A1
+# 02. Delete E1/T1/A1
+# 03. Delete E1/T1/A1 AGAIN
 #
 
-echo "01. Update/APPEND E1/A1 in CP1"
-echo "=============================="
+echo "01. Update/APPEND E1/T1/A1"
+echo "=========================="
 payload='{
   "contextElements": [
     {
-      "type": "T",
+      "type": "T1",
       "id":   "E1",
       "attributes": [
         {
           "name": "A1",
           "type": "string",
-          "value": "E1/A1 in CP1"
+          "value": "XXX"
         }
       ]
     }
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json --port $CP1_PORT
+orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
 
-echo "02. Update/APPEND E1/A2 in CB"
-echo "============================="
+echo "02. Delete E1/T1/A1"
+echo "==================="
 payload='{
   "contextElements": [
     {
-      "type": "T",
+      "type": "T1",
       "id":   "E1",
       "attributes": [
         {
-          "name": "A2",
+          "name": "A1",
           "type": "string",
-          "value": "E1/A2 in CB"
+          "value": "XXX"
         }
       ]
     }
   ],
-  "updateAction": "APPEND"
+  "updateAction": "DELETE"
 }'
-orionCurl --url /v1/updateContext --payload "${payload}" --json
+orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
 
-echo "03. Register E1/A1 in CB for CP1"
-echo "================================"
+echo "03. Delete E1/T1/A1 AGAIN"
+echo "========================="
 payload='{
-  "contextRegistrations": [
-  {
-    "entities": [
-      {
-         "type": "T",
-         "isPattern": "false",
-         "id": "E1"
-      }
-    ],
-    "attributes": [
-      {
-        "name": "A1",
-        "type": "string",
-        "isDomain": "false"
-      }
-    ],
-    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
-    }
- ],
- "duration": "P1M"
-}'
-orionCurl --url /v1/registry/registerContext --payload "${payload}" --json
-echo
-echo
-
-
-echo "04. Query E1/A1 in CB"
-echo "====================="
-payload='{
-  "entities": [
+  "contextElements": [
     {
-      "type": "T",
-      "id":   "E1"
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "XXX"
+        }
+      ]
     }
   ],
-  "attributes": [
-    "A1"
-  ]
+  "updateAction": "DELETE"
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json
+orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
 
 --REGEXPECT--
-01. Update/APPEND E1/A1 in CP1
-==============================
+01. Update/APPEND E1/T1/A1
+==========================
 HTTP/1.1 200 OK
-Content-Length: 382
+Content-Length: 383
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -152,7 +126,7 @@ Date: REGEX(.*)
                 ], 
                 "id": "E1", 
                 "isPattern": "false", 
-                "type": "T"
+                "type": "T1"
             }, 
             "statusCode": {
                 "code": "200", 
@@ -163,54 +137,10 @@ Date: REGEX(.*)
 }
 
 
-02. Update/APPEND E1/A2 in CB
-=============================
+02. Delete E1/T1/A1
+===================
 HTTP/1.1 200 OK
-Content-Length: 382
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A2", 
-                        "type": "string", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-03. Register E1/A1 in CB for CP1
-================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-04. Query E1/A1 in CB
-=====================
-HTTP/1.1 200 OK
-Content-Length: 394
+Content-Length: 383
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -222,12 +152,12 @@ Date: REGEX(.*)
                     {
                         "name": "A1", 
                         "type": "string", 
-                        "value": "E1/A1 in CP1"
+                        "value": ""
                     }
                 ], 
                 "id": "E1", 
                 "isPattern": "false", 
-                "type": "T"
+                "type": "T1"
             }, 
             "statusCode": {
                 "code": "200", 
@@ -238,7 +168,38 @@ Date: REGEX(.*)
 }
 
 
---TEARDOWN---
+03. Delete E1/T1/A1 AGAIN
+=========================
+HTTP/1.1 200 OK
+Content-Length: 526
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "472", 
+                "details": "action: DELETE - entity: [E1, T1] - offending attribute: A1 - attribute not found", 
+                "reasonPhrase": "request parameter is invalid/not allowed"
+            }
+        }
+    ]
+}
+
+
+--TEARDOWN--
 brokerStop CB
 dbDrop CB
-dbDrop CP1

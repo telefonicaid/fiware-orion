@@ -62,7 +62,7 @@ ContextAttribute::ContextAttribute()
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   providingApplication  = "";
-  found                 = true;
+  found                 = false;
 }
 
 
@@ -143,7 +143,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = _compoundValueP->clone();
   typeFromXmlAttribute  = "";
   providingApplication  = "";
-  found                 = true;
+  found                 = false;
 }
 
 
@@ -258,9 +258,9 @@ std::string ContextAttribute::render
   std::string  out                    = "";
   std::string  xmlTag                 = "contextAttribute";
   std::string  jsonTag                = "attribute";
+  bool         valueRendered          = (compoundValueP != NULL) || (omitValue == false) || (request == RtUpdateContextResponse);
   bool         commaAfterContextValue = metadataVector.size() != 0;
-  bool         commaAfterType         = !omitValue || commaAfterContextValue;
-  bool         commaAfterName         = true;  // attribute.type is always rendered
+  bool         commaAfterType         = valueRendered;
 
   metadataVector.tagSet("metadata");
 
@@ -270,7 +270,7 @@ std::string ContextAttribute::render
   }
 
   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
-  out += valueTag(indent + "  ", "name",         name,  ciP->outFormat, commaAfterName);
+  out += valueTag(indent + "  ", "name",         name,  ciP->outFormat, true);  // attribute.type is always rendered
   out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, commaAfterType);
 
   if (compoundValueP == NULL)
@@ -281,7 +281,7 @@ std::string ContextAttribute::render
                       (request != RtUpdateContextResponse)? value : "",
                       ciP->outFormat, commaAfterContextValue);
     }
-    else
+    else if (request == RtUpdateContextResponse)
     {
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
                       "", ciP->outFormat, commaAfterContextValue);

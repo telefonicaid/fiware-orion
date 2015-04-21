@@ -863,7 +863,7 @@ Date: REGEX(.*)
 15. Update/UPDATE All seven attributes plus a few not found
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 2128
+Content-Length: 2180
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -917,6 +917,7 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "404", 
+                "details": "E1", 
                 "reasonPhrase": "No context element found"
             }
         }, 
@@ -940,6 +941,7 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "404", 
+                "details": "E2", 
                 "reasonPhrase": "No context element found"
             }
         }, 

@@ -21,52 +21,17 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update With a False Registration
+Update Attribute That Does Not Exist
 
 --SHELL-INIT--
 dbInit CB
-dbInit CP1
 brokerStart CB
-brokerStart CP1
+
 
 --SHELL--
 
-#
-# 01. Register E1/T1/A1-CP1 in CB
-# 02. Update/UPDATE E1/T1/A1 in CB
-#
-
-echo "01. Register E1/T1/A1-CP1 in CB"
-echo "==============================="
-payload='{
-  "contextRegistrations": [
-    {
-      "entities": [
-        {
-           "type": "T1",
-           "isPattern": "false",
-           "id": "E1"
-        }
-      ],
-      "attributes": [
-        {
-          "name": "A1",
-          "type": "string",
-          "isDomain": "false"
-        }
-      ],
-      "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
-    }
- ],
- "duration": "P1M"
-}'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
-echo
-echo
-
-
-echo "02. Update/UPDATE E1/T1/A1 in CB"
-echo "================================"
+echo "01. Update E1/T1/A1"
+echo "==================="
 payload='{
   "contextElements": [
     {
@@ -76,7 +41,7 @@ payload='{
         {
           "name": "A1",
           "type": "string",
-          "value": "Via CB"
+          "value": "XXX"
         }
       ]
     }
@@ -89,21 +54,8 @@ echo
 
 
 --REGEXPECT--
-01. Register E1/T1/A1-CP1 in CB
-===============================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-02. Update/UPDATE E1/T1/A1 in CB
-================================
+01. Update E1/T1/A1
+===================
 HTTP/1.1 200 OK
 Content-Length: 431
 Content-Type: application/json
@@ -136,6 +88,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-brokerStop CP1
 dbDrop CB
-dbDrop CP1

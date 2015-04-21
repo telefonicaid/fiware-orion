@@ -353,13 +353,12 @@ Date: REGEX(.*)
 07. Update/UPDATE E2/T2/A2=22 in CB, making it being forwarded to CP1 (PUT /v1/contextEntities/E2/attributes/A2?entity::type=T2)
 ================================================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 112
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "code": "200", 
-    "details": "Redirected to context provider localhost:9801/v1", 
     "reasonPhrase": "OK"
 }
 

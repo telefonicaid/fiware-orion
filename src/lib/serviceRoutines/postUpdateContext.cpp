@@ -194,6 +194,8 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   ciP->verb   = POST;
   ciP->method = "POST";
 
+  parseData.upcrs.res.errorCode.fill(SccOk);
+
   s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
   if (s != "OK")
   {
@@ -213,7 +215,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   // Fill in the response from the redirection into the response
   upcrsP->fill(&parseData.upcrs.res);
-
 
   //
   // 6. 'Fixing' StatusCode
@@ -245,21 +246,13 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 * Examine the response from mongo to find out what has really happened ...
 *
 */
-static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, UpdateContextRequest* upcrP)
+static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, UpdateContextRequest* upcrP, ConnectionInfo* ciP)
 {
   ContextElementResponseVector  notFoundV;
 
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
     ContextElementResponse* cerP = upcrsP->contextElementResponseVector[cerIx];
-
-    //
-    // Empty attribute-vector?
-    //
-    if (cerP->contextElement.contextAttributeVector.size() == 0)
-    {
-      cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
-    }
 
     //
     // All attributes with found == false?
@@ -283,17 +276,34 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     // If we have ONLY NOT-FOUNDS, the we have one response with '404 Not Found'
     // If we have a mix, then we need to add a response for the not founds, with '404 Not Found'
     //
-    if (noOfFounds == 0)
+    if ((noOfFounds == 0) && (noOfNotFounds > 0))
     {
-      cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
+      if ((cerP->statusCode.code == SccOk) || (cerP->statusCode.code == SccNone))
+      {
+        cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
+      }
     }
     else if ((noOfFounds > 0) && (noOfNotFounds > 0))
     {
       // Adding a ContextElementResponse for the 'Not-Founds'
 
       ContextElementResponse* notFoundCerP = new ContextElementResponse(&cerP->contextElement.entityId, NULL);
+
+      //
+      // Filling in StatusCode (SccContextElementNotFound) for NotFound
+      //
       notFoundCerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
+
+      //
+      // Setting StatusCode to OK for Found
+      //
+      cerP->statusCode.fill(SccOk);
+
+      //
+      // And, pushing to NotFound-vector 
+      //
       notFoundV.push_back(notFoundCerP);
+
 
       // Now moving the not-founds to notFoundCerP
       std::vector<ContextAttribute*>::iterator iter;
@@ -313,6 +323,14 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
         }
       }
     }
+
+    //
+    // Add EntityId::id to StatusCode::details if 404, but only if StatusCode::details is empty
+    //
+    if ((cerP->statusCode.code == SccContextElementNotFound) && (cerP->statusCode.details == ""))
+    {
+      cerP->statusCode.details = cerP->contextElement.entityId.id;
+    }
   }
 
   //
@@ -328,19 +346,23 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
 
 
   //
-  // If nothing at all in response vector, mark as not found
+  // If nothing at all in response vector, mark as not found (but not if DELETE request)
   //
-  if (upcrsP->contextElementResponseVector.size() == 0)
+  if (ciP->method != "DELETE")
   {
-    if (upcrsP->errorCode.code == SccOk)
+    if (upcrsP->contextElementResponseVector.size() == 0)
     {
-      upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->contextElementVector[0]->entityId.id);
+      if (upcrsP->errorCode.code == SccOk)
+      {
+        upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->contextElementVector[0]->entityId.id);
+      }
     }
   }
 
-
+  
   //
-  // Add entityId::id to details if Not Found and only one element in response
+  // Add entityId::id to details if Not Found and only one element in response.
+  // And, if 0 elements in response, take entityId::id from the request.
   //
   if (upcrsP->errorCode.code == SccContextElementNotFound)
   {
@@ -348,9 +370,34 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     {
       upcrsP->errorCode.details = upcrsP->contextElementResponseVector[0]->contextElement.entityId.id;
     }
+    else if (upcrsP->contextElementResponseVector.size() == 0)
+    {
+      upcrsP->errorCode.details = upcrP->contextElementVector[0]->entityId.id;
+    }
   }
 }
   
+
+
+/* ****************************************************************************
+*
+* attributesToNotFound - mark all attributes with 'found=false'
+*/
+static void attributesToNotFound(UpdateContextRequest* upcrP)
+{
+  for (unsigned int ceIx = 0; ceIx < upcrP->contextElementVector.size(); ++ceIx)
+  {
+    ContextElement* ceP = upcrP->contextElementVector[ceIx];
+
+    for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP = ceP->contextAttributeVector[aIx];
+
+      aP->found = false;
+    }
+  }
+}
+
 
 
 /* ****************************************************************************
@@ -406,11 +453,10 @@ std::string postUpdateContext
   //
   // 02. Send the request to mongoBackend/mongoUpdateContext
   //
-  upcrsP->errorCode.fill(SccContextElementNotFound);
+  upcrsP->errorCode.fill(SccOk);
+  attributesToNotFound(upcrP);
   ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
-  upcrsP->present("From mongoUpdateContext: ");
-  foundAndNotFoundAttributeSeparation(upcrsP, upcrP);
-  upcrsP->present("After foundAndNotFoundAttributeSeparation: ");
+  foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
 
 
 
@@ -454,11 +500,6 @@ std::string postUpdateContext
   }
 
 
-  upcrsP->present("KZ2: ");
-
-
-
-
   //
   // 05. Forwards necessary - sort parts in outgoing requestV
   //     requestV is a vector of UpdateContextRequests and each Context Provider
@@ -472,6 +513,7 @@ std::string postUpdateContext
   UpdateContextRequestVector  requestV;
   UpdateContextResponse       response;
 
+  response.errorCode.fill(SccOk);
   for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
   {
     ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
@@ -494,7 +536,7 @@ std::string postUpdateContext
         //
         if (aP->found == false)
         {
-          response.notFoundPush(&cerP->contextElement.entityId, new ContextAttribute(aP));
+          response.notFoundPush(&cerP->contextElement.entityId, new ContextAttribute(aP), NULL);
           continue;
         }
 
@@ -574,9 +616,10 @@ std::string postUpdateContext
   //
   // Cleanup
   //
-  upcrsP->release();
   upcrP->release();
   requestV.release();
+  upcrsP->release();
+  upcrsP->fill(&response);
 
   return answer;
 }

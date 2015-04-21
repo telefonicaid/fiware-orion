@@ -95,27 +95,54 @@ QueryContextResponse::~QueryContextResponse()
 */
 std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent)
 {
-  std::string out = "";
-  std::string tag = "queryContextResponse";
+  std::string  out               = "";
+  std::string  tag               = "queryContextResponse";
+  bool         errorCodeRendered = false;
+  
+  //
+  // 01. Decide whether errorCode should be rendered
+  //
+  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
+  {
+    errorCodeRendered = true;
+  }
+  else if (contextElementResponseVector.size() == 0)
+  {
+    errorCodeRendered = true;
+  }
+  else if (errorCode.details != "")
+  {
+    if (errorCode.code == SccNone)
+    {
+      errorCode.code = SccOk;
+    }
 
+    errorCodeRendered = true;
+  }
+
+
+  //
+  // 02. render 
+  //
   out += startTag(indent, tag, ciP->outFormat, false);
 
   if (contextElementResponseVector.size() > 0)
   {
-    bool commaNeeded = (errorCode.code != SccNone) && (errorCode.code != SccOk);
-    out += contextElementResponseVector.render(ciP, QueryContext, indent + "  ", commaNeeded);
+    out += contextElementResponseVector.render(ciP, QueryContext, indent + "  ", errorCodeRendered);
   }
 
-  if ((errorCode.code != SccNone) && (errorCode.code != SccOk))
-  {
-    out += errorCode.render(ciP->outFormat, indent + "  ");
-  }
-  else if (contextElementResponseVector.size() == 0)
+  if (errorCodeRendered == true)
   {
     out += errorCode.render(ciP->outFormat, indent + "  ");
   }
 
-  /* Safety check: neither errorCode nor CER vector was filled by mongoBackend */
+
+  //
+  // 03. Safety Check
+  //
+  // If neither errorCode nor CER vector was filled by mongoBackend, then we
+  // report a special kind of error.
+  //
   if ((errorCode.code == SccNone) && (contextElementResponseVector.size() == 0))
   {
     LM_W(("Internal Error (Both error-code and response vector empty)"));

@@ -4027,7 +4027,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
 
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
@@ -4964,9 +4964,9 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("", RES_CER_STATUS(0).details);
+    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A8", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
