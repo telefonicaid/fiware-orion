@@ -110,7 +110,7 @@ echo
 
 echo "05. Dump accumulator, see E1/T1/A1"
 echo "=================================="
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
 echo
 echo
 
@@ -147,7 +147,7 @@ echo
 
 echo "08. Dump accumulator, still only the one notification"
 echo "====================================================="
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
 echo
 echo
 

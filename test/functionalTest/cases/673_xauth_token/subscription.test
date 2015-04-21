@@ -85,8 +85,7 @@ echo
 
 echo "03. Check that the X-Auth-Token was propagated to accumulator"
 echo "============================================================="
-sleep 1
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 echo
 

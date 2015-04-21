@@ -385,7 +385,7 @@ coverage_functional_test: install_coverage
 	lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
 	genhtml -o coverage coverage/broker.info
 
-valgrind:
+valgrind: install_debug
 	@echo For detailed info: tail -f /tmp/valgrindTestSuiteLog
 	test/valgrind/valgrindTestSuite.sh
 

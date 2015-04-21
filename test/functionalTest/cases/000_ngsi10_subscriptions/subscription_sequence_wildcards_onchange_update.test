@@ -178,7 +178,8 @@ echo
 
 
 echo "Accumulated data:"
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
+
 
 --REGEXPECT--
 HTTP/1.1 200 OK
