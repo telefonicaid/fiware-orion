@@ -160,6 +160,8 @@ echo
 
 echo "07. Make sure the accumulator receives the Update, with the correct X-Auth token"
 echo "================================================================================"
+# Include a small time interval to avoid glitches
+sleep 1s
 accumulatorDump
 echo
 echo
