@@ -638,8 +638,25 @@ function runTest()
 
   if [ "$exitCode" != "0" ]
   then
-    exitFunction 11 "SHELL-INIT exited with code $exitCode" $path "($path)" "" DIE
-    return
+    # 3.2 Run the SHELL-INIT part AGAIN
+    sleep 1
+    rm -f $dirname/$filename.shellInit.stderr
+    rm -f $dirname/$filename.shellInit.stdout
+    $dirname/$filename.shellInit > $dirname/$filename.shellInit.stdout 2> $dirname/$filename.shellInit.stderr
+    exitCode=$?
+    linesInStderr=$(wc -l $dirname/$filename.shellInit.stderr | awk '{ print $1}' 2> /dev/null)
+
+    if [ "$linesInStderr" != "" ] && [ "$linesInStderr" != "0" ]
+    then
+      exitFunction 20 "SHELL-INIT II produced output on stderr" $path "($path)" $dirname/$filename.shellInit.stderr
+      return
+    fi
+
+    if [ "$exitCode" != "0" ]
+    then
+      exitFunction 11 "SHELL-INIT exited with code $exitCode" $path "($path)" "" DIE
+      return
+    fi
   fi
 
   # 4. Run the SHELL part (which also compares - FIXME P2: comparison should be moved to separate function)
