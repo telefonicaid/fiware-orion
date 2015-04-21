@@ -142,8 +142,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
 
-  LM_M(("KZ: Forwarding %s request to %s:%d", resource.c_str(), ip.c_str(), port));
-
   out = sendHttpSocket(ip,
                        port,
                        protocol,
@@ -198,7 +196,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   parseData.upcrs.res.errorCode.fill(SccOk);
 
-  LM_M(("KZ: parsing response to forward: %s", cleanPayload));
   s = xmlTreat(cleanPayload, ciP, &parseData, RtUpdateContextResponse, "updateContextResponse", NULL, &errorMsg);
   if (s != "OK")
   {
@@ -218,7 +215,6 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
 
   // Fill in the response from the redirection into the response
   upcrsP->fill(&parseData.upcrs.res);
-  upcrsP->present("replyToForward1: ");
 
   //
   // 6. 'Fixing' StatusCode
@@ -228,12 +224,10 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
     upcrsP->errorCode.fill(SccOk);
   }
 
-  upcrsP->present("replyToForward2: ");
   if ((upcrsP->contextElementResponseVector.size() == 1) && (upcrsP->contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound))
   {
     upcrsP->errorCode.fill(SccContextElementNotFound);
   }
-  upcrsP->present("replyToForward3: ");
 
   
   //
@@ -261,19 +255,6 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     ContextElementResponse* cerP = upcrsP->contextElementResponseVector[cerIx];
 
     //
-    // Empty attribute-vector?
-    // If not a DELETE request - set statusCode to 404
-    //
-    // if (cerP->contextElement.contextAttributeVector.size() == 0)
-    // {
-    //   if (ciP->method != "DELETE")
-    //   {
-    //     LM_M(("KZ: Setting errorCode.code to 404"));
-    //     cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
-    //   }
-    // }
-
-    //
     // All attributes with found == false?
     //
     int noOfFounds    = 0;
@@ -290,24 +271,15 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
       }
     }
 
-    LM_M(("KZ: %d attributes found, %d not-found", noOfFounds, noOfNotFounds));
     //
     // Now, if we have ONLY FOUNDS, then things stay the way they are, one response with '200 OK'
     // If we have ONLY NOT-FOUNDS, the we have one response with '404 Not Found'
     // If we have a mix, then we need to add a response for the not founds, with '404 Not Found'
     //
-    // Just one detail - if we have ZERO FOUNDS and ZERO NOT-FOUNDS, then keep the 200 OK
-    //
-    if ((noOfFounds > 0) && (noOfNotFounds == 0))
-    {
-      LM_M(("KZ: setting statusCode to SccOk as all attributes have been found"));
-      // cerP->statusCode.fill(SccOk);  // FIXME: this is no good
-    }
-    else if ((noOfFounds == 0) && (noOfNotFounds > 0))
+    if ((noOfFounds == 0) && (noOfNotFounds > 0))
     {
       if ((cerP->statusCode.code == SccOk) || (cerP->statusCode.code == SccNone))
       {
-        LM_M(("KZ: Setting errorCode.code to 404"));
         cerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
       }
     }
@@ -376,14 +348,12 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
   //
   // If nothing at all in response vector, mark as not found (but not if DELETE request)
   //
-  LM_M(("KZ: ciP->method == '%s'", ciP->method.c_str()));
   if (ciP->method != "DELETE")
   {
     if (upcrsP->contextElementResponseVector.size() == 0)
     {
       if (upcrsP->errorCode.code == SccOk)
       {
-        LM_M(("KZ: Setting errorCode.code to 404"));
         upcrsP->errorCode.fill(SccContextElementNotFound, upcrP->contextElementVector[0]->entityId.id);
       }
     }
@@ -485,11 +455,8 @@ std::string postUpdateContext
   //
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
-  upcrP->present("To mongoUpdateContext: ");
   ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
-  upcrsP->present("From mongoUpdateContext: ");
   foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
-  upcrsP->present("After foundAndNotFoundAttributeSeparation: ");
 
 
 
@@ -531,11 +498,6 @@ std::string postUpdateContext
       }
     }
   }
-
-
-  upcrsP->present("KZ2: ");
-
-
 
 
   //
@@ -646,10 +608,7 @@ std::string postUpdateContext
     //
     // Add the result from the forwarded update to the total response in 'response'
     //
-    response.present("response before merge: ");
-    upcrs.present("upcrs before merge: ");
     response.merge(&upcrs);
-    response.present("response after merge: ");
   }
 
   answer = response.render(ciP, UpdateContext, "");
@@ -662,7 +621,5 @@ std::string postUpdateContext
   upcrsP->release();
   upcrsP->fill(&response);
 
-  LM_M(("postUpdateContext @%p returns answer: %s", postUpdateContext, answer.c_str()));
-  upcrsP->present("Response from postUpdateContext");
   return answer;
 }

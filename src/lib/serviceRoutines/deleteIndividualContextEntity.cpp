@@ -74,20 +74,14 @@ std::string deleteIndividualContextEntity
   std::string  entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   StatusCode   response;
 
-  LM_M(("KZ: ------------- HERE the DELETE starts --------------------------"));
   // 01. Fill in UpdateContextRequest fromURL-data + URI params
   parseDataP->upcr.res.fill(entityId, entityType, "false", "", "", "DELETE");
-  parseDataP->upcr.res.present("UpdateContextRequest: ");
 
   // 02. Call postUpdateContext standard service routine
   answer = postUpdateContext(ciP, components, compV, parseDataP);
-  LM_M(("KZ: answer from postUpdateContext in parseDataP->upcrs.res:"));
-  parseDataP->upcrs.res.present("From postUpdateContext: ");
 
   // 03. Translate UpdateContextResponse to StatusCode
   response.fill(parseDataP->upcrs.res);
-  LM_M(("KZ: translated answer to just a StatusCode"));
-  response.present("Result: ");
 
   // 04. If not found, put entity info in details
   if ((response.code == SccContextElementNotFound) && (response.details == ""))

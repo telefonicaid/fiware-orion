@@ -178,19 +178,17 @@ void UpdateContextResponse::release(void)
 void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP, StatusCode* scP)
 {
   ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccContextElementNotFound);
-  LM_M(("In notFoundPush"));
+
   if (cerP == NULL)
   {
     cerP = new ContextElementResponse(eP, aP);
 
     if (scP != NULL)
     {
-      LM_M(("Filling statusCode from existing scP"));
       cerP->statusCode.fill(scP);
     }
     else
     {
-      LM_M(("Filling statusCode with SccContextElementNotFound and '%s'", eP->id.c_str()));
       cerP->statusCode.fill(SccContextElementNotFound, eP->id);
     }
 
@@ -216,8 +214,6 @@ void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP, Sta
 void UpdateContextResponse::foundPush(EntityId* eP, ContextAttribute* aP)
 {
   ContextElementResponse* cerP = contextElementResponseVector.lookup(eP, SccOk);
-
-  LM_M(("In foundPush"));
 
   if (cerP == NULL)
   {
@@ -255,7 +251,6 @@ void UpdateContextResponse::fill(UpdateContextResponse* upcrsP)
 */
 void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
 {
-  LM_M(("merging %d contextElementResponses", upcrsP->contextElementResponseVector.size()));
   if (upcrsP->contextElementResponseVector.size() == 0)
   {
     // If no contextElementResponses, copy errorCode if empty
@@ -274,7 +269,6 @@ void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
     ContextElement* ceP = &upcrsP->contextElementResponseVector[cerIx]->contextElement;
     StatusCode*     scP = &upcrsP->contextElementResponseVector[cerIx]->statusCode;
 
-    LM_M(("Merging %d attributes for Entity %s", ceP->contextAttributeVector.size(), ceP->entityId.id.c_str()));
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
     {
       ContextAttribute* aP = new ContextAttribute(ceP->contextAttributeVector[aIx]);

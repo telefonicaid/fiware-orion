@@ -418,7 +418,6 @@ std::string postQueryContext
     qP = new QueryContextResponse();
     qP->errorCode.fill(SccOk);
     queryForward(ciP, requestV[fIx], qP);
-    qP->present("From queryForward; ", "postQueryContext");
 
     //
     // Now, each ContextElementResponse of qP should be tested to see whether there
@@ -427,7 +426,6 @@ std::string postQueryContext
   }
 
   answer = responseV.render(ciP, "");
-  LM_M(("KZ: answer: %s", answer.c_str()));
 
   //
   // Time to cleanup.

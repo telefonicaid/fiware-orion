@@ -66,10 +66,7 @@ HttpStatusCode mongoUpdateContext
     else
     {
         /* Process each ContextElement */
-      LM_M(("KZ: Process each ContextElement"));
         for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {
-
-          LM_M(("KZ: Process ContextElement %d", ix));
 
             processContextElement(requestP->contextElementVector.get(ix),
                                   responseP,

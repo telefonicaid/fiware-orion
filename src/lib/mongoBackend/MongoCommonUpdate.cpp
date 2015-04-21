@@ -1282,7 +1282,6 @@ static bool processContextAttributeVector (ContextElement*                      
             }
         }
         else if (strcasecmp(action.c_str(), "delete") == 0) {
-          LM_M(("KZ: DELETING an attribute"));
             if (deleteAttribute(attrs, newAttrs, targetAttr)) {
                 entityModified = true;
                 attrs = newAttrs;
@@ -1305,7 +1304,6 @@ static bool processContextAttributeVector (ContextElement*                      
                 }
 
                 ca->found = true;
-                LM_M(("KZ: DELETE worked"));
             }
             else {
                 /* If deleteAttribute() returns false, then that particular attribute has not
@@ -1318,7 +1316,6 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - attribute not found");
                 LM_W(("Bad Input (attribute to be deleted is not found)"));
                 ca->found = false;
-                LM_M(("KZ: DELETE failed"));
 
                 return false;
             }
@@ -1645,8 +1642,6 @@ void processContextElement(ContextElement*                      ceP,
     /* Getting the entity in the request (helpful in other places) */
     EntityId* enP = &ceP->entityId;
 
-    LM_M(("KZ: In"));
-
     /* Not supporting isPattern = true currently */
     if (isTrue(enP->isPattern)) {
         buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
@@ -1763,10 +1758,7 @@ void processContextElement(ContextElement*                      ceP,
     //
     int docs = 0;
     
-    LM_M(("KZ: Going through the list of found entities"));
     while (cursor->more()) {
-
-      LM_M(("KZ: found an entity"));
 
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -1957,8 +1949,6 @@ void processContextElement(ContextElement*                      ceP,
         responseP->contextElementResponseVector.push_back(cerP);
     }
     LM_T(LmtServicePath, ("Docs found: %d", docs));
-
-    LM_M(("KZ: Docs found: %d", docs));
 
     /*
      * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()

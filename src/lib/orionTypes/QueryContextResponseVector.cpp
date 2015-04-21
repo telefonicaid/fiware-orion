@@ -131,12 +131,7 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
     //
     if ((responseP->errorCode.code == SccOk) || (responseP->errorCode.code == SccNone))
     {
-      LM_M(("Filling errorCode with SccContextElementNotFound"));
       responseP->errorCode.fill(SccContextElementNotFound);
-    }
-    else
-    {
-      LM_M(("Leaving errorCode as is"));
     }
   }
   else if ((vec.size() == 1) && (vec[0]->contextElementResponseVector.size() == 0))

@@ -77,8 +77,6 @@ std::string putAttributeValueInstance
   StatusCode   response;
 
 
-  LM_M(("EntityType: %s", entityType.c_str()));
-
   // 01. Check validity of path components VS payload
   Metadata* mP = parseDataP->upcar.res.metadataVector.lookupByName("ID");
 
@@ -96,15 +94,12 @@ std::string putAttributeValueInstance
 
   // 02. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(&parseDataP->upcar.res, entityId, entityType, attributeName, metaID, "UPDATE");
-  LM_M(("UpdateContextRequest in putAttributeValueInstance:"));
-  parseDataP->upcr.res.present("UpdateContextRequest in putAttributeValueInstance: ");
 
   // 03. Call postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
 
   // 04. Fill in StatusCode from UpdateContextResponse
-  parseDataP->upcrs.res.present("UpdateContextResponse from postUpdateContext: ");
   response.fill(parseDataP->upcrs.res);
 
 

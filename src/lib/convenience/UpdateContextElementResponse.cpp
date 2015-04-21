@@ -140,7 +140,6 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
   errorCode.fill(ucrsP->errorCode);
   if (errorCode.code == SccNone)
   {
-    LM_M(("Filling errorCode with code SccOk"));
     errorCode.fill(SccOk, errorCode.details);
   }
 
@@ -168,12 +167,10 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
   //
   if ((errorCode.code != SccContextElementNotFound) && (contextAttributeResponseVector.size() == 1) && (contextAttributeResponseVector[0]->statusCode.code == SccContextElementNotFound))
   {
-    LM_M(("Filling errorCode with code SccContextElementNotFound (1)"));
     errorCode.fill(SccContextElementNotFound);
   }
   else if ((errorCode.code != SccContextElementNotFound) && (contextAttributeResponseVector.size() == 0))
   {
-    LM_M(("Filling errorCode with code SccContextElementNotFound (2)"));
     errorCode.fill(SccContextElementNotFound);
   }
   else if (contextAttributeResponseVector.size() == 1)
@@ -185,7 +182,6 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
     if (((errorCode.code == SccNone) || (errorCode.code == SccOk)) && 
         ((contextAttributeResponseVector[0]->statusCode.code != SccNone) && (contextAttributeResponseVector[0]->statusCode.code != SccOk)))
     {
-      LM_M(("Filling errorCode with code %d", contextAttributeResponseVector[0]->statusCode.code));
       errorCode.fill(contextAttributeResponseVector[0]->statusCode);
     }
   }
