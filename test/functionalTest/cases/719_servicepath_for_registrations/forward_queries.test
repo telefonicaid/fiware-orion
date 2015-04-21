@@ -688,7 +688,7 @@ Date: REGEX(.*)
 13. Query E.*/A1 in CB, servicePath /c2/c3/#: E5
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 466
+Content-Length: 394
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -709,7 +709,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }
@@ -720,7 +719,7 @@ Date: REGEX(.*)
 14. Query E.*/A1 in CB, servicePath /x/y/e1,/c1/c2/e2: E2
 ===========================================================
 HTTP/1.1 200 OK
-Content-Length: 466
+Content-Length: 394
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -741,7 +740,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }
@@ -752,7 +750,7 @@ Date: REGEX(.*)
 15. Query E.*/A1 in CB, servicePath /c1/#,/c2/c4/e4: E1,E2,E3,E4
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 1552
+Content-Length: 1480
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -773,7 +771,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }, 

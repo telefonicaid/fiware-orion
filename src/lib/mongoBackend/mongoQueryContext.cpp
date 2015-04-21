@@ -286,6 +286,7 @@ HttpStatusCode mongoQueryContext
     if (!ok)
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
+        rawCerV.release();
         return SccOk;
     }
 
@@ -406,5 +407,6 @@ HttpStatusCode mongoQueryContext
       responseP->errorCode.fill(SccOk, details);
     }
 
+    rawCerV.release();
     return SccOk;
 }

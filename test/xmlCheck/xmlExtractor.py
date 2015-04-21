@@ -152,6 +152,12 @@ with open (file, 'r') as f:
             # as they are not anyURI. In order to fix, we replace the "'$...'" part with a number
             line = re.sub("'\$.*PORT.*'", "9999", line)           
 
+            # We have found that we cannot use things like '<duration>REGEX((PT5S|PT7S))</duration>', given that
+            # duration uses type xs:duration, which has a predefined sytanx incompatible with REGEX(). Thus, we
+            # change these cases on the fly
+            if re.match('\s*<duration>', line):
+                line = re.sub("REGEX\(.*\)", "PT1M", line)
+
             buffer.append(line + "\n")
 
             if re.search('<\/'+ root_element + '>', line):              

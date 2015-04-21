@@ -152,7 +152,7 @@ echo
 
 echo "06. Dump accumulator to see X-Auth headers (or not)"
 echo "==================================================="
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 echo
 

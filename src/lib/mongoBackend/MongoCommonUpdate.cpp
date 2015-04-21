@@ -1303,6 +1303,7 @@ static bool processContextAttributeVector (ContextElement*                      
                     locAttr = "";
                 }
 
+                ca->found = true;
             }
             else {
                 /* If deleteAttribute() returns false, then that particular attribute has not
@@ -1314,8 +1315,9 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - offending attribute: " + targetAttr->toString() + 
                                       " - attribute not found");
                 LM_W(("Bad Input (attribute to be deleted is not found)"));
-                return false;
+                ca->found = false;
 
+                return false;
             }
         }
         else
@@ -1340,12 +1342,19 @@ static bool processContextAttributeVector (ContextElement*                      
 
     }
 
+#if 0
     if (!entityModified)
     {
         /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
          * do a 'continue' without setting it. */
         //FIXME P5: this is ugly, our code should be improved to set cerP in a common place for the "happy case"
         cerP->statusCode.fill(SccOk);
+    }
+#endif
+    /* If the status code was not touched (filled with an error), then set it with Ok */
+    if (cerP->statusCode.code == SccNone)
+    {
+      cerP->statusCode.fill(SccOk);
     }
 
     return entityModified;
@@ -1682,7 +1691,6 @@ void processContextElement(ContextElement*                      ceP,
       slashEscape(servicePathV[0].c_str(), path, sizeof(path));
       const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
       bob.appendRegex(servicePathString, servicePathValue);
-
     }
 
     // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
@@ -1751,6 +1759,7 @@ void processContextElement(ContextElement*                      ceP,
     int docs = 0;
     
     while (cursor->more()) {
+
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
         ++docs;
@@ -1817,7 +1826,10 @@ void processContextElement(ContextElement*                      ceP,
 
         if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
         {
-            /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */            
+            /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
+            // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
+            // in only one place
+            searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
             continue;
@@ -1928,11 +1940,15 @@ void processContextElement(ContextElement*                      ceP,
         /* To finish with this entity processing, search for CPrs in not found attributes and
          * add the corresponding ContextElementResponse to the global response */
         searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
-        cerP->statusCode.fill(SccOk);
+
+        // StatusCode may be set already (if so, we keep the existing value)
+        if (cerP->statusCode.code == SccNone)
+        {
+          cerP->statusCode.fill(SccOk);
+        }
         responseP->contextElementResponseVector.push_back(cerP);
     }
     LM_T(LmtServicePath, ("Docs found: %d", docs));
-
 
     /*
      * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()
@@ -1944,40 +1960,38 @@ void processContextElement(ContextElement*                      ceP,
      */
     if (docs == 0)
     {
-      if (strcasecmp(action.c_str(), "append") != 0)
+      /* Creating the common par of the response that doesn't depend on the case */
+      ContextElementResponse* cerP = new ContextElementResponse();
+      cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
+
+      /* All the attributes existing in the request are added to the response with 'found' set to false
+       * in the of UPDATE/DELETE and true in the case of APPEND */
+      bool foundValue = (strcasecmp(action.c_str(), "append") == 0);
+
+      
+      for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
       {
-        /* All the attributes existing in the request are added to the response with 'found' set to false */
-        ContextElementResponse* cerP = new ContextElementResponse();
-        cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
+        ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
+        ContextAttribute* ca = new ContextAttribute(caP->name, caP->type, "", foundValue);
+        setResponseMetadata(caP, ca);
+        cerP->contextElement.contextAttributeVector.push_back(ca);
+      }
 
-        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
-        {
-          ContextAttribute* caP = new ContextAttribute(ceP->contextAttributeVector.get(ix)->name, "", "", false);
-          cerP->contextElement.contextAttributeVector.push_back(caP);
-        }
-
-        /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for context
-         * providers */
+      if (strcasecmp(action.c_str(), "update") == 0)
+      {
+        /* In the case of UPDATE or DELETE we look for context providers */
         searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
         cerP->statusCode.fill(SccOk);
         responseP->contextElementResponseVector.push_back(cerP);
 
       }
-      else
+      else if (strcasecmp(action.c_str(), "delete") == 0)
       {
-        /* Creating the part of the response that doesn't depend on success or failure */
-        ContextElementResponse* cerP = new ContextElementResponse();
-
-        cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
-
-        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
-        {
-          ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-          ContextAttribute* ca  = new ContextAttribute(caP->name, caP->type);                
-          setResponseMetadata(caP, ca);
-          cerP->contextElement.contextAttributeVector.push_back(ca);
-        }
-
+        cerP->statusCode.fill(SccContextElementNotFound);
+        responseP->contextElementResponseVector.push_back(cerP);
+      }
+      else   /* APPEND */
+      {
         std::string errReason, errDetail;
         if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV))
         {

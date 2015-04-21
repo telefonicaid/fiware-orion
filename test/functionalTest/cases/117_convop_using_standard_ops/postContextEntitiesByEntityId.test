@@ -264,7 +264,7 @@ Date: REGEX(.*)
 06. Update/UPDATE E1/A1 in CB
 =============================
 HTTP/1.1 200 OK
-Content-Length: 453
+Content-Length: 381
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -285,7 +285,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }
@@ -296,7 +295,7 @@ Date: REGEX(.*)
 07. Query E1/A1 in CB
 =====================
 HTTP/1.1 200 OK
-Content-Length: 455
+Content-Length: 383
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -317,7 +316,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }

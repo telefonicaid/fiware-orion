@@ -497,7 +497,7 @@ do                                                                     \
                                                                        \
   if ((text = lmTextGet s) != NULL)                                    \
   {                                                                    \
-    lmOut(text, 'F', __FILE__, __LINE__, "***", 0, NULL);              \
+    lmOut(text, 'F', "ForcedLog", 0, "***", 0, NULL);                  \
     ::free(text);                                                      \
   }                                                                    \
 } while (0)

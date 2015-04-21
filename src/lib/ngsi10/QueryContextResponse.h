@@ -50,13 +50,20 @@ typedef struct QueryContextResponse
   StatusCode                    errorCode;                     // Optional
 
   QueryContextResponse();
+  QueryContextResponse(EntityId* eP, ContextAttribute* aP);
   QueryContextResponse(StatusCode& _errorCode);
   ~QueryContextResponse();
 
-  std::string   render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);  
-  std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
-  void          present(const std::string& indent);
-  void          release(void);  
+  std::string            render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
+  std::string            check(ConnectionInfo*     ciP,
+                               RequestType         requestType,
+                               const std::string&  indent,
+                               const std::string&  predetectedError,
+                               int                 counter);
+  void                   present(const std::string& indent, const std::string& caller);
+  void                   release(void);  
+  void                   fill(QueryContextResponse* qcrsP);
+  QueryContextResponse*  clone(void);
 } QueryContextResponse;
 
 #endif

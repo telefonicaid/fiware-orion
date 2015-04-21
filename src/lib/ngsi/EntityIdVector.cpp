@@ -120,6 +120,41 @@ void EntityIdVector::present(const std::string& indent)
 
 /* ****************************************************************************
 *
+* EntityIdVector::lookup - find a matching entity in the entity-vector
+*/
+EntityId* EntityIdVector::lookup(const std::string& id, const std::string& type, const std::string& isPattern)
+{
+  //
+  // isPattern:  "false" or "" is the same
+  //
+  std::string isPatternFromParam = isPattern;
+  if (isPatternFromParam == "")
+  {
+    isPatternFromParam = "false";
+  }
+
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    std::string isPatternFromVec = vec[ix]->isPattern;
+
+    if (isPatternFromVec == "")
+    {
+      isPatternFromVec = "false";
+    }
+
+    if ((vec[ix]->id == id) && (vec[ix]->type == type) && (isPatternFromVec == isPatternFromParam))
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
 * EntityIdVector::push_back -
 */
 void EntityIdVector::push_back(EntityId* item)
@@ -127,6 +162,19 @@ void EntityIdVector::push_back(EntityId* item)
   vec.push_back(item);
 }
 
+
+
+/* ****************************************************************************
+*
+* EntityIdVector::push_back_if_absent -
+*/
+void EntityIdVector::push_back_if_absent(EntityId* item)
+{
+  if (lookup(item->id, item->type, item->isPattern) == NULL)
+  {
+    vec.push_back(item);
+  }
+}
 
 
 /* ****************************************************************************
