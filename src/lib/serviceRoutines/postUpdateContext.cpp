@@ -301,7 +301,7 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     if ((noOfFounds > 0) && (noOfNotFounds == 0))
     {
       LM_M(("KZ: setting statusCode to SccOk as all attributes have been found"));
-      cerP->statusCode.fill(SccOk);
+      // cerP->statusCode.fill(SccOk);  // FIXME: this is no good
     }
     else if ((noOfFounds == 0) && (noOfNotFounds > 0))
     {
