@@ -67,6 +67,7 @@ HttpStatusCode mongoUpdateContext
     {
         /* Process each ContextElement */
         for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {
+
             processContextElement(requestP->contextElementVector.get(ix),
                                   responseP,
                                   requestP->updateActionType.get(),
@@ -80,7 +81,8 @@ HttpStatusCode mongoUpdateContext
         /* Note that although individual processContextElements() invocations return ConnectionError, this
            error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
            consider the overall mongoUpdateContext() as OK. */
-    }
+        responseP->errorCode.fill(SccOk);
+    }    
     reqSemGive(__FUNCTION__, "ngsi10 update request");
     return SccOk;
 }

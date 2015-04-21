@@ -80,5 +80,7 @@ std::string postSubscribeContext
   ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV);
   answer = scr.render(SubscribeContext, ciP->outFormat, "");
 
+  parseDataP->scr.res.release();
+
   return answer;
 }

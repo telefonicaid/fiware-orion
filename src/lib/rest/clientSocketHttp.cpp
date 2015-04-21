@@ -373,6 +373,7 @@ std::string sendHttpSocket
   delete httpResponse;
 
   LM_TRANSACTION_END();
+
   return result;
 }
 

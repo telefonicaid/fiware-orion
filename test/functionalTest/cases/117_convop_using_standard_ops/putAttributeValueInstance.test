@@ -115,7 +115,7 @@ echo "==========================================================================
 payload='{
   "value": 5
 }'
-orionCurl --url /v1/contextEntities/E1/attributes/A1/M2 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E1/attributes/A1/M2?entity::type=T1 --payload "$payload" -X PUT --json
 echo
 echo
 
@@ -220,14 +220,14 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --payload "$payload" -X PUT --json
 echo
 echo
 
 
 echo "12. GET /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 and see it fail (remotely)"
 echo "=========================================================================================="
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M1 --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --json
 echo
 echo
 
@@ -263,7 +263,7 @@ echo
 
 echo "14. GET /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 and see it work (remotely)"
 echo "=========================================================================================="
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M1 --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --json
 echo
 echo
 
@@ -273,7 +273,7 @@ echo "==========================================================================
 payload='{
   "value": 15
 }'
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M1 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 --payload "$payload" -X PUT --json
 echo
 echo
 
@@ -283,7 +283,7 @@ echo "==========================================================================
 payload='{
   "value": 16
 }'
-orionCurl --url /v1/contextEntities/E2/attributes/A1/M2 --payload "$payload" -X PUT --json
+orionCurl --url /v1/contextEntities/E2/attributes/A1/M2?entity::type=T1 --payload "$payload" -X PUT --json
 echo
 echo
 
@@ -386,14 +386,14 @@ Date: REGEX(.*)
 05. PUT /v1/contextEntities/E1/attributes/A1/M1?entity::type=T1,A1=5 see it fail
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 159
+Content-Length: 88
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "code": "472", 
-    "details": "action: UPDATE - entity: [E1, ] - offending attribute: A1", 
-    "reasonPhrase": "request parameter is invalid/not allowed"
+    "code": "404", 
+    "details": "E1", 
+    "reasonPhrase": "No context element found"
 }
 
 
@@ -572,7 +572,7 @@ Date: REGEX(.*)
 14. GET /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1 and see it work (remotely)
 ==========================================================================================
 HTTP/1.1 200 OK
-Content-Length: 368
+Content-Length: 300
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -593,7 +593,6 @@ Date: REGEX(.*)
     ], 
     "statusCode": {
         "code": "200", 
-        "details": "Redirected to context provider localhost:9801/v1", 
         "reasonPhrase": "OK"
     }
 }
@@ -602,13 +601,12 @@ Date: REGEX(.*)
 15. PUT /v1/contextEntities/E2/attributes/A1/M1?entity::type=T1, see it work
 ============================================================================
 HTTP/1.1 200 OK
-Content-Length: 112
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "code": "200", 
-    "details": "Redirected to context provider localhost:9801/v1", 
     "reasonPhrase": "OK"
 }
 
@@ -630,7 +628,7 @@ Date: REGEX(.*)
 17. Query E2-T1, see E2-T1-A1-M1 (A1 == 15)
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 623
+Content-Length: 551
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -658,7 +656,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }

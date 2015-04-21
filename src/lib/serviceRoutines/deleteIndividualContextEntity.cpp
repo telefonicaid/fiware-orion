@@ -76,7 +76,7 @@ std::string deleteIndividualContextEntity
 
   // 01. Fill in UpdateContextRequest fromURL-data + URI params
   parseDataP->upcr.res.fill(entityId, entityType, "false", "", "", "DELETE");
-  
+
   // 02. Call postUpdateContext standard service routine
   answer = postUpdateContext(ciP, components, compV, parseDataP);
 

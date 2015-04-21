@@ -135,12 +135,25 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
 {
   ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
 
+  errorCode.fill(ucrsP->errorCode);
+  if (errorCode.code == SccNone)
+  {
+    errorCode.fill(SccOk, errorCode.details);
+  }
+
   if (ucrsP->contextElementResponseVector.size() != 0)
   {
+    //
+    // Remove values from the context attributes
+    //
+    for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    {
+      cerP->contextElement.contextAttributeVector[aIx]->value = "";
+    }
+
     contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
   }
 
-  errorCode.fill(ucrsP->errorCode);
 
   //
   // Special treatment if only one contextElementResponse that is NOT FOUND and if
@@ -179,4 +192,17 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
       errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
     }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* present - 
+*/
+void UpdateContextElementResponse::present(const std::string& indent)
+{
+  LM_F(("%sUpdateContextElementResponse:", indent.c_str()));
+  contextAttributeResponseVector.present(indent + "  ");
+  errorCode.present(indent + "  ");
 }

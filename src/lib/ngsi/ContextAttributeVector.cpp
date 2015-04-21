@@ -133,7 +133,7 @@ std::string ContextAttributeVector::render
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1, omitValue);
+      out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
     }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
   }
@@ -142,7 +142,7 @@ std::string ContextAttributeVector::render
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1, omitValue);
+      out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
     }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
   }
@@ -184,11 +184,11 @@ std::string ContextAttributeVector::check
 */
 void ContextAttributeVector::present(const std::string& indent)
 {
-  PRINTF("%lu ContextAttributes", (uint64_t) vec.size());
+  LM_F(("%s%lu ContextAttributes", indent.c_str(), (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->present(indent, ix);
+    vec[ix]->present(indent + "  ", ix);
   }
 }
 
@@ -203,6 +203,19 @@ void ContextAttributeVector::push_back(ContextAttribute* item)
   vec.push_back(item);
 }
 
+
+
+/* ****************************************************************************
+*
+* ContextAttributeVector::push_back - 
+*/
+void ContextAttributeVector::push_back(ContextAttributeVector* aVec)
+{
+  for (unsigned int ix = 0; ix < aVec->size(); ++ix)
+  {
+    vec.push_back(new ContextAttribute((*aVec)[ix]));
+  }
+}
 
 
 /* ****************************************************************************

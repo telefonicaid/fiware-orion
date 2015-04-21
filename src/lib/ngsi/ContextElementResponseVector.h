@@ -44,13 +44,16 @@ typedef struct ContextElementResponseVector
   std::string              render(ConnectionInfo*     ciP,
                                   RequestType         requestType,
                                   const std::string&  indent,
-                                  bool                comma = false);
+                                  bool                comma               = false,
+                                  bool                omitAttributeValues = false);
 
   void                     present(const std::string& indent);
   void                     push_back(ContextElementResponse* item);
   unsigned int             size(void);
   ContextElementResponse*  get(unsigned int ix);
+  ContextElementResponse*  lookup(EntityId* eP, HttpStatusCode code = SccNone);
   void                     release();
+  void                     fill(ContextElementResponseVector& cerV);
 
   ContextElementResponse*  operator[](unsigned int ix)
   {

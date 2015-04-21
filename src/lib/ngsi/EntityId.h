@@ -48,6 +48,7 @@ class EntityId
   std::string  tag;          // Help variable for the 'render' method
 
   EntityId();
+  EntityId(EntityId* eP);
   EntityId(const std::string&  _id,
            const std::string&  _type,
            const std::string&  _isPattern = "",
@@ -59,6 +60,8 @@ class EntityId
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(bool useIsPattern = false, const std::string& delimiter = ", ");
+  bool         equal(EntityId* eP);
+  bool         isPatternIsTrue(void);
 
   std::string  render(Format              format,
                       const std::string&  indent,

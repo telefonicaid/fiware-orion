@@ -374,6 +374,5 @@ void qcrsPresent(ParseData* parseDataP)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  PRINTF("\n\n");
-  parseDataP->qcrs.res.present("");
+  parseDataP->qcrs.res.present("", "xmlQueryContextResponse");
 }

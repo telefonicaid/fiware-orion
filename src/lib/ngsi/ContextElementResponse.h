@@ -49,7 +49,14 @@ typedef struct ContextElementResponse
   ContextElement   contextElement;             // Mandatory
   StatusCode       statusCode;                 // Mandatory
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma = false);
+  bool             prune;                      // operational attribute used internally by the queryContext logic for not deleting entities that were
+                                               // without attributes in the Orion DB
+
+  ContextElementResponse();
+  ContextElementResponse(EntityId* eP, ContextAttribute* aP);
+  ContextElementResponse(ContextElementResponse* cerP);
+
+  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma = false, bool omitAttributeValues = false);
   void         present(const std::string& indent, int ix);
   void         release(void);
 
@@ -59,8 +66,11 @@ typedef struct ContextElementResponse
                      const std::string&  predetectedError,
                      int                 counter);
 
-  void         fill(struct QueryContextResponse* qcrP, const std::string& entityId = "", const std::string& entityType = "");
-
+  void                     fill(struct QueryContextResponse*  qcrP,
+                                const std::string&            entityId = "",
+                                const std::string&            entityType = "");
+  void                     fill(ContextElementResponse* cerP);
+  ContextElementResponse*  clone(void);
 } ContextElementResponse;
 
 #endif  // SRC_LIB_NGSI_CONTEXTELEMENTRESPONSE_H_

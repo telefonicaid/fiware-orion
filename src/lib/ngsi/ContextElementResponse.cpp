@@ -36,6 +36,49 @@
 
 /* ****************************************************************************
 *
+* ContextElementResponse::ContextElementResponse -
+*/
+ContextElementResponse::ContextElementResponse()
+{
+  prune = false;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::ContextElementResponse - 
+*/
+ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* aP)
+{
+  prune = false;
+
+  contextElement.entityId.fill(eP);
+
+  if (aP != NULL)
+  {
+    contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::ContextElementResponse - 
+*/
+ContextElementResponse::ContextElementResponse(ContextElementResponse* cerP)
+{
+  prune = false;
+
+  contextElement.fill(cerP->contextElement);
+  statusCode.fill(cerP->statusCode);
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElementResponse::render - 
 */
 std::string ContextElementResponse::render
@@ -43,7 +86,8 @@ std::string ContextElementResponse::render
   ConnectionInfo*     ciP,
   RequestType         requestType,
   const std::string&  indent,
-  bool                comma
+  bool                comma,
+  bool                omitAttributeValues
 )
 {
   std::string xmlTag   = "contextElementResponse";
@@ -51,7 +95,7 @@ std::string ContextElementResponse::render
   std::string out      = "";
 
   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
-  out += contextElement.render(ciP, requestType, indent + "  ", true);
+  out += contextElement.render(ciP, requestType, indent + "  ", true, omitAttributeValues);
   out += statusCode.render(ciP->outFormat, indent + "  ", false);
   out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
 
@@ -108,8 +152,9 @@ std::string ContextElementResponse::check
 */
 void ContextElementResponse::present(const std::string& indent, int ix)
 {
-  contextElement.present(indent, ix);
-  statusCode.present(indent);
+  LM_F(("%sContextElementResponse %d:", indent.c_str(), ix));
+  contextElement.present(indent + "  ", ix);
+  statusCode.present(indent + "  ");
 }
 
 
@@ -159,4 +204,31 @@ void ContextElementResponse::fill(QueryContextResponse* qcrP, const std::string&
   {
     statusCode.fill(&qcrP->errorCode);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::fill - 
+*/
+void ContextElementResponse::fill(ContextElementResponse* cerP)
+{
+  contextElement.fill(cerP->contextElement);
+  statusCode.fill(cerP->statusCode);
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponse::clone - 
+*/
+ContextElementResponse* ContextElementResponse::clone(void)
+{
+  ContextElementResponse* cerP = new ContextElementResponse();
+
+  cerP->fill(this);
+
+  return cerP;
 }

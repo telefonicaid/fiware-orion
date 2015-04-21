@@ -604,38 +604,53 @@ void destroyAllOntimeIntervalThreads(std::string tenant)
 
 /* ****************************************************************************
 *
+* matchEntity -
+*
+* Taking into account null types and id patterns. Note this function is not
+* commutative: en1 is interpreted as the entity to match *in* en2 (i.e.
+* it is assumed that the pattern is in en2)
+*/
+bool matchEntity(EntityId* en1, EntityId* en2)
+{
+  bool idMatch;
+  if (isTrue(en2->isPattern))
+  {
+    idMatch = false;
+    regex_t regex;
+    if (regcomp(&regex, en2->id.c_str(), 0) != 0)
+    {
+      LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));      
+    }
+    else
+    {
+      idMatch = (regexec(&regex, en1->id.c_str(), 0, NULL, 0) == 0);
+    }
+    regfree(&regex);
+  }
+  else  /* isPattern=false */
+  {
+    idMatch = (en2->id == en1->id);
+  }
+
+  /* Note that type == "" is like a * wildcard for type*/
+  return idMatch && (en1->type == "" || en2->type == "" || en2->type == en1->type);
+}
+
+/* ****************************************************************************
+*
 * includedEntity -
 */
-bool includedEntity(EntityId en, EntityIdVector* entityIdV) {
+bool includedEntity(EntityId en, EntityIdVector& entityIdV)
+{
 
-    for (unsigned int ix = 0; ix < entityIdV->size(); ++ix) {
-        EntityId* en2 = entityIdV->get(ix);
-
-        bool idMatch;
-        if (isTrue(en2->isPattern)) {
-            regex_t regex;
-            if (regcomp(&regex, en2->id.c_str(), 0) != 0) {
-                LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));
-                continue;
-            }
-            if (regexec(&regex, en.id.c_str(), 0, NULL, 0) == 0) {
-                idMatch = true;
-            }
-            else {
-                idMatch = false;
-            }
-            regfree(&regex);
-        }
-        else {  /* isPattern=false */
-            idMatch = (en2->id == en.id);
-        }
-
-        /* Note that type == "" is like a * wildcard */
-        if (idMatch && (en.type == "" || en2->type == "" || en2->type == en.type)) {
-            return true;
-        }
+  for (unsigned int ix = 0; ix < entityIdV.size(); ++ix)
+  {
+    if (matchEntity(&en, entityIdV[ix]))
+    {
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
 /* ****************************************************************************
@@ -912,7 +927,9 @@ static bool processAreaScope(Scope* scoP, BSONObj &areaQuery) {
   }
 
   if (inverted) {
-    areaQuery = BSON("$not" << BSON("$geoWithin" << geoWithin));
+    /* The "$exist: true" was added to make this work with MongoDB 2.6. Surprisingly, MongoDB 2.4
+     * doesn't need it. See http://stackoverflow.com/questions/29388981/different-semantics-in-not-geowithin-with-polygon-geometries-between-mongodb-2 */
+    areaQuery = BSON("$exists" << true << "$not" << BSON("$geoWithin" << geoWithin));
   }
   else {
     areaQuery = BSON("$geoWithin" << geoWithin);
@@ -1274,14 +1291,119 @@ bool entitiesQuery
 
                 cer->contextElement.contextAttributeVector.push_back(caP);
             }
+        }        
+
+        /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
+        for (unsigned int ix = 0; ix < attrL.size(); ++ix)
+        {
+          bool found = false;
+          std::string attrName = attrL.get(ix);
+          for (unsigned int jx = 0; jx < cer->contextElement.contextAttributeVector.size(); ++jx)
+          {
+            if (attrName == cer->contextElement.contextAttributeVector.get(jx)->name)
+            {
+              found = true;
+              break;
+            }
+          }
+          if (!found)
+          {
+            ContextAttribute* caP = new ContextAttribute(attrName, "", "", false);
+            cer->contextElement.contextAttributeVector.push_back(caP);
+          }
         }
-
         cer->statusCode.fill(SccOk);
-
         cerV->push_back(cer);
     }
 
+    /* All the not-patterned entities in the request not in the response are added (without attributes), as they are
+     * used before pruning in the CPr calculation logic */
+    for (unsigned int ix = 0; ix < enV.size(); ++ix)
+    {
+      if (enV.get(ix)->isPattern != "true")
+      {
+        bool needToAdd = true;
+        for (unsigned int jx = 0; jx < cerV->size(); ++jx)
+        {
+          if (cerV->get(jx)->contextElement.entityId.id == enV.get(ix)->id && cerV->get(jx)->contextElement.entityId.type == enV.get(ix)->type)
+          {
+            needToAdd = false;
+            break;  /* jx */
+          }
+        }
+        if (needToAdd)
+        {
+          ContextElementResponse* cerP = new ContextElementResponse();
+          cerP->contextElement.entityId.id = enV.get(ix)->id;
+          cerP->contextElement.entityId.type = enV.get(ix)->type;
+          cerP->contextElement.entityId.isPattern = "false";
+
+          /* This entity has to be pruned if after CPr searching no attribute is "added" to it. The prune attribute distinguish this kind of
+           * entities from the "real ones" that are without attributes in the Orion local database (a rare case, but may happen) */
+          cerP->prune = true;
+
+          for (unsigned int jx = 0; jx < attrL.size(); ++jx)
+          {
+            ContextAttribute* caP = new ContextAttribute(attrL.get(jx), "", "", false);
+            cerP->contextElement.contextAttributeVector.push_back(caP);
+          }
+
+          cerP->statusCode.fill(SccOk);
+
+          cerV->push_back(cerP);
+        }
+      }
+    }
+
     return true;
+}
+
+/* ****************************************************************************
+*
+* pruneContextElements -
+*
+* Remove attributes in the vector with 'found' value is 'false'
+*
+*/
+void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP)
+{
+  for (unsigned int ix = 0; ix < oldCerV.size(); ++ix)
+  {
+    ContextElementResponse* cerP = oldCerV.get(ix);
+    ContextElementResponse* newCerP = new ContextElementResponse();
+
+    /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
+     * of this is that attributeDomainName and domainMetadataVector and not being copied, but it should not be a problem, given that
+     * domain attributes are not implemented */
+    newCerP->contextElement.entityId.fill(&cerP->contextElement.entityId);
+    newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;  // FIXME P10: not sure if this is the right way of doing, maybe we need a fill() method for this
+    newCerP->statusCode.fill(&cerP->statusCode);
+
+    bool pruneEntity = cerP->prune;
+
+    for (unsigned int jx = 0; jx < cerP->contextElement.contextAttributeVector.size(); ++jx)
+    {
+      ContextAttribute* caP = cerP->contextElement.contextAttributeVector[jx];
+      if (caP->found)
+      {
+        ContextAttribute* newCaP = new ContextAttribute(caP);
+        newCerP->contextElement.contextAttributeVector.push_back(newCaP);
+      }
+
+    }
+
+    /* If after pruning the entity has no attribute and no CPr information, then it is not included
+     * in the output vector, except if "prune" is set to false */
+    if (pruneEntity && newCerP->contextElement.contextAttributeVector.size() == 0 && newCerP->contextElement.providingApplicationList.size() == 0)
+    {
+      newCerP->release();
+      delete newCerP;
+    }
+    else
+    {
+      newCerVP->push_back(newCerP);
+    }
+  }
 }
 
 /*****************************************************************************
@@ -1299,7 +1421,7 @@ static void processEntity(ContextRegistrationResponse* crr, EntityIdVector enV, 
      * with NGSI spec */
     en.isPattern = std::string("false");
 
-    if (includedEntity(en, &enV)) {       
+    if (includedEntity(en, enV)) {
         EntityId* enP = new EntityId(en.id, en.type, en.isPattern);
         crr->contextRegistration.entityIdVector.push_back(enP);
     }
@@ -1344,9 +1466,13 @@ static void processContextRegistrationElement (BSONObj cr, EntityIdVector enV, A
 
     /* Note that attributes can be included only if at least one entity has been found */
     if (crr.contextRegistration.entityIdVector.size() > 0) {
-        std::vector<BSONElement> queryAttrV = cr.getField(REG_ATTRS).Array();
-        for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix) {
+        if (cr.hasField(REG_ATTRS)) /* To prevent registration in the E-<null> style */
+        {
+          std::vector<BSONElement> queryAttrV = cr.getField(REG_ATTRS).Array();
+          for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix)
+          {
             processAttribute(&crr, attrL, queryAttrV[ix].embeddedObject());
+          }
         }
     }
 
@@ -1637,15 +1763,18 @@ bool processOnChangeCondition
   std::string          err;
   NotifyContextRequest ncr;
 
-    //
     // FIXME P10: we are using dummy scope at the moment, until subscription scopes get implemented
     //
     Restriction res;    
-    if (!entitiesQuery(enV, attrL, res, &ncr.contextElementResponseVector, &err, false, tenant, servicePathV))
+    ContextElementResponseVector rawCerV;
+    if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, false, tenant, servicePathV))
     {
         ncr.contextElementResponseVector.release();
         return false;
     }
+
+    /* Prune "not found" CERs */
+    pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
 
     if (ncr.contextElementResponseVector.size() > 0)
     {
@@ -1657,16 +1786,20 @@ bool processOnChangeCondition
         if (condValues != NULL) {
             /* Check if some of the attributes in the NotifyCondition values list are in the entity.
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
+            ContextElementResponseVector rawCerV;
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
             // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
-            if (!entitiesQuery(enV, emptyList, res, &allCerV, &err, false, tenant, servicePathV))
+            if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
             {
-                allCerV.release();
+                rawCerV.release();
                 ncr.contextElementResponseVector.release();
                 return false;
             }
+
+            /* Prune "not found" CERs */
+            pruneContextElements(rawCerV, &allCerV);
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
@@ -1919,4 +2052,112 @@ void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>
       delete it->second;
   }
   subs.clear();
+}
+
+/* ****************************************************************************
+*
+* fillContextProviders -
+*
+* This functions is very similar the one with the same name in mongoQueryContext.cpp
+* but acting on a single CER instead that on a complete vector of them.
+*
+* Looks in the CER passed as argument, searching for a suitable CPr in the CRR
+* vector passed as argument. If a suitable CPr is found, it is set in the CER (and the 'found' field
+* is changed to true)
+*
+*/
+void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV)
+{
+  for (unsigned int ix = 0; ix < cer->contextElement.contextAttributeVector.size(); ++ix)
+  {
+    ContextAttribute* ca = cer->contextElement.contextAttributeVector.get(ix);
+    if (ca->found)
+    {
+      continue;
+    }
+    /* Search for some CPr in crrV */
+    std::string perEntPa;
+    std::string perAttrPa;
+    cprLookupByAttribute(cer->contextElement.entityId, ca->name, crrV, &perEntPa, &perAttrPa);
+
+    /* Looking results after crrV processing */
+    ca->providingApplication = perAttrPa == ""? perEntPa : perAttrPa;
+    ca->found = (ca->providingApplication != "");
+  }
+}
+
+/* ****************************************************************************
+*
+* someContextElementNotFound -
+*
+* This functions is very similar the one with the same name in mongoQueryContext.cpp
+* but acting on a single CER instead that on a complete vector of them.
+*
+* Returns true if some attribute with 'found' set to 'false' is found in the CER passed
+* as argument
+*
+*/
+bool someContextElementNotFound(ContextElementResponse& cer)
+{
+
+  for (unsigned int ix = 0; ix < cer.contextElement.contextAttributeVector.size(); ++ix)
+  {
+    if (!cer.contextElement.contextAttributeVector[ix]->found)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+
+/* ****************************************************************************
+*
+* cprLookupByAttribute -
+*
+* Search for the CPr, given the entity/attribute as argument. Actually, two CPrs can be returned
+* the "general" one at entity level or the "specific" one at attribute level
+*
+*/
+void cprLookupByAttribute(EntityId&                          en,
+                          const std::string&                 attrName,
+                          ContextRegistrationResponseVector& crrV,
+                          std::string*                       perEntPa,
+                          std::string*                       perAttrPa)
+{
+  *perEntPa  = "";
+  *perAttrPa = "";
+  for (unsigned int crrIx = 0; crrIx < crrV.size(); ++crrIx)
+  {
+    ContextRegistrationResponse* crr = crrV.get(crrIx);
+    /* Is there a matching entity in the CRR? */
+    for (unsigned enIx = 0; enIx < crr->contextRegistration.entityIdVector.size(); ++enIx)
+    {
+      EntityId* regEn = crr->contextRegistration.entityIdVector.get(enIx);
+      if (regEn->id != en.id || (regEn->type != en.type && regEn->type != ""))
+      {
+        /* No match (keep searching the CRR) */
+        continue;
+      }
+
+      /* CRR without attributes (keep searching in other CRR) */
+      if (crr->contextRegistration.contextRegistrationAttributeVector.size() == 0)
+      {
+        *perEntPa = crr->contextRegistration.providingApplication.get();
+        break; /* enIx */
+      }
+
+      /* Is there a matching entity or the absence of attributes? */
+      for (unsigned attrIx = 0; attrIx < crr->contextRegistration.contextRegistrationAttributeVector.size(); ++attrIx)
+      {
+        std::string regAttrName = crr->contextRegistration.contextRegistrationAttributeVector.get(attrIx)->name;
+        if (regAttrName == attrName)
+        {
+          /* We cannot "improve" this result keep searching in CRR vector, so we return */
+          *perAttrPa = crr->contextRegistration.providingApplication.get();
+          return;
+        }
+      }
+    }
+  }
 }

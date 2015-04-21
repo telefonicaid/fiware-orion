@@ -434,7 +434,7 @@ Date: REGEX(.*)
 07. Update/UPDATE E2/A2=22 in CB, making it being forwarded to CP1 (PUT /v1/contextEntities/E2)
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 326
+Content-Length: 254
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -450,7 +450,6 @@ Date: REGEX(.*)
             ], 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }
@@ -461,7 +460,7 @@ Date: REGEX(.*)
 08. Query CP1 for E2/A2
 =======================
 HTTP/1.1 200 OK
-Content-Length: 450
+Content-Length: 378
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -482,7 +481,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }
@@ -493,7 +491,7 @@ Date: REGEX(.*)
 09. Query CP1 for E2/A2, with URI param attributesFormat=object
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 430
+Content-Length: 358
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -513,7 +511,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }

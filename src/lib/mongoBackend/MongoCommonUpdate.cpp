@@ -1148,7 +1148,6 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 * Returns true if entity was actually modified, false otherwise (including fail cases)
 *
 */
-#define ATTRIBUTE_NOT_FOUND 1
 
 static bool processContextAttributeVector (ContextElement*                            ceP,
                                            std::string                                action,
@@ -1159,8 +1158,7 @@ static bool processContextAttributeVector (ContextElement*                      
                                            double&                                    coordLat,
                                            double&                                    coordLong,
                                            std::string                                tenant,
-                                           const std::vector<std::string>&            servicePathV,
-                                           int*                                       why)
+                                           const std::vector<std::string>&            servicePathV)
 {
     EntityId*   eP         = &cerP->contextElement.entityId;
     std::string entityId   = cerP->contextElement.entityId.id;
@@ -1172,7 +1170,6 @@ static bool processContextAttributeVector (ContextElement*                      
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix) {
 
         ContextAttribute* targetAttr = ceP->contextAttributeVector.get(ix);
-
         /* No matter if success or fail, we have to include the attribute in the response */
         ContextAttribute* ca = new ContextAttribute(targetAttr->name, targetAttr->type);
         setResponseMetadata(targetAttr, ca);
@@ -1190,13 +1187,16 @@ static bool processContextAttributeVector (ContextElement*                      
                 /* If updateAttribute() returns false, then that particular attribute has not
                  * been found. In this case, we interrupt the processing and early return with
                  * an error StatusCode */
+                // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
+                // another .fill() in this function caller. We keep it by the moment, but it probably
+                // will removed when we refactor this function
                 cerP->statusCode.fill(SccInvalidParameter, 
                                       std::string("action: UPDATE") + 
                                       " - entity: [" + eP->toString() + "]" +
                                       " - offending attribute: " + targetAttr->toString());
-                *why = ATTRIBUTE_NOT_FOUND;
-                LM_W(("Bad Input (attribute not found)"));
-                return false;
+
+                /* Although ca has been already pushed into cerP, it can be used */
+                ca->found = false;
 
             }
 
@@ -1303,6 +1303,7 @@ static bool processContextAttributeVector (ContextElement*                      
                     locAttr = "";
                 }
 
+                ca->found = true;
             }
             else {
                 /* If deleteAttribute() returns false, then that particular attribute has not
@@ -1314,15 +1315,16 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - offending attribute: " + targetAttr->toString() + 
                                       " - attribute not found");
                 LM_W(("Bad Input (attribute to be deleted is not found)"));
-                return false;
+                ca->found = false;
 
+                return false;
             }
         }
         else
         {
           cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
           // This is a BUG in the parse layer checks
-          LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));
+          LM_E(("Runtime Error (unknown actionType '%s')", action.c_str()));          
           return false;
         }
 
@@ -1336,16 +1338,23 @@ static bool processContextAttributeVector (ContextElement*                      
               cerP->statusCode.fill(SccReceiverInternalError, err);
               return false;
             }
-        }
+        }        
 
     }
 
+#if 0
     if (!entityModified)
     {
         /* In this case, there wasn't any failure, but ceP was not set. We need to do it ourselves, as the function caller will
          * do a 'continue' without setting it. */
         //FIXME P5: this is ugly, our code should be improved to set cerP in a common place for the "happy case"
         cerP->statusCode.fill(SccOk);
+    }
+#endif
+    /* If the status code was not touched (filled with an error), then set it with Ok */
+    if (cerP->statusCode.code == SccNone)
+    {
+      cerP->statusCode.fill(SccOk);
     }
 
     return entityModified;
@@ -1440,7 +1449,8 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     /* Add location information in the case it was found */
     if (locAttr.length() > 0) {
         insertedDocB.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                              ENT_LOCATION_COORDS << BSON_ARRAY(coordLong << coordLat)));
+                                               ENT_LOCATION_COORDS   << BSON("type" << "Point" <<
+                                                                             "coordinates" << BSON_ARRAY(coordLong << coordLat))));
     }
 
     BSONObj insertedDoc = insertedDocB.obj();
@@ -1548,6 +1558,68 @@ static bool removeEntity
 
 /* ****************************************************************************
 *
+* searchContextProviders -
+*
+*/
+void searchContextProviders(const std::string&              tenant,
+                            const std::vector<std::string>& servicePathV,
+                            EntityId&                       en,
+                            ContextAttributeVector&         caV,
+                            ContextElementResponse*         cerP)
+{
+
+  ContextRegistrationResponseVector  crrV;
+  EntityIdVector                     enV;
+  AttributeList                      attrL;
+  std::string                        err;
+
+  /* Fill input data for registrationsQuery() */
+  enV.push_back(&en);
+  for (unsigned int ix = 0; ix < caV.size(); ++ix)
+  {
+    attrL.push_back(caV.get(ix)->name);
+  }
+
+  /* First CPr lookup (in the case some CER is not found): looking in E-A registrations */
+  if (someContextElementNotFound(*cerP))
+  {
+    if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    {
+      if (crrV.size() > 0)
+      {
+        fillContextProviders(cerP, crrV);
+      }
+    }
+    else
+    {
+      /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+      LM_E(("Database Error (%s)", err.c_str()));
+    }
+    crrV.release();
+  }
+
+  /* Second CPr lookup (in the case some element stills not being found): looking in E-<null> registrations */
+  AttributeList attrNullList;
+  if (someContextElementNotFound(*cerP))
+  {
+    if (registrationsQuery(enV, attrNullList, &crrV, &err, tenant, servicePathV, 0, 0, false))
+    {
+      if (crrV.size() > 0)
+      {
+        fillContextProviders(cerP, crrV);
+      }
+    }
+    else
+    {
+      /* Different from errors in DB at entitiesQuery(), DB fails at registrationsQuery() are not considered "critical" */
+      LM_E(("Database Error (%s)", err.c_str()));
+    }
+    crrV.release();
+  }
+}
+
+/* ****************************************************************************
+*
 * processContextElement -
 *
 * 0. Preparations
@@ -1619,7 +1691,6 @@ void processContextElement(ContextElement*                      ceP,
       slashEscape(servicePathV[0].c_str(), path, sizeof(path));
       const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
       bob.appendRegex(servicePathString, servicePathValue);
-
     }
 
     // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
@@ -1688,8 +1759,10 @@ void processContextElement(ContextElement*                      ceP,
     int docs = 0;
     
     while (cursor->more()) {
+
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+        ++docs;
 
         BSONElement idField = r.getField("_id");
 
@@ -1719,7 +1792,6 @@ void processContextElement(ContextElement*                      ceP,
             LM_T(LmtServicePath, ("Removing entity"));
             removeEntity(entityId, entityType, cerP, tenant, entitySPath);
             responseP->contextElementResponseVector.push_back(cerP);
-            ++docs;
             continue;
         }
 
@@ -1748,42 +1820,20 @@ void processContextElement(ContextElement*                      ceP,
             // will be needed. This is a general comment, applicable to many places in the mongoBackend code
             BSONObj loc = r.getObjectField(ENT_LOCATION);
             locAttr  = loc.getStringField(ENT_LOCATION_ATTRNAME);
-            coordLong  = loc.getField(ENT_LOCATION_COORDS).Array()[0].Double();
-            coordLat = loc.getField(ENT_LOCATION_COORDS).Array()[1].Double();
+            coordLong  = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[0].Double();
+            coordLat = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[1].Double();
         }
 
-        int why = 0;
-        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV, &why))
+        if (!processContextAttributeVector(ceP, action, subsToNotify, attrs, cerP, locAttr, coordLat, coordLong, tenant, servicePathV))
         {
             /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
+            // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
+            // in only one place
+            searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
             responseP->contextElementResponseVector.push_back(cerP);
             releaseTriggeredSubscriptions(subsToNotify);
-
-            //
-            // FIXME P6: Temporary hack for 'Entity found but Attribute not found':
-            //           If caller is 'postContextUpdate' then we need to keep 'docs' at zero for 'Attribute Not Found'
-            //           as to force the call to lookup ngsi9 registrations to do the forward of the message.
-            //           For all other combinations, add to 'docs'.
-            //
-            //           This hack makes 'mongoUpdateContext' return TWO responses for this circumstance, one saying
-            //           "Error: Attribute Not Found", the other indicating that it can be found in a Context Provider.
-            //           This is true only for calls from the function 'postUpdateContext'.
-            //           That function remedies this situation by removiong ther unwanted response (the first one),
-            //           and then overwriting the second one with the response of the Context Provider.
-            //
-            //           This is just a temporary fix.
-            //           The real fix will probably be a rewrite of this piece of code,
-            //           implemented when fixing 'definitely' the issue #716
-            //
-            if ((why != ATTRIBUTE_NOT_FOUND) || (caller != "postUpdateContext"))
-            {
-              ++docs;
-            }
-
             continue;
         }
-
-        ++docs;
 
         /* Now that attrs contains the final status of the attributes after processing the whole
          * list of attributes in the ContextElement, update entity attributes in database */
@@ -1793,7 +1843,8 @@ void processContextElement(ContextElement*                      ceP,
         updateSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
         if (locAttr.length() > 0) {
             updateSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
-                                                           ENT_LOCATION_COORDS << BSON_ARRAY(coordLong << coordLat)));
+                                                ENT_LOCATION_COORDS   << BSON("type" << "Point" <<
+                                                                              "coordinates" << BSON_ARRAY(coordLong << coordLat))));
         } else {
             updateUnset.append(ENT_LOCATION, 1);
         }
@@ -1886,13 +1937,18 @@ void processContextElement(ContextElement*                      ceP,
         //
         releaseTriggeredSubscriptions(subsToNotify);
 
-        /* To finish with this entity processing, add the corresponding ContextElementResponse to
-         * the global response */
-        cerP->statusCode.fill(SccOk);
+        /* To finish with this entity processing, search for CPrs in not found attributes and
+         * add the corresponding ContextElementResponse to the global response */
+        searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+
+        // StatusCode may be set already (if so, we keep the existing value)
+        if (cerP->statusCode.code == SccNone)
+        {
+          cerP->statusCode.fill(SccOk);
+        }
         responseP->contextElementResponseVector.push_back(cerP);
     }
     LM_T(LmtServicePath, ("Docs found: %d", docs));
-
 
     /*
      * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()
@@ -1904,62 +1960,38 @@ void processContextElement(ContextElement*                      ceP,
      */
     if (docs == 0)
     {
-      if (strcasecmp(action.c_str(), "append") != 0)
+      /* Creating the common par of the response that doesn't depend on the case */
+      ContextElementResponse* cerP = new ContextElementResponse();
+      cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
+
+      /* All the attributes existing in the request are added to the response with 'found' set to false
+       * in the of UPDATE/DELETE and true in the case of APPEND */
+      bool foundValue = (strcasecmp(action.c_str(), "append") == 0);
+
+      
+      for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
       {
-        /* Only APPEND can create entities, in the case of UPDATE or DELETE we look for a context
-         * provider or (if there is no context provider) return a not found error */
-        ContextRegistrationResponseVector  crrV;
-        EntityIdVector                     enV;
-        AttributeList                      attrL;
-        std::string                        err;
-
-        enV.push_back(enP);
-        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
-        {
-          attrL.push_back(ceP->contextAttributeVector.get(ix)->name);
-        }
-
-        //
-        // For now, we use limit=1. That ensures that maximum one providing application is returned. In the future,
-        // we will consider leaving this limit open and define an algorithm to pick the right one, and ordered list, etc.
-        //
-        if (registrationsQuery(enV, attrL, &crrV, &err, tenant, servicePathV, 0, 1, false))
-        {
-          if (crrV.size() > 0)
-          {
-            // Suitable CProvider has been found: creating response and returning
-            std::string prApp = crrV[0]->contextRegistration.providingApplication.get();
-            LM_T(LmtCtxProviders, ("context provider found: %s", prApp.c_str()));
-            buildGeneralErrorResponse(ceP, NULL, responseP, SccFound, prApp, &ceP->contextAttributeVector);
-          }
-          else
-          {
-            buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
-          }
-        }
-        else
-        {
-          LM_E(("Database Error (%s)", err.c_str()));
-          buildGeneralErrorResponse(ceP, NULL, responseP, SccContextElementNotFound, enP->id);
-        }
-
-        crrV.release();
+        ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
+        ContextAttribute* ca = new ContextAttribute(caP->name, caP->type, "", foundValue);
+        setResponseMetadata(caP, ca);
+        cerP->contextElement.contextAttributeVector.push_back(ca);
       }
-      else
+
+      if (strcasecmp(action.c_str(), "update") == 0)
       {
-        /* Creating the part of the response that doesn't depend on success or failure */
-        ContextElementResponse* cerP = new ContextElementResponse();
+        /* In the case of UPDATE or DELETE we look for context providers */
+        searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+        cerP->statusCode.fill(SccOk);
+        responseP->contextElementResponseVector.push_back(cerP);
 
-        cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
-
-        for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
-        {
-          ContextAttribute* caP = ceP->contextAttributeVector.get(ix);
-          ContextAttribute* ca  = new ContextAttribute(caP->name, caP->type);                
-          setResponseMetadata(caP, ca);
-          cerP->contextElement.contextAttributeVector.push_back(ca);
-        }
-
+      }
+      else if (strcasecmp(action.c_str(), "delete") == 0)
+      {
+        cerP->statusCode.fill(SccContextElementNotFound);
+        responseP->contextElementResponseVector.push_back(cerP);
+      }
+      else   /* APPEND */
+      {
         std::string errReason, errDetail;
         if (!createEntity(enP, ceP->contextAttributeVector, &errDetail, tenant, servicePathV))
         {

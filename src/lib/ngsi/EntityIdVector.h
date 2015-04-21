@@ -35,6 +35,14 @@
 /* ****************************************************************************
 *
 * EntityIdVector - 
+*
+* NOTE
+* The method 'lookup' looks up an *exact* match for an entity.
+* I.e. the id must be exactly the same, the type exactly the same and isPattern, exactly the same.
+* This is not a *match* method that would find 'matching' entityIds.
+*
+* If you need an entity-matching method, then a new method, called 'match' should be implemented.
+*
 */
 typedef struct EntityIdVector
 {
@@ -43,8 +51,10 @@ typedef struct EntityIdVector
   std::string  render(Format format, const std::string& indent, bool comma = false);
   void         present(const std::string& indent);
   void         push_back(EntityId* item);
+  void         push_back_if_absent(EntityId* item);
   unsigned int size(void);
   EntityId*    get(int ix);
+  EntityId*    lookup(const std::string& name, const std::string& type, const std::string& isPattern);
   void         release();
 
   EntityId*    operator[](unsigned int ix)
