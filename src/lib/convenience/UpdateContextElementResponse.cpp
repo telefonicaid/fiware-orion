@@ -135,8 +135,6 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
 {
   ContextElementResponse* cerP = ucrsP->contextElementResponseVector[0];
 
-  ucrsP->present("UpdateContextResponse to fill from: ");
-
   errorCode.fill(ucrsP->errorCode);
   if (errorCode.code == SccNone)
   {
@@ -194,8 +192,6 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
       errorCode.details = ucrsP->contextElementResponseVector[0]->contextElement.entityId.id;
     }
   }
-
-  present("Filled from UpdateContextResponse");
 }
 
 

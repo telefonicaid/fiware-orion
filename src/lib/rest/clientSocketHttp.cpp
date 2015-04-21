@@ -361,7 +361,6 @@ std::string sendHttpSocket
   else
   {
     // The Response is here
-    LM_M(("Sent notification/forward: %s", payload));
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
     result.assign(httpResponse->memory, httpResponse->size);
   }
@@ -375,7 +374,6 @@ std::string sendHttpSocket
 
   LM_TRANSACTION_END();
 
-  LM_M(("Notification/Forward result from %s:%d: %s", ip.c_str(), port, result.c_str()));
   return result;
 }
 

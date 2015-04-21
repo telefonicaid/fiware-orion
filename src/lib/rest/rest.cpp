@@ -896,7 +896,6 @@ static int connectionTreat
   }
   else
   {
-    LM_M(("Incoming payload: %s", ciP->payload));
     serveFunction(ciP);
   }
 

@@ -121,7 +121,7 @@ extern std::string putAllEntitiesWithTypeAndId
 
   // 05. Fill in response from UpdateContextResponse
   response.fill(&parseDataP->upcrs.res);
-  
+
 
   // 06. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");

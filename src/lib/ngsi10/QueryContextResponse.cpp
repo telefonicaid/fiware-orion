@@ -108,7 +108,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
   }
   else if (contextElementResponseVector.size() == 0)
   {
-    errorCodeRendered =true;
+    errorCodeRendered = true;
   }
   else if (errorCode.details != "")
   {
@@ -117,7 +117,7 @@ std::string QueryContextResponse::render(ConnectionInfo* ciP, RequestType reques
       errorCode.code = SccOk;
     }
 
-    errorCodeRendered =true;
+    errorCodeRendered = true;
   }
 
 

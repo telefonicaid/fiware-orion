@@ -414,12 +414,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
-    LM_M((""));
-    LM_M((""));
-    LM_M((""));
-    LM_M(("***** Calling service-routine for '%s' (@%p)", ciP->url.c_str(), serviceV[ix].treat));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
-    LM_M(("***** After service-routine for '%s': %s", ciP->url.c_str(), response.c_str()));
     filterRelease(&parseData, serviceV[ix].request);
 
     if (reqP != NULL)
@@ -439,7 +434,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       orionExitFunction(0, "Received a 'DIE' request on REST interface");
     }
 
-    LM_M(("replying with %s", response.c_str()));
     restReply(ciP, response);
     return response;
   }
