@@ -1131,7 +1131,7 @@ Date: REGEX(.*)
 16. Update/UPDATE OfficeRoom/Room/pressure=p2300+lightstatus=L23 (pressure OK, lightstatus ERROR)
 =================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 1381
+Content-Length: 1237
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -1152,9 +1152,8 @@ Date: REGEX(.*)
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>472</code>
-        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: UPDATE - entity: [OfficeRoom, Room] - offending attribute: lightstatus</details>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
       </statusCode>
     </contextElementResponse>
     <contextElementResponse>
