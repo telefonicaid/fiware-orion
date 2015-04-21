@@ -26,8 +26,8 @@ Forward non-existing attribute in existing entity for update in context provider
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
-brokerStart CB 0
-brokerStart CP1 0
+brokerStart CB
+brokerStart CP1
 
 --SHELL--
 
@@ -237,7 +237,7 @@ Date: REGEX(.*)
 04. Update/UPDATE E1/A1 in CB
 =============================
 HTTP/1.1 200 OK
-Content-Length: 430
+Content-Length: 382
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -258,7 +258,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "E1", 
                 "reasonPhrase": "OK"
             }
         }

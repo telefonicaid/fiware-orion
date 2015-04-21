@@ -356,7 +356,7 @@ Date: REGEX(.*)
 
 04. Update/UPDATE E1/A1(=BAD) in broker (is forwarded to CP and nothing is found/updated)
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 668
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -368,6 +368,13 @@ Date: REGEX(.*)
         <entityId type="E" isPattern="false">
           <id>E1</id>
         </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
       </contextElement>
       <statusCode>
         <code>404</code>
