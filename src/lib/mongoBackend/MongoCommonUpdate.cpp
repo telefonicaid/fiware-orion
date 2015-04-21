@@ -1940,10 +1940,10 @@ void processContextElement(ContextElement*                      ceP,
         /* To finish with this entity processing, search for CPrs in not found attributes and
          * add the corresponding ContextElementResponse to the global response */
         searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
+
+        // StatusCode may be set already (if so, we keep the existing value)
         if (cerP->statusCode.code == SccNone)
         {
-          /* It could happend that the StatusCode has already be set, in which case we should
-           * keep the existing value */
           cerP->statusCode.fill(SccOk);
         }
         responseP->contextElementResponseVector.push_back(cerP);
