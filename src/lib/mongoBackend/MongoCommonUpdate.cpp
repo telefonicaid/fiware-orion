@@ -1282,6 +1282,7 @@ static bool processContextAttributeVector (ContextElement*                      
             }
         }
         else if (strcasecmp(action.c_str(), "delete") == 0) {
+          LM_M(("KZ: DELETING an attribute"));
             if (deleteAttribute(attrs, newAttrs, targetAttr)) {
                 entityModified = true;
                 attrs = newAttrs;
@@ -1303,6 +1304,8 @@ static bool processContextAttributeVector (ContextElement*                      
                     locAttr = "";
                 }
 
+                ca->found = true;
+                LM_M(("KZ: DELETE worked"));
             }
             else {
                 /* If deleteAttribute() returns false, then that particular attribute has not
@@ -1314,8 +1317,10 @@ static bool processContextAttributeVector (ContextElement*                      
                                       " - offending attribute: " + targetAttr->toString() + 
                                       " - attribute not found");
                 LM_W(("Bad Input (attribute to be deleted is not found)"));
-                return false;
+                ca->found = false;
+                LM_M(("KZ: DELETE failed"));
 
+                return false;
             }
         }
         else
@@ -1640,6 +1645,8 @@ void processContextElement(ContextElement*                      ceP,
     /* Getting the entity in the request (helpful in other places) */
     EntityId* enP = &ceP->entityId;
 
+    LM_M(("KZ: In"));
+
     /* Not supporting isPattern = true currently */
     if (isTrue(enP->isPattern)) {
         buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
@@ -1689,7 +1696,6 @@ void processContextElement(ContextElement*                      ceP,
       slashEscape(servicePathV[0].c_str(), path, sizeof(path));
       const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
       bob.appendRegex(servicePathString, servicePathValue);
-
     }
 
     // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
@@ -1757,7 +1763,11 @@ void processContextElement(ContextElement*                      ceP,
     //
     int docs = 0;
     
+    LM_M(("KZ: Going through the list of found entities"));
     while (cursor->more()) {
+
+      LM_M(("KZ: found an entity"));
+
         BSONObj r = cursor->next();
         LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
         ++docs;
@@ -1948,6 +1958,7 @@ void processContextElement(ContextElement*                      ceP,
     }
     LM_T(LmtServicePath, ("Docs found: %d", docs));
 
+    LM_M(("KZ: Docs found: %d", docs));
 
     /*
      * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()
@@ -1964,8 +1975,10 @@ void processContextElement(ContextElement*                      ceP,
       cerP->contextElement.entityId.fill(enP->id, enP->type, "false");
 
       /* All the attributes existing in the request are added to the response with 'found' set to false
-       * in the of UPDATE or true in the case of APPEND/DELETE */
-      bool foundValue = (strcasecmp(action.c_str(), "update") != 0);
+       * in the of UPDATE/DELETE and true in the case of APPEND */
+      bool foundValue = (strcasecmp(action.c_str(), "append") == 0);
+
+      
       for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
       {
         ContextAttribute* caP = ceP->contextAttributeVector.get(ix);

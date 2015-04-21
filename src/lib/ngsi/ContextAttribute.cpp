@@ -62,7 +62,7 @@ ContextAttribute::ContextAttribute()
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   providingApplication  = "";
-  found                 = true;
+  found                 = false;
 }
 
 
@@ -143,7 +143,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = _compoundValueP->clone();
   typeFromXmlAttribute  = "";
   providingApplication  = "";
-  found                 = true;
+  found                 = false;
 }
 
 

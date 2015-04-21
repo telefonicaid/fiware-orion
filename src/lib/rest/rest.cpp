@@ -891,9 +891,14 @@ static int connectionTreat
     restReply(ciP, errorMsg);
   }
   else if (ciP->answer != "")
+  {
     restReply(ciP, ciP->answer);
+  }
   else
+  {
+    LM_M(("Incoming payload: %s", ciP->payload));
     serveFunction(ciP);
+  }
 
   return MHD_YES;
 }

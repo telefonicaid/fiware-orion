@@ -622,7 +622,7 @@ Date: REGEX(.*)
 09. Update/UPDATE E1/A1+A2+A3+A4+A5+A6+A7 in CB
 ===============================================
 HTTP/1.1 200 OK
-Content-Length: 1296
+Content-Length: 1322
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -686,6 +686,7 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "404", 
+                "details": "E1", 
                 "reasonPhrase": "No context element found"
             }
         }

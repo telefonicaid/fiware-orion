@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update At Attribute That Does Not Exist
+Update Attribute That Does Not Exist
 
 --SHELL-INIT--
 dbInit CB

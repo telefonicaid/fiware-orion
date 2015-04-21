@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Delete At Attribute That Does Exist
+Delete Attribute That Does Exist
 
 --SHELL-INIT--
 dbInit CB

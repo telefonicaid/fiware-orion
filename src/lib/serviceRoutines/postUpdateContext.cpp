@@ -298,7 +298,12 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
     //
     // Just one detail - if we have ZERO FOUNDS and ZERO NOT-FOUNDS, then keep the 200 OK
     //
-    if ((noOfFounds == 0) && (noOfNotFounds > 0))
+    if ((noOfFounds > 0) && (noOfNotFounds == 0))
+    {
+      LM_M(("KZ: setting statusCode to SccOk as all attributes have been found"));
+      cerP->statusCode.fill(SccOk);
+    }
+    else if ((noOfFounds == 0) && (noOfNotFounds > 0))
     {
       if ((cerP->statusCode.code == SccOk) || (cerP->statusCode.code == SccNone))
       {
@@ -311,8 +316,22 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
       // Adding a ContextElementResponse for the 'Not-Founds'
 
       ContextElementResponse* notFoundCerP = new ContextElementResponse(&cerP->contextElement.entityId, NULL);
+
+      //
+      // Filling in StatusCode (SccContextElementNotFound) for NotFound
+      //
       notFoundCerP->statusCode.fill(SccContextElementNotFound, cerP->contextElement.entityId.id);
+
+      //
+      // Setting StatusCode to OK for Found
+      //
+      cerP->statusCode.fill(SccOk);
+
+      //
+      // And, pushing to NotFound-vector 
+      //
       notFoundV.push_back(notFoundCerP);
+
 
       // Now moving the not-founds to notFoundCerP
       std::vector<ContextAttribute*>::iterator iter;
@@ -392,6 +411,27 @@ static void foundAndNotFoundAttributeSeparation(UpdateContextResponse* upcrsP, U
 
 /* ****************************************************************************
 *
+* attributesToNotFound - mark all attributes with 'found=false'
+*/
+static void attributesToNotFound(UpdateContextRequest* upcrP)
+{
+  for (unsigned int ceIx = 0; ceIx < upcrP->contextElementVector.size(); ++ceIx)
+  {
+    ContextElement* ceP = upcrP->contextElementVector[ceIx];
+
+    for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP = ceP->contextAttributeVector[aIx];
+
+      aP->found = false;
+    }
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * postUpdateContext -
 *
 * POST /v1/updateContext
@@ -443,7 +483,8 @@ std::string postUpdateContext
   //
   // 02. Send the request to mongoBackend/mongoUpdateContext
   //
-  upcrsP->errorCode.fill(SccContextElementNotFound);
+  upcrsP->errorCode.fill(SccOk);
+  attributesToNotFound(upcrP);
   upcrP->present("To mongoUpdateContext: ");
   ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
   upcrsP->present("From mongoUpdateContext: ");
