@@ -176,7 +176,7 @@ HttpStatusCode mongoEntityTypes
   {
     BSONObj                  resultItem = resultsArray[ix].embeddedObject();
     TypeEntity*              type       = new TypeEntity(resultItem.getStringField("_id"));
-    std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
+    std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();    
 
     if (!attrsArray[0].isNull())
     {
@@ -274,7 +274,7 @@ HttpStatusCode mongoAttributesForEntityType
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
                                               BSON("$match" << BSON(C_ID_ENTITY << entityType << C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-                                              BSON("$project" << BSON("_id" << 1 << S_ATTRNAMES << 1)) <<
+                                              BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
                                               BSON("$unwind" << S_ATTRNAMES) <<
                                               BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
                                               //BSON("$unwind" << S_ATTRS) <<
@@ -321,12 +321,13 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response*/
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> resultsArray = result.getField("result").Array();
+  std::vector<BSONElement> attrsArray = result.getField("result").Array()[0].embeddedObject().getField("attrs").Array();
+
 
   /* See comment above in the other method regarding this strategy to implement pagination */
-  for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
+  for (unsigned int ix = offset; ix < MIN(attrsArray.size(), offset + limit); ++ix)
   {
-    BSONElement        idField    = resultsArray[ix].embeddedObject().getField("_id");
+    //BSONElement        idField    = resultsArray[ix].embeddedObject().getField("_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -334,14 +335,15 @@ HttpStatusCode mongoAttributesForEntityType
     // Now, if 'resultsArray[ix].embeddedObject().getField("_id")' is not found, if we continue,
     // calling embeddedObject() on it, then we get an exception and the broker crashes.
     //
-    if (idField.eoo() == true)
-    {
-      LM_E(("Database Error (error retrieving _id field in doc: %s)", resultsArray[ix].embeddedObject().toString().c_str()));
-      continue;
-    }
+    //if (idField.eoo() == true)
+    //{
+    //  LM_E(("Database Error (error retrieving _id field in doc: %s)", resultsArray[ix].embeddedObject().toString().c_str()));
+    //  continue;
+    //}
 
-    BSONObj            resultItem = idField.embeddedObject();
-    ContextAttribute*  ca         = new ContextAttribute(resultItem.getStringField(ENT_ATTRS_NAME), resultItem.getStringField(ENT_ATTRS_TYPE));
+    //BSONObj            resultItem = idField.embeddedObject();
+    //ContextAttribute*  ca         = new ContextAttribute(resultItem.getStringField(ENT_ATTRS_NAME), resultItem.getStringField(ENT_ATTRS_TYPE));
+    ContextAttribute*  ca         = new ContextAttribute(attrsArray[ix].str(), "");
     responseP->entityType.contextAttributeVector.push_back(ca);
   }
 
@@ -350,7 +352,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     if (details)
     {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) resultsArray.size());
+      snprintf(detailsMsg, sizeof(detailsMsg), "Count: %d", (int) attrsArray.size());
       responseP->statusCode.fill(SccOk, detailsMsg);
     }
     else
@@ -362,7 +364,7 @@ HttpStatusCode mongoAttributesForEntityType
   {
     if (details)
     {
-      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %d. Offset is %d", (int) resultsArray.size(), offset);
+      snprintf(detailsMsg, sizeof(detailsMsg), "Number of attributes: %d. Offset is %d", (int) attrsArray.size(), offset);
       responseP->statusCode.fill(SccContextElementNotFound, detailsMsg);
     }
     else
