@@ -129,7 +129,10 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
     //
     // Special case: vector is empty: translate to 404
     //
-    responseP->errorCode.fill(SccContextElementNotFound);
+    if ((responseP->errorCode.code == SccOk) || (responseP->errorCode.code == SccNone))
+    {
+      responseP->errorCode.fill(SccContextElementNotFound);
+    }
   }
   else if ((vec.size() == 1) && (vec[0]->contextElementResponseVector.size() == 0))
   {
@@ -137,8 +140,23 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
     // Special case: only one QueryContextResponse in vec, and it has 0 contextElementResponses
     // This is clearly a Not Found ...
     //
-    responseP->errorCode.fill(SccContextElementNotFound);
-    vec[0]->errorCode.fill(SccContextElementNotFound);
+    if ((responseP->errorCode.code == SccOk) || (responseP->errorCode.code == SccNone))
+    {
+      responseP->errorCode.fill(SccContextElementNotFound);
+    }
+
+    if ((vec[0]->errorCode.code == SccOk) ||(vec[0]->errorCode.code == SccNone))
+    {
+      vec[0]->errorCode.fill(SccContextElementNotFound);
+    }
+
+    //
+    // Also, if same errorCode.code but no details ...
+    //
+    if ((responseP->errorCode.code == vec[0]->errorCode.code) && (responseP->errorCode.details == ""))
+    {
+      responseP->errorCode.details = vec[0]->errorCode.details;
+    }
   }
   else
   {

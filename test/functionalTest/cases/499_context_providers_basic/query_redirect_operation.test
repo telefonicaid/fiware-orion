@@ -255,7 +255,7 @@ Date: REGEX(.*)
 
 05. Query broker for E1/A1 (will go to CP, but CP doesn't know about E1/A1)
 HTTP/1.1 200 OK
-Content-Length: 227
+Content-Length: 155
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -264,7 +264,6 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
   </errorCode>
 </queryContextResponse>
 
@@ -333,7 +332,7 @@ Date: REGEX(.*)
 
 08. Query broker for E1/A1 (will go to CP and it will work, A1=CP is returned)
 HTTP/1.1 200 OK
-Content-Length: 692
+Content-Length: 616
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -356,7 +355,6 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

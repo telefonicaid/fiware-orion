@@ -413,6 +413,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     LM_T(LmtTenant, ("tenant: '%s'", ciP->tenant.c_str()));
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
+
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
     filterRelease(&parseData, serviceV[ix].request);
 

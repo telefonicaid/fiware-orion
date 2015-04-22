@@ -447,14 +447,14 @@ Date: REGEX(.*)
 11. GET /v1/contextEntities/type/T1/id/E1/attributes/A2/backup and see it fail remotely
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 163
+Content-Length: 162
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "404", 
-        "details": "Redirected to context provider localhost:9801/v1", 
+        "details": "Entity-Attribute-MetaID triplet: /E1-A2-backup/", 
         "reasonPhrase": "No context element found"
     }
 }
@@ -501,7 +501,7 @@ Date: REGEX(.*)
 13. GET /v1/contextEntities/type/T1/id/E1/attributes/A2/backup and see it work remotely
 =======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 377
+Content-Length: 309
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -522,7 +522,6 @@ Date: REGEX(.*)
     ], 
     "statusCode": {
         "code": "200", 
-        "details": "Redirected to context provider localhost:9801/v1", 
         "reasonPhrase": "OK"
     }
 }

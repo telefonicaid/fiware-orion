@@ -180,7 +180,7 @@ echo
 
 echo "07. See notification of E1/A2 in accumulator"
 echo "============================================"
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
 echo
 echo
 
@@ -217,7 +217,7 @@ echo
 
 echo "09. See no notification of E1/A1 in accumulator"
 echo "==============================================="
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
 echo
 echo
 

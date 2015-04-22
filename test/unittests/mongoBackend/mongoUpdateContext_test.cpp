@@ -4247,7 +4247,7 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
 
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
     EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication);
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
@@ -5438,9 +5438,9 @@ TEST(mongoUpdateContextRequest, updateAttrNotFoundFail)
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("", RES_CER_STATUS(0).details);
+    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
+    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("action: UPDATE - entity: [E1, T1] - offending attribute: A8", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -6396,7 +6396,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
     EXPECT_FALSE(a1.hasField("id"));
-
+    
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6437,8 +6437,7 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_EQ(1360232700, a1id1.getIntField("modDate"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1id2, "type"));
     EXPECT_STREQ("val12", C_STR_FIELD(a1id2, "value"));
-    EXPECT_FALSE(a1id2.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
+    EXPECT_FALSE(a1id2.hasField("modDate"));    
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("new_val2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));

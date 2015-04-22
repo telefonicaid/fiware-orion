@@ -133,7 +133,7 @@ std::string ContextAttributeVector::render
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1, omitValue);
+      out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
     }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
   }
@@ -142,7 +142,7 @@ std::string ContextAttributeVector::render
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1, omitValue);
+      out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
     }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
   }

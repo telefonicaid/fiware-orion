@@ -103,7 +103,7 @@ echo
 echo "04. Check that the accumulator received the notification of both cities"
 echo "======================================================================="
 sleep 1
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 echo
 

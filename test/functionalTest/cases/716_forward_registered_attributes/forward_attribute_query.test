@@ -210,7 +210,7 @@ Date: REGEX(.*)
 04. Query E1/A1 in CB
 =====================
 HTTP/1.1 200 OK
-Content-Length: 466
+Content-Length: 394
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -231,7 +231,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:9801/v1", 
                 "reasonPhrase": "OK"
             }
         }

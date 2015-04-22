@@ -102,7 +102,7 @@ echo
 
 echo "03. Dump accumulator to see NOTHING"
 echo "==================================="
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
 echo
 echo
 
@@ -137,7 +137,7 @@ echo
 
 echo "05. Dump accumulator to see E1/T1"
 echo "================================="
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
 echo
 echo
 
@@ -161,7 +161,7 @@ echo
 
 echo "07. Dump accumulator to see E1/T1, one in JSON, one in XML"
 echo "=========================================================="
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
 echo
 echo
 

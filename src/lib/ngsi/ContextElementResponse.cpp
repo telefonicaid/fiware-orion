@@ -54,7 +54,11 @@ ContextElementResponse::ContextElementResponse(EntityId* eP, ContextAttribute* a
   prune = false;
 
   contextElement.entityId.fill(eP);
-  contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+
+  if (aP != NULL)
+  {
+    contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
+  }
 }
 
 
@@ -82,7 +86,8 @@ std::string ContextElementResponse::render
   ConnectionInfo*     ciP,
   RequestType         requestType,
   const std::string&  indent,
-  bool                comma
+  bool                comma,
+  bool                omitAttributeValues
 )
 {
   std::string xmlTag   = "contextElementResponse";
@@ -90,7 +95,7 @@ std::string ContextElementResponse::render
   std::string out      = "";
 
   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
-  out += contextElement.render(ciP, requestType, indent + "  ", true);
+  out += contextElement.render(ciP, requestType, indent + "  ", true, omitAttributeValues);
   out += statusCode.render(ciP->outFormat, indent + "  ", false);
   out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
 

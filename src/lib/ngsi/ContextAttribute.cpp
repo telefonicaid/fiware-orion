@@ -62,7 +62,7 @@ ContextAttribute::ContextAttribute()
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   providingApplication  = "";
-  found                 = true;
+  found                 = false;
 }
 
 
@@ -143,7 +143,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = _compoundValueP->clone();
   typeFromXmlAttribute  = "";
   providingApplication  = "";
-  found                 = true;
+  found                 = false;
 }
 
 
@@ -193,6 +193,7 @@ std::string ContextAttribute::getLocation()
 std::string ContextAttribute::renderAsJsonObject
 (
   ConnectionInfo*     ciP,
+  RequestType         request,
   const std::string&  indent,
   bool                comma,
   bool                omitValue
@@ -211,7 +212,8 @@ std::string ContextAttribute::renderAsJsonObject
     if (omitValue == false)
     {
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                      value, ciP->outFormat, commaAfterContextValue);
+                      (request != RtUpdateContextResponse)? value : "",
+                      ciP->outFormat, commaAfterContextValue);
     }
   }
   else
@@ -247,6 +249,7 @@ std::string ContextAttribute::renderAsJsonObject
 std::string ContextAttribute::render
 (
   ConnectionInfo*     ciP,
+  RequestType         request,
   const std::string&  indent,
   bool                comma,
   bool                omitValue
@@ -255,19 +258,19 @@ std::string ContextAttribute::render
   std::string  out                    = "";
   std::string  xmlTag                 = "contextAttribute";
   std::string  jsonTag                = "attribute";
+  bool         valueRendered          = (compoundValueP != NULL) || (omitValue == false) || (request == RtUpdateContextResponse);
   bool         commaAfterContextValue = metadataVector.size() != 0;
-  bool         commaAfterType         = !omitValue || commaAfterContextValue;
-  bool         commaAfterName         = commaAfterType || (type != "");
+  bool         commaAfterType         = valueRendered;
 
   metadataVector.tagSet("metadata");
 
   if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outFormat == JSON))
   {
-    return renderAsJsonObject(ciP, indent, comma, omitValue);
+    return renderAsJsonObject(ciP, request, indent, comma, omitValue);
   }
 
   out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
-  out += valueTag(indent + "  ", "name",         name,  ciP->outFormat, commaAfterName);
+  out += valueTag(indent + "  ", "name",         name,  ciP->outFormat, true);  // attribute.type is always rendered
   out += valueTag(indent + "  ", "type",         type,  ciP->outFormat, commaAfterType);
 
   if (compoundValueP == NULL)
@@ -275,7 +278,13 @@ std::string ContextAttribute::render
     if (omitValue == false)
     {
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                      value, ciP->outFormat, commaAfterContextValue);
+                      (request != RtUpdateContextResponse)? value : "",
+                      ciP->outFormat, commaAfterContextValue);
+    }
+    else if (request == RtUpdateContextResponse)
+    {
+      out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                      "", ciP->outFormat, commaAfterContextValue);
     }
   }
   else
