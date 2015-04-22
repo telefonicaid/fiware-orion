@@ -22,6 +22,8 @@
 Max 10 chars in db-name
 
 --SHELL-INIT--
+dbInit 1234567890
+dbInit 12345678901
 
 --SHELL--
 
