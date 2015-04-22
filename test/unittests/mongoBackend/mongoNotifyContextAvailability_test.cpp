@@ -1417,7 +1417,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    utInit();
+    utExit();
 
 }
 
