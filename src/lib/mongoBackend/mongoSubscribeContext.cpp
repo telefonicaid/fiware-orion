@@ -47,13 +47,13 @@ HttpStatusCode mongoSubscribeContext
   const std::string&                   tenant,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   xauthToken,
-  const std::vector<std::string>&      servicePathV
+  const std::vector<std::string>&      servicePathV,
+  Format                               notifyFormat
 )
 {
-    std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
     std::string servicePath  = (servicePathV.size() == 0)? "" : servicePathV[0];
 
-    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormat.c_str()));
+    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", formatToString(notifyFormat)));
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
 
@@ -111,7 +111,7 @@ HttpStatusCode mongoSubscribeContext
                                              requestP->attributeList, oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             (notifyFormat == "XML")? XML : JSON,
+                                             notifyFormat,
                                              tenant,
                                              xauthToken,
                                              servicePathV);
@@ -122,7 +122,7 @@ HttpStatusCode mongoSubscribeContext
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, notifyFormat);
+    sub.append(CSUB_FORMAT, formatToString(notifyFormat));
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();

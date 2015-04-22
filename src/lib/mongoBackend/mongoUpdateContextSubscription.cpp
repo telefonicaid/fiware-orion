@@ -44,7 +44,7 @@ HttpStatusCode mongoUpdateContextSubscription
 (
   UpdateContextSubscriptionRequest*   requestP,
   UpdateContextSubscriptionResponse*  responseP,
-  Format                              inFormat,
+  Format                              notifyFormat,
   const std::string&                  tenant,
   const std::string&                  xauthToken,
   const std::vector<std::string>&     servicePathV
@@ -177,7 +177,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 requestP->subscriptionId.get(),
                                                 C_STR_FIELD(sub, CSUB_REFERENCE),
                                                 &notificationDone,
-                                                inFormat,
+                                                notifyFormat,
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV);
@@ -207,7 +207,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
   /* Adding format to use in notifications */
-  newSub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
+  newSub.append(CSUB_FORMAT, std::string(formatToString(notifyFormat)));
 
   /* Update document in MongoDB */
   BSONObj update = newSub.obj();

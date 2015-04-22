@@ -66,4 +66,12 @@ extern Format stringToFormat(const std::string& s);
 */
 extern Format formatParse(const std::string& format, std::string* charsetP);
 
+
+
+/* ****************************************************************************
+*
+* formatFromInput - 
+*/
+Format formatFromInput(const std::string& fromUriParam, Format inFormat);
+
 #endif  // SRC_LIB_COMMON_FORMAT_H_

@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "common/Format.h"
 #include "common/string.h"
 #include "common/defaultValues.h"
 #include "serviceRoutines/postRegisterContext.h"
@@ -37,6 +38,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/clientSocketHttp.h"
+#include "rest/uriParamNames.h"
 #include "xmlParse/xmlRequest.h"
 
 
@@ -55,7 +57,8 @@ static std::string fordwardRegisterContext
   const std::string&  tenant,
   const std::string&  xauthToken,
   const std::string&  payload,
-  const std::string&  servicePath
+  const std::string&  servicePath,
+  Format              format
 )
 {
   LM_T(LmtCm, ("forwarding registerContext to: host='%s', port=%d", fwdHost, fwdPort));
@@ -68,7 +71,7 @@ static std::string fordwardRegisterContext
                                         servicePath,
                                         xauthToken,
                                         "ngsi9/registerContext",
-                                        // FIXME P3: unhardwire content type
+                                        // FIXME P3: unhardwire content type - from where do I get the Format?
                                         std::string("application/xml"),
                                         payload,
                                         true,
@@ -92,21 +95,22 @@ static void registerContextForward
 (
   ConnectionInfo*           ciP,
   ParseData*                parseDataP,
-  RegisterContextResponse*  rcrP
+  RegisterContextResponse*  rcrP,
+  Format                    format
 )
 {
   /* Forward registerContext */
   if (parseDataP->rcr.res.registrationId.isEmpty())
   {
     /* New registration case */
-    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
+    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->uriParam, ciP->tenant, ciP->servicePathV[0], format);
 
     std::string payload  = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0]);
+    std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0], format);
 
     if (response == "error")
     {
-      LM_E(("Runtime Error (fordwarding of RegisterContext failed)"));
+      LM_E(("Runtime Error (forwarding of RegisterContext failed)"));
       return;
     }
 
@@ -143,11 +147,11 @@ static void registerContextForward
     /* Update case */
     std::string fwdRegId = mongoGetFwdRegId(parseDataP->rcr.res.registrationId.get(), ciP->tenant);
 
-    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
+    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->uriParam, ciP->tenant, ciP->servicePathV[0], format);
     parseDataP->rcr.res.registrationId.set(fwdRegId);
     mongoSetFwdRegId(rcrP->registrationId.get(), fwdRegId, ciP->tenant);
     std::string payload = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0]);
+    fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0], format);
   }
 }
 
@@ -167,6 +171,7 @@ std::string postRegisterContext
 {
   RegisterContextResponse  rcr;
   std::string              answer;
+  Format                   notifyFormat = formatFromInput(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT], ciP->inFormat);
 
   //
   // If more than ONE service-path is input, an error is returned as response.
@@ -195,11 +200,11 @@ std::string postRegisterContext
 
   if (fwdPort != 0)
   {
-    registerContextForward(ciP, parseDataP, &rcr);
+    registerContextForward(ciP, parseDataP, &rcr, notifyFormat);
   }
   else
   {
-    ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
+    ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->tenant, ciP->servicePathV[0], notifyFormat);
   }
 
   answer = rcr.render(RegisterContext, ciP->outFormat, "");

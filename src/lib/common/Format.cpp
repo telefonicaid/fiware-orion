@@ -103,3 +103,14 @@ Format formatParse(const std::string& formatString, std::string* charsetP)
 
   return XML;
 }
+
+
+
+/* ****************************************************************************
+*
+* formatFromInput - 
+*/
+Format formatFromInput(const std::string& fromUriParam, Format inFormat)
+{
+  return (fromUriParam == "")? inFormat : stringToFormat(fromUriParam);
+}

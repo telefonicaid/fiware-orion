@@ -51,16 +51,14 @@ HttpStatusCode mongoRegisterContext
   RegisterContextResponse*             responseP,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
-  const std::string&                   servicePath
-
+  const std::string&                   servicePath,
+  Format                               format
 )
 {
-    // FIXME P10: we have been discussing about changing the "notifyFormat" name for something more neutral and more
-    // meaningfull for *both* subscription notification and cpr forwards
-    std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
-    std::string sPath = servicePath;
+    std::string sPath  = servicePath;
+    std::string formatAsString = (format == XML)? "XML" : "JSON";
 
-    LM_T(LmtMongo, ("Register Context Request: '%s' format", notifyFormat.c_str()));
+    LM_T(LmtMongo, ("Register Context Request: '%s' format", formatAsString.c_str()));
 
     reqSemTake(__FUNCTION__, "ngsi9 register request");    
 
@@ -75,7 +73,7 @@ HttpStatusCode mongoRegisterContext
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())
     {
-      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, notifyFormat);
+      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, formatAsString);
       reqSemGive(__FUNCTION__, "ngsi9 register request");
       return result;
     }
@@ -143,7 +141,7 @@ HttpStatusCode mongoRegisterContext
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, notifyFormat);
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, formatAsString);
     reqSemGive(__FUNCTION__, "ngsi9 register request");
     return result;
 }

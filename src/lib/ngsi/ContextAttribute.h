@@ -52,7 +52,7 @@ typedef struct ContextAttribute
 
   ProvidingApplication     providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
   bool                     found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
-                                                    // It means attribute found either locally or remotely in prodiving application
+                                                    // It means attribute found either locally or remotely in providing application
 
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;

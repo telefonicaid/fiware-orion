@@ -29,6 +29,7 @@
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 #include "serviceRoutines/postSubscribeContext.h"
 
 
@@ -77,7 +78,9 @@ std::string postSubscribeContext
     return answer;
   }
 
-  ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV);
+  Format notifyFormat = formatFromInput(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT], ciP->inFormat);
+
+  ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, notifyFormat);
   answer = scr.render(SubscribeContext, ciP->outFormat, "");
 
   parseDataP->scr.res.release();
