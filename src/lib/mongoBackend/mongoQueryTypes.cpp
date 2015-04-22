@@ -62,16 +62,22 @@ HttpStatusCode mongoEntityTypes
    *
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
-   *                            {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
-   *                            {$project: { "attrs"
-   *                                  {$cond: [ {$eq: [ "$attrs", [ ] ] }, [null], "$attrs"] }
+   *                            {$project: {_id: 1, "attrNames": 1} },
+   *                            {$project: { "attrNames"
+   *                                  {$cond: [ {$eq: [ "$attrNames", [ ] ] }, [null], "$attrNames"] }
    *                               }
    *                            },
-   *                            {$unwind: "$attrs"},
-   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
+   *                            {$unwind: "$attrNames"},
+   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} },
    *                            {$sort: {_id: 1} }
    *                          ]
    *                })
+   *
+   * FIXME:
+   *
+   * db.runCommand({aggregate: "entities", pipeline: [ {$unwind: "$attrNames"} ,
+   *                                                   {$project: {_id: 1, attrNames: {name: "$attrNames", type: "$attrNames" }}} ,
+   *                                                   {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} }  ] } )
    *
    * The $cond part is hard... more information at http://stackoverflow.com/questions/27510143/empty-array-prevents-document-to-appear-in-query
    * As a consequence, some "null" values may appear in the resulting attrs vector, which are pruned by the result processing logic.
@@ -80,6 +86,8 @@ HttpStatusCode mongoEntityTypes
    * following command can be used:
    *
    * db.runCommand({aggregate: "entities", pipeline: [ {$group: {_id: "$_id.type"} }]})
+   *
+   *
    *
    */
 
@@ -94,11 +102,11 @@ HttpStatusCode mongoEntityTypes
   // We are using the $cond: [ .. ] and not the $cond: { .. } one, as the former is the only one valid in MongoDB 2.4
   BSONObj projection = BSON(
     "$project" << BSON(
-      "attrs" << BSON(
+      ENT_ATTRNAMES << BSON(
         "$cond" << BSON_ARRAY(
-          BSON("$eq" << BSON_ARRAY(S_ATTRS << emptyArrayBuilder.arr()) ) <<
+          BSON("$eq" << BSON_ARRAY(S_ATTRNAMES << emptyArrayBuilder.arr()) ) <<
           nulledArrayBuilder.arr() <<
-          S_ATTRS
+          S_ATTRNAMES
         )
       )
     )
@@ -107,10 +115,10 @@ HttpStatusCode mongoEntityTypes
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
                                               BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-                                              BSON("$project" << BSON("_id" << 1 << C_ATTR_NAME << 1 << C_ATTR_TYPE << 1)) <<
+                                              BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
                                               projection <<
-                                              BSON("$unwind" << S_ATTRS) <<
-                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRS))) <<
+                                              BSON("$unwind" << S_ATTRNAMES) <<
+                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
                                               BSON("$sort" << BSON("_id" << 1))
                                              )
                      );
@@ -178,10 +186,8 @@ HttpStatusCode mongoEntityTypes
         if (attrsArray[jx].isNull())
         {
           continue;
-        }
-        
-        BSONObj jAttr = attrsArray[jx].embeddedObject();
-        ContextAttribute* ca = new ContextAttribute(jAttr.getStringField(ENT_ATTRS_NAME), jAttr.getStringField(ENT_ATTRS_TYPE));
+        }        
+        ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), "");
         type->contextAttributeVector.push_back(ca);
       }
     }
@@ -249,18 +255,15 @@ HttpStatusCode mongoAttributesForEntityType
 
   DBClientBase* connection = getMongoConnection();
 
-  /* Compose query based on this aggregation command:
-   *
-   * FIXME P9: taking into account that type is no longer used as part of the attribute "key", not sure if the
-   * aggregation query below is fully correct
+  /* Compose query based on this aggregation command:   
    *
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
-   *                            {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
-   *                            {$unwind: "$attrs"},
+   *                            {$project: {_id: 1, "attrNames": 1} },
+   *                            {$unwind: "$attrNames"},
    *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
-   *                            {$unwind: "$attrs"},
-   *                            {$group: {_id: "$attrs" }},
+   *                            //{$unwind: "$attrs"},
+   *                            //{$group: {_id: "$attrs" }},
    *                            {$sort: {_id.name: 1, _id.type: 1} }
    *                          ]
    *                })
@@ -271,11 +274,11 @@ HttpStatusCode mongoAttributesForEntityType
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
                                               BSON("$match" << BSON(C_ID_ENTITY << entityType << C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
-                                              BSON("$project" << BSON("_id" << 1 << C_ATTR_NAME << 1 << C_ATTR_TYPE << 1)) <<
-                                              BSON("$unwind" << S_ATTRS) <<
-                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRS))) <<
-                                              BSON("$unwind" << S_ATTRS) <<
-                                              BSON("$group" << BSON("_id" << S_ATTRS)) <<
+                                              BSON("$project" << BSON("_id" << 1 << S_ATTRNAMES << 1)) <<
+                                              BSON("$unwind" << S_ATTRNAMES) <<
+                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
+                                              //BSON("$unwind" << S_ATTRS) <<
+                                              //BSON("$group" << BSON("_id" << S_ATTRS)) <<
                                               BSON("$sort" << BSON(C_ID_NAME << 1 << C_ID_TYPE << 1))
                                              )
                     );

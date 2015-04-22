@@ -1,3 +1,5 @@
 - Add: support for MongoDB 2.6 (MongoDB 2.4 should *not* be used any longer as inverted geo-queries will not work in that version) (Issue #415)
 - Add: context providers full functionality (Issue #787)
 - Fix: using proper GJSON for location.coords entities information (Issue #415)
+- Fix: attribute storing in DB (from vector to keymap) to enable CB Active/Active architectures (Issue #878)
+- Fix: simplifying 'GET /v1/contextTypes' and 'GET /v1/contextTypes/<entityType>' operations, removing attribute types (no longer used as attribute identification since 0.17.0)
