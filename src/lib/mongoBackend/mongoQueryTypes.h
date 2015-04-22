@@ -41,8 +41,6 @@ const std::string C_ID_SERVICEPATH = std::string("_id.") + "servicePath";
 const std::string CS_ID_ENTITY     = std::string("$_id.") + "type";
 const std::string C_ID_NAME        = std::string("_id.") + "name";
 const std::string C_ID_TYPE        = std::string("_id.") + "type";
-const std::string C_ATTR_NAME      = std::string(ENT_ATTRS) + "." ENT_ATTRS_NAME;
-//const std::string S_ATTRS          = std::string("$") + "attrs";
 const std::string S_ATTRNAMES      = std::string("$") + ENT_ATTRNAMES;
 
 

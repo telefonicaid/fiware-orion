@@ -55,10 +55,7 @@ HttpStatusCode mongoEntityTypes
 
   DBClientBase* connection = getMongoConnection();
 
-  /* Compose query based on this aggregation command:
-   *
-   * FIXME P9: taking into account that type is no longer used as part of the attribute "key", not sure if the
-   * aggregation query below is fully correct
+  /* Compose query based on this aggregation command:  
    *
    * db.runCommand({aggregate: "entities",
    *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
@@ -71,13 +68,7 @@ HttpStatusCode mongoEntityTypes
    *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} },
    *                            {$sort: {_id: 1} }
    *                          ]
-   *                })
-   *
-   * FIXME:
-   *
-   * db.runCommand({aggregate: "entities", pipeline: [ {$unwind: "$attrNames"} ,
-   *                                                   {$project: {_id: 1, attrNames: {name: "$attrNames", type: "$attrNames" }}} ,
-   *                                                   {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} }  ] } )
+   *                })   
    *
    * The $cond part is hard... more information at http://stackoverflow.com/questions/27510143/empty-array-prevents-document-to-appear-in-query
    * As a consequence, some "null" values may appear in the resulting attrs vector, which are pruned by the result processing logic.
@@ -261,9 +252,7 @@ HttpStatusCode mongoAttributesForEntityType
    *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
    *                            {$project: {_id: 1, "attrNames": 1} },
    *                            {$unwind: "$attrNames"},
-   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
-   *                            //{$unwind: "$attrs"},
-   *                            //{$group: {_id: "$attrs" }},
+   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} },
    *                            {$sort: {_id.name: 1, _id.type: 1} }
    *                          ]
    *                })
@@ -277,8 +266,6 @@ HttpStatusCode mongoAttributesForEntityType
                                               BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
                                               BSON("$unwind" << S_ATTRNAMES) <<
                                               BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
-                                              //BSON("$unwind" << S_ATTRS) <<
-                                              //BSON("$group" << BSON("_id" << S_ATTRS)) <<
                                               BSON("$sort" << BSON(C_ID_NAME << 1 << C_ID_TYPE << 1))
                                              )
                     );
@@ -329,20 +316,21 @@ HttpStatusCode mongoAttributesForEntityType
   {
     //BSONElement        idField    = resultsArray[ix].embeddedObject().getField("_id");
 
+#if 0
+    // FIXME P10: maybe this all problem cheking should be moved...
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
     //
     // Now, if 'resultsArray[ix].embeddedObject().getField("_id")' is not found, if we continue,
     // calling embeddedObject() on it, then we get an exception and the broker crashes.
     //
-    //if (idField.eoo() == true)
-    //{
-    //  LM_E(("Database Error (error retrieving _id field in doc: %s)", resultsArray[ix].embeddedObject().toString().c_str()));
-    //  continue;
-    //}
+    if (idField.eoo() == true)
+    {
+      LM_E(("Database Error (error retrieving _id field in doc: %s)", resultsArray[ix].embeddedObject().toString().c_str()));
+      continue;
+    }
+#endif
 
-    //BSONObj            resultItem = idField.embeddedObject();
-    //ContextAttribute*  ca         = new ContextAttribute(resultItem.getStringField(ENT_ATTRS_NAME), resultItem.getStringField(ENT_ATTRS_TYPE));
     ContextAttribute*  ca         = new ContextAttribute(attrsArray[ix].str(), "");
     responseP->entityType.contextAttributeVector.push_back(ca);
   }
