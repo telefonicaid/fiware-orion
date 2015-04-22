@@ -638,7 +638,18 @@ function runTest()
 
   if [ "$exitCode" != "0" ]
   then
+
+    #
     # 3.2 Run the SHELL-INIT part AGAIN
+    #
+    # This 're-run' of the SHELL-INIT part is due to errors we've seen that seem to be caused by
+    # a try to start a broker while the old one (from the previous functest) is still running.
+    # No way to test this, except with some patience.
+    #
+    # We have seem 'ERROR 11' around once every 500-1000 functests (the suite is of almost 400 tests)
+    # and this fix, if working, will make us not see those 'ERROR 11' again.
+    # If we keep seeing 'ERROR 11' after this change then we will need to investigate further.
+    #
     sleep 1
     rm -f $dirname/$filename.shellInit.stderr
     rm -f $dirname/$filename.shellInit.stdout
