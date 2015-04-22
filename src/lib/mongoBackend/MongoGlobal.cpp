@@ -1788,21 +1788,20 @@ bool processOnChangeCondition
         if (condValues != NULL) {
             /* Check if some of the attributes in the NotifyCondition values list are in the entity.
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
-            ContextElementResponseVector rawCerV2;
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
             // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
-            if (!entitiesQuery(enV, emptyList, res, &rawCerV2, &err, false, tenant, servicePathV))
+            if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
             {
-                rawCerV2.release();
+                rawCerV.release();
                 ncr.contextElementResponseVector.release();
                 return false;
             }
 
             /* Prune "not found" CERs */
-            pruneContextElements(rawCerV2, &allCerV);
-            rawCerV2.release();
+            pruneContextElements(rawCerV, &allCerV);
+            rawCerV.release();
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
