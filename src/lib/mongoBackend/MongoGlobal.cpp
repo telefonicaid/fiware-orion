@@ -1373,7 +1373,7 @@ void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementR
     ContextElementResponse* newCerP = new ContextElementResponse();
 
     /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
-     * of this is that attributeDomainName and domainMetadataVector and not being copied, but it should not be a problem, given that
+     * of this is that attributeDomainName and domainMetadataVector are not being copied, but it should not be a problem, given that
      * domain attributes are not implemented */
     newCerP->contextElement.entityId.fill(&cerP->contextElement.entityId);
     newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;  // FIXME P10: not sure if this is the right way of doing, maybe we need a fill() method for this
@@ -1770,11 +1770,13 @@ bool processOnChangeCondition
     if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, false, tenant, servicePathV))
     {
         ncr.contextElementResponseVector.release();
+        rawCerV.release();
         return false;
     }
 
     /* Prune "not found" CERs */
     pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
+    rawCerV.release();
 
     if (ncr.contextElementResponseVector.size() > 0)
     {
@@ -1786,26 +1788,28 @@ bool processOnChangeCondition
         if (condValues != NULL) {
             /* Check if some of the attributes in the NotifyCondition values list are in the entity.
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
-            ContextElementResponseVector rawCerV;
+            ContextElementResponseVector rawCerV2;
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
             // FIXME P10: we are using an empty service path vector until serive paths get implemented for subscriptions
-            if (!entitiesQuery(enV, emptyList, res, &rawCerV, &err, false, tenant, servicePathV))
+            if (!entitiesQuery(enV, emptyList, res, &rawCerV2, &err, false, tenant, servicePathV))
             {
-                rawCerV.release();
+                rawCerV2.release();
                 ncr.contextElementResponseVector.release();
                 return false;
             }
 
             /* Prune "not found" CERs */
-            pruneContextElements(rawCerV, &allCerV);
+            pruneContextElements(rawCerV2, &allCerV);
+            rawCerV2.release();
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
                 getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
+                
                 return true;
             }
 
