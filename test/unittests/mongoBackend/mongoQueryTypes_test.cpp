@@ -330,46 +330,39 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
-    ASSERT_EQ(6, res.typeEntityVector.get(0)->contextAttributeVector.size());
+    ASSERT_EQ(5, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
     EXPECT_EQ("fuel", ca->name);
-    EXPECT_EQ("fuel_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T");
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
     EXPECT_EQ("plate", ca->name);
-    EXPECT_EQ("plate_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "temp");
     EXPECT_EQ("temp", ca->name);
-    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "colour");
     EXPECT_EQ("colour", ca->name);
-    EXPECT_EQ("colour_T", ca->type);
-    EXPECT_EQ("", ca->value);
-    EXPECT_EQ(NULL, ca->compoundValueP);
-    EXPECT_EQ(0, ca->metadataVector.size());
-
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T2");
-    EXPECT_EQ("plate", ca->name);
-    EXPECT_EQ("plate_T2", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "pos");
     EXPECT_EQ("pos", ca->name);
-    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -380,14 +373,14 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "status");
     EXPECT_EQ("status", ca->name);
-    EXPECT_EQ("status_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "battery");
     EXPECT_EQ("battery", ca->name);
-    EXPECT_EQ("battery_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -398,21 +391,21 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
 
     ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "humidity");
     EXPECT_EQ("humidity", ca->name);
-    EXPECT_EQ("humidity_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "temp");
     EXPECT_EQ("temp", ca->name);
-    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "pos");
     EXPECT_EQ("pos", ca->name);
-    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -455,46 +448,39 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
-    ASSERT_EQ(6, res.typeEntityVector.get(0)->contextAttributeVector.size());
+    ASSERT_EQ(5, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
     EXPECT_EQ("fuel", ca->name);
-    EXPECT_EQ("fuel_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T");
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
     EXPECT_EQ("plate", ca->name);
-    EXPECT_EQ("plate_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "temp");
     EXPECT_EQ("temp", ca->name);
-    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "colour");
     EXPECT_EQ("colour", ca->name);
-    EXPECT_EQ("colour_T", ca->type);
-    EXPECT_EQ("", ca->value);
-    EXPECT_EQ(NULL, ca->compoundValueP);
-    EXPECT_EQ(0, ca->metadataVector.size());
-
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T2");
-    EXPECT_EQ("plate", ca->name);
-    EXPECT_EQ("plate_T2", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "pos");
     EXPECT_EQ("pos", ca->name);
-    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -505,14 +491,14 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "status");
     EXPECT_EQ("status", ca->name);
-    EXPECT_EQ("status_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "battery");
     EXPECT_EQ("battery", ca->name);
-    EXPECT_EQ("battery_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -523,21 +509,21 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
 
     ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "humidity");
     EXPECT_EQ("humidity", ca->name);
-    EXPECT_EQ("humidity_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "temp");
     EXPECT_EQ("temp", ca->name);
-    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "pos");
     EXPECT_EQ("pos", ca->name);
-    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -580,46 +566,39 @@ TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
-    ASSERT_EQ(6, res.typeEntityVector.get(0)->contextAttributeVector.size());
+    ASSERT_EQ(5, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
     EXPECT_EQ("fuel", ca->name);
-    EXPECT_EQ("fuel_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T");
+    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate");
     EXPECT_EQ("plate", ca->name);
-    EXPECT_EQ("plate_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "temp");
     EXPECT_EQ("temp", ca->name);
-    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "colour");
     EXPECT_EQ("colour", ca->name);
-    EXPECT_EQ("colour_T", ca->type);
-    EXPECT_EQ("", ca->value);
-    EXPECT_EQ(NULL, ca->compoundValueP);
-    EXPECT_EQ(0, ca->metadataVector.size());
-
-    ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "plate", "plate_T2");
-    EXPECT_EQ("plate", ca->name);
-    EXPECT_EQ("plate_T2", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "pos");
     EXPECT_EQ("pos", ca->name);
-    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -667,14 +646,14 @@ TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "status");
     EXPECT_EQ("status", ca->name);
-    EXPECT_EQ("status_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "battery");
     EXPECT_EQ("battery", ca->name);
-    EXPECT_EQ("battery_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -722,14 +701,14 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "status");
     EXPECT_EQ("status", ca->name);
-    EXPECT_EQ("status_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "battery");
     EXPECT_EQ("battery", ca->name);
-    EXPECT_EQ("battery_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -740,21 +719,21 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "humidity");
     EXPECT_EQ("humidity", ca->name);
-    EXPECT_EQ("humidity_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "temp");
     EXPECT_EQ("temp", ca->name);
-    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "pos");
     EXPECT_EQ("pos", ca->name);
-    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -838,21 +817,21 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "humidity");
     EXPECT_EQ("humidity", ca->name);
-    EXPECT_EQ("humidity_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "temp");
     EXPECT_EQ("temp", ca->name);
-    EXPECT_EQ("temp_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "pos");
     EXPECT_EQ("pos", ca->name);
-    EXPECT_EQ("pos_T", ca->type);
+    EXPECT_EQ("", ca->type);
     EXPECT_EQ("", ca->value);
     EXPECT_EQ(NULL, ca->compoundValueP);
     EXPECT_EQ(0, ca->metadataVector.size());
@@ -924,12 +903,11 @@ TEST(mongoQueryTypes, queryAllDbException)
   ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
 
   /* Check response is as expected */
-  EXPECT_EQ(SccOk, ms);
-
+  EXPECT_EQ(SccOk, ms); 
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $project: { attrs: { $cond: [ { $eq: [ \"$attrs\", {} ] }, [ null ], \"$attrs\" ] } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $sort: { _id: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", {} ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } - "
             "exception: boom!!", res.statusCode.details);
   EXPECT_EQ(0,res.typeEntityVector.size());
 
@@ -970,7 +948,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrs.name: 1, attrs.type: 1 } }, { $project: { attrs: { $cond: [ { $eq: [ \"$attrs\", {} ] }, [ null ], \"$attrs\" ] } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrs\" } } }, { $sort: { _id: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", {} ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } - "
             "exception: generic", res.statusCode.details);
   EXPECT_EQ(0,res.typeEntityVector.size());
 
