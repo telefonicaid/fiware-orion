@@ -181,6 +181,7 @@ void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP, Sta
 
   if (cerP == NULL)
   {
+    // ContextElementResponse constructor allocates a new ContextAttribute
     cerP = new ContextElementResponse(eP, aP);
 
     if (scP != NULL)
@@ -196,7 +197,7 @@ void UpdateContextResponse::notFoundPush(EntityId* eP, ContextAttribute* aP, Sta
   }
   else
   {
-    cerP->contextElement.contextAttributeVector.push_back(aP);
+    cerP->contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
   }
 }
 
@@ -217,13 +218,14 @@ void UpdateContextResponse::foundPush(EntityId* eP, ContextAttribute* aP)
 
   if (cerP == NULL)
   {
+    // ContextElementResponse constructor allocates a new ContextAttribute
     cerP = new ContextElementResponse(eP, aP);
     cerP->statusCode.fill(SccOk);
     contextElementResponseVector.push_back(cerP);
   }
   else
   {
-    cerP->contextElement.contextAttributeVector.push_back(aP);
+    cerP->contextElement.contextAttributeVector.push_back(new ContextAttribute(aP));
   }
 }
 
@@ -271,7 +273,7 @@ void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
 
     for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
     {
-      ContextAttribute* aP = new ContextAttribute(ceP->contextAttributeVector[aIx]);
+      ContextAttribute* aP = ceP->contextAttributeVector[aIx];
 
       if (scP->code != SccOk)
       {
@@ -281,6 +283,8 @@ void UpdateContextResponse::merge(UpdateContextResponse* upcrsP)
       {
         foundPush(&ceP->entityId, aP);
       }
+
+      
     }
   }
 }
