@@ -108,7 +108,7 @@ static void prepareDatabase(void) {
 
   BSONObj city1 = BSON("_id" << BSON("id" << "Madrid" << "type" << "City") <<
                      "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON_ARRAY(
+                     "attrs" << BSON(
                         "pos" << BSON("type" << "location" << "value" << "40.418889, -3.691944") <<
                         "foo" << BSON("type" << "string" << "value" << "attr_Mad")
                         ) <<
@@ -117,7 +117,7 @@ static void prepareDatabase(void) {
 
   BSONObj city2 = BSON("_id" << BSON("id" << "Alcobendas" << "type" << "City") <<
                      "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON_ARRAY(
+                     "attrs" << BSON(
                         "pos" << BSON("type" << "location" << "value" << "40.533333, -3.633333") <<
                         "foo" << BSON("type" << "string" << "value" << "attr_Alc")
                         ) <<
@@ -126,7 +126,7 @@ static void prepareDatabase(void) {
 
   BSONObj city3 = BSON("_id" << BSON("id" << "Leganes" << "type" << "City") <<
                      "attrNames" << BSON_ARRAY("pos" << "foo") <<
-                     "attrs" << BSON_ARRAY(
+                     "attrs" << BSON(
                         "pos" << BSON("type" << "location" << "value" << "40.316667, -3.75") <<
                         "foo" << BSON("type" << "string" << "value" << "attr_Leg")
                         ) <<
