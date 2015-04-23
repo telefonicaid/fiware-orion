@@ -49,38 +49,6 @@ TypeEntityVector::TypeEntityVector()
 }
 
 
-
-/* ****************************************************************************
-*
-* TypeEntityVector::renderJsonObject -
-*/
-std::string TypeEntityVector::renderAsJsonObject
-(
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
-  bool                comma
-)
-{
-  std::string out      = "";
-  std::string jsonTag  = "types";
-  std::string xmlTag   = "";
-
-  if (vec.size() > 0)
-  {
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
-
-    for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    {
-      out += vec[ix]->render(ciP, indent + "  ", ix != vec.size() - 1);
-    }
-    out += endTag(indent, "", ciP->outFormat, comma, true);
-  }
-
-  return out;
-}
-
-
-
 /* ****************************************************************************
 *
 * TypeEntityVector::render -
@@ -99,10 +67,12 @@ std::string TypeEntityVector::render
 
   if (vec.size() > 0)
   {
+#if 0
     if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
     {
       return renderAsJsonObject(ciP, indent, comma);
     }
+#endif
 
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
 

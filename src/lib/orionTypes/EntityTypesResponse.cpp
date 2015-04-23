@@ -66,11 +66,6 @@ std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& 
   std::string out                 = "";
   std::string tag                 = "entityTypesResponse";
 
-  if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
-  {
-    return renderAsJsonObject(ciP, indent);
-  }
-
   out += startTag(indent, tag, ciP->outFormat, false);
 
   if (typeEntityVector.size() > 0)

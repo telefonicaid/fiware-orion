@@ -165,7 +165,7 @@ Date: REGEX(.*)
 02. Query on / (returns: T1, T2)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 365
+Content-Length: 215
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -177,19 +177,13 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "T1"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "T2"
         }
@@ -200,7 +194,7 @@ Date: REGEX(.*)
 03. Query on /# (returns: T1, T2, T3)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 502
+Content-Length: 277
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -212,28 +206,19 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "T1"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "T2"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "T3"
         }
@@ -244,7 +229,7 @@ Date: REGEX(.*)
 04. Query without servicePath (returns: T1, T2, T3)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 502
+Content-Length: 277
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -256,28 +241,19 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "T1"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "T2"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "T3"
         }

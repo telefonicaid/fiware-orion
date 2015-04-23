@@ -154,6 +154,13 @@ HttpStatusCode mongoEntityTypes
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
 
+  if (resultsArray.size() == 0)
+  {
+    responseP->statusCode.fill(SccContextElementNotFound);
+    reqSemGive(__FUNCTION__, "query types request");
+    return SccOk;
+  }
+
   /* Another strategy to implement pagination is to use the $skip and $limit operators in the
    * aggregation framework. However, doing so, we don't know the total number of results, which can
    * be needed in the case of details=on (using that approach, we need to do two queries: one to get
@@ -308,7 +315,16 @@ HttpStatusCode mongoAttributesForEntityType
   /* Processing result to build response*/
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
-  std::vector<BSONElement> attrsArray = result.getField("result").Array()[0].embeddedObject().getField("attrs").Array();
+  std::vector<BSONElement> resultsArray = result.getField("result").Array();
+
+  if (resultsArray.size() == 0)
+  {
+    responseP->statusCode.fill(SccContextElementNotFound);
+    reqSemGive(__FUNCTION__, "query types request");
+    return SccOk;
+  }
+
+  std::vector<BSONElement> attrsArray = resultsArray[0].embeddedObject().getField("attrs").Array();
 
 
   /* See comment above in the other method regarding this strategy to implement pagination */

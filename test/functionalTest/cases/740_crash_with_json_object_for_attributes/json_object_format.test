@@ -167,22 +167,20 @@ Date: REGEX(.*)
 03. List contextTypes (which is where the broker crash occurs)
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 209
+Content-Length: 154
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
-    }, 
+    },
     "types": [
         {
-            "attributes": {
-                "asdf": {
-                    "type": "asdf"
-                }
-            }, 
+            "attributes": [
+                "asdf"
+            ],
             "name": ""
         }
     ]

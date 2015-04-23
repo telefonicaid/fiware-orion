@@ -54,30 +54,6 @@ TypeEntity::TypeEntity(std::string  _type)
 }
 
 
-
-/* ****************************************************************************
-*
-* TypeEntity::renderAsJsonObject -
-*/
-std::string TypeEntity::renderAsJsonObject
-(
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
-  bool                comma
-)
-{
-  std::string  out            = "";
-  std::string  jsonTag        = type;
-
-  out += startTag(indent, jsonTag, ciP->outFormat, false, false);
-  out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true);
-  out += endTag(indent, "", ciP->outFormat, comma, false);
-
-  return out;
-}
-
-
-
 /* ****************************************************************************
 *
 * TypeEntity::render -
@@ -103,7 +79,20 @@ std::string TypeEntity::render
   if ((typeNameBefore == true) && (ciP->outFormat == JSON))
   {
     out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
-    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", true, true);
+
+    out += indent + "  \"attributes\": [ ";
+    for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+    {
+      ContextAttribute* caP = contextAttributeVector.get(ix);
+      out += "\"" + caP->name + "\"";
+      if (ix != contextAttributeVector.size() - 1)
+      {
+        /* Except for the last element, we have to add a comma */
+        out += ", ";
+      }
+    }
+    out += " ], \n";
+
   }
   else
   {
@@ -116,7 +105,30 @@ std::string TypeEntity::render
     else
     {
       out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
-      out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true);
+      if (ciP->outFormat == JSON) {
+        out += indent + "  \"attributes\": [ ";
+        for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+        {
+          ContextAttribute* caP = contextAttributeVector.get(ix);
+          out += "\"" + caP->name + "\"";
+          if (ix != contextAttributeVector.size() - 1)
+          {
+            /* Except for the last element, we have to add a comma */
+            out += ", ";
+          }
+        }
+        out += " ]\n";
+      }
+      else  /* XML */
+      {
+        out += indent + "  <attributes>\n";
+        for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
+        {
+          ContextAttribute* caP = contextAttributeVector.get(ix);
+          out += indent + "    " + "<name>" + caP->name + "</name>\n";
+        }
+        out += indent + "  </attributes>\n";
+      }
     }
 
     out += endTag(indent, xmlTag, ciP->outFormat, comma, false);

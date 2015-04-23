@@ -565,15 +565,15 @@ function dbInsertEntity()
         "id": entity,
         "type": "T"
     },
-    "attrs": [
-        {
-            "name": "A",
+    "attrNames": [ "A" ],
+    "attrs": {
+        "A": {
             "type": "TA",
             "value": s,
             "creDate" : 1389376081,
             "modDate" : 1389376081
         },
-    ],
+    },
     "creDate": 1389376081,
     "modDate": 1389376081
   }'
