@@ -333,23 +333,19 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_ok)
     EXPECT_EQ("E1", cer0.contextElement.entityId.id);
     EXPECT_EQ("T", cer0.contextElement.entityId.type);
     EXPECT_EQ("false", cer0.contextElement.entityId.isPattern);
-    ASSERT_EQ(4, cer0.contextElement.contextAttributeVector.size());
+    ASSERT_EQ(3, cer0.contextElement.contextAttributeVector.size());
     ca0 = *cer0.contextElement.contextAttributeVector.get(0);
     ca1 = *cer0.contextElement.contextAttributeVector.get(1);
-    ca2 = *cer0.contextElement.contextAttributeVector.get(2);
-    ca3 = *cer0.contextElement.contextAttributeVector.get(3);
+    ca2 = *cer0.contextElement.contextAttributeVector.get(2);    
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
     EXPECT_EQ("X", ca0.value);
-    EXPECT_EQ("A1", ca1.name);
-    EXPECT_EQ("TA1bis", ca1.type);
-    EXPECT_EQ("Y", ca1.value);
-    EXPECT_EQ("A2", ca2.name);
-    EXPECT_EQ("TA2", ca2.type);
-    EXPECT_EQ("Z", ca2.value);
-    EXPECT_EQ("A3", ca3.name);
-    EXPECT_EQ("TA3", ca3.type);
-    EXPECT_EQ("W", ca3.value);
+    EXPECT_EQ("A2", ca1.name);
+    EXPECT_EQ("TA2", ca1.type);
+    EXPECT_EQ("Z", ca1.value);
+    EXPECT_EQ("A3", ca2.name);
+    EXPECT_EQ("TA3", ca2.type);
+    EXPECT_EQ("W", ca2.value);
 
     /* Context Element Response #2 */
     EXPECT_EQ(SccOk, cer1.statusCode.code);
@@ -411,23 +407,19 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_pattern)
     EXPECT_EQ("E1", cer0.contextElement.entityId.id);
     EXPECT_EQ("T", cer0.contextElement.entityId.type);
     EXPECT_EQ("false", cer0.contextElement.entityId.isPattern);
-    ASSERT_EQ(4, cer0.contextElement.contextAttributeVector.size());
+    ASSERT_EQ(3, cer0.contextElement.contextAttributeVector.size());
     ca0 = *cer0.contextElement.contextAttributeVector.get(0);
     ca1 = *cer0.contextElement.contextAttributeVector.get(1);
-    ca2 = *cer0.contextElement.contextAttributeVector.get(2);
-    ca3 = *cer0.contextElement.contextAttributeVector.get(3);
+    ca2 = *cer0.contextElement.contextAttributeVector.get(2);    
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
     EXPECT_EQ("X", ca0.value);
-    EXPECT_EQ("A1", ca1.name);
-    EXPECT_EQ("TA1bis", ca1.type);
-    EXPECT_EQ("Y", ca1.value);
-    EXPECT_EQ("A2", ca2.name);
-    EXPECT_EQ("TA2", ca2.type);
-    EXPECT_EQ("Z", ca2.value);
-    EXPECT_EQ("A3", ca3.name);
-    EXPECT_EQ("TA3", ca3.type);
-    EXPECT_EQ("W", ca3.value);
+    EXPECT_EQ("A2", ca1.name);
+    EXPECT_EQ("TA2", ca1.type);
+    EXPECT_EQ("Z", ca1.value);
+    EXPECT_EQ("A3", ca2.name);
+    EXPECT_EQ("TA3", ca2.type);
+    EXPECT_EQ("W", ca2.value);
 
     /* Context Element Response #2 */
     EXPECT_EQ(SccOk, cer1.statusCode.code);
@@ -518,11 +510,13 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
     /* Do operation */
     ms = mongoGetContextElementResponses(enV, attrL, &cerV, &err);
 
+    //query(): { query: { $or: [ { _id.id: "E1", _id.type: "T" }, { _id.id: "E2", _id.type: "T" } ], _id.servicePath: { $in: [ /^/.*/, null ] }, attrNames: { $in: [ "A1", "A2", "A3", "A4" ] } }, orderby: { creDate: 1 } } -
+
     /* Check results */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("collection: unittest.entities - "
               "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T\" }, { _id.id: \"E2\", _id.type: \"T\" } ], _id.servicePath: { $in: [ /^/.*/, null ] }, "
-              "attrs.name: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } }, orderby: { creDate: 1 } } - "
+              "attrNames: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } }, orderby: { creDate: 1 } } - "
               "exception: boom!!", err);    
 
     /* Release mock */
