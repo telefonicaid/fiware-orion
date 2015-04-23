@@ -1008,14 +1008,14 @@ TEST(mongoQueryTypes, queryGivenTypeBasic)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(2)->metadataVector.size());
 
     /* Attr 4 */
-    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(3)->name);
+    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(3)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(3)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(3)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(3)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(3)->metadataVector.size());
 
     /* Attr 5 */
-    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(4)->name);
+    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(4)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(4)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(4)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(4)->compoundValueP);
@@ -1078,14 +1078,14 @@ TEST(mongoQueryTypes, queryGivenTypePaginationDetails)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(2)->metadataVector.size());
 
     /* Attr 4 */
-    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(3)->name);
+    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(3)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(3)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(3)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(3)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(3)->metadataVector.size());
 
     /* Attr 5 */
-    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(4)->name);
+    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(4)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(4)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(4)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(4)->compoundValueP);
@@ -1148,14 +1148,14 @@ TEST(mongoQueryTypes, queryGivenTypePaginationAll)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(2)->metadataVector.size());
 
     /* Attr 4 */
-    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(3)->name);
+    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(3)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(3)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(3)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(3)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(3)->metadataVector.size());
 
     /* Attr 5 */
-    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(4)->name);
+    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(4)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(4)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(4)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(4)->compoundValueP);
@@ -1290,14 +1290,14 @@ TEST(mongoQueryTypes, queryGivenTypePaginationRange)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
 
     /* Attr 4 */
-    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(1)->name);
+    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(1)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(1)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(1)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(1)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(1)->metadataVector.size());
 
     /* Attr 5 */
-    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(2)->name);
+    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(2)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(2)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(2)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(2)->compoundValueP);
@@ -1376,14 +1376,14 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingOverlap)
     ASSERT_EQ(2, res.entityType.contextAttributeVector.size());
 
     /* Attr 1 */
-    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(0)->name);
+    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(0)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(0)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(0)->compoundValueP);
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
 
     /* Attr 2 */
-    EXPECT_EQ("pos", res.entityType.contextAttributeVector.get(1)->name);
+    EXPECT_EQ("temp", res.entityType.contextAttributeVector.get(1)->name);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(1)->type);
     EXPECT_EQ("", res.entityType.contextAttributeVector.get(1)->value);
     EXPECT_EQ(NULL, res.entityType.contextAttributeVector.get(1)->compoundValueP);
@@ -1461,7 +1461,7 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id.name: 1, _id.type: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } - "
             "exception: boom!!", res.statusCode.details);
   EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
 
@@ -1502,7 +1502,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id.name: 1, _id.type: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.type: \"Car\", _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $unwind: \"$attrs\" }, { $group: { _id: \"$attrs\" } }, { $sort: { _id: 1 } } ] } - "
             "exception: generic", res.statusCode.details);
   EXPECT_EQ(0,res.entityType.contextAttributeVector.size());
 

@@ -201,8 +201,8 @@ Date: REGEX(.*)
 
 {
     "attributes": [
-        "A2",
-        "A1"
+        "A1",
+        "A2"
     ],
     "name": "T1",
     "statusCode": {
@@ -221,8 +221,8 @@ Date: REGEX(.*)
 
 {
     "attributes": [
-        "A2",
-        "A1"
+        "A1",
+        "A2"
     ],
     "name": "T1",
     "statusCode": {
@@ -277,10 +277,10 @@ Date: REGEX(.*)
 
 {
     "attributes": [
+        "A1",
         "A2",
-        "A4",
         "A3",
-        "A1"
+        "A4"
     ],
     "name": "T1",
     "statusCode": {
@@ -299,8 +299,8 @@ Date: REGEX(.*)
 
 {
     "attributes": [
-        "A4",
-        "A3"
+        "A3",
+        "A4"
     ],
     "name": "T1",
     "statusCode": {
@@ -319,8 +319,8 @@ Date: REGEX(.*)
 
 {
     "attributes": [
-        "A2",
-        "A1"
+        "A1",
+        "A2"
     ],
     "name": "T1",
     "statusCode": {
