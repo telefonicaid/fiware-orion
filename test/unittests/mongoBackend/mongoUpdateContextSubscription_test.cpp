@@ -24,6 +24,7 @@
 */
 #include "gtest/gtest.h"
 #include "testInit.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -3617,25 +3618,24 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
 * matchEnt1_Attr0_T0_C1 -
 */
 TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
-{
-
+{  
     HttpStatusCode                    ms;
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
+
+    utInit();
 
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -3646,11 +3646,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -3713,7 +3708,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -3728,19 +3724,19 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -3751,11 +3747,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -3818,7 +3809,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -3833,17 +3825,17 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -3854,11 +3846,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -3923,7 +3910,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -3938,17 +3926,17 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -3959,11 +3947,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -4028,7 +4011,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -4043,30 +4027,28 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2, cer3;
 
     cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
 
     cer2.contextElement.entityId.fill("E1", "T1bis", "false");
-    ContextAttribute ca4("A1", "TA1", "T");
-    ContextAttribute ca5("A1", "TA1bis", "U");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.contextElement.contextAttributeVector.push_back(&ca5);
+    ContextAttribute ca3("A1", "TA1", "T");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
 
     cer3.contextElement.entityId.fill("E1", "", "false");
-    ContextAttribute ca6("A1", "TA1", "P");
-    ContextAttribute ca7("A2", "TA2", "Q");
-    cer3.contextElement.contextAttributeVector.push_back(&ca6);
-    cer3.contextElement.contextAttributeVector.push_back(&ca7);
+    ContextAttribute ca4("A1", "TA1", "P");
+    ContextAttribute ca5("A2", "TA2", "Q");
+    cer3.contextElement.contextAttributeVector.push_back(&ca4);
+    cer3.contextElement.contextAttributeVector.push_back(&ca5);
 
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
@@ -4080,11 +4062,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860022");
@@ -4149,7 +4126,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -4164,30 +4142,28 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2, cer3;
 
     cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca1("A1", "TA1", "X");   
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
 
     cer2.contextElement.entityId.fill("E1", "T1bis", "false");
-    ContextAttribute ca4("A1", "TA1", "T");
-    ContextAttribute ca5("A1", "TA1bis", "U");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
-    cer2.contextElement.contextAttributeVector.push_back(&ca5);
+    ContextAttribute ca3("A1", "TA1", "T");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
 
     cer3.contextElement.entityId.fill("E1", "", "false");
-    ContextAttribute ca6("A1", "TA1", "P");
-    ContextAttribute ca7("A2", "TA2", "Q");
-    cer3.contextElement.contextAttributeVector.push_back(&ca6);
-    cer3.contextElement.contextAttributeVector.push_back(&ca7);
+    ContextAttribute ca4("A1", "TA1", "P");
+    ContextAttribute ca5("A2", "TA2", "Q");
+    cer3.contextElement.contextAttributeVector.push_back(&ca4);
+    cer3.contextElement.contextAttributeVector.push_back(&ca5);
 
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
@@ -4201,11 +4177,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860022");
@@ -4270,7 +4241,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -4285,6 +4257,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
@@ -4292,15 +4266,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
 
     cer1.contextElement.entityId.fill("E1", "T", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
 
     cer2.contextElement.entityId.fill("E2", "T", "false");
-    ContextAttribute ca4("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
+    ContextAttribute ca3("A2", "TA2", "R");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
 
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
@@ -4313,11 +4285,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -4382,7 +4349,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -4397,6 +4365,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
@@ -4404,15 +4374,13 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
 
     cer1.contextElement.entityId.fill("E1", "T", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
 
     cer2.contextElement.entityId.fill("E2", "T", "false");
-    ContextAttribute ca4("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
+    ContextAttribute ca3("A2", "TA2", "R");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
 
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
@@ -4425,11 +4393,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -4494,7 +4457,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -4509,6 +4473,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
@@ -4516,27 +4482,23 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
 
     cer1.contextElement.entityId.fill("E1", "T", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
 
     cer2.contextElement.entityId.fill("E2", "T", "false");
-    ContextAttribute ca4("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
+    ContextAttribute ca3("A2", "TA2", "R");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
 
     cer3.contextElement.entityId.fill("E2", "Tbis", "false");
-    ContextAttribute ca5("A1", "TA1", "T");
-    ContextAttribute ca6("A1", "TA1bis", "U");
-    cer3.contextElement.contextAttributeVector.push_back(&ca5);
-    cer3.contextElement.contextAttributeVector.push_back(&ca6);
+    ContextAttribute ca4("A1", "TA1", "T");
+    cer3.contextElement.contextAttributeVector.push_back(&ca4);
 
     cer4.contextElement.entityId.fill("E1", "", "false");
-    ContextAttribute ca7("A1", "TA1", "P");
-    ContextAttribute ca8("A2", "TA2", "Q");
-    cer4.contextElement.contextAttributeVector.push_back(&ca7);
-    cer4.contextElement.contextAttributeVector.push_back(&ca8);
+    ContextAttribute ca5("A1", "TA1", "P");
+    ContextAttribute ca6("A2", "TA2", "Q");
+    cer4.contextElement.contextAttributeVector.push_back(&ca5);
+    cer4.contextElement.contextAttributeVector.push_back(&ca6);
 
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
@@ -4551,11 +4513,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860022");
@@ -4620,7 +4577,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -4635,34 +4593,32 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2, cer3, cer4;
 
     cer1.contextElement.entityId.fill("E1", "T", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
+    cer1.contextElement.contextAttributeVector.push_back(&ca2);    
 
     cer2.contextElement.entityId.fill("E2", "T", "false");
-    ContextAttribute ca4("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
+    ContextAttribute ca3("A2", "TA2", "R");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
 
     cer3.contextElement.entityId.fill("E2", "Tbis", "false");
-    ContextAttribute ca5("A1", "TA1", "T");
-    ContextAttribute ca6("A1", "TA1bis", "U");
-    cer3.contextElement.contextAttributeVector.push_back(&ca5);
-    cer3.contextElement.contextAttributeVector.push_back(&ca6);
+    ContextAttribute ca4("A1", "TA1", "T");
+    cer3.contextElement.contextAttributeVector.push_back(&ca4);
 
     cer4.contextElement.entityId.fill("E1", "", "false");
-    ContextAttribute ca7("A1", "TA1", "P");
-    ContextAttribute ca8("A2", "TA2", "Q");
-    cer4.contextElement.contextAttributeVector.push_back(&ca7);
-    cer4.contextElement.contextAttributeVector.push_back(&ca8);
+    ContextAttribute ca5("A1", "TA1", "P");
+    ContextAttribute ca6("A2", "TA2", "Q");
+    cer4.contextElement.contextAttributeVector.push_back(&ca5);
+    cer4.contextElement.contextAttributeVector.push_back(&ca6);
 
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
@@ -4677,11 +4633,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860022");
@@ -4746,7 +4697,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -4761,19 +4713,19 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -4784,11 +4736,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -4860,7 +4807,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -4875,19 +4823,19 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -4898,11 +4846,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -4974,7 +4917,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -4990,25 +4934,20 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
+    cer.contextElement.contextAttributeVector.push_back(&ca3);    
     expectedNcr.contextElementResponseVector.push_back(&cer);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
@@ -5082,7 +5021,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -5097,17 +5037,17 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -5118,11 +5058,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -5196,7 +5131,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -5211,17 +5147,17 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -5232,11 +5168,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -5310,7 +5241,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -5325,17 +5257,17 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -5346,11 +5278,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -5424,7 +5351,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -5439,17 +5367,17 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -5460,11 +5388,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -5531,7 +5454,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -5545,19 +5469,19 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -5570,11 +5494,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -5658,7 +5577,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -5672,19 +5592,19 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
     cer.contextElement.contextAttributeVector.push_back(&ca3);
-    cer.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -5697,11 +5617,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -5778,7 +5693,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -5792,17 +5708,17 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -5815,11 +5731,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -5905,7 +5816,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -5919,17 +5831,17 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer;
     cer.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer.contextElement.contextAttributeVector.push_back(&ca1);
     cer.contextElement.contextAttributeVector.push_back(&ca2);
-    cer.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -5942,11 +5854,6 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860002", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860002");
@@ -6025,7 +5932,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -6040,27 +5948,27 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
-    cer1.contextElement.contextAttributeVector.push_back(&ca4);
+    cer1.contextElement.contextAttributeVector.push_back(&ca3);    
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.id = "E2";
     cer2.contextElement.entityId.type = "T2";
     cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca5("A2", "TA2", "R");
-    ContextAttribute ca6("A3", "TA3", "S");
+    ContextAttribute ca4("A2", "TA2", "R");
+    ContextAttribute ca5("A3", "TA3", "S");
+    cer2.contextElement.contextAttributeVector.push_back(&ca4);
     cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    cer2.contextElement.contextAttributeVector.push_back(&ca6);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -6071,11 +5979,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860003");
@@ -6142,7 +6045,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -6157,23 +6061,23 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.id = "E2";
     cer2.contextElement.entityId.type = "T2";
     cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca4("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
+    ContextAttribute ca3("A2", "TA2", "R");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -6184,11 +6088,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860004");
@@ -6257,7 +6156,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -6271,27 +6171,27 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
     cer1.contextElement.contextAttributeVector.push_back(&ca3);
-    cer1.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.id = "E2";
     cer2.contextElement.entityId.type = "T2";
     cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca5("A2", "TA2", "R");
-    ContextAttribute ca6("A3", "TA3", "S");
+    ContextAttribute ca4("A2", "TA2", "R");
+    ContextAttribute ca5("A3", "TA3", "S");
+    cer2.contextElement.contextAttributeVector.push_back(&ca4);
     cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    cer2.contextElement.contextAttributeVector.push_back(&ca6);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -6302,11 +6202,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860003");
@@ -6382,7 +6277,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -6396,27 +6292,27 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill ("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
     cer1.contextElement.contextAttributeVector.push_back(&ca3);
-    cer1.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.id = "E2";
     cer2.contextElement.entityId.type = "T2";
     cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca5("A2", "TA2", "R");
-    ContextAttribute ca6("A3", "TA3", "S");
+    ContextAttribute ca4("A2", "TA2", "R");
+    ContextAttribute ca5("A3", "TA3", "S");
+    cer2.contextElement.contextAttributeVector.push_back(&ca4);
     cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    cer2.contextElement.contextAttributeVector.push_back(&ca6);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -6427,11 +6323,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860003");
@@ -6500,7 +6391,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -6514,23 +6406,23 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.id = "E2";
     cer2.contextElement.entityId.type = "T2";
     cer2.contextElement.entityId.isPattern = "false";
-    ContextAttribute ca4("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
+    ContextAttribute ca3("A2", "TA2", "R");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -6541,11 +6433,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860004");
@@ -6623,7 +6510,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -6637,21 +6525,21 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca4("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
+    ContextAttribute ca3("A2", "TA2", "R");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -6662,11 +6550,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860004");
@@ -6737,7 +6620,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -6751,25 +6635,25 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
     cer1.contextElement.contextAttributeVector.push_back(&ca3);
-    cer1.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca5("A2", "TA2", "R");
-    ContextAttribute ca6("A3", "TA3", "S");
+    ContextAttribute ca4("A2", "TA2", "R");
+    ContextAttribute ca5("A3", "TA3", "S");
+    cer2.contextElement.contextAttributeVector.push_back(&ca4);
     cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    cer2.contextElement.contextAttributeVector.push_back(&ca6);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -6782,11 +6666,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860003");
@@ -6874,7 +6753,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -6888,25 +6768,25 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
-    ContextAttribute ca4("A3", "TA3", "W");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
+    ContextAttribute ca3("A3", "TA3", "W");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
     cer1.contextElement.contextAttributeVector.push_back(&ca3);
-    cer1.contextElement.contextAttributeVector.push_back(&ca4);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca5("A2", "TA2", "R");
-    ContextAttribute ca6("A3", "TA3", "S");
+    ContextAttribute ca4("A2", "TA2", "R");
+    ContextAttribute ca5("A3", "TA3", "S");
+    cer2.contextElement.contextAttributeVector.push_back(&ca4);
     cer2.contextElement.contextAttributeVector.push_back(&ca5);
-    cer2.contextElement.contextAttributeVector.push_back(&ca6);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -6919,11 +6799,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860003", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860003");
@@ -7004,7 +6879,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -7018,21 +6894,21 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill("E1", "T1", "false");
     ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
     cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca4("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
+    ContextAttribute ca3("A2", "TA2", "R");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -7045,11 +6921,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860004");
@@ -7139,7 +7010,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 /* ****************************************************************************
@@ -7153,21 +7025,21 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifyContextRequest expectedNcr;
     expectedNcr.originator.set("localhost");
     ContextElementResponse cer1, cer2;
     cer1.contextElement.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1", "X");
-    ContextAttribute ca2("A1", "TA1bis", "Y");
-    ContextAttribute ca3("A2", "TA2", "Z");
+    ContextAttribute ca1("A1", "TA1", "X");    
+    ContextAttribute ca2("A2", "TA2", "Z");
     cer1.contextElement.contextAttributeVector.push_back(&ca1);
-    cer1.contextElement.contextAttributeVector.push_back(&ca2);
-    cer1.contextElement.contextAttributeVector.push_back(&ca3);
+    cer1.contextElement.contextAttributeVector.push_back(&ca2);    
     expectedNcr.contextElementResponseVector.push_back(&cer1);
     cer2.contextElement.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca4("A2", "TA2", "R");
-    cer2.contextElement.contextAttributeVector.push_back(&ca4);
+    ContextAttribute ca3("A2", "TA2", "R");
+    cer2.contextElement.contextAttributeVector.push_back(&ca3);
     expectedNcr.contextElementResponseVector.push_back(&cer2);
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -7180,11 +7052,6 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860004", 120, ""))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860004");
@@ -7267,7 +7134,8 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
@@ -7281,6 +7149,8 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     UpdateContextSubscriptionRequest  req;
     UpdateContextSubscriptionResponse res;
 
+    utInit();
+
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads("51307b66f481db11bf860001"))
@@ -7290,11 +7160,6 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     EXPECT_CALL(*notifierMock, createIntervalThread("51307b66f481db11bf860001", 60, ""))
             .Times(1);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
@@ -7356,7 +7221,8 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
 
     /* Release mock */
     delete notifierMock;
-    delete timerMock;
+
+    utExit();
 
 }
 
