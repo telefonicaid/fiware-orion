@@ -6133,11 +6133,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6154,11 +6152,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_FALSE(a3.hasField("id"));
     EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
     EXPECT_FALSE(a4.hasField("value"));
     EXPECT_FALSE(a4.hasField("modDate"));
-    EXPECT_FALSE(a4.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
     EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6175,11 +6171,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_FALSE(a5.hasField("id"));
     EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
     EXPECT_FALSE(a6.hasField("value"));
     EXPECT_FALSE(a6.hasField("modDate"));
-    EXPECT_FALSE(a6.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6194,7 +6188,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -6212,11 +6205,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6240,7 +6231,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithId)
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
     mongoDisconnect();
@@ -6334,11 +6324,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6355,11 +6343,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_FALSE(a3.hasField("id"));
     EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
     EXPECT_FALSE(a4.hasField("value"));
     EXPECT_FALSE(a4.hasField("modDate"));
-    EXPECT_FALSE(a4.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
     EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6376,11 +6362,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_FALSE(a5.hasField("id"));
     EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
     EXPECT_FALSE(a6.hasField("value"));
     EXPECT_FALSE(a6.hasField("modDate"));
-    EXPECT_FALSE(a6.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6395,7 +6379,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -6413,11 +6396,9 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6441,7 +6422,6 @@ TEST(mongoUpdateContextRequest, updateAttrWithAndWithoutId)
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("new_val2", C_STR_FIELD(a2, "value"));
     EXPECT_EQ(1360232700, a2.getIntField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
     mongoDisconnect();
@@ -6529,11 +6509,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6550,11 +6528,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_FALSE(a3.hasField("id"));
     EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
     EXPECT_FALSE(a4.hasField("value"));
     EXPECT_FALSE(a4.hasField("modDate"));
-    EXPECT_FALSE(a4.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
     EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6571,11 +6547,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_FALSE(a5.hasField("id"));
     EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
     EXPECT_FALSE(a6.hasField("value"));
     EXPECT_FALSE(a6.hasField("modDate"));
-    EXPECT_FALSE(a6.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6590,7 +6564,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -6608,11 +6581,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6640,7 +6611,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithId)
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
     mongoDisconnect();
@@ -6734,11 +6704,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6755,11 +6723,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_FALSE(a3.hasField("id"));
     EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
     EXPECT_FALSE(a4.hasField("value"));
     EXPECT_FALSE(a4.hasField("modDate"));
-    EXPECT_FALSE(a4.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
     EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6776,11 +6742,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_FALSE(a5.hasField("id"));
     EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
     EXPECT_FALSE(a6.hasField("value"));
     EXPECT_FALSE(a6.hasField("modDate"));
-    EXPECT_FALSE(a6.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6795,7 +6759,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -6813,11 +6776,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6847,11 +6808,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithAndWithoutId)
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
     EXPECT_STREQ("TA3",C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("new_val3", C_STR_FIELD(a3, "value"));
     EXPECT_EQ(1360232700, a3.getIntField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
     mongoDisconnect();
@@ -6939,11 +6898,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6960,11 +6917,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_FALSE(a3.hasField("id"));
     EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
     EXPECT_FALSE(a4.hasField("value"));
     EXPECT_FALSE(a4.hasField("modDate"));
-    EXPECT_FALSE(a4.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
     EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -6981,11 +6936,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_FALSE(a5.hasField("id"));
     EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
     EXPECT_FALSE(a6.hasField("value"));
     EXPECT_FALSE(a6.hasField("modDate"));
-    EXPECT_FALSE(a6.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7000,7 +6953,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -7018,11 +6970,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7046,7 +6996,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithIdFails)
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
     mongoDisconnect();
@@ -7129,11 +7078,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7150,11 +7097,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_FALSE(a3.hasField("id"));
     EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
     EXPECT_FALSE(a4.hasField("value"));
     EXPECT_FALSE(a4.hasField("modDate"));
-    EXPECT_FALSE(a4.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
     EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7171,11 +7116,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_FALSE(a5.hasField("id"));
     EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
     EXPECT_FALSE(a6.hasField("value"));
     EXPECT_FALSE(a6.hasField("modDate"));
-    EXPECT_FALSE(a6.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7190,7 +7133,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -7208,11 +7150,9 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));    
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7236,7 +7176,6 @@ TEST(mongoUpdateContextRequest, appendAttrWithoutIdFails)
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
     mongoDisconnect();
@@ -7324,11 +7263,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7345,11 +7282,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_FALSE(a3.hasField("id"));
     EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
     EXPECT_FALSE(a4.hasField("value"));
     EXPECT_FALSE(a4.hasField("modDate"));
-    EXPECT_FALSE(a4.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
     EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7366,11 +7301,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_FALSE(a5.hasField("id"));
     EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
     EXPECT_FALSE(a6.hasField("value"));
     EXPECT_FALSE(a6.hasField("modDate"));
-    EXPECT_FALSE(a6.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7384,7 +7317,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -7402,11 +7334,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7426,7 +7356,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("val2", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     /* Release connection */
     mongoDisconnect();
@@ -7520,11 +7449,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E2" << "_id.type" << "T2"));
     EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7541,11 +7468,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("val3", C_STR_FIELD(a3, "value"));
     EXPECT_FALSE(a3.hasField("modDate"));
-    EXPECT_FALSE(a3.hasField("id"));
     EXPECT_STREQ("TA4", C_STR_FIELD(a4, "type"));
     EXPECT_FALSE(a4.hasField("value"));
     EXPECT_FALSE(a4.hasField("modDate"));
-    EXPECT_FALSE(a4.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
     EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7562,11 +7487,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("val5", C_STR_FIELD(a5, "value"));
     EXPECT_FALSE(a5.hasField("modDate"));
-    EXPECT_FALSE(a5.hasField("id"));
     EXPECT_STREQ("TA6", C_STR_FIELD(a6, "type"));
     EXPECT_FALSE(a6.hasField("value"));
     EXPECT_FALSE(a6.hasField("modDate"));
-    EXPECT_FALSE(a6.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1bis"));
     EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
@@ -7581,7 +7504,6 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1bis2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
 
     /* Note "_id.type: {$exists: false}" is a way for querying for entities without type */
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << BSON("$exists" << false)));
@@ -7599,11 +7521,9 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("val1-nt", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    EXPECT_FALSE(a1.hasField("id"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_FALSE(a2.hasField("value"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_FALSE(a2.hasField("id"));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E10" << "_id.type" << "T10"));
     EXPECT_STREQ("E10", C_STR_FIELD(ent.getObjectField("_id"), "id"));

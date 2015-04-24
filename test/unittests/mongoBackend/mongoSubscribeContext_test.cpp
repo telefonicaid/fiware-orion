@@ -4140,11 +4140,6 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1)
             .Times(0);
     setNotifier(notifierMock);
 
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "", "false");
     NotifyCondition nc;
@@ -4735,11 +4730,6 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1_disjoint)
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
     setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E[1-2]", "", "true");
