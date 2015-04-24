@@ -264,23 +264,25 @@ Content-Type: application/xml
 </updateContextRequest>
 =======================================
 POST http://localhost:REGEX(\d+)/v1/queryContext
-Content-Length: 223
+Content-Length: 137
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json
 
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-  </attributeList>
-</queryContextRequest>
+{
+  "entities" : [
+    {
+      "type" : "T",
+      "isPattern" : "false",
+      "id" : "E1"
+    }
+  ],
+  "attributes" : [
+    "A1"
+  ]
+}
 =======================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
 Content-Length: 472
@@ -308,22 +310,24 @@ Content-Type: application/xml
 </updateContextRequest>
 =======================================
 POST http://localhost:REGEX(\d+)/v1/queryContext
-Content-Length: 223
+Content-Length: 137
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json
 
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-  </attributeList>
-</queryContextRequest>
+{
+  "entities" : [
+    {
+      "type" : "T",
+      "isPattern" : "false",
+      "id" : "E1"
+    }
+  ],
+  "attributes" : [
+    "A1"
+  ]
+}
 =======================================
 
 

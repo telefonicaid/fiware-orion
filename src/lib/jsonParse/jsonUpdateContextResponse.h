@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_ORIONTYPES_QUERYCONTEXTREQUESTVECTOR_H_
-#define SRC_LIB_ORIONTYPES_QUERYCONTEXTREQUESTVECTOR_H_
+#ifndef SRC_LIB_JSONPARSE_JSONUPDATECONTEXTRESPONSE_H_
+#define SRC_LIB_JSONPARSE_JSONUPDATECONTEXTRESPONSE_H_
 
 /*
 *
@@ -26,41 +26,48 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "common/Format.h"
-#include "ngsi10/QueryContextRequest.h"
+#include "jsonParse/JsonNode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* QueryContextRequestVector - 
+* upcrsParseVector - 
 */
-typedef struct QueryContextRequestVector
-{
-  std::vector<QueryContextRequest*>  vec;
-  int                                xmls;
-  int                                jsons;
+extern JsonNode jsonUpcrsParseVector[];
 
-  QueryContextRequestVector();
 
-  Format                format(void);
-  unsigned int          size(void);
-  void                  push_back(QueryContextRequest* item);
-  QueryContextRequest*  lookup(const std::string& contextProvider, EntityId* eP);
-  void                  release(void);
-  void                  present(void);
 
-  QueryContextRequest*  operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
+/* ****************************************************************************
+*
+* jsonUpcrsInit - 
+*/
+extern void jsonUpcrsInit(ParseData* reqDataP);
 
-    return NULL;
-  }
-} QueryContextRequestVector;
 
-#endif  // SRC_LIB_ORIONTYPES_QUERYCONTEXTREQUESTVECTOR_H_
+
+/* ****************************************************************************
+*
+* jsonUpcrsRelease - 
+*/
+extern void jsonUpcrsRelease(ParseData* reqDataP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUpcrsCheck - 
+*/
+extern std::string jsonUpcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP);
+
+
+
+/* ****************************************************************************
+*
+* jsonUpcrsPresent - 
+*/
+extern void jsonUpcrsPresent(ParseData* reqDataP);
+
+#endif  // SRC_LIB_JSONPARSE_JSONUPDATECONTEXTRESPONSE_H_

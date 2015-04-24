@@ -59,7 +59,8 @@ extern std::string sendHttpSocket
   const std::string&     content_type, 
   const std::string&     content,
   bool                   useRush,
-  bool                   waitForResponse
+  bool                   waitForResponse,
+  const std::string&     acceptFormat = ""
 );
 
 #endif

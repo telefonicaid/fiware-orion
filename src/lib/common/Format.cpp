@@ -112,5 +112,18 @@ Format formatParse(const std::string& formatString, std::string* charsetP)
 */
 Format formatFromInput(const std::string& fromUriParam, Format inFormat)
 {
-  return (fromUriParam == "")? inFormat : stringToFormat(fromUriParam);
+  if (fromUriParam == "JSON")
+  {
+    return JSON;
+  }
+  else if (fromUriParam == "XML")
+  {
+    return XML;
+  }
+  else if (fromUriParam != "")
+  {
+    LM_W(("Bad Input (URI parameter 'notifyFormat' had an unsupported value: '%s' - using inFormat (%s))", fromUriParam.c_str(), formatToString(inFormat)));
+  }
+
+  return inFormat;
 }

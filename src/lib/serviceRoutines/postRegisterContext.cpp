@@ -58,11 +58,14 @@ static std::string fordwardRegisterContext
   const std::string&  xauthToken,
   const std::string&  payload,
   const std::string&  servicePath,
-  Format              format
+  const std::string&  format
 )
 {
   LM_T(LmtCm, ("forwarding registerContext to: host='%s', port=%d", fwdHost, fwdPort));
   LM_T(LmtCm, ("payload (content-type: application/xml): '%s'", payload.c_str()));
+
+  const std::string mimeType = (format == "JSON")? "application/json" : "application/xml";
+
   std::string response = sendHttpSocket(fwdHost,
                                         fwdPort,
                                         "http:",
@@ -71,8 +74,7 @@ static std::string fordwardRegisterContext
                                         servicePath,
                                         xauthToken,
                                         "ngsi9/registerContext",
-                                        // FIXME P3: unhardwire content type - from where do I get the Format?
-                                        std::string("application/xml"),
+                                        mimeType,
                                         payload,
                                         true,
                                         true);
@@ -95,18 +97,17 @@ static void registerContextForward
 (
   ConnectionInfo*           ciP,
   ParseData*                parseDataP,
-  RegisterContextResponse*  rcrP,
-  Format                    format
+  RegisterContextResponse*  rcrP
 )
 {
   /* Forward registerContext */
   if (parseDataP->rcr.res.registrationId.isEmpty())
   {
     /* New registration case */
-    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->uriParam, ciP->tenant, ciP->servicePathV[0], format);
+    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
 
     std::string payload  = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0], format);
+    std::string response = fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0], ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
 
     if (response == "error")
     {
@@ -147,11 +148,11 @@ static void registerContextForward
     /* Update case */
     std::string fwdRegId = mongoGetFwdRegId(parseDataP->rcr.res.registrationId.get(), ciP->tenant);
 
-    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->uriParam, ciP->tenant, ciP->servicePathV[0], format);
+    ciP->httpStatusCode  = mongoRegisterContext(&parseDataP->rcr.res, rcrP, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
     parseDataP->rcr.res.registrationId.set(fwdRegId);
     mongoSetFwdRegId(rcrP->registrationId.get(), fwdRegId, ciP->tenant);
     std::string payload = parseDataP->rcr.res.render(RegisterContext, ciP->inFormat, "");
-    fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0], format);
+    fordwardRegisterContext(fwdHost, fwdPort, ciP->tenant, ciP->httpHeaders.xauthToken, payload, ciP->servicePathV[0], ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
   }
 }
 
@@ -171,7 +172,6 @@ std::string postRegisterContext
 {
   RegisterContextResponse  rcr;
   std::string              answer;
-  Format                   notifyFormat = formatFromInput(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT], ciP->inFormat);
 
   //
   // If more than ONE service-path is input, an error is returned as response.
@@ -200,11 +200,11 @@ std::string postRegisterContext
 
   if (fwdPort != 0)
   {
-    registerContextForward(ciP, parseDataP, &rcr, notifyFormat);
+    registerContextForward(ciP, parseDataP, &rcr);
   }
   else
   {
-    ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->tenant, ciP->servicePathV[0], notifyFormat);
+    ciP->httpStatusCode = mongoRegisterContext(&parseDataP->rcr.res, &rcr, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
   }
 
   answer = rcr.render(RegisterContext, ciP->outFormat, "");

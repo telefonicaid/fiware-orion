@@ -102,11 +102,13 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string  uriPath;
     std::string  protocol;
     
+    LM_M(("KZ: parsing URL '%s'", url.c_str()));
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextRequest: malformed URL: '%s')", url.c_str()));
       return;
     }
+    LM_M(("KZ: Got host:%s, port:%d, path:%s", host.c_str(), port, uriPath.c_str()));
 
     /* Set Content-Type depending on the format */
     std::string content_type = (format == XML)? "application/xml" : "application/json";
@@ -171,11 +173,14 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     int          port;
     std::string  uriPath;
     std::string  protocol;
+
+    LM_M(("KZ: parsing URL '%s'", url.c_str()));
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
       return;
     }
+    LM_M(("KZ: Got host:%s, port:%d, path:%s", host.c_str(), port, uriPath.c_str()));
 
     /* Set Content-Type depending on the format */
     std::string content_type = (format == XML ? "application/xml" : "application/json");

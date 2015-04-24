@@ -136,7 +136,8 @@ std::string sendHttpSocket
    const std::string&     content_type,
    const std::string&     content,
    bool                   useRush,
-   bool                   waitForResponse
+   bool                   waitForResponse,
+   const std::string&     acceptFormat
 )
 {
   char                       portAsString[16];
@@ -291,8 +292,15 @@ std::string sendHttpSocket
   }
 
   // ----- Accept
-  headers = curl_slist_append(headers, "Accept: application/xml, application/json");
-  outgoingMsgSize += 41; // from "Accept: application/xml, application/json"
+  std::string acceptedFormats = "application/xml, application/json";
+  if (acceptFormat != "")
+  {
+    acceptedFormats = acceptFormat;
+  }
+
+  std::string acceptString = "Accept: " + acceptedFormats;
+  headers = curl_slist_append(headers, acceptString.c_str());
+  outgoingMsgSize += acceptString.size();
 
   // ----- Expect
   headers = curl_slist_append(headers, "Expect: ");
@@ -472,7 +480,8 @@ std::string sendHttpSocket
    const std::string&     content_type,
    const std::string&     content,
    bool                   useRush,
-   bool                   waitForResponse
+   bool                   waitForResponse,
+   const std::string&     acceptFormat
 )
 {  
   char                       buffer[TAM_BUF];
@@ -565,12 +574,28 @@ std::string sendHttpSocket
   memset(msg, 0, MAX_STA_MSG_SIZE);
 
   char cvBuf[128];
-  snprintf(preContent, sizeof(preContent),
+
+  //
+  // Accepted mime-types
+  //
+  if (acceptFormat == "")
+    acceptFormat = "application/xml, application/json";
+
+
+  snprintf(preContent,
+           sizeof(preContent),
            "%s %s HTTP/1.1\n"
            "User-Agent: orion/%s libcurl/%s\n"
            "Host: %s:%d\n"
-           "Accept: application/xml, application/json\n%s",
-           verb.c_str(), resource.c_str(), versionGet(), curlVersionGet(cvBuf, sizeof(cvBuf)), ip.c_str(), (int) port, rushHttpHeaders.c_str());
+           "Accept: %s\n%s",
+           verb.c_str(),
+           resource.c_str(),
+           versionGet(),
+           curlVersionGet(cvBuf, sizeof(cvBuf)),
+           ip.c_str(),
+           (int) port,
+           acceptFormat.c_str(),
+           rushHttpHeaders.c_str());
 
   LM_T(LmtRush, ("'PRE' HTTP headers:\n--------------\n%s\n-------------", preContent));
 

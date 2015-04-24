@@ -41,8 +41,7 @@ extern HttpStatusCode mongoNotifyContextAvailability
   NotifyContextAvailabilityResponse*   responseP,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant       = "",
-  const std::string&                   servicePath  = "",
-  Format                               notifyFormat = XML
+  const std::string&                   servicePath  = ""
 );
 
 #endif

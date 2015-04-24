@@ -45,7 +45,7 @@
 * Payload Out: SubscribeContextResponse
 *
 * URI parameters
-*   - notifyFormat=XXX    (handled by mongoBackend)
+*   - notifyFormat=XXX    (used by mongoBackend)
 */
 std::string postSubscribeContext
 (
@@ -78,9 +78,7 @@ std::string postSubscribeContext
     return answer;
   }
 
-  Format notifyFormat = formatFromInput(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT], ciP->inFormat);
-
-  ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV, notifyFormat);
+  ciP->httpStatusCode = mongoSubscribeContext(&parseDataP->scr.res, &scr, ciP->tenant, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->servicePathV);
   answer = scr.render(SubscribeContext, ciP->outFormat, "");
 
   parseDataP->scr.res.release();

@@ -98,6 +98,8 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
 
+  LM_M(("Got an URI param: %s=%s", ckey, val));
+
   if (key == URI_PARAM_NOTIFY_FORMAT)
   {
     if (strcasecmp(val, "xml") == 0)
@@ -109,6 +111,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       OrionError error(SccBadRequest, std::string("Bad notification format: /") + value + "/. Valid values: /XML/ and /JSON/");
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = error.render(ciP->outFormat, "");
+      LM_M(("Bad value for uri param '%s': %s (responding in %s))", URI_PARAM_NOTIFY_FORMAT, value.c_str(), formatToString(ciP->outFormat)));
       return MHD_YES;
     }
   }
@@ -205,6 +208,8 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 {
   HttpHeaders*  headerP = (HttpHeaders*) cbDataP;
   std::string   key     = ckey;
+
+  LM_M(("Got an HTTP Header: %s=%s", ckey, value));
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
@@ -777,15 +782,6 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
-    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
-    if (ciP->httpStatusCode != SccOk)
-    {
-      LM_W(("Bad Input (error in URI parameters)"));
-      restReply(ciP, ciP->answer);
-      return MHD_YES;
-    }
-    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
-
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
     if (!ciP->httpHeaders.servicePathReceived)
     {
@@ -826,6 +822,15 @@ static int connectionTreat
     else
       ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
 
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+    if (ciP->httpStatusCode != SccOk)
+    {
+      LM_W(("Bad Input (error in URI parameters)"));
+      restReply(ciP, ciP->answer);
+      return MHD_YES;
+    }
+    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+
     // Set default mime-type for notifications
     if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
     {
@@ -834,7 +839,7 @@ static int connectionTreat
       else if (ciP->outFormat == JSON)
         ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
       else
-        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = DEFAULT_FORMAT_AS_STRING;
 
       LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
     }

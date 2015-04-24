@@ -31,6 +31,15 @@
 
 /* ****************************************************************************
 *
+* DEFAULT_FORMAT - 
+*/
+#define DEFAULT_FORMAT              XML
+#define DEFAULT_FORMAT_AS_STRING    "XML"
+
+
+
+/* ****************************************************************************
+*
 * Format - 
 */
 typedef enum Format

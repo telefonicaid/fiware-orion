@@ -43,8 +43,7 @@ extern HttpStatusCode mongoRegisterContext
   RegisterContextResponse*             responseP,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant       = "",
-  const std::string&                   servicePath  = "",
-  Format                               format       = XML
+  const std::string&                   servicePath  = ""
 );
 
 #endif
