@@ -363,7 +363,7 @@ static std::string errorCodeDetails(const std::string& path, const std::string& 
 */
 JsonNode jsonUpcrsParseVector[] =
 {
-  { "contextResponses",                                           jsonNullTreat            },
+  { "/contextResponses",                                          jsonNullTreat            },
   { "/contextResponses/contextResponse",                          contextResponse          },
 
   { CELEM,                                                        jsonNullTreat            },
