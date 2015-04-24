@@ -140,10 +140,10 @@ Date: REGEX(.*)
   <typeEntities>
     <entityType>
       <name>Room</name>
-      <attributesList>
+      <contextAttributeList>
         <name>pressure</name>
         <name>temperature</name>
-      </attributesList>
+      </contextAttributeList>
     </entityType>
   </typeEntities>
   <statusCode>
@@ -164,10 +164,10 @@ Date: REGEX(.*)
   <typeEntities>
     <entityType>
       <name>Room</name>
-      <attributesList>
+      <contextAttributeList>
         <name>pressure</name>
         <name>temperature</name>
-      </attributesList>
+      </contextAttributeList>
     </entityType>
   </typeEntities>
   <statusCode>

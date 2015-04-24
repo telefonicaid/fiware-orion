@@ -35,6 +35,7 @@
 #include "ngsi/ContextAttributeVector.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 
 
 
@@ -109,7 +110,7 @@ std::string ContextAttributeVector::render
   // only one of them should be included in the vector. Any one of them.
   // So, step 1 is to purge the context attribute vector from 'copies'.
   //
-  if ((ciP->uriParam["attributeFormat"] == "object") && (ciP->outFormat == JSON))
+  if ((ciP->uriParam[URI_PARAM_ATTRIBUTE_FORMAT] == "object") && (ciP->outFormat == JSON))
   {
     std::vector<std::string> added;
 
@@ -131,7 +132,9 @@ std::string ContextAttributeVector::render
     }
 
     // 2. Now it's time to render
-    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+    // Note that in the case of attribute as name, we have to use a vector, thus using
+    // attrsAsName variable as value for isVector parameter
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, attrsAsName, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
       if (attrsAsName)
@@ -143,7 +146,7 @@ std::string ContextAttributeVector::render
         out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
       }
     }
-    out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
+    out += endTag(indent, xmlTag, ciP->outFormat, comma, attrsAsName);
   }
   else
   {

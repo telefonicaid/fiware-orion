@@ -165,7 +165,7 @@ Date: REGEX(.*)
 02. Query on / (returns: T1, T2)
 ================================
 HTTP/1.1 200 OK
-Content-Length: 215
+Content-Length: 249
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -194,7 +194,7 @@ Date: REGEX(.*)
 03. Query on /# (returns: T1, T2, T3)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 277
+Content-Length: 328
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -229,7 +229,7 @@ Date: REGEX(.*)
 04. Query without servicePath (returns: T1, T2, T3)
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 277
+Content-Length: 328
 Content-Type: application/json
 Date: REGEX(.*)
 
