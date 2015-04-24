@@ -849,7 +849,8 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
     BSONObj obj = be.embeddedObject();
     cvP->type = orion::CompoundValueNode::Object;
-    for( BSONObj::iterator i = obj.begin(); i.more(); ) {
+    for (BSONObj::iterator i = obj.begin(); i.more(); )
+    {
         BSONElement e = i.next();
         addCompoundNode(cvP, e);
     }
@@ -863,7 +864,8 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
     std::vector<BSONElement> vec = be.Array();
     cvP->type = orion::CompoundValueNode::Vector;
-    for( unsigned int ix = 0; ix < vec.size(); ++ix) {
+    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    {
         BSONElement e = vec[ix];
         addCompoundNode(cvP, e);
 
@@ -1223,7 +1225,7 @@ bool entitiesQuery
 
         std::set<std::string> attrNames;
         queryAttrs.getFieldNames(attrNames);
-        for( std::set<std::string>::iterator i = attrNames.begin(); i!=attrNames.end(); ++i)
+        for (std::set<std::string>::iterator i = attrNames.begin(); i!=attrNames.end(); ++i)
         {
           std::string attrName = *i;
           BSONObj queryAttr = queryAttrs.getField(attrName).embeddedObject();

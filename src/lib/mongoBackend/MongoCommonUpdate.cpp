@@ -214,9 +214,11 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2) {
 
 
     bool found = false;
-    for( BSONObj::iterator i1 = mdV1.begin(); i1.more(); ) {
+    for (BSONObj::iterator i1 = mdV1.begin(); i1.more(); )
+    {
         BSONObj md1 = i1.next().embeddedObject();
-        for( BSONObj::iterator i2 = mdV2.begin(); i2.more(); ) {
+        for (BSONObj::iterator i2 = mdV2.begin(); i2.more(); )
+        {
             BSONObj md2 = i2.next().embeddedObject();
             /* Check metadata match */
             if (matchMetadata(md1, md2)) {
@@ -255,7 +257,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   /* 1. Add value */
   valueBson(caP, ab);
 
-  /* 2. Add type (only if type is not empty in the request, otherwise, we leave type untouched) */
+  /* Add type, if present in request. If not, just use the one that is already present in the database. */
   if (caP->type != "")
   {
     ab.append(ENT_ATTRS_TYPE, caP->type);
@@ -296,7 +298,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   if (attr.hasField(ENT_ATTRS_MD))
   {
     mdV = attr.getField(ENT_ATTRS_MD).embeddedObject();
-    for( BSONObj::iterator i = mdV.begin(); i.more(); )
+    for (BSONObj::iterator i = mdV.begin(); i.more(); )
     {
       BSONObj md = i.next().embeddedObject();
       mdVSize++;
@@ -389,30 +391,28 @@ static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttrib
 {
   actualUpdate = false;
 
-  /* Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document */
+  /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
   std::string effectiveName = caP->name;
   if (caP->getId() != "")
   {
     effectiveName += "__" + caP->getId();
   }
 
-  //LM_T(LmtMongo, ("==== %s", attrs.toString().c_str()));
-  if (attrs.hasField(effectiveName.c_str()))
-  {
-    BSONObj attr = attrs.getField(effectiveName).embeddedObject();
-    BSONObj newAttr;
-    actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
-    if (actualUpdate)
-    {
-      const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
-      toSet->append(composedName, newAttr);
-    }
-    return true;
-  }
-  else
+  if (!attrs.hasField(effectiveName.c_str()))
   {
     return false;
   }
+
+  BSONObj attr = attrs.getField(effectiveName).embeddedObject();
+  BSONObj newAttr;
+  actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
+  if (actualUpdate)
+  {
+    const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
+    toSet->append(composedName, newAttr);
+  }
+
+  return true;
 
 }
 
@@ -482,7 +482,8 @@ static bool appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuil
 
   /* 3. Metadata */
   BSONObj mdV;
-  if (contextAttributeCustomMetadataToBson(mdV, caP)) {
+  if (contextAttributeCustomMetadataToBson(mdV, caP))
+  {
       ab.appendArray(ENT_ATTRS_MD, mdV);
   }
 
@@ -512,14 +513,14 @@ static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP)
   std::string prefix = caP->name + "__";
   if (caP->getId() == "")
   {
-    /* Attribute attempting to append hasn't ID. Thus, no attribute with same name can have ID in attrs,
+    /* Attribute attempting to append doesn't have any ID. Thus, no attribute with same name can have ID in attrs,
      * i.e. no attribute starting with "<attrName>" can at the same time start with "<attrName>__" */
     std::set<std::string> attrNames;
     attrs.getFieldNames(attrNames);
-    for( std::set<std::string>::iterator i = attrNames.begin(); i!=attrNames.end(); ++i)
+    for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
     {
       std::string attrName = *i;
-      if (strncmp(caP->name.c_str(), attrName.c_str(), strlen(caP->name.c_str())) == 0 &&
+      if (strncmp(caP->name.c_str(), attrName.c_str(), caP->name.length()) == 0 &&
           strncmp(prefix.c_str(), attrName.c_str(), strlen(prefix.c_str())) == 0)
       {
         return false;
@@ -533,7 +534,7 @@ static bool legalIdUsage(BSONObj& attrs, ContextAttribute* caP)
      * i.e. no attribute starting with "<attrName>" can at the same time have a name not starting with "<attrName>__" */
     std::set<std::string> attrNames;
     attrs.getFieldNames(attrNames);
-    for( std::set<std::string>::iterator i = attrNames.begin(); i!=attrNames.end(); ++i)
+    for (std::set<std::string>::iterator i = attrNames.begin(); i!=attrNames.end(); ++i)
     {
       std::string attrName = *i;
       if (strncmp(caP->name.c_str(), attrName.c_str(), strlen(caP->name.c_str())) == 0 &&
@@ -632,35 +633,33 @@ static bool processLocation(ContextAttributeVector caV, std::string& locAttr, do
 static bool deleteAttribute(BSONObj& attrs, BSONObjBuilder* toUnset, std::map<std::string, unsigned int>* deleted, ContextAttribute* caP)
 {
 
-  /* Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document */
+  /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
   std::string effectiveName = caP->name;
   if (caP->getId() != "")
   {
     effectiveName += "__" + caP->getId();
   }
 
-  if (attrs.hasField(effectiveName.c_str()))
-  {
-    const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
-    toUnset->append(composedName, 1);
-
-    /* Record the ocurrence of this attribute. Only attributes using ID may have a value greater than 1 */
-    if (deleted->count(caP->name))
-    {
-      std::map<std::string, unsigned int>::iterator it = deleted->find(caP->name);
-      it->second++;
-    }
-    else
-    {
-      deleted->insert(std::make_pair(caP->name, 1));
-    }
-
-    return true;
-  }
-  else
+  if (!attrs.hasField(effectiveName.c_str()))
   {
     return false;
   }
+
+  const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
+  toUnset->append(composedName, 1);
+
+  /* Record the ocurrence of this attribute. Only attributes using ID may have a value greater than 1 */
+  if (deleted->count(caP->name))
+  {
+    std::map<std::string, unsigned int>::iterator it = deleted->find(caP->name);
+    it->second++;
+  }
+  else
+  {
+    deleted->insert(std::make_pair(caP->name, 1));
+  }
+
+  return true;
 
 }
 
@@ -1064,9 +1063,9 @@ static unsigned int howManyAttrs(BSONObj& attrs, std::string& attrName)
   unsigned int c = 0;
   std::set<std::string> attrNames;
   attrs.getFieldNames(attrNames);
-  for(std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
+  for (std::set<std::string>::iterator i = attrNames.begin(); i != attrNames.end(); ++i)
   {
-    if(basePart(*i) == attrName)
+    if (basePart(*i) == attrName)
     {
       c++;
     }
@@ -1279,9 +1278,9 @@ static bool processContextAttributeVector (ContextElement*                      
     }
 
     /* Special processing in the case of DELETE, to avoid "deleting too much" in the case of using
-     * metadata ID. If metadata ID feature were removed this ugly piece of code wouldn't be needed ;)
+     * metadata ID. If metadata ID feature were removed, this ugly piece of code wouldn't be needed ;)
      * FIXME P3: note that in the case of Active/Active configuration it could happen that
-     * the attrsName get desyncrhonized, e.g. starting situation is A-ID1 and A-ID2, node
+     * the attrsName get desynchronized, e.g. starting situation is A-ID1 and A-ID2, node
      * #1 process DELETE A-ID1 and node #2 process DELETE A-ID2, each one thinking than the
      * other A-IDx copy will be there at the end, thus nobody includes it in the toPull array
      */

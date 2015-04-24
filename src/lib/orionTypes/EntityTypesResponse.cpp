@@ -34,29 +34,6 @@
 #include "orionTypes/EntityTypesResponse.h"
 
 
-
-/* ****************************************************************************
-*
-* EntityTypesResponse::renderAsJsonObject -
-*/
-std::string EntityTypesResponse::renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent)
-{
-  std::string out                 = "";
-
-  out += startTag(indent, "", ciP->outFormat, false);
-
-  if (typeEntityVector.size() > 0)
-    out += typeEntityVector.render(ciP, indent + "  ", true);
-
-  out += statusCode.render(ciP->outFormat, indent + "  ");
-
-  out += endTag(indent, "", ciP->outFormat);
-
-  return out;
-}
-
-
-
 /* ****************************************************************************
 *
 * EntityTypesResponse::render -

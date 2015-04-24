@@ -67,12 +67,6 @@ std::string TypeEntityVector::render
 
   if (vec.size() > 0)
   {
-#if 0
-    if ((ciP->uriParam["attributesFormat"] == "object") && (ciP->outFormat == JSON))
-    {
-      return renderAsJsonObject(ciP, indent, comma);
-    }
-#endif
 
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
 

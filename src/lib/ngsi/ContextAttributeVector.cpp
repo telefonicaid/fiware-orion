@@ -78,7 +78,8 @@ std::string ContextAttributeVector::render
   RequestType         request,
   const std::string&  indent,
   bool                comma,
-  bool                omitValue
+  bool                omitValue,
+  bool                attrsAsName
 )
 {
   std::string out      = "";
@@ -133,7 +134,14 @@ std::string ContextAttributeVector::render
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+      if (attrsAsName)
+      {
+        out += vec[ix]->renderAsNameString(ciP, request, indent + "  ", ix != vec.size() - 1);
+      }
+      else
+      {
+        out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+      }
     }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
   }
@@ -142,7 +150,14 @@ std::string ContextAttributeVector::render
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, true, true);
     for (unsigned int ix = 0; ix < vec.size(); ++ix)
     {
-      out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+      if (attrsAsName)
+      {
+        out += vec[ix]->renderAsNameString(ciP, request, indent + "  ", ix != vec.size() - 1);
+      }
+      else
+      {
+        out += vec[ix]->render(ciP, request, indent + "  ", ix != vec.size() - 1, omitValue);
+      }
     }
     out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
   }

@@ -507,11 +507,10 @@ inline std::string basePart(std::string name)
     /* If not found, return just 'name' */
     return name;
   }
-  else
-  {
-    /* If found, return substring */
-    return name.substr(0, pos);
-  }
+
+  /* If found, return substring */
+  return name.substr(0, pos);
+
 }
 
 inline std::string idPart(std::string name)
@@ -523,11 +522,10 @@ inline std::string idPart(std::string name)
     /* If not found, return just "" */
     return "";
   }
-  else
-  {
-    /* If found, return substring */
-    return name.substr(pos + 2, name.length());
-  }
+
+  /* If found, return substring */
+  return name.substr(pos + 2, name.length());
+
 }
 
 #endif

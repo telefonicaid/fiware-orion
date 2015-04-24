@@ -72,7 +72,8 @@ typedef struct ContextAttributeVector
                             RequestType         requestType,
                             const std::string&  indent,
                             bool                comma     = false,
-                            bool                omitValue = false);
+                            bool                omitValue = false,
+                            bool                attrsAsName = false);
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

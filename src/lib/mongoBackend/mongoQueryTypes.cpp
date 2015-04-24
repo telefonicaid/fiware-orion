@@ -174,7 +174,7 @@ HttpStatusCode mongoEntityTypes
   {
     BSONObj                  resultItem = resultsArray[ix].embeddedObject();
     TypeEntity*              type       = new TypeEntity(resultItem.getStringField("_id"));
-    std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();    
+    std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
 
     if (!attrsArray[0].isNull())
     {

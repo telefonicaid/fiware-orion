@@ -79,20 +79,7 @@ std::string TypeEntity::render
   if ((typeNameBefore == true) && (ciP->outFormat == JSON))
   {
     out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
-
-    out += indent + "  \"attributes\": [ ";
-    for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
-    {
-      ContextAttribute* caP = contextAttributeVector.get(ix);
-      out += "\"" + caP->name + "\"";
-      if (ix != contextAttributeVector.size() - 1)
-      {
-        /* Except for the last element, we have to add a comma */
-        out += ", ";
-      }
-    }
-    out += " ], \n";
-
+    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", true, true, true);
   }
   else
   {
@@ -105,30 +92,7 @@ std::string TypeEntity::render
     else
     {
       out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
-      if (ciP->outFormat == JSON) {
-        out += indent + "  \"attributes\": [ ";
-        for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
-        {
-          ContextAttribute* caP = contextAttributeVector.get(ix);
-          out += "\"" + caP->name + "\"";
-          if (ix != contextAttributeVector.size() - 1)
-          {
-            /* Except for the last element, we have to add a comma */
-            out += ", ";
-          }
-        }
-        out += " ]\n";
-      }
-      else  /* XML */
-      {
-        out += indent + "  <attributes>\n";
-        for (unsigned int ix = 0; ix < contextAttributeVector.size(); ix++)
-        {
-          ContextAttribute* caP = contextAttributeVector.get(ix);
-          out += indent + "    " + "<name>" + caP->name + "</name>\n";
-        }
-        out += indent + "  </attributes>\n";
-      }
+      out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true, true);
     }
 
     out += endTag(indent, xmlTag, ciP->outFormat, comma, false);

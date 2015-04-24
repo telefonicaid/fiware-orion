@@ -325,7 +325,7 @@ Date: REGEX(.*)
 02. Query on /Madrid/Gardens/# (returns: tEG, tEGN, tEGS)
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 282
+Content-Length: 333
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -360,7 +360,7 @@ Date: REGEX(.*)
 03. Query on /Madrid/Gardens (returns: tEG)
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 154
+Content-Length: 171
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -383,7 +383,7 @@ Date: REGEX(.*)
 04. Query on /Madrid/Gardens/North (returns: tEGN)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 172
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -406,7 +406,7 @@ Date: REGEX(.*)
 05. Query on /Madrid/Gardens/North/# (returns: tEGN)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 172
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -429,7 +429,7 @@ Date: REGEX(.*)
 06. Query on /Madrid/Gardens, /Madrid/Transport (returns: tEG, tET)
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 251
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -458,7 +458,7 @@ Date: REGEX(.*)
 07. Query on /Madrid/Gardens/#, /Madrid/Transport/# (returns: tEG, tEGN, tEGS, tET, tETP, tETH)
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 473
+Content-Length: 575
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -511,7 +511,7 @@ Date: REGEX(.*)
 08. Query on /Madrid/Gardens, /Madrid/Transport/# (return: tEG, tET, tETP, tETH)
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 345
+Content-Length: 413
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -552,7 +552,7 @@ Date: REGEX(.*)
 09. Query on /Madrid/Gardens, /Madrid/Transport (return: tEG, tET)
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 217
+Content-Length: 251
 Content-Type: application/json
 Date: REGEX(.*)
 
