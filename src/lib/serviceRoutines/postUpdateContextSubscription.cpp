@@ -51,7 +51,7 @@ std::string postUpdateContextSubscription
 
   ucsr.subscribeError.subscriptionId = parseDataP->ucsr.res.subscriptionId;
 
-  Format  notifyFormat = formatFromInput(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT], ciP->inFormat);
+  Format  notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
   ciP->httpStatusCode  = mongoUpdateContextSubscription(&parseDataP->ucsr.res,
                                                         &ucsr,
                                                         notifyFormat,
