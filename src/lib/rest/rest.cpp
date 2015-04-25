@@ -98,8 +98,6 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   std::string      key   = ckey;
   std::string      value = (val == NULL)? "" : val;
 
-  LM_M(("Got an URI param: %s=%s", ckey, val));
-
   if (key == URI_PARAM_NOTIFY_FORMAT)
   {
     if (strcasecmp(val, "xml") == 0)
@@ -111,7 +109,6 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
       OrionError error(SccBadRequest, std::string("Bad notification format: /") + value + "/. Valid values: /XML/ and /JSON/");
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = error.render(ciP->outFormat, "");
-      LM_M(("Bad value for uri param '%s': %s (responding in %s))", URI_PARAM_NOTIFY_FORMAT, value.c_str(), formatToString(ciP->outFormat)));
       return MHD_YES;
     }
   }
@@ -208,8 +205,6 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 {
   HttpHeaders*  headerP = (HttpHeaders*) cbDataP;
   std::string   key     = ckey;
-
-  LM_M(("Got an HTTP Header: %s=%s", ckey, value));
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 

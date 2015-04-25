@@ -40,8 +40,8 @@ extern HttpStatusCode mongoNotifyContextAvailability
   NotifyContextAvailabilityRequest*    requestP,
   NotifyContextAvailabilityResponse*   responseP,
   std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant       = "",
-  const std::string&                   servicePath  = ""
+  const std::string&                   tenant      = "",
+  const std::string&                   servicePath = ""
 );
 
 #endif

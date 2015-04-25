@@ -69,7 +69,7 @@ HttpStatusCode mongoNotifyContextAvailability
      * point of view, notifyContextAvailability is considered as a new registration (as no registratinId is
      * received in the notification message) */
     RegisterContextResponse rcres;
-    processRegisterContext(&rcr, &rcres, NULL, tenant, servicePath, notifyFormat.c_str());
+    processRegisterContext(&rcr, &rcres, NULL, tenant, servicePath, notifyFormat);
 
     responseP->responseCode.fill(SccOk);
 
