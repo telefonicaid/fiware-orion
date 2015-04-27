@@ -54,8 +54,8 @@ HttpStatusCode mongoRegisterContext
   const std::string&                   servicePath
 )
 {
-    std::string  sPath         = servicePath;
-    std::string  notifyFormat  = uriParam[URI_PARAM_NOTIFY_FORMAT];
+    std::string  sPath               = servicePath;
+    const std::string  notifyFormat  = uriParam[URI_PARAM_NOTIFY_FORMAT];
 
     LM_T(LmtMongo, ("Register Context Request: '%s' format", notifyFormat.c_str()));
 

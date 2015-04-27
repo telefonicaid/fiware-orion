@@ -50,9 +50,9 @@ HttpStatusCode mongoSubscribeContext
   const std::vector<std::string>&      servicePathV
 )
 {
-    std::string  notifyFormatAsString  = uriParam[URI_PARAM_NOTIFY_FORMAT];
-    Format       notifyFormat          = stringToFormat(notifyFormatAsString);
-    std::string  servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];
+    const std::string  notifyFormatAsString  = uriParam[URI_PARAM_NOTIFY_FORMAT];
+    Format             notifyFormat          = stringToFormat(notifyFormatAsString);
+    std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];
 
     LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormatAsString.c_str()));
 
