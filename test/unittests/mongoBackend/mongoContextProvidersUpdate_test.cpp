@@ -1618,18 +1618,20 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   DBClientBase* connection = getMongoConnection();
 
   /* entities collection */
-  BSONObj ent;
-  std::vector<BSONElement> attrs;
+  BSONObj ent, attrs;
+  std::vector<BSONElement> attrNames;
   ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
   ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T"));
   EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
   EXPECT_STREQ("T", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-  attrs = ent.getField("attrs").Array();
-  ASSERT_EQ(1, attrs.size());
-  BSONObj a1 = getAttr(attrs, "A1", "T");
-  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
+  ASSERT_EQ(1, attrs.nFields());
+  ASSERT_EQ(1, attrNames.size());
+  BSONObj a1 = attrs.getField("A1").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
   EXPECT_STREQ("T",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("10", C_STR_FIELD(a1, "value"));
   EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -1638,10 +1640,12 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
   EXPECT_STREQ("T", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-  attrs = ent.getField("attrs").Array();
-  ASSERT_EQ(1, attrs.size());
-  BSONObj a3 = getAttr(attrs, "A3", "T");
-  EXPECT_STREQ("A3", C_STR_FIELD(a3, "name"));
+  attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
+  ASSERT_EQ(1, attrs.nFields());
+  ASSERT_EQ(1, attrNames.size());
+  BSONObj a3 = attrs.getField("A3").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A3"));
   EXPECT_STREQ("T",C_STR_FIELD(a3, "type"));
   EXPECT_STREQ("30", C_STR_FIELD(a3, "value"));
   EXPECT_EQ(1360232700, a3.getIntField("modDate"));
