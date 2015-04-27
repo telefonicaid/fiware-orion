@@ -34,7 +34,7 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "orionTypes/UpdateContextRequestVector.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/clientSocketHttp.h"
+#include "rest/httpRequestSend.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
@@ -170,19 +170,19 @@ static void updateForward(ConnectionInfo* ciP, UpdateContextRequest* upcrP, Upda
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
 
-  out = sendHttpSocket(ip,
-                       port,
-                       protocol,
-                       verb,
-                       tenant,
-                       servicePath,
-                       ciP->httpHeaders.xauthToken,
-                       resource,
-                       mimeType,
-                       cleanPayload,
-                       false,
-                       true,
-                       mimeType);
+  out = httpRequestSend(ip,
+                        port,
+                        protocol,
+                        verb,
+                        tenant,
+                        servicePath,
+                        ciP->httpHeaders.xauthToken,
+                        resource,
+                        mimeType,
+                        cleanPayload,
+                        false,
+                        true,
+                        mimeType);
 
   if ((out == "error") || (out == ""))
   {

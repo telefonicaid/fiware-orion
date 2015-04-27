@@ -37,7 +37,7 @@
 #include "mongoBackend/mongoConfManOperations.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/clientSocketHttp.h"
+#include "rest/httpRequestSend.h"
 #include "rest/uriParamNames.h"
 #include "xmlParse/xmlRequest.h"
 
@@ -66,18 +66,18 @@ static std::string fordwardRegisterContext
 
   const std::string mimeType = (format == "JSON")? "application/json" : "application/xml";
 
-  std::string response = sendHttpSocket(fwdHost,
-                                        fwdPort,
-                                        "http:",
-                                        "POST",
-                                        tenant,
-                                        servicePath,
-                                        xauthToken,
-                                        "ngsi9/registerContext",
-                                        mimeType,
-                                        payload,
-                                        true,
-                                        true);
+  std::string response = httpRequestSend(fwdHost,
+                                         fwdPort,
+                                         "http:",
+                                         "POST",
+                                         tenant,
+                                         servicePath,
+                                         xauthToken,
+                                         "ngsi9/registerContext",
+                                         mimeType,
+                                         payload,
+                                         true,
+                                         true);
 
   LM_T(LmtCm, ("response to forward registerContext: '%s'", response.c_str()));
 

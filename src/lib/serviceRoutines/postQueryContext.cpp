@@ -33,7 +33,7 @@
 #include "orionTypes/QueryContextRequestVector.h"
 #include "orionTypes/QueryContextResponseVector.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/clientSocketHttp.h"
+#include "rest/httpRequestSend.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
@@ -136,19 +136,19 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format 
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
   std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
 
-  out = sendHttpSocket(ip,
-                       port,
-                       protocol,
-                       verb,
-                       tenant,
-                       servicePath,
-                       ciP->httpHeaders.xauthToken,
-                       resource,
-                       mimeType,
-                       payload,
-                       false,
-                       true,
-                       mimeType);
+  out = httpRequestSend(ip,
+                        port,
+                        protocol,
+                        verb,
+                        tenant,
+                        servicePath,
+                        ciP->httpHeaders.xauthToken,
+                        resource,
+                        mimeType,
+                        payload,
+                        false,
+                        true,
+                        mimeType);
 
   if ((out == "error") || (out == ""))
   {

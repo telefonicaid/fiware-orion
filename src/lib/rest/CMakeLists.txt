@@ -25,7 +25,7 @@ SET (SOURCES
     restReply.cpp
     RestService.cpp
     Verb.cpp
-    clientSocketHttp.cpp
+    httpRequestSend.cpp
     orionReply.cpp
     OrionError.cpp
     HttpStatusCode.cpp
@@ -39,7 +39,7 @@ SET (HEADERS
     restReply.h
     RestService.h
     Verb.h
-    clientSocketHttp.h
+    httpRequestSend.h
     orionReply.h
     OrionError.h
     HttpStatusCode.h

@@ -41,7 +41,7 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/clientSocketHttp.h"
+#include "rest/httpRequestSend.h"
 #include "rest/rest.h"
 #include "serviceRoutines/versionTreat.h"
 
@@ -61,7 +61,7 @@
 *
 * See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
 * to provide a way to do asynchronous HTTP transactions in the way we intended
-* with the previous version of sendHttpSocket. To enable the old behavior of asynchronous
+* with the previous version of httpRequestSend. To enable the old behavior of asynchronous
 * HTTP requests uncomment the following #define line.
 *
 * [1] http://stackoverflow.com/questions/24288513/how-to-do-curl-multi-perform-asynchronously-in-c
@@ -121,9 +121,9 @@ static char* curlVersionGet(char* buf, int bufLen)
 
 /* ****************************************************************************
 *
-* sendHttpRequest -
+* httpRequestSend -
 */
-std::string sendHttpSocket
+std::string httpRequestSend
 (
    const std::string&     _ip,
    unsigned short         port,
@@ -212,7 +212,7 @@ std::string sendHttpSocket
 
   //
   // Rush
-  // Every call to sendHttpSocket specifies whether RUSH should be used or not.
+  // Every call to httpRequestSend specifies whether RUSH should be used or not.
   // But, this depends also on how the broker was started, so here the 'useRush'
   // parameter is cancelled in case the broker was started without rush.
   //
@@ -389,9 +389,9 @@ std::string sendHttpSocket
 
 /* ****************************************************************************
 *
-* socketHttpConnect -
+* httpRequestConnect -
 */
-int socketHttpConnect(const std::string& host, unsigned short port)
+int httpRequestConnect(const std::string& host, unsigned short port)
 {
   int                 fd;
   struct addrinfo     hints;
@@ -454,7 +454,7 @@ int socketHttpConnect(const std::string& host, unsigned short port)
 
 /* ****************************************************************************
 *
-* sendHttpSocket -
+* httpRequestSend -
 *
 * The waitForResponse arguments specifies if the method has to wait for response
 * before return. If this argument is false, the return string is ""
@@ -469,7 +469,7 @@ int socketHttpConnect(const std::string& host, unsigned short port)
 * calloc/free syscalls if the notification payload is not very large.
 *
 */
-std::string sendHttpSocket
+std::string httpRequestSend
 (
    const std::string&     _ip,
    unsigned short         port,
@@ -539,7 +539,7 @@ std::string sendHttpSocket
 
   //
   // Rush
-  // Every call to sendHttpSocket specifies whether RUSH should be used or not.
+  // Every call to httpRequestSend specifies whether RUSH should be used or not.
   // But, this depends also on how the broker was started, so here the 'useRush'
   // parameter is cancelled in case the broker was started without rush.
   //
@@ -655,7 +655,7 @@ std::string sendHttpSocket
   /* We add a final newline (I guess that HTTP protocol needs it) */
   strcat(msg, "\n");
 
-  int fd = socketHttpConnect(ip, port); // Connecting to HTTP server
+  int fd = (ip, port); // Connecting to HTTP server
 
   if (fd == -1)
   {
