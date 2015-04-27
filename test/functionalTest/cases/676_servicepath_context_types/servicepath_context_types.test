@@ -325,7 +325,7 @@ Date: REGEX(.*)
 02. Query on /Madrid/Gardens/# (returns: tEG, tEGN, tEGS)
 =========================================================
 HTTP/1.1 200 OK
-Content-Length: 507
+Content-Length: 327
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -337,28 +337,19 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEG"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEGN"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEGS"
         }
@@ -369,7 +360,7 @@ Date: REGEX(.*)
 03. Query on /Madrid/Gardens (returns: tEG)
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 229
+Content-Length: 169
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -381,10 +372,7 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEG"
         }
@@ -395,7 +383,7 @@ Date: REGEX(.*)
 04. Query on /Madrid/Gardens/North (returns: tEGN)
 ==================================================
 HTTP/1.1 200 OK
-Content-Length: 230
+Content-Length: 170
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -407,10 +395,7 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEGN"
         }
@@ -421,7 +406,7 @@ Date: REGEX(.*)
 05. Query on /Madrid/Gardens/North/# (returns: tEGN)
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 230
+Content-Length: 170
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -433,10 +418,7 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEGN"
         }
@@ -447,7 +429,7 @@ Date: REGEX(.*)
 06. Query on /Madrid/Gardens, /Madrid/Transport (returns: tEG, tET)
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 367
+Content-Length: 247
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -459,19 +441,13 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEG"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tET"
         }
@@ -482,7 +458,7 @@ Date: REGEX(.*)
 07. Query on /Madrid/Gardens/#, /Madrid/Transport/# (returns: tEG, tEGN, tEGS, tET, tETP, tETH)
 ===============================================================================================
 HTTP/1.1 200 OK
-Content-Length: 923
+Content-Length: 563
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -494,55 +470,37 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEG"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEGN"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEGS"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tET"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tETH"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tETP"
         }
@@ -553,7 +511,7 @@ Date: REGEX(.*)
 08. Query on /Madrid/Gardens, /Madrid/Transport/# (return: tEG, tET, tETP, tETH)
 ================================================================================
 HTTP/1.1 200 OK
-Content-Length: 645
+Content-Length: 405
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -565,37 +523,25 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEG"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tET"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tETH"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tETP"
         }
@@ -606,7 +552,7 @@ Date: REGEX(.*)
 09. Query on /Madrid/Gardens, /Madrid/Transport (return: tEG, tET)
 ==================================================================
 HTTP/1.1 200 OK
-Content-Length: 367
+Content-Length: 247
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -618,19 +564,13 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tEG"
         },
         {
             "attributes": [
-                {
-                    "name": "A",
-                    "type": "string"
-                }
+                "A"
             ],
             "name": "tET"
         }

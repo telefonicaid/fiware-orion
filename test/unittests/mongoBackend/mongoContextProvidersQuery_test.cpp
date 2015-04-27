@@ -336,9 +336,10 @@ static void prepareDatabaseSeveralCprs1(bool addGenericRegistry)
    *
    */
 
-  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "T" << "value" << "1")
+  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<                     
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "T" << "value" << "1")
                         )
                     );
 
@@ -454,8 +455,9 @@ static void prepareDatabaseSeveralCprs2(void)
 
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "T" << "value" << "1")
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "T" << "value" << "1")
                         )
                     );
 
@@ -594,7 +596,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -653,7 +655,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -719,7 +721,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -785,7 +787,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -862,7 +864,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -934,7 +936,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1191,7 +1193,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1264,7 +1266,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1348,7 +1350,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -1477,7 +1479,7 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1536,7 +1538,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
@@ -1599,7 +1601,7 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1684,7 +1686,7 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1812,7 +1814,7 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E3", RES_CER(1).entityId.id);
@@ -1941,7 +1943,7 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -2091,7 +2093,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   utExit();
 
@@ -2178,7 +2180,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   utExit();
 
@@ -2248,7 +2250,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
 
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   utExit();
 

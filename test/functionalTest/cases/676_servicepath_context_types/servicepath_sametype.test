@@ -287,7 +287,7 @@ Date: REGEX(.*)
 02. Query types on / (returns: T - [a, b])
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -299,14 +299,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-                {
-                    "name": "b",
-                    "type": "string"
-                },
-                {
-                    "name": "a",
-                    "type": "string"
-                }
+                "b",
+                "a"
             ],
             "name": "T"
         }
@@ -317,7 +311,7 @@ Date: REGEX(.*)
 03. Query types on /# (returns: T - [a, b, c, d, e])
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 519
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -329,28 +323,11 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-#SORT_START
-                {
-                    "name": "e",
-                    "type": "string"
-                },
-                {
-                    "name": "d",
-                    "type": "string"
-                },
-                {
-                    "name": "c",
-                    "type": "string"
-                },
-                {
-                    "name": "b",
-                    "type": "string"
-                },
-                {
-                    "name": "a",
-                    "type": "string"
-                }
-#SORT_END
+                "e",
+                "d",
+                "c",
+                "b",
+                "a"
             ],
             "name": "T"
         }
@@ -361,7 +338,7 @@ Date: REGEX(.*)
 04. Query types on /A (returns: T - [b, c])
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -373,16 +350,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-#SORT_START
-                {
-                    "name": "c",
-                    "type": "string"
-                },
-                {
-                    "name": "b",
-                    "type": "string"
-                }
-#SORT_END
+                "c",
+                "b"
             ],
             "name": "T"
         }
@@ -393,7 +362,7 @@ Date: REGEX(.*)
 05. Query types on /A/# (returns: T - [b, c, d, e])
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 446
+Content-Length: 206
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -405,24 +374,10 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-#SORT_START
-                {
-                    "name": "e",
-                    "type": "string"
-                },
-                {
-                    "name": "d",
-                    "type": "string"
-                },
-                {
-                    "name": "c",
-                    "type": "string"
-                },
-                {
-                    "name": "b",
-                    "type": "string"
-                }
-#SORT_END
+                "e",
+                "d",
+                "c",
+                "b"
             ],
             "name": "T"
         }
@@ -433,7 +388,7 @@ Date: REGEX(.*)
 06. Query types on /A/A1 (returns: T- [c, d])
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -445,16 +400,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-#SORT_START
-                {
-                    "name": "d",
-                    "type": "string"
-                },
-                {
-                    "name": "c",
-                    "type": "string"
-                }
-#SORT_END
+                "d",
+                "c"
             ],
             "name": "T"
         }
@@ -465,7 +412,7 @@ Date: REGEX(.*)
 07. Query types on /A/A1/# (returns: T - [c, d])
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 300
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -477,16 +424,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-#SORT_START
-                {
-                    "name": "d",
-                    "type": "string"
-                },
-                {
-                    "name": "c",
-                    "type": "string"
-                }
-#SORT_END
+                "d",
+                "c"
             ],
             "name": "T"
         }

@@ -25,7 +25,7 @@ ExtraOp getAttributesForEntityType:  GET /v1/contextTypes/{entity::type}
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0
+brokerStart CB 0-255
 
 --SHELL--
 
@@ -33,7 +33,6 @@ brokerStart CB 0
 # 01. GET /v1/contextTypes/T1 and see it fail
 # 02. POST /v1/updateContext, creating E1-T1-A1+A2
 # 03. GET /v1/contextTypes/T1 and see it work
-# 04. GET /v1/contextTypes/T1?attributeFormat=object and see it work
 # 05. POST /v1/updateContext, creating E1-T1-A3+A4, servicePath /s1
 # 06. GET /v1/contextTypes/T1, without servicePath, see four types
 # 07. GET /v1/contextTypes/T1, with servicePath /s1, see two types
@@ -82,14 +81,7 @@ echo
 echo
 
 
-echo "04. GET /v1/contextTypes/T1?attributeFormat=object and see it work"
-echo "=================================================================="
-orionCurl --url /v1/contextTypes/T1?attributeFormat=object --json
-echo
-echo
-
-
-echo "05. POST /v1/updateContext, creating E1-T1-A3+A4, servicePath /s1"
+echo "04. POST /v1/updateContext, creating E1-T1-A3+A4, servicePath /s1"
 echo "================================================================="
 payload='{
   "contextElements": [
@@ -117,21 +109,21 @@ echo
 echo
 
 
-echo "06. GET /v1/contextTypes/T1, without servicePath, see four types"
+echo "05. GET /v1/contextTypes/T1, without servicePath, see four types"
 echo "================================================================"
 orionCurl --url /v1/contextTypes/T1 --json
 echo
 echo
 
 
-echo "07. GET /v1/contextTypes/T1, with servicePath /s1, see two types"
+echo "06. GET /v1/contextTypes/T1, with servicePath /s1, see two types"
 echo "================================================================"
 orionCurl --url /v1/contextTypes/T1 --json --servicePath /s1
 echo
 echo
 
 
-echo "08. GET /v1/contextTypes/T1, with servicePath /, see two types"
+echo "07. GET /v1/contextTypes/T1, with servicePath /, see two types"
 echo "=============================================================="
 orionCurl --url /v1/contextTypes/T1 --json --servicePath /
 echo
@@ -194,54 +186,24 @@ Date: REGEX(.*)
 03. GET /v1/contextTypes/T1 and see it work
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 251
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "A1", 
-            "type": "string"
-        }, 
-        {
-            "name": "A2", 
-            "type": "string"
-        }
-    ], 
-    "name": "T1", 
+        "A1",
+        "A2"
+    ],
+    "name": "T1",
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
 
 
-04. GET /v1/contextTypes/T1?attributeFormat=object and see it work
-==================================================================
-HTTP/1.1 200 OK
-Content-Length: 219
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "attributes": {
-        "A1": {
-            "type": "string"
-        }, 
-        "A2": {
-            "type": "string"
-        }
-    }, 
-    "name": "T1", 
-    "statusCode": {
-        "code": "200", 
-        "reasonPhrase": "OK"
-    }
-}
-
-
-05. POST /v1/updateContext, creating E1-T1-A3+A4, servicePath /s1
+04. POST /v1/updateContext, creating E1-T1-A3+A4, servicePath /s1
 =================================================================
 HTTP/1.1 200 OK
 Content-Length: 491
@@ -277,87 +239,63 @@ Date: REGEX(.*)
 }
 
 
-06. GET /v1/contextTypes/T1, without servicePath, see four types
+05. GET /v1/contextTypes/T1, without servicePath, see four types
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 167
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "A1", 
-            "type": "string"
-        }, 
-        {
-            "name": "A2", 
-            "type": "string"
-        }, 
-        {
-            "name": "A3", 
-            "type": "string"
-        }, 
-        {
-            "name": "A4", 
-            "type": "string"
-        }
-    ], 
-    "name": "T1", 
+        "A1",
+        "A2",
+        "A3",
+        "A4"
+    ],
+    "name": "T1",
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
 
 
-07. GET /v1/contextTypes/T1, with servicePath /s1, see two types
+06. GET /v1/contextTypes/T1, with servicePath /s1, see two types
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 251
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "A3", 
-            "type": "string"
-        }, 
-        {
-            "name": "A4", 
-            "type": "string"
-        }
-    ], 
-    "name": "T1", 
+        "A3",
+        "A4"
+    ],
+    "name": "T1",
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
 
 
-08. GET /v1/contextTypes/T1, with servicePath /, see two types
+07. GET /v1/contextTypes/T1, with servicePath /, see two types
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 251
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "A1", 
-            "type": "string"
-        }, 
-        {
-            "name": "A2", 
-            "type": "string"
-        }
-    ], 
-    "name": "T1", 
+        "A1",
+        "A2"
+    ],
+    "name": "T1",
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     }
 }
