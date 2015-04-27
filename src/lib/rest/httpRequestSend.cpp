@@ -655,7 +655,7 @@ std::string httpRequestSend
   /* We add a final newline (I guess that HTTP protocol needs it) */
   strcat(msg, "\n");
 
-  int fd = (ip, port); // Connecting to HTTP server
+  int fd = httpRequestConnect(ip, port); // Connecting to HTTP server
 
   if (fd == -1)
   {
