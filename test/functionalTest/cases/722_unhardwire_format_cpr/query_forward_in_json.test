@@ -34,7 +34,7 @@ accumulatorStart
 # 01. Register E1/T1/A1 in CB, accumulator as CP, in XML and with notifyFormat set to JSON
 # 02. Register E1/T1/A2 in CB, accumulator as CP, in JSON
 # 03. Query E1/T1/A1 in CB, using XML - forwarded to accumulator in JSON
-# 04. Query E1/T1/A1 in CB - forwarded to accumulator in JSON
+# 04. Query E1/T1/A1 in CB, using JSON - forwarded to accumulator in JSON
 # 05. Dump accumulator - see two Queries in JSON
 #
 
@@ -113,8 +113,8 @@ echo
 echo
 
 
-echo "04. Query E1/T1/A1 in CB - forwarded to accumulator in JSON"
-echo "==========================================================="
+echo "04. Query E1/T1/A1 in CB, using JSON - forwarded to accumulator in JSON"
+echo "======================================================================="
 payload='{
   "entities": [
     {
@@ -183,8 +183,8 @@ Date: REGEX(.*)
 </queryContextResponse>
 
 
-04. Query E1/T1/A1 in CB - forwarded to accumulator in JSON
-===========================================================
+04. Query E1/T1/A1 in CB, using JSON - forwarded to accumulator in JSON
+=======================================================================
 HTTP/1.1 200 OK
 Content-Length: 147
 Content-Type: application/json

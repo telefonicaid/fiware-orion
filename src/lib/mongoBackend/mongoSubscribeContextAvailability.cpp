@@ -52,7 +52,7 @@ HttpStatusCode mongoSubscribeContextAvailability
   const std::string&                     tenant
 )
 {
-    LM_T(LmtMongo, ("Subscribe Context Availability Request"));
+    LM_T(LmtMongo, ("Subscribe Context Availability Request, notifyFormat: %s", formatToString(notifyFormat)));
 
     reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
 

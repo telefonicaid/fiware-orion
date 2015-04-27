@@ -48,7 +48,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   const std::string&                              tenant
 )
 {
-  LM_T(LmtMongo, ("Update Context Subscription"));
+  LM_T(LmtMongo, ("Update Context Subscription, notifyFormat: '%s'", formatToString(notifyFormat)));
   reqSemTake(__FUNCTION__, "ngsi9 update subscription request");
 
   DBClientBase* connection = getMongoConnection();

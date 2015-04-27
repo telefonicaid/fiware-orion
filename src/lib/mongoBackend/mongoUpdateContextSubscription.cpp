@@ -52,7 +52,7 @@ HttpStatusCode mongoUpdateContextSubscription
 {
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request");
 
-  LM_T(LmtMongo, ("Update Context Subscription"));
+  LM_T(LmtMongo, ("Update Context Subscription, notifyFormat: '%s'", formatToString(notifyFormat)));
 
   DBClientBase* connection = getMongoConnection();
 
