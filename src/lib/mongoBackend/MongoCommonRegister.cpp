@@ -353,7 +353,8 @@ HttpStatusCode processRegisterContext
   RegisterContextResponse*  responseP,
   OID*                      id,
   const std::string&        tenant,
-  const std::string&        servicePath
+  const std::string&        servicePath,
+  const std::string&        format
 )
 {
     DBClientBase* connection = getMongoConnection();
@@ -380,6 +381,7 @@ HttpStatusCode processRegisterContext
     reg.append("_id", oid);
     reg.append(REG_EXPIRATION, expiration);
     reg.append(REG_SERVICE_PATH, servicePath);
+    reg.append(REG_FORMAT, format);
 
     /* We accumulate the subscriptions in a map. The key of the map is the string representing
      * subscription id */

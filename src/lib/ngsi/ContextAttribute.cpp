@@ -61,8 +61,10 @@ ContextAttribute::ContextAttribute()
   value                 = "";
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
-  providingApplication  = "";
   found                 = false;
+
+  providingApplication.set("");
+  providingApplication.setFormat(NOFORMAT);
 }
 
 
@@ -77,9 +79,11 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   type                  = caP->type;
   value                 = caP->value;
   compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
-  providingApplication  = caP->providingApplication;
   found                 = caP->found;
   typeFromXmlAttribute  = "";
+
+  providingApplication.set(caP->providingApplication.get());
+  providingApplication.setFormat(caP->providingApplication.getFormat());
 
   LM_T(LmtClone, ("Creating a ContextAttribute: compoundValueP at %p for attribute '%s' at %p",
                   compoundValueP,
@@ -118,9 +122,10 @@ ContextAttribute::ContextAttribute
   type                  = _type;
   value                 = _value;
   compoundValueP        = NULL;
-  typeFromXmlAttribute  = "";
-  providingApplication  = "";
   found                 = _found;
+
+  providingApplication.set("");
+  providingApplication.setFormat(NOFORMAT);
 }
 
 
@@ -142,8 +147,11 @@ ContextAttribute::ContextAttribute
   type                  = _type;
   compoundValueP        = _compoundValueP->clone();
   typeFromXmlAttribute  = "";
-  providingApplication  = "";
   found                 = false;
+
+  providingApplication.set("");
+  providingApplication.setFormat(NOFORMAT);
+
 }
 
 
@@ -390,7 +398,7 @@ void ContextAttribute::present(const std::string& indent, int ix)
     compoundValueP->show(indent + "  ");
   }
 
-  LM_F(("%s  PA:       %s", indent.c_str(), providingApplication.c_str()));
+  LM_F(("%s  PA:       %s (%s)", indent.c_str(), providingApplication.get().c_str(), formatToString(providingApplication.getFormat())));
   LM_F(("%s  found:    %s", indent.c_str(), FT(found)));
 
   metadataVector.present("Attribute", indent + "  ");

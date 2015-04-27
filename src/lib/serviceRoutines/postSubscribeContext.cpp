@@ -29,6 +29,7 @@
 #include "ngsi/ParseData.h"
 #include "ngsi10/SubscribeContextResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 #include "serviceRoutines/postSubscribeContext.h"
 
 
@@ -44,7 +45,7 @@
 * Payload Out: SubscribeContextResponse
 *
 * URI parameters
-*   - notifyFormat=XXX    (handled by mongoBackend)
+*   - notifyFormat=XXX    (used by mongoBackend)
 */
 std::string postSubscribeContext
 (

@@ -26,6 +26,8 @@
 * Author: Fermín Galán
 */
 
+#include <map>
+
 #include "ngsi9/NotifyContextAvailabilityRequest.h"
 #include "ngsi9/NotifyContextAvailabilityResponse.h"
 
@@ -35,10 +37,11 @@
 */
 extern HttpStatusCode mongoNotifyContextAvailability
 (
-  NotifyContextAvailabilityRequest*   requestP,
-  NotifyContextAvailabilityResponse*  responseP,
-  const std::string&                  tenant      = "",
-  const std::string&                  servicePath = ""
+  NotifyContextAvailabilityRequest*    requestP,
+  NotifyContextAvailabilityResponse*   responseP,
+  std::map<std::string, std::string>&  uriParam,
+  const std::string&                   tenant      = "",
+  const std::string&                   servicePath = ""
 );
 
 #endif

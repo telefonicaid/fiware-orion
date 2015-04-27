@@ -48,24 +48,11 @@ HttpStatusCode mongoSubscribeContextAvailability
   SubscribeContextAvailabilityRequest*   requestP,
   SubscribeContextAvailabilityResponse*  responseP,
   std::map<std::string, std::string>&    uriParam,
-  Format                                 inFormat,
+  Format                                 notifyFormat,
   const std::string&                     tenant
 )
 {
-    std::string notifyFormat       = uriParam[URI_PARAM_NOTIFY_FORMAT];
-    Format      notifyFormatBinary = XML;
-
-    if (notifyFormat == "")
-    {
-      notifyFormat = (inFormat == XML)? "XML" : "JSON";
-    }
-
-    if (notifyFormat == "JSON")
-    {
-      notifyFormatBinary = JSON;
-    }
-
-    LM_T(LmtMongo, ("Subscribe Context Availability Request"));
+    LM_T(LmtMongo, ("Subscribe Context Availability Request, notifyFormat: %s", formatToString(notifyFormat)));
 
     reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
 
@@ -113,7 +100,7 @@ HttpStatusCode mongoSubscribeContextAvailability
     sub.append(CASUB_ATTRS, attrs.arr());
 
     /* Adding format to use in notifications */
-    sub.append(CASUB_FORMAT, notifyFormat);
+    sub.append(CASUB_FORMAT, formatToString(notifyFormat));
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
@@ -150,7 +137,7 @@ HttpStatusCode mongoSubscribeContextAvailability
     }
 
     /* Send notifications for matching context registrations */
-    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), notifyFormatBinary, tenant);
+    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), notifyFormat, tenant);
 
     /* Fill the response element */
     responseP->duration = requestP->duration;

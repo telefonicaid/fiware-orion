@@ -47,17 +47,19 @@ using namespace mongo;
 */
 HttpStatusCode mongoRegisterContext
 (
-  RegisterContextRequest*   requestP,
-  RegisterContextResponse*  responseP,
-  const std::string&        tenant,
-  const std::string&        servicePath
+  RegisterContextRequest*              requestP,
+  RegisterContextResponse*             responseP,
+  std::map<std::string, std::string>&  uriParam,
+  const std::string&                   tenant,
+  const std::string&                   servicePath
 )
-{    
-    std::string sPath = servicePath;
+{
+    std::string  sPath               = servicePath;
+    const std::string  notifyFormat  = uriParam[URI_PARAM_NOTIFY_FORMAT];
 
-    reqSemTake(__FUNCTION__, "ngsi9 register request");
+    LM_T(LmtMongo, ("Register Context Request: '%s' format", notifyFormat.c_str()));
 
-    LM_T(LmtMongo, ("Register Context Request"));
+    reqSemTake(__FUNCTION__, "ngsi9 register request");    
 
     DBClientBase* connection = getMongoConnection();
 
@@ -70,7 +72,7 @@ HttpStatusCode mongoRegisterContext
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())
     {
-      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath);
+      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, notifyFormat);
       reqSemGive(__FUNCTION__, "ngsi9 register request");
       return result;
     }
@@ -138,7 +140,7 @@ HttpStatusCode mongoRegisterContext
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath);
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, notifyFormat);
     reqSemGive(__FUNCTION__, "ngsi9 register request");
     return result;
 }

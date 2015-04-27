@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_COMMON_FORMAT_H_
-#define SRC_LIB_COMMON_FORMAT_H_
+#ifndef SRC_LIB_JSONPARSE_JSONQUERYCONTEXTRESPONSE_H_
+#define SRC_LIB_JSONPARSE_JSONQUERYCONTEXTRESPONSE_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -27,52 +27,47 @@
 */
 #include <string>
 
-
-
-/* ****************************************************************************
-*
-* DEFAULT_FORMAT - 
-*/
-#define DEFAULT_FORMAT              XML
-#define DEFAULT_FORMAT_AS_STRING    "XML"
+#include "jsonParse/JsonNode.h"
+#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* Format - 
+* qcrsParseVector - 
 */
-typedef enum Format
-{
-  XML      = 1,
-  JSON     = 2,
-  TEXT     = 3,
-  HTML     = 4,
-  NOFORMAT = 5
-} Format;
+extern JsonNode jsonQcrsParseVector[];
 
 
 
 /* ****************************************************************************
 *
-* formatToString - 
+* jsonQcrsInit - 
 */
-extern const char* formatToString(Format format);
+extern void jsonQcrsInit(ParseData* reqDataP);
 
 
 
 /* ****************************************************************************
 *
-* stringToFormat
+* jsonQcrsRelease - 
 */
-extern Format stringToFormat(const std::string& s);
+extern void jsonQcrsRelease(ParseData* reqDataP);
 
 
 
 /* ****************************************************************************
 *
-* formatParse - 
+* jsonQcrsCheck - 
 */
-extern Format formatParse(const std::string& format, std::string* charsetP);
+extern std::string jsonQcrsCheck(ParseData* reqDataP, ConnectionInfo* ciP);
 
-#endif  // SRC_LIB_COMMON_FORMAT_H_
+
+
+/* ****************************************************************************
+*
+* jsonQcrsPresent - 
+*/
+extern void jsonQcrsPresent(ParseData* reqDataP);
+
+#endif  // SRC_LIB_JSONPARSE_JSONQUERYCONTEXTRESPONSE_H_

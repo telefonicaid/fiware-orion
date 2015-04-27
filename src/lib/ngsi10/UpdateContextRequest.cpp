@@ -48,6 +48,8 @@
 */
 UpdateContextRequest::UpdateContextRequest()
 {
+  xmls  = 0;
+  jsons = 0;
 }
 
 
@@ -60,6 +62,9 @@ UpdateContextRequest::UpdateContextRequest(const std::string _contextProvider, E
 {
   contextProvider = _contextProvider;
   contextElementVector.push_back(new ContextElement(eP));
+
+  xmls  = 0;
+  jsons = 0;
 }
 
 
@@ -70,6 +75,28 @@ UpdateContextRequest::UpdateContextRequest(const std::string _contextProvider, E
 */
 void UpdateContextRequest::init(void)
 {
+  xmls  = 0;
+  jsons = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::format - 
+*/
+Format UpdateContextRequest::format(void)
+{
+  if (xmls > jsons)
+  {
+    return XML;
+  }
+  else if (jsons > xmls)
+  {
+    return JSON;
+  }
+
+  return DEFAULT_FORMAT;
 }
 
 

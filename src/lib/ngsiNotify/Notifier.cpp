@@ -32,7 +32,7 @@
 
 #include "onTimeIntervalThread.h"
 #include "senderThread.h"
-#include "rest/clientSocketHttp.h"
+#include "rest/httpRequestSend.h"
 
 
 /* ****************************************************************************
@@ -112,18 +112,18 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string content_type = (format == XML)? "application/xml" : "application/json";
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host,
-                   port,
-                   protocol,
-                   "POST",
-                   tenant,
-                   spathList,
-                   xauthToken,
-                   uriPath,
-                   content_type,
-                   payload,
-                   true,
-                   NOTIFICATION_WAIT_MODE);
+    httpRequestSend(host,
+                    port,
+                    protocol,
+                    "POST",
+                    tenant,
+                    spathList,
+                    xauthToken,
+                    uriPath,
+                    content_type,
+                    payload,
+                    true,
+                    NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -171,6 +171,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     int          port;
     std::string  uriPath;
     std::string  protocol;
+
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
@@ -182,7 +183,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD

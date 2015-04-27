@@ -777,15 +777,6 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
-    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
-    if (ciP->httpStatusCode != SccOk)
-    {
-      LM_W(("Bad Input (error in URI parameters)"));
-      restReply(ciP, ciP->answer);
-      return MHD_YES;
-    }
-    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
-
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
     if (!ciP->httpHeaders.servicePathReceived)
     {
@@ -826,6 +817,15 @@ static int connectionTreat
     else
       ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
 
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+    if (ciP->httpStatusCode != SccOk)
+    {
+      LM_W(("Bad Input (error in URI parameters)"));
+      restReply(ciP, ciP->answer);
+      return MHD_YES;
+    }
+    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+
     // Set default mime-type for notifications
     if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
     {
@@ -834,7 +834,7 @@ static int connectionTreat
       else if (ciP->outFormat == JSON)
         ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
       else
-        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = DEFAULT_FORMAT_AS_STRING;
 
       LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
     }

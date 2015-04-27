@@ -31,6 +31,7 @@
 #include "ngsi/MetadataVector.h"
 #include "common/Format.h"
 #include "ngsi/Request.h"
+#include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
 #include "rest/ConnectionInfo.h"
 
@@ -49,9 +50,9 @@ typedef struct ContextAttribute
                                            //          E.g. /v1/contextTypes
   MetadataVector  metadataVector;          // Optional
 
-  std::string     providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
-  bool            found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
-                                           // It means attribute found either locally or remotely in prodiving application
+  ProvidingApplication     providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
+  bool                     found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
+                                                    // It means attribute found either locally or remotely in providing application
 
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;

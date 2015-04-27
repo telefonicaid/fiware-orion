@@ -37,16 +37,16 @@
 
 /***************************************************************************
 *
-* socketHttpConnect -
+* httpRequestConnect -
 */
-extern int socketHttpConnect(const std::string& host, unsigned short port);
+extern int httpRequestConnect(const std::string& host, unsigned short port);
 
 
 /* ****************************************************************************
 *
-* sendHttpSocket - 
+* httpRequestSend - 
 */
-extern std::string sendHttpSocket
+extern std::string httpRequestSend
 (
   const std::string&     ip,
   unsigned short         port, 
@@ -59,7 +59,8 @@ extern std::string sendHttpSocket
   const std::string&     content_type, 
   const std::string&     content,
   bool                   useRush,
-  bool                   waitForResponse
+  bool                   waitForResponse,
+  const std::string&     acceptFormat = ""
 );
 
 #endif

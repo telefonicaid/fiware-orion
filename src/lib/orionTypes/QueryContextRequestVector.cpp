@@ -29,10 +29,43 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "orionTypes/QueryContextRequestVector.h"
 #include "ngsi/Request.h"
+
+
+
+/* ****************************************************************************
+*
+* QueryContextRequestVector::QueryContextRequestVector - 
+*/
+QueryContextRequestVector::QueryContextRequestVector()
+{
+  xmls  = 0;
+  jsons = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* QueryContextRequestVector::format - 
+*/
+Format QueryContextRequestVector::format(void)
+{
+  if (xmls > jsons)
+  {
+    return XML;
+  }
+  else if (jsons > xmls)
+  {
+    return JSON;
+  }
+
+  return DEFAULT_FORMAT;
+}
 
 
 

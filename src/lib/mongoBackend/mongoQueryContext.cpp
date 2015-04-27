@@ -78,7 +78,7 @@ void fillContextProviders(ContextElementResponseVector& cerV, ContextRegistratio
 * addContextProviderEntity -
 *
 */
-void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP, std::string pa)
+void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP, ProvidingApplication pa)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
@@ -107,7 +107,7 @@ void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP,
 *
 *
 */
-void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* enP, ContextRegistrationAttribute* craP, const std::string& pa)
+void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* enP, ContextRegistrationAttribute* craP, const ProvidingApplication& pa)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
@@ -198,7 +198,7 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
       /* Registration without attributes */
       for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
       {
-        addContextProviderEntity(cerV, cr.entityIdVector.get(jx), cr.providingApplication.get());
+        addContextProviderEntity(cerV, cr.entityIdVector.get(jx), cr.providingApplication);
       }
     }
     else
@@ -208,7 +208,7 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
       {
         for (unsigned int aIx = 0; aIx < cr.contextRegistrationAttributeVector.size(); ++aIx)
         {
-          addContextProviderAttribute(cerV, cr.entityIdVector.get(eIx), cr.contextRegistrationAttributeVector.get(aIx), cr.providingApplication.get());
+          addContextProviderAttribute(cerV, cr.entityIdVector.get(eIx), cr.contextRegistrationAttributeVector.get(aIx), cr.providingApplication);
         }
       }
     }

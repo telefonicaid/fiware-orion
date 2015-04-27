@@ -53,12 +53,15 @@ typedef struct UpdateContextRequest
   ContextElementVector    contextElementVector;  // Mandatory
   UpdateActionType        updateActionType;      // Mandatory
 
-  std::string             contextProvider;  // Not part of the payload - used internally only
+  std::string             contextProvider;       // Not part of the payload - used internally only
+  int                     xmls;                  // Not part of the payload - used internally only
+  int                     jsons;                 // Not part of the payload - used internally only
 
   UpdateContextRequest();
   UpdateContextRequest(const std::string _contextProvider, EntityId* eP);
 
   void               init(void);
+  Format             format(void);
   std::string        render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
   std::string        check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void               release(void);

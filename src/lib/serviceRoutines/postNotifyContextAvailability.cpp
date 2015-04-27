@@ -79,7 +79,7 @@ std::string postNotifyContextAvailability
     return answer;
   }
 
-  ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->tenant, ciP->servicePathV[0]);
+  ciP->httpStatusCode = mongoNotifyContextAvailability(&parseDataP->ncar.res, &ncar, ciP->uriParam, ciP->tenant, ciP->servicePathV[0]);
 
   answer = ncar.render(NotifyContextAvailability, ciP->outFormat, "");
   return answer;

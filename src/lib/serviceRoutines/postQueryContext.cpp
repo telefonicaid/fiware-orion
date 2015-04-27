@@ -33,9 +33,10 @@
 #include "orionTypes/QueryContextRequestVector.h"
 #include "orionTypes/QueryContextResponseVector.h"
 #include "rest/ConnectionInfo.h"
-#include "rest/clientSocketHttp.h"
+#include "rest/httpRequestSend.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "xmlParse/xmlRequest.h"
+#include "jsonParse/jsonRequest.h"
 
 
 
@@ -52,20 +53,40 @@ static char* xmlPayloadClean(const char*  payload, const char* payloadWord)
 
 /* ****************************************************************************
 *
+* jsonPayloadClean -
+*/
+static char* jsonPayloadClean(const char* payload)
+{
+  return (char*) strstr(payload, "{");
+}
+
+
+
+/* ****************************************************************************
+*
 * queryForward - 
 *
 * An entity/attribute has been found on some context provider.
 * We need to forward the query request to the context provider, indicated in qcrsP->contextProvider
 *
 * 1. Parse the providing application to extract IP, port and URI-path
-* 2. Render an XML-string of the request we want to forward
+* 2. Render the string of the request we want to forward
 * 3. Send the request to the providing application (and await the response)
-* 4. Parse the XML response and fill in a binary QueryContextResponse
-* 5. Render QueryContextResponse from the providing application
-* 6. 'Fixing' StatusCode
+* 4. Parse the response and fill in a binary QueryContextResponse
+* 5. Fill in the response from the redirection into the response of this function
+* 6. 'Fix' StatusCode
 * 7. Freeing memory
+*
+*
+* FIXME P5: The function 'queryForward' is implemented to pick the format (XML or JSON) based on the
+*           count of the Format for all the participating attributes. If we have more attributes 'preferring'
+*           XML than JSON, the forward is done in XML, etc. This is all OK.
+*           What is not OK is that the Accept HTTP header is set to the same format as the Content-Type HTTP Header.
+*           While this is acceptable, it is not great. As the broker understands both XML and JSON, we could send
+*           the forward message with an Acceot header of XML/JSON and then at reading the response, instead of 
+*           throwing away the HTTP headers, we could read the "Content-Type" and do the parse according the Content-Type.
 */
-static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryContextResponse* qcrsP)
+static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, Format format, QueryContextResponse* qcrsP)
 {
   std::string     ip;
   std::string     protocol;
@@ -89,18 +110,20 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
 
   //
-  // 2. Render an XML-string of the request we want to forward
+  // 2. Render the string of the request we want to forward
   //
-  std::string  payload = qcrP->render(QueryContext, XML, "");
-  char*        cleanPayload;
+  std::string  payload = qcrP->render(QueryContext, format, "");
+  char*        cleanPayload = (char*) payload.c_str();;
 
-  if ((cleanPayload = xmlPayloadClean(payload.c_str(), "<queryContextRequest>")) == NULL)
+  if (format == XML)
   {
-    LM_E(("Runtime Error (error rendering forward-request)"));
-    qcrsP->errorCode.fill(SccContextElementNotFound, "");
-    return;
+    if ((cleanPayload = xmlPayloadClean(payload.c_str(), "<queryContextRequest>")) == NULL)
+    {
+      LM_E(("Runtime Error (error rendering forward-request)"));
+      qcrsP->errorCode.fill(SccContextElementNotFound, "");
+      return;
+    }
   }
-
 
   //
   // 3. Send the request to the Context Provider (and await the reply)
@@ -111,19 +134,21 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   std::string     resource     = prefix + "/queryContext";
   std::string     tenant       = ciP->tenant;
   std::string     servicePath  = (ciP->httpHeaders.servicePathReceived == true)? ciP->httpHeaders.servicePath : "";
+  std::string     mimeType     = (format == XML)? "application/xml" : "application/json";
 
-  out = sendHttpSocket(ip,
-                       port,
-                       protocol,
-                       verb,
-                       tenant,
-                       servicePath,
-                       ciP->httpHeaders.xauthToken,
-                       resource,
-                       "application/xml",
-                       payload,
-                       false,
-                       true);
+  out = httpRequestSend(ip,
+                        port,
+                        protocol,
+                        verb,
+                        tenant,
+                        servicePath,
+                        ciP->httpHeaders.xauthToken,
+                        resource,
+                        mimeType,
+                        payload,
+                        false,
+                        true,
+                        mimeType);
 
   if ((out == "error") || (out == ""))
   {
@@ -134,12 +159,19 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
 
   //
-  // 4. Parse the XML response and fill in a binary QueryContextResponse
+  // 4. Parse the response and fill in a binary QueryContextResponse
   //
   std::string  s;
   std::string  errorMsg;
 
-  cleanPayload = xmlPayloadClean(out.c_str(), "<queryContextResponse>");
+  if (format == XML)
+  {
+    cleanPayload = xmlPayloadClean(out.c_str(), "<queryContextResponse>");
+  }
+  else
+  {
+    cleanPayload = jsonPayloadClean(out.c_str());
+  }
 
   if ((cleanPayload == NULL) || (cleanPayload[0] == 0))
   {
@@ -164,7 +196,15 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
   ciP->verb   = POST;
   ciP->method = "POST";
 
-  s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
+  if (format == XML)
+  {
+    s = xmlTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL, &errorMsg);
+  }
+  else
+  {
+    s = jsonTreat(cleanPayload, ciP, &parseData, RtQueryContextResponse, "queryContextResponse", NULL);
+  }
+
   if (s != "OK")
   {
     LM_W(("Internal Error (error parsing reply from prov app: %s)", errorMsg.c_str()));
@@ -176,17 +216,13 @@ static void queryForward(ConnectionInfo* ciP, QueryContextRequest* qcrP, QueryCo
 
 
   //
-  // 5. Render QueryContextResponse from the providing application
+  // 5. Fill in the response from the redirection into the response of this function
   //
-  char portV[16];
-  snprintf(portV, sizeof(portV), "%d", port);
-
-  // Fill in the response from the redirection into the response
   qcrsP->fill(&parseData.qcrs.res);
 
 
   //
-  // 6. 'Fixing' StatusCode
+  // 6. 'Fix' StatusCode
   //
   if (qcrsP->errorCode.code == SccNone)
   {
@@ -227,7 +263,7 @@ static bool forwardsPending(QueryContextResponse* qcrsP)
     {
       ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
       
-      if (aP->providingApplication != "")
+      if (aP->providingApplication.get() != "")
       {
         return true;
       }      
@@ -323,7 +359,7 @@ std::string postQueryContext
     {
       QueryContextRequest* requestP;
 
-      requestP = new QueryContextRequest(cerP->contextElement.providingApplicationList[ix], eP, qcrP->attributeList);
+      requestP = new QueryContextRequest(cerP->contextElement.providingApplicationList[ix].get(), eP, qcrP->attributeList);
       requestV.push_back(requestP);
     }
 
@@ -335,7 +371,7 @@ std::string postQueryContext
       // An empty providingApplication means the attribute is local
       // In such a case, the response is already in our hand, we just need to copy it to responseV
       //
-      if (aP->providingApplication == "")
+      if (aP->providingApplication.get() == "")
       {
         if (aP->found == false)
         {
@@ -367,12 +403,27 @@ std::string postQueryContext
       //
       // Not a local attribute - aP->providingApplication is not empty
       //
-      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication, eP);
+      QueryContextRequest* requestP = requestV.lookup(aP->providingApplication.get(), eP);
 
       if (requestP == NULL)
       {
-        requestP = new QueryContextRequest(aP->providingApplication, eP, aP->name);
+        requestP = new QueryContextRequest(aP->providingApplication.get(), eP, aP->name);
         requestV.push_back(requestP);
+
+        //
+        // requestV maintains counters of the formats each added item is supposed to be in.
+        // Before the forward is done, these counters (one for XML and one for JSON) are examined
+        // and a format is chosen.
+        //
+        if (aP->providingApplication.format == XML)
+        {
+          requestV.xmls++;
+        }
+        else if (aP->providingApplication.format == JSON)
+        {
+          requestV.jsons++;
+        }
+
       }
       else
       {
@@ -417,7 +468,7 @@ std::string postQueryContext
 
     qP = new QueryContextResponse();
     qP->errorCode.fill(SccOk);
-    queryForward(ciP, requestV[fIx], qP);
+    queryForward(ciP, requestV[fIx], requestV.format(), qP);
 
     //
     // Now, each ContextElementResponse of qP should be tested to see whether there

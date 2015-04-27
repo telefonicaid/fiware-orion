@@ -24,7 +24,7 @@
 #include "senderThread.h"
 #include "logMsg/traceLevels.h"
 #include "logMsg/logMsg.h"
-#include "rest/clientSocketHttp.h"
+#include "rest/httpRequestSend.h"
 
 /* ****************************************************************************
 *
@@ -46,18 +46,18 @@ void* startSenderThread(void* p)
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
-    sendHttpSocket(params->ip,
-                   params->port,
-                   params->protocol,                   
-                   params->verb,
-                   params->tenant,
-                   params->servicePath,
-                   params->xauthToken,
-                   params->resource,
-                   params->content_type,
-                   params->content,
-                   true,
-                   NOTIFICATION_WAIT_MODE);
+    httpRequestSend(params->ip,
+                    params->port,
+                    params->protocol,                   
+                    params->verb,
+                    params->tenant,
+                    params->servicePath,
+                    params->xauthToken,
+                    params->resource,
+                    params->content_type,
+                    params->content,
+                    true,
+                    NOTIFICATION_WAIT_MODE);
 
     /* Delete the parameters after using them */
     delete params;

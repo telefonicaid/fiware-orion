@@ -78,7 +78,14 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
   bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
   bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+  if (requestType == UpdateContext)
+  {
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  }
+  else
+  {
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+  }
 
   out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
   out += attributeDomainName.render(ciP->outFormat, indent + "  ", commaAfterAttributeDomainName);
@@ -167,6 +174,7 @@ void ContextElement::present(const std::string& indent, int ix)
   domainMetadataVector.present("Domain", indent + "  ");
   for (unsigned int ix = 0; ix < providingApplicationList.size(); ++ix)
   {
+    LM_F(("%s  PA: %s (%s)", indent.c_str(), providingApplicationList[ix].get().c_str(), formatToString(providingApplicationList[ix].getFormat())));
     LM_F(("%s  providingApplication: %s", indent.c_str(), providingApplicationList[ix].c_str()));
   }
 }
