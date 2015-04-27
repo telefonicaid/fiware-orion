@@ -5,11 +5,11 @@ developed as a part of the FI-WARE platform.
 
 If this is your first contact with Orion Context Broker, it is highly recommended to have a look to the brief Quick Start guide:
 
-https://wiki.fi-ware.org/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Quick_Start_for_Programmers
+https://wiki.fiware.org/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Quick_Start_for_Programmers
 
 You will find all the information on Orion Context Broker in its page in the FI-WARE Catalogue:
 
-http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
+http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
 
 Note that you don't need this repository code if you install the broker via its RPM package (check Orion Context
 Broker installation and administration manual about installing via RPM).
