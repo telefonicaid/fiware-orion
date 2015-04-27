@@ -83,18 +83,6 @@ echo
 echo
 
 
-echo "5. Listing of Entity Type Attributes. Response in Object-JSON"
-orionCurl --url /v1/contextTypes/Room?attributeFormat=object --json 
-echo
-echo
-
-
-echo "6. Listing of Entity Type Attributes. Response in Object-JSON, details=on"
-orionCurl --url '/v1/contextTypes/Room?attributeFormat=object&details=on' --json 
-echo
-echo
-
-
 --REGEXPECT--
 0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
 HTTP/1.1 200 OK
@@ -134,7 +122,7 @@ Date: REGEX(.*)
 
 1. Listing of Entity Type Attributes. Response in XML
 HTTP/1.1 200 OK
-Content-Length: 298
+Content-Length: 320
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -142,10 +130,10 @@ Date: REGEX(.*)
 <entityTypeAttributesResponse>
   <entityType>
     <name>Room</name>
-    <attributes>
+    <contextAttributeList>
       <name>pressure</name>
       <name>temperature</name>
-    </attributes>
+    </contextAttributeList>
   </entityType>
   <statusCode>
     <code>200</code>
@@ -156,7 +144,7 @@ Date: REGEX(.*)
 
 2. Listing of Entity Type Attributes. Response in XML, details=on
 HTTP/1.1 200 OK
-Content-Length: 330
+Content-Length: 352
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -164,10 +152,10 @@ Date: REGEX(.*)
 <entityTypeAttributesResponse>
   <entityType>
     <name>Room</name>
-    <attributes>
+    <contextAttributeList>
       <name>pressure</name>
       <name>temperature</name>
-    </attributes>
+    </contextAttributeList>
   </entityType>
   <statusCode>
     <code>200</code>
@@ -179,7 +167,7 @@ Date: REGEX(.*)
 
 3. Listing of Entity Type Attributes. Response in JSON
 HTTP/1.1 200 OK
-Content-Length: 144
+Content-Length: 164
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -198,46 +186,7 @@ Date: REGEX(.*)
 
 4. Listing of Entity Type Attributes. Response in JSON, details=on
 HTTP/1.1 200 OK
-Content-Length: 172
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "attributes": [
-        "pressure",
-        "temperature"
-    ],
-    "name": "Room",
-    "statusCode": {
-        "code": "200",
-        "details": "Count: 2",
-        "reasonPhrase": "OK"
-    }
-}
-
-
-5. Listing of Entity Type Attributes. Response in Object-JSON
-HTTP/1.1 200 OK
-Content-Length: 144
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "attributes": [
-        "pressure",
-        "temperature"
-    ],
-    "name": "Room",
-    "statusCode": {
-        "code": "200",
-        "reasonPhrase": "OK"
-    }
-}
-
-
-6. Listing of Entity Type Attributes. Response in Object-JSON, details=on
-HTTP/1.1 200 OK
-Content-Length: 172
+Content-Length: 192
 Content-Type: application/json
 Date: REGEX(.*)
 

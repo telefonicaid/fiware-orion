@@ -434,7 +434,7 @@ Date: REGEX(.*)
 
 {
     "contextElement": {
-        "attributes": [        
+        "attributes": [
             {
                 "metadatas": [
                     {
