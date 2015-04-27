@@ -55,12 +55,6 @@ accumulatorStart
 # 1.3. Dump accumulator to see notification of A1 in JSON, as the subscription was done in JSON
 # 1.4. Reset the accumulator
 #
-#   1.5. Modify subscription in XML (later)
-#   1.6. Dump accumulator to see notification of A1 in XML, as the subscription modification was done in XML (later
-#   1.7. Reset the accumulator (later)
-#   1.8. Modify subscription in XML, with URI parameter notifyFormat=JSON (later)
-#   1.9. Dump accumulator to see notification of A1 in JSON, as the subscription modification was done with notifyFormat=JSON (later)
-# 
 # 2.1. Register E1/T1/A2
 # 2.2. Availability-Subscribe to E1/A2 in XML
 # 2.3. Dump accumulator to see notification of A2 in XML, as the subscription was done in XML
@@ -86,6 +80,15 @@ accumulatorStart
 # 6.3. Dump accumulator to see notification of A6 in XML, as URI parameter notifyFormat was XML
 # 6.4. Reset the accumulator
 #
+#
+# FIXME (See github issue #898) These tests about updated subscription should be added to this test
+# 
+#   1.5. Modify subscription in XML
+#   1.6. Dump accumulator to see notification of A1 in XML, as the subscription modification was done in XML
+#   1.7. Reset the accumulator
+#   1.8. Modify subscription in XML, with URI parameter notifyFormat=JSON
+#   1.9. Dump accumulator to see notification of A1 in JSON, as the subscription modification was done with notifyFormat=JSON
+# 
 
 
 echo "0.1. Availability-Subscribe to E1/A0 in JSON, with invalid notifyFormat=ABCD"
