@@ -24,7 +24,7 @@ then
     exit 1
 fi  
 
-outFiles=$(find . -name '*.out' | grep -v valgrind)
+outFiles=$(find . -name '*.out' | grep -v valgrind | sort)
 for outFile in $outFiles
 do
   # Search for the corresponging .regexpect file

@@ -256,17 +256,17 @@ std::string ContextAttribute::renderAsNameString
 
   if (ciP->outFormat == XML)
   {
-    out += indent + " " + "<name>" + name + "</name>\n";
+    out += indent + "<name>" + name + "</name>\n";
   }
   else /* JSON */
   {
     if (comma)
     {
-      out += indent + "  " + "\"" + name + "\",\n";
+      out += indent + "\"" + name + "\",\n";
     }
     else
     {
-      out += indent + "  " + "\"" + name + "\"\n";
+      out += indent + "\"" + name + "\"\n";
     }
   }
 

@@ -186,7 +186,7 @@ Date: REGEX(.*)
 03. GET /v1/contextTypes/T1 and see it work
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -242,7 +242,7 @@ Date: REGEX(.*)
 05. GET /v1/contextTypes/T1, without servicePath, see four types
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 175
+Content-Length: 167
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -264,7 +264,7 @@ Date: REGEX(.*)
 06. GET /v1/contextTypes/T1, with servicePath /s1, see two types
 ================================================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -284,7 +284,7 @@ Date: REGEX(.*)
 07. GET /v1/contextTypes/T1, with servicePath /, see two types
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 147
+Content-Length: 143
 Content-Type: application/json
 Date: REGEX(.*)
 

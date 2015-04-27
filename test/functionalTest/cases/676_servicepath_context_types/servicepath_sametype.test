@@ -287,7 +287,7 @@ Date: REGEX(.*)
 02. Query types on / (returns: T - [a, b])
 ==========================================
 HTTP/1.1 200 OK
-Content-Length: 184
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -311,7 +311,7 @@ Date: REGEX(.*)
 03. Query types on /# (returns: T - [a, b, c, d, e])
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 229
+Content-Length: 219
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -338,7 +338,7 @@ Date: REGEX(.*)
 04. Query types on /A (returns: T - [b, c])
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 184
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -362,7 +362,7 @@ Date: REGEX(.*)
 05. Query types on /A/# (returns: T - [b, c, d, e])
 ===================================================
 HTTP/1.1 200 OK
-Content-Length: 214
+Content-Length: 206
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -388,7 +388,7 @@ Date: REGEX(.*)
 06. Query types on /A/A1 (returns: T- [c, d])
 =============================================
 HTTP/1.1 200 OK
-Content-Length: 184
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -412,7 +412,7 @@ Date: REGEX(.*)
 07. Query types on /A/A1/# (returns: T - [c, d])
 ================================================
 HTTP/1.1 200 OK
-Content-Length: 184
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 

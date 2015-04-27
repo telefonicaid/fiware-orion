@@ -171,7 +171,7 @@ Date: REGEX(.*)
 03. List contextTypes (which is where the broker crash occurs)
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 171
+Content-Length: 169
 Content-Type: application/json
 Date: REGEX(.*)
 

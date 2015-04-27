@@ -131,7 +131,7 @@ Date: REGEX(.*)
 
 1. Listing of Entity Types. Response in XML
 HTTP/1.1 200 OK
-Content-Length: 351
+Content-Length: 349
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -155,7 +155,7 @@ Date: REGEX(.*)
 
 2. Listing of Entity Types. Response in XML, with details=on
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 381
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -201,7 +201,7 @@ Date: REGEX(.*)
 
 4. Listing of Entity Types. Response in JSON
 HTTP/1.1 200 OK
-Content-Length: 204
+Content-Length: 200
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -224,7 +224,7 @@ Date: REGEX(.*)
 
 5. Listing of Entity Types. Response in JSON, with details=on
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 228
 Content-Type: application/json
 Date: REGEX(.*)
 
