@@ -41,18 +41,19 @@
 */
 std::string AttributeList::render(Format format, const std::string& indent, bool comma)
 {
-  std::string  out = "";
-  std::string  tag = "attributeList";
+  std::string  out     = "";
+  std::string  xmlTag  = "attributeList";
+  std::string  jsonTag = "attributes";
 
   if (attributeV.size() == 0)
     return "";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, xmlTag, jsonTag, format, true, true, false);
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
-    out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1);
+    out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, false, true);
 
-  out += endTag(indent, tag, format, comma);
+  out += endTag(indent, xmlTag, format, comma, true);
 
   return out;
 }

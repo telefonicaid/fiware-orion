@@ -1,4 +1,4 @@
-"attributeList" : {
-  "attribute" : "a1",
-  "attribute" : "a2"
-}
+"attributes" : [
+  "a1",
+  "a2"
+]

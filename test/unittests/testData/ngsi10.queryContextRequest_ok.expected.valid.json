@@ -11,11 +11,11 @@
       "id" : "OfficeRoom"
     }
   ],
-  "attributeList" : {
-    "attribute" : "temperature",
-    "attribute" : "occupancy",
-    "attribute" : "lightstatus"
-  },
+  "attributes" : [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
   "restriction" : {
     "attributeExpression" : "Attribute Expression",
     "scope" : [

@@ -3,3 +3,4 @@
 - Fix: unhardwire format to forward requests to context providers (Issue #722)
 - Fix: using proper GJSON for location.coords entities information (Issue #415)
 - Fix: DELETE updates are resolved locally, previously they were forwarded to CPrs (Issue #755)
+- Fix: The URI parameter 'notifyFormat' is now treated the same way for subscriptions as for registrations.

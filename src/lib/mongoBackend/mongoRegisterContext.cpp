@@ -52,13 +52,10 @@ HttpStatusCode mongoRegisterContext
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant,
   const std::string&                   servicePath
-
 )
 {
-    // FIXME P10: we have been discussing about changing the "notifyFormat" name for something more neutral and more
-    // meaningfull for *both* subscription notification and cpr forwards
-    std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
-    std::string sPath = servicePath;
+    std::string  sPath               = servicePath;
+    const std::string  notifyFormat  = uriParam[URI_PARAM_NOTIFY_FORMAT];
 
     LM_T(LmtMongo, ("Register Context Request: '%s' format", notifyFormat.c_str()));
 

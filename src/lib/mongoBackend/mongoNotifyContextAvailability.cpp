@@ -45,9 +45,7 @@ HttpStatusCode mongoNotifyContextAvailability
   const std::string&                   servicePath
 )
 {
-    // FIXME P10: we have been discussing about changing the "notifyFormat" name for something more neutral and more
-    // meaningfull for *both* subscription notification and cpr forwards
-    std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
+    const std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
 
     LM_T(LmtMongo, ("Notify Context Availability: '%s' format", notifyFormat.c_str()));
 

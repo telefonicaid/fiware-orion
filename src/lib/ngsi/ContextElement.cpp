@@ -78,7 +78,14 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
   bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
   bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+  if (requestType == UpdateContext)
+  {
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  }
+  else
+  {
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+  }
 
   out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
   out += attributeDomainName.render(ciP->outFormat, indent + "  ", commaAfterAttributeDomainName);

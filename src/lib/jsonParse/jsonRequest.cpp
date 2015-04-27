@@ -43,7 +43,9 @@
 #include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
 
 #include "jsonParse/jsonQueryContextRequest.h"
+#include "jsonParse/jsonQueryContextResponse.h"
 #include "jsonParse/jsonUpdateContextRequest.h"
+#include "jsonParse/jsonUpdateContextResponse.h"
 #include "jsonParse/jsonSubscribeContextRequest.h"
 #include "jsonParse/jsonUnsubscribeContextRequest.h"
 #include "jsonParse/jsonNotifyContextRequest.h"
@@ -123,7 +125,10 @@ static JsonRequest jsonRequest[] =
   { AttributeValueInstanceWithTypeAndId,           "POST", "updateContextAttributeRequest",         FUNCS(Upcar) },
 
   { ContextEntitiesByEntityIdAndType,              "POST", "registerProviderRequest",               FUNCS(Rpr)   },
-  { EntityByIdAttributeByNameIdAndType,            "POST", "registerProviderRequest",               FUNCS(Rpr)   }
+  { EntityByIdAttributeByNameIdAndType,            "POST", "registerProviderRequest",               FUNCS(Rpr)   },
+
+  { RtQueryContextResponse,                        "POST", "queryContextResponse",                  FUNCS(Qcrs)  },
+  { RtUpdateContextResponse,                       "POST", "updateContextResponse",                 FUNCS(Upcrs) }
 };
 
 
@@ -217,6 +222,7 @@ std::string jsonTreat
   }
   catch (const std::exception &e)
   {
+    LM_W(("Bad Input (JSON Parse Error)"));
     std::string errorReply  = restErrorReplyGet(ciP,
                                                 ciP->outFormat,
                                                 "",
@@ -229,6 +235,7 @@ std::string jsonTreat
   }
   catch (...)
   {
+    LM_W(("Bad Input (JSON Parse Error II)"));
     std::string errorReply  = restErrorReplyGet(ciP,
                                                 ciP->outFormat,
                                                 "",

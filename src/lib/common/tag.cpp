@@ -281,7 +281,7 @@ std::string endTag
 *
 * NOTE
 * The value of the tag is not HTML-escaped if the value is an Association.
-<* In the case of Associations, the specific values must be HTML-escaped instead.
+* In the case of Associations, the specific values must be HTML-escaped instead.
 */
 std::string valueTag
 (
