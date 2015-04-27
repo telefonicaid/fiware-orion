@@ -495,57 +495,59 @@ Content-Length: 934
 Content-Type: application/json
 Date: REGEX(.*)
 
+#SORT_START
 {
     "contextResponses": [
         {
             "contextElement": {
-                "id": "E1", 
-                "isPattern": "false", 
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A3", 
-                        "type": "", 
+                        "name": "A3",
+                        "type": "",
                         "value": "14"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A3", 
-                        "type": "", 
+                        "name": "A3",
+                        "type": "",
                         "value": "15"
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
     ]
 }
+#SORT_END
 
 
 17. DELETE /v1/contextEntities/type/T1/id/E1/attributes/A3, service-path /s3, and see it fail

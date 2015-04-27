@@ -287,20 +287,14 @@ Date: REGEX(.*)
 02. Query type T on / (returns: T - [a, b])
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 248
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "a",
-            "type": "string"
-        },
-        {
-            "name": "b",
-            "type": "string"
-        }
+        "a",
+        "b"
     ],
     "name": "T",
     "statusCode": {
@@ -313,32 +307,17 @@ Date: REGEX(.*)
 03. Query type T on /# (returns: T - [a, b, c, d, e])
 =====================================================
 HTTP/1.1 200 OK
-Content-Length: 443
+Content-Length: 173
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "a",
-            "type": "string"
-        },
-        {
-            "name": "b",
-            "type": "string"
-        },
-        {
-            "name": "c",
-            "type": "string"
-        },
-        {
-            "name": "d",
-            "type": "string"
-        },
-        {
-            "name": "e",
-            "type": "string"
-        }
+        "a",
+        "b",
+        "c",
+        "d",
+        "e"
     ],
     "name": "T",
     "statusCode": {
@@ -351,20 +330,14 @@ Date: REGEX(.*)
 04. Query type T on /A (returns: T - [b, c])
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 248
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "b",
-            "type": "string"
-        },
-        {
-            "name": "c",
-            "type": "string"
-        }
+        "b",
+        "c"
     ],
     "name": "T",
     "statusCode": {
@@ -377,28 +350,16 @@ Date: REGEX(.*)
 05. Query type T on /A/# (returns: T - [b, c, d, e])
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 378
+Content-Length: 162
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "b",
-            "type": "string"
-        },
-        {
-            "name": "c",
-            "type": "string"
-        },
-        {
-            "name": "d",
-            "type": "string"
-        },
-        {
-            "name": "e",
-            "type": "string"
-        }
+        "b",
+        "c",
+        "d",
+        "e"
     ],
     "name": "T",
     "statusCode": {
@@ -411,20 +372,14 @@ Date: REGEX(.*)
 06. Query type T on /A/A1 (returns: T- [c, d])
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 248
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "c",
-            "type": "string"
-        },
-        {
-            "name": "d",
-            "type": "string"
-        }
+        "c",
+        "d"
     ],
     "name": "T",
     "statusCode": {
@@ -437,20 +392,14 @@ Date: REGEX(.*)
 07. Query type T on /A/A1/# (returns: T - [c, d])
 =================================================
 HTTP/1.1 200 OK
-Content-Length: 248
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attributes": [
-        {
-            "name": "c",
-            "type": "string"
-        },
-        {
-            "name": "d",
-            "type": "string"
-        }
+        "c",
+        "d"
     ],
     "name": "T",
     "statusCode": {

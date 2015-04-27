@@ -248,7 +248,39 @@ std::string ContextAttribute::renderAsJsonObject
   return out;
 }
 
+/* ****************************************************************************
+*
+* renderAsNameString -
+*/
+std::string ContextAttribute::renderAsNameString
+(
+  ConnectionInfo*     ciP,
+  RequestType         request,
+  const std::string&  indent,
+  bool                comma
+)
+{
+  std::string  out                    = "";
 
+  if (ciP->outFormat == XML)
+  {
+    out += indent + "<name>" + name + "</name>\n";
+  }
+  else /* JSON */
+  {
+    if (comma)
+    {
+      out += indent + "\"" + name + "\",\n";
+    }
+    else
+    {
+      out += indent + "\"" + name + "\"\n";
+    }
+  }
+
+  return out;
+
+}
 
 /* ****************************************************************************
 *

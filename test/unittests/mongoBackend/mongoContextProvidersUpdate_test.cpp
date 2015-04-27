@@ -89,28 +89,20 @@
 
 /* ****************************************************************************
 *
-* getAttr -
+* findAttr -
 *
-* We need this function because we can not trust on array index, at mongo will
-* not sort the elements within the array. This function assumes that always will
-* find a result, that is ok for testing code.
-*
-* FIXME P7: duplicated function in mongoUpdateContext_test.cpp. Unify.
 */
-BSONObj getAttr(std::vector<BSONElement> attrs, std::string name, std::string type, std::string id = "") {
+static bool findAttr(std::vector<BSONElement> attrs, std::string name)
+{
 
-    BSONElement be;
-    for (unsigned int ix = 0; ix < attrs.size(); ++ix) {
-        BSONObj attr = attrs[ix].embeddedObject();
-        std::string attrName = STR_FIELD(attr, "name");
-        std::string attrType = STR_FIELD(attr, "type");
-        std::string attrId = STR_FIELD(attr, "id");
-        if (attrName == name && attrType == type && ( id == "" || attrId == id )) {
-            be = attrs[ix];
-            break;
-        }
+  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
+  {
+    if (attrs[ix].str() == name)
+    {
+      return true;
     }
-    return be.embeddedObject();
+  }
+  return false;
 
 }
 
@@ -367,14 +359,16 @@ static void prepareDatabaseSeveralCprs(bool withFormat = false)
    */
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "T" << "value" << "1")
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "T" << "value" << "1")
                         )
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A3" << "type" << "T" << "value" << "3")
+                     "attrNames" << BSON_ARRAY("A3") <<
+                     "attrs" << BSON(
+                        "A3" << BSON("type" << "T" << "value" << "3")
                         )
                     );
 
@@ -1830,18 +1824,20 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
   DBClientBase* connection = getMongoConnection();
 
   /* entities collection */
-  BSONObj ent;
-  std::vector<BSONElement> attrs;
+  BSONObj ent, attrs;
+  std::vector<BSONElement> attrNames;
   ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
   ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T"));
   EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
   EXPECT_STREQ("T", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-  attrs = ent.getField("attrs").Array();
-  ASSERT_EQ(1, attrs.size());
-  BSONObj a1 = getAttr(attrs, "A1", "T");
-  EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+  attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
+  ASSERT_EQ(1, attrs.nFields());
+  ASSERT_EQ(1, attrNames.size());
+  BSONObj a1 = attrs.getField("A1").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A1"));
   EXPECT_STREQ("T",C_STR_FIELD(a1, "type"));
   EXPECT_STREQ("10", C_STR_FIELD(a1, "value"));
   EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -1850,10 +1846,12 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
   EXPECT_STREQ("E2", C_STR_FIELD(ent.getObjectField("_id"), "id"));
   EXPECT_STREQ("T", C_STR_FIELD(ent.getObjectField("_id"), "type"));
   EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-  attrs = ent.getField("attrs").Array();
-  ASSERT_EQ(1, attrs.size());
-  BSONObj a3 = getAttr(attrs, "A3", "T");
-  EXPECT_STREQ("A3", C_STR_FIELD(a3, "name"));
+  attrs = ent.getField("attrs").embeddedObject();
+  attrNames = ent.getField("attrNames").Array();
+  ASSERT_EQ(1, attrs.nFields());
+  ASSERT_EQ(1, attrNames.size());
+  BSONObj a3 = attrs.getField("A3").embeddedObject();
+  EXPECT_TRUE(findAttr(attrNames, "A3"));
   EXPECT_STREQ("T",C_STR_FIELD(a3, "type"));
   EXPECT_STREQ("30", C_STR_FIELD(a3, "value"));
   EXPECT_EQ(1360232700, a3.getIntField("modDate"));

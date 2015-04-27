@@ -849,7 +849,8 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
     BSONObj obj = be.embeddedObject();
     cvP->type = orion::CompoundValueNode::Object;
-    for( BSONObj::iterator i = obj.begin(); i.more(); ) {
+    for (BSONObj::iterator i = obj.begin(); i.more(); )
+    {
         BSONElement e = i.next();
         addCompoundNode(cvP, e);
     }
@@ -863,7 +864,8 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be) {
     std::vector<BSONElement> vec = be.Array();
     cvP->type = orion::CompoundValueNode::Vector;
-    for( unsigned int ix = 0; ix < vec.size(); ++ix) {
+    for (unsigned int ix = 0; ix < vec.size(); ++ix)
+    {
         BSONElement e = vec[ix];
         addCompoundNode(cvP, e);
 
@@ -1005,8 +1007,8 @@ bool entitiesQuery
      *
      * {
      *    "$or": [ ... ],            (always)
-     *    "_id.servicePath: { ... }   (always, in some cases using {$exists: false})
-     *    "attrs.name": { ... },     (only if attributes are used in the query)
+     *    "_id.servicePath: { ... }  (always, in some cases using {$exists: false})
+     *    "attrNames": { ... },      (only if attributes are used in the query)
      *    "location.coords": { ... } (only in the case of geo-queries)
      *  }
      *
@@ -1034,11 +1036,10 @@ bool entitiesQuery
         attrs.append(attrName);
         LM_T(LmtMongo, ("Attribute query token: '%s'", attrName.c_str()));
     }
-    std::string attrNames = ENT_ATTRS "." ENT_ATTRS_NAME;
     if (attrs.arrSize() > 0) {
         /* If we don't do this checking, the {$in: [] } in the attribute name part will
          * make the query fail*/
-        finalQuery.append(attrNames, BSON("$in" << attrs.arr()));
+        finalQuery.append(ENT_ATTRNAMES, BSON("$in" << attrs.arr()));
     }
 
     /* Part 5: scopes */
@@ -1201,18 +1202,17 @@ bool entitiesQuery
         }
 
         /* Attributes part */
-
-        std::vector<BSONElement> queryAttrV;
+        BSONObj queryAttrs;
 
         //
-        // This try/catch should not be necessary as all document in the entities collection have an attrs array
+        // This try/catch should not be necessary as all document in the entities collection have an attrs embedded document
         // from creation time. However, it adds an extra protection, just in case.
         // Somebody *could* manipulate the mongo database and if so, the broker would crash here.
         // Better to be on the safe side ...
         //
         try
         {
-          queryAttrV = r.getField(ENT_ATTRS).Array();
+          queryAttrs = r.getField(ENT_ATTRS).embeddedObject();
         }
         catch (...)
         {
@@ -1223,75 +1223,90 @@ bool entitiesQuery
           return true;
         }
 
-        for (unsigned int ix = 0; ix < queryAttrV.size(); ++ix) {
+        std::set<std::string> attrNames;
+        queryAttrs.getFieldNames(attrNames);
+        for (std::set<std::string>::iterator i = attrNames.begin(); i!=attrNames.end(); ++i)
+        {
+          std::string attrName = *i;
+          BSONObj queryAttr = queryAttrs.getField(attrName).embeddedObject();
 
-            ContextAttribute ca;
+          ContextAttribute ca;
 
-            BSONObj queryAttr = queryAttrV[ix].embeddedObject();
+          ca.name = basePart(attrName);
+          std::string mdId = idPart(attrName);
+          ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
 
-            ca.name = STR_FIELD(queryAttr, ENT_ATTRS_NAME);
-            ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
+          /* Note that includedAttribute decision is based on name and type. Value is set only if
+           * decision is positive */
+          if (includedAttribute(ca, &attrL))
+          {
+            ContextAttribute* caP;
+            if (queryAttr.getField(ENT_ATTRS_VALUE).type() == String)
+            {
+              ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
+              if (!includeEmpty && ca.value.length() == 0)
+              {
+                continue;
+              }
+              caP = new ContextAttribute(ca.name, ca.type, ca.value);
+            }
+            else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object)
+            {
+              caP = new ContextAttribute(ca.name, ca.type);
+              caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
+              compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+            }
+            else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array)
+            {
+              caP = new ContextAttribute(ca.name, ca.type);
+              caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
+              compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+            }
+            else
+            {
+              LM_T(LmtSoftError, ("unknown BSON type"));
+              continue;
+            }
 
-            /* Note that includedAttribute decision is based on name and type. Value is set only if
-             * decision is positive */
-            if (includedAttribute(ca, &attrL)) {
+            /* Setting ID (if found) */
+            if (mdId != "")
+            {
+              Metadata* md = new Metadata(NGSI_MD_ID, "string", mdId);
+              caP->metadataVector.push_back(md);
+            }
+            if (locAttr == ca.name)
+            {
+              Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
+              caP->metadataVector.push_back(md);
+            }
 
-                ContextAttribute* caP;
-                if (queryAttr.getField(ENT_ATTRS_VALUE).type() == String) {
-                    ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
-                    if (!includeEmpty && ca.value.length() == 0) {
-                        continue;
-                    }
-                    caP = new ContextAttribute(ca.name, ca.type, ca.value);
-                }
-                else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object) {
-                    caP = new ContextAttribute(ca.name, ca.type);
-                    caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
-                    compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
-                }
-                else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array) {
-                    caP = new ContextAttribute(ca.name, ca.type);
-                    caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
-                    compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+            /* Setting custom metadata (if any) */
+            if (queryAttr.hasField(ENT_ATTRS_MD))
+            {
+              std::vector<BSONElement> metadataV = queryAttr.getField(ENT_ATTRS_MD).Array();
+              for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
+              {
+
+                BSONObj metadata = metadataV[ix].embeddedObject();
+                Metadata* md;
+
+                if (metadata.hasField(ENT_ATTRS_MD_TYPE))
+                {
+                  md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME), STR_FIELD(metadata, ENT_ATTRS_MD_TYPE), STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
                 }
                 else
                 {
-                  LM_T(LmtSoftError, ("unknown BSON type"));
-                  continue;
+                  md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME), "", STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
                 }
 
-                /* Setting ID (if found) */
-                if (STR_FIELD(queryAttr, ENT_ATTRS_ID) != "") {
-                    Metadata* md = new Metadata(NGSI_MD_ID, "string", STR_FIELD(queryAttr, ENT_ATTRS_ID));
-                    caP->metadataVector.push_back(md);
-                }
-                if (locAttr == ca.name) {
-                    Metadata* md = new Metadata(NGSI_MD_LOCATION, "string", LOCATION_WGS84);
-                    caP->metadataVector.push_back(md);
-                }
-
-                /* Setting custom metadata (if any) */
-                if (queryAttr.hasField(ENT_ATTRS_MD)) {
-                    std::vector<BSONElement> metadataV = queryAttr.getField(ENT_ATTRS_MD).Array();
-                    for (unsigned int ix = 0; ix < metadataV.size(); ++ix) {
-
-                        BSONObj metadata = metadataV[ix].embeddedObject();
-                        Metadata* md;
-
-                        if (metadata.hasField(ENT_ATTRS_MD_TYPE)) {
-                            md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME), STR_FIELD(metadata, ENT_ATTRS_MD_TYPE), STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
-                        }
-                        else {
-                            md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME), "", STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
-                        }
-
-                        caP->metadataVector.push_back(md);
-                    }
-                }
-
-                cer->contextElement.contextAttributeVector.push_back(caP);
+                caP->metadataVector.push_back(md);
+              }
             }
-        }        
+
+            cer->contextElement.contextAttributeVector.push_back(caP);
+          }
+
+        }
 
         /* All the attributes existing in the request but not found in the response are added with 'found' set to false */
         for (unsigned int ix = 0; ix < attrL.size(); ++ix)
@@ -1373,7 +1388,7 @@ void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementR
     ContextElementResponse* newCerP = new ContextElementResponse();
 
     /* Note we cannot use the ContextElement::fill() method, given that it also copies the ContextAttributeVector. The side-effect
-     * of this is that attributeDomainName and domainMetadataVector and not being copied, but it should not be a problem, given that
+     * of this is that attributeDomainName and domainMetadataVector are not being copied, but it should not be a problem, given that
      * domain attributes are not implemented */
     newCerP->contextElement.entityId.fill(&cerP->contextElement.entityId);
     newCerP->contextElement.providingApplicationList = cerP->contextElement.providingApplicationList;  // FIXME P10: not sure if this is the right way of doing, maybe we need a fill() method for this
@@ -1774,11 +1789,13 @@ bool processOnChangeCondition
     if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, false, tenant, servicePathV))
     {
         ncr.contextElementResponseVector.release();
+        rawCerV.release();
         return false;
     }
 
     /* Prune "not found" CERs */
     pruneContextElements(rawCerV, &ncr.contextElementResponseVector);
+    rawCerV.release();
 
     if (ncr.contextElementResponseVector.size() > 0)
     {
@@ -1790,7 +1807,6 @@ bool processOnChangeCondition
         if (condValues != NULL) {
             /* Check if some of the attributes in the NotifyCondition values list are in the entity.
              * Note that in this case we do a query for all the attributes, not restricted to attrV */
-            ContextElementResponseVector rawCerV;
             ContextElementResponseVector allCerV;
             AttributeList emptyList;
             // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
@@ -1804,12 +1820,14 @@ bool processOnChangeCondition
 
             /* Prune "not found" CERs */
             pruneContextElements(rawCerV, &allCerV);
+            rawCerV.release();
 
             if (isCondValueInContextElementResponse(condValues, &allCerV)) {
                 /* Send notification */
                 getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
+                
                 return true;
             }
 

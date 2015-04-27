@@ -75,13 +75,12 @@ using namespace mongo;
 #define REG_FORMAT                  "format"
 
 #define ENT_ATTRS                    "attrs"
+#define ENT_ATTRNAMES                "attrNames"
 #define ENT_ENTITY_ID                "id"
 #define ENT_ENTITY_TYPE              "type"
 #define ENT_SERVICE_PATH             "servicePath"
-#define ENT_ATTRS_NAME               "name"
 #define ENT_ATTRS_TYPE               "type"
 #define ENT_ATTRS_VALUE              "value"
-#define ENT_ATTRS_ID                 "id"
 #define ENT_ATTRS_CREATION_DATE      "creDate"
 #define ENT_ATTRS_MODIFICATION_DATE  "modDate"
 #define ENT_ATTRS_MD                 "md"
@@ -493,5 +492,43 @@ extern void cprLookupByAttribute(EntityId&                          en,
                                  Format*                            perEntPaFormat,
                                  std::string*                       perAttrPa,
                                  Format*                            perAttrPaFormat);
+
+
+/* ****************************************************************************
+*
+* basePart, idPart -
+*
+* Helper functions for entitysQuery to split the attribute name string into part,
+* e.g. "A1__ID1" into "A1" and "ID1"
+*/
+inline std::string basePart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just 'name' */
+    return name;
+  }
+
+  /* If found, return substring */
+  return name.substr(0, pos);
+
+}
+
+inline std::string idPart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just "" */
+    return "";
+  }
+
+  /* If found, return substring */
+  return name.substr(pos + 2, name.length());
+
+}
 
 #endif

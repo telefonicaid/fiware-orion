@@ -447,14 +447,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -484,14 +484,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -521,14 +521,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -558,14 +558,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>

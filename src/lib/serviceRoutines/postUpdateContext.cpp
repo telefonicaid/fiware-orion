@@ -673,6 +673,7 @@ std::string postUpdateContext
   requestV.release();
   upcrsP->release();
   upcrsP->fill(&response);
+  response.release();
 
   return answer;
 }
