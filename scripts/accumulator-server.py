@@ -111,28 +111,18 @@ file(pidfile, 'w').write(pid)
 #
 atexit.register(all_done)
 
-hang = False
-die  = False
+sleep(1)
 
 app = Flask(__name__)
 
+@app.route("/noresponse", methods=['POST'])
+def noresponse():
+    print "Not Responding"
+    sleep(10)
+    return Response(status=200)
+
 @app.route("/v1/updateContext", methods=['POST'])
-def treat():
-    if (hang == True):
-        sys.sleep(10);
-    if (die == True):
-        sys.exit(1);
-    return "OK"
-
-
 @app.route("/v1/queryContext", methods=['POST'])
-def treat():
-    if (hang == True):
-        sys.sleep(10);
-    if (die == True):
-        sys.exit(1);
-    return "OK"
-
 
 @app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE'])
 def record():
@@ -210,27 +200,6 @@ def reset():
 @app.route('/pid', methods=['GET'])
 def getPid():
     return str(os.getpid())
-
-
-@app.route('/hang', methods=['GET'])
-def treat():
-    global hang
-    hang = True
-    return "OK"
-
-
-@app.route('/nohang', methods=['GET'])
-def hanger():
-    global hang
-    hang = False
-    return Response(status=200)
-
-
-@app.route('/die', methods=['GET'])
-def die():
-    die = True
-    return Response(status=200)
-
 
 
 # This is the accumulation string

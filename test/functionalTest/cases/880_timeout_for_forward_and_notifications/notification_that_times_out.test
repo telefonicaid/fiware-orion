@@ -32,8 +32,7 @@ accumulatorStart
 
 #
 # 01. Register E1/T1/A1
-# 02. Make accumulator not respond to notifications
-# 03. Availability-Subscribe to E1/A1 for accumulator
+# 02. Availability-Subscribe to E1/A1 for accumulator, on a non-responding URL
 # 04. Sleep 6 secs (default timeout for notifications is 5 seconds)
 # 05. Grep in brokers logfile to see that the notification failed and that the broker thread continued
 # 06. Dump notifications in accumulator - see nothing
@@ -67,15 +66,8 @@ echo
 echo
 
 
-echo "02. Make accumulator not respond to notifications"
-echo "================================================="
-curl localhost:${LISTENER_PORT}/pid -s -S > /dev/null
-echo
-echo
-
-
-echo "03. Availability-Subscribe to E1/A1 for accumulator"
-echo "==================================================="
+echo "02. Availability-Subscribe to E1/A1 for accumulator, on a non-responding URL"
+echo "============================================================================"
 payload='{
   "entities": [
     {
@@ -86,7 +78,7 @@ payload='{
   "attributes": [
     "A1"
   ], 
-  "reference": "http://localhost:'${LISTENER_PORT}'/accumulate",
+  "reference": "http://localhost:'${LISTENER_PORT}'/noresponse",
   "duration": "P1M"
 }'
 orionCurl --url /v1/registry/subscribeContextAvailability --payload "$payload" --json
@@ -94,17 +86,21 @@ echo
 echo
 
 
-echo "04. Sleep 6 secs (default timeout for notifications is 5 seconds)"
+echo "03. Sleep 6 secs (default timeout for notifications is 5 seconds)"
 echo "================================================================="
 sleep 6
 echo
 echo
 
 
-# 05. Grep in brokers logfile to see that the notification failed and that the broker thread continued
+echo "04. Grep in brokers logfile to see that the notification failed and that the broker thread continued"
+echo "===================================================================================================="
+grep "(curl_easy_perform failed: Timeout was reached)" /tmp/contextBroker.log | awk -F "curl_easy_perform" '{ print "(curl_easy_perform" $2 }'
+echo
+echo
 
 
-echo "06. Dump notifications in accumulator - see nothing"
+echo "05. Dump notifications in accumulator - see nothing"
 echo "==================================================="
 accumulatorDump
 echo
@@ -125,13 +121,8 @@ Date: REGEX(.*)
 }
 
 
-02. Make accumulator not respond to notifications
-=================================================
-OK
-
-
-03. Availability-Subscribe to E1/A1 for accumulator
-===================================================
+02. Availability-Subscribe to E1/A1 for accumulator, on a non-responding URL
+============================================================================
 HTTP/1.1 200 OK
 Content-Length: 74
 Content-Type: application/json
@@ -143,11 +134,16 @@ Date: REGEX(.*)
 }
 
 
-04. Sleep 6 secs (default timeout for notifications is 5 seconds)
+03. Sleep 6 secs (default timeout for notifications is 5 seconds)
 =================================================================
 
 
-06. Dump notifications in accumulator - see nothing
+04. Grep in brokers logfile to see that the notification failed and that the broker thread continued
+====================================================================================================
+(curl_easy_perform failed: Timeout was reached)
+
+
+05. Dump notifications in accumulator - see nothing
 ===================================================
 
 
