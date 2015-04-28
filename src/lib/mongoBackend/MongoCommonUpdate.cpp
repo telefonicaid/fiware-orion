@@ -163,20 +163,25 @@ static bool isNotCustomMetadata(std::string md) {
 *
 * hasMetadata -
 *
-* Check if a metadata is included in a (request) ContextAttribute
+* Check if a metadata is included in a (request) ContextAttribute.
+* FIXME P1: excellent candidate for a method for either
+*           ContextAttribute or MetadataVector (or both)
 */
-static bool hasMetadata(std::string name, std::string type, ContextAttribute ca) {
+static bool hasMetadata(std::string name, std::string type, ContextAttribute* caP)
+{
+    for (unsigned int ix = 0; ix < caP->metadataVector.size() ; ++ix)
+    {
+        Metadata* md = caP->metadataVector.get(ix);
 
-    for (unsigned int ix = 0; ix < ca.metadataVector.size() ; ++ix) {
-        Metadata* md = ca.metadataVector.get(ix);
         /* Note that, different from entity types or attribute types, for attribute metadata we don't consider empty type
          * as a wildcard in order to keep it simpler */
-        if ((md->name == name) && (md->type == type)) {
+        if ((md->name == name) && (md->type == type))
+        {
             return true;
         }
     }
-    return false;
 
+    return false;
 }
 
 
