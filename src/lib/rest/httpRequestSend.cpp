@@ -137,7 +137,8 @@ std::string httpRequestSend
    const std::string&     content,
    bool                   useRush,
    bool                   waitForResponse,
-   const std::string&     acceptFormat
+   const std::string&     acceptFormat,
+   long                   timeoutInMilliseconds
 )
 {
   char                       portAsString[16];
@@ -357,10 +358,27 @@ std::string httpRequestSend
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) httpResponse); // Custom data for response handling
 
+  LM_M(("KZ: VERB: %s", verb.c_str()));
+  LM_M(("KZ: URL:  %s", url.c_str()));
+  //
+  // Timeout 
+  //
+  // The parameter timeoutInMilliseconds holds the timeout time in milliseconds.
+  // If the timeout time requested is 0, then no timeuot is used.
+  //
+  if (timeoutInMilliseconds != 0) 
+  {
+    LM_M(("KZ: Setting timeout to %d milliseconds", timeoutInMilliseconds));
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutInMilliseconds);
+  }
+
+
   // Synchronous HTTP request
   LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
+  LM_M(("KZ: Sending Notification"));
   res = curl_easy_perform(curl);
 
+  LM_M(("KZ: res == %d", res));
   if (res != CURLE_OK)
   {
     LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
@@ -371,6 +389,7 @@ std::string httpRequestSend
     // The Response is here
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
     result.assign(httpResponse->memory, httpResponse->size);
+    LM_M(("KZ: got a response of %d bytes: %s", httpResponse->size, httpResponse->memory));
   }
 
   // Cleanup curl environment
@@ -481,7 +500,8 @@ std::string httpRequestSend
    const std::string&     content,
    bool                   useRush,
    bool                   waitForResponse,
-   const std::string&     acceptFormat
+   const std::string&     acceptFormat,
+   int                    timeoutInMilliseconds
 )
 {  
   char                       buffer[TAM_BUF];

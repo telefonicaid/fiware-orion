@@ -60,7 +60,8 @@ extern std::string httpRequestSend
   const std::string&     content,
   bool                   useRush,
   bool                   waitForResponse,
-  const std::string&     acceptFormat = ""
+  const std::string&     acceptFormat          = "",
+  long                   timeoutInMilliseconds = 5000
 );
 
 #endif
