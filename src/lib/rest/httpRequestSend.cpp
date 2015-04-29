@@ -401,7 +401,6 @@ std::string httpRequestSend
   //
   if (timeoutInMilliseconds != 0) 
   {
-    LM_M(("KZ: timeout: %d", timeoutInMilliseconds));
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutInMilliseconds);
   }
 
@@ -412,8 +411,11 @@ std::string httpRequestSend
 
   if (res != CURLE_OK)
   {
+    //
+    // NOTE: This log line is used by the functional tests in cases/880_timeout_for_forward_and_notifications/
+    //       So, this line should not be removed/altered, at least not without also modifying the functests.
+    //
     LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
-    LM_M(("KZ: curl_easy_perform failed with code: %d (%s)", res, curl_easy_strerror(res)));
     result = "";
   }
   else
@@ -421,7 +423,6 @@ std::string httpRequestSend
     // The Response is here
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
     result.assign(httpResponse->memory, httpResponse->size);
-    LM_M(("KZ: response: %s", httpResponse->memory));
   }
 
   // Cleanup curl environment

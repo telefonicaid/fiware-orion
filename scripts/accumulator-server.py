@@ -111,7 +111,6 @@ file(pidfile, 'w').write(pid)
 #
 atexit.register(all_done)
 
-sleep(1)
 
 app = Flask(__name__)
 
@@ -132,7 +131,6 @@ def qnoresponse():
 
 @app.route("/v1/updateContext", methods=['POST'])
 @app.route("/v1/queryContext", methods=['POST'])
-
 @app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE'])
 def record():
 
@@ -209,7 +207,6 @@ def reset():
 @app.route('/pid', methods=['GET'])
 def getPid():
     return str(os.getpid())
-
 
 # This is the accumulation string
 ac = ''
