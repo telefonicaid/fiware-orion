@@ -55,5 +55,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-cert' <certificate key file (for https)>]
                       [option '-rush' <rush host (IP:port)>]
                       [option '-multiservice' (service multi tenancy mode)]
+                      [option '-appTmo' <timeout in milliseconds for forwards and notifications>]
                       
 --TEARDOWN--

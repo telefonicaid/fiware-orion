@@ -117,7 +117,16 @@ app = Flask(__name__)
 
 @app.route("/noresponse", methods=['POST'])
 def noresponse():
-    print "Not Responding"
+    sleep(10)
+    return Response(status=200)
+
+@app.route("/noresponse/updateContext", methods=['POST'])
+def unoresponse():
+    sleep(10)
+    return Response(status=200)
+
+@app.route("/noresponse/queryContext", methods=['POST'])
+def qnoresponse():
     sleep(10)
     return Response(status=200)
 

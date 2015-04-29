@@ -57,6 +57,36 @@
 
 
 
+/* ****************************************************************************
+*
+* Default timeout - 5000 milliseconds
+*/
+#define DEFAULT_TIMEOUT     5000
+
+
+
+/* ****************************************************************************
+*
+* defaultTimeout - 
+*/
+static long defaultTimeout = DEFAULT_TIMEOUT;
+
+
+
+/* ****************************************************************************
+*
+* httpRequestInit - 
+*/
+void httpRequestInit(long defaultTimeoutInMilliseconds)
+{
+  if (defaultTimeoutInMilliseconds != -1)
+  {
+    defaultTimeout = defaultTimeoutInMilliseconds;
+  }
+}
+
+
+
 /* **************************************************************************** 
 *
 * See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
@@ -152,6 +182,11 @@ std::string httpRequestSend
   CURL*                      curl;
 
   ++callNo;
+
+  if (timeoutInMilliseconds == -1)
+  {
+    timeoutInMilliseconds = defaultTimeout;
+  }
 
   LM_TRANSACTION_START("to", ip.c_str(), port, resource.c_str());
 
@@ -366,6 +401,7 @@ std::string httpRequestSend
   //
   if (timeoutInMilliseconds != 0) 
   {
+    LM_M(("KZ: timeout: %d", timeoutInMilliseconds));
     curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutInMilliseconds);
   }
 
@@ -377,6 +413,7 @@ std::string httpRequestSend
   if (res != CURLE_OK)
   {
     LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
+    LM_M(("KZ: curl_easy_perform failed with code: %d (%s)", res, curl_easy_strerror(res)));
     result = "";
   }
   else
@@ -384,6 +421,7 @@ std::string httpRequestSend
     // The Response is here
     LM_I(("Notification Successfully Sent to %s", url.c_str()));
     result.assign(httpResponse->memory, httpResponse->size);
+    LM_M(("KZ: response: %s", httpResponse->memory));
   }
 
   // Cleanup curl environment
@@ -549,6 +587,11 @@ std::string httpRequestSend
   {
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
     return "error";
+  }
+
+  if (timeoutInMilliseconds == -1)
+  {
+    timeoutInMilliseconds = defaultTimeout;
   }
 
   //

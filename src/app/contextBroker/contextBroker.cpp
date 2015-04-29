@@ -77,6 +77,7 @@
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
+#include "rest/httpRequestSend.h"
 
 #include "common/sem.h"
 #include "common/globals.h"
@@ -209,6 +210,7 @@ bool            https;
 bool            mtenant;
 char            rush[256];
 double          timeout;
+long            appTmo;
 
 
 
@@ -241,6 +243,8 @@ double          timeout;
 #define HTTPSCERTFILE_DESC  "certificate key file (for https)"
 #define RUSH_DESC           "rush host (IP:port)"
 #define MULTISERVICE_DESC   "service multi tenancy mode"
+#define APP_TMO_DESC        "timeout in milliseconds for forwards and notifications"
+#define MAX_L               900000
 
 
 
@@ -276,6 +280,7 @@ PaArgument paArgs[] =
   { "-rush",         rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
   { "-multiservice", &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
+  { "-appTmo",       &appTmo,       "APP_TMO",        PaLong,   PaOpt, -1,         -1,     MAX_L, APP_TMO_DESC       },
 
   PA_END_OF_ARGS
 };
@@ -1132,6 +1137,8 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
   {
     LM_I(("Running in NGSI9 only mode"));
   }
+
+  httpRequestInit(appTmo);
 }
 
 

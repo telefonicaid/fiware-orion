@@ -7,3 +7,6 @@
        a consequence, the 'attributeFormat' URI parameter is no longer needed in the 'GET /v1/contextTypes', so it is ignored.
 - Fix: DELETE updates are resolved locally, previously they were forwarded to CPrs (Issue #755)
 - Fix: The URI parameter 'notifyFormat' is now treated the same way for subscriptions as for registrations.
+- Add: Notifications and forwarded queries/updates are now controlled by a timeout. (Issue #880)
+       The default timeout is set to 5 seconds, including connection, write reqiest and read the response.
+       To change this timeout, a new CLI option '-appTmo' has been added to the broker.
