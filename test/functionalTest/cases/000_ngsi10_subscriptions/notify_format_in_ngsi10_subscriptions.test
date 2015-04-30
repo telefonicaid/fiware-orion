@@ -43,8 +43,8 @@ accumulatorStart
 # 2. Create a subscription in XML, without using URI parameter notifyFormat - see notification in XML
 # 3. Create a subscription in JSON, with URI parameter notifyFormat in JSON - see notification in JSON
 # 4. Create a subscription in JSON, with URI parameter notifyFormat in XML - see notification in XML
-# 5. Create a subscription in XML, with URI parameter notifyFormat in JSON - see notification in JSON
-# 6. Create a subscription in XML, with URI parameter notifyFormat in XML - see notification in XML
+# 5. Create a subscription in XML, with URI parameter notifyFormat in XML - see notification in XML
+# 6. Create a subscription in XML, with URI parameter notifyFormat in JSON - see notification in JSON
 #
 # 
 # TEST PLAN:
