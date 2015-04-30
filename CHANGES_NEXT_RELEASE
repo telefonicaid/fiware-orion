@@ -14,3 +14,4 @@
        New name:  '-dbTimeout',
        New type:  integer (was a floating point number)
        New unit:  milliseconds (was seconds, but decimals were allowed as it was a floating point number)
+- Add: Updates of ngsi9 subscriptions now also support the URI parameter notifyFormat
