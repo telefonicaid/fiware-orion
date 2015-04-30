@@ -79,13 +79,13 @@ accumulatorStart
 # 4.4. Reset the accumulator
 #
 # 5.1. Update/APPEND E1/T1/A5
-# 5.2. Subscribe to E1/A5 in JSON, with URI parameter notifyFormat=XML
+# 5.2. Subscribe to E1/A5 in XML, with URI parameter notifyFormat=XML
 # 5.3. Dump accumulator to see notification of A5 in XML, as URI parameter notifyFormat was XML
 # 5.4. Reset the accumulator
 #
 # 6.1. Update/APPEND E1/T1/A6
-# 6.2. Subscribe to E1/A6 in XML, with URI parameter notifyFormat=XML
-# 6.3. Dump accumulator to see notification of A6 in XML, as URI parameter notifyFormat was XML
+# 6.2. Subscribe to E1/A6 in XML, with URI parameter notifyFormat=JSON
+# 6.3. Dump accumulator to see notification of A6 in JSON, as URI parameter notifyFormat was JSON
 # 6.4. Reset the accumulator
 
 echo "0.1. Subscribe to E1/A0 in JSON, with invalid notifyFormat=ABCD"
@@ -410,6 +410,206 @@ echo
 
 
 echo "3.4. Reset the accumulator"
+echo "=========================="
+curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+accumulatorDump
+echo
+echo
+
+
+echo "4.1. Update/APPEND E1/T1/A4"
+echo "==========================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A4",
+          "type": "string",
+          "value": "4"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "4.2. Subscribe to E1/A4 in JSON, with URI parameter notifyFormat=XML"
+echo "===================================================================="
+payload='{
+  "entities": [
+    {
+        "id":   "E1",
+        "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A4"
+  ],
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A4"
+        ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext?notifyFormat=XML --payload "$payload" --json
+echo
+echo
+
+
+echo "4.3. Dump accumulator to see notification of A4 in XML, as URI parameter notifyFormat was XML"
+echo "============================================================================================="
+sleep 1
+accumulatorDump
+echo
+echo
+
+
+echo "4.4. Reset the accumulator"
+echo "=========================="
+curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+accumulatorDump
+echo
+echo
+
+
+echo "5.1. Update/APPEND E1/T1/A5"
+echo "==========================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A5",
+          "type": "string",
+          "value": "5"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "5.2. Subscribe to E1/A5 in XML, with URI parameter notifyFormat=XML"
+echo "==================================================================="
+payload='<?xml version="1.0"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="T1" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A5</attribute>
+  </attributeList>
+  <reference>http://localhost:'${LISTENER_PORT}'/notify</reference>
+  <duration>PT1H</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>A5</condValue>
+      </condValueList>          
+    </notifyCondition>
+  </notifyConditions>
+</subscribeContextRequest>'
+orionCurl --url /v1/subscribeContext?notifyFormat=XML --payload "$payload"
+echo
+echo
+
+
+echo "5.3. Dump accumulator to see notification of A5 in XML, as URI parameter notifyFormat was XML"
+echo "============================================================================================="
+sleep 1
+accumulatorDump
+echo
+echo
+
+
+echo "5.4. Reset the accumulator"
+echo "=========================="
+curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+accumulatorDump
+echo
+echo
+
+
+echo "6.1. Update/APPEND E1/T1/A6"
+echo "==========================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A6",
+          "type": "string",
+          "value": "6"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "6.2. Subscribe to E1/A6 in XML, with URI parameter notifyFormat=JSON"
+echo "===================================================================="
+payload='<?xml version="1.0"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="T1" isPattern="false">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A6</attribute>
+  </attributeList>
+  <reference>http://localhost:'${LISTENER_PORT}'/notify</reference>
+  <duration>PT1H</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>A6</condValue>
+      </condValueList>          
+    </notifyCondition>
+  </notifyConditions>
+</subscribeContextRequest>'
+orionCurl --url /v1/subscribeContext?notifyFormat=JSON --payload "$payload"
+echo
+echo
+
+
+echo "6.3. Dump accumulator to see notification of A6 in JSON, as URI parameter notifyFormat was JSON"
+echo "==============================================================================================="
+sleep 1
+accumulatorDump
+echo
+echo
+
+
+echo "6.4. Reset the accumulator"
 echo "=========================="
 curl localhost:${LISTENER_PORT}/reset -s -S -X POST
 accumulatorDump
@@ -817,6 +1017,266 @@ Content-Type: application/json
 
 
 3.4. Reset the accumulator
+==========================
+
+
+4.1. Update/APPEND E1/T1/A4
+===========================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A4", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+4.2. Subscribe to E1/A4 in JSON, with URI parameter notifyFormat=XML
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 110
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "PT24H", 
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+4.3. Dump accumulator to see notification of A4 in XML, as URI parameter notifyFormat was XML
+=============================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 717
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T1" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A4</name>
+            <type>string</type>
+            <contextValue>4</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+=======================================
+
+
+4.4. Reset the accumulator
+==========================
+
+
+5.1. Update/APPEND E1/T1/A5
+===========================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A5", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+5.2. Subscribe to E1/A5 in XML, with URI parameter notifyFormat=XML
+===================================================================
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+
+
+5.3. Dump accumulator to see notification of A5 in XML, as URI parameter notifyFormat was XML
+=============================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 717
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/xml
+
+<notifyContextRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <originator>localhost</originator>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="T1" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A5</name>
+            <type>string</type>
+            <contextValue>5</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</notifyContextRequest>
+=======================================
+
+
+5.4. Reset the accumulator
+==========================
+
+
+6.1. Update/APPEND E1/T1/A6
+===========================
+HTTP/1.1 200 OK
+Content-Length: 383
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A6", 
+                        "type": "string", 
+                        "value": ""
+                    }
+                ], 
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+6.2. Subscribe to E1/A6 in XML, with URI parameter notifyFormat=JSON
+====================================================================
+HTTP/1.1 200 OK
+Content-Length: 192
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>PT1H</duration>
+  </subscribeResponse>
+</subscribeContextResponse>
+
+
+6.3. Dump accumulator to see notification of A6 in JSON, as URI parameter notifyFormat was JSON
+===============================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 463
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "originator" : "localhost",
+  "contextResponses" : [
+    {
+      "contextElement" : {
+        "type" : "T1",
+        "isPattern" : "false",
+        "id" : "E1",
+        "attributes" : [
+          {
+            "name" : "A6",
+            "type" : "string",
+            "value" : "6"
+          }
+        ]
+      },
+      "statusCode" : {
+        "code" : "200",
+        "reasonPhrase" : "OK"
+      }
+    }
+  ]
+}
+=======================================
+
+
+6.4. Reset the accumulator
 ==========================
 
 
