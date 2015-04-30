@@ -77,6 +77,7 @@
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
+#include "rest/httpRequestSend.h"
 
 #include "common/sem.h"
 #include "common/globals.h"
@@ -208,7 +209,8 @@ char            httpsCertFile[1024];
 bool            https;
 bool            mtenant;
 char            rush[256];
-double          timeout;
+long            dbTimeout;
+long            httpTimeout;
 
 
 
@@ -229,7 +231,7 @@ double          timeout;
 #define DBUSER_DESC         "database user"
 #define DBPASSWORD_DESC     "database password"
 #define DB_DESC             "database name"
-#define TIMEOUT_DESC        "timeout in seconds for connections to the replica set (ignored in the case of not using replica set)"
+#define DB_TMO_DESC         "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
 #define FWDHOST_DESC        "host for forwarding NGSI9 regs"
 #define FWDPORT_DESC        "port for forwarding NGSI9 regs"
 #define NGSI9_DESC          "run as Configuration Manager"
@@ -241,6 +243,8 @@ double          timeout;
 #define HTTPSCERTFILE_DESC  "certificate key file (for https)"
 #define RUSH_DESC           "rush host (IP:port)"
 #define MULTISERVICE_DESC   "service multi tenancy mode"
+#define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
+#define MAX_L               900000
 
 
 
@@ -260,7 +264,7 @@ PaArgument paArgs[] =
   { "-dbuser",       user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
   { "-dbpwd",        pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
   { "-db",           dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
-  { "-timeout",      &timeout,      "TIMEOUT",        PaDouble, PaOpt, 10,         PaNL,   PaNL,  TIMEOUT_DESC       },
+  { "-dbTimeout",    &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
 
   { "-fwdHost",      fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
   { "-fwdPort",      &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
@@ -276,6 +280,7 @@ PaArgument paArgs[] =
   { "-rush",         rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
   { "-multiservice", &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
+  { "-httpTimeout",  &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
 
   PA_END_OF_ARGS
 };
@@ -1132,6 +1137,8 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
   {
     LM_I(("Running in NGSI9 only mode"));
   }
+
+  httpRequestInit(httpTimeout);
 }
 
 
@@ -1140,10 +1147,11 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 *
 * mongoInit -
 */
-static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, double timeout)
+static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, long timeout)
 {
+  double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, timeout))
+  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -1393,7 +1401,7 @@ int main(int argC, char* argV[])
 
   pidFile();
   orionInit(orionExit, ORION_VERSION);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, timeout);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout);
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 

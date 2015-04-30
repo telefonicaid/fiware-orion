@@ -57,6 +57,36 @@
 
 
 
+/* ****************************************************************************
+*
+* Default timeout - 5000 milliseconds
+*/
+#define DEFAULT_TIMEOUT     5000
+
+
+
+/* ****************************************************************************
+*
+* defaultTimeout - 
+*/
+static long defaultTimeout = DEFAULT_TIMEOUT;
+
+
+
+/* ****************************************************************************
+*
+* httpRequestInit - 
+*/
+void httpRequestInit(long defaultTimeoutInMilliseconds)
+{
+  if (defaultTimeoutInMilliseconds != -1)
+  {
+    defaultTimeout = defaultTimeoutInMilliseconds;
+  }
+}
+
+
+
 /* **************************************************************************** 
 *
 * See [1] for a discussion on how curl_multi is to be used. Libcurl does not seem
@@ -137,7 +167,8 @@ std::string httpRequestSend
    const std::string&     content,
    bool                   useRush,
    bool                   waitForResponse,
-   const std::string&     acceptFormat
+   const std::string&     acceptFormat,
+   long                   timeoutInMilliseconds
 )
 {
   char                       portAsString[16];
@@ -151,6 +182,11 @@ std::string httpRequestSend
   CURL*                      curl;
 
   ++callNo;
+
+  if (timeoutInMilliseconds == -1)
+  {
+    timeoutInMilliseconds = defaultTimeout;
+  }
 
   LM_TRANSACTION_START("to", ip.c_str(), port, resource.c_str());
 
@@ -357,12 +393,28 @@ std::string httpRequestSend
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) httpResponse); // Custom data for response handling
 
+  //
+  // Timeout 
+  //
+  // The parameter timeoutInMilliseconds holds the timeout time in milliseconds.
+  // If the timeout time requested is 0, then no timeuot is used.
+  //
+  if (timeoutInMilliseconds != 0) 
+  {
+    curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutInMilliseconds);
+  }
+
+
   // Synchronous HTTP request
   LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
   res = curl_easy_perform(curl);
 
   if (res != CURLE_OK)
   {
+    //
+    // NOTE: This log line is used by the functional tests in cases/880_timeout_for_forward_and_notifications/
+    //       So, this line should not be removed/altered, at least not without also modifying the functests.
+    //
     LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
     result = "";
   }
@@ -481,7 +533,8 @@ std::string httpRequestSend
    const std::string&     content,
    bool                   useRush,
    bool                   waitForResponse,
-   const std::string&     acceptFormat
+   const std::string&     acceptFormat,
+   int                    timeoutInMilliseconds
 )
 {  
   char                       buffer[TAM_BUF];
@@ -535,6 +588,11 @@ std::string httpRequestSend
   {
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
     return "error";
+  }
+
+  if (timeoutInMilliseconds == -1)
+  {
+    timeoutInMilliseconds = defaultTimeout;
   }
 
   //

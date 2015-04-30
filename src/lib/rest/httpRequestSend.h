@@ -35,11 +35,22 @@
 #define MAX_STA_MSG_SIZE (20 * 1024)           // 20 KB (HTTP request static buffer)
 #define MAX_DYN_MSG_SIZE (8 * 1024 * 1024)     // 8 MB  (maximum length of the HTTP request dynamic buffer)
 
+
+
+/***************************************************************************
+*
+* httpRequestInit -
+*/
+extern void httpRequestInit(long defaultTimeoutInMilliseconds);
+
+
+
 /***************************************************************************
 *
 * httpRequestConnect -
 */
 extern int httpRequestConnect(const std::string& host, unsigned short port);
+
 
 
 /* ****************************************************************************
@@ -60,7 +71,8 @@ extern std::string httpRequestSend
   const std::string&     content,
   bool                   useRush,
   bool                   waitForResponse,
-  const std::string&     acceptFormat = ""
+  const std::string&     acceptFormat          = "",
+  long                   timeoutInMilliseconds = -1
 );
 
 #endif
