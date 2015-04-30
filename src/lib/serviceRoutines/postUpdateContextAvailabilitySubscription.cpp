@@ -28,6 +28,7 @@
 #include "mongoBackend/mongoUpdateContextAvailabilitySubscription.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/UpdateContextAvailabilitySubscriptionResponse.h"
+#include "rest/uriParamNames.h"
 #include "rest/ConnectionInfo.h"
 
 
@@ -48,6 +49,7 @@ std::string postUpdateContextAvailabilitySubscription
   std::string                                    answer;
 
   ucas.subscriptionId = parseDataP->ucas.res.subscriptionId;
+  Format notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
 
   // FIXME P6: by the moment, we are assuming that notification will be sent in the same format than the one
   // used to do the subscription, so we are passing ciP->inFomat. This is just an heuristic, the client could want
@@ -55,7 +57,7 @@ std::string postUpdateContextAvailabilitySubscription
   // flexible approach, to be implemented
   ciP->httpStatusCode = mongoUpdateContextAvailabilitySubscription(&parseDataP->ucas.res,
                                                                    &ucas,
-                                                                   ciP->inFormat,
+                                                                   notifyFormat,
                                                                    ciP->tenant);
 
   answer = ucas.render(UpdateContextAvailabilitySubscription, ciP->outFormat, "", 0);

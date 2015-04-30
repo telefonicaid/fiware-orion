@@ -54,6 +54,12 @@ accumulatorStart
 # 1.2. Availability-Subscribe to E1/A1 in JSON 
 # 1.3. Dump accumulator to see notification of A1 in JSON, as the subscription was done in JSON
 # 1.4. Reset the accumulator
+# 1.5. Update subscription using XML
+# 1.6. Dump accumulator to see notification of A1 in XML, as the subscription-update was done in XML
+# 1.7. Reset the accumulator
+# 1.8. Update subscription using XML but with notifyFormat=JSON
+# 1.9. Dump accumulator to see notification of A1 in JSON, as the subscription-update was done with notifyFormat=JSON
+# 1.10. Reset the accumulator
 #
 # 2.1. Register E1/T1/A2
 # 2.2. Availability-Subscribe to E1/A2 in XML
@@ -83,11 +89,12 @@ accumulatorStart
 #
 # FIXME (See github issue #898) These tests about updated subscription should be added to this test
 # 
-#   1.5. Modify subscription in XML
-#   1.6. Dump accumulator to see notification of A1 in XML, as the subscription modification was done in XML
+#   1.5. Update subscription using XML
+#   1.6. Dump accumulator to see notification of A1 in XML, as the subscription-update was done in XML
 #   1.7. Reset the accumulator
-#   1.8. Modify subscription in XML, with URI parameter notifyFormat=JSON
-#   1.9. Dump accumulator to see notification of A1 in JSON, as the subscription modification was done with notifyFormat=JSON
+#   1.8. Update subscription using XML but with notifyFormat=JSON
+#   1.9. Dump accumulator to see notification of A1 in JSON, as the subscription-update was done with notifyFormat=JSON
+#   1.10. Reset the accumulator
 # 
 
 
@@ -155,6 +162,7 @@ payload='{
  "duration": "P1M"
 }'
 orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+REG_ID=$(echo "$_response" | grep -Po '(?<="registrationId" : ")[^"]*')
 echo
 echo
 
@@ -192,6 +200,81 @@ echo "1.4. Reset the accumulator"
 echo "=========================="
 curl localhost:${LISTENER_PORT}/reset -s -S -X POST
 accumulatorDump
+echo
+echo
+
+
+echo "1.5. Update subscription using XML"
+echo "=================================="
+payload='<?xml version="1.0"?>
+<updateContextAvailabilitySubscriptionRequest>
+  <entityIdList>
+    <entityId type="T1">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+    <attribute>A2</attribute>
+    <attribute>A3</attribute>
+  </attributeList>
+  <duration>PT2M</duration>
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</updateContextAvailabilitySubscriptionRequest>'
+orionCurl --url "/v1/registry/updateContextAvailabilitySubscription" --payload "$payload"
+echo
+echo
+
+
+echo "1.6. Dump accumulator to see notification of A1 in XML, as the subscription-update was done in XML"
+echo "=================================================================================================="
+sleep 1
+accumulatorDump
+echo
+echo
+
+
+echo "1.7. Reset the accumulator"
+echo "=========================="
+curl localhost:${LISTENER_PORT}/reset -s -S -X POST
+accumulatorDump
+echo
+echo
+
+
+echo "1.8. Update subscription using XML but with notifyFormat=JSON"
+echo "============================================================="
+payload='<?xml version="1.0"?>
+<updateContextAvailabilitySubscriptionRequest>
+  <entityIdList>
+    <entityId type="T1">
+      <id>E1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList>
+    <attribute>A1</attribute>
+    <attribute>A2</attribute>
+    <attribute>A3</attribute>
+  </attributeList>
+  <duration>PT2M</duration>
+  <subscriptionId>'$SUB_ID'</subscriptionId>
+</updateContextAvailabilitySubscriptionRequest>'
+orionCurl --url "/v1/registry/updateContextAvailabilitySubscription?notifyFormat=JSON" --payload "$payload"
+echo
+echo
+
+
+echo "1.9. Dump accumulator to see notification of A1 in JSON, as the subscription-update was done with notifyFormat=JSON"
+echo "==================================================================================================================="
+sleep 1
+accumulatorDump
+echo
+echo
+
+
+echo "1.10. Reset the accumulator"
+echo "==========================="
+curl localhost:${LISTENER_PORT}/reset -s -S -X POST
 echo
 echo
 
@@ -612,6 +695,112 @@ Content-Type: application/json
 
 1.4. Reset the accumulator
 ==========================
+
+
+1.5. Update subscription using XML
+==================================
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextAvailabilitySubscriptionResponse>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <duration>PT2M</duration>
+</updateContextAvailabilitySubscriptionResponse>
+
+
+1.6. Dump accumulator to see notification of A1 in XML, as the subscription-update was done in XML
+==================================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 823
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/xml
+
+<notifyContextAvailabilityRequest>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="T1" isPattern="false">
+            <id>E1</id>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>A1</name>
+            <type>string</type>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://localhost:9997/notify</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</notifyContextAvailabilityRequest>
+=======================================
+
+
+1.7. Reset the accumulator
+==========================
+
+
+1.8. Update subscription using XML but with notifyFormat=JSON
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 185
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextAvailabilitySubscriptionResponse>
+  <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+  <duration>PT2M</duration>
+</updateContextAvailabilitySubscriptionResponse>
+
+
+1.9. Dump accumulator to see notification of A1 in JSON, as the subscription-update was done with notifyFormat=JSON
+===================================================================================================================
+POST http://localhost:REGEX(\d+)/notify
+Content-Length: 505
+User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
+Host: localhost:REGEX(\d+)
+Accept: application/xml, application/json
+Content-Type: application/json
+
+{
+  "subscriptionId" : "REGEX([0-9a-f]{24})",
+  "contextRegistrationResponses" : [
+    {
+      "contextRegistration" : {
+        "entities" : [
+          {
+            "type" : "T1",
+            "isPattern" : "false",
+            "id" : "E1"
+          }
+        ],
+        "attributes" : [
+          {
+            "name" : "A1",
+            "type" : "string",
+            "isDomain" : "false"
+          }
+        ],
+        "providingApplication" : "http://localhost:9997/notify"
+      }
+    }
+  ]
+}
+=======================================
+
+
+1.10. Reset the accumulator
+===========================
 
 
 2.1. Register E1/T1/A2
