@@ -9,4 +9,8 @@
 - Fix: The URI parameter 'notifyFormat' is now treated the same way for subscriptions as for registrations.
 - Add: Notifications and forwarded queries/updates are now controlled by a timeout. (Issue #880)
        The default timeout is set to 5000 milliseconds (5 seconds), including connection, writing the request and reading the response.
-       To change this timeout, a new CLI option '-appTmo' has been added to the broker.
+       To change this timeout, a new CLI option '-httpTimeout' has been added to the broker.
+- Fix: Changed the name, type and unit of the CLI option '-timeout'.
+       New name:  '-dbTimeout',
+       New type:  integer (was a floating point number)
+       New unit:  milliseconds (was seconds, but decimals were allowed as it was a floating point number)
