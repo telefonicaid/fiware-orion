@@ -90,7 +90,7 @@ void transactionIdSet(void)
 *
 * orionInit - 
 */
-void orionInit(OrionExitFunction exitFunction, const char* version)
+void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);
@@ -99,7 +99,7 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
   orionExitFunction = exitFunction;
 
   // Initialize the semaphore used by mongoBackend
-  semInit();
+  semInit(reqPolicy);
 
   // Set timer object (singleton)
   setTimer(new Timer());

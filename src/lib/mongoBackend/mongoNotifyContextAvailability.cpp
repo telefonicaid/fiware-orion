@@ -46,10 +46,11 @@ HttpStatusCode mongoNotifyContextAvailability
 )
 {
     const std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
+    bool              reqSemTaken;
 
     LM_T(LmtMongo, ("Notify Context Availability: '%s' format", notifyFormat.c_str()));
 
-    reqSemTake(__FUNCTION__, "mongo ngsi9 notification");
+    reqSemTake(__FUNCTION__, "mongo ngsi9 notification", SemReadOp, &reqSemTaken);
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -73,6 +74,6 @@ HttpStatusCode mongoNotifyContextAvailability
 
     responseP->responseCode.fill(SccOk);
 
-    reqSemGive(__FUNCTION__, "mongo ngsi9 notification");
+    reqSemGive(__FUNCTION__, "mongo ngsi9 notification", reqSemTaken);
     return SccOk;
 }

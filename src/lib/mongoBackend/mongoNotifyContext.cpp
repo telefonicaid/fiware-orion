@@ -43,7 +43,9 @@ HttpStatusCode mongoNotifyContext
   const std::vector<std::string>&  servicePathV
 )
 {
-    reqSemTake(__FUNCTION__, "ngsi10 notification");
+    bool reqSemTaken;
+
+    reqSemTake(__FUNCTION__, "ngsi10 notification", SemReadOp, &reqSemTaken);
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -60,7 +62,7 @@ HttpStatusCode mongoNotifyContext
         processContextElement(ceP, &ucr, "append", tenant, servicePathV, uriParams, xauthToken);
     }
 
-    reqSemGive(__FUNCTION__, "ngsi10 notification");
+    reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);
     responseP->responseCode.fill(SccOk);
 
     return SccOk;

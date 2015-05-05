@@ -53,10 +53,11 @@ HttpStatusCode mongoSubscribeContext
     const std::string  notifyFormatAsString  = uriParam[URI_PARAM_NOTIFY_FORMAT];
     Format             notifyFormat          = stringToFormat(notifyFormatAsString);
     std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];
+    bool               reqSemTaken;
 
     LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormatAsString.c_str()));
 
-    reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
+    reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
 
     DBClientBase* connection = getMongoConnection();
 
@@ -138,7 +139,7 @@ HttpStatusCode mongoSubscribeContext
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)", reqSemTaken);
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +
@@ -150,7 +151,7 @@ HttpStatusCode mongoSubscribeContext
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)", reqSemTaken);
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +
@@ -160,7 +161,7 @@ HttpStatusCode mongoSubscribeContext
         return SccOk;
     }    
 
-    reqSemGive(__FUNCTION__, "ngsi10 subscribe request");
+    reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
 
     /* Fill the response element */
     responseP->subscribeResponse.duration = requestP->duration;

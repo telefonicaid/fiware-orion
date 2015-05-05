@@ -343,8 +343,9 @@ HttpStatusCode mongoDiscoverContextAvailability
   int          limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
   bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  bool         reqSemTaken;
 
-  reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request");
+  reqSemTake(__FUNCTION__, "mongo ngsi9 discovery request", SemReadOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("DiscoverContextAvailability Request"));  
 
@@ -378,6 +379,6 @@ HttpStatusCode mongoDiscoverContextAvailability
   if (hsCode != SccOk)
     ++noOfDiscoveryErrors;
 
-  reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request");
+  reqSemGive(__FUNCTION__, "mongo ngsi9 discovery request", reqSemTaken);
   return hsCode;
 }

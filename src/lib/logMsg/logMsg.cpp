@@ -406,9 +406,9 @@ bool  lmPreamble                   = true;
 
 /* ****************************************************************************
 *
-* semInit -
+* lmSemInit -
 */
-static void semInit(void)
+static void lmSemInit(void)
 {
   sem_init(&sem, 0, 1);
 }
@@ -425,7 +425,7 @@ static void semTake(void)
 
   if (firstTime == 1)
   {
-    semInit();
+    lmSemInit();
     firstTime = 0;
   }
 

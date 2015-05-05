@@ -55,7 +55,9 @@ HttpStatusCode mongoUpdateContext
   const std::string&                    caller
 )
 {
-    reqSemTake(__FUNCTION__, "ngsi10 update request");
+    bool reqSemTaken;
+
+    reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
 
     /* Check that the service path vector has only one element, returning error otherwise */
     if (servicePathV.size() > 1)
@@ -83,6 +85,6 @@ HttpStatusCode mongoUpdateContext
            consider the overall mongoUpdateContext() as OK. */
         responseP->errorCode.fill(SccOk);
     }    
-    reqSemGive(__FUNCTION__, "ngsi10 update request");
+    reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
     return SccOk;
 }

@@ -36,9 +36,10 @@
 *
 * Globals -
 */
-static sem_t  reqSem;
-static sem_t  mongoSem;
-static sem_t  transSem;
+static sem_t           reqSem;
+static sem_t           mongoSem;
+static sem_t           transSem;
+static SemRequestType  reqPolicy;
 
 
 
@@ -46,15 +47,15 @@ static sem_t  transSem;
 *
 * semInit -
 *
-*   parameter #1: 0 - the semaphore is to be shared between threads,
-*   parameter #2: 1 - initially the semaphore is free
+*   parameter #2: 0 - the semaphore is to be shared between threads,
+*   parameter #3: 1 - initially the semaphore is free
 *
 * RETURN VALUE (of sem_init)
 *   0 on success,
 *  -1 on failure
 *
 */
-int semInit(int shared, int takenInitially)
+int semInit(SemRequestType _reqPolicy, int shared, int takenInitially)
 {
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
@@ -74,6 +75,7 @@ int semInit(int shared, int takenInitially)
     return 3;
   }
 
+  reqPolicy = _reqPolicy;
   return 0;
 }
 
@@ -83,14 +85,39 @@ int semInit(int shared, int takenInitially)
 *
 * reqSemTake -
 */
-int reqSemTake(const char* who, const char* what)
+int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken)
 {
   int r;
+
+  if (reqType == SemNoneOp)
+  {
+    *taken = false;
+    return -1;
+  }
+
+  if (reqPolicy == SemNoneOp)
+  {
+    *taken = false;
+    return -1;
+  }
+
+  if ((reqPolicy == SemWriteOp) && (reqType == SemReadOp))
+  {
+    *taken = false;
+    return -1;
+  }
+
+  if ((reqPolicy == SemReadOp) && (reqType == SemWriteOp))
+  {
+    *taken = false;
+    return -1;
+  }
 
   LM_T(LmtReqSem, ("%s taking the 'req' semaphore for '%s'", who, what));
   r = sem_wait(&reqSem);
   LM_T(LmtReqSem, ("%s has the 'req' semaphore", who));
 
+  *taken = true;
   return r;
 }
 
@@ -134,8 +161,13 @@ int transSemTake(const char* who, const char* what)
 *
 * reqSemGive -
 */
-int reqSemGive(const char* who, const char* what)
+int reqSemGive(const char* who, const char* what, bool semTaken)
 {
+  if (semTaken == false)
+  {
+    return 0;
+  }
+
   if (what != NULL)
   {
     LM_T(LmtReqSem, ("%s gives the 'req' semaphore for '%s'", who, what));

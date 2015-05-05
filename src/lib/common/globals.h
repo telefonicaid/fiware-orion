@@ -30,6 +30,7 @@
 #include <string>
 
 #include "common/Timer.h"
+#include "common/sem.h"
 
 
 
@@ -88,7 +89,7 @@ extern OrionExitFunction  orionExitFunction;
 *
 * orionInit - 
 */
-extern void orionInit(OrionExitFunction exitFunction, const char* version);
+extern void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy);
 
 
 
