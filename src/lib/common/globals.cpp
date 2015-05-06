@@ -47,6 +47,7 @@ int                    startTime         = -1;
 int                    statisticsTime    = -1;
 OrionExitFunction      orionExitFunction = NULL;
 static struct timeval  logStartTime;
+bool                   semTimeStatistics = false;
 
 
 
@@ -90,7 +91,7 @@ void transactionIdSet(void)
 *
 * orionInit - 
 */
-void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy)
+void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy, bool semTimeStat)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);
@@ -99,7 +100,7 @@ void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestTy
   orionExitFunction = exitFunction;
 
   // Initialize the semaphore used by mongoBackend
-  semInit(reqPolicy);
+  semInit(reqPolicy, semTimeStat);
 
   // Set timer object (singleton)
   setTimer(new Timer());
@@ -112,8 +113,8 @@ void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestTy
   }
 
   // Set start time and statisticsTime used by REST interface
-  startTime      = logStartTime.tv_sec;
-  statisticsTime = startTime;
+  startTime         = logStartTime.tv_sec;
+  statisticsTime    = startTime;
 
   strncpy(transactionId, "N/A", sizeof(transactionId));
 }

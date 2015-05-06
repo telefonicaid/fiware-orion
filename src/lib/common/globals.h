@@ -82,6 +82,7 @@ extern bool               harakiri;
 extern int                startTime;
 extern int                statisticsTime;
 extern OrionExitFunction  orionExitFunction;
+extern bool               semTimeStatistics;
 
 
 
@@ -89,7 +90,7 @@ extern OrionExitFunction  orionExitFunction;
 *
 * orionInit - 
 */
-extern void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy);
+extern void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy, bool semTimeStat);
 
 
 
