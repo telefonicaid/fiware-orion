@@ -121,6 +121,9 @@ for doc in db[COL].find():
             skipped += 1
             continue
 
+        # All '.' are transformed into '=' given that MongoDB doesn't allow '.' in key names
+        attr_key = attr_key.replace('.', '=')
+
         attrs[attr_key] = attr
 
     n_attr_names = len(attr_names)

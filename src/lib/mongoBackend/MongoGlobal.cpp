@@ -1232,7 +1232,7 @@ bool entitiesQuery
 
           ContextAttribute ca;
 
-          ca.name = basePart(attrName);
+          ca.name = dbDotDecode(basePart(attrName));
           std::string mdId = idPart(attrName);
           ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
 
@@ -2189,4 +2189,79 @@ void cprLookupByAttribute(EntityId&                          en,
       }
     }
   }
+}
+
+#define DOT_ESCAPE_CHAR '='
+
+/* ****************************************************************************
+*
+* dbDotEncode -
+*
+* Replace:
+*   . => =
+*/
+std::string dbDotEncode(std::string fromString)
+{
+  char* to     = (char*) malloc(fromString.length() * 2 + 1);
+  char* from   = (char*) fromString.c_str();
+  char* toFree = to;
+
+  while (*from != 0)
+  {
+    if (*from == '.')
+    {
+      *to = DOT_ESCAPE_CHAR;
+    }
+    else
+    {
+      *to = *from;
+    }
+
+    ++to;
+    ++from;
+  }
+  *to = 0;
+
+  std::string s = toFree;
+
+  free(toFree);
+
+  return s;
+}
+
+
+/* ****************************************************************************
+*
+* dbDotDecode -
+*
+* Replace:
+*   = => .
+*/
+std::string dbDotDecode(std::string fromString)
+{
+  unsigned char* to     = (unsigned char*) malloc(fromString.length() + 1);
+  unsigned char* from   = (unsigned char*) fromString.c_str();
+  char*          toFree = (char*) to;
+
+  while (*from != 0)
+  {
+    if (*from == DOT_ESCAPE_CHAR)
+    {
+      *to = '.';
+    }
+    else
+    {
+      *to = *from;
+    }
+
+    ++to;
+    ++from;
+  }
+  *to = 0;
+
+  std::string s = toFree;
+
+  free(toFree);
+
+  return s;
 }
