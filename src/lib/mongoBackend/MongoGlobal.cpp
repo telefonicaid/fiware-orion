@@ -463,7 +463,7 @@ void ensureLocationIndex(std::string tenant) {
     /* Ensure index for entity locations, in the case of using 2.4 */
     if (mongoLocationCapable()) {
         std::string index = ENT_LOCATION "." ENT_LOCATION_COORDS;
-        connection->ensureIndex(getEntitiesCollectionName(tenant).c_str(), BSON(index << "2dsphere" ));
+        connection->createIndex(getEntitiesCollectionName(tenant).c_str(), BSON(index << "2dsphere" ));
         LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
     }
 }
@@ -522,7 +522,7 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, OtisTreatFuncti
 
 /* ****************************************************************************
 *
-* recoverOnTimeIntervalThread - 
+* recoverOnTimeIntervalThread -
 */
 static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 {
@@ -535,7 +535,7 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
     return;
   }
 
-  std::string  subId   = idField.OID().str();
+  std::string  subId   = idField.OID().toString();
 
   // Paranoia check II:  'conditions' exists?
   BSONElement conditionsField = sub.getField(CSUB_CONDITIONS);
@@ -574,7 +574,7 @@ void recoverOntimeIntervalThreads(std::string tenant)
 
 /* ****************************************************************************
 *
-* destroyOnTimeIntervalThread - 
+* destroyOnTimeIntervalThread -
 */
 static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
 {
@@ -586,7 +586,7 @@ static void destroyOnTimeIntervalThread(std::string tenant, BSONObj& sub)
     return;
   }
 
-  std::string  subId   = idField.OID().str();
+  std::string  subId   = idField.OID().toString();
 
   notifier->destroyOntimeIntervalThreads(subId);
 }
@@ -619,7 +619,7 @@ bool matchEntity(EntityId* en1, EntityId* en2)
     regex_t regex;
     if (regcomp(&regex, en2->id.c_str(), 0) != 0)
     {
-      LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));      
+      LM_W(("Bad Input (error compiling regex: '%s')", en2->id.c_str()));
     }
     else
     {
@@ -711,7 +711,7 @@ static void fillQueryEntity(BSONArrayBuilder& ba, EntityId* enP)
 {
   BSONObjBuilder     ent;
   const std::string  idString          = "_id." ENT_ENTITY_ID;
-  const std::string  typeString        = "_id." ENT_ENTITY_TYPE;  
+  const std::string  typeString        = "_id." ENT_ENTITY_TYPE;
 
   if (enP->isPattern == "true")
     ent.appendRegex(idString, enP->id);
@@ -1551,7 +1551,7 @@ bool registrationsQuery
 
     BSONArrayBuilder entityOr;
     BSONArrayBuilder entitiesWithType;
-    BSONArrayBuilder entitiesWithoutType;    
+    BSONArrayBuilder entitiesWithoutType;
 
     for (unsigned int ix = 0; ix < enV.size(); ++ix)
     {
@@ -1784,7 +1784,7 @@ bool processOnChangeCondition
 
     // FIXME P10: we are using dummy scope at the moment, until subscription scopes get implemented
     //
-    Restriction res;    
+    Restriction res;
     ContextElementResponseVector rawCerV;
     if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, false, tenant, servicePathV))
     {
@@ -1827,7 +1827,7 @@ bool processOnChangeCondition
                 getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
                 allCerV.release();
                 ncr.contextElementResponseVector.release();
-                
+
                 return true;
             }
 
@@ -2038,13 +2038,13 @@ void slashEscape(const char* from, char* to, unsigned int toLen)
 
     ++ix;
   }
-  
+
   // 2. If the escaped version of 'from' doesn't fit inside 'to', return ERROR as string
   if ((strlen(from) + slashes + 1) > toLen)
   {
     strncpy(to, "ERROR", toLen);
     return;
-  } 
+  }
 
 
   // 3. Copy 'in' to 'from', including escapes for '/'
@@ -2069,7 +2069,7 @@ void slashEscape(const char* from, char* to, unsigned int toLen)
 */
 void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>& subs)
 {
-  for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
+  for (std::map<std::string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
       delete it->second;
   }
