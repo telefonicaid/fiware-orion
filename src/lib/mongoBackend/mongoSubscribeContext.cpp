@@ -91,11 +91,21 @@ HttpStatusCode mongoSubscribeContext
     
     /* Build entities array */
     BSONArrayBuilder entities;
-    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix) {
+    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
+    {
         EntityId* en = requestP->entityIdVector.get(ix);
-        entities.append(BSON(CSUB_ENTITY_ID << en->id <<
-                             CSUB_ENTITY_TYPE << en->type <<
-                             CSUB_ENTITY_ISPATTERN << en->isPattern));
+
+        if (en->type == "")
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
+        else
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_TYPE << en->type <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
     }
     sub.append(CSUB_ENTITIES, entities.arr());
 
