@@ -23,7 +23,11 @@
 __author__ = 'fermin'
 
 from pymongo import MongoClient
+import json
 import sys
+
+ATTRNAMES = 'attrNames'
+ATTRS     = 'attrs'
 
 # The way in which Python manage dictionaries doesn't make easy to be sure
 # of field ordering, which is important for MongoDB in the case of using an
@@ -43,13 +47,20 @@ def flatten(_id):
 
     return r
 
-def old_coordinates_format(doc):
-    c = doc['location']['coords']
-    # Is c a list and has 2 element?
-    if type(c) is list:
-        return (len(c) == 2)
-    else:
+def update_ok(doc, n_attr_names, n_attrs):
+
+    if (not ATTRNAMES in doc or not ATTRS in doc):
+        print "debug1"
         return False
+
+    ck_attr_names = len(doc[ATTRNAMES])
+    ck_attrs = len(doc[ATTRS].keys())
+
+    if (n_attr_names != ck_attr_names or n_attrs != ck_attrs):
+        print "debug 2: %d %d %d %d" % (n_attr_names, ck_attr_names, ck_attrs, n_attrs)
+        return False
+
+    return True
 
 if len(sys.argv) != 2:
     print "missing db name"
@@ -73,37 +84,65 @@ db = client[DB]
 
 need_fix = False
 
-n = 0
+skipped = 0
 changed = 0
-error = 0
+error   = 0
+total   = 0
 
-# Note the 'location.coords.type': {$exists: False} part of the query is a way of ensuring that modified
-# document are not "reinyected" in the cursor (some weird behaviour has been observed if that part of the
-# query is not used)
-for doc in db[COL].find({'location.coords': {'$exists': True}, 'location.coords.type': {'$exists': False}}):
-    n += 1
+print "- processing entities collection changing attrs vector to objects, this may take a while... "
+for doc in db[COL].find():
 
-    # Is uses an array of coordinates(i.e. pre-0.21.0 format)?
-    if (old_coordinates_format(doc)):
-        coordX = doc['location']['coords'][0]
-        coordY = doc['location']['coords'][1]
-        new_coords = {
-            'type': 'Point',
-            'coordinates': [ coordX, coordY ]
-        }
-        db[COL].update(flatten(doc['_id']), {'$set': {'location.coords': new_coords}})
-        # Check update was ok
-        check_doc = db[COL].find_one(flatten(doc['_id']))
-        if (old_coordinates_format(check_doc)):
-            print "ERROR: document <%s> change attempt failed!" % str(check_doc['_id'])
-            need_fix = True
-            error += 1
+    total += 1
+
+    # Check that attribute field exists and is a vector (otherwise this entity is skipped)
+    old_attrs = doc[ATTRS]
+    if not isinstance(old_attrs, list):
+        skipped += 1
+        continue
+
+    # Process attribute by attribute, storing them in a temporal hashmap and list
+    attr_names = []
+    attrs = {}
+    for attr in old_attrs:
+        name = attr.pop('name')
+        # Does the attribute have an ID field?
+        if 'id' in attr:
+            id = attr.pop('id')
+            attr_key = name + "__" + id
         else:
-            changed += 1
+            attr_key = name
 
-print '---- Documents using old coordinates format: %d' % n
-print '---- Changed documents:                      %d' % changed
-print '---- Errors changing documents:              %d' % error
+        if not name in attr_names:
+            attr_names.append(name)
+
+        if attr_key in attrs:
+            print '- dupplicate attribute detected in entity %s: <%s>. Skipping' % (json.dumps(doc['_id']), attr_key)
+            need_fix = True
+            skipped += 1
+            continue
+
+        attrs[attr_key] = attr
+
+    n_attr_names = len(attr_names)
+    n_attrs = len(attrs.keys())
+
+    # Update document with the new attribute fields
+    db[COL].update(flatten(doc['_id']), {'$set': {ATTRNAMES: attr_names, ATTRS: attrs}})
+
+    # Check update was ok (this is not an exhaustive checking that is better than nothing :)
+    check_doc = db[COL].find_one(flatten(doc['_id']))
+
+    if update_ok(check_doc, n_attr_names, n_attrs):
+        changed += 1
+    else:
+        print "ERROR: document <%s> change attempt failed!" % json.dumps(check_doc['_id'])
+        need_fix = True
+        error += 1
+
+print '- Documents processed:   %d' % total
+print '  * changed:             %d' % changed
+print '  * skipped:             %d' % skipped
+print '  * error:               %d' % error
 
 if need_fix:
     print "------------------------------------------------------"
