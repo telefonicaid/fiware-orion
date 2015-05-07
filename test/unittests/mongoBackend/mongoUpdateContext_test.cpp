@@ -9220,7 +9220,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityUpdate_2levels)
   ce.contextAttributeVector.push_back(&ca);
   req.contextElementVector.push_back(&ce);
   req.updateActionType.set("UPDATE");
-  servicePathVector.push_back("/home/kz");
+  servicePathVector.push_back("/home/kz/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
@@ -9421,7 +9421,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityAppend_2levels)
   ce.contextAttributeVector.push_back(&ca);
   req.contextElementVector.push_back(&ce);
   req.updateActionType.set("APPEND");
-  servicePathVector.push_back("/home/kz");
+  servicePathVector.push_back("/home/kz/#");
 
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
@@ -9751,7 +9751,7 @@ TEST(mongoUpdateContextRequest, servicePathEntityDeletion_2levels)
     ce.entityId.fill("E1", "T1", "false");
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
-    servicePathVector.push_back("/home/kz");
+    servicePathVector.push_back("/home/kz/#");
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
