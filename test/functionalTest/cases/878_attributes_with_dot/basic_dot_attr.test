@@ -32,7 +32,7 @@ brokerStart CB
 # 01. Update/APPEND E1 with attributes d.o.t=1 and normal=2
 # 02. Query E1 gets d.o.t=1 and normal=2
 # 03. Update/UPDATE E1 attribute d.o.t=10
-# 04. Query E1 gess d.o.t=10 and normal=2
+# 04. Query E1 gets d.o.t=10 and normal=2
 # 05. Update/APPEND E1 attribute d.o.t.bis=3
 # 06. Query E1 gets d.o.t=10, normal=2, d.o.t.bis=3
 # 07. Update/DELETE E1 attribute d.o.t
@@ -103,7 +103,7 @@ orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
-echo "04. Query E1 gess d.o.t=10 and normal=2"
+echo "04. Query E1 gets d.o.t=10 and normal=2"
 echo "======================================="
 payload='{
   "entities": [
@@ -296,7 +296,7 @@ Date: REGEX(.*)
 }
 
 
-04. Query E1 gess d.o.t=10 and normal=2
+04. Query E1 gets d.o.t=10 and normal=2
 =======================================
 HTTP/1.1 200 OK
 Content-Length: 501
