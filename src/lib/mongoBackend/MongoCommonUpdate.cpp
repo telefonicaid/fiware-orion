@@ -1649,20 +1649,8 @@ void processContextElement(ContextElement*                      ceP,
       char               path[MAX_SERVICE_NAME_LEN];
       slashEscape(servicePathV[0].c_str(), path, sizeof(path));
 
-      if (path[strlen(path) - 1] == '#')
-      {
-        /* Remove '\/#' trailing part of the string */
-        int l = strlen(path);
-        path[l - 3] = 0;
-
-        const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
-        bob.appendRegex(servicePathString, servicePathValue);
-      }
-      else
-      {
-        const std::string  servicePathValue  = std::string("^") + path + "$";
-        bob.appendRegex(servicePathString, servicePathValue);
-      }
+      const std::string  servicePathValue  = std::string("^") + path + "$";
+      bob.appendRegex(servicePathString, servicePathValue);
     }
 
 
