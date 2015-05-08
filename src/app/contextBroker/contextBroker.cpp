@@ -213,6 +213,7 @@ long            dbTimeout;
 long            httpTimeout;
 char            mutexPolicy[16];
 bool            mutexTimeStat;
+char            writeConcern[16];
 
 
 
@@ -249,6 +250,7 @@ bool            mutexTimeStat;
 #define MAX_L               900000
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
 #define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
+#define WRITE_CONCERN_DESC  "db write concern (normal/none)"
 
 
 
@@ -286,7 +288,8 @@ PaArgument paArgs[] =
 
   { "-httpTimeout",  &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
   { "-mutexPolicy",  mutexPolicy,   "MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
-  { "-mutexTimeStat", &mutexTimeStat,  "MUTEX_TIME_STAT",  PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC   },
+  { "-mutexTimeStat",&mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
+  { "-writeConcern", &writeConcern, "WRITE_CONCERN",  PaString, PaOpt, _i "normal",PaNL,   PaNL,  WRITE_CONCERN_DESC },
 
   PA_END_OF_ARGS
 };
@@ -1153,11 +1156,11 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 *
 * mongoInit -
 */
-static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, long timeout)
+static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, long timeout, char* writeConcern)
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo))
+  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -1439,7 +1442,7 @@ int main(int argC, char* argV[])
   pidFile();
   SemRequestType policy = policyGet(mutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern);
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 

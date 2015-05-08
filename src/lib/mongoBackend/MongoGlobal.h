@@ -156,7 +156,8 @@ extern bool mongoConnect(const char* host,
                          const char* username,
                          const char* passwd,
                          bool        _multitenant,
-                         double      timeout);
+                         double      timeout,
+                         const std::string& writeConcern = "normal");
 #ifdef UNIT_TEST
 extern bool mongoConnect(const char* host);
 extern bool mongoConnect(DBClientConnection* c);

@@ -93,13 +93,14 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 *
 * mongoConnect -
 */
-bool mongoConnect(const char* host,
-                  const char* db,
-                  const char* rplSet,
-                  const char* username,
-                  const char* passwd,
-                  bool        _multitenant,
-                  double      timeout)
+bool mongoConnect(const char*         host,
+                  const char*         db,
+                  const char*         rplSet,
+                  const char*         username,
+                  const char*         passwd,
+                  bool                _multitenant,
+                  double              timeout,
+                  const std::string&  writeConcern)
 {
 
     std::string err;
@@ -179,6 +180,15 @@ bool mongoConnect(const char* host,
     }
 
     LM_I(("Successful connection to database"));
+
+    //
+    // WriteConcern
+    //
+    enum WriteConcern wconcern = (writeConcern == "normal")? W_NORMAL : W_NONE;
+
+    connection->setWriteConcern(wconcern);
+
+
 
     /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using
