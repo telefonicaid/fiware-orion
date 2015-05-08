@@ -25,6 +25,7 @@ __author__ = 'fermin'
 from pymongo import MongoClient
 import json
 import sys
+from time import sleep
 
 ATTRNAMES = 'attrNames'
 ATTRS     = 'attrs'
@@ -84,25 +85,39 @@ db = client[DB]
 
 need_fix = False
 
-skipped = 0
-changed = 0
-error   = 0
-total   = 0
+skipped     = 0
+changed     = 0
+error       = 0
+processed   = 0
 
-print "- processing entities collection changing attrs vector to objects, this may take a while... "
-for doc in db[COL].find():
+total = db[COL].count()
 
-    total += 1
+print "- processing entities collection (%d entities) changing attrs vectors to objects, this may take a while... " % total
+
+# The sort() is a way of ensuring that a modified document doesn't enters again at the end of the cursor (we have
+# observed that this may happen with large collections, e.g ~50,000 entities). In addition, we have to use
+# batch_size so the cursor doesn't expires at server (see http://stackoverflow.com/questions/10298354/mongodb-cursor-id-not-valid-error).
+# The used batch_size value is an heuristic
+for doc in db[COL].find().sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePath', 1)]).batch_size(100):
+
+    processed += 1
+
+    sys.stdout.write('- processing entity: %d/%d   \r' % (processed, total) )
+    sys.stdout.flush()
 
     # Check that attribute field exists and is a vector (otherwise this entity is skipped)
     old_attrs = doc[ATTRS]
     if not isinstance(old_attrs, list):
+        #print '- %d: not vector attribute for entity %s. Skipping' % (processed, json.dumps(doc['_id']))
         skipped += 1
         continue
 
     # Process attribute by attribute, storing them in a temporal hashmap and list
     attr_names = []
     attrs = {}
+
+
+    to_skip = False
     for attr in old_attrs:
         name = attr.pop('name')
         # Does the attribute have an ID field?
@@ -116,15 +131,19 @@ for doc in db[COL].find():
             attr_names.append(name)
 
         if attr_key in attrs:
-            print '- dupplicate attribute detected in entity %s: <%s>. Skipping' % (json.dumps(doc['_id']), attr_key)
+            print '- %d: dupplicate attribute detected in entity %s: <%s>. Skipping' % (processed, json.dumps(doc['_id']), attr_key)
             need_fix = True
-            skipped += 1
-            continue
+            to_skip = True
+            break
 
         # All '.' are transformed into '=' given that MongoDB doesn't allow '.' in key names
         attr_key = attr_key.replace('.', '=')
 
         attrs[attr_key] = attr
+
+    if to_skip:
+        skipped += 1
+        continue
 
     n_attr_names = len(attr_names)
     n_attrs = len(attrs.keys())
@@ -138,11 +157,12 @@ for doc in db[COL].find():
     if update_ok(check_doc, n_attr_names, n_attrs):
         changed += 1
     else:
-        print "ERROR: document <%s> change attempt failed!" % json.dumps(check_doc['_id'])
+        print "- %d: ERROR: document <%s> change attempt failed!" % (processed, json.dumps(check_doc['_id']))
         need_fix = True
         error += 1
 
-print '- Documents processed:   %d' % total
+print '- processing entity: %d/%d' % (processed, total)
+print '- documents processed:   %d' % processed
 print '  * changed:             %d' % changed
 print '  * skipped:             %d' % skipped
 print '  * error:               %d' % error

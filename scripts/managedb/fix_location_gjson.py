@@ -73,15 +73,25 @@ db = client[DB]
 
 need_fix = False
 
-n = 0
-changed = 0
-error = 0
+processed = 0
+changed   = 0
+error     = 0
 
-# Note the 'location.coords.type': {$exists: False} part of the query is a way of ensuring that modified
-# document are not "reinyected" in the cursor (some weird behaviour has been observed if that part of the
-# query is not used)
-for doc in db[COL].find({'location.coords': {'$exists': True}, 'location.coords.type': {'$exists': False}}):
-    n += 1
+total_col = db[COL].count()
+total     = db[COL].find({'location.coords': {'$exists': True}}).count()
+
+print "- processing entities collection (%d entities of %d) changing coordinates format, this may take a while... " % (total, total_col)
+
+# The sort() is a way of ensuring that a modified document doesn't enters again at the end of the cursor (we have
+# observed that this may happen with large collections, e.g ~50,000 entities). In addition, we have to use
+# batch_size so the cursor doesn't expires at server (see http://stackoverflow.com/questions/10298354/mongodb-cursor-id-not-valid-error).
+# The used batch_size value is an heuristic
+for doc in db[COL].find({'location.coords': {'$exists': True}}).sort([('_id.id', 1), ('_id.type', -1), ('_id.servicePath', 1)]).batch_size(100):
+
+    processed += 1
+
+    sys.stdout.write('- processing entity: %d/%d   \r' % (processed, total) )
+    sys.stdout.flush()
 
     # Is uses an array of coordinates(i.e. pre-0.21.0 format)?
     if (old_coordinates_format(doc)):
@@ -95,15 +105,16 @@ for doc in db[COL].find({'location.coords': {'$exists': True}, 'location.coords.
         # Check update was ok
         check_doc = db[COL].find_one(flatten(doc['_id']))
         if (old_coordinates_format(check_doc)):
-            print "ERROR: document <%s> change attempt failed!" % str(check_doc['_id'])
+            print "- %d: ERROR: document <%s> change attempt failed!" % (processed, str(check_doc['_id']))
             need_fix = True
             error += 1
         else:
             changed += 1
 
-print '---- Documents using old coordinates format: %d' % n
-print '---- Changed documents:                      %d' % changed
-print '---- Errors changing documents:              %d' % error
+print '- processing entity: %d/%d' % (processed, total)
+print '- documents processed:   %d' % processed
+print '  * changed:             %d' % changed
+print '  * errors:              %d' % error
 
 if need_fix:
     print "------------------------------------------------------"
