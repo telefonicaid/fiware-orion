@@ -24,6 +24,9 @@
 */
 
 #include <regex.h>
+#include <algorithm>  // std::replace                                                                                                                       
+#include <string>
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
@@ -2191,7 +2194,16 @@ void cprLookupByAttribute(EntityId&                          en,
   }
 }
 
-#define DOT_ESCAPE_CHAR '='
+
+
+/* ****************************************************************************
+*
+* Characters for attribute value encoding
+*/
+#define ESCAPE_1_DECODED  '.'
+#define ESCAPE_1_ENCODED  '='
+
+
 
 /* ****************************************************************************
 *
@@ -2200,34 +2212,12 @@ void cprLookupByAttribute(EntityId&                          en,
 * Replace:
 *   . => =
 */
-std::string dbDotEncode(std::string fromString)
+std::string dbDotEncode(std::string s)
 {
-  char* to     = (char*) malloc(fromString.length() * 2 + 1);
-  char* from   = (char*) fromString.c_str();
-  char* toFree = to;
-
-  while (*from != 0)
-  {
-    if (*from == '.')
-    {
-      *to = DOT_ESCAPE_CHAR;
-    }
-    else
-    {
-      *to = *from;
-    }
-
-    ++to;
-    ++from;
-  }
-  *to = 0;
-
-  std::string s = toFree;
-
-  free(toFree);
-
+  replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
   return s;
 }
+
 
 
 /* ****************************************************************************
@@ -2237,31 +2227,8 @@ std::string dbDotEncode(std::string fromString)
 * Replace:
 *   = => .
 */
-std::string dbDotDecode(std::string fromString)
+std::string dbDotDecode(std::string s)
 {
-  unsigned char* to     = (unsigned char*) malloc(fromString.length() + 1);
-  unsigned char* from   = (unsigned char*) fromString.c_str();
-  char*          toFree = (char*) to;
-
-  while (*from != 0)
-  {
-    if (*from == DOT_ESCAPE_CHAR)
-    {
-      *to = '.';
-    }
-    else
-    {
-      *to = *from;
-    }
-
-    ++to;
-    ++from;
-  }
-  *to = 0;
-
-  std::string s = toFree;
-
-  free(toFree);
-
+  std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
   return s;
 }
