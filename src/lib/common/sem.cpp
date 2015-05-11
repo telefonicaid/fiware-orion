@@ -89,7 +89,6 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
 
   // Measure accumulated semaphore waiting time?
   semTimeStatistics = semTimeStat;
-  LM_M(("KZ: semTimeStatistics == %s", (semTimeStatistics == true)? "true" : "false"));
   return 0;
 }
 
@@ -101,8 +100,6 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
 */
 static void difftimeofday(struct timespec* endTime, struct timespec* startTime, struct timespec* diffTime)
 {
-  LM_M(("KZ: In difftimeofday"));
-
   diffTime->tv_nsec = endTime->tv_nsec - startTime->tv_nsec;
   diffTime->tv_sec  = endTime->tv_sec  - startTime->tv_sec;
 
