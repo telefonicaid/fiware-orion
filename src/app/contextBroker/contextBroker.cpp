@@ -211,6 +211,7 @@ bool            mtenant;
 char            rush[256];
 long            dbTimeout;
 long            httpTimeout;
+char            mutexPolicy[16];
 
 
 
@@ -245,6 +246,7 @@ long            httpTimeout;
 #define MULTISERVICE_DESC   "service multi tenancy mode"
 #define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
 #define MAX_L               900000
+#define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
 
 
 
@@ -281,6 +283,7 @@ PaArgument paArgs[] =
   { "-multiservice", &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",  &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
+  { "-mutexPolicy",  mutexPolicy,   "MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
 
   PA_END_OF_ARGS
 };
@@ -1279,8 +1282,39 @@ static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
 }
 
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 
+/* ****************************************************************************
+*
+* policyGet - 
+*/
+static SemRequestType policyGet(std::string mutexPolicy)
+{
+  if (mutexPolicy == "read")
+  {
+    return SemReadOp;
+  }
+  else if (mutexPolicy == "write")
+  {
+    return SemWriteOp;
+  }
+  else if (mutexPolicy == "all")
+  {
+    return SemReadWriteOp;
+  }
+  else if (mutexPolicy == "none")
+  {
+    return SemNoneOp;
+  }
+
+  //
+  // Default is to protect both reads and writes
+  //
+  return SemReadWriteOp;
+}
+
+
+
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -
@@ -1400,7 +1434,8 @@ int main(int argC, char* argV[])
   }
 
   pidFile();
-  orionInit(orionExit, ORION_VERSION);
+  SemRequestType policy = policyGet(mutexPolicy);
+  orionInit(orionExit, ORION_VERSION, policy);
   mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout);
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);

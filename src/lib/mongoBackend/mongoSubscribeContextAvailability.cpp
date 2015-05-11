@@ -52,9 +52,11 @@ HttpStatusCode mongoSubscribeContextAvailability
   const std::string&                     tenant
 )
 {
+    bool reqSemTaken;
+
     LM_T(LmtMongo, ("Subscribe Context Availability Request, notifyFormat: %s", formatToString(notifyFormat)));
 
-    reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
+    reqSemTake(__FUNCTION__, "ngsi9 subscribe request", SemWriteOp, &reqSemTaken);
 
     DBClientBase* connection = getMongoConnection();
 
@@ -116,7 +118,7 @@ HttpStatusCode mongoSubscribeContextAvailability
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)");
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)", reqSemTaken);
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
@@ -127,7 +129,7 @@ HttpStatusCode mongoSubscribeContextAvailability
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)", reqSemTaken);
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
@@ -143,6 +145,6 @@ HttpStatusCode mongoSubscribeContextAvailability
     responseP->duration = requestP->duration;
     responseP->subscriptionId.set(oid.toString());
 
-    reqSemGive(__FUNCTION__, "ngsi9 subscribe request");
+    reqSemGive(__FUNCTION__, "ngsi9 subscribe request", reqSemTaken);
     return SccOk;
 }

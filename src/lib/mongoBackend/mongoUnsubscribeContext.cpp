@@ -40,7 +40,9 @@
 */
 HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, UnsubscribeContextResponse* responseP, const std::string& tenant)
 {
-    reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request");
+    bool reqSemTaken;
+
+    reqSemTake(__FUNCTION__, "ngsi10 unsubscribe request", SemWriteOp, &reqSemTaken);
 
     LM_T(LmtMongo, ("Unsubscribe Context"));
 
@@ -69,7 +71,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
         // mongoBackend. By the moment we can live this here, but we should remove in the future
         // (old issue #95)
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo assertion exception)");
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo assertion exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo assertion exception)", reqSemTaken);
         responseP->statusCode.fill(SccContextElementNotFound);
         LM_W(("Bad Input (invalid OID format)"));
         return SccOk;
@@ -77,7 +79,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
         responseP->statusCode.fill(SccReceiverInternalError,
                                    std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                    " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -88,7 +90,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo generic exception)", reqSemTaken);
         responseP->statusCode.fill(SccReceiverInternalError,
                                    std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                    " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -99,7 +101,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
 
     if (sub.isEmpty()) {
        responseP->statusCode.fill(SccContextElementNotFound, std::string("subscriptionId: /") + requestP->subscriptionId.get() + "/");
-       reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)");
+       reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (no subscriptions found)", reqSemTaken);
        return SccOk;
     }
 
@@ -118,7 +120,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "remove from SubscribeContextCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo db exception)", reqSemTaken);
         responseP->statusCode.fill(SccReceiverInternalError,
                                    std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                    " - remove() _id: " + requestP->subscriptionId.get().c_str() +
@@ -129,7 +131,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "remove from SubscribeContextCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request (mongo generic exception)", reqSemTaken);
         responseP->statusCode.fill(SccReceiverInternalError,
                                    std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                    " - remove() _id: " + requestP->subscriptionId.get().c_str() +
@@ -143,6 +145,6 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     getNotifier()->destroyOntimeIntervalThreads(requestP->subscriptionId.get());
 
     responseP->statusCode.fill(SccOk);
-    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request");
+    reqSemGive(__FUNCTION__, "ngsi10 unsubscribe request", reqSemTaken);
     return SccOk;
 }

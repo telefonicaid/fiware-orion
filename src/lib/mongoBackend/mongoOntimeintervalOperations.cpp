@@ -39,9 +39,11 @@ using namespace mongo;
 *
 * mongoGetContextSubscriptionInfo -
 */
-HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, ContextSubscriptionInfo* csiP, std::string* err, const std::string& tenant) {
+HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, ContextSubscriptionInfo* csiP, std::string* err, const std::string& tenant)
+{
+    bool reqSemTaken;
 
-    reqSemTake(__FUNCTION__, "get info on subscriptions");
+    reqSemTake(__FUNCTION__, "get info on subscriptions", SemReadOp, &reqSemTaken);
 
     LM_T(LmtMongo, ("Get Subscription Info operation"));
 
@@ -60,7 +62,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "get info on subscriptions (mongo db exception)");
+        reqSemGive(__FUNCTION__, "get info on subscriptions (mongo db exception)", reqSemTaken);
         *err = e.what();
         LM_E(("Database Error ('findOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), e.what()));
         return SccOk;
@@ -68,7 +70,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "get info on subscriptions (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "get info on subscriptions (mongo generic exception)", reqSemTaken);
         *err = "Database error: received generic exception";
         LM_E(("Database Error ('indOne id=%s, coll=%s', '%s')", subId.c_str(), getSubscribeContextCollectionName(tenant).c_str(), "generic exception"));
         return SccOk;
@@ -78,7 +80,7 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
 
     /* Check if we found anything */
     if (sub.isEmpty()) {
-        reqSemGive(__FUNCTION__, "get info on subscriptions (nothing found)");
+        reqSemGive(__FUNCTION__, "get info on subscriptions (nothing found)", reqSemTaken);
         return SccOk;
     }
 
@@ -115,19 +117,21 @@ HttpStatusCode mongoGetContextSubscriptionInfo(const std::string& subId, Context
     std::string fmt = STR_FIELD(sub, CSUB_FORMAT);
     csiP->format = sub.hasField(CSUB_FORMAT)? stringToFormat(fmt) : XML;
 
-    reqSemGive(__FUNCTION__, "get info on subscriptions");
+    reqSemGive(__FUNCTION__, "get info on subscriptions", reqSemTaken);
     return SccOk;
 }
 
 /* ****************************************************************************
 *
 * mongoGetContextElementResponses -
+*
+* This function is basically a wrapper of mongoBackend internal entitiesQuery() function
 */
-HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const AttributeList& attrL, ContextElementResponseVector* cerV, std::string* err, const std::string& tenant) {
+HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const AttributeList& attrL, ContextElementResponseVector* cerV, std::string* err, const std::string& tenant)
+{
+    bool reqSemTaken;
 
-    /* This function is basically a wrapper of mongoBackend internal entitiesQuery() function */
-
-    reqSemTake(__FUNCTION__, "get context-element responses");
+    reqSemTake(__FUNCTION__, "get context-element responses", SemReadOp, &reqSemTaken);
     LM_T(LmtMongo, ("Get Notify Context Request operation"));
 
     // FIXME P10: we are using dummy scope by the moment, until subscription scopes get implemented
@@ -137,7 +141,7 @@ HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const 
     Restriction res;
     if (!entitiesQuery(enV, attrL, res, &rawCerV, err, true, tenant, servicePath))
     {
-        reqSemGive(__FUNCTION__, "get context-element responses (no entities found)");
+        reqSemGive(__FUNCTION__, "get context-element responses (no entities found)", reqSemTaken);
         rawCerV.release();
         return SccOk;
     }
@@ -146,7 +150,7 @@ HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const 
     pruneContextElements(rawCerV, cerV);
     rawCerV.release();
 
-    reqSemGive(__FUNCTION__, "get context-element responses");
+    reqSemGive(__FUNCTION__, "get context-element responses", reqSemTaken);
     return SccOk;
 }
 
@@ -155,9 +159,11 @@ HttpStatusCode mongoGetContextElementResponses(const EntityIdVector& enV, const 
 * mongoUpdateCsubNewNotification -
 *
 */
-HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::string* err, const std::string& tenant) {
+HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::string* err, const std::string& tenant)
+{
+    bool reqSemTaken;
 
-    reqSemTake(__FUNCTION__, "update subscription notifications");
+    reqSemTake(__FUNCTION__, "update subscription notifications", SemWriteOp, &reqSemTaken);
 
     LM_T(LmtMongo, ("Update NGI10 Subscription New Notification"));
 
@@ -182,7 +188,7 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
+        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)", reqSemTaken);
         *err = e.what();
         LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
         return SccReceiverInternalError;
@@ -190,12 +196,12 @@ HttpStatusCode mongoUpdateCsubNewNotification(const std::string& subId, std::str
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)", reqSemTaken);
         *err = "Generic Exception";
         LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), err->c_str()));
         return SccReceiverInternalError;
     }
 
-    reqSemGive(__FUNCTION__, "update subscription notifications");
+    reqSemGive(__FUNCTION__, "update subscription notifications", reqSemTaken);
     return SccOk;
 }
