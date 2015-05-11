@@ -50,7 +50,7 @@ HttpStatusCode mongoNotifyContextAvailability
 
     LM_T(LmtMongo, ("Notify Context Availability: '%s' format", notifyFormat.c_str()));
 
-    reqSemTake(__FUNCTION__, "mongo ngsi9 notification", SemReadOp, &reqSemTaken);
+    reqSemTake(__FUNCTION__, "mongo ngsi9 notification", SemWriteOp, &reqSemTaken);
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */

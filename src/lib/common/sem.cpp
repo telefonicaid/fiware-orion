@@ -89,12 +89,6 @@ int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* 
 {
   int r;
 
-  if (reqType == SemNoneOp)
-  {
-    *taken = false;
-    return -1;
-  }
-
   if (reqPolicy == SemNoneOp)
   {
     *taken = false;
