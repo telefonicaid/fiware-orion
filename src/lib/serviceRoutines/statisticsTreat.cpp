@@ -135,6 +135,7 @@ std::string statisticsTreat
     noOfRegisterResponses                           = -1;
 
     semTimeReqReset();
+    semTimeMongoReset();
 
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
