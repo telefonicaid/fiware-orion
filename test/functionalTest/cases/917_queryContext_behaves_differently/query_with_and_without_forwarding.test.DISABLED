@@ -87,7 +87,7 @@ payload='{
         "isDomain": "false"
       }
     ],
-    "providingApplication": "http://1.1.1.1:'${LISTENER_PORT}'/noresponse"
+    "providingApplication": "http://localhost:'${LISTENER_PORT}'/noresponse"
     }
  ],
  "duration": "P1M"
