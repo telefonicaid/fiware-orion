@@ -113,8 +113,8 @@ void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestTy
   }
 
   // Set start time and statisticsTime used by REST interface
-  startTime         = logStartTime.tv_sec;
-  statisticsTime    = startTime;
+  startTime      = logStartTime.tv_sec;
+  statisticsTime = startTime;
 
   strncpy(transactionId, "N/A", sizeof(transactionId));
 }
