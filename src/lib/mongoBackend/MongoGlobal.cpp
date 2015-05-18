@@ -188,10 +188,17 @@ bool mongoConnect(const char*         host,
     // WriteConcern
     //
     enum WriteConcern wconcern = (writeConcern == "normal")? W_NORMAL : W_NONE;
+    enum WriteConcern wconcernCheck;
 
     connection->setWriteConcern(wconcern);
-
-
+    wconcernCheck = connection->getWriteConcern();
+    
+    if (wconcernCheck != wconcern)
+    {
+      LM_E(("Database Error (Write Concern not set as desired)"));
+      return false;
+    }
+    LM_T(LmtMongo, ("Active DB Write Concern mode: %s" (wconcernCheck == W_NORMAL)? "Normal" : "None"));
 
     /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using
