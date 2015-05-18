@@ -55,7 +55,7 @@ payload='{
     ],
     "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext/ --payload "$payload" --json
 echo
 echo
 
