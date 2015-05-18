@@ -1648,9 +1648,11 @@ void processContextElement(ContextElement*                      ceP,
       LM_T(LmtServicePath, ("Updating entity '%s' for Service Path: '%s', action '%s'", ceP->entityId.id.c_str(), servicePathV[0].c_str(), action.c_str()));
       char               path[MAX_SERVICE_NAME_LEN];
       slashEscape(servicePathV[0].c_str(), path, sizeof(path));
-      const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
+
+      const std::string  servicePathValue  = std::string("^") + path + "$";
       bob.appendRegex(servicePathString, servicePathValue);
     }
+
 
     // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
     // Restriction is not a valid field in updateContext according to the NGSI specification. In the
