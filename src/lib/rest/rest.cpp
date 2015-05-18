@@ -604,7 +604,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* urlCheck - 
+* urlCheck - check for forbidden characters and remove trailing slashes
 *
 * Returns 'true' if the URL is OK, 'false' otherwise.
 * ciP->answer and ciP->httpStatusCode are set if an error is encountered.
@@ -621,8 +621,19 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
     return false;
   }
 
+  //
+  // Remove '/' at end of URL path
+  //
+  char* s = (char*) url.c_str();
+  while (s[strlen(s) - 1] == '/')
+  {
+    s[strlen(s) - 1] = 0;
+  }
+
   return true;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -790,7 +801,7 @@ static int connectionTreat
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
 
-    if (urlCheck(ciP, url) == false)
+    if (urlCheck(ciP, ciP->url) == false)
     {
       LM_W(("Bad Input (error in URI path)"));
       restReply(ciP, ciP->answer);
