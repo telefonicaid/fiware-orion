@@ -1,2 +1,4 @@
 - Add: New CLI parameter for the mutex policy: -mutexPolicy (Issue #910)
-
+- Add: Measuring the accumulated time waiting for the DB semaphores.
+       The measures are added to the REST request /statistics, but only if
+       the new CLI parameter -mutexTimeStat is set (Issue #911)

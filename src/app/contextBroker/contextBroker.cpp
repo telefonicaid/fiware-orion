@@ -212,6 +212,7 @@ char            rush[256];
 long            dbTimeout;
 long            httpTimeout;
 char            mutexPolicy[16];
+bool            mutexTimeStat;
 
 
 
@@ -247,6 +248,7 @@ char            mutexPolicy[16];
 #define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
 #define MAX_L               900000
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
+#define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
 
 
 
@@ -284,6 +286,7 @@ PaArgument paArgs[] =
 
   { "-httpTimeout",  &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
   { "-mutexPolicy",  mutexPolicy,   "MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
+  { "-mutexTimeStat", &mutexTimeStat,  "MUTEX_TIME_STAT",  PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC   },
 
   PA_END_OF_ARGS
 };
@@ -1435,7 +1438,7 @@ int main(int argC, char* argV[])
 
   pidFile();
   SemRequestType policy = policyGet(mutexPolicy);
-  orionInit(orionExit, ORION_VERSION, policy);
+  orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
   mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout);
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);

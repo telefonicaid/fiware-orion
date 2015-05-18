@@ -57,5 +57,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-multiservice' (service multi tenancy mode)]
                       [option '-httpTimeout' <timeout in milliseconds for forwards and notifications>]
                       [option '-mutexPolicy' <mutex policy (none/read/write/all)>]
+                      [option '-mutexTimeStat' (measure total semaphore waiting time)]
                       
 --TEARDOWN--
