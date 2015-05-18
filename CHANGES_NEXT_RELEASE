@@ -3,3 +3,4 @@
        The measures are added to the REST request /statistics, but only if
        the new CLI parameter -mutexTimeStat is set (Issue #911)
 - Fix: Removing trailing slashes for path of URI before treating the request (Issue #828)
+- Fix: Fixed a bug regtarding subscriptions with empty entity-type (Issue #691)
