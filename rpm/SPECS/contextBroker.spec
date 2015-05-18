@@ -162,6 +162,27 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Sun May 10 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.21.0-1
+- Add: support for MongoDB 2.6/3.0 (MongoDB 2.4 should *not* be used any longer as inverted geo-queries will not work in that version) (Issue #415)
+- Add: context providers full functionality (Issue #787)
+- Fix: unhardwire format to forward requests to context providers (Issue #722)
+- Fix: using proper GJSON for location.coords entities information (Issue #415)
+- Fix: attribute storing in DB (from vector to keymap) to enable CB Active/Active architectures. As a consecuence of this, '.' in the name of attributes is now stored as
+       '=' in the key (as MongoDB doesn't allow to use '.' for keys). This is transparant from the point of view of the user, given that '=' is a forbidden character in
+       the external API (Issue #878)
+- Fix: simplifying 'GET /v1/contextTypes' and 'GET /v1/contextTypes/<entityType>' operations, removing attribute types (no longer used as attribute identification since 0.17.0). As
+       a consequence, the 'attributeFormat' URI parameter is no longer needed in the 'GET /v1/contextTypes', so it is ignored.
+- Fix: DELETE updates are resolved locally, previously they were forwarded to CPrs (Issue #755)
+- Fix: The URI parameter 'notifyFormat' is now treated the same way for subscriptions as for registrations.
+- Add: Notifications and forwarded queries/updates are now controlled by a timeout. (Issue #880)
+       The default timeout is set to 5000 milliseconds (5 seconds), including connection, writing the request and reading the response.
+       To change this timeout, a new CLI option '-httpTimeout' has been added to the broker.
+- Fix: Changed the name, type and unit of the CLI option '-timeout'.
+       New name:  '-dbTimeout',
+       New type:  integer (was a floating point number)
+       New unit:  milliseconds (was seconds, but decimals were allowed as it was a floating point number)
+- Add: Updates of ngsi9 subscriptions now also support the URI parameter notifyFormat
+
 * Tue Mar 31 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.20.0-1
 - Add: new CLI parameter '-timeout' to specify DB connection timeout in the case of using MongoDB replica sets (Issue #589).
 - Fix: All convenience operations to use the service routines of standard operations (Issue #117)
