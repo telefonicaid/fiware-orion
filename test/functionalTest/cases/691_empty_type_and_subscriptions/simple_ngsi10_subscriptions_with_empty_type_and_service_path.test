@@ -34,8 +34,6 @@ accumulatorStart
 # 01. Make accumulator subscribe to E//A1 (empty type)
 # 02. Create E/T1/A1 using convop /v1/contextEntities/type/T1/id/E
 # 03. Check whether the accumulator received the notification of E/T1/A1
-# 04. Create E/T2/A1 using stdop /v1/updateContext
-# 05. Check whether the accumulator received the notification of E/T2/A1
 #
 
 echo "01. Make accumulator subscribe to E//A1 (empty type)"

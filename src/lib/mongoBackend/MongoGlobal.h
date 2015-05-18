@@ -532,4 +532,18 @@ inline std::string idPart(std::string name)
 
 }
 
+/* ****************************************************************************
+*
+* dbDotEncode -
+*
+*/
+extern std::string dbDotEncode(std::string fromString);
+
+/* ****************************************************************************
+*
+* dbDotDecode -
+*
+*/
+extern std::string dbDotDecode(std::string fromString);
+
 #endif

@@ -24,6 +24,9 @@
 */
 
 #include <regex.h>
+#include <algorithm>  // std::replace                                                                                                                       
+#include <string>
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
@@ -1242,7 +1245,7 @@ bool entitiesQuery
 
           ContextAttribute ca;
 
-          ca.name = basePart(attrName);
+          ca.name = dbDotDecode(basePart(attrName));
           std::string mdId = idPart(attrName);
           ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
 
@@ -2199,4 +2202,43 @@ void cprLookupByAttribute(EntityId&                          en,
       }
     }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* Characters for attribute value encoding
+*/
+#define ESCAPE_1_DECODED  '.'
+#define ESCAPE_1_ENCODED  '='
+
+
+
+/* ****************************************************************************
+*
+* dbDotEncode -
+*
+* Replace:
+*   . => =
+*/
+std::string dbDotEncode(std::string s)
+{
+  replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
+  return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* dbDotDecode -
+*
+* Replace:
+*   = => .
+*/
+std::string dbDotDecode(std::string s)
+{
+  std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
+  return s;
 }

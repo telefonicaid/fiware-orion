@@ -135,6 +135,8 @@ std::string statisticsTreat
     noOfRegisterResponses                           = -1;
 
     semTimeReqReset();
+    semTimeMongoReset();
+    semTimeTransReset();
 
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
@@ -413,6 +415,10 @@ std::string statisticsTreat
     char mongoSemaphoreWaitingTime[64];
     semTimeMongoGet(mongoSemaphoreWaitingTime, sizeof(mongoSemaphoreWaitingTime));
     out += TAG_ADD_STRING("dbSemaphoreWaitingTime", mongoSemaphoreWaitingTime);
+
+    char transSemaphoreWaitingTime[64];
+    semTimeTransGet(transSemaphoreWaitingTime, sizeof(transSemaphoreWaitingTime));
+    out += TAG_ADD_STRING("transactionSemaphoreWaitingTime", transSemaphoreWaitingTime);
   }
 
   int now = getCurrentTime();

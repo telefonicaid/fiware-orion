@@ -83,6 +83,7 @@ extern int transSemGive(const char* who, const char* what = NULL);
 */
 extern void semTimeReqGet(char* buf, int bufLen);
 extern void semTimeMongoGet(char* buf, int bufLen);
+extern void semTimeTransGet(char* buf, int bufLen);
 
 
 
@@ -92,5 +93,6 @@ extern void semTimeMongoGet(char* buf, int bufLen);
 */
 extern void semTimeReqReset(void);
 extern void semTimeMongoReset(void);
+extern void semTimeTransReset(void);
 
 #endif  // SRC_LIB_COMMON_SEM_H_
