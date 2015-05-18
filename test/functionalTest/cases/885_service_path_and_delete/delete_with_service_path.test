@@ -32,9 +32,9 @@ brokerStart CB
 #
 # 01. Create E/T/A1, service-path /father
 # 02. Create E/T/A1, service-path /father/son
-# 03. Query  E/T/A1 - see two entities
+# 03. Query  E/T/A1 (with implicit service-path /#) - see two entities
 # 04. Delete E/T/A1, service-path /father
-# 05. Query  E/T/A1 - see one entity
+# 05. Query  E/T/A1 (with implicit service-path /#) - see one entity
 #
 
 echo "01. Create E/T/A1, service-path /father"
@@ -83,8 +83,8 @@ echo
 echo
 
 
-echo "03. Query  E/T/A1 - see two entities"
-echo "===================================="
+echo "03. Query  E/T/A1 (with implicit service-path /#) - see two entities"
+echo "===================================================================="
 payload='{
   "entities": [
     {
@@ -123,8 +123,8 @@ echo
 echo
 
 
-echo "05. Query  E/T/A1 - see one entity"
-echo "=================================="
+echo "05. Query  E/T/A1 (with implicit service-path /#) - see one entity"
+echo "=================================================================="
 payload='{
   "entities": [
     {
@@ -204,8 +204,8 @@ Date: REGEX(.*)
 }
 
 
-03. Query  E/T/A1 - see two entities
-====================================
+03. Query  E/T/A1 (with implicit service-path /#) - see two entities
+====================================================================
 HTTP/1.1 200 OK
 Content-Length: 739
 Content-Type: application/json
@@ -284,8 +284,8 @@ Date: REGEX(.*)
 }
 
 
-05. Query  E/T/A1 - see one entity
-==================================
+05. Query  E/T/A1 (with implicit service-path /#) - see one entity
+==================================================================
 HTTP/1.1 200 OK
 Content-Length: 384
 Content-Type: application/json
