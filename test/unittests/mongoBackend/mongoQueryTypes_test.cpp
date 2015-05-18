@@ -891,7 +891,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   /* Prepare mock */
   const DBException e = DBException("boom!!", 33);
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_,_,_,_))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -931,7 +931,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   /* Prepare mock */
   const std::exception e;
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_,_,_,_))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -1444,7 +1444,7 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
   /* Prepare mock */
   const DBException e = DBException("boom!!", 33);
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_,_,_,_))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -1485,7 +1485,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   /* Prepare mock */
   const std::exception e;
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_,_,_,_))
       .WillByDefault(Throw(e));
 
   utInit();

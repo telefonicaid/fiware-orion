@@ -164,7 +164,7 @@ TEST(mongoUnsubscribeContextAvailability, unsubscribe)
     DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
 
     /* Release connection */
     mongoDisconnect();

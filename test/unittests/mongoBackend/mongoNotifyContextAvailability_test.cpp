@@ -95,7 +95,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -159,7 +159,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok_XML)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
   EXPECT_STREQ("XML", reg.getStringField("format"));
 
@@ -224,7 +224,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok_JSON)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
   EXPECT_STREQ("JSON", reg.getStringField("format"));
 
@@ -287,7 +287,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -353,7 +353,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -427,7 +427,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -501,7 +501,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -575,7 +575,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -647,7 +647,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -714,7 +714,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -785,7 +785,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -864,7 +864,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -943,7 +943,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1022,7 +1022,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1100,7 +1100,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1177,7 +1177,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1262,7 +1262,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1364,7 +1364,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1466,7 +1466,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1568,7 +1568,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1666,7 +1666,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1754,7 +1754,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1850,7 +1850,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1962,7 +1962,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -2074,7 +2074,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -2186,7 +2186,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
