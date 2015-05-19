@@ -250,7 +250,7 @@ int             writeConcern;
 #define MAX_L               900000
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
 #define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
-#define WRITE_CONCERN_DESC  "db write concern (0:none,1:normal)"
+#define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
 
 
 
