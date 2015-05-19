@@ -91,7 +91,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     if (strlen(restAllowedOrigin) > 0)
     {
       // If any origin is allowed the header is sent always with "any" as value
-      if (strcmp(restAllowedOrigin, "*") == 0)
+      if (strcmp(restAllowedOrigin, "__ALL") == 0)
       {
         MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
       }

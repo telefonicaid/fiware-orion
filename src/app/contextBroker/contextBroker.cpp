@@ -247,7 +247,7 @@ int             writeConcern;
 #define HTTPSCERTFILE_DESC  "certificate key file (for https)"
 #define RUSH_DESC           "rush host (IP:port)"
 #define MULTISERVICE_DESC   "service multi tenancy mode"
-#define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '*' for any"
+#define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '__ALL' for any"
 #define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
 #define MAX_L               900000
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"

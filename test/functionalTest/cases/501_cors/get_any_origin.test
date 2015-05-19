@@ -25,7 +25,7 @@ CORS GET any origin
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 0-255 IPV4 -corsOrigin '*'
+brokerStart CB 0-255 IPV4 -corsOrigin __ALL
 
 --SHELL--
 echo "01. Update/APPEND E1-T1-A1"
@@ -65,7 +65,70 @@ echo
 echo
 
 --REGEXPECT--
-TBD
+01. Update/APPEND E1-T1-A1
+==========================
+HTTP/1.1 200 OK
+Content-Length: 383
+Access-Control-Allow-Origin: *
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "string",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. Query E1-T1
+===============
+HTTP/1.1 200 OK
+Content-Length: 384
+Access-Control-Allow-Origin: *
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A1",
+                        "type": "string",
+                        "value": "1"
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

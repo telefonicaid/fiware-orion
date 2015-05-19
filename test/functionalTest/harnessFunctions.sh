@@ -704,7 +704,7 @@ function orionCurl()
 
   if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
   #if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
-  if [ "$_origin" != "" ];     then    _ORIGIN='--header "Origin: '$_origin'"'; fi
+  #if [ "$_origin" != "" ];     then    _ORIGIN='--header "Origin: '$_origin'"'; fi
 
   _URL=$_host:$_port$_url
   
@@ -720,29 +720,36 @@ function orionCurl()
 #   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD ${_HTTP_TENANT} --header \"Expect:\" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\"  $_BUILTINS --header "Fiware-ServicePath: $_servicePath" $_xtra"
 #   echo '==============================================================================================================================================================='   
   
-  #
-  # FIXME P2: This 'if' should be refactored: if we use the $_HTTP_TENANT variable within curl,
-  #           it will not render correctly. We have to find another way.
+  # FIXME P10: we are taking advantage that --cors is not used with any other header. The if needs
+  #            urgent refactor: it not following (deliverately) the ident style
+  if [ "$_origin" != "" ]
+  then
+    vMsg _URL: $_URL
+    _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Origin: $_origin" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+  else
+  # FIXME P10: This 'if' should be refactored: if we use the $_HTTP_TENANT variable within curl,
+  #            it will not render correctly. We have to find another way.
   #
   if [ "$_httpTenant" != "" ]
   then
      if [ "$_servicePath" != "" ]
      then
        vMsg _URL1: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Fiware-Service: $_httpTenant" --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
      else
        vMsg _URL2: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
      fi
   else
      if [ "$_servicePath" != "" ]
      then
        vMsg _URL3: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken"  $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken"  $_BUILTINS $_xtra)
      else
        vMsg _URL4: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
      fi
+  fi
   fi
   
   #
