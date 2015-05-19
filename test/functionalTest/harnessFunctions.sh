@@ -601,6 +601,7 @@ function dbInsertEntity()
 #   --servicePath <path>           (Service Path in HTTP header)
 #   --urlParams   <params>         (URI parameters 'in' URL-string)
 #   --xauthToken  <token>          (X-Auth token value)
+#   --origin      <origin>         (Origin in HTTP header)
 #   --verbose                      (verbose output)
 #   --noPayloadCheck               (don't check the payload)
 #
@@ -626,6 +627,7 @@ function orionCurl()
   _verbose='off'
   _debug='off'
   _xauthToken=''
+  _origin=''
   _noPayloadCheck='off'
 
   while [ "$#" != 0 ]
@@ -641,7 +643,8 @@ function orionCurl()
     elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
     elif [ "$1" == "--urlParams" ]; then       _urlParams=$2; shift;
-    elif [ "$1" == "--xauthToken" ]; then       _xauthToken=$2; shift;
+    elif [ "$1" == "--xauthToken" ]; then      _xauthToken=$2; shift;
+    elif [ "$1" == "--origin" ]; then          _origin=$2; shift;
     elif [ "$1" == "--verbose" ]; then         _verbose=on;
     elif [ "$1" == "--debug" ]; then           _debug=on;
     elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck=on;
@@ -701,6 +704,7 @@ function orionCurl()
 
   if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
   #if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
+  if [ "$_origin" != "" ];     then    _ORIGIN='--header "Origin: '$_origin'"'; fi
 
   _URL=$_host:$_port$_url
   
@@ -725,19 +729,19 @@ function orionCurl()
      if [ "$_servicePath" != "" ]
      then
        vMsg _URL1: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Fiware-Service: $_httpTenant" --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
      else
        vMsg _URL2: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
      fi
   else
      if [ "$_servicePath" != "" ]
      then
        vMsg _URL3: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken"  $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken"  $_BUILTINS $_xtra)
      else
        vMsg _URL4: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
      fi
   fi
   
