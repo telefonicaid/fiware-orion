@@ -150,7 +150,7 @@ using namespace mongo;
 *
 * mongoConnect -
 *
-* Default value for writeConcern == 1 (0: None, 1: Normal)
+* Default value for writeConcern == 1 (0: unacknowledged, 1: acknowledged)
 */
 extern bool mongoConnect(const char* host,
                          const char* db,

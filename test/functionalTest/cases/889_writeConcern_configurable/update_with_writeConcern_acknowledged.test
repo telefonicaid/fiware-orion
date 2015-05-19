@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Update with WriteConcern set to NORMAL
+Update with WriteConcern set to 1 (acknowledged)
 
 ----SHELL-INIT--
 dbInit CB
