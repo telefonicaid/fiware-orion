@@ -70,14 +70,16 @@ static void prepareDatabase(void) {
   DBClientBase* connection = getMongoConnection();
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1")
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "val1")
                         )
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E1") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1b")
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "val1b")
                         )
                     );
 
@@ -130,7 +132,7 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
     EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
@@ -198,7 +200,7 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
   EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
   mongoDisconnect();
@@ -254,7 +256,7 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterNotExist)
   EXPECT_EQ("val1b", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
   mongoDisconnect();

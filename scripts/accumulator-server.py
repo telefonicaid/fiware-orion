@@ -114,6 +114,21 @@ atexit.register(all_done)
 
 app = Flask(__name__)
 
+@app.route("/noresponse", methods=['POST'])
+def noresponse():
+    sleep(10)
+    return Response(status=200)
+
+@app.route("/noresponse/updateContext", methods=['POST'])
+def unoresponse():
+    sleep(10)
+    return Response(status=200)
+
+@app.route("/noresponse/queryContext", methods=['POST'])
+def qnoresponse():
+    sleep(10)
+    return Response(status=200)
+
 @app.route("/v1/updateContext", methods=['POST'])
 @app.route("/v1/queryContext", methods=['POST'])
 @app.route(server_url, methods=['GET', 'POST', 'PUT', 'DELETE'])

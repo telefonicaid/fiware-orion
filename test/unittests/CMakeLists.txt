@@ -110,10 +110,6 @@ SET (SOURCES
     serviceRoutines/putAttributeValueInstance_test.cpp
     serviceRoutines/getAttributeValueInstance_test.cpp
 
-    convenienceMap/mapDeleteIndividualContextEntity_test.cpp
-    convenienceMap/mapGetIndividualContextEntity_test.cpp
-    convenienceMap/mapPutIndividualContextEntity_test.cpp
-
     convenience/Convenience_test.cpp
     convenience/AppendContextElementRequest_test.cpp
     convenience/AppendContextElementResponse_test.cpp
@@ -256,7 +252,6 @@ SET (STATIC_LIBS
     parse
     convenience
     serviceRoutines
-    convenienceMap
     rest
     ngsi9
     ngsi10

@@ -57,6 +57,7 @@ typedef struct MetadataVector
   void          push_back(Metadata* item);
   unsigned int  size(void);
   Metadata*     get(int ix);
+  Metadata*     lookupByName(const std::string& _name);
   void          release();
   void          fill(MetadataVector* mV);
 } MetadataVector;

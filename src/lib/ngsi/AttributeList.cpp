@@ -41,18 +41,19 @@
 */
 std::string AttributeList::render(Format format, const std::string& indent, bool comma)
 {
-  std::string  out = "";
-  std::string  tag = "attributeList";
+  std::string  out     = "";
+  std::string  xmlTag  = "attributeList";
+  std::string  jsonTag = "attributes";
 
   if (attributeV.size() == 0)
     return "";
 
-  out += startTag(indent, tag, format);
+  out += startTag(indent, xmlTag, jsonTag, format, true, true, false);
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
-    out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1);
+    out += valueTag(indent + "  ", "attribute", attributeV[ix], format, ix != attributeV.size() - 1, false, true);
 
-  out += endTag(indent, tag, format, comma);
+  out += endTag(indent, xmlTag, format, comma, true);
 
   return out;
 }
@@ -89,10 +90,12 @@ std::string AttributeList::check
 */
 void AttributeList::present(const std::string& indent)
 {
-  PRINTF("%sAttribute List\n",    indent.c_str());
+  LM_F(("%sAttribute List",    indent.c_str()));
 
   for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
-    PRINTF("%s  %s\n", indent.c_str(), attributeV[ix].c_str());
+  {
+    LM_F(("%s  %s", indent.c_str(), attributeV[ix].c_str()));
+  }
 }
 
 
@@ -110,11 +113,44 @@ void AttributeList::release(void)
 
 /* ****************************************************************************
 *
+* lookup - 
+*/
+bool AttributeList::lookup(const std::string& attributeName)
+{
+  for (unsigned int ix = 0; ix < attributeV.size(); ++ix)
+  {
+    if (attributeV[ix] == attributeName)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * push_back - 
 */
 void AttributeList::push_back(const std::string& attributeName)
 {
   attributeV.push_back(attributeName);
+}
+
+
+
+/* ****************************************************************************
+*
+* push_back_if_absent - 
+*/
+void AttributeList::push_back_if_absent(const std::string& attributeName)
+{
+  if (lookup(attributeName) == false)
+  {
+    attributeV.push_back(attributeName);
+  }
 }
 
 
@@ -137,4 +173,18 @@ unsigned int AttributeList::size(void)
 std::string AttributeList::get(int ix)
 {
   return attributeV[ix];
+}
+
+
+
+/* ****************************************************************************
+*
+* AttributeList::clone - 
+*/
+void AttributeList::clone(AttributeList& aList)
+{
+  for (unsigned int ix = 0; ix < aList.size(); ++ix)
+  {
+    push_back(aList[ix]);
+  }
 }

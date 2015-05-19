@@ -116,5 +116,6 @@ std::string getEntityByIdAttributeByNameWithTypeAndId
 
 
   // 05. Cleanup and return result
+  parseDataP->dcar.res.release();
   return answer;
 }

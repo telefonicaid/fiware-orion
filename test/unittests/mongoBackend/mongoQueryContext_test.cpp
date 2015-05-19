@@ -77,7 +77,6 @@
 *
 * - query1Ent0Attr
 * - query1Ent1Attr
-* - query1Ent1AttrSameName
 * - queryNEnt0Attr
 * - queryNEnt1AttrSingle
 * - queryNEnt1AttrMulti
@@ -143,7 +142,6 @@ static void prepareDatabase(void) {
    *     (no attrs)
    * - E1*
    *     A1: val1bis
-   *     A1*: val1bis2
    * - E1**
    *     A1: val1bis1
    *
@@ -153,33 +151,37 @@ static void prepareDatabase(void) {
    */
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2")
+                     "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "val1") <<
+                        "A2" << BSON("type" << "TA2" << "value" << "val2")
                         )
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2bis") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "val3")
+                     "attrNames" << BSON_ARRAY("A2" << "A3") <<
+                     "attrs" << BSON(
+                        "A2" << BSON("type" << "TA2" << "value" << "val2bis") <<
+                        "A3" << BSON("type" << "TA3" << "value" << "val3")
                         )
                     );
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T4") <<
-                     "attrs" << BSONArray()
+                     "attrNames" << BSONArray() <<
+                     "attrs" << BSONObj()
                     );
 
   BSONObj en5 = BSON("_id" << BSON("id" << "E1" << "type" << "T1bis") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1bis") <<
-                        BSON("name" << "A1" << "type" << "TA1bis" << "value" << "val1bis2")
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "val1bis")
                         )
                     );
 
   BSONObj en6 = BSON("_id" << BSON("id" << "E1") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1bis1")
+                     "attrNames" << BSON_ARRAY("A1") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "val1bis1")
                         )
                     );
 
@@ -223,33 +225,38 @@ static void prepareDatabasePatternTrue(void) {
    */
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "val1") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2")
+                     "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "val1") <<
+                        "A2" << BSON("type" << "TA2" << "value" << "val2")
                         )
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2bis") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "val3")
+                     "attrNames" << BSON_ARRAY("A2" << "A3") <<
+                     "attrs" << BSON(
+                        "A2" << BSON("type" << "TA2" << "value" << "val2bis") <<
+                        "A3" << BSON("type" << "TA3" << "value" << "val3")
                         )
                     );
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E4" << "type" << "T") <<
-                     "attrs" << BSONArray()
+                     "attrNames" << BSONArray() <<
+                     "attrs" << BSONObj()
                     );
 
   BSONObj en5 = BSON("_id" << BSON("id" << "E1" << "type" << "Tbis") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A4" << "type" << "TA4" << "value" << "val4") <<
-                        BSON("name" << "A5" << "type" << "TA5" << "value" << "val5")
+                     "attrNames" << BSON_ARRAY("A4" << "A5") <<
+                     "attrs" << BSON(
+                        "A4" << BSON("type" << "TA4" << "value" << "val4") <<
+                        "A5" << BSON("type" << "TA5" << "value" << "val5")
                         )
                     );
 
   BSONObj en6 = BSON("_id" << BSON("id" << "E2") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "val2bis1")
+                     "attrNames" << BSON_ARRAY("A2") <<
+                     "attrs" << BSON(
+                        "A2" << BSON("type" << "TA2" << "value" << "val2bis1")
                         )
                     );
 
@@ -277,20 +284,20 @@ static void prepareDatabaseWithAttributeIds(void) {
 
     DBClientBase* connection = getMongoConnection();
     BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "A" << "id" << "ID1") <<
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "B" << "id" << "ID2") <<
-                          BSON("name" << "A1" << "type" << "TA11" << "value" << "C") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "D")
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                          "A1__ID1" << BSON("type" << "TA1" << "value" << "A") <<
+                          "A1__ID2" << BSON("type" << "TA1" << "value" << "B") <<
+                          "A2"      << BSON("type" << "TA2" << "value" << "D")
                           )
                       );
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "E" << "id" << "ID1") <<
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "F" << "id" << "ID2") <<
-                          BSON("name" << "A1" << "type" << "TA11" << "value" << "G") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "H")
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                          "A1__ID1" << BSON("type" << "TA1" << "value" << "E") <<
+                          "A1__ID2" << BSON("type" << "TA1" << "value" << "F") <<
+                          "A2"      << BSON("type" << "TA2" << "value" << "H")
                           )
                       );
 
@@ -315,18 +322,14 @@ static void prepareDatabaseWithCustomMetadata(void) {
 
     DBClientBase* connection = getMongoConnection();
     BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "A" <<
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "A" <<
                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "1") <<
                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "2")
                                                  )
                                ) <<
-                          BSON("name" << "A1" << "type" << "TA11" << "value" << "B" <<
-                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "3") <<
-                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << "4")
-                                                 )
-                               ) <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "C" <<
+                          "A2" << BSON("type" << "TA2" << "value" << "C" <<
                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "5") <<
                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "6")
                                                  )
@@ -335,18 +338,14 @@ static void prepareDatabaseWithCustomMetadata(void) {
                       );
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                           BSON("name" << "A1" << "type" << "TA1" << "value" << "D" <<
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                           "A1" << BSON("type" << "TA1" << "value" << "D" <<
                                 "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "7") <<
                                                    BSON("name" << "MD2" << "type" << "TMD2" << "value" << "8")
                                                   )
                                 ) <<
-                           BSON("name" << "A1" << "type" << "TA11" << "value" << "E" <<
-                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "9") <<
-                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "10")
-                                                  )
-                                ) <<
-                           BSON("name" << "A2" << "type" << "TA2" << "value" << "F" <<
+                           "A2" << BSON("type" << "TA2" << "value" << "F" <<
                                 "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "11") <<
                                                    BSON("name" << "MD2" << "type" << "TMD2" << "value" << "12")
                                                   )
@@ -388,20 +387,20 @@ static void prepareDatabaseWithServicePath(const std::string modifier)
    *
    */
 
-  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T" << "servicePath" << "/home")       << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a1")));
-  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T" << "servicePath" << "/home/kz")    << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a2")));
-  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T" << "servicePath" << "/home/fg")    << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a3")));
-  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T" << "servicePath" << "/home/kz/e4") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a4")));
-  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T" << "servicePath" << "/home/kz/e5") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a5")));
-  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T" << "servicePath" << "/home/fg/e6") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a6")));
-  BSONObj e07 = BSON("_id" << BSON("id" << "E7"  << "type" << "T" << "servicePath" << "/home2")      << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a7")));
-  BSONObj e08 = BSON("_id" << BSON("id" << "E8"  << "type" << "T" << "servicePath" << "/home2/kz")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a8")));
-  BSONObj e09 = BSON("_id" << BSON("id" << "E9"  << "type" << "T" << "servicePath" << "")            << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a9")));
-  BSONObj e10 = BSON("_id" << BSON("id" << "E10" << "type" << "T")                                   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a10")));
+  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T" << "servicePath" << "/home")       << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a1")));
+  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T" << "servicePath" << "/home/kz")    << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a2")));
+  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T" << "servicePath" << "/home/fg")    << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a3")));
+  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T" << "servicePath" << "/home/kz/e4") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a4")));
+  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T" << "servicePath" << "/home/kz/e5") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a5")));
+  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T" << "servicePath" << "/home/fg/e6") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a6")));
+  BSONObj e07 = BSON("_id" << BSON("id" << "E7"  << "type" << "T" << "servicePath" << "/home2")      << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a7")));
+  BSONObj e08 = BSON("_id" << BSON("id" << "E8"  << "type" << "T" << "servicePath" << "/home2/kz")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a8")));
+  BSONObj e09 = BSON("_id" << BSON("id" << "E9"  << "type" << "T" << "servicePath" << "")            << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a9")));
+  BSONObj e10 = BSON("_id" << BSON("id" << "E10" << "type" << "T")                                   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a10")));
 
-  BSONObj e11 = BSON("_id" << BSON("id" << "E11" << "type" << "T" << "servicePath" << "/home3/e11")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a11")));
-  BSONObj e12 = BSON("_id" << BSON("id" << "E12" << "type" << "T" << "servicePath" << "/home3/e12")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a12")));
-  BSONObj e13 = BSON("_id" << BSON("id" << "E13" << "type" << "T" << "servicePath" << "/home3/e13")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a13")));
+  BSONObj e11 = BSON("_id" << BSON("id" << "E11" << "type" << "T" << "servicePath" << "/home3/e11")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a11")));
+  BSONObj e12 = BSON("_id" << BSON("id" << "E12" << "type" << "T" << "servicePath" << "/home3/e12")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a12")));
+  BSONObj e13 = BSON("_id" << BSON("id" << "E13" << "type" << "T" << "servicePath" << "/home3/e13")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a13")));
 
   connection->insert(ENTITIES_COLL, e01);
   connection->insert(ENTITIES_COLL, e02);
@@ -422,19 +421,19 @@ static void prepareDatabaseWithServicePath(const std::string modifier)
 
   if (modifier == "patternNoType")
   {
-    BSONObj e = BSON("_id" << BSON("id" << "E" << "type" << "OOO" << "servicePath" << "/home/kz/123")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ae_1")));
+    BSONObj e = BSON("_id" << BSON("id" << "E" << "type" << "OOO" << "servicePath" << "/home/kz/123")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ae_1")));
     connection->insert(ENTITIES_COLL, e);
   }
   else if (modifier == "noPatternNoType")
   {
-    BSONObj e = BSON("_id" << BSON("id" << "E3" << "type" << "OOO" << "servicePath" << "/home/fg/124")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ae_2")));
+    BSONObj e = BSON("_id" << BSON("id" << "E3" << "type" << "OOO" << "servicePath" << "/home/fg/124")  << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ae_2")));
     connection->insert(ENTITIES_COLL, e);
   }
   else if (modifier == "IdenticalEntitiesButDifferentServicePaths")
   {
-    BSONObj ie1 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/01")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_01")));
-    BSONObj ie2 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/02")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_02")));
-    BSONObj ie3 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/03")   << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "ie_03")));
+    BSONObj ie1 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/01")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ie_01")));
+    BSONObj ie2 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/02")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ie_02")));
+    BSONObj ie3 = BSON("_id" << BSON("id" << "IE" << "type" << "T" << "servicePath" << "/home/fg/03")   << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "ie_03")));
 
     connection->insert(ENTITIES_COLL, ie1);
     connection->insert(ENTITIES_COLL, ie2);
@@ -465,12 +464,12 @@ static void prepareDatabaseForPagination(void)
    *
    */
 
-  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a1")));
-  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a2")));
-  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a3")));
-  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a4")));
-  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a5")));
-  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T") << "attrs" << BSON_ARRAY(BSON("name" << "A1" << "type" << "TA1" << "value" << "a6")));
+  BSONObj e01 = BSON("_id" << BSON("id" << "E1"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a1")));
+  BSONObj e02 = BSON("_id" << BSON("id" << "E2"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a2")));
+  BSONObj e03 = BSON("_id" << BSON("id" << "E3"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a3")));
+  BSONObj e04 = BSON("_id" << BSON("id" << "E4"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a4")));
+  BSONObj e05 = BSON("_id" << BSON("id" << "E5"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a5")));
+  BSONObj e06 = BSON("_id" << BSON("id" << "E6"  << "type" << "T") << "attrNames" << BSON_ARRAY("A1") << "attrs" << BSON("A1" << BSON("type" << "TA1" << "value" << "a6")));
 
   connection->insert(ENTITIES_COLL, e01);
   connection->insert(ENTITIES_COLL, e02);
@@ -522,7 +521,7 @@ TEST(mongoQueryContextRequest, paginationDetails)
     EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -633,7 +632,7 @@ TEST(mongoQueryContextRequest, paginationAll)
     EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -744,7 +743,7 @@ TEST(mongoQueryContextRequest, paginationOnlyFirst)
     EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -796,7 +795,7 @@ TEST(mongoQueryContextRequest, paginationOnlySecond)
     EXPECT_EQ("a2", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -848,7 +847,7 @@ TEST(mongoQueryContextRequest, paginationRange)
     EXPECT_EQ("a3", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E4", RES_CER(1).entityId.id);
@@ -965,7 +964,7 @@ TEST(mongoQueryContextRequest, paginationNonExistingOverlap)
     EXPECT_EQ("a6", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -1057,7 +1056,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_2levels)
   EXPECT_EQ("a2", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E4", RES_CER(1).entityId.id);
@@ -1129,7 +1128,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1238,7 +1237,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   EXPECT_EQ("a10", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E11", RES_CER(1).entityId.id);
@@ -1322,7 +1321,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1levelbis)
   EXPECT_EQ("a7", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E8", RES_CER(1).entityId.id);
@@ -1382,7 +1381,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   EXPECT_EQ("ie_01", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   EXPECT_EQ("IE", RES_CER(1).entityId.id);
   EXPECT_EQ("T", RES_CER(1).entityId.type);
@@ -1452,7 +1451,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   EXPECT_EQ("ie_01", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   utExit();
 }
@@ -1500,7 +1499,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   EXPECT_EQ("ie_02", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   utExit();
 }
@@ -1549,7 +1548,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   EXPECT_EQ("ie_03", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   utExit();
 }
@@ -1597,7 +1596,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   EXPECT_EQ("a2", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E4", RES_CER(1).entityId.id);
@@ -1681,7 +1680,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -1802,7 +1801,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   EXPECT_EQ("a10", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E11", RES_CER(1).entityId.id);
@@ -1886,7 +1885,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1levelbis)
   EXPECT_EQ("a7", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E8", RES_CER(1).entityId.id);
@@ -1982,7 +1981,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternTypeOk)
   EXPECT_EQ("a3", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   utExit();
 }
@@ -2030,7 +2029,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
   EXPECT_EQ("a3", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E3", RES_CER(1).entityId.id);
@@ -2092,7 +2091,7 @@ TEST(mongoQueryContextRequest, queryWithSeveralServicePaths)
   EXPECT_EQ("a4", RES_CER_ATTR(0, 0)->value);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-  EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+  EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Context Element response # 2 */
   EXPECT_EQ("E12", RES_CER(1).entityId.id);
@@ -2113,7 +2112,7 @@ TEST(mongoQueryContextRequest, queryWithSeveralServicePaths)
 *
 * query1Ent0Attr -
 *
-* Discover:  E1 - no attrs
+* Query:     E1 - no attrs
 * Result:    E1 - (A1, A2)
 *
 * This test also checks that querying for type (E1) doesn't match with no-typed
@@ -2158,7 +2157,7 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
     EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -2171,7 +2170,7 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
 *
 * query1Ent1Attr -
 *
-* Discover:  E1 - A1
+* Query:     E1 - A1
 * Result:    E1 - A1
 */
 TEST(mongoQueryContextRequest, query1Ent1Attr)
@@ -2209,64 +2208,7 @@ TEST(mongoQueryContextRequest, query1Ent1Attr)
     EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
-
-    /* Release connection */
-    mongoDisconnect();
-}
-
-/* ****************************************************************************
-*
-* query1Ent1AttrSameName -
-*
-* Discover:  E1* - A1
-* Result:    E1* - (A1, A1*)  [same name but different type]
-*/
-TEST(mongoQueryContextRequest, query1Ent1AttrSameName)
-{
-    HttpStatusCode         ms;
-    QueryContextRequest   req;
-    QueryContextResponse  res;
-
-    /* Prepare database */
-    prepareDatabase();
-
-    /* Forge the request (from "inside" to "outside") */
-    EntityId en("E1", "T1bis", "false");
-    req.entityIdVector.push_back(&en);
-    req.attributeList.push_back("A1");
-
-    /* Invoke the function in mongoBackend library */    
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
-
-    /* Check response is as expected */
-    EXPECT_EQ(SccOk, ms);
-
-    EXPECT_EQ(SccNone, res.errorCode.code);
-    EXPECT_EQ("", res.errorCode.reasonPhrase);
-    EXPECT_EQ("", res.errorCode.details);
-
-    ASSERT_EQ(1, res.contextElementResponseVector.size());
-    /* Context Element response # 1 */
-    EXPECT_EQ("E1", RES_CER(0).entityId.id);
-    EXPECT_EQ("T1bis", RES_CER(0).entityId.type);
-    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
-    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1bis", RES_CER_ATTR(0, 0)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA1bis", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("val1bis2", RES_CER_ATTR(0, 1)->value);
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
-
-    /* Release dynamic memory used by response (mongoBackend allocates it) */
-    res.contextElementResponseVector.release();
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -2276,7 +2218,7 @@ TEST(mongoQueryContextRequest, query1Ent1AttrSameName)
 *
 * queryNEnt0Attr -
 *
-* Discover:  (E1, E2) -no attrs
+* Query:     (E1, E2) -no attrs
 * Result:    E1 - (A1, A2)
 *            E2 - (A3, A4)
 */
@@ -2319,7 +2261,7 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
     EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -2347,7 +2289,7 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
 *
 * queryNEnt1AttrSingle -
 *
-* Discover:  (E1, E2) - A1
+* Query:     (E1, E2) - A1
 * Result:    E1 - A1
 */
 TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
@@ -2387,7 +2329,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
     EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -2400,7 +2342,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
 *
 * queryNEnt1AttrMulti -
 *
-* Discover:  (E1, E2) - A2
+* Query:     (E1, E2) - A2
 * Result:    E1 - A2
 *            E2 - A2
 */
@@ -2441,7 +2383,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
     EXPECT_EQ("val2", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -2466,7 +2408,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
 *
 * queryNEntNAttr -
 *
-* Discover:  (E1, E2) - (A1, A3)
+* Query:     (E1, E2) - (A1, A3)
 * Result:    E1 - A1
 *            E2 - A3
 */
@@ -2509,7 +2451,7 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
     EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -2534,7 +2476,7 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
 *
 * query1Ent0AttrFail -
 *
-* Discover:  E3 - no attrs
+* Query:     E3 - no attrs
 * Result:    none
 */
 TEST(mongoQueryContextRequest, query1Ent0AttrFail)
@@ -2572,7 +2514,7 @@ TEST(mongoQueryContextRequest, query1Ent0AttrFail)
 *
 * query1Ent1AttrFail -
 *
-* Discover:  E1 - A3
+* Query:     E1 - A3
 * Result:    none
 */
 TEST(mongoQueryContextRequest, query1Ent1AttrFail)
@@ -2613,7 +2555,7 @@ TEST(mongoQueryContextRequest, query1Ent1AttrFail)
 *
 * query1EntWA0AttrFail -
 *
-* Discover:  E4 - A1
+* Query:     E4 - A1
 * Result:    none
 */
 TEST(mongoQueryContextRequest, query1EntWA0AttrFail)
@@ -2652,7 +2594,7 @@ TEST(mongoQueryContextRequest, query1EntWA0AttrFail)
 *
 * query1EntWA1Attr -
 *
-* Discover:  E4 - none
+* Query:     E4 - none
 * Result:    E4 - none
 */
 TEST(mongoQueryContextRequest, query1EntWA1Attr)
@@ -2686,7 +2628,7 @@ TEST(mongoQueryContextRequest, query1EntWA1Attr)
     EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
@@ -2699,7 +2641,7 @@ TEST(mongoQueryContextRequest, query1EntWA1Attr)
 *
 * queryNEntWA0Attr -
 *
-* Discover:  (E1, E4) - none
+* Query:     (E1, E4) - none
 * Result:    E1 - A1, A2
 *            E4 - none
 */
@@ -2742,7 +2684,7 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
     EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E4", RES_CER(1).entityId.id);
@@ -2764,7 +2706,7 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
 *
 * queryNEntWA1Attr -
 *
-* Discover:  (E1, E4) - A1
+* Query:     (E1, E4) - A1
 * Result:    E1 - A1
 */
 TEST(mongoQueryContextRequest, queryNEntWA1Attr)
@@ -2804,7 +2746,7 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
     EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -2814,9 +2756,9 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
 *
 * queryNoType -
 *
-* Discover:  E1
+* Query:     E1
 * Result:    E1   - A1
-*            E1*  - A1, A1*
+*            E1*  - A1
 *            E1** - A1
 *
 * Note that this case checks matching of no-type in the query for both the case in
@@ -2858,19 +2800,16 @@ TEST(mongoQueryContextRequest, queryNoType)
     EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response #2 */
     EXPECT_EQ("E1", RES_CER(1).entityId.id);
     EXPECT_EQ("T1bis", RES_CER(1).entityId.type);
     EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
+    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ("val1bis", RES_CER_ATTR(1, 0)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(1, 1)->name);
-    EXPECT_EQ("TA1bis", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("val1bis2", RES_CER_ATTR(1, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -2925,7 +2864,7 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T", RES_CER(0).entityId.type);
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
@@ -2940,13 +2879,9 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
     EXPECT_EQ("ID", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
     EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 2)->name);
-    EXPECT_EQ("TA11", RES_CER_ATTR(0, 2)->type);
-    EXPECT_EQ("C", RES_CER_ATTR(0, 2)->value);
-    ASSERT_EQ(0, RES_CER_ATTR(0, 2)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -2986,7 +2921,7 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T", RES_CER(0).entityId.type);
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
@@ -2997,19 +2932,9 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
     EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA11", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("B", RES_CER_ATTR(0, 1)->value);
-    ASSERT_EQ(2, RES_CER_ATTR(0, 1)->metadataVector.size());
-    EXPECT_EQ("MD1", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
-    EXPECT_EQ("TMD1", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("3", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
-    EXPECT_EQ("MD2", RES_CER_ATTR(0, 1)->metadataVector.get(1)->name);
-    EXPECT_EQ("TMD2", RES_CER_ATTR(0, 1)->metadataVector.get(1)->type);
-    EXPECT_EQ("4", RES_CER_ATTR(0, 1)->metadataVector.get(1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -3020,7 +2945,7 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
 *
 * queryPattern0Attr -
 *
-* Discover:  E[1-2] - none
+* Query:     E[1-2] - none
 * Result:    E1 - (A1, A2)
 *            E2 - (A2, A3)
 *
@@ -3065,7 +2990,7 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -3090,7 +3015,7 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
 *
 * queryPattern1AttrSingle -
 *
-* Discover:  E[1-2] - A1
+* Query:     E[1-2] - A1
 * Result:    E1 - A1
 */
 TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
@@ -3128,7 +3053,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
     EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -3138,7 +3063,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
 *
 * queryPattern1AttrMulti -
 *
-* Discover:  E[1-2] - A2
+* Query:     E[1-2] - A2
 * Result:    E1 - A2
 *            E2 - A2
 */
@@ -3177,7 +3102,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
     EXPECT_EQ("val2", RES_CER_ATTR(0, 0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -3199,7 +3124,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
 *
 * queryPatternNAttr -
 *
-* Discover:  E[1-2] - (A1, A2)
+* Query:     E[1-2] - (A1, A2)
 * Result:    E1 - (A1, A2)
 *            E2 - A2
 */
@@ -3242,7 +3167,7 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
     EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -3264,7 +3189,7 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
 *
 * queryPatternFail -
 *
-* Discover:  R.* - none
+* Query:     R.* - none
 * Result:    none
 */
 TEST(mongoQueryContextRequest, queryPatternFail)
@@ -3299,7 +3224,7 @@ TEST(mongoQueryContextRequest, queryPatternFail)
 *
 * queryMixPatternAndNotPattern -
 *
-* Discover:  (E[1-2]. E4) - none
+* Query:     (E[1-2]. E4) - none
 * Result:    E1 - (A1, A2)
 *            E2 - (A2 ,A3)
 *            E4 - none
@@ -3343,7 +3268,7 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
     EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -3380,7 +3305,7 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
 *
 * queryNoTypePattern -
 *
-* Discover:  E[1-2]
+* Query:     E[1-2]
 * Result:    E1   - A1, A2
 *            E2   - A2 ,A3
 *            E1*  - A4, A5
@@ -3427,7 +3352,7 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
     EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E2", RES_CER(1).entityId.id);
@@ -3512,7 +3437,7 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T", RES_CER(0).entityId.type);
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(3, RES_CER(0).contextAttributeVector.size());
+    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
@@ -3520,6 +3445,7 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+
     EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ("B", RES_CER_ATTR(0, 1)->value);
@@ -3527,19 +3453,16 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     EXPECT_EQ("ID", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
     EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 2)->name);
-    EXPECT_EQ("TA11", RES_CER_ATTR(0, 2)->type);
-    EXPECT_EQ("C", RES_CER_ATTR(0, 2)->value);
-    ASSERT_EQ(0, RES_CER_ATTR(0, 2)->metadataVector.size());
+
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E11", RES_CER(1).entityId.id);
     EXPECT_EQ("T", RES_CER(1).entityId.type);
     EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(3, RES_CER(1).contextAttributeVector.size());
+    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ("E", RES_CER_ATTR(1, 0)->value);
@@ -3547,6 +3470,7 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     EXPECT_EQ("ID", RES_CER_ATTR(1, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(1, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("ID1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->value);
+
     EXPECT_EQ("A1", RES_CER_ATTR(1, 1)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 1)->type);
     EXPECT_EQ("F", RES_CER_ATTR(1, 1)->value);
@@ -3554,13 +3478,10 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     EXPECT_EQ("ID", RES_CER_ATTR(1, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(1, 1)->metadataVector.get(0)->type);
     EXPECT_EQ("ID2", RES_CER_ATTR(1, 1)->metadataVector.get(0)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(1, 2)->name);
-    EXPECT_EQ("TA11", RES_CER_ATTR(1, 2)->type);
-    EXPECT_EQ("G", RES_CER_ATTR(1, 2)->value);
-    ASSERT_EQ(0, RES_CER_ATTR(1, 2)->metadataVector.size());
+
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();
@@ -3600,7 +3521,7 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     EXPECT_EQ("E10", RES_CER(0).entityId.id);
     EXPECT_EQ("T", RES_CER(0).entityId.type);
     EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
@@ -3610,26 +3531,16 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     EXPECT_EQ("1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
-    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
-    EXPECT_EQ("TA11", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("B", RES_CER_ATTR(0, 1)->value);
-    ASSERT_EQ(2, RES_CER_ATTR(0, 1)->metadataVector.size());
-    EXPECT_EQ("MD1", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
-    EXPECT_EQ("TMD1", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("3", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
-    EXPECT_EQ("MD2", RES_CER_ATTR(0, 1)->metadataVector.get(1)->name);
-    EXPECT_EQ("TMD2", RES_CER_ATTR(0, 1)->metadataVector.get(1)->type);
-    EXPECT_EQ("4", RES_CER_ATTR(0, 1)->metadataVector.get(1)->value);
+    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);           
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
     EXPECT_EQ("E11", RES_CER(1).entityId.id);
     EXPECT_EQ("T", RES_CER(1).entityId.type);
     EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
-    ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
+    ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
     EXPECT_EQ("D", RES_CER_ATTR(1, 0)->value);
@@ -3640,19 +3551,9 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     EXPECT_EQ("MD2", RES_CER_ATTR(1, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(1, 0)->metadataVector.get(1)->type);
     EXPECT_EQ("8", RES_CER_ATTR(1, 0)->metadataVector.get(1)->value);
-    EXPECT_EQ("A1", RES_CER_ATTR(1, 1)->name);
-    EXPECT_EQ("TA11", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("E", RES_CER_ATTR(1, 1)->value);
-    ASSERT_EQ(2, RES_CER_ATTR(1, 1)->metadataVector.size());
-    EXPECT_EQ("MD1", RES_CER_ATTR(1, 1)->metadataVector.get(0)->name);
-    EXPECT_EQ("TMD1", RES_CER_ATTR(1, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("9", RES_CER_ATTR(1, 1)->metadataVector.get(0)->value);
-    EXPECT_EQ("MD2", RES_CER_ATTR(1, 1)->metadataVector.get(1)->name);
-    EXPECT_EQ("TMD2", RES_CER_ATTR(1, 1)->metadataVector.get(1)->type);
-    EXPECT_EQ("10", RES_CER_ATTR(1, 1)->metadataVector.get(1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
     mongoDisconnect();

@@ -182,14 +182,14 @@ echo
 01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 158
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "404", 
-        "details": "Entity-Attribute pair: /E1-A1/", 
+        "details": "Entity-Attribute-MetaID triplet: /E1-A1-12/", 
         "reasonPhrase": "No context element found"
     }
 }
@@ -253,14 +253,14 @@ Date: REGEX(.*)
 05. GET /v1/contextEntities/type/T1/id/E1/attributes/A1/12 and see it fail
 ==========================================================================
 HTTP/1.1 200 OK
-Content-Length: 145
+Content-Length: 158
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "404", 
-        "details": "Entity-Attribute pair: /E1-A1/", 
+        "details": "Entity-Attribute-MetaID triplet: /E1-A1-12/", 
         "reasonPhrase": "No context element found"
     }
 }

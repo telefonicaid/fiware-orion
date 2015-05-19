@@ -44,15 +44,17 @@ HttpStatusCode mongoUpdateContextSubscription
 (
   UpdateContextSubscriptionRequest*   requestP,
   UpdateContextSubscriptionResponse*  responseP,
-  Format                              inFormat,
+  Format                              notifyFormat,
   const std::string&                  tenant,
   const std::string&                  xauthToken,
   const std::vector<std::string>&     servicePathV
 )
 {
-  reqSemTake(__FUNCTION__, "ngsi10 update subscription request");
+  bool reqSemTaken;
 
-  LM_T(LmtMongo, ("Update Context Subscription"));
+  reqSemTake(__FUNCTION__, "ngsi10 update subscription request", SemWriteOp, &reqSemTaken);
+
+  LM_T(LmtMongo, ("Update Context Subscription, notifyFormat: '%s'", formatToString(notifyFormat)));
 
   DBClientBase* connection = getMongoConnection();
 
@@ -74,7 +76,7 @@ HttpStatusCode mongoUpdateContextSubscription
       // mongoBackend. For the moment we can leave this here, but we should remove it in the future
       // (old issue #95)
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo assertion exception)");
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo assertion exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo assertion exception)", reqSemTaken);
 
       responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
       LM_W(("Bad Input (invalid OID format)"));
@@ -83,7 +85,7 @@ HttpStatusCode mongoUpdateContextSubscription
   catch (const DBException &e)
   {
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)", reqSemTaken);
 
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
@@ -95,7 +97,7 @@ HttpStatusCode mongoUpdateContextSubscription
   catch (...)
   {
       mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)", reqSemTaken);
 
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
@@ -108,7 +110,7 @@ HttpStatusCode mongoUpdateContextSubscription
 
   if (sub.isEmpty()) {
       responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (no subscriptions found)", reqSemTaken);
       return SccOk;
   }
 
@@ -177,7 +179,7 @@ HttpStatusCode mongoUpdateContextSubscription
                                                 requestP->subscriptionId.get(),
                                                 C_STR_FIELD(sub, CSUB_REFERENCE),
                                                 &notificationDone,
-                                                inFormat,
+                                                notifyFormat,
                                                 tenant,
                                                 xauthToken,
                                                 servicePathV);
@@ -207,7 +209,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
 
   /* Adding format to use in notifications */
-  newSub.append(CSUB_FORMAT, std::string(formatToString(inFormat)));
+  newSub.append(CSUB_FORMAT, std::string(formatToString(notifyFormat)));
 
   /* Update document in MongoDB */
   BSONObj update = newSub.obj();
@@ -224,7 +226,7 @@ HttpStatusCode mongoUpdateContextSubscription
   catch (const DBException &e)
   {
       mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)", reqSemTaken);
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                " - update() _id: " + requestP->subscriptionId.get().c_str() +
@@ -237,7 +239,7 @@ HttpStatusCode mongoUpdateContextSubscription
   catch (...)
   {
       mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
-      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)");
+      reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)", reqSemTaken);
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                " - update() _id: " + requestP->subscriptionId.get().c_str() +
@@ -258,6 +260,6 @@ HttpStatusCode mongoUpdateContextSubscription
   }  
   responseP->subscribeResponse.subscriptionId = requestP->subscriptionId;
 
-  reqSemGive(__FUNCTION__, "ngsi10 update subscription request");
+  reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
   return SccOk;
 }

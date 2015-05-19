@@ -53,10 +53,20 @@ typedef struct UpdateContextRequest
   ContextElementVector    contextElementVector;  // Mandatory
   UpdateActionType        updateActionType;      // Mandatory
 
-  void         init(void);
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
-  std::string  check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
-  void         release(void);
+  std::string             contextProvider;       // Not part of the payload - used internally only
+  int                     xmls;                  // Not part of the payload - used internally only
+  int                     jsons;                 // Not part of the payload - used internally only
+
+  UpdateContextRequest();
+  UpdateContextRequest(const std::string _contextProvider, EntityId* eP);
+
+  void               init(void);
+  Format             format(void);
+  std::string        render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent);
+  std::string        check(ConnectionInfo* ciP,  RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
+  void               release(void);
+  ContextAttribute*  attributeLookup(EntityId* eP, const std::string& attributeName);
+
   void         present(const std::string& indent);
 
   void         fill(const UpdateContextElementRequest* ucerP,
@@ -71,12 +81,14 @@ typedef struct UpdateContextRequest
                     const std::string& entityType,
                     const std::string& isPattern,
                     const std::string& attributeName,
+                    const std::string& metaID,
                     const std::string& _updateActionType);
 
   void         fill(const UpdateContextAttributeRequest* ucarP,
                     const std::string&                   entityId,
                     const std::string&                   entityType,
                     const std::string&                   attributeName,
+                    const std::string&                   metaID,
                     const std::string&                   _updateActionType);
 } UpdateContextRequest;
 

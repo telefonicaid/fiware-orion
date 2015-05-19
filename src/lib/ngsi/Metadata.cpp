@@ -144,10 +144,10 @@ std::string Metadata::check
 */
 void Metadata::present(const std::string& metadataType, int ix, const std::string& indent)
 {
-  PRINTF("%s%s Metadata %d:\n",   indent.c_str(), metadataType.c_str(), ix);
-  PRINTF("%s  Name:     %s\n", indent.c_str(), name.c_str());
-  PRINTF("%s  Type:     %s\n", indent.c_str(), type.c_str());
-  PRINTF("%s  Value:    %s\n", indent.c_str(), value.c_str());
+  LM_F(("%s%s Metadata %d:",   indent.c_str(), metadataType.c_str(), ix));
+  LM_F(("%s  Name:     %s", indent.c_str(), name.c_str()));
+  LM_F(("%s  Type:     %s", indent.c_str(), type.c_str()));
+  LM_F(("%s  Value:    %s", indent.c_str(), value.c_str()));
 }
 
 

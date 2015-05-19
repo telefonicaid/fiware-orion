@@ -92,24 +92,6 @@ echo
 echo
 
 
-echo "7. Listing of Entity Types. Response in Object-JSON"
-orionCurl --url '/v1/contextTypes?attributeFormat=object' --json 
-echo
-echo
-
-
-echo "8. Listing of Entity Types. Response in Object-JSON, with details=on"
-orionCurl --url '/v1/contextTypes?attributeFormat=object&details=on' --json 
-echo
-echo
-
-
-echo "9. Listing of Entity Types. Response in Object-JSON, with details=on and collapse=true"
-orionCurl --url '/v1/contextTypes?attributeFormat=object&details=on&collapse=true' --json  
-echo
-echo
-
-
 --REGEXPECT--
 0. Adding an entity of type 'Room', with two attributes, temperature:celsius and pressure:mmHg
 HTTP/1.1 200 OK
@@ -126,18 +108,16 @@ Date: REGEX(.*)
           <id>ConferenceRoom</id>
         </entityId>
         <contextAttributeList>
-#SORT_START
-          <contextAttribute>
-            <name>pressure</name>
-            <type>mmHg</type>
-            <contextValue/>
-          </contextAttribute>
           <contextAttribute>
             <name>temperature</name>
             <type>celsius</type>
             <contextValue/>
           </contextAttribute>
-#SORT_END
+          <contextAttribute>
+            <name>pressure</name>
+            <type>mmHg</type>
+            <contextValue/>
+          </contextAttribute>
         </contextAttributeList>
       </contextElement>
       <statusCode>
@@ -151,7 +131,7 @@ Date: REGEX(.*)
 
 1. Listing of Entity Types. Response in XML
 HTTP/1.1 200 OK
-Content-Length: 522
+Content-Length: 349
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -161,16 +141,8 @@ Date: REGEX(.*)
     <entityType>
       <name>Room</name>
       <contextAttributeList>
-#SORT_START
-        <contextAttribute>
-          <name>temperature</name>
-          <type>celsius</type>
-        </contextAttribute>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>mmHg</type>
-        </contextAttribute>
-#SORT_END
+        <name>pressure</name>
+        <name>temperature</name>
       </contextAttributeList>
     </entityType>
   </typeEntities>
@@ -183,7 +155,7 @@ Date: REGEX(.*)
 
 2. Listing of Entity Types. Response in XML, with details=on
 HTTP/1.1 200 OK
-Content-Length: 554
+Content-Length: 381
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -193,16 +165,8 @@ Date: REGEX(.*)
     <entityType>
       <name>Room</name>
       <contextAttributeList>
-#SORT_START
-        <contextAttribute>
-          <name>temperature</name>
-          <type>celsius</type>
-        </contextAttribute>
-        <contextAttribute>
-          <name>pressure</name>
-          <type>mmHg</type>
-        </contextAttribute>
-#SORT_END
+        <name>pressure</name>
+        <name>temperature</name>
       </contextAttributeList>
     </entityType>
   </typeEntities>
@@ -237,28 +201,20 @@ Date: REGEX(.*)
 
 4. Listing of Entity Types. Response in JSON
 HTTP/1.1 200 OK
-Content-Length: 319
+Content-Length: 200
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
-        "code": "200", 
+        "code": "200",
         "reasonPhrase": "OK"
     },
     "types": [
         {
             "attributes": [
-#SORT_START
-                {
-                    "name": "temperature",
-                    "type": "celsius"
-                },
-                {
-                    "name": "pressure",
-                    "type": "mmHg"
-                }
-#SORT_END
+                "pressure",
+                "temperature"
             ],
             "name": "Room"
         }
@@ -268,7 +224,7 @@ Date: REGEX(.*)
 
 5. Listing of Entity Types. Response in JSON, with details=on
 HTTP/1.1 200 OK
-Content-Length: 347
+Content-Length: 228
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -281,16 +237,8 @@ Date: REGEX(.*)
     "types": [
         {
             "attributes": [
-#SORT_START
-                {
-                    "name": "temperature",
-                    "type": "celsius"
-                },
-                {
-                    "name": "pressure",
-                    "type": "mmHg"
-                }
-#SORT_END
+                "pressure",
+                "temperature"
             ],
             "name": "Room"
         }
@@ -299,85 +247,6 @@ Date: REGEX(.*)
 
 
 6. Listing of Entity Types. Response in JSON, with details=on and collapse=true
-HTTP/1.1 200 OK
-Content-Length: 154
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "statusCode": {
-        "code": "200",
-        "details": "Count: 1",
-        "reasonPhrase": "OK"
-    },
-    "types": [
-        {
-            "name": "Room"
-        }
-    ]
-}
-
-
-7. Listing of Entity Types. Response in Object-JSON
-HTTP/1.1 200 OK
-Content-Length: 283
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "statusCode": {
-        "code": "200",
-        "reasonPhrase": "OK"
-    },
-    "types": [
-        {
-            "attributes": {
-#SORT_START
-                "pressure": {
-                    "type": "mmHg"
-                },
-                "temperature": {
-                    "type": "celsius"
-                }
-#SORT_END
-            },
-            "name": "Room"
-        }
-    ]
-}
-
-
-8. Listing of Entity Types. Response in Object-JSON, with details=on
-HTTP/1.1 200 OK
-Content-Length: 311
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "statusCode": {
-        "code": "200",
-        "details": "Count: 1",
-        "reasonPhrase": "OK"
-    },
-    "types": [
-        {
-            "attributes": {
-#SORT_START
-                "pressure": {
-                    "type": "mmHg"
-                },
-                "temperature": {
-                    "type": "celsius"
-                }
-#SORT_END
-            },
-            "name": "Room"
-        }
-    ]
-}
-
-
-9. Listing of Entity Types. Response in Object-JSON, with details=on and collapse=true
 HTTP/1.1 200 OK
 Content-Length: 154
 Content-Type: application/json

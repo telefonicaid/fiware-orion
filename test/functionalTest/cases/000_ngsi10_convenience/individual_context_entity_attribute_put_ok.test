@@ -149,14 +149,14 @@ Date: REGEX(.*)
     </entityId>
     <contextAttributeList>
       <contextAttribute>
-        <name>temperature</name>
-        <type>centigrade</type>
-        <contextValue>10</contextValue>
-      </contextAttribute>
-      <contextAttribute>
         <name>pressure</name>
         <type>mmHg</type>
         <contextValue>720</contextValue>
+      </contextAttribute>
+      <contextAttribute>
+        <name>temperature</name>
+        <type>centigrade</type>
+        <contextValue>10</contextValue>
       </contextAttribute>
     </contextAttributeList>
   </contextElement>
@@ -190,14 +190,14 @@ Date: REGEX(.*)
     </entityId>
     <contextAttributeList>
       <contextAttribute>
-        <name>temperature</name>
-        <type>centigrade</type>
-        <contextValue>31</contextValue>
-      </contextAttribute>
-      <contextAttribute>
         <name>pressure</name>
         <type>mmHg</type>
         <contextValue>720</contextValue>
+      </contextAttribute>
+      <contextAttribute>
+        <name>temperature</name>
+        <type>centigrade</type>
+        <contextValue>31</contextValue>
       </contextAttribute>
     </contextAttributeList>
   </contextElement>

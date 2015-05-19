@@ -474,7 +474,7 @@ Date: REGEX(.*)
 13. GET /v1/contextEntities/E3/attributes/A1?entity::type=T1 (from CP1)
 =========================================================================
 HTTP/1.1 200 OK
-Content-Length: 248
+Content-Length: 180
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -488,7 +488,6 @@ Date: REGEX(.*)
     ], 
     "statusCode": {
         "code": "200", 
-        "details": "Redirected to context provider localhost:9801/v1", 
         "reasonPhrase": "OK"
     }
 }

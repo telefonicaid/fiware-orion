@@ -130,3 +130,21 @@ void SubscribeContextAvailabilityRequest::present(const std::string& indent)
    duration.present(indent);
    restriction.present(indent);   
 }
+
+
+
+/* ****************************************************************************
+*
+* SubscribeContextAvailabilityRequest::fill - 
+*/
+void SubscribeContextAvailabilityRequest::fill(EntityTypeInfo typeInfo)
+{
+  if ((typeInfo == EntityTypeEmpty) || (typeInfo == EntityTypeNotEmpty))
+  {
+    Scope* scopeP = new Scope(SCOPE_FILTER_EXISTENCE, SCOPE_VALUE_ENTITY_TYPE);
+
+    scopeP->oper  = (typeInfo == EntityTypeEmpty)? SCOPE_OPERATOR_NOT : "";
+      
+    restriction.scopeVector.push_back(scopeP);
+  }
+}

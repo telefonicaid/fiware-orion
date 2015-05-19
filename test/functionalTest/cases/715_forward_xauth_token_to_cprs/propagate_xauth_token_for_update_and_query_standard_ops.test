@@ -152,7 +152,7 @@ echo
 
 echo "06. Dump accumulator to see X-Auth headers (or not)"
 echo "==================================================="
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 echo
 
@@ -238,92 +238,96 @@ Date: REGEX(.*)
 06. Dump accumulator to see X-Auth headers (or not)
 ===================================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
-Content-Length: 472
+Content-Length: 274
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json
 
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E1</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type>string</type>
-          <contextValue>W1-CB</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>UPDATE</updateAction>
-</updateContextRequest>
+{
+  "contextElements" : [
+    {
+      "type" : "T",
+      "isPattern" : "false",
+      "id" : "E1",
+      "attributes" : [
+        {
+          "name" : "A1",
+          "type" : "string",
+          "value" : "W1-CB"
+        }
+      ]
+    }
+  ],
+  "updateAction" : "UPDATE"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/v1/queryContext
-Content-Length: 223
+Content-Length: 137
 X-Auth-Token: kz
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json
 
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-  </attributeList>
-</queryContextRequest>
+{
+  "entities" : [
+    {
+      "type" : "T",
+      "isPattern" : "false",
+      "id" : "E1"
+    }
+  ],
+  "attributes" : [
+    "A1"
+  ]
+}
 =======================================
 POST http://localhost:REGEX(\d+)/v1/updateContext
-Content-Length: 472
+Content-Length: 274
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json
 
-<updateContextRequest>
-  <contextElementList>
-    <contextElement>
-      <entityId type="T" isPattern="false">
-        <id>E1</id>
-      </entityId>
-      <contextAttributeList>
-        <contextAttribute>
-          <name>A1</name>
-          <type>string</type>
-          <contextValue>W1-CB</contextValue>
-        </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>UPDATE</updateAction>
-</updateContextRequest>
+{
+  "contextElements" : [
+    {
+      "type" : "T",
+      "isPattern" : "false",
+      "id" : "E1",
+      "attributes" : [
+        {
+          "name" : "A1",
+          "type" : "string",
+          "value" : "W1-CB"
+        }
+      ]
+    }
+  ],
+  "updateAction" : "UPDATE"
+}
 =======================================
 POST http://localhost:REGEX(\d+)/v1/queryContext
-Content-Length: 223
+Content-Length: 137
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
-Accept: application/xml, application/json
-Content-Type: application/xml
+Accept: application/json
+Content-Type: application/json
 
-<queryContextRequest>
-  <entityIdList>
-    <entityId type="T" isPattern="false">
-      <id>E1</id>
-    </entityId>
-  </entityIdList>
-  <attributeList>
-    <attribute>A1</attribute>
-  </attributeList>
-</queryContextRequest>
+{
+  "entities" : [
+    {
+      "type" : "T",
+      "isPattern" : "false",
+      "id" : "E1"
+    }
+  ],
+  "attributes" : [
+    "A1"
+  ]
+}
 =======================================
 
 

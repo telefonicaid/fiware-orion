@@ -352,7 +352,7 @@ Date: REGEX(.*)
 05. Update/UPDATE E1/A1=W1-CB in CB with service-path /world/1
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 382
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -373,7 +373,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:REGEX(\d+)/v1", 
                 "reasonPhrase": "OK"
             }
         }
@@ -384,7 +383,7 @@ Date: REGEX(.*)
 06. Update/UPDATE E1/A2=W2-CB in CB with service-path /world/2
 ==============================================================
 HTTP/1.1 200 OK
-Content-Length: 454
+Content-Length: 382
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -405,7 +404,6 @@ Date: REGEX(.*)
             }, 
             "statusCode": {
                 "code": "200", 
-                "details": "Redirected to context provider localhost:REGEX(\d+)/v1", 
                 "reasonPhrase": "OK"
             }
         }

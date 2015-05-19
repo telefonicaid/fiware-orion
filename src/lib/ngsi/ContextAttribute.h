@@ -31,6 +31,7 @@
 #include "ngsi/MetadataVector.h"
 #include "common/Format.h"
 #include "ngsi/Request.h"
+#include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
 #include "rest/ConnectionInfo.h"
 
@@ -42,27 +43,33 @@
 */
 typedef struct ContextAttribute
 {
-  std::string     name;            // Mandatory
-  std::string     type;            // Optional
-  std::string     value;           // Optional (FI-WARE changes - MANDATORY in OMA spec)
-                                   //          Especially for the new convops, value is NOT mandatory
-                                   //          E.g. /v1/contextTypes
-  MetadataVector  metadataVector;  // Optional
+  std::string     name;                    // Mandatory
+  std::string     type;                    // Optional
+  std::string     value;                   // Optional (FI-WARE changes - MANDATORY in OMA spec)
+                                           //          Especially for the new convops, value is NOT mandatory
+                                           //          E.g. /v1/contextTypes
+  MetadataVector  metadataVector;          // Optional
+
+  ProvidingApplication     providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
+  bool                     found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
+                                                    // It means attribute found either locally or remotely in providing application
 
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
 
+  ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP);
-  ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value = "");
+  ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value = "", bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Grabbers for metadata to which CB gives a special semantic */
   std::string  getId();
   std::string  getLocation();
 
-  std::string  render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool omitValue = false);
-  std::string  renderAsJsonObject(ConnectionInfo* ciP, const std::string& indent, bool comma, bool omitValue = false);
+  std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
+  std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
+  std::string  renderAsNameString(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(void);
@@ -72,6 +79,7 @@ typedef struct ContextAttribute
                      const std::string&  indent,
                      const std::string&  predetectedError,
                      int                 counter);
+  ContextAttribute* clone();
 } ContextAttribute;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTE_H_

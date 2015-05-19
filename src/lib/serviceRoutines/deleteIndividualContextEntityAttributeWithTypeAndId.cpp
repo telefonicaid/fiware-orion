@@ -110,7 +110,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
 
   // 03. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(entityId, entityType, "", attributeName, "DELETE");
+  parseDataP->upcr.res.fill(entityId, entityType, "", attributeName, "", "DELETE");
 
 
   // 04. Call Standard Operation
@@ -123,6 +123,7 @@ std::string deleteIndividualContextEntityAttributeWithTypeAndId
 
   // 06. Cleanup and return result
   answer = response.render(ciP->outFormat, "", false, false);
+  parseDataP->upcr.res.release();
 
   return answer;
 }

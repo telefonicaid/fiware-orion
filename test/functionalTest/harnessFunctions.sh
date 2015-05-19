@@ -89,6 +89,12 @@ function dbInit()
   elif [ "$role" == "CP3" ]
   then
     echo 'db.dropDatabase()' | mongo ${CP3_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP4" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP4_DATABASE_NAME} --quiet
+  elif [ "$role" == "CP5" ]
+  then
+    echo 'db.dropDatabase()' | mongo ${CP5_DATABASE_NAME} --quiet
   else
     echo 'db.dropDatabase()' | mongo $db --quiet
   fi
@@ -110,6 +116,21 @@ function dbDrop()
       dbInit $db
     fi
   fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# dbResetAll - 
+#
+function dbResetAll()
+{
+  all=$(echo show dbs | mongo --quiet | grep ftest | awk '{ print $1 }')
+  for db in $all
+  do
+    dbDrop $db
+  done
 }
 
 
@@ -164,6 +185,16 @@ function localBrokerStart()
     mkdir -p $CP3_LOG_DIR
     port=$CP3_PORT
     CB_START_CMD="contextBroker -harakiri -port $CP3_PORT -pidpath $CP3_PID_FILE -db $CP3_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP3_LOG_DIR $extraParams"
+  elif [ "$role" == "CP4" ]
+  then
+    mkdir -p $CP4_LOG_DIR
+    port=$CP4_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP4_PORT -pidpath $CP4_PID_FILE -db $CP4_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP4_LOG_DIR $extraParams"
+  elif [ "$role" == "CP5" ]
+  then
+    mkdir -p $CP5_LOG_DIR
+    port=$CP5_PORT
+    CB_START_CMD="contextBroker -harakiri -port $CP5_PORT -pidpath $CP5_PID_FILE -db $CP5_DATABASE_NAME -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -209,6 +240,12 @@ function localBrokerStop
   elif [ "$role" == "CP3" ]
   then
     port=$CP3_PORT
+  elif [ "$role" == "CP4" ]
+  then
+    port=$CP4_PORT
+  elif [ "$role" == "CP5" ]
+  then
+    port=$CP5_PORT
   fi
 
   # Test to see if we have a broker running on $port if so kill it!
@@ -294,6 +331,14 @@ function brokerStop
   then
     pidFile=$CP3_PID_FILE
     port=$CP3_PORT
+  elif [ "$role" == "CP4" ]
+  then
+    pidFile=$CP4_PID_FILE
+    port=$CP4_PORT
+  elif [ "$role" == "CP5" ]
+  then
+    pidFile=$CP5_PID_FILE
+    port=$CP5_PORT
   fi
 
   if [ "$VALGRIND" == "" ]; then
@@ -405,7 +450,7 @@ function accumulatorStart()
 
   accumulatorStop $port
 
-  accumulator-server.py $port /notify $bindIp 2> /tmp/accumulator_$port &
+  accumulator-server.py $port /notify $bindIp > /tmp/accumulator_${port}_stdout 2> /tmp/accumulator_${port}_stderr &
   echo accumulator running as PID $$
 
   # Wait until accumulator has started or we have waited a given maximum time
@@ -427,6 +472,56 @@ function accumulatorStart()
    port_not_ok=$?
   done
 }
+
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulatorDump
+#
+function accumulatorDump()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER_PORT}/dump -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+  fi
+}
+
+
+# ------------------------------------------------------------------------------
+#
+# accumulator2Dump
+#
+function accumulator2Dump()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER2_PORT}/dump -s -S 2> /dev/null
+  fi
+}
+
+
+# ------------------------------------------------------------------------------
+#
+# valgrindSleep
+#
+function valgrindSleep()
+{
+  if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
+  then
+    sleep $1
+  fi
+}
+
+
 
 # ------------------------------------------------------------------------------
 #
@@ -470,15 +565,15 @@ function dbInsertEntity()
         "id": entity,
         "type": "T"
     },
-    "attrs": [
-        {
-            "name": "A",
+    "attrNames": [ "A" ],
+    "attrs": {
+        "A": {
             "type": "TA",
             "value": s,
             "creDate" : 1389376081,
             "modDate" : 1389376081
         },
-    ],
+    },
     "creDate": 1389376081,
     "modDate": 1389376081
   }'
@@ -857,6 +952,7 @@ function coapCurl()
 
 export -f dbInit
 export -f dbDrop
+export -f dbResetAll
 export -f brokerStart
 export -f localBrokerStop
 export -f localBrokerStart
@@ -866,8 +962,11 @@ export -f proxyCoapStart
 export -f proxyCoapStop
 export -f accumulatorStart
 export -f accumulatorStop
+export -f accumulatorDump
+export -f accumulator2Dump
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
 export -f coapCurl
 export -f vMsg
+export -f valgrindSleep

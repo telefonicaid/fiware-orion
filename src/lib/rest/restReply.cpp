@@ -43,6 +43,7 @@
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/NotifyContextResponse.h"
 
+#include "rest/rest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/HttpStatusCode.h"
 #include "rest/mhd.h"
@@ -53,8 +54,7 @@
 
 
 static int replyIx = 0;
-// This value is got from the command line
-extern char allowedOrigin[64];
+
 /* ****************************************************************************
 *
 * restReply - 
@@ -88,17 +88,17 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     else if (ciP->outFormat == JSON)
       MHD_add_response_header(response, "Content-Type", "application/json");
 
-    if (strlen(allowedOrigin) > 0)
+    if (strlen(restAllowedOrigin) > 0)
     {
       // If any origin is allowed the header is sent always with "any" as value
-      if (strcmp(allowedOrigin, "*") == 0)
+      if (strcmp(restAllowedOrigin, "*") == 0)
       {
         MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
       }
       // If an specific origin is allowed the header is only sent if the origins match
-      else if (strcmp(ciP->httpHeaders.origin.c_str(), allowedOrigin) == 0)
+      else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
       {
-        MHD_add_response_header(response, "Access-Control-Allow-Origin", allowedOrigin);
+        MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
       }
     }
   }

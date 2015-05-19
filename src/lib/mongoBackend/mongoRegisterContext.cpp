@@ -47,17 +47,20 @@ using namespace mongo;
 */
 HttpStatusCode mongoRegisterContext
 (
-  RegisterContextRequest*   requestP,
-  RegisterContextResponse*  responseP,
-  const std::string&        tenant,
-  const std::string&        servicePath
+  RegisterContextRequest*              requestP,
+  RegisterContextResponse*             responseP,
+  std::map<std::string, std::string>&  uriParam,
+  const std::string&                   tenant,
+  const std::string&                   servicePath
 )
-{    
-    std::string sPath = servicePath;
+{
+    std::string        sPath         = servicePath;
+    const std::string  notifyFormat  = uriParam[URI_PARAM_NOTIFY_FORMAT];
+    bool               reqSemTaken;
 
-    reqSemTake(__FUNCTION__, "ngsi9 register request");
+    LM_T(LmtMongo, ("Register Context Request: '%s' format", notifyFormat.c_str()));
 
-    LM_T(LmtMongo, ("Register Context Request"));
+    reqSemTake(__FUNCTION__, "ngsi9 register request", SemWriteOp, &reqSemTaken);
 
     DBClientBase* connection = getMongoConnection();
 
@@ -70,8 +73,8 @@ HttpStatusCode mongoRegisterContext
     /* Check if new registration */
     if (requestP->registrationId.isEmpty())
     {
-      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath);
-      reqSemGive(__FUNCTION__, "ngsi9 register request");
+      HttpStatusCode result = processRegisterContext(requestP, responseP, NULL, tenant, sPath, notifyFormat);
+      reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
       return result;
     }
 
@@ -91,7 +94,7 @@ HttpStatusCode mongoRegisterContext
     catch (const AssertionException &e)
     {
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (AssertionException)");
-        reqSemGive(__FUNCTION__, "ngsi9 register request");
+        reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
 
         /* This happens when OID format is wrong */
         // FIXME: this checking should be done at parsing stage, without progressing to
@@ -105,7 +108,7 @@ HttpStatusCode mongoRegisterContext
     catch (const DBException &e)
     {
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (DBException)");
-        reqSemGive(__FUNCTION__, "ngsi9 register request");
+        reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
 
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
@@ -118,7 +121,7 @@ HttpStatusCode mongoRegisterContext
     catch (...)
     {
         mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (Generic Exception)");
-        reqSemGive(__FUNCTION__, "ngsi9 register request");
+        reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
 
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
@@ -131,14 +134,14 @@ HttpStatusCode mongoRegisterContext
 
     if (reg.isEmpty())
     {
-       reqSemGive(__FUNCTION__, "ngsi9 register request (no registrations found)");
+       reqSemGive(__FUNCTION__, "ngsi9 register request (no registrations found)", reqSemTaken);
        responseP->errorCode.fill(SccContextElementNotFound, std::string("registration id: /") + requestP->registrationId.get() + "/");
        responseP->registrationId = requestP->registrationId;
        ++noOfRegistrationUpdateErrors;
        return SccOk;
     }
 
-    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath);
-    reqSemGive(__FUNCTION__, "ngsi9 register request");
+    HttpStatusCode result = processRegisterContext(requestP, responseP, &id, tenant, sPath, notifyFormat);
+    reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
     return result;
 }

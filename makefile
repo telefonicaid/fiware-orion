@@ -42,24 +42,14 @@ ifndef TOPDIR
 	RPM_TOPDIR=$(ORION_WS)/rpm
 endif
 
-# Version for the contextBroker-* packages (except contextBroker-fiware)
+# Version for the contextBroker-* packages 
 ifndef BROKER_VERSION
 	BROKER_VERSION:=$(shell grep "\#define ORION_VERSION" src/app/contextBroker/version.h | sed -e 's/^.* "//' -e 's/"//' | sed -e 's/-/_/g')
 endif
 
-# Release ID for the contextBroker-* packages (execept contextBroker-fiware)
+# Release ID for the contextBroker-* packages
 ifndef BROKER_RELEASE
 	BROKER_RELEASE=dev
-endif
-
-# Version for the contextBroker-fiware package
-ifndef FIWARE_VERSION
-	FIWARE_VERSION=3.1.1
-endif
-
-# Release ID for the contextBroker-fiware package
-ifndef FIWARE_RELEASE
-	FIWARE_RELEASE=dev
 endif
 
 ifndef BUILD_ARCH
@@ -214,8 +204,6 @@ rpm-ts:
 		--define '_topdir $(RPM_TOPDIR)' \
 		--define 'broker_version $(BROKER_VERSION)' \
 		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'fiware_version $(FIWARE_VERSION)' \
-		--define 'fiware_release $(FIWARE_RELEASE)' \
 		--define 'build_arch $(BUILD_ARCH)'
 
 rpm: 
@@ -225,8 +213,6 @@ rpm:
 		--define '_topdir $(RPM_TOPDIR)' \
 		--define 'broker_version $(BROKER_VERSION)' \
 		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'fiware_version $(FIWARE_VERSION)' \
-		--define 'fiware_release $(FIWARE_RELEASE)' \
 		--define 'build_arch $(BUILD_ARCH)'
 
 mock: 
@@ -236,14 +222,10 @@ mock:
 	rpmbuild -bs rpm/contextBroker.spec \
 		--define 'broker_version $(BROKER_VERSION)' \
 		--define 'broker_release $(BROKER_RELEASE)' \
-		--define 'fiware_version $(FIWARE_VERSION)' \
-		--define 'fiware_release $(FIWARE_RELEASE)' \
 		--define 'build_arch $(BUILD_ARCH)'
 	/usr/bin/mock -r $(MOCK_CONFIG)-$(BUILD_ARCH) ~/rpmbuild/SRPMS/contextBroker-$(BROKER_VERSION)-$(BROKER_RELEASE).src.rpm -v \
 		--define='broker_version $(BROKER_VERSION)' \
 		--define='broker_release $(BROKER_RELEASE)' \
-		--define='fiware_version $(BROKER_FIWARE_VERSION)' \
-		--define 'fiware_release $(FIWARE_RELEASE)' \
 		--define='build_arch $(BUILD_ARCH)'
 	mkdir -p packages
 	cp /var/lib/mock/$(MOCK_CONFIG)-$(BUILD_ARCH)/result/*.rpm packages
@@ -403,7 +385,7 @@ coverage_functional_test: install_coverage
 	lcov -r coverage/broker.info "src/lib/parseArgs/*" -o coverage/broker.info
 	genhtml -o coverage coverage/broker.info
 
-valgrind:
+valgrind: install_debug
 	@echo For detailed info: tail -f /tmp/valgrindTestSuiteLog
 	test/valgrind/valgrindTestSuite.sh
 

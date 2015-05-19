@@ -28,307 +28,365 @@ dbInit CB
 brokerStart CB
 
 --SHELL--
-url="/v1/updateContext"
+
+#
+# 01. Update/APPEND OfficeRoom/Room/pressure=p230
+# 02. Update/APPEND OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+# 03. Update/APPEND OfficeRoom/Room/pressure=p230
+# 04. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+# 05. Update/APPEND OfficeRoom/Room/pressure=p23
+# 06. Update/UPDATE OfficeRoom/Room/pressure=p230
+# 07. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+# 08. Update/APPEND OfficeRoom/Room/pressure=
+# 09. Update/UPDATE OfficeRoom/Room/pressure=
+# 10. Update/DELETE OfficeRoom/Room/pressure
+# 11. Update/DELETE OfficeRoom/Room/pressure AGAIN (error)
+# 12. Update/DELETE OfficeRoom/Room/pressure AGAIN AGAIN (same error)
+# 13. Update/UPDATE OfficeRoom/Room/pressure=p230
+# 14. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+# 15. Update/APPEND OfficeRoom/Room/pressure=p23
+# 16. Update/UPDATE OfficeRoom/Room/pressure=p2300+lightstatus=L23 (pressure OK, lightstatus ERROR)
+# 17. Update/APPEND OfficeRoom/Room/pressure=p2300+lightstatus=L23 (both OK)
+# 18. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+#
+
+echo "01. Update/APPEND OfficeRoom/Room/pressure=p230"
+echo "==============================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p230</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p230</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "1: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+echo "02. Update/APPEND OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p235</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p235</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>ConferenceRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p230</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p230</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "2: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "03. Update/APPEND OfficeRoom/Room/pressure=p230"
+echo "==============================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p230</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p230</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "3: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "04. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p235</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p235</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>ConferenceRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p230</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p230</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "4: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "05. Update/APPEND OfficeRoom/Room/pressure=p23"
+echo "=============================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p23</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p23</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "5: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "06. Update/UPDATE OfficeRoom/Room/pressure=p230"
+echo "==============================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p230</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p230</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "6: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "07. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p235</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p235</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>ConferenceRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p230</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p230</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "7: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "08. Update/APPEND OfficeRoom/Room/pressure="
+echo "==========================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue></contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue></contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "8: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "09. Update/UPDATE OfficeRoom/Room/pressure="
+echo "==========================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue></contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue></contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "9: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "10. Update/DELETE OfficeRoom/Room/pressure"
+echo "=========================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue></contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue></contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>DELETE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "10: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "11. Update/DELETE OfficeRoom/Room/pressure AGAIN (error)"
+echo "========================================================"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue></contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue></contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>DELETE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "11: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "12. Update/DELETE OfficeRoom/Room/pressure AGAIN AGAIN (same error)"
+echo "==================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p23</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p23</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>DELETE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "12: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "13. Update/UPDATE OfficeRoom/Room/pressure=p230"
+echo "==============================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
@@ -347,153 +405,173 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "13: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "14. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p235</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p235</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>ConferenceRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p230</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p230</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "14: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "15. Update/APPEND OfficeRoom/Room/pressure=p23"
+echo "=============================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p23</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p23</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "15: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "16. Update/UPDATE OfficeRoom/Room/pressure=p2300+lightstatus=L23 (pressure OK, lightstatus ERROR)"
+echo "================================================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p2300</contextValue>
-                </contextAttribute>
-            <contextAttribute>
+          <type>clima</type>
+          <contextValue>p2300</contextValue>
+        </contextAttribute>
+        <contextAttribute>
           <name>lightstatus</name>
-                  <type>light</type>
-                  <contextValue>L23</contextValue>
-                </contextAttribute>
+          <type>light</type>
+          <contextValue>L23</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "16: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "17. Update/APPEND OfficeRoom/Room/pressure=p2300+lightstatus=L23 (both OK)"
+echo "=========================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p2300</contextValue>
-                </contextAttribute>
-            <contextAttribute>
+          <type>clima</type>
+          <contextValue>p2300</contextValue>
+        </contextAttribute>
+        <contextAttribute>
           <name>lightstatus</name>
-                  <type>light</type>
-                  <contextValue>L23</contextValue>
-                </contextAttribute>
+          <type>light</type>
+          <contextValue>L23</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-echo "17: ++++++++++++++++++++"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-url="/v1/updateContext"
+
+echo "18. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230"
+echo "====================================================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p235</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p235</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>ConferenceRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>ConferenceRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p230</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p230</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>UPDATE</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
 
 --REGEXPECT--
+01. Update/APPEND OfficeRoom/Room/pressure=p230
+===============================================
 HTTP/1.1 200 OK
 Content-Length: 636
 Content-Type: application/xml
@@ -522,7 +600,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-1: ++++++++++++++++++++
+
+
+02. Update/APPEND OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 1178
 Content-Type: application/xml
@@ -569,7 +650,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-2: ++++++++++++++++++++
+
+
+03. Update/APPEND OfficeRoom/Room/pressure=p230
+===============================================
 HTTP/1.1 200 OK
 Content-Length: 636
 Content-Type: application/xml
@@ -598,7 +682,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-3: ++++++++++++++++++++
+
+
+04. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 1178
 Content-Type: application/xml
@@ -645,7 +732,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-4: ++++++++++++++++++++
+
+
+05. Update/APPEND OfficeRoom/Room/pressure=p23
+==============================================
 HTTP/1.1 200 OK
 Content-Length: 636
 Content-Type: application/xml
@@ -674,7 +764,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-5: ++++++++++++++++++++
+
+
+06. Update/UPDATE OfficeRoom/Room/pressure=p230
+===============================================
 HTTP/1.1 200 OK
 Content-Length: 636
 Content-Type: application/xml
@@ -703,7 +796,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-6: ++++++++++++++++++++
+
+
+07. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 1178
 Content-Type: application/xml
@@ -750,7 +846,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-7: ++++++++++++++++++++
+
+
+08. Update/APPEND OfficeRoom/Room/pressure=
+===========================================
 HTTP/1.1 200 OK
 Content-Length: 834
 Content-Type: application/xml
@@ -780,7 +879,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-8: ++++++++++++++++++++
+
+
+09. Update/UPDATE OfficeRoom/Room/pressure=
+===========================================
 HTTP/1.1 200 OK
 Content-Length: 834
 Content-Type: application/xml
@@ -810,7 +912,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-9: ++++++++++++++++++++
+
+
+10. Update/DELETE OfficeRoom/Room/pressure
+==========================================
 HTTP/1.1 200 OK
 Content-Length: 636
 Content-Type: application/xml
@@ -839,7 +944,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-10: ++++++++++++++++++++
+
+
+11. Update/DELETE OfficeRoom/Room/pressure AGAIN (error)
+========================================================
 HTTP/1.1 200 OK
 Content-Length: 799
 Content-Type: application/xml
@@ -869,7 +977,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-11: ++++++++++++++++++++
+
+
+12. Update/DELETE OfficeRoom/Room/pressure AGAIN AGAIN (same error)
+===================================================================
 HTTP/1.1 200 OK
 Content-Length: 799
 Content-Type: application/xml
@@ -899,7 +1010,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-12: ++++++++++++++++++++
+
+
+13. Update/UPDATE OfficeRoom/Room/pressure=p230
+===============================================
 HTTP/1.1 200 OK
 Content-Length: 777
 Content-Type: application/xml
@@ -929,7 +1043,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-13: ++++++++++++++++++++
+
+
+14. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 1319
 Content-Type: application/xml
@@ -977,7 +1094,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-14: ++++++++++++++++++++
+
+
+15. Update/APPEND OfficeRoom/Room/pressure=p23
+==============================================
 HTTP/1.1 200 OK
 Content-Length: 636
 Content-Type: application/xml
@@ -1006,9 +1126,12 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-15: ++++++++++++++++++++
+
+
+16. Update/UPDATE OfficeRoom/Room/pressure=p2300+lightstatus=L23 (pressure OK, lightstatus ERROR)
+=================================================================================================
 HTTP/1.1 200 OK
-Content-Length: 949
+Content-Length: 1237
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -1026,6 +1149,19 @@ Date: REGEX(.*)
             <type>clima</type>
             <contextValue/>
           </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>OfficeRoom</id>
+        </entityId>
+        <contextAttributeList>
           <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
@@ -1034,14 +1170,17 @@ Date: REGEX(.*)
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>472</code>
-        <reasonPhrase>request parameter is invalid/not allowed</reasonPhrase>
-        <details>action: UPDATE - entity: [OfficeRoom, Room] - offending attribute: lightstatus</details>
+        <code>404</code>
+        <reasonPhrase>No context element found</reasonPhrase>
+        <details>OfficeRoom</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-16: ++++++++++++++++++++
+
+
+17. Update/APPEND OfficeRoom/Room/pressure=p2300+lightstatus=L23 (both OK)
+==========================================================================
 HTTP/1.1 200 OK
 Content-Length: 805
 Content-Type: application/xml
@@ -1075,7 +1214,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-17: ++++++++++++++++++++
+
+
+18. Update/UPDATE OfficeRoom/Room/pressure=p235 AND ConferenceRoom/Room/pressure=p230
+=====================================================================================
 HTTP/1.1 200 OK
 Content-Length: 1178
 Content-Type: application/xml
@@ -1122,6 +1264,8 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
+
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB

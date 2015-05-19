@@ -25,6 +25,9 @@
 #include <stdio.h>
 #include <string>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
@@ -48,9 +51,20 @@ ContextElement::ContextElement()
 
 /* ****************************************************************************
 *
+* ContextElement::ContextElement - 
+*/
+ContextElement::ContextElement(EntityId* eP)
+{
+  entityId.fill(eP);
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElement::render - 
 */
-std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma)
+std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)
 {
   std::string  out                              = "";
   std::string  xmlTag                           = "contextElement";
@@ -64,11 +78,18 @@ std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType,
   bool         commaAfterAttributeDomainName    = domainMetadataVectorRendered  || contextAttributeVectorRendered;
   bool         commaAfterEntityId               = commaAfterAttributeDomainName || attributeDomainNameRendered;
 
-  out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+  if (requestType == UpdateContext)
+  {
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
+  }
+  else
+  {
+    out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, true);
+  }
 
   out += entityId.render(ciP->outFormat, indent + "  ", commaAfterEntityId, false);
   out += attributeDomainName.render(ciP->outFormat, indent + "  ", commaAfterAttributeDomainName);
-  out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector);
+  out += contextAttributeVector.render(ciP, requestType, indent + "  ", commaAfterContextAttributeVector, omitAttributeValues);
   out += domainMetadataVector.render(ciP->outFormat, indent + "  ", commaAfterDomainMetadataVector);
 
   out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
@@ -140,17 +161,22 @@ void ContextElement::present(const std::string& indent, int ix)
 {
   if (ix == -1)
   {
-    PRINTF("%sContext Element:\n", indent.c_str());
+    LM_F(("%sContext Element:", indent.c_str()));
   }
   else
   {
-    PRINTF("%sContext Element %d:\n", indent.c_str(), ix);
+    LM_F(("%sContext Element %d:", indent.c_str(), ix));
   }
 
   entityId.present(indent + "  ", -1);
   attributeDomainName.present(indent + "  ");
   contextAttributeVector.present(indent + "  ");
   domainMetadataVector.present("Domain", indent + "  ");
+  for (unsigned int ix = 0; ix < providingApplicationList.size(); ++ix)
+  {
+    LM_F(("%s  PA: %s (%s)", indent.c_str(), providingApplicationList[ix].get().c_str(), formatToString(providingApplicationList[ix].getFormat())));
+    LM_F(("%s  providingApplication: %s", indent.c_str(), providingApplicationList[ix].c_str()));
+  }
 }
 
 
@@ -165,6 +191,9 @@ void ContextElement::fill(const struct ContextElement& ce)
   attributeDomainName.fill(ce.attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ce.contextAttributeVector);
   domainMetadataVector.fill((MetadataVector*) &ce.domainMetadataVector);
+  /* Note that according to http://www.cplusplus.com/reference/vector/vector/operator=/, it is
+   * safe to copy vectors of std::string using '=' */
+  providingApplicationList = ce.providingApplicationList;
 }
 
 
@@ -179,4 +208,7 @@ void ContextElement::fill(ContextElement* ceP)
   attributeDomainName.fill(ceP->attributeDomainName);
   contextAttributeVector.fill((ContextAttributeVector*) &ceP->contextAttributeVector);
   domainMetadataVector.fill((MetadataVector*) &ceP->domainMetadataVector);
+  /* Note that according to http://www.cplusplus.com/reference/vector/vector/operator=/, it is
+   * safe to copy vectors of std::string using '=' */
+  providingApplicationList = ceP->providingApplicationList;
 }

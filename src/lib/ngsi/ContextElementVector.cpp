@@ -74,7 +74,7 @@ std::string ContextElementVector::render
     out += vec[ix]->render(ciP, requestType, indent + "  ", ix != vec.size() - 1);
   }
 
-  out += endTag(indent, xmlTag, ciP->outFormat, comma);
+  out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
 
   return out;
 }
@@ -168,4 +168,22 @@ std::string ContextElementVector::check
   }
 
   return "OK";
+}
+
+
+/* ****************************************************************************
+*
+* ContextElementVector::lookup - 
+*/
+ContextElement* ContextElementVector::lookup(EntityId* eP)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if ((vec[ix]->entityId.id == eP->id) && (vec[ix]->entityId.type == eP->type))
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
 }

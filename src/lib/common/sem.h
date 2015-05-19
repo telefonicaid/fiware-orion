@@ -31,9 +31,29 @@
 
 /* ****************************************************************************
 *
+* SemRequestType - 
+*/
+typedef enum SemRequestType
+{
+  SemReadOp,
+  SemWriteOp,
+  SemReadWriteOp,
+  SemNoneOp
+} SemRequestType;
+
+
+
+/* ****************************************************************************
+*
 * semInit -
 */
-extern int semInit(int shared = 0, int takenInitially = 1);
+extern int semInit
+(
+  SemRequestType  _reqPolicy     = SemReadWriteOp,
+  bool            semTimeStat    = false,
+  int             shared         = 0,
+  int             takenInitially = 1
+);
 
 
 
@@ -41,7 +61,7 @@ extern int semInit(int shared = 0, int takenInitially = 1);
 *
 * xxxSemTake -
 */
-extern int reqSemTake(const char* who, const char* what);
+extern int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken);
 extern int mongoSemTake(const char* who, const char* what);
 extern int transSemTake(const char* who, const char* what);
 
@@ -51,8 +71,28 @@ extern int transSemTake(const char* who, const char* what);
 *
 * xxxSemGive -
 */
-extern int reqSemGive(const char* who, const char* what = NULL);
+extern int reqSemGive(const char* who, const char* what = NULL, bool taken = true);
 extern int mongoSemGive(const char* who, const char* what = NULL);
 extern int transSemGive(const char* who, const char* what = NULL);
+
+
+
+/* ****************************************************************************
+*
+* semTimeXxxGet - get accumulated semaphore waiting time
+*/
+extern void semTimeReqGet(char* buf, int bufLen);
+extern void semTimeMongoGet(char* buf, int bufLen);
+extern void semTimeTransGet(char* buf, int bufLen);
+
+
+
+/* ****************************************************************************
+*
+* semTimeXxxReset - 
+*/
+extern void semTimeReqReset(void);
+extern void semTimeMongoReset(void);
+extern void semTimeTransReset(void);
 
 #endif  // SRC_LIB_COMMON_SEM_H_

@@ -80,6 +80,7 @@ IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = 0;
+char                             restAllowedOrigin[64];
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -605,7 +606,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* urlCheck - 
+* urlCheck - check for forbidden characters and remove trailing slashes
 *
 * Returns 'true' if the URL is OK, 'false' otherwise.
 * ciP->answer and ciP->httpStatusCode are set if an error is encountered.
@@ -622,8 +623,19 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
     return false;
   }
 
+  //
+  // Remove '/' at end of URL path
+  //
+  char* s = (char*) url.c_str();
+  while (s[strlen(s) - 1] == '/')
+  {
+    s[strlen(s) - 1] = 0;
+  }
+
   return true;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -778,15 +790,6 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
-    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
-    if (ciP->httpStatusCode != SccOk)
-    {
-      LM_W(("Bad Input (error in URI parameters)"));
-      restReply(ciP, ciP->answer);
-      return MHD_YES;
-    }
-    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
-
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
     if (!ciP->httpHeaders.servicePathReceived)
     {
@@ -800,7 +803,7 @@ static int connectionTreat
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
 
-    if (urlCheck(ciP, url) == false)
+    if (urlCheck(ciP, ciP->url) == false)
     {
       LM_W(("Bad Input (error in URI path)"));
       restReply(ciP, ciP->answer);
@@ -827,6 +830,15 @@ static int connectionTreat
     else
       ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
 
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+    if (ciP->httpStatusCode != SccOk)
+    {
+      LM_W(("Bad Input (error in URI parameters)"));
+      restReply(ciP, ciP->answer);
+      return MHD_YES;
+    }
+    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+
     // Set default mime-type for notifications
     if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
     {
@@ -835,7 +847,7 @@ static int connectionTreat
       else if (ciP->outFormat == JSON)
         ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
       else
-        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = DEFAULT_FORMAT_AS_STRING;
 
       LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
     }
@@ -892,9 +904,13 @@ static int connectionTreat
     restReply(ciP, errorMsg);
   }
   else if (ciP->answer != "")
+  {
     restReply(ciP, ciP->answer);
+  }
   else
+  {
     serveFunction(ciP);
+  }
 
   return MHD_YES;
 }
@@ -1036,6 +1052,7 @@ void restInit
   bool                _multitenant,
   const std::string&  _rushHost,
   unsigned short      _rushPort,
+  const char*         _allowedOrigin,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
   RestServeFunction   _serveFunction,
@@ -1053,6 +1070,8 @@ void restInit
   multitenant   = _multitenant;
   rushHost      = _rushHost;
   rushPort      = _rushPort;
+
+  strcpy(restAllowedOrigin, _allowedOrigin);
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);

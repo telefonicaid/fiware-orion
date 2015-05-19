@@ -57,6 +57,8 @@ TEST(commonSem, unique)
    s = mongoSemTake(__FUNCTION__, "test");
    EXPECT_EQ(0, s);
 
-   s = reqSemTake(__FUNCTION__, "test");
+   bool taken;
+   s = reqSemTake(__FUNCTION__, "test", SemReadWriteOp, &taken);
    EXPECT_EQ(0, s);
+   EXPECT_TRUE(taken);
 }

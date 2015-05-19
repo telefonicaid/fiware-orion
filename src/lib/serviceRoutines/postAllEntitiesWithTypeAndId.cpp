@@ -150,6 +150,7 @@ std::string postAllEntitiesWithTypeAndId
 
   // 07. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
+  parseDataP->upcr.res.release();
   response.release();
 
   return answer;

@@ -72,15 +72,15 @@ using namespace mongo;
 #define REG_ATTRS_TYPE              "type"
 #define REG_ATTRS_ISDOMAIN          "isDomain"
 #define REG_SERVICE_PATH            "servicePath"
+#define REG_FORMAT                  "format"
 
 #define ENT_ATTRS                    "attrs"
+#define ENT_ATTRNAMES                "attrNames"
 #define ENT_ENTITY_ID                "id"
 #define ENT_ENTITY_TYPE              "type"
 #define ENT_SERVICE_PATH             "servicePath"
-#define ENT_ATTRS_NAME               "name"
 #define ENT_ATTRS_TYPE               "type"
 #define ENT_ATTRS_VALUE              "value"
-#define ENT_ATTRS_ID                 "id"
 #define ENT_ATTRS_CREATION_DATE      "creDate"
 #define ENT_ATTRS_MODIFICATION_DATE  "modDate"
 #define ENT_ATTRS_MD                 "md"
@@ -149,6 +149,8 @@ using namespace mongo;
 /*****************************************************************************
 *
 * mongoConnect -
+*
+* Default value for writeConcern == 1 (0: unacknowledged, 1: acknowledged)
 */
 extern bool mongoConnect(const char* host,
                          const char* db,
@@ -156,7 +158,8 @@ extern bool mongoConnect(const char* host,
                          const char* username,
                          const char* passwd,
                          bool        _multitenant,
-                         double      timeout);
+                         double      timeout,
+                         int         writeConcern = 1);
 #ifdef UNIT_TEST
 extern bool mongoConnect(const char* host);
 extern bool mongoConnect(DBClientConnection* c);
@@ -301,9 +304,15 @@ extern void destroyAllOntimeIntervalThreads(std::string tenant);
 
 /* ****************************************************************************
 *
+* matchEntity -
+*/
+extern bool matchEntity(EntityId* en1, EntityId* en2);
+
+/* ****************************************************************************
+*
 * includedEntity -
 */
-extern bool includedEntity(EntityId en, EntityIdVector* entityIdV);
+extern bool includedEntity(EntityId en, EntityIdVector& entityIdV);
 
 /* ****************************************************************************
 *
@@ -337,6 +346,13 @@ extern bool entitiesQuery
   bool                             details = false,
   long long*                       countP  = NULL
 );
+
+/* ****************************************************************************
+*
+* pruneContextElements -
+*
+*/
+extern void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
 
 /* ****************************************************************************
 *
@@ -452,5 +468,84 @@ extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscri
 *
 */
 extern BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
+
+/* ****************************************************************************
+*
+* fillContextProviders -
+*
+*/
+extern void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV);
+
+/* ****************************************************************************
+*
+* someContextElementNotFound -
+*
+*/
+extern bool someContextElementNotFound(ContextElementResponse& cer);
+
+/* ****************************************************************************
+*
+* cprLookupByAttribute -
+*
+*/
+extern void cprLookupByAttribute(EntityId&                          en,
+                                 const std::string&                 attrName,
+                                 ContextRegistrationResponseVector& crrV,
+                                 std::string*                       perEntPa,
+                                 Format*                            perEntPaFormat,
+                                 std::string*                       perAttrPa,
+                                 Format*                            perAttrPaFormat);
+
+
+/* ****************************************************************************
+*
+* basePart, idPart -
+*
+* Helper functions for entitysQuery to split the attribute name string into part,
+* e.g. "A1__ID1" into "A1" and "ID1"
+*/
+inline std::string basePart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just 'name' */
+    return name;
+  }
+
+  /* If found, return substring */
+  return name.substr(0, pos);
+
+}
+
+inline std::string idPart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just "" */
+    return "";
+  }
+
+  /* If found, return substring */
+  return name.substr(pos + 2, name.length());
+
+}
+
+/* ****************************************************************************
+*
+* dbDotEncode -
+*
+*/
+extern std::string dbDotEncode(std::string fromString);
+
+/* ****************************************************************************
+*
+* dbDotDecode -
+*
+*/
+extern std::string dbDotDecode(std::string fromString);
 
 #endif

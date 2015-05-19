@@ -43,7 +43,9 @@ HttpStatusCode mongoNotifyContext
   const std::vector<std::string>&  servicePathV
 )
 {
-    reqSemTake(__FUNCTION__, "ngsi10 notification");
+    bool reqSemTaken;
+
+    reqSemTake(__FUNCTION__, "ngsi10 notification", SemWriteOp, &reqSemTaken);
 
     /* We ignore "subscriptionId" and "originator" in the request, as we don't have anything interesting
      * to do with them */
@@ -54,13 +56,13 @@ HttpStatusCode mongoNotifyContext
         // We use 'ucr' to conform to processContextElement signature but we are not doing anything with that
         UpdateContextResponse  ucr;
         ContextElement*        ceP = &requestP->contextElementResponseVector.get(ix)->contextElement;
-        // FIXME P10: we pass an empty uriParmas in order to fulfill the processContextElement signature().
+        // FIXME P10: we pass an empty uriParams in order to fulfill the processContextElement signature().
         std::map<std::string, std::string> uriParams;
 
         processContextElement(ceP, &ucr, "append", tenant, servicePathV, uriParams, xauthToken);
     }
 
-    reqSemGive(__FUNCTION__, "ngsi10 notification");
+    reqSemGive(__FUNCTION__, "ngsi10 notification", reqSemTaken);
     responseP->responseCode.fill(SccOk);
 
     return SccOk;

@@ -114,10 +114,7 @@ echo "3: ++++++++++++++++++++"
 sleep 4
 
 # Sleep one second more if running under valgrind
-if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
-then
-  sleep 1
-fi
+valgrindSleep 1
 
 url="/v1/unsubscribeContext"
 payload='<?xml version="1.0"?>
@@ -152,12 +149,7 @@ SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk
 echo "5: ++++++++++++++++++++"
 # Wait 5 seconds, so we receive two notifications
 sleep 5
-
-# Sleep one second more if running under valgrind
-if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
-then
-  sleep 1
-fi
+valgrindSleep 1
 
 url="/v1/unsubscribeContext"
 payload='<?xml version="1.0"?>
@@ -249,11 +241,8 @@ orionCurl --url "$url" --payload "$payload"
 
 echo "10: ++++++++++++++++++++"
 # Get accumulated data - if running under valgrind, sleep 2 secs, to make sure the onchange notifications have time to arrive 
-if [ "$FUNC_TEST_RUNNING_UNDER_VALGRIND" == "true" ]
-then
-  sleep 2
-fi
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
+
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -458,14 +447,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -495,14 +484,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -532,14 +521,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -569,14 +558,14 @@ Content-Type: application/xml
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>pressure</name>
-            <type>clima</type>
-            <contextValue>p2300</contextValue>
-          </contextAttribute>
-          <contextAttribute>
             <name>lightstatus</name>
             <type>light</type>
             <contextValue>L23</contextValue>
+          </contextAttribute>
+          <contextAttribute>
+            <name>pressure</name>
+            <type>clima</type>
+            <contextValue>p2300</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
