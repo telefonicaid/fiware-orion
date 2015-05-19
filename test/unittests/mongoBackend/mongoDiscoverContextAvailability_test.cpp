@@ -2642,7 +2642,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
 
     EXPECT_EQ("collection: unittest.registrations "
               "- query(): { query: { $or: [ { contextRegistration.entities: { $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
-              "{ contextRegistration.entities.id: { $in: {} } } ], "
+              "{ contextRegistration.entities.id: { $in: [] } } ], "
               "expiration: { $gt: 1360232700 }"
               ", servicePath: { $in: [ /^/.*/, null ] } }"
               ", orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);

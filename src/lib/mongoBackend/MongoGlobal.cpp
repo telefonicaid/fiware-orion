@@ -81,6 +81,7 @@ static std::string          subscribeContextAvailabilityCollectionName;
 static std::string          assocationsCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
+static bool 				clientIsInitialized = false;
 
 /* ****************************************************************************
 *
@@ -89,6 +90,18 @@ static bool                 multitenant;
 static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
 static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElement& be);
 
+
+/* ****************************************************************************
+*
+* shutdownClient -
+*/
+static void shutdownClient(void)
+{
+	mongo::Status status = mongo::client::shutdown();
+	if (!status.isOK()) {
+		LM_E(("Database Shutdown Error %s (cannot shutodown mongo client)", status.toString().c_str()));
+	}
+}
 /* ****************************************************************************
 *
 * mongoConnect -
@@ -108,6 +121,18 @@ bool mongoConnect(const char* host,
     LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
 
     mongoSemTake(__FUNCTION__, "connecting to mongo");
+
+	// We trust this function is called once. If not, this call
+	// should be protected against multiple calls
+	if (!clientIsInitialized) {
+	mongo::Status status = mongo::client::initialize();
+	if (!status.isOK()) {
+		LM_E(("Database Startup Error %s (cannot initialize mongo client)", status.toString().c_str()));
+		return false;
+	}
+	atexit(shutdownClient);
+	clientIsInitialized = true;
+	}
 
     bool connected     = false;
     int  retries       = RECONNECT_RETRIES;
