@@ -213,7 +213,7 @@ long            dbTimeout;
 long            httpTimeout;
 char            mutexPolicy[16];
 bool            mutexTimeStat;
-char            writeConcern[16];
+int             writeConcern;
 
 
 
@@ -250,7 +250,7 @@ char            writeConcern[16];
 #define MAX_L               900000
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
 #define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
-#define WRITE_CONCERN_DESC  "db write concern (normal/none)"
+#define WRITE_CONCERN_DESC  "db write concern (0:none,1:normal)"
 
 
 
@@ -289,7 +289,7 @@ PaArgument paArgs[] =
   { "-httpTimeout",  &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
   { "-mutexPolicy",  mutexPolicy,   "MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
   { "-mutexTimeStat",&mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
-  { "-writeConcern", &writeConcern, "WRITE_CONCERN",  PaString, PaOpt, _i "normal",PaNL,   PaNL,  WRITE_CONCERN_DESC },
+  { "-writeConcern", &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,              0,     1,  WRITE_CONCERN_DESC },
 
   PA_END_OF_ARGS
 };
@@ -1156,7 +1156,7 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 *
 * mongoInit -
 */
-static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, long timeout, char* writeConcern)
+static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, long timeout, int writeConcern)
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 

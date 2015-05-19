@@ -25,7 +25,7 @@ Update with WriteConcern set to NORMAL
 
 ----SHELL-INIT--
 dbInit CB
-brokerStart CB 0 IPv4 -writeConcern normal
+brokerStart CB 0 IPv4 -writeConcern 1
 
 --SHELL--
 

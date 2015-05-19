@@ -103,7 +103,7 @@ bool mongoConnect(const char*         host,
                   const char*         passwd,
                   bool                _multitenant,
                   double              timeout,
-                  const std::string&  writeConcern)
+                  int                 writeConcern)
 {
 
     std::string err;
@@ -187,18 +187,17 @@ bool mongoConnect(const char*         host,
     //
     // WriteConcern
     //
-    enum WriteConcern wconcern = (writeConcern == "normal")? W_NORMAL : W_NONE;
-    enum WriteConcern wconcernCheck;
+    int writeConcernCheck;
 
-    connection->setWriteConcern(wconcern);
-    wconcernCheck = connection->getWriteConcern();
+    connection->setWriteConcern((mongo::WriteConcern) writeConcern);
+    writeConcernCheck = (int) connection->getWriteConcern();
     
-    if (wconcernCheck != wconcern)
+    if (writeConcernCheck != writeConcern)
     {
       LM_E(("Database Error (Write Concern not set as desired)"));
       return false;
     }
-    LM_T(LmtMongo, ("Active DB Write Concern mode: %s", (wconcernCheck == W_NORMAL)? "Normal" : "None"));
+    LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
 
     /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using

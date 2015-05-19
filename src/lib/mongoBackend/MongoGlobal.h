@@ -149,6 +149,8 @@ using namespace mongo;
 /*****************************************************************************
 *
 * mongoConnect -
+*
+* Default value for writeConcern == 1 (0: None, 1: Normal)
 */
 extern bool mongoConnect(const char* host,
                          const char* db,
@@ -157,7 +159,7 @@ extern bool mongoConnect(const char* host,
                          const char* passwd,
                          bool        _multitenant,
                          double      timeout,
-                         const std::string& writeConcern = "normal");
+                         int         writeConcern = 1);
 #ifdef UNIT_TEST
 extern bool mongoConnect(const char* host);
 extern bool mongoConnect(DBClientConnection* c);
