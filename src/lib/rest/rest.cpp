@@ -1071,7 +1071,7 @@ void restInit
   rushHost      = _rushHost;
   rushPort      = _rushPort;
 
-  strcpy(restAllowedOrigin, _allowedOrigin);
+  strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);
