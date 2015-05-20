@@ -59,5 +59,6 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-mutexPolicy' <mutex policy (none/read/write/all)>]
                       [option '-mutexTimeStat' (measure total semaphore waiting time)]
                       [option '-writeConcern' <db write concern (0:unacknowledged, 1:acknowledged)>]
+                      [option '-corsOrigin' <CORS allowed origin. use '__ALL' for any>]
                       
 --TEARDOWN--

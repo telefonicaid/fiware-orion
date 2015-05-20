@@ -80,6 +80,7 @@ IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = 0;
+char                             restAllowedOrigin[64];
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -215,6 +216,7 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
   else if (strcasecmp(key.c_str(), "Connection") == 0)      headerP->connection     = value;
   else if (strcasecmp(key.c_str(), "Content-Type") == 0)    headerP->contentType    = value;
   else if (strcasecmp(key.c_str(), "Content-Length") == 0)  headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key.c_str(), "Origin") == 0)          headerP->origin         = value;
   else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)  headerP->tenant         = value;
   else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)    headerP->xauthToken     = value;
   else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
@@ -1050,6 +1052,7 @@ void restInit
   bool                _multitenant,
   const std::string&  _rushHost,
   unsigned short      _rushPort,
+  const char*         _allowedOrigin,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
   RestServeFunction   _serveFunction,
@@ -1067,6 +1070,8 @@ void restInit
   multitenant   = _multitenant;
   rushHost      = _rushHost;
   rushPort      = _rushPort;
+
+  strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);

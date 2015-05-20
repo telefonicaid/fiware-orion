@@ -209,6 +209,7 @@ char            httpsCertFile[1024];
 bool            https;
 bool            mtenant;
 char            rush[256];
+char            allowedOrigin[64];
 long            dbTimeout;
 long            httpTimeout;
 char            mutexPolicy[16];
@@ -246,12 +247,12 @@ int             writeConcern;
 #define HTTPSCERTFILE_DESC  "certificate key file (for https)"
 #define RUSH_DESC           "rush host (IP:port)"
 #define MULTISERVICE_DESC   "service multi tenancy mode"
+#define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '__ALL' for any"
 #define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
 #define MAX_L               900000
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
 #define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
 #define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
-
 
 
 /* ****************************************************************************
@@ -290,6 +291,8 @@ PaArgument paArgs[] =
   { "-mutexPolicy",  mutexPolicy,   "MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
   { "-mutexTimeStat",&mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
   { "-writeConcern", &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,              0,     1,  WRITE_CONCERN_DESC },
+
+  { "-corsOrigin",   allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
 
   PA_END_OF_ARGS
 };
@@ -1469,14 +1472,14 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));
