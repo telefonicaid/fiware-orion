@@ -28,8 +28,8 @@ dbInit CB
 brokerStart CB 0-255 IPV4 -corsOrigin rivendel
 
 --SHELL--
-echo "01. Update/APPEND E1-T1-A1"
-echo "=========================="
+echo "01. Update/APPEND E1-T1-A1 (Access-Control-Allow-Origin header not included)"
+echo "============================================================================"
 payload='{
   "contextElements": [
     {
@@ -50,37 +50,43 @@ orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
-echo "02. Query E1-T1 with rivendel origin"
-echo "===================================="
-payload='{
-  "entities": [
-    {
-      "type": "T1",
-      "id": "E1"
-    }
-  ]
-}'
-orionCurl --url /v1/queryContext --payload "${payload}" --json --origin rivendel
+echo "02. Query E1-T1 with rivendel origin (Access-Control-Allow-Origin header included)"
+echo "=================================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --json -X GET --origin rivendel
 echo
 echo
 
-echo "03. Query E1-T1 with mordor origin"
-echo "=================================="
+echo "03. Query E1-T1 with mordor origin (Access-Control-Allow-Origin header not included)"
+echo "===================================================================================="
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --json -X GET --origin mordor
+echo
+echo
+
+echo "04. Update/UPDATE E1-T1-A1 with rivendel origin (Access-Control-Allow-Origin not included for POST)"
+echo "==================================================================================================="
 payload='{
-  "entities": [
+  "contextElements": [
     {
       "type": "T1",
-      "id": "E1"
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "2"
+        }
+      ]
     }
-  ]
+  ],
+  "updateAction": "UPDATE"
 }'
-orionCurl --url /v1/queryContext --payload "${payload}" --json --origin mordor
+orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
 --REGEXPECT--
-01. Update/APPEND E1-T1-A1
-==========================
+01. Update/APPEND E1-T1-A1 (Access-Control-Allow-Origin header not included)
+============================================================================
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
@@ -110,42 +116,65 @@ Date: REGEX(.*)
 }
 
 
-02. Query E1-T1 with rivendel origin
-====================================
+02. Query E1-T1 with rivendel origin (Access-Control-Allow-Origin header included)
+==================================================================================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 279
 Access-Control-Allow-Origin: rivendel
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1",
-                        "type": "string",
-                        "value": "1"
-                    }
-                ],
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "A1",
+                "type": "string",
+                "value": "1"
             }
-        }
-    ]
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": "T1"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
 }
 
 
-03. Query E1-T1 with mordor origin
-==================================
+03. Query E1-T1 with mordor origin (Access-Control-Allow-Origin header not included)
+====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 279
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "A1",
+                "type": "string",
+                "value": "1"
+            }
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": "T1"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+
+
+04. Update/UPDATE E1-T1-A1 with rivendel origin (Access-Control-Allow-Origin not included for POST)
+===================================================================================================
+HTTP/1.1 200 OK
+Content-Length: 383
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -157,7 +186,7 @@ Date: REGEX(.*)
                     {
                         "name": "A1",
                         "type": "string",
-                        "value": "1"
+                        "value": ""
                     }
                 ],
                 "id": "E1",

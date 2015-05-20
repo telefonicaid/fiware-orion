@@ -28,8 +28,8 @@ dbInit CB
 brokerStart CB 0-255 IPV4 -corsOrigin __ALL
 
 --SHELL--
-echo "01. Update/APPEND E1-T1-A1"
-echo "=========================="
+echo "01. Update/APPEND E1-T1-A1 (Access-Control-Allow-Origin not included for POST)"
+echo "=============================================================================="
 payload='{
   "contextElements": [
     {
@@ -50,26 +50,17 @@ orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
-echo "02. Query E1-T1"
-echo "==============="
-payload='{
-  "entities": [
-    {
-      "type": "T1",
-      "id": "E1"
-    }
-  ]
-}'
-orionCurl --url /v1/queryContext --payload "${payload}" --json
+echo "02. Query E1-T1 (Access-Control-Allow-Origin included)"
+echo "======================================================"
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --json -X GET
 echo
 echo
 
 --REGEXPECT--
-01. Update/APPEND E1-T1-A1
-==========================
+01. Update/APPEND E1-T1-A1 (Access-Control-Allow-Origin not included for POST)
+==============================================================================
 HTTP/1.1 200 OK
 Content-Length: 383
-Access-Control-Allow-Origin: *
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -97,35 +88,31 @@ Date: REGEX(.*)
 }
 
 
-02. Query E1-T1
-===============
+02. Query E1-T1 (Access-Control-Allow-Origin included)
+======================================================
 HTTP/1.1 200 OK
-Content-Length: 384
+Content-Length: 279
 Access-Control-Allow-Origin: *
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A1",
-                        "type": "string",
-                        "value": "1"
-                    }
-                ],
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "A1",
+                "type": "string",
+                "value": "1"
             }
-        }
-    ]
+        ],
+        "id": "E1",
+        "isPattern": "false",
+        "type": "T1"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
 }
 
 

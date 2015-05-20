@@ -88,7 +88,8 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     else if (ciP->outFormat == JSON)
       MHD_add_response_header(response, "Content-Type", "application/json");
 
-    if (strlen(restAllowedOrigin) > 0)
+    // At the present version, CORS is support only for GET requests
+    if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
     {
       // If any origin is allowed the header is sent always with "any" as value
       if (strcmp(restAllowedOrigin, "__ALL") == 0)
