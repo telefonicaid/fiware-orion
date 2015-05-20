@@ -8995,7 +8995,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
             .WillByDefault(Return(cursorMockEnt));
     ON_CALL(*connectionMock, _query("unittest.csubs",_,_,_,_,_,_))
             .WillByDefault(Return(cursorMockCsub));
-    ON_CALL(*connectionMock, update(_,_,_,_,_))
+    ON_CALL(*connectionMock, update("unittest.entities",_,_,_,_,_))
             .WillByDefault(Throw(e));
 
     /* Set MongoDB connection */

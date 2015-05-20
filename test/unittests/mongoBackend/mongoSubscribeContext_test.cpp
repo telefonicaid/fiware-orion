@@ -7428,7 +7428,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("unittest.csubs",_,_))
+    ON_CALL(*connectionMock, insert("unittest.csubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();

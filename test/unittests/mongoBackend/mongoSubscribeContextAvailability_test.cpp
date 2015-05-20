@@ -2572,7 +2572,7 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("unittest.casubs",_,_))
+    ON_CALL(*connectionMock, insert("unittest.casubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();

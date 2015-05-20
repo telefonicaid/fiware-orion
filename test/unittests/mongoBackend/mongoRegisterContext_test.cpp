@@ -2714,7 +2714,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
             .WillByDefault(Return(1));
     ON_CALL(*connectionMock, findOne(_,_,_,_))
             .WillByDefault(Return(fakeEntity));
-    ON_CALL(*connectionMock, update("unittest.registrations",_,_,_,_))
+    ON_CALL(*connectionMock, update("unittest.registrations",_,_,_,_,_))
             .WillByDefault(Throw(e));    
     ON_CALL(*cursorMockCAsub, more())
             .WillByDefault(Return(false));
@@ -2867,7 +2867,7 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     /* Prepare mock */   
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("unittest.associations",_,_))
+    ON_CALL(*connectionMock, insert("unittest.associations",_,_,_))
             .WillByDefault(Throw(e));
 
     /* Forge the request (from "inside" to "outside") */
