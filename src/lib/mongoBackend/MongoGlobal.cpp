@@ -215,12 +215,16 @@ bool mongoConnect(const char*         host,
     //
     // WriteConcern
     //
-    int writeConcernCheck;
+    mongo::WriteConcern writeConcernCheck;
 
-    connection->setWriteConcern((mongo::WriteConcern) writeConcern);
-    writeConcernCheck = (int) connection->getWriteConcern();
+    // In legacy driver writeConcern is no longer an int, but a class. We need a small
+    // conversion step here
+    mongo::WriteConcern wc = writeConcern == 1 ? mongo::WriteConcern::acknowledged : mongo::WriteConcern::unacknowledged;
+
+    connection->setWriteConcern((mongo::WriteConcern) wc);
+    writeConcernCheck = (mongo::WriteConcern) connection->getWriteConcern();
     
-    if (writeConcernCheck != writeConcern)
+    if (writeConcernCheck.nodes() != wc.nodes())
     {
       LM_E(("Database Error (Write Concern not set as desired)"));
       return false;
