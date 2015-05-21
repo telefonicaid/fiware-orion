@@ -7329,9 +7329,9 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.duration.set("PT5H");
 
-    /* Set MongoDB connection */
-    setMongoConnectionForUnitTest(connectionMock);
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
