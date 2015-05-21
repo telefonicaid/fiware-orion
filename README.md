@@ -81,7 +81,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * boost: 1.41 (the one that comes in EPEL6 repository)
 * libmicrohttpd: 0.9.22 (the one that comes in EPEL6 repository)
 * libcurl: 7.19.7
-* Mongo Driver: 2.2.3 (from source)
+* Mongo Driver: legacy-1.0.2 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
 * cantcoap (for proxyCoap)
@@ -104,16 +104,14 @@ sudo yum install make cmake gcc-c++ scons
 sudo yum install libmicrohttpd-devel boost-devel libcurl-devel
 ```
 
-* Install the Mongo Driver from source (reference procedure http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/):
+* Install the Mongo Driver from source:
 
 ```
-wget http://downloads.mongodb.org/cxx-driver/mongodb-linux-x86_64-2.2.3.tgz
-# Don't pay attention to the '-linux-x86_64' in the name: it is actually source code for any platform
-tar xfvz mongodb-linux-x86_64-2.2.3.tgz
-cd mongo-cxx-driver-v2.2
-scons                                         # The build/libmongoclient.a library is generated as outcome
-sudo scons install                            # This puts .h files in /usr/local/include and libmongoclient.a in /usr/local/lib
-sudo chmod a+r -R /usr/local/include/mongo    # It seems that scons install breaks permissions
+wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.2.tar.gz
+tar xfvz legacy-1.0.2.tar.gz
+cd mongo-cxx-driver-legacy-1.0.2
+scons                                         # The build/linux2/normal/libmongoclient.a library is generated as outcome
+sudo scons install --prefix=/usr/local        # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
 ```
 
 * Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the
