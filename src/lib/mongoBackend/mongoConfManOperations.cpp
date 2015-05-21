@@ -39,11 +39,12 @@ using namespace mongo;
 */
 void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, const std::string& tenant)
 {
+    DBClientBase* connection = NULL;
+
     reqSemTake(__FUNCTION__, "Mongo Set Forward RegId");
 
     LM_T(LmtMongo, ("Mongo Set Forward RegId"));
 
-    DBClientBase* connection = getMongoConnection();
 
     try
     {
@@ -52,23 +53,30 @@ void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, con
                         getRegistrationsCollectionName(tenant).c_str(),
                         regId.c_str(), updateQuery.toString().c_str()));
 
-        mongoSemTake(__FUNCTION__, "update in RegistrationsCollection");
+        connection = getMongoConnection();
         connection->update(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << OID(regId)), updateQuery);
-        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
+        releaseMongoConnection(connection);
+
         LM_I(("Database Operation Successful (update _id: %s, query: %s)", regId.c_str(), updateQuery.toString().c_str()));
     }
     catch (const DBException &e)
     {
+        //
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
-        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo db exception)");
+        //
+        releaseMongoConnection(connection);
+
         LM_E(("Database Error ('update tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), e.what()));
     }
     catch (...)
     {
+        //
         // FIXME: probably we can do something apart of printing the error, but currently
         // we haven't a use case for that
-        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (mongo generic exception)");
+        //
+        releaseMongoConnection(connection);
+
         LM_E(("Database Error ('update tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), "generic exception"));
     }
 
@@ -81,22 +89,21 @@ void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, con
 */
 std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant)
 {
-    std::string retVal = "";
+    DBClientBase*  connection = NULL;
+    std::string    retVal     = "";
 
     reqSemTake(__FUNCTION__, "Mongo Get Forward RegId");
 
     LM_T(LmtMongo, ("Mongo Get Forward RegId"));
-
-    DBClientBase* connection = getMongoConnection();
 
     try
     {
         LM_T(LmtMongo, ("findOne() in '%s' collection doc _id '%s'", getRegistrationsCollectionName(tenant).c_str(), regId.c_str()));
         BSONObj doc;
 
-        mongoSemTake(__FUNCTION__, "findOne in RegistrationsCollection");
+        connection = getMongoConnection();
         doc = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << OID(regId)));
-        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection");
+        releaseMongoConnection(connection);
 
         LM_T(LmtMongo, ("reg doc: '%s'", doc.toString().c_str()));
         retVal = STR_FIELD(doc, REG_FWS_REGID);
@@ -104,16 +111,22 @@ std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant
     }
     catch (const DBException &e)
     {
-        // FIXME: probably we can do something apart of printing the error, but currently
+        //
+        // FIXME: probably we can do something apart from printing the error, but currently
         // we haven't a use case for that
-        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo db exception)");
+        //
+        releaseMongoConnection(connection);
+
         LM_E(("Database Error ('findOne tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), e.what()));
     }
     catch (...)
     {
-        // FIXME: probably we can do something apart of printing the error, but currently
+        //
+        // FIXME: probably we can do something apart from printing the error, but currently
         // we haven't a use case for that
-        mongoSemGive(__FUNCTION__, "findOne in RegistrationsCollection (mongo generic exception)");
+        //
+        releaseMongoConnection(connection);
+
         LM_E(("Database Error ('findOne tenant=%s, id=%s', 'generic exception')", tenant.c_str(), regId.c_str()));
     }
 

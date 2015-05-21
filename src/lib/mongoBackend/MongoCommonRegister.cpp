@@ -50,7 +50,7 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
 {
     // FIXME: first version of associations doesn't support association update
 
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connection = NULL;
 
     for (unsigned int ix = 0; ix < mdV.size(); ++ix) {
 
@@ -94,25 +94,32 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getAssociationsCollectionName(tenant).c_str(), doc.toString().c_str()));
         try
         {
-            mongoSemTake(__FUNCTION__, "insert into AssociationsCollection");
+            connection = getMongoConnection();
             connection->insert(getAssociationsCollectionName(tenant).c_str(), doc);
-            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection");
+            releaseMongoConnection(connection);
+
             LM_I(("Database Operation Successful (%s)", doc.toString().c_str()));
         }
         catch (const DBException &e)
         {
-            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (mongo db exception)");
+            releaseMongoConnection(connection);
+
             *err = e.what();
             LM_E(("Database Error ('insert \"%s\" in %s', '%s')", doc.toString().c_str(), getAssociationsCollectionName(tenant).c_str(), e.what()));
+
             return false;
         }
-        catch(...) {
-            mongoSemGive(__FUNCTION__, "insert into AssociationsCollection (mongo generic exception)");
+        catch (...)
+        {
+            releaseMongoConnection(connection);
+
             *err = "Generic Exception from mongo";
             LM_E(("Database Error ('insert \"%s\" in %s', '%s')", doc.toString().c_str(), getAssociationsCollectionName(tenant).c_str(), "generic error"));
+
             return false;
         }
     }
+
     return true;
 }
 
@@ -164,9 +171,9 @@ static bool processSubscriptions
 static bool addTriggeredSubscriptions(ContextRegistration                  cr,
                                       map<string, TriggeredSubscription*>& subs,
                                       std::string&                         err,
-                                      std::string                          tenant) {
-
-    DBClientBase* connection = getMongoConnection();
+                                      std::string                          tenant)
+{
+    DBClientBase* connection = NULL;
 
     BSONArrayBuilder entitiesNoPatternA;
     std::vector<std::string> idJsV;
@@ -263,7 +270,7 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query.toString().c_str()));
     try
     {
-        mongoSemTake(__FUNCTION__, "query in SubscribeContextAvailabilityCollection");
+        connection = getMongoConnection();
         cursor = connection->query(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query);
 
         /*
@@ -276,21 +283,25 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
 
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection");
+        releaseMongoConnection(connection);
+
         LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (mongo db exception)");
+        releaseMongoConnection(connection);
+
         err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                " - query(): " + query.toString() +
                " - exception: " + e.what();
         LM_E(("Database Error (%s)", err.c_str()));
+
         return false;
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextAvailabilityCollection (mongo generic exception)");
+        releaseMongoConnection(connection);
+
         err = std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                " - query(): " + query.toString() +
                " - exception: " + "generic";
@@ -330,7 +341,6 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
     }
 
     return true;
-
 }
 
 /* ****************************************************************************
@@ -357,7 +367,7 @@ HttpStatusCode processRegisterContext
   const std::string&        format
 )
 {
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connection = NULL;
 
     /* If expiration is not present, then use a default one */
     if (requestP->duration.isEmpty())
@@ -456,17 +466,19 @@ HttpStatusCode processRegisterContext
     LM_T(LmtMongo, ("upsert update() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), regDoc.toString().c_str()));
     try
     {
-        mongoSemTake(__FUNCTION__, "update in RegistrationsCollection");
+        connection = getMongoConnection();
         /* Note the fourth parameter is set to "true". This means "upsert", so if the document doesn't previously
          * exist in the collection, it is created. Thus, this way is ok with both uses of
          * registerContext (either new registration or updating an existing one) */
         connection->update(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << oid), regDoc, true);
-        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection");
+        releaseMongoConnection(connection);
+
         LM_I(("Database Operation Successful (_id: %s)", oid.toString().c_str()));
     }
     catch (const DBException& e)
     {
-        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (DBException)");
+        releaseMongoConnection(connection);
+
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                                   " - upsert update(): " + regDoc.toString() +
@@ -478,7 +490,8 @@ HttpStatusCode processRegisterContext
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "update in RegistrationsCollection (Generic Exception)");
+        releaseMongoConnection(connection);
+
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                                   " - upsert update(): " + regDoc.toString() +

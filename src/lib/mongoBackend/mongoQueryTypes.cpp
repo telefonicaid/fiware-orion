@@ -44,16 +44,16 @@ HttpStatusCode mongoEntityTypes
   std::map<std::string, std::string>&   uriParams
 )
 {
-  unsigned int offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-  std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+  std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+  bool           details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  DBClientBase*  connection     = NULL;
+
   LM_T(LmtMongo, ("Query Entity Types"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
   reqSemTake(__FUNCTION__, "query types request");
-
-  DBClientBase* connection = getMongoConnection();
 
   /* Compose query based on this aggregation command:  
    *
@@ -116,17 +116,18 @@ HttpStatusCode mongoEntityTypes
 
   LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
 
-  mongoSemTake(__FUNCTION__, "aggregation command");  
   try
   {
-
+    connection = getMongoConnection();
     connection->runCommand(composeDatabaseName(tenant).c_str(), cmd, result);
-    mongoSemGive(__FUNCTION__, "aggregation command");
+    releaseMongoConnection(connection);
+
     LM_I(("Database Operation Successful (%s)", cmd.toString().c_str()));
   }
   catch (const DBException& e)
   {
-      mongoSemGive(__FUNCTION__, "aggregation command");
+      releaseMongoConnection(connection);
+
       std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
               " - command: " + cmd.toString() +
               " - exception: " + e.what();
@@ -138,7 +139,8 @@ HttpStatusCode mongoEntityTypes
   }
   catch (...)
   {
-      mongoSemGive(__FUNCTION__, "aggregation command");
+      releaseMongoConnection(connection);
+
       std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
               " - command: " + cmd.toString() +
               " - exception: " + "generic";
@@ -238,10 +240,11 @@ HttpStatusCode mongoAttributesForEntityType
   std::map<std::string, std::string>&   uriParams
 )
 {
-  unsigned int offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-  std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  DBClientBase*  connection     = NULL;
+  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+  std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+  bool           details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
 
   // Setting the name of the entity type for the response
   responseP->entityType.type = entityType;
@@ -251,7 +254,6 @@ HttpStatusCode mongoAttributesForEntityType
 
   reqSemTake(__FUNCTION__, "query types attributes request");
 
-  DBClientBase* connection = getMongoConnection();
 
   /* Compose query based on this aggregation command:   
    *
@@ -283,17 +285,18 @@ HttpStatusCode mongoAttributesForEntityType
 
   LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
 
-  mongoSemTake(__FUNCTION__, "aggregation command"); 
   try
   {
-
+    connection = getMongoConnection();
     connection->runCommand(composeDatabaseName(tenant).c_str(), cmd, result);
-    mongoSemGive(__FUNCTION__, "aggregation command");
+    releaseMongoConnection(connection);
+
     LM_I(("Database Operation Successful (%s)", cmd.toString().c_str()));
   }
   catch (const DBException& e)
   {
-      mongoSemGive(__FUNCTION__, "aggregation command");
+      releaseMongoConnection(connection);
+
       std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
               " - command: " + cmd.toString() +
               " - exception: " + e.what();
@@ -305,7 +308,8 @@ HttpStatusCode mongoAttributesForEntityType
   }
   catch (...)
   {
-      mongoSemGive(__FUNCTION__, "aggregation command");
+      releaseMongoConnection(connection);
+
       std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
               " - command: " + cmd.toString() +
               " - exception: " + "generic";

@@ -141,22 +141,45 @@ using namespace mongo;
 
 /*****************************************************************************
 *
-* Macro to ease extracting fields from BSON objects
+* Macros to ease extracting fields from BSON objects
 */
 #define STR_FIELD(i, sf) std::string(i.getStringField(sf))
 #define C_STR_FIELD(i, sf) i.getStringField(sf)
+
+
+
+/* ****************************************************************************
+*
+* mongoStart - 
+*/
+extern bool mongoStart
+(
+  const char* host,
+  const char* db,
+  const char* rplSet,
+  const char* username,
+  const char* passwd,
+  bool        _multitenant,
+  double      timeout,
+  int         poolSize
+);
+
+
 
 /*****************************************************************************
 *
 * mongoConnect -
 */
-extern bool mongoConnect(const char* host,
-                         const char* db,
-                         const char* rplSet,
-                         const char* username,
-                         const char* passwd,
-                         bool        _multitenant,
-                         double      timeout);
+extern DBClientBase* mongoConnect
+(
+  const char*  host,
+  const char*  db,
+  const char*  rplSet,
+  const char*  username,
+  const char*  passwd,
+  double       timeout
+);
+
 #ifdef UNIT_TEST
 extern bool mongoConnect(const char* host);
 extern bool mongoConnect(DBClientConnection* c);
@@ -185,9 +208,15 @@ extern void mongoDisconnect();
 * getMongoConnection -
 *
 * I would prefer to have per-collection methods, to have a better encapsulation, but
-* the Mongo C++ API seems not working that way
+* the Mongo C++ API seems not to work that way
 */
 extern DBClientBase* getMongoConnection(void);
+
+/* ****************************************************************************
+*
+* releaseMongoConnection - 
+*/
+extern void releaseMongoConnection(DBClientBase* connection);
 
 /*****************************************************************************
 *

@@ -50,11 +50,12 @@ HttpStatusCode mongoUpdateContextSubscription
   const std::vector<std::string>&     servicePathV
 )
 {
+  DBClientBase* connection = NULL;
+
   reqSemTake(__FUNCTION__, "ngsi10 update subscription request");
 
   LM_T(LmtMongo, ("Update Context Subscription, notifyFormat: '%s'", formatToString(notifyFormat)));
 
-  DBClientBase* connection = getMongoConnection();
 
   /* Look for document */
   BSONObj  sub;
@@ -62,9 +63,9 @@ HttpStatusCode mongoUpdateContextSubscription
   {
       OID id = OID(requestP->subscriptionId.get());
 
-      mongoSemTake(__FUNCTION__, "findOne in SubscribeContextCollection");
+      connection = getMongoConnection();
       sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << id));
-      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection");
+      releaseMongoConnection(connection);
       LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
   }
   catch (const AssertionException &e)
@@ -73,7 +74,8 @@ HttpStatusCode mongoUpdateContextSubscription
       // FIXME P4: this checking should be done at the parsing stage, without progressing to
       // mongoBackend. For the moment we can leave this here, but we should remove it in the future
       // (old issue #95)
-      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo assertion exception)");
+      //
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo assertion exception)");
 
       responseP->subscribeError.errorCode.fill(SccContextElementNotFound);
@@ -82,7 +84,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   catch (const DBException &e)
   {
-      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo db exception)");
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)");
 
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
@@ -94,7 +96,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   catch (...)
   {
-      mongoSemGive(__FUNCTION__, "findOne in SubscribeContextCollection (mongo generic exception)");
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)");
 
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
@@ -216,14 +218,16 @@ HttpStatusCode mongoUpdateContextSubscription
       LM_T(LmtMongo, ("update() in '%s' collection _id '%s': %s}", getSubscribeContextCollectionName(tenant).c_str(),
                          requestP->subscriptionId.get().c_str(),
                          update.toString().c_str()));
-      mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
+
+      connection = getMongoConnection();
       connection->update(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
-      mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
+      releaseMongoConnection(connection);
+
       LM_I(("Database Operation Successful (update _id: %s, %s)", requestP->subscriptionId.get().c_str(), update.toString().c_str()));
   }
   catch (const DBException &e)
   {
-      mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo db exception)");
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
@@ -236,7 +240,7 @@ HttpStatusCode mongoUpdateContextSubscription
   }
   catch (...)
   {
-      mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi10 update subscription request (mongo generic exception)");
       responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +

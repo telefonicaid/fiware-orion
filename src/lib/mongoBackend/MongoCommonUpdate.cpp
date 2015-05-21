@@ -748,10 +748,10 @@ static bool addTriggeredSubscriptions(std::string                               
                                       std::string                               tenant,
                                       const std::vector<std::string>&           servicePathV)
 {
-    DBClientBase*             connection      = getMongoConnection();
+    DBClientBase*             connection      = NULL;
     std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
-    std::vector<std::string>  spathV;
     std::string               spathRegex      = "";
+    std::vector<std::string>  spathV;
 
     
     //
@@ -814,13 +814,13 @@ static bool addTriggeredSubscriptions(std::string                               
     // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
     BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
 
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
+
     /* Do the query */
     auto_ptr<DBClientCursor> cursor;
     try
     {
-        LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
-
-        mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
+        connection      = getMongoConnection();
         cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
 
         /*
@@ -831,13 +831,13 @@ static bool addTriggeredSubscriptions(std::string                               
         if (cursor.get() == NULL) {
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
+        releaseMongoConnection(connection);
 
         LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (DBException)");
+        releaseMongoConnection(connection);
         err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                " - query(): " + query.toString() +
                " - exception: " + e.what();
@@ -846,7 +846,7 @@ static bool addTriggeredSubscriptions(std::string                               
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (Generic Exception)");
+        releaseMongoConnection(connection);
         err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                " - query(): " + query.toString() +
                " - exception: " + "generic";
@@ -905,8 +905,7 @@ static bool processSubscriptions(const EntityId*                           enP,
                                  const std::string&                        xauthToken,
                                  std::vector<std::string>                  servicePathV)
 {
-
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connection = NULL;
 
     /* For each one of the subscriptions in the map, send notification */
     bool ret = true;
@@ -954,14 +953,16 @@ static bool processSubscriptions(const EntityId*                           enP,
                                 query.toString().c_str(),
                                 update.toString().c_str()));
 
-                mongoSemTake(__FUNCTION__, "update in SubscribeContextCollection");
+                connection = getMongoConnection();
                 connection->update(getSubscribeContextCollectionName(tenant).c_str(), query, update);
-                mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection");
+                releaseMongoConnection(connection);
+
                 LM_I(("Database Operation Successful (update: %s, query: %s)", update.toString().c_str(), query.toString().c_str()));
             }
             catch (const DBException &e)
             {
-                mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo db exception)");
+                releaseMongoConnection(connection);
+
                 err += std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + e.what();
                 LM_E(("Database Error (%s)", err.c_str()));
@@ -969,7 +970,8 @@ static bool processSubscriptions(const EntityId*                           enP,
             }
             catch (...)
             {
-                mongoSemGive(__FUNCTION__, "update in SubscribeContextCollection (mongo generic exception)");
+                releaseMongoConnection(connection);
+
                 err += std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                        " - query(): " + query.toString() + " - update(): " + update.toString() + " - exception: " + "generic";
                 LM_E(("Database Error (%s)", err.c_str()));
@@ -1326,9 +1328,9 @@ static bool processContextAttributeVector (ContextElement*                      
 * createEntity -
 *
 */
-static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant, const std::vector<std::string>& servicePathV) {
-
-    DBClientBase* connection = getMongoConnection();
+static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::string* errDetail, std::string tenant, const std::vector<std::string>& servicePathV)
+{
+    DBClientBase* connection = NULL;
 
     LM_T(LmtMongo, ("Entity not found in '%s' collection, creating it", getEntitiesCollectionName(tenant).c_str()));
 
@@ -1414,17 +1416,19 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
     BSONObj insertedDoc = insertedDocB.obj();
     LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), insertedDoc.toString().c_str()));
-    mongoSemTake(__FUNCTION__, "insert into EntitiesCollection");
 
     try
     {
+        connection = getMongoConnection();
         connection->insert(getEntitiesCollectionName(tenant).c_str(), insertedDoc);
-        mongoSemGive(__FUNCTION__, "insert into EntitiesCollection");
+        releaseMongoConnection(connection);
+
         LM_I(("Database Operation Successful (insert %s)", insertedDoc.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "insert into EntitiesCollection (mongo db exception)");
+        releaseMongoConnection(connection);
+
         *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + e.what();
@@ -1434,7 +1438,8 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "insert into EntitiesCollection (mongo generic exception)");
+        releaseMongoConnection(connection);
+
         *errDetail = std::string("Database Error: collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - insert(): " + insertedDoc.toString() +
                 " - exception: " + "generic";
@@ -1463,7 +1468,7 @@ static bool removeEntity
     const std::string    idString          = "_id." ENT_ENTITY_ID;
     const std::string    typeString        = "_id." ENT_ENTITY_TYPE;
     const std::string    servicePathString = "_id." ENT_SERVICE_PATH;
-    DBClientBase*        connection        = getMongoConnection();
+    DBClientBase*        connection        = NULL;
     BSONObjBuilder       bob;
     BSONObj              query;
 
@@ -1483,14 +1488,17 @@ static bool removeEntity
     try {
         LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", getEntitiesCollectionName(tenant).c_str(),
                            query.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "remove in EntitiesCollection");
+
+        connection = getMongoConnection();        
         connection->remove(getEntitiesCollectionName(tenant).c_str(), query);
-        mongoSemGive(__FUNCTION__, "remove in EntitiesCollection");
+        releaseMongoConnection(connection);
+
         LM_I(("Database Operation Successful (remove %s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "remove in EntitiesCollection (mongo db exception)");
+        releaseMongoConnection(connection);
+
         cerP->statusCode.fill(SccReceiverInternalError,
            std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
            " - remove() query: " + query.toString() +
@@ -1501,7 +1509,8 @@ static bool removeEntity
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo generic exception)");
+        releaseMongoConnection(connection);
+
         cerP->statusCode.fill(SccReceiverInternalError,
            std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
            " - remove() query: " + query.toString() +
@@ -1595,8 +1604,7 @@ void processContextElement(ContextElement*                      ceP,
                            const std::string&                   caller
 )
 {
-
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connection = NULL;
 
     /* Getting the entity in the request (helpful in other places) */
     EntityId* enP = &ceP->entityId;
@@ -1671,7 +1679,8 @@ void processContextElement(ContextElement*                      ceP,
     try
     {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
-        mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
+
+        connection = getMongoConnection();
         cursor = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
 
         /*
@@ -1682,13 +1691,14 @@ void processContextElement(ContextElement*                      ceP,
         if (cursor.get() == NULL) {
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
+        releaseMongoConnection(connection);
 
         LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
+        releaseMongoConnection(connection);
+
         buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,                           
                            std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                               " - query(): " + query.toString() +
@@ -1698,7 +1708,8 @@ void processContextElement(ContextElement*                      ceP,
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
+        releaseMongoConnection(connection);
+
         buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,                           
                            std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                               " - query(): " + query.toString() +
@@ -1862,14 +1873,17 @@ void processContextElement(ContextElement*                      ceP,
             LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getEntitiesCollectionName(tenant).c_str(),
                             query.toString().c_str(),
                             updatedEntityObj.toString().c_str()));
-            mongoSemTake(__FUNCTION__, "update in EntitiesCollection");
+            
+            connection = getMongoConnection();
             connection->update(getEntitiesCollectionName(tenant).c_str(), query, updatedEntityObj);
-            mongoSemGive(__FUNCTION__, "update in EntitiesCollection");
+            releaseMongoConnection(connection);
+
             LM_I(("Database Operation Successful (update %s)", query.toString().c_str()));
         }
         catch (const DBException &e)
         {
-            mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo db exception)");
+            releaseMongoConnection(connection);
+
             cerP->statusCode.fill(SccReceiverInternalError,
                std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                " - update() query: " + query.toString() +
@@ -1883,7 +1897,8 @@ void processContextElement(ContextElement*                      ceP,
         }
         catch (...)
         {
-            mongoSemGive(__FUNCTION__, "update in EntitiesCollection (mongo generic exception)");
+            releaseMongoConnection(connection);
+
             cerP->statusCode.fill(SccReceiverInternalError,
                std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                " - update() query: " + query.toString() +

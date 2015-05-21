@@ -211,6 +211,7 @@ bool            mtenant;
 char            rush[256];
 long            dbTimeout;
 long            httpTimeout;
+int             dbPoolSize;
 
 
 
@@ -244,6 +245,7 @@ long            httpTimeout;
 #define RUSH_DESC           "rush host (IP:port)"
 #define MULTISERVICE_DESC   "service multi tenancy mode"
 #define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
+#define DBPS_DESC           "database connection pool size"
 #define MAX_L               900000
 
 
@@ -265,6 +267,7 @@ PaArgument paArgs[] =
   { "-dbpwd",        pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
   { "-db",           dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
   { "-dbTimeout",    &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
+  { "-dbPoolSize",   &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         0,      100,   DBPS_DESC          },
 
   { "-fwdHost",      fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
   { "-fwdPort",      &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
@@ -1147,11 +1150,20 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 *
 * mongoInit -
 */
-static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, long timeout)
+static void mongoInit
+(
+  const char*  dbHost,
+  const char*  rplSet,
+  std::string  dbName,
+  const char*  user,
+  const char*  pwd,
+  long         timeout,
+  int          dbPoolSize
+)
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo))
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, dbPoolSize))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -1401,7 +1413,7 @@ int main(int argC, char* argV[])
 
   pidFile();
   orionInit(orionExit, ORION_VERSION);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, dbPoolSize);
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 

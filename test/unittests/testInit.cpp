@@ -38,17 +38,44 @@ using namespace mongo;
 *
 * This function (which is called before every test) cleans the database
 */
-void setupDatabase(void) {
+extern DBClientBase* mongoInitialConnectionGetForUnitTest();
+extern void          setMongoConnectionForUnitTest(DBClientBase*);
+void setupDatabase(void)
+{
+    DBClientBase*  connection   = NULL;
+    static bool    mongoStarted = false;
 
-    mongoConnect("localhost");
-    DBClientBase* connection = getMongoConnection();
+    if (mongoStarted == false)
+    {
+      LM_M(("KZ: Starting mongo"));
+      mongoStart("localhost", "", "", "", "", false, 0, 10);
+
+      connection = mongoInitialConnectionGetForUnitTest();
+      LM_M(("KZ: connection set to %p", connection));
+      setMongoConnectionForUnitTest(connection);
+      mongoStarted = true;
+    }
+    else
+    {
+      LM_M(("KZ: Mongo already started - getting mongo connection"));
+      connection = getMongoConnection();
+
+      if (connection == NULL)
+      {
+        extern void setMongoConnectionForUnitTest(DBClientBase*);
+        connection = mongoInitialConnectionGetForUnitTest();
+        LM_M(("KZ: connection was NULL - got another one: %p", connection));
+        setMongoConnectionForUnitTest(connection);
+      }
+    }
+
+    LM_M(("KZ: connection at %p", connection));
 
     connection->dropCollection(REGISTRATIONS_COLL);
     connection->dropCollection(ENTITIES_COLL);
     connection->dropCollection(SUBSCRIBECONTEXT_COLL);
     connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);
     connection->dropCollection(ASSOCIATIONS_COLL);
-
 
     setDbPrefix(DBPREFIX);
     setRegistrationsCollectionName("registrations");
@@ -57,6 +84,7 @@ void setupDatabase(void) {
     setSubscribeContextAvailabilityCollectionName("casubs");
     setAssociationsCollectionName("associations");
 
+    LM_M(("KZ: setupDatabase DONE"));
 }
 
 /* ****************************************************************************
