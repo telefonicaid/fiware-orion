@@ -7302,11 +7302,13 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
                                        "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                                        "attrs" << BSONArray() <<
                                        "conditions" << BSONArray());
+
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
     ON_CALL(*connectionMock, update("unittest.csubs",_,_,_,_,_))
             .WillByDefault(Throw(e));
     ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
             .WillByDefault(Return(fakeSub));
+
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, destroyOntimeIntervalThreads(_))
             .Times(0);
@@ -7328,8 +7330,8 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     req.duration.set("PT5H");
 
     /* Set MongoDB connection */
-    prepareDatabase();
     setMongoConnectionForUnitTest(connectionMock);
+    prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
@@ -7345,8 +7347,8 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
               "- exception: boom!!", res.subscribeError.errorCode.details);
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
     delete timerMock;
-    setMongoConnectionForUnitTest(NULL);
 }

@@ -500,6 +500,7 @@ static DBClientBase* connection = NULL;
 
 void setMongoConnectionForUnitTest(DBClientBase* _connection)
 {
+  LM_M(("KZ: Set mongo connection to %p", _connection));
   connection = _connection;
 }
 #endif
