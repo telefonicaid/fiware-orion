@@ -428,7 +428,7 @@ DBClientBase* mongoConnect(const char*  host,
     if (writeConcernCheck.nodes() != wc.nodes())
     {
       LM_E(("Database Error (Write Concern not set as desired)"));
-      return false;
+      return NULL;
     }
     LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
 
