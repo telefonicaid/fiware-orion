@@ -46,6 +46,8 @@ using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * First set of test is related with updating thinks
@@ -7327,7 +7329,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
 
     /* Set MongoDB connection */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
@@ -7346,5 +7348,5 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     delete notifierMock;
     delete connectionMock;
     delete timerMock;
-
+    setMongoConnectionForUnitTest(NULL);
 }

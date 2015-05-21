@@ -41,6 +41,7 @@
 
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
 
 
 /* ****************************************************************************
@@ -8999,7 +9000,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
             .WillByDefault(Throw(e));
 
     /* Set MongoDB connection */
-    mongoConnect(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -9039,9 +9040,8 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
               "- exception: boom!!", RES_CER_STATUS(0).details);
 
     /* Release mocks */
-    //delete cursorMockEnt;
-    //delete cursorMockCsub;
     delete connectionMock;
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -9066,7 +9066,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
             .WillByDefault(Throw(e));
 
     /* Set MongoDB connection */
-    mongoConnect(connectionMock);    
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
@@ -9101,6 +9101,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
 
     /* Release mock */
     delete connectionMock;
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
