@@ -47,6 +47,7 @@ int                    startTime         = -1;
 int                    statisticsTime    = -1;
 OrionExitFunction      orionExitFunction = NULL;
 static struct timeval  logStartTime;
+bool                   semTimeStatistics = false;
 
 
 
@@ -90,7 +91,7 @@ void transactionIdSet(void)
 *
 * orionInit - 
 */
-void orionInit(OrionExitFunction exitFunction, const char* version)
+void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy, bool semTimeStat)
 {
   // Give the rest library the correct version string of this executable
   versionSet(version);
@@ -99,7 +100,7 @@ void orionInit(OrionExitFunction exitFunction, const char* version)
   orionExitFunction = exitFunction;
 
   // Initialize the semaphore used by mongoBackend
-  semInit();
+  semInit(reqPolicy, semTimeStat);
 
   // Set timer object (singleton)
   setTimer(new Timer());

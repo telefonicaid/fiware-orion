@@ -48,10 +48,12 @@ HttpStatusCode mongoEntityTypes
   unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
   bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  bool         reqSemTaken;
+
   LM_T(LmtMongo, ("Query Entity Types"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
-  reqSemTake(__FUNCTION__, "query types request");
+  reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
 
   DBClientBase* connection = getMongoConnection();
 
@@ -133,7 +135,7 @@ HttpStatusCode mongoEntityTypes
 
       LM_E(("Database Error (%s)", err.c_str()));
       responseP->statusCode.fill(SccReceiverInternalError, err);
-      reqSemGive(__FUNCTION__, "query types request");
+      reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
       return SccOk;
   }
   catch (...)
@@ -145,7 +147,7 @@ HttpStatusCode mongoEntityTypes
 
       LM_E(("Database Error (%s)", err.c_str()));
       responseP->statusCode.fill(SccReceiverInternalError, err);
-      reqSemGive(__FUNCTION__, "query types request");
+      reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
       return SccOk;
   }
 
@@ -157,7 +159,7 @@ HttpStatusCode mongoEntityTypes
   if (resultsArray.size() == 0)
   {
     responseP->statusCode.fill(SccContextElementNotFound);
-    reqSemGive(__FUNCTION__, "query types request");
+    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
     return SccOk;
   }
 
@@ -219,7 +221,7 @@ HttpStatusCode mongoEntityTypes
     }
   }
 
-  reqSemGive(__FUNCTION__, "query types request");
+  reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
   return SccOk;
 
@@ -242,6 +244,7 @@ HttpStatusCode mongoAttributesForEntityType
   unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
   bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  bool         reqSemTaken;
 
   // Setting the name of the entity type for the response
   responseP->entityType.type = entityType;
@@ -249,7 +252,7 @@ HttpStatusCode mongoAttributesForEntityType
   LM_T(LmtMongo, ("Query Types Attribute for <%s>", entityType.c_str()));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
-  reqSemTake(__FUNCTION__, "query types attributes request");
+  reqSemTake(__FUNCTION__, "query types attributes request", SemReadOp, &reqSemTaken);
 
   DBClientBase* connection = getMongoConnection();
 
@@ -300,7 +303,7 @@ HttpStatusCode mongoAttributesForEntityType
 
       LM_E(("Database Error (%s)", err.c_str()));
       responseP->statusCode.fill(SccReceiverInternalError, err);
-      reqSemGive(__FUNCTION__, "query types request");
+      reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
       return SccOk;
   }
   catch (...)
@@ -312,7 +315,7 @@ HttpStatusCode mongoAttributesForEntityType
 
       LM_E(("Database Error (%s)", err.c_str()));
       responseP->statusCode.fill(SccReceiverInternalError, err);
-      reqSemGive(__FUNCTION__, "query types request");
+      reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
       return SccOk;
   }
 
@@ -324,7 +327,7 @@ HttpStatusCode mongoAttributesForEntityType
   if (resultsArray.size() == 0)
   {
     responseP->statusCode.fill(SccContextElementNotFound);
-    reqSemGive(__FUNCTION__, "query types request");
+    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
     return SccOk;
   }
 
@@ -375,7 +378,7 @@ HttpStatusCode mongoAttributesForEntityType
     }
   }
 
-  reqSemGive(__FUNCTION__, "query types request");
+  reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
   return SccOk;
 }

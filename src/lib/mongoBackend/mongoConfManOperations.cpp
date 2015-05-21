@@ -39,7 +39,9 @@ using namespace mongo;
 */
 void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, const std::string& tenant)
 {
-    reqSemTake(__FUNCTION__, "Mongo Set Forward RegId");
+    bool reqSemTaken;
+
+    reqSemTake(__FUNCTION__, "Mongo Set Forward RegId", SemWriteOp, &reqSemTaken);
 
     LM_T(LmtMongo, ("Mongo Set Forward RegId"));
 
@@ -72,7 +74,7 @@ void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, con
         LM_E(("Database Error ('update tenant=%s, id=%s', '%s')", tenant.c_str(), regId.c_str(), "generic exception"));
     }
 
-    reqSemGive(__FUNCTION__, "Mongo Set Forward RegId");
+    reqSemGive(__FUNCTION__, "Mongo Set Forward RegId", reqSemTaken);
 }
 
 /* ****************************************************************************
@@ -82,8 +84,9 @@ void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, con
 std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant)
 {
     std::string retVal = "";
+    bool        reqSemTaken;
 
-    reqSemTake(__FUNCTION__, "Mongo Get Forward RegId");
+    reqSemTake(__FUNCTION__, "Mongo Get Forward RegId", SemReadOp, &reqSemTaken);
 
     LM_T(LmtMongo, ("Mongo Get Forward RegId"));
 
@@ -117,7 +120,7 @@ std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant
         LM_E(("Database Error ('findOne tenant=%s, id=%s', 'generic exception')", tenant.c_str(), regId.c_str()));
     }
 
-    reqSemGive(__FUNCTION__, "Mongo Get Forward RegId");
+    reqSemGive(__FUNCTION__, "Mongo Get Forward RegId", reqSemTaken);
 
     return retVal;
 }

@@ -43,6 +43,7 @@
 #include "ngsi10/UpdateContextSubscriptionResponse.h"
 #include "ngsi10/NotifyContextResponse.h"
 
+#include "rest/rest.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/HttpStatusCode.h"
 #include "rest/mhd.h"
@@ -53,6 +54,7 @@
 
 
 static int replyIx = 0;
+
 /* ****************************************************************************
 *
 * restReply - 
@@ -85,6 +87,21 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
       MHD_add_response_header(response, "Content-Type", "application/xml");
     else if (ciP->outFormat == JSON)
       MHD_add_response_header(response, "Content-Type", "application/json");
+
+    // At the present version, CORS is support only for GET requests
+    if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
+    {
+      // If any origin is allowed the header is sent always with "any" as value
+      if (strcmp(restAllowedOrigin, "__ALL") == 0)
+      {
+        MHD_add_response_header(response, "Access-Control-Allow-Origin", "*");
+      }
+      // If an specific origin is allowed the header is only sent if the origins match
+      else if (strcmp(ciP->httpHeaders.origin.c_str(), restAllowedOrigin) == 0)
+      {
+        MHD_add_response_header(response, "Access-Control-Allow-Origin", restAllowedOrigin);
+      }
+    }
   }
 
   MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);

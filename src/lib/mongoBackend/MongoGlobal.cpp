@@ -24,6 +24,9 @@
 */
 
 #include <regex.h>
+#include <algorithm>  // std::replace                                                                                                                       
+#include <string>
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
@@ -107,13 +110,14 @@ static void shutdownClient(void)
 *
 * mongoConnect -
 */
-bool mongoConnect(const char* host,
-                  const char* db,
-                  const char* rplSet,
-                  const char* username,
-                  const char* passwd,
-                  bool        _multitenant,
-                  double      timeout)
+bool mongoConnect(const char*         host,
+                  const char*         db,
+                  const char*         rplSet,
+                  const char*         username,
+                  const char*         passwd,
+                  bool                _multitenant,
+                  double              timeout,
+                  int                 writeConcern)
 {
 
     std::string err;
@@ -207,6 +211,21 @@ bool mongoConnect(const char* host,
     }
 
     LM_I(("Successful connection to database"));
+
+    //
+    // WriteConcern
+    //
+    int writeConcernCheck;
+
+    connection->setWriteConcern((mongo::WriteConcern) writeConcern);
+    writeConcernCheck = (int) connection->getWriteConcern();
+    
+    if (writeConcernCheck != writeConcern)
+    {
+      LM_E(("Database Error (Write Concern not set as desired)"));
+      return false;
+    }
+    LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
 
     /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using
@@ -1260,7 +1279,7 @@ bool entitiesQuery
 
           ContextAttribute ca;
 
-          ca.name = basePart(attrName);
+          ca.name = dbDotDecode(basePart(attrName));
           std::string mdId = idPart(attrName);
           ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
 
@@ -2217,4 +2236,43 @@ void cprLookupByAttribute(EntityId&                          en,
       }
     }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* Characters for attribute value encoding
+*/
+#define ESCAPE_1_DECODED  '.'
+#define ESCAPE_1_ENCODED  '='
+
+
+
+/* ****************************************************************************
+*
+* dbDotEncode -
+*
+* Replace:
+*   . => =
+*/
+std::string dbDotEncode(std::string s)
+{
+  replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
+  return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* dbDotDecode -
+*
+* Replace:
+*   = => .
+*/
+std::string dbDotDecode(std::string s)
+{
+  std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
+  return s;
 }

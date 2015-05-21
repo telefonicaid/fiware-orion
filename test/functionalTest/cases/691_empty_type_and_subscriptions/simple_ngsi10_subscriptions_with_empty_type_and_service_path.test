@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Simple NGSI10 subscription with service path and with empty type
+Simple NGSI10 subscription with empty type
 
 --SHELL-INIT--
 dbInit CB
@@ -31,21 +31,18 @@ accumulatorStart
 --SHELL--
 
 #
-# 01. Make accumulator subscribe to all entities of Service Path /Madrid/#
-# 02. Create entity E/T with Service Path /Madrid
-# 03. Create entity E/T with Service Path /Barcelona
-# 04. Check that the accumulator received the notification of E/T Madrid only
+# 01. Make accumulator subscribe to E//A1 (empty type)
+# 02. Create E/T1/A1 using convop /v1/contextEntities/type/T1/id/E
+# 03. Check whether the accumulator received the notification of E/T1/A1
 #
 
-
-echo "01. Make accumulator subscribe to all entities of Service Path /Madrid/#"
-echo "========================================================================"
+echo "01. Make accumulator subscribe to E//A1 (empty type)"
+echo "===================================================="
 payload='{
   "entities": [
     {
         "isPattern": "false",
-        "id": "E",
-        "type": ""
+        "id": "E"
     }
   ],
   "attributes": [
@@ -53,7 +50,6 @@ payload='{
   ],
   "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
   "duration": "P1M",
-  "throttling": "PT1S",
   "notifyConditions": [
     {
         "type": "ONCHANGE",
@@ -63,13 +59,13 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/subscribeContext --payload "${payload}" --servicePath "/Madrid/#" --json
+orionCurl --url /v1/subscribeContext --payload "${payload}" --json
 echo
 echo
 
 
-echo "02. Create entity E/T with Service Path /Madrid"
-echo "==============================================="
+echo "02. Create E/T1/A1 using convop /v1/contextEntities/type/T1/id/E"
+echo "================================================================"
 payload='{
   "attributes" : [
     {
@@ -79,56 +75,38 @@ payload='{
     }
   ]
 }'
-orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Madrid --json
+orionCurl --url /v1/contextEntities/type/T1/id/E --payload "${payload}" --json
 echo
 echo
 
 
-echo "03. Create entity E/T with Service Path /Barcelona"
-echo "=================================================="
-payload='{
-  "attributes" : [
-    {
-      "name" : "A1",
-      "type" : "AT",
-      "value" : "Barcelona"
-    }
-  ]
-}'
-orionCurl --url /v1/contextEntities/type/T/id/E --payload "${payload}" --servicePath /Barcelona --json
-echo
-echo
-
-
-echo "04. Check that the accumulator received the initial notification of E/T Madrid only"
-echo "==================================================================================="
-sleep 1
-curl localhost:${LISTENER_PORT}/dump -s -S
+echo "03. Check whether the accumulator received the notification of E/T1/A1"
+echo "======================================================================"
+accumulatorDump
 echo
 echo
 
 
 --REGEXPECT--
-01. Make accumulator subscribe to all entities of Service Path /Madrid/#
-========================================================================
+01. Make accumulator subscribe to E//A1 (empty type)
+====================================================
 HTTP/1.1 200 OK
-Content-Length: 135
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "subscribeResponse": {
         "duration": "P1M", 
-        "subscriptionId": "REGEX([0-9a-f]{24})", 
-        "throttling": "PT1S"
+        "subscriptionId": "REGEX([0-9a-f]{24})"
     }
 }
 
 
-02. Create entity E/T with Service Path /Madrid
-===============================================
+02. Create E/T1/A1 using convop /v1/contextEntities/type/T1/id/E
+================================================================
 HTTP/1.1 200 OK
-Content-Length: 310
+Content-Length: 311
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -150,44 +128,14 @@ Date: REGEX(.*)
     ], 
     "id": "E", 
     "isPattern": "false", 
-    "type": "T"
+    "type": "T1"
 }
 
 
-03. Create entity E/T with Service Path /Barcelona
-==================================================
-HTTP/1.1 200 OK
-Content-Length: 310
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "attributes": [
-                {
-                    "name": "A1", 
-                    "type": "AT", 
-                    "value": ""
-                }
-            ], 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ], 
-    "id": "E", 
-    "isPattern": "false", 
-    "type": "T"
-}
-
-
-04. Check that the accumulator received the initial notification of E/T Madrid only
-===================================================================================
+03. Check whether the accumulator received the notification of E/T1/A1
+======================================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
-Fiware-Servicepath: /Madrid
-Content-Length: 462
+Content-Length: 463
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: 127.0.0.1:REGEX(\d+)
 Accept: application/xml, application/json
@@ -199,7 +147,7 @@ Content-Type: application/json
   "contextResponses" : [
     {
       "contextElement" : {
-        "type" : "T",
+        "type" : "T1",
         "isPattern" : "false",
         "id" : "E",
         "attributes" : [
@@ -223,4 +171,4 @@ Content-Type: application/json
 --TEARDOWN---
 brokerStop CB
 accumulatorStop
-# dbDrop CB
+dbDrop CB

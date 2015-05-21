@@ -397,7 +397,7 @@ static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttrib
   actualUpdate = false;
 
   /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
-  std::string effectiveName = caP->name;
+  std::string effectiveName = dbDotEncode(caP->name);
   if (caP->getId() != "")
   {
     effectiveName += "__" + caP->getId();
@@ -462,7 +462,7 @@ static bool appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuil
 {
 
   /* Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document */
-  std::string effectiveName = caP->name;
+  std::string effectiveName = dbDotEncode(caP->name);
   if (caP->getId() != "")
   {
     effectiveName += "__" + caP->getId();
@@ -639,7 +639,7 @@ static bool deleteAttribute(BSONObj& attrs, BSONObjBuilder* toUnset, std::map<st
 {
 
   /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
-  std::string effectiveName = caP->name;
+  std::string effectiveName = dbDotEncode(caP->name);
   if (caP->getId() != "")
   {
     effectiveName += "__" + caP->getId();
@@ -1365,7 +1365,7 @@ static bool createEntity(EntityId* eP, ContextAttributeVector attrsV, std::strin
 
         valueBson(attrsV.get(ix), bsonAttr);
 
-        std::string effectiveName = attrsV.get(ix)->name;
+        std::string effectiveName = dbDotEncode(attrsV.get(ix)->name);
         if (attrId.length() != 0)
         {
           effectiveName += "__" + attrId;
@@ -1648,9 +1648,11 @@ void processContextElement(ContextElement*                      ceP,
       LM_T(LmtServicePath, ("Updating entity '%s' for Service Path: '%s', action '%s'", ceP->entityId.id.c_str(), servicePathV[0].c_str(), action.c_str()));
       char               path[MAX_SERVICE_NAME_LEN];
       slashEscape(servicePathV[0].c_str(), path, sizeof(path));
-      const std::string  servicePathValue  = std::string("^") + path + "$|" + "^" + path + "\\/.*";
+
+      const std::string  servicePathValue  = std::string("^") + path + "$";
       bob.appendRegex(servicePathString, servicePathValue);
     }
+
 
     // FIXME P7: we build the filter for '?!exist=entity::type' directly at mongoBackend layer given that
     // Restriction is not a valid field in updateContext according to the NGSI specification. In the

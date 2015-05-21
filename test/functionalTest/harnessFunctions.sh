@@ -601,6 +601,7 @@ function dbInsertEntity()
 #   --servicePath <path>           (Service Path in HTTP header)
 #   --urlParams   <params>         (URI parameters 'in' URL-string)
 #   --xauthToken  <token>          (X-Auth token value)
+#   --origin      <origin>         (Origin in HTTP header)
 #   --verbose                      (verbose output)
 #   --noPayloadCheck               (don't check the payload)
 #
@@ -626,6 +627,7 @@ function orionCurl()
   _verbose='off'
   _debug='off'
   _xauthToken=''
+  _origin=''
   _noPayloadCheck='off'
 
   while [ "$#" != 0 ]
@@ -641,7 +643,8 @@ function orionCurl()
     elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
     elif [ "$1" == "--urlParams" ]; then       _urlParams=$2; shift;
-    elif [ "$1" == "--xauthToken" ]; then       _xauthToken=$2; shift;
+    elif [ "$1" == "--xauthToken" ]; then      _xauthToken=$2; shift;
+    elif [ "$1" == "--origin" ]; then          _origin=$2; shift;
     elif [ "$1" == "--verbose" ]; then         _verbose=on;
     elif [ "$1" == "--debug" ]; then           _debug=on;
     elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck=on;
@@ -701,6 +704,7 @@ function orionCurl()
 
   if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
   #if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
+  #if [ "$_origin" != "" ];     then    _ORIGIN='--header "Origin: '$_origin'"'; fi
 
   _URL=$_host:$_port$_url
   
@@ -716,9 +720,15 @@ function orionCurl()
 #   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD ${_HTTP_TENANT} --header \"Expect:\" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\"  $_BUILTINS --header "Fiware-ServicePath: $_servicePath" $_xtra"
 #   echo '==============================================================================================================================================================='   
   
-  #
-  # FIXME P2: This 'if' should be refactored: if we use the $_HTTP_TENANT variable within curl,
-  #           it will not render correctly. We have to find another way.
+  # FIXME P10: we are taking advantage that --cors is not used with any other header. The if needs
+  #            urgent refactor: it not following (deliverately) the ident style
+  if [ "$_origin" != "" ]
+  then
+    vMsg _URL: $_URL
+    _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Origin: $_origin" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+  else
+  # FIXME P10: This 'if' should be refactored: if we use the $_HTTP_TENANT variable within curl,
+  #            it will not render correctly. We have to find another way.
   #
   if [ "$_httpTenant" != "" ]
   then
@@ -739,6 +749,7 @@ function orionCurl()
        vMsg _URL4: $_URL
        _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
      fi
+  fi
   fi
   
   #

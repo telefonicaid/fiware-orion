@@ -149,6 +149,8 @@ using namespace mongo;
 /*****************************************************************************
 *
 * mongoConnect -
+*
+* Default value for writeConcern == 1 (0: unacknowledged, 1: acknowledged)
 */
 extern bool mongoConnect(const char* host,
                          const char* db,
@@ -156,7 +158,8 @@ extern bool mongoConnect(const char* host,
                          const char* username,
                          const char* passwd,
                          bool        _multitenant,
-                         double      timeout);
+                         double      timeout,
+                         int         writeConcern = 1);
 #ifdef UNIT_TEST
 extern bool mongoConnect(const char* host);
 extern bool mongoConnect(DBClientConnection* c);
@@ -530,5 +533,19 @@ inline std::string idPart(std::string name)
   return name.substr(pos + 2, name.length());
 
 }
+
+/* ****************************************************************************
+*
+* dbDotEncode -
+*
+*/
+extern std::string dbDotEncode(std::string fromString);
+
+/* ****************************************************************************
+*
+* dbDotDecode -
+*
+*/
+extern std::string dbDotDecode(std::string fromString);
 
 #endif
