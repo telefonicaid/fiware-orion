@@ -172,10 +172,22 @@ int mongoPoolInitialize
   //
   int r = sem_init(&connectionPoolSem, 0, 1);
 
+  if (r != 0)
+  {
+    LM_E(("Runtime Error (cannot create connection pool semaphore)"));
+    return -1;
+  }
+
   //
   // Set up the semaphore protecting the set of connections of the pool (connectionSem)
   //
   r = sem_init(&connectionSem, 0, connectionPoolSize);
+  if (r != 0)
+  {
+    LM_E(("Runtime Error (cannot create connection semaphore-set)"));
+    return -1;
+  }
+
 
   return 0;
 }
