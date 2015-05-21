@@ -285,7 +285,7 @@ link_directories("/opt/lib/")
 # flags
 # ------------------------------------------------------------
 add_definitions(-DUNIT_TEST)
-add_definitions(-g)
+
 
 
 # Executable declaration
