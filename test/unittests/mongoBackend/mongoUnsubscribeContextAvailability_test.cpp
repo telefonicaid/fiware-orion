@@ -43,6 +43,8 @@ using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * First set of test is related with updating thinks
@@ -199,9 +201,11 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object).
+     * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUnsubscribeContextAvailability(&req, &res);
@@ -214,21 +218,18 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     EXPECT_EQ("collection: unittest.casubs "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);
-
-    /* Check database (untouched) */
-    mongoDisconnect();
     
     // Sleeping a little to "give mongod time to process its input".
     // Without this sleep, this tests fails around 50% of the times (in Ubuntu 13.04)
     usleep(1000);
-    mongoConnect("localhost");
-    DBClientBase* connection = getMongoConnection();
-    int                 count      = connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
+
+    int count = connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
     ASSERT_EQ(2, count);
 
     /* Release mocks */
     delete notifierMock;
+    setMongoConnectionForUnitTest(NULL);
 
 }
 
@@ -264,9 +265,11 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
     /* Forge the request (from "inside" to "outside") */
     req.subscriptionId.set("51307b66f481db11bf860001");
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object).
+     * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUnsubscribeContextAvailability(&req, &res);
@@ -280,17 +283,14 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
               "- remove() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);
 
-    /* Check database (untouched) */
-    mongoDisconnect();
-
     // Sleeping a little to "give mongod time to process its input".
     // Without this sleep, this tests fails around 50% of the times (in Ubuntu 13.04)
     usleep(1000);
-    mongoConnect("localhost");
-    DBClientBase* connection = getMongoConnection();
+
     ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
 
 }

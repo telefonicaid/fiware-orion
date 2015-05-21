@@ -48,6 +48,8 @@ using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests
@@ -2729,8 +2731,9 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     req.contextRegistrationVector.push_back(&cr);
     req.duration.set("PT1M");
 
-    /* Set MongoDB connection */
-    mongoConnect(connectionMock);
+    /* Set MongoDB connection mock (preserving the "actual" connection for later use) */
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoRegisterContext(&req, &res, uriParams);
@@ -2754,13 +2757,10 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
               "- exception: boom!!", s2);
 
     /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 
-    /* Reconnect to database in not-mocked way */
-    mongoConnect("localhost");
-
-    /* check collection has not been touched */
-    DBClientBase* connection = getMongoConnection();
+    /* check collection has not been touched */    
     EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
     EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
@@ -2889,8 +2889,9 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     /* Prepare database */
     prepareDatabase();
 
-    /* Set MongoDB connection */
-    mongoConnect(connectionMock);
+    /* Set MongoDB connection mock (preserving "actual" connection for later use) */
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoRegisterContext(&req, &res, uriParams);
@@ -2904,13 +2905,10 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     EXPECT_EQ("", res.errorCode.details);    
 
     /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;    
 
-    /* Reconnect to database in not-mocked way */
-    mongoConnect("localhost");
-
-    /* check collections have not been touched */
-    DBClientBase* connection = getMongoConnection();
+    /* check collections have not been touched */  
     EXPECT_EQ(0, connection->count(ASSOCIATIONS_COLL, BSONObj()));
     EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
 

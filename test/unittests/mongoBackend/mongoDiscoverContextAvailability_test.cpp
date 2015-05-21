@@ -38,6 +38,8 @@
 
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests
@@ -2672,8 +2674,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     ON_CALL(*connectionMock, _query("unittest.associations",_,_,_,_,_,_))
             .WillByDefault(Throw(e));
 
-    /* Set MongoDB connection */
-    mongoConnect(connectionMock);
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
@@ -2693,6 +2695,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 
 }

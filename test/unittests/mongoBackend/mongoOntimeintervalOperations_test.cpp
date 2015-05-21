@@ -38,6 +38,8 @@ using ::testing::MatchesRegex;
 using ::testing::Throw;
 using ::testing::Return;
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * For mongoGetContextSubscriptionInfo:
@@ -276,9 +278,9 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
     ContextSubscriptionInfo csi;
     std::string err;
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
     ms = mongoGetContextSubscriptionInfo(subId, &csi, &err);
@@ -288,6 +290,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
     EXPECT_EQ("boom!!", err);
 
     /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 }
 
@@ -503,9 +506,9 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
     ContextElementResponseVector cerV;
     std::string err;
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
     ms = mongoGetContextElementResponses(enV, attrL, &cerV, &err);    
@@ -518,6 +521,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
               "exception: boom!!", err);    
 
     /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 }
 
@@ -624,9 +628,11 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     std::string subId = "51307b66f481db11bf860001";
     std::string err;
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object)
+     * Note that we preserve the "actual" connection for future database checking */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
     ms = mongoUpdateCsubNewNotification(subId, &err);
@@ -635,13 +641,11 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     EXPECT_EQ(SccReceiverInternalError, ms);
     EXPECT_EQ("boom!!", err);
 
-    /* Check that database is as expected (untouched) */
-    mongoDisconnect();
+    /* Check that database is as expected (untouched) */   
 
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
-    mongoConnect("localhost");
-    DBClientBase* connection = getMongoConnection();
+
     BSONObj sub1 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     BSONObj sub2 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(20000000, sub1.getIntField("lastNotification"));
@@ -650,6 +654,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     EXPECT_EQ(30, sub2.getIntField("count"));
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete timerMock;
 
 }

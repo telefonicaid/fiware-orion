@@ -7260,9 +7260,9 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     req.subscriptionId.set("51307b66f481db11bf860001");
     req.duration.set("PT5H");
 
-    /* Set MongoDB connection */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
@@ -7277,6 +7277,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
               "- exception: boom!!", res.subscribeError.errorCode.details);
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
 

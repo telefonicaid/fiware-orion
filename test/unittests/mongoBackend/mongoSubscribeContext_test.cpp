@@ -37,7 +37,7 @@
 #include "mongo/client/dbclient.h"
 #include "rest/uriParamNames.h"
 
-
+extern void setMongoConnectionForUnitTest(DBClientBase*);
 
 /* ****************************************************************************
 *
@@ -7453,9 +7453,11 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
 
-    /* Set MongoDB connection */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object).
+     * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    mongoConnect(connectionMock);  
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoSubscribeContext(&req, &res, "", uriParams, "", emptyServicePathV);
@@ -7474,14 +7476,11 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
               "- exception: boom!!", s2);
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;    
 
-    /* Reconnect to database in not-mocked way */
-    mongoConnect("localhost");
-
-    /* check collection has not been touched */
-    DBClientBase* connection = getMongoConnection();
+    /* check collection has not been touched */ 
     EXPECT_EQ(0, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
 
     utExit();
