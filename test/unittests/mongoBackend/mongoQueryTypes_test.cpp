@@ -891,7 +891,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   /* Prepare mock */
   const DBException e = DBException("boom!!", 33);
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_,_,_,_))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -907,7 +907,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", {} ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } - "
             "exception: boom!!", res.statusCode.details);
   EXPECT_EQ(0,res.typeEntityVector.size());
 
@@ -931,7 +931,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   /* Prepare mock */
   const std::exception e;
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_,_,_,_))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -948,7 +948,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
   EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
   EXPECT_EQ("database: unittest - "
-            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", {} ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } - "
+            "command: { aggregate: \"entities\", pipeline: [ { $match: { _id.servicePath: { $in: [ /^/.*/, null ] } } }, { $project: { _id: 1, attrNames: 1 } }, { $project: { attrNames: { $cond: [ { $eq: [ \"$attrNames\", [] ] }, [ null ], \"$attrNames\" ] } } }, { $unwind: \"$attrNames\" }, { $group: { _id: \"$_id.type\", attrs: { $addToSet: \"$attrNames\" } } }, { $sort: { _id: 1 } } ] } - "
             "exception: generic", res.statusCode.details);
   EXPECT_EQ(0,res.typeEntityVector.size());
 
@@ -1444,7 +1444,7 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
   /* Prepare mock */
   const DBException e = DBException("boom!!", 33);
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_,_,_,_))
       .WillByDefault(Throw(e));
 
   utInit();
@@ -1485,7 +1485,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   /* Prepare mock */
   const std::exception e;
   DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-  ON_CALL(*connectionMock, runCommand(_,_,_,_,_))
+  ON_CALL(*connectionMock, runCommand(_,_,_,_))
       .WillByDefault(Throw(e));
 
   utInit();

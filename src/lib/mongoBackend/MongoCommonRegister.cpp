@@ -92,7 +92,7 @@ static bool processAssociations(MetadataVector mdV, std::string* err, std::strin
 
         BSONObj doc = BSON("_id" << name << ASSOC_SOURCE_ENT << srcEn << ASSOC_TARGET_ENT << tgtEn << ASSOC_ATTRS << attrs.arr());
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getAssociationsCollectionName(tenant).c_str(), doc.toString().c_str()));
-        try 
+        try
         {
             mongoSemTake(__FUNCTION__, "insert into AssociationsCollection");
             connection->insert(getAssociationsCollectionName(tenant).c_str(), doc);
@@ -307,8 +307,8 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
         //
         // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
         //
-        // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get 
-        // an exception and the broker crashes. 
+        // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get
+        // an exception and the broker crashes.
         //
         if (idField.eoo() == true)
         {
@@ -316,10 +316,10 @@ static bool addTriggeredSubscriptions(ContextRegistration                  cr,
           continue;
         }
 
-        std::string subIdStr = idField.OID().str();
+        std::string subIdStr = idField.OID().toString();
 
         if (subs.count(subIdStr) == 0) {
-            LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));            
+            LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
 
             TriggeredSubscription* trigs = new TriggeredSubscription(sub.hasField(CASUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CASUB_FORMAT)) : XML,
                                                                      STR_FIELD(sub, CASUB_REFERENCE),
@@ -496,7 +496,7 @@ HttpStatusCode processRegisterContext
 
     /* Fill the response element */
     responseP->duration = requestP->duration;
-    responseP->registrationId.set(oid.str());
+    responseP->registrationId.set(oid.toString());
     responseP->errorCode.fill(SccOk);
 
     return SccOk;

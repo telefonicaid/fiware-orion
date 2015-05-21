@@ -203,7 +203,7 @@ TEST(mongoRegisterContext_update, updateCase1)
 
   /* reg #1 */
   reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-  EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().str());
+  EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
   EXPECT_EQ(1360232760, reg.getIntField("expiration"));
 
   contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -226,7 +226,7 @@ TEST(mongoRegisterContext_update, updateCase1)
 
   /* reg #2 (untouched) */
   reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-  EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().str());
+  EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().toString());
   EXPECT_EQ(20000000, reg.getIntField("expiration"));
 
   contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -321,7 +321,7 @@ TEST(mongoRegisterContext_update, updateCase2)
 
     /* reg #1 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
     EXPECT_EQ(10000000, reg.getIntField("expiration"));
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -352,7 +352,7 @@ TEST(mongoRegisterContext_update, updateCase2)
 
     /* reg #2 */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().toString());
     EXPECT_EQ(1360232760, reg.getIntField("expiration"));
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -430,7 +430,7 @@ TEST(mongoRegisterContext_update, updateNotFound)
 
     /* reg #1 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
     EXPECT_EQ(10000000, reg.getIntField("expiration"));
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -461,7 +461,7 @@ TEST(mongoRegisterContext_update, updateNotFound)
 
     /* reg #2 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().toString());
     EXPECT_EQ(20000000, reg.getIntField("expiration"));
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -555,7 +555,7 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
 
     /* reg #1 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
     EXPECT_EQ(10000000, reg.getIntField("expiration")) << "wrong expiration (reg #1)";    
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -586,7 +586,7 @@ TEST(mongoRegisterContext_update, updateWrongIdString)
 
     /* reg #2 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().toString());
     EXPECT_EQ(20000000, reg.getIntField("expiration"));
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -682,7 +682,7 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
 
     /* reg #1 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
     EXPECT_EQ(10000000, reg.getIntField("expiration"));
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -713,7 +713,7 @@ TEST(DISABLED_mongoRegisterContext_update, updateWrongIdNoHex)
 
     /* reg #2 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().toString());
     EXPECT_EQ(20000000, reg.getIntField("expiration"));
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -808,7 +808,7 @@ TEST(mongoRegisterContext_update, updateFromXmlToJson)
 
   /* reg #1 */
   reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-  EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().str());
+  EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
   EXPECT_EQ(1360232760, reg.getIntField("expiration"));
   EXPECT_STREQ("JSON", reg.getStringField("format"));
 
@@ -832,7 +832,7 @@ TEST(mongoRegisterContext_update, updateFromXmlToJson)
 
   /* reg #2 (untouched) */
   reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-  EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().str());
+  EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().toString());
   EXPECT_EQ(20000000, reg.getIntField("expiration"));
   EXPECT_STREQ("JSON", reg.getStringField("format"));
 
@@ -930,7 +930,7 @@ TEST(mongoRegisterContext_update, updateFromJsonToXml)
 
   /* reg #1 (untouched) */
   reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-  EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().str());
+  EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
   EXPECT_EQ(10000000, reg.getIntField("expiration"));
   EXPECT_STREQ("XML", reg.getStringField("format"));
 
@@ -962,7 +962,7 @@ TEST(mongoRegisterContext_update, updateFromJsonToXml)
 
   /* reg #2 */
   reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-  EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().str());
+  EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().toString());
   EXPECT_EQ(1360232760, reg.getIntField("expiration"));
   EXPECT_STREQ("XML", reg.getStringField("format"));
 
@@ -1067,7 +1067,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
 
     /* reg #1 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
-    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860001", reg.getField("_id").OID().toString());
     EXPECT_EQ(10000000, reg.getIntField("expiration"));
 
     contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1098,7 +1098,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
 
     /* reg #2 (untouched) */
     reg = connection->findOne(REGISTRATIONS_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860002", reg.getField("_id").OID().toString());
     EXPECT_EQ(20000000, reg.getIntField("expiration"));
 
     contextRegistrationV = reg.getField("contextRegistration").Array();

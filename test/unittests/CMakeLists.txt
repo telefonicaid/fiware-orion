@@ -287,6 +287,7 @@ link_directories("/opt/lib/")
 add_definitions(-DUNIT_TEST)
 
 
+
 # Executable declaration
 # ------------------------------------------------------------
 
@@ -311,7 +312,11 @@ ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)
 ELSEIF(${DISTRO} MATCHES "CentOS_6.*")
   MESSAGE("unitTest: CentOS DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient
+-lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)
+ELSEIF(${DISTRO} MATCHES "Debian_.*")
+  MESSAGE("unitTest: Debian DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)
 ELSE()
   MESSAGE("unitTest: Other DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)

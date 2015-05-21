@@ -191,7 +191,7 @@ TEST(mongoUnsubscribeContext, unsubscribe)
     DBClientBase* connection = getMongoConnection();
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
-    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().str());
+    EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
 
     /* Release connection */
     mongoDisconnect();
@@ -286,7 +286,7 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
     ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
             .WillByDefault(Return(fakeSub));
-    ON_CALL(*connectionMock, remove("unittest.csubs",_,_))
+    ON_CALL(*connectionMock, remove("unittest.csubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();

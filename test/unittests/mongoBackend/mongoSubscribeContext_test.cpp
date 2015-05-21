@@ -369,7 +369,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -460,7 +460,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_JSON)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -551,7 +551,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -647,7 +647,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_C0)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -746,7 +746,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_C0)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -840,7 +840,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -933,7 +933,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1028,7 +1028,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1125,7 +1125,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T0_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1222,7 +1222,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1323,7 +1323,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T0_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1427,7 +1427,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1538,7 +1538,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_TN_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1648,7 +1648,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1763,7 +1763,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_TN_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1865,7 +1865,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -1965,7 +1965,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -2067,7 +2067,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_C0)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -2172,7 +2172,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_C0)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -2272,7 +2272,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -2371,7 +2371,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -2472,7 +2472,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -2575,7 +2575,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T0_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -2677,7 +2677,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -2784,7 +2784,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T0_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -2894,7 +2894,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -3011,7 +3011,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_TN_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -3127,7 +3127,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -3248,7 +3248,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_TN_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -3353,7 +3353,7 @@ TEST(mongoSubscribeContext, Ent1_Attr0_T1_C0_throttling)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_EQ(4, sub.getIntField("throttling"));
@@ -3445,7 +3445,7 @@ TEST(mongoSubscribeContext, Ent1_AttrN_T1_C0_throttling)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_EQ(4, sub.getIntField("throttling"));
@@ -3539,7 +3539,7 @@ TEST(mongoSubscribeContext, EntN_Attr0_T1_C0_throttling)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_EQ(4, sub.getIntField("throttling"));
@@ -3640,7 +3640,7 @@ TEST(mongoSubscribeContext, EntN_AttrN_T1_C0_throttling)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_EQ(4, sub.getIntField("throttling"));
@@ -3747,7 +3747,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -3851,7 +3851,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_C1_JSON)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -3953,7 +3953,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -4058,7 +4058,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_C1_disjoint)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -4177,7 +4177,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -4296,7 +4296,7 @@ TEST(mongoSubscribeContext, matchEnt1NoType_AttrN_T0_C1_disjoint)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -4408,7 +4408,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -4520,7 +4520,7 @@ TEST(mongoSubscribeContext, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -4644,7 +4644,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -4768,7 +4768,7 @@ TEST(mongoSubscribeContext, matchEnt1PatternNoType_AttrN_T0_C1_disjoint)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -4876,7 +4876,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -4988,7 +4988,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CN_partial)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -5099,7 +5099,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_T0_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -5205,7 +5205,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_disjoint)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -5319,7 +5319,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -5433,7 +5433,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CN_partial_disjoint)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -5545,7 +5545,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_T0_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -5661,7 +5661,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -5784,7 +5784,7 @@ TEST(mongoSubscribeContext, matchEnt1_Attr0_TN_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -5904,7 +5904,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -6029,7 +6029,7 @@ TEST(mongoSubscribeContext, matchEnt1_AttrN_TN_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -6151,7 +6151,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -6266,7 +6266,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_C1)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -6387,7 +6387,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -6510,7 +6510,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_T0_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -6628,7 +6628,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -6749,7 +6749,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_T0_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -6877,7 +6877,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -7012,7 +7012,7 @@ TEST(mongoSubscribeContext, matchEntN_Attr0_TN_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -7142,7 +7142,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CN)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -7277,7 +7277,7 @@ TEST(mongoSubscribeContext, matchEntN_AttrN_TN_CNbis)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -7380,7 +7380,7 @@ TEST(mongoSubscribeContext, defaultDuration)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXT_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360319100, sub.getIntField("expiration"));
     EXPECT_FALSE(sub.hasField("lastNotification"));
     EXPECT_FALSE(sub.hasField("throttling"));
@@ -7428,7 +7428,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("unittest.csubs",_,_))
+    ON_CALL(*connectionMock, insert("unittest.csubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -7470,7 +7470,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     std::string s2 = res.subscribeError.errorCode.details.substr(56+24, res.subscribeError.errorCode.details.size()-56-24);
     EXPECT_EQ("collection: unittest.csubs "
               "- insert(): { _id: ObjectId('", s1);
-    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: {}, conditions: [ { type: \"ONTIMEINTERVAL\", value: 60 } ], format: \"XML\" } "
+    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], conditions: [ { type: \"ONTIMEINTERVAL\", value: 60 } ], format: \"XML\" } "
               "- exception: boom!!", s2);
 
     /* Release mocks */
