@@ -100,7 +100,7 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 */
 static void shutdownClient(void)
 {
-	mongo::Status status = mongo::client::shutdown();
+  mongo::Status status = mongo::client::shutdown();
   if (!status.isOK())
   {
 		LM_E(("Database Shutdown Error %s (cannot shutodown mongo client)", status.toString().c_str()));
