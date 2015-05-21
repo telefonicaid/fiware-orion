@@ -612,7 +612,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, update("unittest.csubs",_,_,_,_))
+    ON_CALL(*connectionMock, update("unittest.csubs",_,_,_,_,_))
             .WillByDefault(Throw(e));
 
     TimerMock* timerMock = new TimerMock();

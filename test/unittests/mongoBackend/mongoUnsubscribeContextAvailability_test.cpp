@@ -253,7 +253,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
     ON_CALL(*connectionMock, findOne("unittest.casubs",_,_,_))
             .WillByDefault(Return(fakeSub));
-    ON_CALL(*connectionMock, remove("unittest.casubs",_,_))
+    ON_CALL(*connectionMock, remove("unittest.casubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();

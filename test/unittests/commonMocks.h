@@ -51,11 +51,11 @@ public:
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_count));
         ON_CALL(*this, findOne(_,_,_,_))
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_findOne));
-        ON_CALL(*this, insert(_,_,_))
+        ON_CALL(*this, insert(_,_,_,_))
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_insert));
-        ON_CALL(*this, remove(_,_,_))
+        ON_CALL(*this, remove(_,_,_,_))
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_remove));
-        ON_CALL(*this, update(_,_,_,_,_))
+        ON_CALL(*this, update(_,_,_,_,_,_))
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_update));
         ON_CALL(*this, _query(_,_,_,_,_,_,_))
                 .WillByDefault(Invoke(this, &DBClientConnectionMock::parent_query));
@@ -65,9 +65,9 @@ public:
 
     MOCK_METHOD5(count, unsigned long long(const std::string &ns, const BSONObj &query, int options, int limit, int skip));
     MOCK_METHOD4(findOne, BSONObj(const std::string &ns, const Query &query, const BSONObj *fieldsToReturn, int queryOptions));
-    MOCK_METHOD3(insert, void(const std::string &ns, BSONObj obj, int flags));
-    MOCK_METHOD5(update, void(const std::string &ns, Query query, BSONObj obj, bool upsert, bool multi));
-    MOCK_METHOD3(remove, void(const std::string &ns, Query q, bool justOne));
+    MOCK_METHOD4(insert, void(const std::string &ns, BSONObj obj, int flags, const WriteConcern* wc));
+    MOCK_METHOD6(update, void(const std::string &ns, Query query, BSONObj obj, bool upsert, bool multi, const WriteConcern* wc));
+    MOCK_METHOD4(remove, void(const std::string &ns, Query q, bool justOne, const WriteConcern* wc));
     MOCK_METHOD4(runCommand, bool(const std::string &dbname, const BSONObj& cmd, BSONObj &info, int options));
 
     /* We can not directly mock a method that returns std::auto_ptr<T>, so we are using the workaround described in
@@ -85,14 +85,14 @@ public:
     BSONObj parent_findOne(const std::string &ns, const Query &query, const BSONObj *fieldsToReturn, int queryOptions) {
         return DBClientConnection::findOne(ns, query, fieldsToReturn, queryOptions);
     }
-    void parent_insert(const std::string &ns, BSONObj obj, int flags) {
-        return DBClientConnection::insert(ns, obj, flags);
+    void parent_insert(const std::string &ns, BSONObj obj, int flags, const WriteConcern* wc) {
+        return DBClientConnection::insert(ns, obj, flags, wc);
     }
-    void parent_update(const std::string &ns, Query query, BSONObj obj, bool upsert, bool multi) {
-        return DBClientConnection::update(ns, query, obj, upsert, multi);
+    void parent_update(const std::string &ns, Query query, BSONObj obj, bool upsert, bool multi, const WriteConcern* wc) {
+        return DBClientConnection::update(ns, query, obj, upsert, multi, wc);
     }
-    void parent_remove(const std::string &ns, Query query, bool justOne) {
-        return DBClientConnection::remove(ns, query, justOne);
+    void parent_remove(const std::string &ns, Query query, bool justOne, const WriteConcern* wc) {
+        return DBClientConnection::remove(ns, query, justOne, wc);
     }
     /* Note that given the way in which query() and _query() are defined, parent_query uses
      * a slightly different pattern */

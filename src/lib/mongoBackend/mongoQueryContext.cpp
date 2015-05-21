@@ -265,10 +265,11 @@ HttpStatusCode mongoQueryContext
     std::string err;
     bool        ok;
     long long   count = -1;
+    bool        reqSemTaken;
 
     ContextElementResponseVector rawCerV;
 
-    reqSemTake(__FUNCTION__, "ngsi10 query request");
+    reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
     ok = entitiesQuery(requestP->entityIdVector,
                        requestP->attributeList,
                        requestP->restriction,
@@ -281,7 +282,7 @@ HttpStatusCode mongoQueryContext
                        limit,
                        details,
                        &count);
-    reqSemGive(__FUNCTION__, "ngsi10 query request");
+    reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
 
     if (!ok)
     {

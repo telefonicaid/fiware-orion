@@ -7301,7 +7301,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
                                        "attrs" << BSONArray() <<
                                        "conditions" << BSONArray());
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, update("unittest.csubs",_,_,_,_))
+    ON_CALL(*connectionMock, update("unittest.csubs",_,_,_,_,_))
             .WillByDefault(Throw(e));
     ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
             .WillByDefault(Return(fakeSub));

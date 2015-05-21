@@ -161,7 +161,8 @@ extern bool mongoStart
   const char* passwd,
   bool        _multitenant,
   double      timeout,
-  int         poolSize
+  int         writeConcern = 1,
+  int         poolSize     = 10
 );
 
 
@@ -169,6 +170,8 @@ extern bool mongoStart
 /*****************************************************************************
 *
 * mongoConnect -
+*
+* Default value for writeConcern == 1 (0: unacknowledged, 1: acknowledged)
 */
 extern DBClientBase* mongoConnect
 (
@@ -177,6 +180,7 @@ extern DBClientBase* mongoConnect
   const char*  rplSet,
   const char*  username,
   const char*  passwd,
+  int          writeConcern,
   double       timeout
 );
 
@@ -559,5 +563,19 @@ inline std::string idPart(std::string name)
   return name.substr(pos + 2, name.length());
 
 }
+
+/* ****************************************************************************
+*
+* dbDotEncode -
+*
+*/
+extern std::string dbDotEncode(std::string fromString);
+
+/* ****************************************************************************
+*
+* dbDotDecode -
+*
+*/
+extern std::string dbDotDecode(std::string fromString);
 
 #endif

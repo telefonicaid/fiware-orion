@@ -24,6 +24,9 @@
 */
 #include <semaphore.h>
 #include <regex.h>
+#include <algorithm>  // std::replace                                                                                                                       
+#include <string>
+
 #include "mongo/client/dbclient.h"
 
 #include "logMsg/logMsg.h"
@@ -82,7 +85,6 @@ static Notifier*            notifier;
 static bool                 multitenant;
 static bool                 clientIsInitialized = false;
 
-
 /* ****************************************************************************
 *
 * Forward declarations
@@ -97,10 +99,11 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 */
 static void shutdownClient(void)
 {
-	mongo::Status status = mongo::client::shutdown();
-	if (!status.isOK()) {
-		LM_E(("Database Shutdown Error %s (cannot shutodown mongo client)", status.toString().c_str()));
-	}
+  mongo::Status status = mongo::client::shutdown();
+  if (!status.isOK())
+  {
+    LM_E(("Database Shutdown Error %s (cannot shutdown mongo client)", status.toString().c_str()));
+  }
 }
 
 
@@ -140,6 +143,7 @@ int mongoPoolInitialize
   const char* username,
   const char* passwd,
   double      timeout,
+  int         writeConcern,
   int         poolSize
 )
 {
@@ -159,7 +163,7 @@ int mongoPoolInitialize
   //
   for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
-    connectionPool[ix].connection = mongoConnect(host, db, rplSet, username, passwd, timeout);
+    connectionPool[ix].connection = mongoConnect(host, db, rplSet, username, passwd, writeConcern, timeout);
     connectionPool[ix].free       = true;
   }
 
@@ -265,6 +269,7 @@ bool mongoStart
   const char* passwd,
   bool        _multitenant,
   double      timeout,
+  int         writeConcern,
   int         poolSize
 )
 {
@@ -289,7 +294,7 @@ bool mongoStart
     }
 	}
 
-  if (mongoPoolInitialize(host, db, rplSet, username, passwd, timeout, poolSize) != 0)
+  if (mongoPoolInitialize(host, db, rplSet, username, passwd, timeout, writeConcern, poolSize) != 0)
   {
     LM_E(("Database Startup Error (cannot initialize mongo connection pool)"));
     return false;
@@ -306,12 +311,13 @@ bool mongoStart
 *
 * mongoConnect - move to mongoPool.cpp?
 */
-DBClientBase* mongoConnect(const char* host,
-                           const char* db,
-                           const char* rplSet,
-                           const char* username,
-                           const char* passwd,
-                           double      timeout)
+DBClientBase* mongoConnect(const char*  host,
+                           const char*  db,
+                           const char*  rplSet,
+                           const char*  username,
+                           const char*  passwd,
+                           int          writeConcern,
+                           double       timeout)
 {
     std::string   err;
     DBClientBase* connection = NULL;
@@ -395,6 +401,25 @@ DBClientBase* mongoConnect(const char* host,
 
     LM_I(("Successful connection to database"));
 
+    //
+    // WriteConcern
+    //
+    mongo::WriteConcern writeConcernCheck;
+
+    // In legacy driver writeConcern is no longer an int, but a class. We need a small
+    // conversion step here
+    mongo::WriteConcern wc = writeConcern == 1 ? mongo::WriteConcern::acknowledged : mongo::WriteConcern::unacknowledged;
+
+    connection->setWriteConcern((mongo::WriteConcern) wc);
+    writeConcernCheck = (mongo::WriteConcern) connection->getWriteConcern();
+    
+    if (writeConcernCheck.nodes() != wc.nodes())
+    {
+      LM_E(("Database Error (Write Concern not set as desired)"));
+      return false;
+    }
+    LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
+
     /* Authentication is different depending if multiservice is used or not. In the case of not
      * using multiservice, we authenticate in the single-service database. In the case of using
      * multiservice, it isn't a default database that we know at contextBroker start time (when
@@ -453,12 +478,12 @@ bool mongoConnect(const char* host)
 }
 
 
+#ifdef UNIT_TEST
 /* ****************************************************************************
 *
 * For unit tests there is only one connection. This connection is stored right here (DBClientBase* connection) and
 * given out using the function getMongoConnection().
 */
-#ifdef UNIT_TEST
 static DBClientBase* connection = NULL;
 
 void setMongoConnectionForUnitTest(DBClientBase* _connection)
@@ -1497,7 +1522,7 @@ bool entitiesQuery
 
           ContextAttribute ca;
 
-          ca.name = basePart(attrName);
+          ca.name = dbDotDecode(basePart(attrName));
           std::string mdId = idPart(attrName);
           ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
 
@@ -2453,4 +2478,43 @@ void cprLookupByAttribute(EntityId&                          en,
       }
     }
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* Characters for attribute value encoding
+*/
+#define ESCAPE_1_DECODED  '.'
+#define ESCAPE_1_ENCODED  '='
+
+
+
+/* ****************************************************************************
+*
+* dbDotEncode -
+*
+* Replace:
+*   . => =
+*/
+std::string dbDotEncode(std::string s)
+{
+  replace(s.begin(), s.end(), ESCAPE_1_DECODED, ESCAPE_1_ENCODED);
+  return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* dbDotDecode -
+*
+* Replace:
+*   = => .
+*/
+std::string dbDotDecode(std::string s)
+{
+  std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
+  return s;
 }

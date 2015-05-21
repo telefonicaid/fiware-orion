@@ -52,11 +52,12 @@ HttpStatusCode mongoSubscribeContextAvailability
   const std::string&                     tenant
 )
 {
-    DBClientBase* connection = NULL;
+    DBClientBase*  connection = NULL;
+    bool           reqSemTaken;
 
     LM_T(LmtMongo, ("Subscribe Context Availability Request, notifyFormat: %s", formatToString(notifyFormat)));
 
-    reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
+    reqSemTake(__FUNCTION__, "ngsi9 subscribe request", SemWriteOp, &reqSemTaken);
 
     /* If expiration is not present, then use a default one */
     if (requestP->duration.isEmpty()) {
@@ -117,7 +118,7 @@ HttpStatusCode mongoSubscribeContextAvailability
     catch (const DBException &e)
     {
         releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)");
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)", reqSemTaken);
 
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
@@ -130,7 +131,7 @@ HttpStatusCode mongoSubscribeContextAvailability
     catch (...)
     {
         releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)", reqSemTaken);
 
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
@@ -148,6 +149,6 @@ HttpStatusCode mongoSubscribeContextAvailability
     responseP->duration = requestP->duration;
     responseP->subscriptionId.set(oid.toString());
 
-    reqSemGive(__FUNCTION__, "ngsi9 subscribe request");
+    reqSemGive(__FUNCTION__, "ngsi9 subscribe request", reqSemTaken);
     return SccOk;
 }

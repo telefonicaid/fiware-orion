@@ -53,11 +53,12 @@ HttpStatusCode mongoSubscribeContext
     const std::string  notifyFormatAsString  = uriParam[URI_PARAM_NOTIFY_FORMAT];
     Format             notifyFormat          = stringToFormat(notifyFormatAsString);
     std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];
-    DBClientBase*      connection;
+    DBClientBase*      connection            = NULL;
+    bool               reqSemTaken           = false;
 
     LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormatAsString.c_str()));
 
-    reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
+    reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
 
     /* If expiration is not present, then use a default one */
     if (requestP->duration.isEmpty()) {
@@ -89,11 +90,21 @@ HttpStatusCode mongoSubscribeContext
     
     /* Build entities array */
     BSONArrayBuilder entities;
-    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix) {
+    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
+    {
         EntityId* en = requestP->entityIdVector.get(ix);
-        entities.append(BSON(CSUB_ENTITY_ID << en->id <<
-                             CSUB_ENTITY_TYPE << en->type <<
-                             CSUB_ENTITY_ISPATTERN << en->isPattern));
+
+        if (en->type == "")
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
+        else
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_TYPE << en->type <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
     }
     sub.append(CSUB_ENTITIES, entities.arr());
 
@@ -138,7 +149,8 @@ HttpStatusCode mongoSubscribeContext
     catch (const DBException &e)
     {
         releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)", reqSemTaken);
+
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +
@@ -150,7 +162,8 @@ HttpStatusCode mongoSubscribeContext
     catch (...)
     {
         releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)");
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)", reqSemTaken);
+
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +
@@ -160,7 +173,7 @@ HttpStatusCode mongoSubscribeContext
         return SccOk;
     }    
 
-    reqSemGive(__FUNCTION__, "ngsi10 subscribe request");
+    reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
 
     /* Fill the response element */
     responseP->subscribeResponse.duration = requestP->duration;

@@ -45,9 +45,10 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   const std::string&                       tenant
 )
 {
-  DBClientBase* connection = NULL;
+  DBClientBase*  connection = NULL;
+  bool           reqSemTaken;
 
-  reqSemTake(__FUNCTION__, "ngsi9 unsubscribe request");
+  reqSemTake(__FUNCTION__, "ngsi9 unsubscribe request", SemWriteOp, &reqSemTaken);
 
   LM_T(LmtMongo, ("Unsubscribe Context Availability"));
 
@@ -73,7 +74,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability
       if (sub.isEmpty())
       {
           responseP->statusCode.fill(SccContextElementNotFound);
-          reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (no subscriptions)");
+          reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (no subscriptions)", reqSemTaken);
           return SccOk;
       }
   }
@@ -86,7 +87,8 @@ HttpStatusCode mongoUnsubscribeContextAvailability
       // (odl issues #95)
       //
       releaseMongoConnection(connection);
-      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo assertion exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo assertion exception)", reqSemTaken);
+
       responseP->statusCode.fill(SccContextElementNotFound);
       LM_W(("Bad Input (invalid OID format)"));
       return SccOk;
@@ -94,7 +96,8 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   catch (const DBException &e)
   {
       releaseMongoConnection(connection);
-      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
+
       responseP->statusCode.fill(SccReceiverInternalError,
                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                  " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -105,7 +108,8 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   catch (...)
   {
       releaseMongoConnection(connection);
-      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo generic exception)");
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo generic exception)", reqSemTaken);
+
       responseP->statusCode.fill(SccReceiverInternalError,
                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                  " - findOne() _id: " + requestP->subscriptionId.get() +
@@ -132,8 +136,8 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   catch (const DBException &e)
   {
       releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)", reqSemTaken);
 
-      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo db exception)");
       responseP->statusCode.fill(SccReceiverInternalError,
                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                  " - remove() _id: " + requestP->subscriptionId.get().c_str() +
@@ -144,8 +148,8 @@ HttpStatusCode mongoUnsubscribeContextAvailability
   catch (...)
   {
       releaseMongoConnection(connection);
+      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo generic exception)", reqSemTaken);
 
-      reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request (mongo generic exception)");
       responseP->statusCode.fill(SccReceiverInternalError,
                                  std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                  " - remove() _id: " + requestP->subscriptionId.get().c_str() +
@@ -154,7 +158,7 @@ HttpStatusCode mongoUnsubscribeContextAvailability
       return SccOk;
   }
 
+  reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request", reqSemTaken);
   responseP->statusCode.fill(SccOk);
-  reqSemGive(__FUNCTION__, "ngsi9 unsubscribe request");
   return SccOk;
 }

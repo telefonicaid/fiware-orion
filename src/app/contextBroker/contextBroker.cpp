@@ -209,9 +209,13 @@ char            httpsCertFile[1024];
 bool            https;
 bool            mtenant;
 char            rush[256];
+char            allowedOrigin[64];
 long            dbTimeout;
 long            httpTimeout;
 int             dbPoolSize;
+char            mutexPolicy[16];
+bool            mutexTimeStat;
+int             writeConcern;
 
 
 
@@ -244,10 +248,13 @@ int             dbPoolSize;
 #define HTTPSCERTFILE_DESC  "certificate key file (for https)"
 #define RUSH_DESC           "rush host (IP:port)"
 #define MULTISERVICE_DESC   "service multi tenancy mode"
+#define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '__ALL' for any"
 #define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
 #define DBPS_DESC           "database connection pool size"
 #define MAX_L               900000
-
+#define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
+#define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
+#define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
 
 
 /* ****************************************************************************
@@ -284,6 +291,11 @@ PaArgument paArgs[] =
   { "-multiservice", &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
   { "-httpTimeout",  &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
+  { "-mutexPolicy",  mutexPolicy,   "MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
+  { "-mutexTimeStat",&mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
+  { "-writeConcern", &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,              0,     1,  WRITE_CONCERN_DESC },
+
+  { "-corsOrigin",   allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
 
   PA_END_OF_ARGS
 };
@@ -1158,6 +1170,7 @@ static void mongoInit
   const char*  user,
   const char*  pwd,
   long         timeout,
+  int          writeConcern,
   int          dbPoolSize
 )
 {
@@ -1291,8 +1304,39 @@ static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
 }
 
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 
+/* ****************************************************************************
+*
+* policyGet - 
+*/
+static SemRequestType policyGet(std::string mutexPolicy)
+{
+  if (mutexPolicy == "read")
+  {
+    return SemReadOp;
+  }
+  else if (mutexPolicy == "write")
+  {
+    return SemWriteOp;
+  }
+  else if (mutexPolicy == "all")
+  {
+    return SemReadWriteOp;
+  }
+  else if (mutexPolicy == "none")
+  {
+    return SemNoneOp;
+  }
+
+  //
+  // Default is to protect both reads and writes
+  //
+  return SemReadWriteOp;
+}
+
+
+
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -
@@ -1412,8 +1456,10 @@ int main(int argC, char* argV[])
   }
 
   pidFile();
-  orionInit(orionExit, ORION_VERSION);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, dbPoolSize);
+  SemRequestType policy = policyGet(mutexPolicy);
+  orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize);
+
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 
@@ -1440,14 +1486,14 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));

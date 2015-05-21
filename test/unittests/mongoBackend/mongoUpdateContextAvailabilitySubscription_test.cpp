@@ -2785,7 +2785,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
                                        "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                                        "attrs" << BSONArray());
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, update("unittest.casubs",_,_,_,_))
+    ON_CALL(*connectionMock, update("unittest.casubs",_,_,_,_,_))
             .WillByDefault(Throw(e));
     ON_CALL(*connectionMock, findOne("unittest.casubs",_,_,_))
             .WillByDefault(Return(fakeSub));
