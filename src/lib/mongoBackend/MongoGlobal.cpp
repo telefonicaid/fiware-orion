@@ -103,7 +103,7 @@ static void shutdownClient(void)
   mongo::Status status = mongo::client::shutdown();
   if (!status.isOK())
   {
-    LM_E(("Database Shutdown Error %s (cannot shutodown mongo client)", status.toString().c_str()));
+    LM_E(("Database Shutdown Error %s (cannot shutdown mongo client)", status.toString().c_str()));
   }
 }
 /* ****************************************************************************
