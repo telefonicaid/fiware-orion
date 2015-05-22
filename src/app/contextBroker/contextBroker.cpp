@@ -1177,7 +1177,7 @@ static void mongoInit
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, dbPoolSize, mutexTimeStat))
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -1460,7 +1460,6 @@ int main(int argC, char* argV[])
   SemRequestType policy = policyGet(mutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
   mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, mutexTimeStat);
-
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 

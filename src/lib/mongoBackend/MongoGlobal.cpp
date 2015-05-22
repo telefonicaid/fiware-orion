@@ -345,7 +345,6 @@ static DBClientBase* connection = NULL;
 
 void setMongoConnectionForUnitTest(DBClientBase* _connection)
 {
-  LM_M(("KZ: Set mongo connection to %p", _connection));
   connection = _connection;
 }
 #endif
@@ -362,7 +361,6 @@ void setMongoConnectionForUnitTest(DBClientBase* _connection)
 void mongoDisconnect()
 {
 #ifdef UNIT_TEST
-    LM_M(("KZ: In mongoDisconnect"));
     /* Safety check of null before releasing */
 //    if (connection != NULL) {
 //        delete connection;

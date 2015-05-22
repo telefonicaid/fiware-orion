@@ -48,13 +48,7 @@ TEST(commonSem, unique)
    s = semInit();
    EXPECT_EQ(0, s);
 
-   s = mongoSemGive(__FUNCTION__, "test");
-   EXPECT_EQ(0, s);
-   
    s = reqSemGive(__FUNCTION__, "test");
-   EXPECT_EQ(0, s);
-
-   s = mongoSemTake(__FUNCTION__, "test");
    EXPECT_EQ(0, s);
 
    bool taken;

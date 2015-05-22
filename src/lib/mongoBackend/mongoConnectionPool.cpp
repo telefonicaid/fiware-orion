@@ -75,6 +75,15 @@ int mongoConnectionPoolInit
 )
 {
   //
+  // Checking incoming parameters
+  //
+  if (poolSize == 0)
+  {
+    poolSize = 10;
+  }
+
+
+  //
   // Create the pool
   //
   connectionPool     = (MongoConnection*) calloc(sizeof(MongoConnection), poolSize);
@@ -171,7 +180,6 @@ DBClientBase* mongoPoolConnectionGet(void)
     }
   }
 
-  LM_M(("KZ: releasing connectionPoolSem"));
   sem_post(&connectionPoolSem);
   
   return connection;
@@ -185,22 +193,18 @@ DBClientBase* mongoPoolConnectionGet(void)
 */
 void mongoPoolConnectionRelease(DBClientBase* connection)
 {
-  LM_M(("KZ: Waiting for connectionPoolSem"));
   sem_wait(&connectionPoolSem);
-  LM_M(("KZ: Got connectionPoolSem"));
 
   for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
     if (connectionPool[ix].connection == connection)
     {
       connectionPool[ix].free = true;
-      LM_M(("KZ: releasing connectionSem"));
       sem_post(&connectionSem);
       break;
     }
   }
 
-  LM_M(("KZ: releasing connectionPoolSem"));
   sem_post(&connectionPoolSem);
 }
 
