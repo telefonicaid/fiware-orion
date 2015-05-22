@@ -47,29 +47,23 @@ void setupDatabase(void)
 
     if (mongoStarted == false)
     {
-      LM_M(("KZ: Starting mongo"));
       mongoStart("localhost", "", "", "", "", false, 0, 10);
 
       connection = mongoInitialConnectionGetForUnitTest();
-      LM_M(("KZ: connection set to %p", connection));
       setMongoConnectionForUnitTest(connection);
       mongoStarted = true;
     }
     else
     {
-      LM_M(("KZ: Mongo already started - getting mongo connection"));
       connection = getMongoConnection();
 
       if (connection == NULL)
       {
         extern void setMongoConnectionForUnitTest(DBClientBase*);
         connection = mongoInitialConnectionGetForUnitTest();
-        LM_M(("KZ: connection was NULL - got another one: %p", connection));
         setMongoConnectionForUnitTest(connection);
       }
     }
-
-    LM_M(("KZ: connection at %p", connection));
 
     connection->dropCollection(REGISTRATIONS_COLL);
     connection->dropCollection(ENTITIES_COLL);
@@ -83,8 +77,6 @@ void setupDatabase(void)
     setSubscribeContextCollectionName("csubs");
     setSubscribeContextAvailabilityCollectionName("casubs");
     setAssociationsCollectionName("associations");
-
-    LM_M(("KZ: setupDatabase DONE"));
 }
 
 /* ****************************************************************************
