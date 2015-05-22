@@ -147,36 +147,6 @@ bool mongoStart
 
 
 
-#if 0
-/* ****************************************************************************
-*
-* mongoConnect -
-*
-* Version of the function that doesn't use authentication parameters.
-* FIXME: no longer used?
-*/
-bool mongoConnect(const char* host)
-{
-  return true;
-}
-#endif
-
-
-#ifdef UNIT_TEST
-/* ****************************************************************************
-*
-* For unit tests there is only one connection. This connection is stored right here (DBClientBase* connection) and
-* given out using the function getMongoConnection().
-*/
-static DBClientBase* connection = NULL;
-
-void setMongoConnectionForUnitTest(DBClientBase* _connection)
-{
-  connection = _connection;
-}
-#endif
-
-
 /* ****************************************************************************
 *
 * mongoDisconnect -
@@ -193,6 +163,13 @@ void mongoDisconnect()
   //           FUNCTION TO BE REMOVED - see github issue #929
 }
 
+
+
+#ifdef UNIT_TEST
+
+static DBClientBase* connection = NULL;
+
+
 /* ****************************************************************************
 *
 * mongoConnect -
@@ -201,30 +178,42 @@ void mongoDisconnect()
 * object to be mocked.
 *
 */
-#ifdef UNIT_TEST
 bool mongoConnect(DBClientConnection* c) {
 
     connection = c;
 
     return true;
 }
+
+
+
+/* ****************************************************************************
+*
+* For unit tests there is only one connection. This connection is stored right here (DBClientBase* connection) and
+* given out using the function getMongoConnection().
+*/
+void setMongoConnectionForUnitTest(DBClientBase* _connection)
+{
+  connection = _connection;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoInitialConnectionGetForUnitTest - 
+*
+* This function is meant to be used by unit tests, to get a connection from the pool 
+* and then use that connection, setting it with the function 'setMongoConnectionForUnitTest'.
+* This will set the static variable 'connection' in MongoGlobal.cpp and later 'getMongoConnection'
+* returns that variable (getMongoConnection is used by the entire mongo backend).
+*
+*/
+DBClientBase* mongoInitialConnectionGetForUnitTest(void)
+{
+  return mongoPoolConnectionGet();
+}
 #endif
-
-/*****************************************************************************
-*
-* getNotifier -
-*/
-Notifier* getNotifier() {
-    return notifier;
-}
-
-/*****************************************************************************
-*
-* setNotifier -
-*/
-void setNotifier(Notifier* n) {
-    notifier = n;
-}
 
 
 
@@ -244,14 +233,32 @@ DBClientBase* getMongoConnection(void)
 #endif
 }
 
-DBClientBase* mongoInitialConnectionGetForUnitTest(void)
-{
-  return mongoPoolConnectionGet();
-}
 
+/* ****************************************************************************
+*
+* releaseMongoConnection - give back mongo connection to connection pool 
+*/
 void releaseMongoConnection(DBClientBase* connection)
 {
   mongoPoolConnectionRelease(connection);
+}
+
+
+
+/*****************************************************************************
+*
+* getNotifier -
+*/
+Notifier* getNotifier() {
+    return notifier;
+}
+
+/*****************************************************************************
+*
+* setNotifier -
+*/
+void setNotifier(Notifier* n) {
+    notifier = n;
 }
 
 
