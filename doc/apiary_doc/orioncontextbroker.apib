@@ -24,14 +24,16 @@ Multitenant/multiservice ensures that the entities/attributes/subscriptions of o
    
 Orion Context Broker supports hierarchical scopes, so entities can be assigned to a scope at creation time with updateContext (or related convenience operation). Then, queryContext (and related convenience operations)can be also scoped to locate entities in the corresponding scopes.
 
-For example, consider an Orion-based application using the following scopes:
+For example, consider an Orion-based application using the following scopes (shown in the figure):
 
 + Madrid, as first level scope
 + Gardens and Districts, as second-level scope (children of Madrid)
 + ParqueNorte, ParqueOeste and ParqueSur (children of Gardens) and Fuencarral and Latina (children of Districts)
 Parterre1 and Parterre2 (children of ParqueNorte)
 
-The scope to use is specified using the ìFiware-ServicePathî HTTP in update/query request. For example, to create the entity ìTree1î of type "Tree" in ìParterre1î the following Fiware-ServicePath will be used:   
+![Authentication flow](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/c/ce/ServicePathExample.png)
+
+The scope to use is specified using the ‚ÄúFiware-ServicePath‚Äù HTTP in update/query request. For example, to create the entity ‚ÄúTree1‚Äù of type "Tree" in ‚ÄúParterre1‚Äù the following Fiware-ServicePath will be used:   
    
     Fiware-ServicePath:/Madrid/Gardens/ParqueNorte/Parterre1
 
@@ -85,9 +87,9 @@ In this example, we are playing the role of context producers by creating an ent
             }
         }
         ],
-            "id": ìCar1",
+            "id": ‚ÄúCar1",
             "isPattern": "false",
-            "type": ìCar"
+            "type": ‚ÄúCar"
         }
         
 The entity Car has been created with the specific attribute speed.
@@ -2693,7 +2695,7 @@ Area unions or intersections (e.g. the intersection of a circle and a polygon) a
 
 In order to illustrate geo-located queries with polygons, let's consider the following scenario: three entities (A, B and C, of type "Point") have been created in Orion Context Broker, each one in the coordinates shown in the following picture:
 
-+ http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/5/59/Orion-geo-points.png
+![Authentication flow](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/5/59/Orion-geo-points.png)
 
 Let's consider a query whose scope is the internal area to the square defined by coordinates (0, 0), (0, 6), (6, 6) and (6, 0):
 
@@ -2724,7 +2726,8 @@ Let's consider a query whose scope is the internal area to the square defined by
 
 The result of the query would be A and B:
 
-+ http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/b/b3/Orion-geo-square.png
+
+![Authentication flow](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/b/b3/Orion-geo-square.png)
 
 o define a polygon, we use the polygon element which, in sequence, include a vertexList. A vertexList is composed by a list of vertex elements, each one containing a couple of elements (latitude and longitude) that provide the coordinates of the vertex. The result of the query would be A and B.
 
@@ -2796,7 +2799,7 @@ Let's consider a query whose scope is inside a radius of 15 km (15000 meters) ce
 
 The result of the query would be Madrid, Leganes and Alcobendas.As shown in the picture:
 
-+ http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/9/97/Orion-geo-circle-14-in.png
+![Authentication flow](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/9/97/Orion-geo-circle-14-in.png)
 
 <center>
 
