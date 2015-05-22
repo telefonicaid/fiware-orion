@@ -168,23 +168,6 @@ extern bool mongoStart
 
 
 
-/*****************************************************************************
-*
-* mongoConnect -
-*
-* Default value for writeConcern == 1 (0: unacknowledged, 1: acknowledged)
-*/
-extern DBClientBase* mongoConnect
-(
-  const char*  host,
-  const char*  db,
-  const char*  rplSet,
-  const char*  username,
-  const char*  passwd,
-  int          writeConcern,
-  double       timeout
-);
-
 #ifdef UNIT_TEST
 extern bool mongoConnect(const char* host);
 extern bool mongoConnect(DBClientConnection* c);

@@ -70,13 +70,13 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
     LM_E(("Runtime Error (error initializing 'req' semaphore: %s)", strerror(errno)));
-    return 1;
+    return -1;
   }
 
   if (sem_init(&transSem, shared, takenInitially) == -1)
   {
     LM_E(("Runtime Error (error initializing 'transactionId' semaphore: %s)", strerror(errno)));
-    return 2;
+    return -1;
   }
 
   reqPolicy = _reqPolicy;

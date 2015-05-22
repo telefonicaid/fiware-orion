@@ -35,6 +35,14 @@ using namespace mongo;
 
 /* ****************************************************************************
 *
+* mongoVersionGet - 
+*/
+extern void mongoVersionGet(int* mayor, int* minor);
+
+
+
+/* ****************************************************************************
+*
 * mongoConnectionPoolInit - 
 */
 extern int mongoConnectionPoolInit
@@ -44,6 +52,7 @@ extern int mongoConnectionPoolInit
   const char* rplSet,
   const char* username,
   const char* passwd,
+  bool        multitenant,
   double      timeout,
   int         writeConcern,
   int         poolSize,

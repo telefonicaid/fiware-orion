@@ -54,16 +54,6 @@ using std::auto_ptr;
 
 /* ****************************************************************************
 *
-* RECONNECT_RETRIES - number of retries after connect
-* RECONNECT_DELAY   - number of millisecs to sleep between retries
-*/
-#define RECONNECT_RETRIES 100
-#define RECONNECT_DELAY   1000  // One second
-
-
-
-/* ****************************************************************************
-*
 * OtisTreatFunction - callback signature for treatOntimeintervalSubscriptions
 */
 typedef void (*OtisTreatFunction)(std::string tenant, BSONObj& bobjP);
@@ -74,8 +64,6 @@ typedef void (*OtisTreatFunction)(std::string tenant, BSONObj& bobjP);
 *
 * Globals
 */
-static int                  mongoVersionMayor = -1;
-static int                  mongoVersionMinor = -1;
 static std::string          dbPrefix;
 static std::string          entitiesCollectionName;
 static std::string          registrationsCollectionName;
@@ -84,7 +72,6 @@ static std::string          subscribeContextAvailabilityCollectionName;
 static std::string          assocationsCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
-static bool                 clientIsInitialized = false;
 
 /* ****************************************************************************
 *
@@ -130,198 +117,37 @@ bool mongoStart
   bool        semTimeStat
 )
 {
-  static bool called = false;
+  static bool alreadyDone = false;
 
-  if (called == true)
+  if (alreadyDone == true)
   {
-    LM_W(("mongoStart already called - can only be called once, so please fix!"));
+    LM_E(("Runtime Error (mongoStart already called - can only be called once)"));
     return false;
   }
-  called = true;
+  alreadyDone = true;
 
   multitenant = _multitenant;
 
-	if (!clientIsInitialized)
+  mongo::Status status = mongo::client::initialize();
+  if (!status.isOK())
   {
-    mongo::Status status = mongo::client::initialize();
-    if (!status.isOK())
-    {
-      LM_E(("Database Startup Error %s (cannot initialize mongo client)", status.toString().c_str()));
-      return false;
-    }
-	}
+    LM_E(("Database Startup Error %s (cannot initialize mongo client)", status.toString().c_str()));
+    return false;
+  }
+  atexit(shutdownClient);
 
-  if (mongoConnectionPoolInit(host, db, rplSet, username, passwd, timeout, writeConcern, poolSize, semTimeStat) != 0)
+  if (mongoConnectionPoolInit(host, db, rplSet, username, passwd, _multitenant, timeout, writeConcern, poolSize, semTimeStat) != 0)
   {
     LM_E(("Database Startup Error (cannot initialize mongo connection pool)"));
     return false;
   }
 
-  atexit(shutdownClient);
-  clientIsInitialized = true;
   return true;
 }
 
 
 
-/* ****************************************************************************
-*
-* mongoConnect - move to mongoConnectionPool?
-*/
-DBClientBase* mongoConnect(const char*  host,
-                           const char*  db,
-                           const char*  rplSet,
-                           const char*  username,
-                           const char*  passwd,
-                           int          writeConcern,
-                           double       timeout)
-{
-    std::string   err;
-    DBClientBase* connection = NULL;
-
-    LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
-
-    bool connected     = false;
-    int  retries       = RECONNECT_RETRIES;
-
-    if (strlen(rplSet) == 0)
-    {
-      /* Setting the first argument to true is to use autoreconnect */
-      connection = new DBClientConnection(true);
-
-      /* Not sure of how to generalize the following code, given that DBClientBase class doesn't have a common connect() method (surprisingly) */
-      for (int tryNo = 0; tryNo < retries; ++tryNo)
-      {
-        if ( ((DBClientConnection*)connection)->connect(host, err))
-        {
-          connected = true;
-          break;
-        }
-
-        if (tryNo == 0)
-        {
-          LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
-        }
-        else
-        {
-          LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
-        }
-
-        usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
-      }
-
-    }
-    else
-    {
-      LM_T(LmtMongo, ("Using replica set %s", rplSet));
-
-      // autoReconnect is always on for DBClientReplicaSet connections.
-      std::vector<std::string>  hostTokens;
-      int components = stringSplit(host, ',', hostTokens);
-
-      std::vector<HostAndPort> rplSetHosts;
-      for (int ix = 0; ix < components; ix++)
-      {
-          LM_T(LmtMongo, ("rplSet host <%s>", hostTokens[ix].c_str()));
-          rplSetHosts.push_back(HostAndPort(hostTokens[ix]));
-      }
-
-      connection = new DBClientReplicaSet(rplSet, rplSetHosts, timeout);
-
-      /* Not sure of to generalize the following code, given that DBClientBase class hasn't a common connect() method (surprisingly) */
-      for (int tryNo = 0; tryNo < retries; ++tryNo)
-      {
-        if ( ((DBClientReplicaSet*)connection)->connect())
-        {
-          connected = true;
-          break;
-        }
-
-        if (tryNo == 0)
-        {
-          LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
-        }
-        else
-        {
-          LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
-        }
-
-        usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
-      }
-    }
-
-    if (connected == false)
-    {
-      LM_E(("Database Error (connection failed, after %d retries: '%s')", retries, err.c_str()));
-      return NULL;
-    }
-
-    LM_I(("Successful connection to database"));
-
-    //
-    // WriteConcern
-    //
-    mongo::WriteConcern writeConcernCheck;
-
-    // In legacy driver writeConcern is no longer an int, but a class. We need a small
-    // conversion step here
-    mongo::WriteConcern wc = writeConcern == 1 ? mongo::WriteConcern::acknowledged : mongo::WriteConcern::unacknowledged;
-
-    connection->setWriteConcern((mongo::WriteConcern) wc);
-    writeConcernCheck = (mongo::WriteConcern) connection->getWriteConcern();
-    
-    if (writeConcernCheck.nodes() != wc.nodes())
-    {
-      LM_E(("Database Error (Write Concern not set as desired)"));
-      return NULL;
-    }
-    LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
-
-    /* Authentication is different depending if multiservice is used or not. In the case of not
-     * using multiservice, we authenticate in the single-service database. In the case of using
-     * multiservice, it isn't a default database that we know at contextBroker start time (when
-     * this connection function is invoked) so we authenticate on the admin database, which provides
-     * access to any database */
-    if (multitenant)
-    {
-        if (strlen(username) != 0 && strlen(passwd) != 0)
-        {
-            if (!connection->auth("admin", std::string(username), std::string(passwd), err))
-            {
-                LM_E(("Database Startup Error (authentication: db='admin', username='%s', password='*****': %s)", username, err.c_str()));
-                return NULL;
-            }
-        }
-    }
-    else
-    {
-        if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0)
-        {
-            if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err))
-            {
-                LM_E(("Database Startup Error (authentication: db='%s', username='%s', password='*****': %s)", db, username, err.c_str()));
-                return NULL;
-            }
-        }
-    }
-
-    /* Get mongo version with the 'buildinfo' command */
-    BSONObj result;
-    std::string extra;
-    connection->runCommand("admin", BSON("buildinfo" << 1), result);
-    std::string versionString = std::string(result.getStringField("version"));
-    if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
-    {
-        LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
-        return NULL;
-    }
-    LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
-
-    return connection;
-}
-
-
-
+#if 0
 /* ****************************************************************************
 *
 * mongoConnect -
@@ -333,6 +159,7 @@ bool mongoConnect(const char* host)
 {
   return true;
 }
+#endif
 
 
 #ifdef UNIT_TEST
@@ -360,13 +187,10 @@ void setMongoConnectionForUnitTest(DBClientBase* _connection)
 */
 void mongoDisconnect()
 {
-#ifdef UNIT_TEST
-    /* Safety check of null before releasing */
-//    if (connection != NULL) {
-//        delete connection;
-//    }
-//    connection = NULL;
-#endif
+  // FIXME P4: with the adding of the connection pool, this function is no longer needed.
+  //           However, as it is called from MANY places, especially in unit tests, the
+  //           function will stay for now.
+  //           FUNCTION TO BE REMOVED - see github issue #929
 }
 
 /* ****************************************************************************
@@ -591,8 +415,12 @@ std::string getAssociationsCollectionName(std::string tenant) {
 */
 bool mongoLocationCapable(void)
 {
-    /* Geo location based in 2dsphere indexes was introduced in MongoDB 2.4 */
-    return ((mongoVersionMayor == 2) && (mongoVersionMinor >= 4)) || (mongoVersionMayor > 2);
+  int mayor;
+  int minor;
+
+  /* Geo location based on 2dsphere indexes was introduced in MongoDB 2.4 */
+  mongoVersionGet(&mayor, &minor);
+  return ((mayor == 2) && (minor >= 4)) || (mayor > 2);
 }
 
 /*****************************************************************************

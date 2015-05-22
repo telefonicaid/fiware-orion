@@ -26,9 +26,22 @@
 #include <semaphore.h>
 
 #include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "common/clockFunctions.h"
+#include "common/string.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
+
+
+
+/* ****************************************************************************
+*
+* RECONNECT_RETRIES - number of retries after connect
+* RECONNECT_DELAY   - number of millisecs to sleep between retries
+*/
+#define RECONNECT_RETRIES 100
+#define RECONNECT_DELAY   1000  // One second
 
 
 
@@ -54,6 +67,183 @@ static sem_t            connectionPoolSem;
 static sem_t            connectionSem;
 static struct timespec  semWaitingTime     = { 0, 0 };
 static bool             semStatistics      = false;
+static int              mongoVersionMayor = -1;
+static int              mongoVersionMinor = -1;
+
+
+
+/* ****************************************************************************
+*
+* mongoVersionGet - 
+*/
+void mongoVersionGet(int* mayor, int* minor)
+{
+  *mayor = mongoVersionMayor;
+  *minor = mongoVersionMinor;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoConnect - 
+*
+* Default value for writeConcern == 1 (0: unacknowledged, 1: acknowledged)
+*/
+static DBClientBase* mongoConnect
+(
+  const char*  host,
+  const char*  db,
+  const char*  rplSet,
+  const char*  username,
+  const char*  passwd,
+  bool         multitenant,
+  int          writeConcern,
+  double       timeout
+)
+{
+  std::string   err;
+  DBClientBase* connection = NULL;
+
+  LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
+
+  bool connected     = false;
+  int  retries       = RECONNECT_RETRIES;
+
+  if (strlen(rplSet) == 0)
+  {
+    /* Setting the first argument to true is to use autoreconnect */
+    connection = new DBClientConnection(true);
+
+    /* Not sure of how to generalize the following code, given that DBClientBase class doesn't have a common connect() method (surprisingly) */
+    for (int tryNo = 0; tryNo < retries; ++tryNo)
+    {
+      if ( ((DBClientConnection*)connection)->connect(host, err))
+      {
+        connected = true;
+        break;
+      }
+
+      if (tryNo == 0)
+      {
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
+      }
+      else
+      {
+        LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
+      }
+
+      usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
+    }
+  }
+  else
+  {
+    LM_T(LmtMongo, ("Using replica set %s", rplSet));
+
+    // autoReconnect is always on for DBClientReplicaSet connections.
+    std::vector<std::string>  hostTokens;
+    int components = stringSplit(host, ',', hostTokens);
+
+    std::vector<HostAndPort> rplSetHosts;
+    for (int ix = 0; ix < components; ix++)
+    {
+      LM_T(LmtMongo, ("rplSet host <%s>", hostTokens[ix].c_str()));
+      rplSetHosts.push_back(HostAndPort(hostTokens[ix]));
+    }
+
+    connection = new DBClientReplicaSet(rplSet, rplSetHosts, timeout);
+
+    /* Not sure of to generalize the following code, given that DBClientBase class hasn't a common connect() method (surprisingly) */
+    for (int tryNo = 0; tryNo < retries; ++tryNo)
+    {
+      if ( ((DBClientReplicaSet*)connection)->connect())
+      {
+        connected = true;
+        break;
+      }
+
+      if (tryNo == 0)
+      {
+        LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
+      }
+      else
+      {
+        LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
+      }
+
+      usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
+    }
+  }
+
+  if (connected == false)
+  {
+    LM_E(("Database Error (connection failed, after %d retries: '%s')", retries, err.c_str()));
+    return NULL;
+  }
+
+  LM_I(("Successful connection to database"));
+
+  //
+  // WriteConcern
+  //
+  mongo::WriteConcern writeConcernCheck;
+
+  // In legacy driver writeConcern is no longer an int, but a class. We need a small
+  // conversion step here
+  mongo::WriteConcern wc = writeConcern == 1 ? mongo::WriteConcern::acknowledged : mongo::WriteConcern::unacknowledged;
+
+  connection->setWriteConcern((mongo::WriteConcern) wc);
+  writeConcernCheck = (mongo::WriteConcern) connection->getWriteConcern();
+    
+  if (writeConcernCheck.nodes() != wc.nodes())
+  {
+    LM_E(("Database Error (Write Concern not set as desired)"));
+    return NULL;
+  }
+  LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
+
+  /* Authentication is different depending if multiservice is used or not. In the case of not
+   * using multiservice, we authenticate in the single-service database. In the case of using
+   * multiservice, it isn't a default database that we know at contextBroker start time (when
+   * this connection function is invoked) so we authenticate on the admin database, which provides
+   * access to any database */
+  if (multitenant)
+  {
+    if (strlen(username) != 0 && strlen(passwd) != 0)
+    {
+      if (!connection->auth("admin", std::string(username), std::string(passwd), err))
+      {
+        LM_E(("Database Startup Error (authentication: db='admin', username='%s', password='*****': %s)", username, err.c_str()));
+        return NULL;
+      }
+    }
+  }
+  else
+  {
+    if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0)
+    {
+      if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err))
+      {
+        LM_E(("Database Startup Error (authentication: db='%s', username='%s', password='*****': %s)", db, username, err.c_str()));
+        return NULL;
+      }
+    }
+  }
+
+  /* Get mongo version with the 'buildinfo' command */
+  BSONObj result;
+  std::string extra;
+  connection->runCommand("admin", BSON("buildinfo" << 1), result);
+  std::string versionString = std::string(result.getStringField("version"));
+  if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
+  {
+    LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
+    return NULL;
+  }
+  LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
+
+  return connection;
+}
 
 
 
@@ -68,6 +258,7 @@ int mongoConnectionPoolInit
   const char* rplSet,
   const char* username,
   const char* passwd,
+  bool        multitenant,
   double      timeout,
   int         writeConcern,
   int         poolSize,
@@ -99,7 +290,7 @@ int mongoConnectionPoolInit
   //
   for (int ix = 0; ix < connectionPoolSize; ++ix)
   {
-    connectionPool[ix].connection = mongoConnect(host, db, rplSet, username, passwd, writeConcern, timeout);
+    connectionPool[ix].connection = mongoConnect(host, db, rplSet, username, passwd, multitenant, writeConcern, timeout);
     connectionPool[ix].free       = true;
   }
 
@@ -137,15 +328,25 @@ int mongoConnectionPoolInit
 *
 * mongoPoolConnectionGet - 
 *
-* There are two semaphores to get a connection. There is a limited number of connections
-* and the first thing to do is to wait for a connection to become avilable (any of the
-* connections in the pool) - this is done waiting on the counting semaphore that is 
+* There are two semaphores to get a connection.
+* - One binary semaphore that protects the connection-vector itself (connectionPoolSem)
+* - One counting semaphore that makes the caller wait until there is at least one free connection (connectionSem)
+*
+* There is a limited number of connections and the first thing to do is to wait for a connection
+* to become avilable (any of the N connections in the pool) - this is done waiting on the counting semaphore that is 
 * initialized with "POOL SIZE" - meaning the semaphore can be taken N times if the pool size is N.
 * 
 * Once a connection is free, 'sem_wait(&connectionSem)' returns and we now have to take the semaphore 
 * that protects for pool itself (we *are* going to modify the vector of the pool - can only do it in
 * one thread at a time ...)
-* 
+*
+* After taking a connection, the semaphore 'connectionPoolSem' is freed, as all modifications to the connection pool
+* have finished.
+* The other semaphore however, 'connectionSem', is kept and it is not freed until we finish using the connection.
+*
+* The function mongoPoolConnectionRelease releases the counting semaphore 'connectionSem'.
+* Very important to call the function 'mongoPoolConnectionRelease' after finishing using the connection !
+*
 */
 DBClientBase* mongoPoolConnectionGet(void)
 {
