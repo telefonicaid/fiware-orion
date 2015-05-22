@@ -52,7 +52,13 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
      * in the request */
     responseP->subscriptionId = requestP->subscriptionId;
 
-    OID id = OID(requestP->subscriptionId.get());
+    if (responseP->subscriptionId.get() == "")
+    {
+        responseP->statusCode.fill(SccContextElementNotFound);
+        LM_W(("Bad Input (no subscriptionId)"));
+        return SccOk;
+    }
+
     LM_T(LmtMongo, ("findOne() in '%s' collection _id '%s'}", getSubscribeContextCollectionName(tenant).c_str(),
                     requestP->subscriptionId.get().c_str()));
 
@@ -60,6 +66,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     connection = getMongoConnection();
     try
     {
+        OID id = OID(requestP->subscriptionId.get());
         sub = connection->findOne(getSubscribeContextCollectionName(tenant).c_str(), BSON("_id" << id));
         releaseMongoConnection(connection);
         LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
