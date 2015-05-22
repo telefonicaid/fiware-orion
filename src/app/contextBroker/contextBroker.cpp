@@ -274,7 +274,7 @@ PaArgument paArgs[] =
   { "-dbpwd",        pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
   { "-db",           dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
   { "-dbTimeout",    &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
-  { "-dbPoolSize",   &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         0,      100,   DBPS_DESC          },
+  { "-dbPoolSize",   &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         0,      10000, DBPS_DESC          },
 
   { "-fwdHost",      fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
   { "-fwdPort",      &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
