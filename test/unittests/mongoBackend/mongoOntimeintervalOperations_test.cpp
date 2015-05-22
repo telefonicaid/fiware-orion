@@ -656,5 +656,5 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     /* Release mocks */
     setMongoConnectionForUnitTest(NULL);
     delete timerMock;
-
+    delete connectionMock;
 }

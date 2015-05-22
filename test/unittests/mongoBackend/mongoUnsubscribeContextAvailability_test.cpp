@@ -228,9 +228,9 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     ASSERT_EQ(2, count);
 
     /* Release mocks */
-    delete notifierMock;
     setMongoConnectionForUnitTest(NULL);
-
+    delete notifierMock;
+    delete connectionMock;
 }
 
 /* ****************************************************************************
@@ -292,6 +292,6 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
     /* Release mocks */
     setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
-
+    delete connectionMock;
 }
 

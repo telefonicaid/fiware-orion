@@ -40,6 +40,7 @@ SET (SOURCES
     mongoNotifyContextAvailability.cpp
     mongoQueryTypes.cpp
     TriggeredSubscription.cpp
+    mongoConnectionPool.cpp
 )
 
 SET (HEADERS
@@ -62,6 +63,7 @@ SET (HEADERS
     mongoNotifyContextAvailability.h
     mongoQueryTypes.h
     TriggeredSubscription.h
+    mongoConnectionPool.h
 )
 
 

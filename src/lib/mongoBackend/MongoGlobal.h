@@ -162,7 +162,8 @@ extern bool mongoStart
   bool        _multitenant,
   double      timeout,
   int         writeConcern = 1,
-  int         poolSize     = 10
+  int         poolSize     = 10,
+  bool        semTimeStat  = false
 );
 
 

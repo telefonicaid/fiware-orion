@@ -261,7 +261,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     /* Release mocks */
     setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
-
+    delete connectionMock;
 }
 
 /* ****************************************************************************
@@ -328,6 +328,6 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     /* Release mocks */
     setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
-
+    delete connectionMock;
 }
 

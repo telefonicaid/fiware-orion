@@ -38,6 +38,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
+#include "mongoBackend/mongoConnectionPool.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
@@ -110,163 +111,6 @@ static void shutdownClient(void)
 
 /* ****************************************************************************
 *
-* MongoConnection - 
-*/
-typedef struct MongoConnection
-{
-  DBClientBase*  connection;
-  bool           free;
-} MongoConnection;
-
-
-
-/* ****************************************************************************
-*
-* connectionPool - 
-*/
-static MongoConnection* connectionPool     = NULL;
-static int              connectionPoolSize = 0;
-static sem_t            connectionPoolSem;
-static sem_t            connectionSem;
-
-
-
-/* ****************************************************************************
-*
-* mongoPoolInitialize - move to mongoPool.cpp?
-*/
-int mongoPoolInitialize
-(
-  const char* host,
-  const char* db,
-  const char* rplSet,
-  const char* username,
-  const char* passwd,
-  double      timeout,
-  int         writeConcern,
-  int         poolSize
-)
-{
-  //
-  // Create the pool
-  //
-  connectionPool     = (MongoConnection*) calloc(sizeof(MongoConnection), poolSize);
-  if (connectionPool == NULL)
-  {
-    LM_E(("Runtime Error (insufficient memory to create connection pool of %d connections)", poolSize));
-    return -1;
-  }
-  connectionPoolSize = poolSize;
-
-  //
-  // Initialize (connect) the pool
-  //
-  for (int ix = 0; ix < connectionPoolSize; ++ix)
-  {
-    connectionPool[ix].connection = mongoConnect(host, db, rplSet, username, passwd, writeConcern, timeout);
-    connectionPool[ix].free       = true;
-  }
-
-  //
-  // Set up the semaphore protecting the pool itself (connectionPoolSem)
-  //
-  int r = sem_init(&connectionPoolSem, 0, 1);
-
-  if (r != 0)
-  {
-    LM_E(("Runtime Error (cannot create connection pool semaphore)"));
-    return -1;
-  }
-
-  //
-  // Set up the semaphore protecting the set of connections of the pool (connectionSem)
-  //
-  r = sem_init(&connectionSem, 0, connectionPoolSize);
-  if (r != 0)
-  {
-    LM_E(("Runtime Error (cannot create connection semaphore-set)"));
-    return -1;
-  }
-
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoPoolConnectionGet - 
-*
-* There are two semaphores to get a connection. There is a limited number of connections
-* and the first thing to do is to wait for a connection to become avilable (any of the
-* connections in the pool) - this is done waiting on the counting semaphore that is 
-* initialized with "POOL SIZE" - meaning the semaphore can be taken N times if the pool size is N.
-* 
-* Once a connection is free, 'sem_wait(&connectionSem)' returns and we now have to take the semaphore 
-* that protects for pool itself (we *are* going to modify the vector of the pool - can only do it in
-* one thread at a time ...)
-* 
-*/
-DBClientBase* mongoPoolConnectionGet(void)
-{
-  DBClientBase* connection = NULL;
-
-  LM_M(("KZ: Waiting for connectionSem"));
-  sem_wait(&connectionSem);
-  LM_M(("KZ: Got connectionSem"));
-
-  LM_M(("KZ: Waiting for connectionPoolSem"));
-  sem_wait(&connectionPoolSem);
-  LM_M(("KZ: Got connectionPoolSem"));
-
-  for (int ix = 0; ix < connectionPoolSize; ++ix)
-  {
-    if (connectionPool[ix].free == true)
-    {
-      connectionPool[ix].free = false;
-      connection = connectionPool[ix].connection;
-      break;
-    }
-  }
-
-  LM_M(("KZ: releasing connectionPoolSem"));
-  sem_post(&connectionPoolSem);
-  
-  return connection;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoPoolConnectionRelease - 
-*/
-void mongoPoolConnectionRelease(DBClientBase* connection)
-{
-  LM_M(("KZ: Waiting for connectionPoolSem"));
-  sem_wait(&connectionPoolSem);
-  LM_M(("KZ: Got connectionPoolSem"));
-
-  for (int ix = 0; ix < connectionPoolSize; ++ix)
-  {
-    if (connectionPool[ix].connection == connection)
-    {
-      connectionPool[ix].free = true;
-      LM_M(("KZ: releasing connectionSem"));
-      sem_post(&connectionSem);
-      break;
-    }
-  }
-
-  LM_M(("KZ: releasing connectionPoolSem"));
-  sem_post(&connectionPoolSem);
-}
-
-
-
-/* ****************************************************************************
-*
 * mongoStart -
 *
 * This function must be called just once, because of the intialization of mongo::client
@@ -282,7 +126,8 @@ bool mongoStart
   bool        _multitenant,
   double      timeout,
   int         writeConcern,
-  int         poolSize
+  int         poolSize,
+  bool        semTimeStat
 )
 {
   static bool called = false;
@@ -306,7 +151,7 @@ bool mongoStart
     }
 	}
 
-  if (mongoPoolInitialize(host, db, rplSet, username, passwd, timeout, writeConcern, poolSize) != 0)
+  if (mongoConnectionPoolInit(host, db, rplSet, username, passwd, timeout, writeConcern, poolSize, semTimeStat) != 0)
   {
     LM_E(("Database Startup Error (cannot initialize mongo connection pool)"));
     return false;
@@ -321,7 +166,7 @@ bool mongoStart
 
 /* ****************************************************************************
 *
-* mongoConnect - move to mongoPool.cpp?
+* mongoConnect - move to mongoConnectionPool?
 */
 DBClientBase* mongoConnect(const char*  host,
                            const char*  db,

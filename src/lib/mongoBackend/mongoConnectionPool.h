@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_COMMON_SEM_H_
-#define SRC_LIB_COMMON_SEM_H_
+#ifndef SRC_LIB_MONGOBACKEND_MONGOCONNECTIONPOOL_H_
+#define SRC_LIB_MONGOBACKEND_MONGOCONNECTIONPOOL_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,72 +23,63 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan
+* Author: Ken Zangelin
 */
-#include <stdio.h>
+#include <semaphore.h>
+
+#include "mongo/client/dbclient.h"
+
+using namespace mongo;
 
 
 
 /* ****************************************************************************
 *
-* SemRequestType - 
+* mongoConnectionPoolInit - 
 */
-typedef enum SemRequestType
-{
-  SemReadOp,
-  SemWriteOp,
-  SemReadWriteOp,
-  SemNoneOp
-} SemRequestType;
-
-
-
-/* ****************************************************************************
-*
-* semInit -
-*/
-extern int semInit
+extern int mongoConnectionPoolInit
 (
-  SemRequestType  _reqPolicy     = SemReadWriteOp,
-  bool            semTimeStat    = false,
-  int             shared         = 0,
-  int             takenInitially = 1
+  const char* host,
+  const char* db,
+  const char* rplSet,
+  const char* username,
+  const char* passwd,
+  double      timeout,
+  int         writeConcern,
+  int         poolSize,
+  bool        semTimeStat
 );
 
 
 
 /* ****************************************************************************
 *
-* xxxSemTake -
+* mongoPoolConnectionGet - 
 */
-extern int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken);
-extern int transSemTake(const char* who, const char* what);
+extern DBClientBase* mongoPoolConnectionGet(void);
 
 
 
 /* ****************************************************************************
 *
-* xxxSemGive -
+* mongoPoolConnectionRelease - 
 */
-extern int reqSemGive(const char* who, const char* what = NULL, bool taken = true);
-extern int transSemGive(const char* who, const char* what = NULL);
+extern void mongoPoolConnectionRelease(DBClientBase* connection);
 
 
 
 /* ****************************************************************************
 *
-* semTimeXxxGet - get accumulated semaphore waiting time
+* mongoPoolConnectionSemWaitingTimeGet - 
 */
-extern void semTimeReqGet(char* buf, int bufLen);
-extern void semTimeTransGet(char* buf, int bufLen);
+extern char* mongoPoolConnectionSemWaitingTimeGet(char* buf, int bufLen);
 
 
 
 /* ****************************************************************************
 *
-* semTimeXxxReset - 
+* mongoPoolConnectionSemWaitingTimeReset - 
 */
-extern void semTimeReqReset(void);
-extern void semTimeTransReset(void);
+extern void mongoPoolConnectionSemWaitingTimeReset(void);
 
-#endif  // SRC_LIB_COMMON_SEM_H_
+#endif  // SRC_LIB_MONGOBACKEND_MONGOCONNECTIONPOOL_H_
