@@ -145,7 +145,7 @@ function localBrokerStart()
   traceLevels=$2
   ipVersion=$3
 
-  POOL_SIZE=1
+  POOL_SIZE=${POOL_SIZE:-10}
 
   shift
   shift
