@@ -266,15 +266,6 @@ int mongoConnectionPoolInit
 )
 {
   //
-  // Checking incoming parameters
-  //
-  if (poolSize == 0)
-  {
-    poolSize = 10;
-  }
-
-
-  //
   // Create the pool
   //
   connectionPool     = (MongoConnection*) calloc(sizeof(MongoConnection), poolSize);
