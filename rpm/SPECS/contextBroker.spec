@@ -162,6 +162,18 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon May 25 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.22.0-1
+- Add: CORS support for GET requests, configuring allowed origin with -corsOrigin CLI parameter (Issue #501)
+- Add: New CLI parameter for the mutex policy: -reqMutexPolicy (Issue #910)
+- Add: Measuring the accumulated time waiting for the DB semaphores.
+       The measures are added to the REST request /statistics, but only if
+       the new CLI parameter -mutexTimeStat is set (Issue #911)
+- Fix: Removing trailing slashes for path of URI before treating the request (Issue #828)
+- Fix: Fixed a bug regarding subscriptions with empty entity-type (Issue #691)
+- Fix: updateContext propagated to the entire Service Path subtree, instead of just scoping to the particular Service Path in the Fiware-Service header (Issue #885)
+- Fix: Mongo driver migrated to legacy-1.0.2
+- Add: Database connection pool for mongo. Default size of the pool is 10 connections. This is changed using the CLI parameter -dbPoolSize (Issue #909)
+
 * Sun May 10 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.21.0-1
 - Add: support for MongoDB 2.6/3.0 (MongoDB 2.4 should *not* be used any longer as inverted geo-queries will not work in that version) (Issue #415)
 - Add: context providers full functionality (Issue #787)
