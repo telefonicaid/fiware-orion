@@ -8,3 +8,4 @@
 - Fix: updateContext propagated to the entire Service Path subtree, instead of just scoping to the particular Service Path in the Fiware-Service header (Issue #885)
 - Fix: Mongo driver migrated to legacy-1.0.2
 - Add: Database connection pool for mongo. Default size of the pool is 10 connections. This is changed using the CLI parameter -dbPoolSize (Issue #909)
+- Fix: Changed name of CLI parameter '-mutexPolicy' to '-reqMutexPolicy' (No issue)
