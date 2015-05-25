@@ -53,13 +53,12 @@ HttpStatusCode mongoSubscribeContext
     const std::string  notifyFormatAsString  = uriParam[URI_PARAM_NOTIFY_FORMAT];
     Format             notifyFormat          = stringToFormat(notifyFormatAsString);
     std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];
-    bool               reqSemTaken;
+    DBClientBase*      connection            = NULL;
+    bool               reqSemTaken           = false;
 
     LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormatAsString.c_str()));
 
     reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
-
-    DBClientBase* connection = getMongoConnection();
 
     /* If expiration is not present, then use a default one */
     if (requestP->duration.isEmpty()) {
@@ -139,17 +138,19 @@ HttpStatusCode mongoSubscribeContext
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
     LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), subDoc.toString().c_str()));
+
     try
     {
-        mongoSemTake(__FUNCTION__, "insert into SubscribeContextCollection");
+        connection = getMongoConnection();
         connection->insert(getSubscribeContextCollectionName(tenant).c_str(), subDoc);
-        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection");
+        releaseMongoConnection(connection);
         LM_I(("Database Operation Successful (insert %s)", subDoc.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo db exception)");
+        releaseMongoConnection(connection);
         reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)", reqSemTaken);
+
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +
@@ -160,8 +161,9 @@ HttpStatusCode mongoSubscribeContext
     }    
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo generic exception)");
+        releaseMongoConnection(connection);
         reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)", reqSemTaken);
+
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +

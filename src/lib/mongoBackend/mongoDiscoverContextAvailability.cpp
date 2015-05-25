@@ -57,7 +57,7 @@ static bool associationsQuery
   const std::vector<std::string>&  servicePathV
 )
 {
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connection = NULL;
 
     /* Note that SCOPE_VALUE_ASSOC_SOURCE means that the argument is a target (so we use ASSOC_TARGET_ENT and
      * ASSOC_ATTRS_TARGET in the query), while SCOPE_VALUE_ASSOC_TARGET means that the argument is a source (so we
@@ -106,7 +106,7 @@ static bool associationsQuery
     {
         LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getAssociationsCollectionName(tenant).c_str(), query.toString().c_str()));
 
-        mongoSemTake(__FUNCTION__, "query in AssociationsCollection");
+        connection = getMongoConnection();
         cursor = connection->query(getAssociationsCollectionName(tenant).c_str(), query, limit, offset);
 
         /*
@@ -114,15 +114,19 @@ static bool associationsQuery
          * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
          * exception ourselves
          */
-        if (cursor.get() == NULL) {
+        if (cursor.get() == NULL)
+        {
             throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
-        mongoSemGive(__FUNCTION__, "query in AssociationsCollection");
+        releaseMongoConnection(connection);
+
+
         LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "query in AssociationsCollection (DBException)");
+        releaseMongoConnection(connection);
+
         *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
@@ -131,7 +135,8 @@ static bool associationsQuery
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "query in AssociationsCollection (Generic Exception)");
+        releaseMongoConnection(connection);
+
         *err = std::string("collection: ") + getAssociationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";

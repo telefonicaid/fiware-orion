@@ -22,7 +22,7 @@
 *
 * Author: Fermín Galán
 */
-
+#include <semaphore.h>
 #include <regex.h>
 #include <algorithm>  // std::replace                                                                                                                       
 #include <string>
@@ -38,6 +38,7 @@
 
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoOntimeintervalOperations.h"
+#include "mongoBackend/mongoConnectionPool.h"
 
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/AttributeList.h"
@@ -53,16 +54,6 @@ using std::auto_ptr;
 
 /* ****************************************************************************
 *
-* RECONNECT_RETRIES - number of retries after connect
-* RECONNECT_DELAY   - number of millisecs to sleep between retries
-*/
-#define RECONNECT_RETRIES 100
-#define RECONNECT_DELAY   1000  // One second
-
-
-
-/* ****************************************************************************
-*
 * OtisTreatFunction - callback signature for treatOntimeintervalSubscriptions
 */
 typedef void (*OtisTreatFunction)(std::string tenant, BSONObj& bobjP);
@@ -73,9 +64,6 @@ typedef void (*OtisTreatFunction)(std::string tenant, BSONObj& bobjP);
 *
 * Globals
 */
-static DBClientBase*        connection;
-static int                  mongoVersionMayor = -1;
-static int                  mongoVersionMinor = -1;
 static std::string          dbPrefix;
 static std::string          entitiesCollectionName;
 static std::string          registrationsCollectionName;
@@ -84,7 +72,6 @@ static std::string          subscribeContextAvailabilityCollectionName;
 static std::string          assocationsCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
-static bool                 clientIsInitialized = false;
 
 /* ****************************************************************************
 *
@@ -106,184 +93,59 @@ static void shutdownClient(void)
     LM_E(("Database Shutdown Error %s (cannot shutdown mongo client)", status.toString().c_str()));
   }
 }
+
+
+
 /* ****************************************************************************
 *
-* mongoConnect -
+* mongoStart -
+*
+* This function must be called just once, because of the intialization of mongo::client
+* and the creation of the connection pool.
 */
-bool mongoConnect(const char*         host,
-                  const char*         db,
-                  const char*         rplSet,
-                  const char*         username,
-                  const char*         passwd,
-                  bool                _multitenant,
-                  double              timeout,
-                  int                 writeConcern)
+bool mongoStart
+(
+  const char* host,
+  const char* db,
+  const char* rplSet,
+  const char* username,
+  const char* passwd,
+  bool        _multitenant,
+  double      timeout,
+  int         writeConcern,
+  int         poolSize,
+  bool        semTimeStat
+)
 {
+  static bool alreadyDone = false;
 
-    std::string err;
-    multitenant = _multitenant;
+  if (alreadyDone == true)
+  {
+    LM_E(("Runtime Error (mongoStart already called - can only be called once)"));
+    return false;
+  }
+  alreadyDone = true;
 
-    LM_T(LmtMongo, ("Connection info: dbName='%s', rplSet='%s', timeout=%f", db, rplSet, timeout));
+  multitenant = _multitenant;
 
-    mongoSemTake(__FUNCTION__, "connecting to mongo");
+  mongo::Status status = mongo::client::initialize();
+  if (!status.isOK())
+  {
+    LM_E(("Database Startup Error %s (cannot initialize mongo client)", status.toString().c_str()));
+    return false;
+  }
+  atexit(shutdownClient);
 
-    // We trust this function is called once. If not, this call
-    // should be protected against multiple calls
-    if (!clientIsInitialized)
-    {
-      mongo::Status status = mongo::client::initialize();
-      if (!status.isOK())
-      {
-        LM_E(("Database Startup Error %s (cannot initialize mongo client)", status.toString().c_str()));
-        return false;
-      }
-      atexit(shutdownClient);
-      clientIsInitialized = true;
-    }
+  if (mongoConnectionPoolInit(host, db, rplSet, username, passwd, _multitenant, timeout, writeConcern, poolSize, semTimeStat) != 0)
+  {
+    LM_E(("Database Startup Error (cannot initialize mongo connection pool)"));
+    return false;
+  }
 
-    bool connected     = false;
-    int  retries       = RECONNECT_RETRIES;
-
-    if (strlen(rplSet) == 0)
-    {
-      /* The first argument to true is to use autoreconnect */
-      connection = new DBClientConnection(true);
-
-      /* Not sure of to generalize the following code, given that DBClientBase class hasn't a common connect() method (surprisingly) */
-      for (int tryNo = 0; tryNo < retries; ++tryNo)
-      {
-          if ( ((DBClientConnection*)connection)->connect(host, err))
-        {
-          connected = true;
-          break;
-        }
-
-        if (tryNo == 0)
-          LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
-        else
-          LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
-
-        usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
-      }
-
-    }
-    else
-    {
-      LM_T(LmtMongo, ("Using replica set %s", rplSet));
-      // autoReconnect is always on for DBClientReplicaSet connections.
-      std::vector<std::string>  hostTokens;
-      int components = stringSplit(host, ',', hostTokens);
-
-      std::vector<HostAndPort> rplSetHosts;
-      for (int ix = 0; ix < components; ix++)
-      {
-          LM_T(LmtMongo, ("rplSet host <%s>", hostTokens[ix].c_str()));
-          rplSetHosts.push_back(HostAndPort(hostTokens[ix]));
-      }
-
-      connection = new DBClientReplicaSet(rplSet, rplSetHosts, timeout);
-
-      /* Not sure of to generalize the following code, given that DBClientBase class hasn't a common connect() method (surprisingly) */
-      for (int tryNo = 0; tryNo < retries; ++tryNo)
-      {
-          if ( ((DBClientReplicaSet*)connection)->connect())
-        {
-          connected = true;
-          break;
-        }
-
-        if (tryNo == 0)
-          LM_E(("Database Startup Error (cannot connect to mongo - doing %d retries with a %d microsecond interval)", retries, RECONNECT_DELAY));
-        else
-          LM_T(LmtMongo, ("Try %d connecting to mongo failed", tryNo));
-
-        usleep(RECONNECT_DELAY * 1000); // usleep accepts microseconds
-      }
-
-
-    }
-
-    if (connected == false)
-    {
-      mongoSemGive(__FUNCTION__, "connecting to mongo failed");
-      LM_E(("Database Error (connection failed, after %d retries: '%s')", retries, err.c_str()));
-      return false;
-    }
-
-    LM_I(("Successful connection to database"));
-
-    //
-    // WriteConcern
-    //
-    mongo::WriteConcern writeConcernCheck;
-
-    // In legacy driver writeConcern is no longer an int, but a class. We need a small
-    // conversion step here
-    mongo::WriteConcern wc = writeConcern == 1 ? mongo::WriteConcern::acknowledged : mongo::WriteConcern::unacknowledged;
-
-    connection->setWriteConcern((mongo::WriteConcern) wc);
-    writeConcernCheck = (mongo::WriteConcern) connection->getWriteConcern();
-    
-    if (writeConcernCheck.nodes() != wc.nodes())
-    {
-      LM_E(("Database Error (Write Concern not set as desired)"));
-      return false;
-    }
-    LM_T(LmtMongo, ("Active DB Write Concern mode: %d", writeConcern));
-
-    /* Authentication is different depending if multiservice is used or not. In the case of not
-     * using multiservice, we authenticate in the single-service database. In the case of using
-     * multiservice, it isn't a default database that we know at contextBroker start time (when
-     * this connection function is invoked) so we authenticate on the admin database, which provides
-     * access to any database */
-    if (multitenant) {
-        if (strlen(username) != 0 && strlen(passwd) != 0) {
-            if (!connection->auth("admin", std::string(username), std::string(passwd), err))
-            {
-                mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_E(("Database Startup Error (authentication: db='admin', username='%s', password='*****': %s)", username, err.c_str()));
-                return false;
-            }
-        }
-    }
-    else {
-        if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0) {
-            if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err))
-            {
-                mongoSemGive(__FUNCTION__, "connecting to mongo failed during authentication");
-                LM_E(("Database Startup Error (authentication: db='%s', username='%s', password='*****': %s)", db, username, err.c_str()));
-                return false;
-            }
-        }
-    }
-
-    /* Get mongo version with the 'buildinfo' command */
-    BSONObj result;
-    std::string extra;
-    connection->runCommand("admin", BSON("buildinfo" << 1), result);
-    std::string versionString = std::string(result.getStringField("version"));
-    if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
-    {
-        mongoSemGive(__FUNCTION__, "wrong mongo version format");
-        LM_E(("Database Startup Error (invalid version format: %s)", versionString.c_str()));
-        return false;
-    }
-    LM_T(LmtMongo, ("mongo version server: %s (mayor: %d, minor: %d, extra: %s)", versionString.c_str(), mongoVersionMayor, mongoVersionMinor, extra.c_str()));
-
-    mongoSemGive(__FUNCTION__, "connecting to mongo");
-    return true;
+  return true;
 }
 
-/* ****************************************************************************
-*
-* mongoConnect -
-*
-* Version of the functions that doesn't uses authentication parameters
-*/
-bool mongoConnect(const char* host) {
 
-    return mongoConnect(host, "", "", "", "", false, 0);
-}
 
 /* ****************************************************************************
 *
@@ -293,13 +155,20 @@ bool mongoConnect(const char* host) {
 * object to be mocked.
 *
 */
-void mongoDisconnect() {
-    /* Safety check of null before releasing */
-    if (connection != NULL) {
-        delete connection;
-    }
-    connection = NULL;
+void mongoDisconnect()
+{
+  // FIXME P4: with the adding of the connection pool, this function is no longer needed.
+  //           However, as it is called from MANY places, especially in unit tests, the
+  //           function will stay for now.
+  //           FUNCTION TO BE REMOVED - see github issue #929
 }
+
+
+
+#ifdef UNIT_TEST
+
+static DBClientBase* connection = NULL;
+
 
 /* ****************************************************************************
 *
@@ -309,14 +178,72 @@ void mongoDisconnect() {
 * object to be mocked.
 *
 */
-#ifdef UNIT_TEST
 bool mongoConnect(DBClientConnection* c) {
 
     connection = c;
 
     return true;
 }
+
+
+
+/* ****************************************************************************
+*
+* For unit tests there is only one connection. This connection is stored right here (DBClientBase* connection) and
+* given out using the function getMongoConnection().
+*/
+void setMongoConnectionForUnitTest(DBClientBase* _connection)
+{
+  connection = _connection;
+}
+
+
+
+/* ****************************************************************************
+*
+* mongoInitialConnectionGetForUnitTest - 
+*
+* This function is meant to be used by unit tests, to get a connection from the pool 
+* and then use that connection, setting it with the function 'setMongoConnectionForUnitTest'.
+* This will set the static variable 'connection' in MongoGlobal.cpp and later 'getMongoConnection'
+* returns that variable (getMongoConnection is used by the entire mongo backend).
+*
+*/
+DBClientBase* mongoInitialConnectionGetForUnitTest(void)
+{
+  return mongoPoolConnectionGet();
+}
 #endif
+
+
+
+/* ****************************************************************************
+*
+* getMongoConnection -
+*
+* I would prefer to have per-collection methods, to have a better encapsulation, but
+* the Mongo C++ API doesn't seem to work that way
+*/
+DBClientBase* getMongoConnection(void)
+{
+#ifdef UNIT_TEST
+  return connection;
+#else
+  return mongoPoolConnectionGet();
+#endif
+}
+
+
+/* ****************************************************************************
+*
+* releaseMongoConnection - give back mongo connection to connection pool 
+*/
+void releaseMongoConnection(DBClientBase* connection)
+{
+  mongoPoolConnectionRelease(connection);
+}
+
+
 
 /*****************************************************************************
 *
@@ -334,17 +261,7 @@ void setNotifier(Notifier* n) {
     notifier = n;
 }
 
-/* ****************************************************************************
-*
-* getMongoConnection -
-*
-* I would prefer to have per-collection methods, to have a better encapsulation, but
-* the Mongo C++ API doesn't seem to work that way
-*/
-DBClientBase* getMongoConnection(void)
-{
-    return connection;
-}
+
 
 /*****************************************************************************
 *
@@ -361,12 +278,13 @@ extern void setDbPrefix(std::string _dbPrefix)
 * getOrionDatabases -
 *
 */
-extern void getOrionDatabases(std::vector<std::string>& dbs) {
+extern void getOrionDatabases(std::vector<std::string>& dbs)
+{
+  BSONObj       result;
+  DBClientBase* connection = getMongoConnection();
 
-    BSONObj result;
-    mongoSemTake(__FUNCTION__, "get Orion databases");
     connection->runCommand("admin", BSON("listDatabases" << 1), result);
-    mongoSemGive(__FUNCTION__, "get Orion databases");
+    releaseMongoConnection(connection);
 
     std::vector<BSONElement> databases = result.getField("databases").Array();
 
@@ -497,24 +415,35 @@ std::string getAssociationsCollectionName(std::string tenant) {
     return composeCollectionName(tenant, assocationsCollectionName);
 }
 
+
 /*****************************************************************************
 *
 * mongoLocationCapable -
 */
-bool mongoLocationCapable(void) {
-    /* Geo location based in 2dsphere indexes was introduced in MongoDB 2.4 */
-    return ((mongoVersionMayor == 2) && (mongoVersionMinor >= 4)) || (mongoVersionMayor > 2);
+bool mongoLocationCapable(void)
+{
+  int mayor;
+  int minor;
+
+  /* Geo location based on 2dsphere indexes was introduced in MongoDB 2.4 */
+  mongoVersionGet(&mayor, &minor);
+  return ((mayor == 2) && (minor >= 4)) || (mayor > 2);
 }
 
 /*****************************************************************************
 *
 * ensureLocationIndex -
 */
-void ensureLocationIndex(std::string tenant) {
+void ensureLocationIndex(std::string tenant)
+{
     /* Ensure index for entity locations, in the case of using 2.4 */
-    if (mongoLocationCapable()) {
-        std::string index = ENT_LOCATION "." ENT_LOCATION_COORDS;
+    if (mongoLocationCapable())
+    {
+        std::string   index      = ENT_LOCATION "." ENT_LOCATION_COORDS;
+        DBClientBase* connection = getMongoConnection();
+
         connection->createIndex(getEntitiesCollectionName(tenant).c_str(), BSON(index << "2dsphere" ));
+        releaseMongoConnection(connection);
         LM_T(LmtMongo, ("ensuring 2dsphere index on %s (tenant %s)", index.c_str(), tenant.c_str()));
     }
 }
@@ -522,19 +451,19 @@ void ensureLocationIndex(std::string tenant) {
 /* ****************************************************************************
 *
 * treatOnTimeIntervalSubscriptions -
+*
+* Look for ONTIMEINTERVAL subscriptions in the database
 */
 static void treatOnTimeIntervalSubscriptions(std::string tenant, OtisTreatFunction treatFunction)
 {
-  /* Look for ONTIMEINTERVAL subscriptions in the database */
-  std::string condType = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
-  BSONObj     query    = BSON(condType << ON_TIMEINTERVAL_CONDITION);
+  std::string               condType   = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
+  BSONObj                   query      = BSON(condType << ON_TIMEINTERVAL_CONDITION);
+  DBClientBase*             connection = getMongoConnection();
+  auto_ptr<DBClientCursor>  cursor;
 
-  DBClientBase* connection = getMongoConnection();
-  auto_ptr<DBClientCursor> cursor;
+  LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
   try
   {
-    LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), query.toString().c_str()));
-    mongoSemTake(__FUNCTION__, "query in SubscribeContextCollection");
     cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
 
     /*
@@ -546,18 +475,19 @@ static void treatOnTimeIntervalSubscriptions(std::string tenant, OtisTreatFuncti
     {
       throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
     }
-    mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection");
+    releaseMongoConnection(connection);  // KZ: OK to release the connection up here?
+
     LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
   }
   catch (const DBException &e)
   {
-    mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo db exception)");
+    releaseMongoConnection(connection);
     LM_E(("Database Error (DBException: %s)", e.what()));
     return;
   }
   catch (...)
   {
-    mongoSemGive(__FUNCTION__, "query in SubscribeContextCollection (mongo generic exception)");
+    releaseMongoConnection(connection);
     LM_E(("Database Error (generic exception)"));
     return;
   }
@@ -1052,7 +982,7 @@ bool entitiesQuery
   long long*                       countP
 )
 {
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connection = NULL;
 
     /* Query structure is as follows
      *
@@ -1140,8 +1070,8 @@ bool entitiesQuery
     Query                     sortCriteria  = query.sort(BSON(ENT_CREATION_DATE << 1));
 
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getEntitiesCollectionName(tenant).c_str(), query.toString().c_str()));
-    mongoSemTake(__FUNCTION__, "query in EntitiesCollection");
 
+    connection = getMongoConnection();
     try
     {
         if ((details == true) && (countP != NULL))
@@ -1161,12 +1091,12 @@ bool entitiesQuery
            throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
         }
 
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection");
+        releaseMongoConnection(connection);
         LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException& e)
     {
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo db exception)");
+        releaseMongoConnection(connection);
         *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
@@ -1176,7 +1106,7 @@ bool entitiesQuery
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "query in EntitiesCollection (mongo generic exception)");
+        releaseMongoConnection(connection);
         *err = std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
@@ -1591,7 +1521,7 @@ bool registrationsQuery
   long long*                          countP
 )
 {
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connection = NULL;
 
     /* Build query based on arguments */
     // FIXME P2: this implementation need to be refactored for cleanup
@@ -1675,8 +1605,8 @@ bool registrationsQuery
 
     LM_T(LmtMongo, ("query() in '%s' collection: '%s'", getRegistrationsCollectionName(tenant).c_str(), query.toString().c_str()));
     LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
-    mongoSemTake(__FUNCTION__, "query in RegistrationsCollection");
 
+    connection = getMongoConnection();
     try
     {
         if ((details == true) && (countP != NULL))
@@ -1685,12 +1615,12 @@ bool registrationsQuery
         }
 
         cursor = connection->query(getRegistrationsCollectionName(tenant).c_str(), query, limit, offset);
-        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection");
+        releaseMongoConnection(connection);
         LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException& e)
     {
-        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo db exception)");
+        releaseMongoConnection(connection);
         *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + e.what();
@@ -1700,7 +1630,7 @@ bool registrationsQuery
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "query in RegistrationsCollection (mongo generic exception)");
+        releaseMongoConnection(connection);
         *err = std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
                 " - query(): " + query.toString() +
                 " - exception: " + "generic";
@@ -1983,7 +1913,7 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
 
     LM_T(LmtMongo, ("Update NGSI9 Subscription New Notification"));
 
-    DBClientBase* connection = getMongoConnection();
+    DBClientBase* connection = NULL;
 
     /* Update the document */
     BSONObj query = BSON("_id" << OID(subId));
@@ -1992,24 +1922,23 @@ static HttpStatusCode mongoUpdateCasubNewNotification(std::string subId, std::st
                     query.toString().c_str(),
                     update.toString().c_str()));
 
-    mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
-
+    connection = getMongoConnection();
     try
     {
         connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), query, update);
-        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+        releaseMongoConnection(connection);
         LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
+        releaseMongoConnection(connection);
         *err = e.what();
         LM_E(("Database Error ('update[%s:%s] in %s', '%s')", query.toString().c_str(), update.toString().c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), e.what()));
         return SccOk;
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
+        releaseMongoConnection(connection);
         *err = "Database error - exception thrown";
         LM_E(("Database Error ('update[%s:%s] in %s', '%s')", query.toString().c_str(), update.toString().c_str(), getSubscribeContextAvailabilityCollectionName(tenant).c_str(), "generic exception"));
         return SccOk;

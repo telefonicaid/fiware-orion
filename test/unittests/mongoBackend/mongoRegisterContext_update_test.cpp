@@ -48,6 +48,8 @@ using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests
@@ -1031,8 +1033,9 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     /* Prepare database */
     prepareDatabase();
 
-    /* Set MongoDB connection */
-    mongoConnect(connectionMock);
+    /* Set MongoDB connection mock (preserving "actual" connection for later use) */
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoRegisterContext(&req, &res, uriParams);
@@ -1047,17 +1050,13 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.errorCode.details);
 
-    /* Release mock */    
+    /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
-
-    /* Reconnect to database in not-mocked way */
-    mongoConnect("localhost");
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
-     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
-
-    DBClientBase* connection = getMongoConnection();
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */   
 
     /* registrations collection: */
     ASSERT_EQ(2, connection->count(REGISTRATIONS_COLL, BSONObj()));

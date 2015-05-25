@@ -46,6 +46,8 @@ using ::testing::MatchesRegex;
 using ::testing::Throw;
 using ::testing::Return;
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 
 /* ****************************************************************************
 *
@@ -2744,9 +2746,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbFindOneFail)
     req.subscriptionId.set("51307b66f481db11bf860010");
     req.duration.set("PT5H");
 
-    /* Set MongoDB connection */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContextAvailabilitySubscription(&req, &res);
@@ -2761,6 +2763,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbFindOneFail)
               "- exception: boom!!", res.errorCode.details);
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
 
@@ -2805,9 +2808,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
     req.subscriptionId.set("51307b66f481db11bf860010");
     req.duration.set("PT5H");
 
-    /* Set MongoDB connection */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoUpdateContextAvailabilitySubscription(&req, &res);
@@ -2823,6 +2826,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
               "- exception: boom!!", res.errorCode.details);
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
     delete timerMock;

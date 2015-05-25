@@ -35,6 +35,9 @@
 
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
 /* ****************************************************************************
 *
 * Tests
@@ -897,7 +900,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   utInit();
 
   /* Set MongoDB connection */
-  mongoConnect(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
   ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
@@ -913,6 +916,7 @@ TEST(mongoQueryTypes, queryAllDbException)
 
   /* Release mock */
   delete connectionMock;
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 
@@ -937,7 +941,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   utInit();
 
   /* Set MongoDB connection */
-  mongoConnect(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
   ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
@@ -954,7 +958,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
 
   /* Release mock */
   delete connectionMock;
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1450,7 +1454,7 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
   utInit();
 
   /* Set MongoDB connection */
-  mongoConnect(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
   ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
@@ -1467,9 +1471,9 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
 
   /* Release mock */
   delete connectionMock;
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1491,7 +1495,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   utInit();
 
   /* Set MongoDB connection */
-  mongoConnect(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
   ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
@@ -1508,7 +1512,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
 
   /* Release mock */
   delete connectionMock;
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
-
 }

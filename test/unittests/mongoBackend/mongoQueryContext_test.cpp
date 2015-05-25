@@ -36,6 +36,8 @@
 
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests
@@ -3577,7 +3579,7 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
             .WillByDefault(Throw(e));
 
     /* Set MongoDB connection */
-    mongoConnect(connectionMock);    
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1", "false");
@@ -3600,5 +3602,6 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
     res.contextElementResponseVector.release();    
 
     /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 }

@@ -212,6 +212,7 @@ char            rush[256];
 char            allowedOrigin[64];
 long            dbTimeout;
 long            httpTimeout;
+int             dbPoolSize;
 char            mutexPolicy[16];
 bool            mutexTimeStat;
 int             writeConcern;
@@ -249,6 +250,7 @@ int             writeConcern;
 #define MULTISERVICE_DESC   "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '__ALL' for any"
 #define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
+#define DBPS_DESC           "database connection pool size"
 #define MAX_L               900000
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
 #define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
@@ -272,6 +274,7 @@ PaArgument paArgs[] =
   { "-dbpwd",        pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
   { "-db",           dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
   { "-dbTimeout",    &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
+  { "-dbPoolSize",   &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
 
   { "-fwdHost",      fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
   { "-fwdPort",      &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
@@ -1159,11 +1162,22 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 *
 * mongoInit -
 */
-static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, long timeout, int writeConcern)
+static void mongoInit
+(
+  const char*  dbHost,
+  const char*  rplSet,
+  std::string  dbName,
+  const char*  user,
+  const char*  pwd,
+  long         timeout,
+  int          writeConcern,
+  int          dbPoolSize,
+  bool         mutexTimeStat
+)
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern))
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -1445,7 +1459,7 @@ int main(int argC, char* argV[])
   pidFile();
   SemRequestType policy = policyGet(mutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, mutexTimeStat);
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 

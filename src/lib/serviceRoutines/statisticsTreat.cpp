@@ -37,6 +37,7 @@
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/statisticsTreat.h"
+#include "mongoBackend/mongoConnectionPool.h"
 
 
 
@@ -135,8 +136,8 @@ std::string statisticsTreat
     noOfRegisterResponses                           = -1;
 
     semTimeReqReset();
-    semTimeMongoReset();
     semTimeTransReset();
+    mongoPoolConnectionSemWaitingTimeReset();
 
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
@@ -412,9 +413,9 @@ std::string statisticsTreat
     semTimeReqGet(requestSemaphoreWaitingTime, sizeof(requestSemaphoreWaitingTime));
     out += TAG_ADD_STRING("requestSemaphoreWaitingTime", requestSemaphoreWaitingTime);
 
-    char mongoSemaphoreWaitingTime[64];
-    semTimeMongoGet(mongoSemaphoreWaitingTime, sizeof(mongoSemaphoreWaitingTime));
-    out += TAG_ADD_STRING("dbSemaphoreWaitingTime", mongoSemaphoreWaitingTime);
+    char mongoPoolSemaphoreWaitingTime[64];
+    mongoPoolConnectionSemWaitingTimeGet(mongoPoolSemaphoreWaitingTime, sizeof(mongoPoolSemaphoreWaitingTime));
+    out += TAG_ADD_STRING("dbConnectionPoolWaitingTime", mongoPoolSemaphoreWaitingTime);
 
     char transSemaphoreWaitingTime[64];
     semTimeTransGet(transSemaphoreWaitingTime, sizeof(transSemaphoreWaitingTime));

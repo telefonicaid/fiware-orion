@@ -41,6 +41,7 @@
 
 #include "unittest.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
 
 /* ****************************************************************************
 *
@@ -2591,9 +2592,11 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object).
+     * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
@@ -2612,13 +2615,12 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
               "- exception: boom!!", s2);
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
     delete timerMock;
 
-    /* Reconnect to database to check it has not been touched */
-    mongoConnect("localhost");
-    DBClientBase* connection = getMongoConnection();
+    /* Check actual database has not been touched */
     ASSERT_EQ(0, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
 
 }

@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
+#define SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
+
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -22,37 +25,24 @@
 *
 * Author: Ken Zangelin
 */
-#include "gtest/gtest.h"
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-#include "common/sem.h"
+#include <time.h>
 
 
 
 /* ****************************************************************************
 *
-* semToString - 
-*
-* The real test here would be to create a few threads and play with the semaphores ... 
-*
-* Here I only exercise the code (which is also valid and important)
-*
-* This is only a wrapper function for the real semaphore function and as we're only testing
-* the wrapper functions, there is no reason to do any more ...
+* clock_difftime - 
 */
-TEST(commonSem, unique)
-{
-   int s;
+extern void clock_difftime(struct timespec* endTime, struct timespec* startTime, struct timespec* diffTime);
 
-   s = semInit();
-   EXPECT_EQ(0, s);
 
-   s = reqSemGive(__FUNCTION__, "test");
-   EXPECT_EQ(0, s);
 
-   bool taken;
-   s = reqSemTake(__FUNCTION__, "test", SemReadWriteOp, &taken);
-   EXPECT_EQ(0, s);
-   EXPECT_TRUE(taken);
-}
+/* ****************************************************************************
+*
+* clock_addtime - 
+*/
+extern void clock_addtime(struct timespec* accTime, struct timespec* diffTime);
+
+#endif  // SRC_LIB_COMMON_CLOCKFUNCTIONS_H_
+
+

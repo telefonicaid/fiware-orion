@@ -54,6 +54,7 @@ HttpStatusCode mongoRegisterContext
   const std::string&                   servicePath
 )
 {
+    DBClientBase*      connection    = NULL;
     std::string        sPath         = servicePath;
     const std::string  notifyFormat  = uriParam[URI_PARAM_NOTIFY_FORMAT];
     bool               reqSemTaken;
@@ -61,8 +62,6 @@ HttpStatusCode mongoRegisterContext
     LM_T(LmtMongo, ("Register Context Request: '%s' format", notifyFormat.c_str()));
 
     reqSemTake(__FUNCTION__, "ngsi9 register request", SemWriteOp, &reqSemTaken);
-
-    DBClientBase* connection = getMongoConnection();
 
     // Default value for service-path is "/"
     if (sPath == "")
@@ -85,15 +84,15 @@ HttpStatusCode mongoRegisterContext
     {
         id = OID(requestP->registrationId.get());
 
-        mongoSemTake(__FUNCTION__, "findOne from RegistrationsCollection");
+        connection = getMongoConnection();
         reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id << "servicePath" << sPath));
-        mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection");
+        releaseMongoConnection(connection);
 
         LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
     }
     catch (const AssertionException &e)
     {
-        mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (AssertionException)");
+        releaseMongoConnection(connection);
         reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
 
         /* This happens when OID format is wrong */
@@ -107,7 +106,7 @@ HttpStatusCode mongoRegisterContext
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (DBException)");
+        releaseMongoConnection(connection);
         reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
 
         responseP->errorCode.fill(SccReceiverInternalError,
@@ -120,7 +119,7 @@ HttpStatusCode mongoRegisterContext
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "findOne from RegistrationsCollection (Generic Exception)");
+        releaseMongoConnection(connection);
         reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
 
         responseP->errorCode.fill(SccReceiverInternalError,
