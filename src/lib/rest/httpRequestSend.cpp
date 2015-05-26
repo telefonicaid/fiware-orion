@@ -31,7 +31,6 @@
 #include <arpa/inet.h>                          // inet_ntoa
 #include <netinet/tcp.h>                        // TCP_NODELAY
 #include <curl/curl.h>
-#include <pthread.h>                            // mutex
 
 #include <string>
 #include <vector>
@@ -45,6 +44,7 @@
 #include "rest/httpRequestSend.h"
 #include "rest/rest.h"
 #include "serviceRoutines/versionTreat.h"
+#include "rest/curl_context.h"
 
 
 
@@ -146,73 +146,6 @@ static char* curlVersionGet(char* buf, int bufLen)
   snprintf(buf, bufLen, "%s", idP->version);
 
   return buf;
-}
-
-/**************************
- *
- *
- *
-*/
-struct curl_context {
-  CURL *curl;
-  pthread_mutex_t *pmutex;
-};
-
-static pthread_mutex_t contexts_mutex = PTHREAD_MUTEX_INITIALIZER;
-static std::map<std::string, struct curl_context> contexts;
-
-static struct curl_context
-get_context(const std::string& url)
-{
-  struct curl_context cc;
-  int s = pthread_mutex_lock(&contexts_mutex);
-  if(s!=0)
-  {
-       LM_X(1,("pthread_mutex_lock"));
-  }
-  std::map<std::string, struct curl_context>::iterator it;
-  it = contexts.find(url);
-  if (it==contexts.end())
-  {
-      //not found, create it
-      cc.curl = curl_easy_init();
-      pthread_mutex_t *pm = (pthread_mutex_t *) malloc(sizeof(*pm));
-      if (pm==NULL)
-      {
-          LM_X(1,("malloc"));
-      }
-      int s = pthread_mutex_init(pm, NULL);
-      if(s!=0)
-      {
-           LM_X(1,("pthread_mutex_init"));
-      }
-      cc.pmutex = pm;
-      contexts[url] = cc;
-  }
-  else
-  {
-      cc = it->second;
-  }
-
-  s = pthread_mutex_lock(cc.pmutex);
-  if(s!=0)
-  {
-      LM_X(1,("pthread_mutex_lock"));
-  }
-  s = pthread_mutex_unlock(&contexts_mutex);
-  if(s!=0)
-  {
-      LM_X(1,("pthread_mutex_unlock"));
-  }
-  return cc;
-}
-void release_curl_context(struct curl_context cc)
-{
-  int s = pthread_mutex_unlock(cc.pmutex);
-  if(s!=0)
-  {
-      LM_X(1,("pthread_mutex_unlock"));
-  }
 }
 
 /* ****************************************************************************
