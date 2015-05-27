@@ -41,6 +41,40 @@ cd - > /dev/null 2>&1
 
 
 
+# ------------------------------------------------------------------------------
+#
+# Debug mode?
+#
+if [ "$ORION_FT_DEBUG" == "1" ]
+then
+  _debug='on'
+fi
+
+
+
+# ------------------------------------------------------------------------------
+#
+# dMsg2 - debug output
+#
+function dMsg2()
+{
+  if [ "$_debug" == "on" ]
+  then
+    echo $* >> /tmp/orionFuncTestDebug.log
+  fi
+}
+
+
+# -----------------------------------------------------------------------------
+#
+# Log file for debugging
+#
+rm -f /tmp/orionFuncTestDebug.log
+echo $(date) > /tmp/orionFuncTestDebug.log
+dMsg2 Functional Tests Starting ...
+
+
+
 # -----------------------------------------------------------------------------
 #
 # Env vars

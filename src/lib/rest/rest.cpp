@@ -117,6 +117,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     char* cP = (char*) val;
 
+    LM_M(("value for URI_PARAM_PAGINATION_OFFSET: '%s'", cP));
     while (*cP != 0)
     {
       if ((*cP < '0') || (*cP > '9'))
@@ -134,6 +135,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     char* cP = (char*) val;
 
+    LM_M(("value for URI_PARAM_PAGINATION_LIMIT: '%s'", cP));
     while (*cP != 0)
     {
       if ((*cP < '0') || (*cP > '9'))
@@ -157,7 +159,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     }
     else if (limit == 0)
     {
-      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unaccepted]");
+      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = error.render(ciP->outFormat, "");
       return MHD_YES;
@@ -206,6 +208,8 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 {
   HttpHeaders*  headerP = (HttpHeaders*) cbDataP;
   std::string   key     = ckey;
+
+  LM_M(("Got header %s: %s", ckey, value));
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
@@ -518,6 +522,18 @@ static char* removeTrailingSlash(std::string path)
 */
 int servicePathSplit(ConnectionInfo* ciP)
 {
+  //
+  // Special case: empty service-path 
+  //
+  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->servicePath == ""))
+  {
+    OrionError e(SccBadRequest, "empty service path");
+    ciP->answer = e.render(ciP->outFormat, "");
+    LM_W(("Bad Input (empty service path)"));
+    return -1;
+  }
+
+
   int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
 
   if (servicePaths == 0)
@@ -742,6 +758,8 @@ static int connectionTreat
     //
     char            ip[32];
     unsigned short  port = 0;
+
+    LM_M(("New incoming connection: %s", url));
 
     const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
     if (mciP != NULL)
