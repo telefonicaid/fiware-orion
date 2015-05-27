@@ -173,6 +173,7 @@ fi
 - Fix: updateContext propagated to the entire Service Path subtree, instead of just scoping to the particular Service Path in the Fiware-Service header (Issue #885)
 - Fix: Mongo driver migrated to legacy-1.0.2
 - Add: Database connection pool for mongo. Default size of the pool is 10 connections. This is changed using the CLI parameter -dbPoolSize (Issue #909)
+- Add: New CLI parameter for Mongo write concern: -writeConcern (Issue #889)
 
 * Sun May 10 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.21.0-1
 - Add: support for MongoDB 2.6/3.0 (MongoDB 2.4 should *not* be used any longer as inverted geo-queries will not work in that version) (Issue #415)
