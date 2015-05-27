@@ -117,7 +117,6 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     char* cP = (char*) val;
 
-    LM_M(("value for URI_PARAM_PAGINATION_OFFSET: '%s'", cP));
     while (*cP != 0)
     {
       if ((*cP < '0') || (*cP > '9'))
@@ -135,7 +134,6 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   {
     char* cP = (char*) val;
 
-    LM_M(("value for URI_PARAM_PAGINATION_LIMIT: '%s'", cP));
     while (*cP != 0)
     {
       if ((*cP < '0') || (*cP > '9'))
@@ -208,8 +206,6 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 {
   HttpHeaders*  headerP = (HttpHeaders*) cbDataP;
   std::string   key     = ckey;
-
-  LM_M(("Got header %s: %s", ckey, value));
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
@@ -758,8 +754,6 @@ static int connectionTreat
     //
     char            ip[32];
     unsigned short  port = 0;
-
-    LM_M(("New incoming connection: %s", url));
 
     const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
     if (mciP != NULL)
