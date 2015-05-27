@@ -37,7 +37,6 @@ export CONTEXTBROKER_HARNESS_FUNCTIONS_SOURCED="YES"
 
 if [ "$ORION_FT_DEBUG" == "1" ]
 then
-  echo ORION_FT_DEBUG: $ORION_FT_DEBUG > /tmp/kz
   _debug='on'
 else
   _debug='off'
