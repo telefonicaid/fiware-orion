@@ -10,7 +10,7 @@ static pthread_mutex_t contexts_mutex = PTHREAD_MUTEX_INITIALIZER;
 static std::map<std::string, struct curl_context> contexts;
 
 struct curl_context
-get_context(const std::string& url)
+get_curl_context(const std::string& url)
 {
   struct curl_context cc;
   int s = pthread_mutex_lock(&contexts_mutex);
