@@ -44,16 +44,15 @@ get_context(const std::string& url)
   {
       cc = it->second;
   }
-
+  s = pthread_mutex_unlock(&contexts_mutex);
+  if(s!=0)
+  {
+    LM_X(1,("pthread_mutex_unlock"));
+  }
   s = pthread_mutex_lock(cc.pmutex);
   if(s!=0)
   {
       LM_X(1,("pthread_mutex_lock"));
-  }
-  s = pthread_mutex_unlock(&contexts_mutex);
-  if(s!=0)
-  {
-      LM_X(1,("pthread_mutex_unlock"));
   }
   return cc;
 }
