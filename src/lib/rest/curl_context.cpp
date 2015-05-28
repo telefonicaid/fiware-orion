@@ -10,7 +10,7 @@ static pthread_mutex_t contexts_mutex = PTHREAD_MUTEX_INITIALIZER;
 static std::map<std::string, struct curl_context> contexts;
 
 struct curl_context
-get_curl_context(const std::string& url)
+get_curl_context(const std::string& key)
 {
   struct curl_context cc;
   int s = pthread_mutex_lock(&contexts_mutex);
@@ -19,7 +19,7 @@ get_curl_context(const std::string& url)
        LM_X(1,("pthread_mutex_lock"));
   }
   std::map<std::string, struct curl_context>::iterator it;
-  it = contexts.find(url);
+  it = contexts.find(key);
   if (it==contexts.end())
   {
       //not found, create it
@@ -37,7 +37,7 @@ get_curl_context(const std::string& url)
       cc.pmutex = pm;
       if (cc.curl != NULL)
       {
-        contexts[url] = cc;
+        contexts[key] = cc;
       }
   }
   else

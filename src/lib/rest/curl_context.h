@@ -15,7 +15,7 @@ struct curl_context {
 };
 
 struct curl_context
-get_curl_context(const std::string& url);
+get_curl_context(const std::string& key);
 
 void
 release_curl_context(struct curl_context cc);
