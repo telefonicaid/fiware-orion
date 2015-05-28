@@ -233,7 +233,7 @@ std::string httpRequestSend
     return "error";
   }
 
-  cc = get_curl_context(resource);
+  cc = get_curl_context(ip);
   if ((curl = cc.curl) == NULL)
   {
     LM_E(("Runtime Error (could not init libcurl)"));
