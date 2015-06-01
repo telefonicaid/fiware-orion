@@ -52,26 +52,12 @@ fi
 
 
 
-# ------------------------------------------------------------------------------
-#
-# dMsg2 - debug output
-#
-function dMsg2()
-{
-  if [ "$_debug" == "on" ]
-  then
-    echo $* >> /tmp/orionFuncTestDebug.log
-  fi
-}
-
-
 # -----------------------------------------------------------------------------
 #
 # Log file for debugging
 #
 rm -f /tmp/orionFuncTestDebug.log
 echo $(date) > /tmp/orionFuncTestDebug.log
-dMsg2 Functional Tests Starting ...
 
 
 
@@ -339,6 +325,7 @@ fi
 #
 # Preparations - cd to the test directory
 #
+dMsg Functional Tests Starting ...
 if [ "$dirOrFile" != "" ] && [ -d "$dirOrFile" ]
 then
   cd $dirOrFile

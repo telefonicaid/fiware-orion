@@ -518,8 +518,13 @@ static char* removeTrailingSlash(std::string path)
 */
 int servicePathSplit(ConnectionInfo* ciP)
 {
+#if 0
   //
   // Special case: empty service-path 
+  //
+  // FIXME P4: We're not sure what this 'fix' really fixes.
+  //           Must implement a functest to reproduce this situation.
+  //           And, if that is not possible, just remove the whole thing
   //
   if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->servicePath == ""))
   {
@@ -528,7 +533,7 @@ int servicePathSplit(ConnectionInfo* ciP)
     LM_W(("Bad Input (empty service path)"));
     return -1;
   }
-
+#endif
 
   int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
 
