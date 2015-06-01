@@ -157,7 +157,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     }
     else if (limit == 0)
     {
-      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unaccepted]");
+      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = error.render(ciP->outFormat, "");
       return MHD_YES;
@@ -518,6 +518,23 @@ static char* removeTrailingSlash(std::string path)
 */
 int servicePathSplit(ConnectionInfo* ciP)
 {
+#if 0
+  //
+  // Special case: empty service-path 
+  //
+  // FIXME P4: We're not sure what this 'fix' really fixes.
+  //           Must implement a functest to reproduce this situation.
+  //           And, if that is not possible, just remove the whole thing
+  //
+  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->servicePath == ""))
+  {
+    OrionError e(SccBadRequest, "empty service path");
+    ciP->answer = e.render(ciP->outFormat, "");
+    LM_W(("Bad Input (empty service path)"));
+    return -1;
+  }
+#endif
+
   int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
 
   if (servicePaths == 0)
