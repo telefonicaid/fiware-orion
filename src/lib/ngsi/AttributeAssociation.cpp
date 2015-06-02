@@ -97,12 +97,11 @@ void AttributeAssociation::present(const std::string& indent, int ix)
   {
     LM_F(("%sAttribute Association:\n",indent.c_str()));
   }
-  else
+else
   {
     LM_F(("%sAttribute Association %d:\n",indent.c_str(), ix));
   }
 
   LM_F(("%s  Source: %s\n", indent.c_str(), source.c_str()));
-  LM_F(("%s  Target: %s\n", indent.c_str(), target.c_str()));
-  LM_F("\n");
+  LM_F(("%s  Target: %s\n\n", indent.c_str(), target.c_str()));
 }
