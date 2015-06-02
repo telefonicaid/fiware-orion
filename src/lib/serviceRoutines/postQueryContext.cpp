@@ -34,6 +34,7 @@
 #include "orionTypes/QueryContextResponseVector.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
+#include "rest/uriParamNames.h"
 #include "serviceRoutines/postQueryContext.h"
 #include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
@@ -323,7 +324,6 @@ std::string postQueryContext
   }
 
 
-
   //
   // 03. Complex case (queries to be forwarded)
   //
@@ -476,7 +476,10 @@ std::string postQueryContext
     responseV.push_back(qP);
   }
 
-  answer = responseV.render(ciP, "");
+  std::string detailsString  = ciP->uriParam[URI_PARAM_PAGINATION_DETAILS];
+  bool        details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+
+  answer = responseV.render(ciP, "", details, qcrsP->errorCode.details);
 
   //
   // Time to cleanup.

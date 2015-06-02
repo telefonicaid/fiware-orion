@@ -109,7 +109,7 @@ void QueryContextResponseVector::present(void)
 *
 * QueryContextResponseVector::render - 
 */
-std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::string& indent)
+std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::string& indent, bool details, const std::string& detailsString)
 {
   QueryContextResponse* responseP = new QueryContextResponse();
   std::string           answer;
@@ -164,6 +164,11 @@ std::string QueryContextResponseVector::render(ConnectionInfo* ciP, const std::s
     // We have found something, so, all good
     //
     responseP->errorCode.fill(SccOk);
+  }
+
+  if (details)
+  {
+    responseP->errorCode.fill(SccOk, detailsString);
   }
 
   for (unsigned int qIx = 0; qIx < vec.size(); ++qIx)
