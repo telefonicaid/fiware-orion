@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string>
 
+#include "logMsg/logMsg.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/AttributeAssociation.h"
@@ -93,14 +95,14 @@ void AttributeAssociation::present(const std::string& indent, int ix)
 {
   if (ix == -1)
   {
-    PRINTF("%sAttribute Association:\n",       indent.c_str());
+    LM_F(("%sAttribute Association:\n",indent.c_str()));
   }
   else
   {
-    PRINTF("%sAttribute Association %d:\n",    indent.c_str(), ix);
+    LM_F(("%sAttribute Association %d:\n",indent.c_str(), ix));
   }
 
-  PRINTF("%s  Source: %s\n", indent.c_str(), source.c_str());
-  PRINTF("%s  Target: %s\n", indent.c_str(), target.c_str());
-  PRINTF("\n");
+  LM_F(("%s  Source: %s\n", indent.c_str(), source.c_str()));
+  LM_F(("%s  Target: %s\n", indent.c_str(), target.c_str()));
+  LM_F("\n");
 }

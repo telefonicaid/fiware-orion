@@ -97,11 +97,11 @@ void AttributeExpression::present(const std::string& indent)
 {
   if (string != "")
   {
-    PRINTF("%sAttributeExpression: %s\n", indent.c_str(), string.c_str());
+    LM_F(("%sAttributeExpression: %s\n", indent.c_str(), string.c_str()));
   }
   else
   {
-    PRINTF("%sNo AttributeExpression\n", indent.c_str());
+    LM_F(("%sNo AttributeExpression\n", indent.c_str()));
   }
 }
 

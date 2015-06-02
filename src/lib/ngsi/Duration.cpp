@@ -142,17 +142,17 @@ int64_t Duration::parse(void)
 
 /* ****************************************************************************
 *
-* Duration::present -
+* Duration::present
 */
 void Duration::present(const std::string& indent)
 {
   if (string != "")
   {
-    PRINTF("%sDuration: %s\n", indent.c_str(), string.c_str());
+    LM_F(("%sDuration: %s\n", indent.c_str(), string.c_str()));
   }
   else
   {
-    PRINTF("%sNo Duration\n", indent.c_str());
+    LM_F(("%sNo Duration\n", indent.c_str()));
   }
 }
 
