@@ -35,7 +35,7 @@ accumulatorStart
 # 02. Update/APPEND E1/A1+A2
 # 03. Dump accumulator, see initial notification
 # 04. Reset accumulator
-# 05. Update/UPDATE E1/A2
+# 05. Update/UPDATE E1/A2 (and A1 but the value of A1 doesn't change)
 # 06. Dump accumulator, see no notification (this was the bug)
 # 07. Update/UPDATE E1/A1
 # 08. Dump accumulator, see the notification
@@ -81,7 +81,7 @@ payload='{
         {
           "name": "A1",
           "type": "string",
-          "value": "A1 in step 02"
+          "value": "A1 unchanged"
         },
         {
           "name": "A2",
@@ -113,14 +113,19 @@ echo
 echo
 
 
-echo "05. Update/UPDATE E1/A2"
-echo "======================="
+echo "05. Update/UPDATE E1/A2 (and A1 but the value of A1 doesn't change)"
+echo "==================================================================="
 payload='{
   "contextElements": [
     {
       "id": "E1",
       "type": "T1",
       "attributes": [
+        {
+          "name": "A1",
+          "type": "string",
+          "value": "A1 unchanged"
+        },
         {
           "name": "A2",
           "type": "string",
@@ -231,7 +236,7 @@ Date: REGEX(.*)
 03. Dump accumulator, see initial notification
 ==============================================
 POST http://localhost:REGEX(\d+)/notify
-Content-Length: 475
+Content-Length: 474
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/xml, application/json
@@ -250,7 +255,7 @@ Content-Type: application/json
           {
             "name" : "A1",
             "type" : "string",
-            "value" : "A1 in step 02"
+            "value" : "A1 unchanged"
           }
         ]
       },
@@ -268,10 +273,10 @@ Content-Type: application/json
 =====================
 
 
-05. Update/UPDATE E1/A2
-=======================
+05. Update/UPDATE E1/A2 (and A1 but the value of A1 doesn't change)
+===================================================================
 HTTP/1.1 200 OK
-Content-Length: 383
+Content-Length: 491
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -280,6 +285,11 @@ Date: REGEX(.*)
         {
             "contextElement": {
                 "attributes": [
+                    {
+                        "name": "A1", 
+                        "type": "string", 
+                        "value": ""
+                    }, 
                     {
                         "name": "A2", 
                         "type": "string", 
