@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
@@ -134,7 +135,7 @@ std::string TypeEntity::check
 */
 void TypeEntity::present(const std::string& indent)
 {
-  PRINTF("%stype:   %s", indent.c_str(), type.c_str());
+  LM_F(("%stype:   %s", indent.c_str(), type.c_str()));
   contextAttributeVector.present(indent);
 }
 
