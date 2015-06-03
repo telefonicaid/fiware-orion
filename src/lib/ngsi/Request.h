@@ -101,7 +101,11 @@ typedef enum RequestType
   ContextEntitiesByEntityIdAndType,
   EntityByIdAttributeByNameIdAndType,
 
-  InvalidRequest
+  // Version 2 ConvOps: /v2/*
+  Entities = 70,
+
+
+  InvalidRequest = 100
 } RequestType;
 
 

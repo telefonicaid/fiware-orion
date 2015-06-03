@@ -171,6 +171,9 @@
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
+
+#include "serviceRoutines/getEntities.h"
+
 #include "contextBroker/version.h"
 
 #include "common/string.h"
@@ -323,6 +326,14 @@ PaArgument paArgs[] =
 *
 */
 
+
+//
+// /v2 conv-ops 
+//
+#define ENT                Entities
+
+#define ENT_COMPS          { 2, "v2", "entities" }
+#define ENT_COMPS_WORD     ""
 
 //
 // NGSI9
@@ -568,6 +579,9 @@ PaArgument paArgs[] =
 #define INV_ALL_COMPS      0, { "*", "*", "*", "*", "*", "*"             }
 
 
+
+#define V2_CONVENIENCE_OPERATIONS                                                                        \
+  { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               },
 
 #define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
   { "POST",   RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   postRegisterContext                       }, \
