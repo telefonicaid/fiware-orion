@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string>
 
+#include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
@@ -124,11 +125,11 @@ void ContextRegistration::present(const std::string& indent, int ix)
 {
   if (ix != -1)
   {
-    PRINTF("%sContext Registration %d:\n", indent.c_str(), ix);
+    LM_F(("%sContext Registration %d:\n", indent.c_str(), ix));
   }
   else
   {
-    PRINTF("%scontext registration:\n", indent.c_str());
+    LM_F(("%scontext registration:\n", indent.c_str()));
   }
 
   entityIdVector.present(indent + "  ");

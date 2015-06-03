@@ -114,7 +114,7 @@ std::string TypeEntityVector::check
 */
 void TypeEntityVector::present(const std::string& indent)
 {
-  PRINTF("%lu TypeEntitys", (uint64_t) vec.size());
+  LM_F(("%lu TypeEntitys", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

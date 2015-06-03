@@ -215,7 +215,7 @@ std::string dcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * dcarPresent -
@@ -227,7 +227,7 @@ void dcarPresent(ParseData* reqDataP)
     return;
   }
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   reqDataP->dcar.res.present("");
 }
 

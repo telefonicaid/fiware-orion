@@ -364,7 +364,7 @@ std::string qcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 }
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * qcrsPresent -

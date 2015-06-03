@@ -74,7 +74,7 @@ std::string ncarCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 }
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * ncarPresent - 
@@ -86,7 +86,7 @@ void ncarPresent(ParseData* parseDataP)
     return;
   }
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   parseDataP->ncar.res.present("");
 }
 
