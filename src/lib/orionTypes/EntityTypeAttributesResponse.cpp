@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
 #include "common/Format.h"
 #include "common/globals.h"
 #include "common/tag.h"
@@ -93,7 +94,7 @@ std::string EntityTypeAttributesResponse::check
 */
 void EntityTypeAttributesResponse::present(const std::string& indent)
 {
-  PRINTF("%sEntityTypeAttributesResponse:\n", indent.c_str());
+  LM_F(("%sEntityTypeAttributesResponse:\n", indent.c_str()));
   entityType.present("indent + "  "");
   statusCode.present("indent + "  "");
 }

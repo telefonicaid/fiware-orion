@@ -101,11 +101,11 @@ void RegistrationId::present(const std::string& indent)
 {
   if (string != "")
   {
-    PRINTF("%sRegistrationId: %s\n", indent.c_str(), string.c_str());
+    LM_F(("%sRegistrationId: %s\n", indent.c_str(), string.c_str()));
   }
   else
   {
-    PRINTF("%sNo RegistrationId\n", indent.c_str());
+    LM_F(("%sNo RegistrationId\n", indent.c_str()));
   }
 }
 

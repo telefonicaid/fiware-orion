@@ -43,12 +43,6 @@
 
 
 
-/* ****************************************************************************
-*
-* PRINTF - 
-*/
-#define PRINTF printf
-
 
 /* ****************************************************************************
 *
@@ -163,3 +157,4 @@ extern int64_t parse8601(const std::string& s);
 extern void transactionIdSet(void);
 
 #endif  // SRC_LIB_COMMON_GLOBALS_H_
+	

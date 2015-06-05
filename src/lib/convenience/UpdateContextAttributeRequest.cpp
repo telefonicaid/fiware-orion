@@ -150,8 +150,8 @@ std::string UpdateContextAttributeRequest::check
 */
 void UpdateContextAttributeRequest::present(std::string indent)
 {
-  PRINTF("%stype:         %s", indent.c_str(), type.c_str());
-  PRINTF("%scontextValue: %s", indent.c_str(), contextValue.c_str());
+  LM_F(("%stype:         %s", indent.c_str(), type.c_str()));
+  LM_F(("%scontextValue: %s", indent.c_str(), contextValue.c_str()));
   metadataVector.present("ContextMetadata", indent);
 }
 

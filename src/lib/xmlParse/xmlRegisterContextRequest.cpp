@@ -495,7 +495,6 @@ std::string rcrCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 }
 
 
-#define PRINTF printf
 /* ****************************************************************************
 *
 * rcrPresent -
@@ -507,7 +506,7 @@ void rcrPresent(ParseData* parseDataP)
     return;
   }
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   parseDataP->rcr.res.contextRegistrationVector.present("");
   parseDataP->rcr.res.duration.present("");
   parseDataP->rcr.res.registrationId.present("");
