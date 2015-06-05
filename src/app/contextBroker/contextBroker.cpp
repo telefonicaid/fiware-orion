@@ -580,7 +580,10 @@ PaArgument paArgs[] =
 
 
 #define V2_CONVENIENCE_OPERATIONS                                                                        \
-  { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }
+  { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
+  { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
+
+
 
 #define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
   { "POST",   RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   postRegisterContext                       }, \
