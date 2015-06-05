@@ -376,7 +376,14 @@ std::string ContextAttribute::renderV2
     }
     else
     {
-      out = "\"" + name + "\":\"" + value + "\"";
+      if (compoundValueP == NULL)
+      {
+        out = "\"" + name + "\":\"" + value + "\"";
+      }
+      else
+      {
+        out = "\"" + name + "\":{" + compoundValueP->renderV2() + "}";
+      }
     }
   }
   else
@@ -389,7 +396,14 @@ std::string ContextAttribute::renderV2
     }
     else
     {
-      out += "\"value\":\"" + value + "\"";
+      if (compoundValueP == NULL)
+      {
+        out += "\"value\":\"" + value + "\"";
+      }
+      else
+      {
+        out = "\"" + name + "\":{" + compoundValueP->renderV2() + "}";
+      }
     }
 
     if ((type != "") && (isNumber == false))
@@ -404,7 +418,6 @@ std::string ContextAttribute::renderV2
 
     out += "}";
   }
-
 
   if (comma)
   {
