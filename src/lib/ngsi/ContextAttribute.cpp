@@ -382,7 +382,18 @@ std::string ContextAttribute::renderV2
       }
       else
       {
-        out = "\"" + name + "\":{" + compoundValueP->renderV2() + "}";
+        if (compoundValueP->isObject())
+        {
+          out = "\"" + name + "\":{" + compoundValueP->renderV2() + "}";
+        }
+        else if (compoundValueP->isVector())
+        {
+          out = "\"" + name + "\":[" + compoundValueP->renderV2() + "]";
+        }
+        else
+        {
+          out = "\"" + name + "\":\"" + compoundValueP->renderV2() + "\"";  // Can toplevel be a String?
+        }
       }
     }
   }
@@ -402,7 +413,18 @@ std::string ContextAttribute::renderV2
       }
       else
       {
-        out = "\"" + name + "\":{" + compoundValueP->renderV2() + "}";
+        if (compoundValueP->isObject())
+        {
+          out = "\"" + name + "\":{" + compoundValueP->renderV2() + "}";
+        }
+        else if (compoundValueP->isVector())
+        {
+          out = "\"" + name + "\":[" + compoundValueP->renderV2() + "]";
+        }
+        else
+        {
+          out = "\"" + name + "\":\"" + compoundValueP->renderV2() + "\"";  // Can toplevel be a String?
+        }
       }
     }
 
