@@ -96,7 +96,8 @@ const char* requestType(RequestType rt)
   case ContextEntitiesByEntityIdAndType:                 return "ContextEntitiesByEntityIdAndType";
   case EntityByIdAttributeByNameIdAndType:               return "EntityByIdAttributeByNameIdAndType";
 
-  case Entities:                                         return "Entities";
+  case EntitiesRequest:                                  return "EntitiesRequest";
+  case EntitiesResponse:                                 return "EntitiesResponse";
   }
 
   return "";

@@ -1,9 +1,9 @@
-#ifndef MONGO_QUERY_CONTEXT_H
-#define MONGO_QUERY_CONTEXT_H
+#ifndef SRC_LIB_APITYPESV2_ENTITIES_H_
+#define SRC_LIB_APITYPESV2_ENTITIES_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,28 +23,35 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan Marquez
+* Author: Ken Zangelin
 */
 #include <string>
-#include <map>
+#include <vector>
 
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "apiTypesV2/EntityVector.h"
+#include "ngsi/StatusCode.h"
 
 
+struct QueryContextResponse;
 
 /* ****************************************************************************
 *
-* mongoQueryContext - 
+* Entities - 
 */
-extern HttpStatusCode mongoQueryContext
-(
-  QueryContextRequest*                  requestP,
-  QueryContextResponse*                 responseP,
-  const std::string&                    tenant,
-  const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams,
-  long long*                            countP = NULL
-);
+class Entities
+{
+public:
+  EntityVector vec;          // Optional - mandatory if 200-OK
+  StatusCode   errorCode;    // Optional - mandatory if not 200-OK
 
-#endif
+  Entities();
+  ~Entities();
+
+  std::string  render(ConnectionInfo* ciP, RequestType requestType);
+  std::string  check(ConnectionInfo*  ciP, RequestType requestType);
+  void         present(const std::string& indent, const std::string& caller);
+  void         release(void);
+  void         fill(QueryContextResponse* qcrsP);
+};
+
+#endif  // SRC_LIB_APITYPESV2_ENTITIES_H_

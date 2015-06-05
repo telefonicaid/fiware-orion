@@ -102,7 +102,8 @@ typedef enum RequestType
   EntityByIdAttributeByNameIdAndType,
 
   // Version 2 ConvOps: /v2/*
-  Entities = 70,
+  EntitiesRequest = 70,
+  EntitiesResponse,
 
 
   InvalidRequest = 100

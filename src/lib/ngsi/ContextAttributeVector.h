@@ -74,6 +74,7 @@ typedef struct ContextAttributeVector
                             bool                comma     = false,
                             bool                omitValue = false,
                             bool                attrsAsName = false);
+  std::string        renderV2(ConnectionInfo* ciP, RequestType requestType);
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

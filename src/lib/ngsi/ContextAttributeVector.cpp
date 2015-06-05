@@ -71,6 +71,74 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 
 /* ****************************************************************************
 *
+* ContextAttributeVector::renderV2 - 
+*
+* Attributes named 'id' or 'type' are not rendered in API version 2, due to the 
+* compact way in which API v2 is rendered. Attributes named 'id' or 'type' would simply
+* collide with the 'id' and 'type' of the entity itself (holder of the attribute).
+*
+* If anybody (stupid enough) needs an attribute named 'id' or 'type', then API v1
+* will have to be used to retreive that information.
+*/
+std::string ContextAttributeVector::renderV2
+(
+  ConnectionInfo*     ciP,
+  RequestType         request
+)
+{
+  if (vec.size() == 0)
+  {
+    return "";
+  }
+
+
+  //
+  // Pass 1 - count the total number of atrtributes valid for rendering.
+  //
+  // Attributes named 'id' or 'type' are not rendered.
+  // This gives us a small problem in the logic here, about knowing whether the
+  // comma should be rendered or not.
+  //
+  // To fix this problem we need to do two passes over the vector, the first pass to
+  // count the number of valid attributes and the second to do the work.
+  // In the second pass, if the number of rendered attributes "so far" is less than the total
+  // number of valid attributes, then the comma must be rendered.
+  //
+  int validAttributes = 0;
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
+    {
+      continue;
+    }
+
+    ++validAttributes;
+  }
+
+
+  //
+  // Pass 2 - do the work, helped by the value of 'validAttributes'.
+  //
+  std::string  out;
+  int          renderedAttributes = 0;
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
+    {
+      continue;
+    }
+
+    ++renderedAttributes;
+    out += vec[ix]->renderV2(ciP, request, renderedAttributes < validAttributes);
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextAttributeVector::render - 
 */
 std::string ContextAttributeVector::render

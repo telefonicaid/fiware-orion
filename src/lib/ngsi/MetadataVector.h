@@ -46,7 +46,7 @@ typedef struct MetadataVector
 
   void          tagSet(const std::string& tagName);
   std::string   render(Format format, const std::string& indent, bool comma = false);
-
+  std::string   renderV2(ConnectionInfo* ciP, RequestType requestType, bool comma = false);
   std::string   check(RequestType requestType,
                       Format format,
                       const std::string& indent,

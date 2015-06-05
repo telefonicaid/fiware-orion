@@ -578,19 +578,28 @@ int servicePathSplit(ConnectionInfo* ciP)
 * NOTE
 *   Any failure about Content-Type is an error in the HTTP layer (not exclusively NGSI)
 *   so we don't want to use the default 200
+*
+* NOTE
+*   In version 2 of the protocol, we admit ONLY application/json
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
   //
-  // Four cases:
+  // Five cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
   //   3. text/xml used and acceptTextXml is setto true (iotAgent only)
   //   4. Content-Type present but not supported
+  //   5. API version 2 and not 'application/json'
+  //
+
 
   // Case 1
   if (ciP->httpHeaders.contentLength == 0)
+  {
     return 0;
+  }
+
 
   // Case 2
   if (ciP->httpHeaders.contentType == "")
@@ -599,15 +608,31 @@ static int contentTypeCheck(ConnectionInfo* ciP)
     ciP->httpStatusCode = SccUnsupportedMediaType;
     ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
     ciP->httpStatusCode = SccUnsupportedMediaType;
+
     return 1;
   }
 
+
   // Case 3
   if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
+  {
     return 0;
+  }
+
 
   // Case 4
   if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+  {
+    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    return 1;
+  }
+
+
+  // Case 5
+  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -713,6 +738,27 @@ std::string defaultServicePath(const char* url, const char* method)
 
   LM_W(("Bad Input (cannot find default service path for: (%s, %s))", method, url));
   return DEFAULT_SERVICE_PATH;
+}
+
+
+
+/* ****************************************************************************
+*
+* apiVersionGet - 
+*
+* This function returns the version of the API for the incoming message,
+* based on the URL.
+* If the URL starts with "/v2" then the request is considered API version 2.
+* Otherwise, API version 1.
+*/
+static std::string apiVersionGet(const char* path)
+{
+  if ((path[1] == 'v') && (path[2] == '2'))
+  {
+    return "v2";
+  }
+
+  return "v1";
 }
 
 
@@ -833,6 +879,8 @@ static int connectionTreat
       LM_W(("Bad Input (error in ServicePath http-header)"));
       restReply(ciP, ciP->answer);
     }
+
+    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     if (contentTypeCheck(ciP) != 0)
     {

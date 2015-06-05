@@ -114,6 +114,7 @@ int noOfAttributesForEntityTypeResponse                  = -1;
 int noOfContextEntitiesByEntityIdAndType                 = -1;
 
 int noOfEntitiesRequests                                 = -1;
+int noOfEntitiesResponses                                = -1;
 
 
 
@@ -203,6 +204,7 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case RtEntityTypesResponse:                            ++noOfEntityTypesResponse; break;
   case RtAttributesForEntityTypeResponse:                ++noOfAttributesForEntityTypeResponse; break;
 
-  case Entities:                                         ++noOfEntitiesRequests; break;
+  case EntitiesRequest:                                  ++noOfEntitiesRequests; break;
+  case EntitiesResponse:                                 ++noOfEntitiesResponses; break;
   }
 }

@@ -351,6 +351,73 @@ std::string ContextAttribute::render
 
 /* ****************************************************************************
 *
+* renderV2 - 
+*/
+std::string ContextAttribute::renderV2
+(
+  ConnectionInfo*     ciP,
+  RequestType         request,
+  bool                comma
+)
+{
+  std::string  out;
+  bool         isNumber = false;
+
+  if (type == "number")
+  {
+    isNumber = true;
+  }
+
+  if (((type == "") || (isNumber == true)) && (metadataVector.size() == 0))
+  {
+    if (isNumber == true)
+    {
+      out = "\"" + name + "\":" + value;
+    }
+    else
+    {
+      out = "\"" + name + "\":\"" + value + "\"";
+    }
+  }
+  else
+  {
+    out = "\"" + name + "\":{";
+
+    if (isNumber == true)
+    {
+      out += "\"value\":" + value;
+    }
+    else
+    {
+      out += "\"value\":\"" + value + "\"";
+    }
+
+    if ((type != "") && (isNumber == false))
+    {
+      out += ",\"type\":\"" + type + "\"";
+    }
+
+    if (metadataVector.size() > 0)
+    {
+      out += "," + metadataVector.renderV2(ciP, request, false);
+    }
+
+    out += "}";
+  }
+
+
+  if (comma)
+  {
+    out += ",";
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextAttribute::check - 
 */
 std::string ContextAttribute::check

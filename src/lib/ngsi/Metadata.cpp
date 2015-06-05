@@ -174,3 +174,46 @@ void Metadata::fill(const struct Metadata& md)
   value       = md.value;
   association = md.association;
 }
+
+
+
+/* ****************************************************************************
+*
+* renderV2 - 
+*/
+std::string Metadata::renderV2(ConnectionInfo* ciP, RequestType request, bool comma)
+{
+  std::string  out;
+  bool         isNumber = false;
+
+  if (type == "number")
+  {
+    isNumber = true;
+  }
+
+  if ((type == "") || (isNumber == true))
+  {
+    if (isNumber == true)
+    {
+      out = "\"" + name + "\":" + value;
+    }
+    else
+    {
+      out = "\"" + name + "\":\"" + value + "\"";
+    }
+  }
+  else
+  {
+    out = "\"" + name +"\":{";
+    out += "\"value\":\"" + value + "\"";
+    out += ",\"type\":\"" + type +"\"";
+    out += "}";
+  }
+
+  if (comma)
+  {
+    out += ",";
+  }
+
+  return out;
+}
