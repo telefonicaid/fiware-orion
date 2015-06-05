@@ -579,7 +579,7 @@ PaArgument paArgs[] =
 
 
 
-#define V2_CONVENIENCE_OPERATIONS                                                                        \
+#define CONVENIENCE_OPERATIONS_V2                                                                        \
   { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
   { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
 
@@ -915,7 +915,7 @@ PaArgument paArgs[] =
 */
 RestService restServiceV[] =
 {
-  V2_CONVENIENCE_OPERATIONS,
+  CONVENIENCE_OPERATIONS_V2,
 
   REGISTRY_STANDARD_REQUESTS_V0,
   REGISTRY_STANDARD_REQUESTS_V1,
