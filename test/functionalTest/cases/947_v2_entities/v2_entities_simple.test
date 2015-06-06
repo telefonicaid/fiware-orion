@@ -127,14 +127,14 @@ echo
 
 echo "03. GET /v2/entities"
 echo "===================="
-orionCurl --url /v2/entities --json #--noPayloadCheck
+orionCurl --url /v2/entities --json
 echo
 echo
 
 
 echo "04. GET /v2/entities?count=true"
 echo "==============================="
-orionCurl --url /v2/entities?count=true --json #--noPayloadCheck
+orionCurl --url /v2/entities?count=true --json
 echo
 echo
 
@@ -163,7 +163,7 @@ echo
 
 echo "06. GET /v2/entities"
 echo "===================="
-orionCurl --url /v2/entities --json #--noPayloadCheck
+orionCurl --url /v2/entities --json
 echo
 echo
 
