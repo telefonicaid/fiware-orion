@@ -66,7 +66,7 @@ std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
     return vec.render(ciP, requestType, false);
   }
 
-  return errorCode.render(JSON, "", false, false);
+  return errorCode.renderV2();
 } 
 
 
@@ -74,10 +74,14 @@ std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
 /* ****************************************************************************
 *
 * Entities::check - 
+*
+* NOTE
+*   The 'check' method is normally only used to check that incoming payload is correct.
+*   For now (at least), the Entities type is only used as outgoing payload ...
 */
 std::string Entities::check(ConnectionInfo* ciP, RequestType requestType)
 {
-  return "OK";
+  return vec.check(ciP, requestType);
 }
 
 
@@ -86,8 +90,10 @@ std::string Entities::check(ConnectionInfo* ciP, RequestType requestType)
 *
 * Entities::present - 
 */
-void Entities::present(const std::string& indent, const std::string& caller)
+void Entities::present(const std::string& indent)
 {
+  LM_F(("%s%d Entities:", indent.c_str(), vec.size()));
+  vec.present(indent + "  ");
 }
 
 
@@ -112,22 +118,19 @@ void Entities::fill(QueryContextResponse* qcrsP)
   if (qcrsP->errorCode.code != SccOk)
   {
     errorCode.fill(qcrsP->errorCode);
+    return;
   }
-  else
+
+  for (unsigned int ix = 0; ix < qcrsP->contextElementResponseVector.size(); ++ix)
   {
-    unsigned int ix;
+    ContextElement* ceP = &qcrsP->contextElementResponseVector[ix]->contextElement;
+    Entity*         eP  = new Entity();
 
-    for (ix = 0; ix < qcrsP->contextElementResponseVector.size(); ++ix)
-    {
-      ContextElement* ceP = &qcrsP->contextElementResponseVector[ix]->contextElement;
-      Entity*         eP  = new Entity();
+    eP->id        = ceP->entityId.id;
+    eP->type      = ceP->entityId.type;
+    eP->isPattern = ceP->entityId.isPattern;
 
-      eP->id        = ceP->entityId.id;
-      eP->type      = ceP->entityId.type;
-      eP->isPattern = ceP->entityId.isPattern;
-
-      eP->attributeVector.fill(&ceP->contextAttributeVector);
-      vec.push_back(eP);
-    }
+    eP->attributeVector.fill(&ceP->contextAttributeVector);
+    vec.push_back(eP);
   }
 }

@@ -35,14 +35,6 @@
 /* ****************************************************************************
 *
 * EntityVector - 
-*
-* NOTE
-* The method 'lookup' looks up an *exact* match for an entity.
-* I.e. the id must be exactly the same, the type exactly the same and isPattern, exactly the same.
-* This is not a *match* method that would find 'matching' entities.
-*
-* If you need an entity-matching method, then a new method, called 'match' should be implemented.
-*
 */
 typedef struct EntityVector
 {
@@ -52,7 +44,6 @@ typedef struct EntityVector
   std::string   check(ConnectionInfo*  ciP, RequestType requestType);
   void          present(const std::string& indent);
   void          push_back(Entity* item);
-  void          push_back_if_absent(Entity* item);
   unsigned int  size(void);
   Entity*       get(int ix);
   Entity*       lookup(const std::string& name, const std::string& type, const std::string& isPattern);

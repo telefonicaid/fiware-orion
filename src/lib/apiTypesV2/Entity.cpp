@@ -86,6 +86,11 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 */
 std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 {
+  if (id == "")
+  {
+    return "No Entity ID";
+  }
+
   return "OK";
 }
 
@@ -95,7 +100,7 @@ std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 *
 * Entity::present - 
 */
-void Entity::present(const std::string& indent, const std::string& caller)
+void Entity::present(const std::string& indent)
 {
   LM_F(("%sid:        %s", indent.c_str(), id.c_str()));
   LM_F(("%stype:      %s", indent.c_str(), type.c_str()));

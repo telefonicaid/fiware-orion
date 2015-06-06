@@ -71,27 +71,13 @@ std::string EntityVector::check
   RequestType         requestType
 )
 {
-  // Only OK to be empty if part of a ContextRegistration
-  if ((requestType == DiscoverContextAvailability)           ||
-      (requestType == SubscribeContextAvailability)          ||
-      (requestType == UpdateContextAvailabilitySubscription) ||
-      (requestType == QueryContext)                          ||
-      (requestType == SubscribeContext))
-  {
-    if (vec.size() == 0)
-    {
-      LM_W(("Bad Input (mandatory entity list missing)"));
-      return "No entities";
-    }
-  }
-
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     std::string res;
 
     if ((res = vec[ix]->check(ciP, requestType)) != "OK")
     {
-      LM_W(("Bad Input (invalid vector of Entitys)"));
+      LM_W(("Bad Input (invalid vector of Entity)"));
       return res;
     }
   }
@@ -111,43 +97,8 @@ void EntityVector::present(const std::string& indent)
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->present(indent, "EntityVector");
+    vec[ix]->present(indent + "  ");
   }
-}
-
-
-
-/* ****************************************************************************
-*
-* EntityVector::lookup - find a matching entity in the entity-vector
-*/
-Entity* EntityVector::lookup(const std::string& id, const std::string& type, const std::string& isPattern)
-{
-  //
-  // isPattern:  "false" or "" is the same
-  //
-  std::string isPatternFromParam = isPattern;
-  if (isPatternFromParam == "")
-  {
-    isPatternFromParam = "false";
-  }
-
-  for (unsigned int ix = 0; ix < vec.size(); ++ix)
-  {
-    std::string isPatternFromVec = vec[ix]->isPattern;
-
-    if (isPatternFromVec == "")
-    {
-      isPatternFromVec = "false";
-    }
-
-    if ((vec[ix]->id == id) && (vec[ix]->type == type) && (isPatternFromVec == isPatternFromParam))
-    {
-      return vec[ix];
-    }
-  }
-
-  return NULL;
 }
 
 
@@ -161,19 +112,6 @@ void EntityVector::push_back(Entity* item)
   vec.push_back(item);
 }
 
-
-
-/* ****************************************************************************
-*
-* EntityVector::push_back_if_absent -
-*/
-void EntityVector::push_back_if_absent(Entity* item)
-{
-  if (lookup(item->id, item->type, item->isPattern) == NULL)
-  {
-    vec.push_back(item);
-  }
-}
 
 
 /* ****************************************************************************

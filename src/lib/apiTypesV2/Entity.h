@@ -51,7 +51,7 @@ public:
 
   std::string  render(ConnectionInfo* ciP, RequestType requestType, bool comma = false);
   std::string  check(ConnectionInfo*  ciP, RequestType requestType);
-  void         present(const std::string& indent, const std::string& caller);
+  void         present(const std::string& indent);
   void         release(void);
   void         fill(const std::string& id, const std::string& type, const std::string& isPattern, ContextAttributeVector* aVec);
 };

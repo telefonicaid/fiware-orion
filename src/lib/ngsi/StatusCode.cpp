@@ -124,6 +124,51 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
 
 /* ****************************************************************************
 *
+* StatusCode::renderV2 -
+*
+* For version 2 of the API, the unnecessary 'reasonPhrase' is removed.
+*/
+std::string StatusCode::renderV2(bool comma)
+{
+  std::string  out  = "";
+
+  if (strstr(details.c_str(), "\"") != NULL)
+  {
+    int    len = details.length() * 2;
+    char*  s2    = (char*) calloc(1, len + 1);
+
+    strReplace(s2, len, details.c_str(), "\"", "\\\"");
+    details = s2;
+    free(s2);
+  }
+
+  char codeV[16];
+
+  snprintf(codeV, sizeof(codeV), "%d", code);
+
+  out += "{";
+
+  out += std::string("\"code\":\"") + codeV + "\"";
+  
+  if (details != "")
+  {
+    out += ",\"details\":\"" + details + "\"";
+  }
+
+  out += "}";
+
+  if (comma)
+  {
+    out += ",";
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * StatusCode::fill -
 */
 void StatusCode::fill(HttpStatusCode _code, const std::string& _details)
