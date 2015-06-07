@@ -43,7 +43,9 @@
 std::string EntityVector::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
   if (vec.size() == 0)
+  {
     return "";
+  }
 
   std::string out;
 
