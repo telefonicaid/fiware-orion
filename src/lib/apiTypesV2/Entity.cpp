@@ -65,7 +65,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
   if (attributeVector.size() != 0)
   {
     out += ",";
-    out += attributeVector.renderV2(ciP, requestType);
+    out += attributeVector.toJson(true);
   }    
 
   out += "}";

@@ -66,7 +66,7 @@ std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
     return vec.render(ciP, requestType, false);
   }
 
-  return errorCode.renderV2();
+  return errorCode.toJson(true);
 } 
 
 
@@ -117,11 +117,20 @@ void Entities::fill(QueryContextResponse* qcrsP)
 {
   if (qcrsP->errorCode.code == SccContextElementNotFound)
   {
+    //
+    // If no entities are found, we respond with a 200 OK
+    // and an empty vector of entities ( [] )
+    //
+
     errorCode.fill(SccOk);
     return;
   }
   else if (qcrsP->errorCode.code != SccOk)
   {
+    //
+    // If any other error - use the error for the response
+    //
+
     errorCode.fill(qcrsP->errorCode);
     return;
   }

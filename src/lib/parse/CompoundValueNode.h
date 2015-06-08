@@ -126,7 +126,7 @@ class CompoundValueNode
   void                check(void);
   std::string         finish(void);
   std::string         render(Format format, const std::string& indent);
-  std::string         renderV2(void);
+  std::string         toJson(bool isLastElement);
 
   static const char*  typeName(const Type _type);
   void                shortShow(const std::string& indent);

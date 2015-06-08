@@ -61,7 +61,7 @@ typedef struct Metadata
   Metadata(const std::string& _name, const std::string& _type, const std::string& _value = "");
 
   std::string  render(Format format, const std::string& indent, bool comma = false);
-  std::string  renderV2(ConnectionInfo* ciP, RequestType request, bool comma = false);
+  std::string  toJson(bool isLastElement);
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
   void         fill(const struct Metadata& md);

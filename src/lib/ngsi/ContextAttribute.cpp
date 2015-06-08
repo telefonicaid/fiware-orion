@@ -351,14 +351,9 @@ std::string ContextAttribute::render
 
 /* ****************************************************************************
 *
-* renderV2 - 
+* toJson - 
 */
-std::string ContextAttribute::renderV2
-(
-  ConnectionInfo*     ciP,
-  RequestType         request,
-  bool                comma
-)
+std::string ContextAttribute::toJson(bool isLastElement)
 {
   std::string  out;
   bool         isNumber = false;
@@ -384,15 +379,15 @@ std::string ContextAttribute::renderV2
       {
         if (compoundValueP->isObject())
         {
-          out = "\"" + name + "\":{" + compoundValueP->renderV2() + "}";
+          out = "\"" + name + "\":{" + compoundValueP->toJson(true) + "}";
         }
         else if (compoundValueP->isVector())
         {
-          out = "\"" + name + "\":[" + compoundValueP->renderV2() + "]";
+          out = "\"" + name + "\":[" + compoundValueP->toJson(true) + "]";
         }
         else
         {
-          out = "\"" + name + "\":\"" + compoundValueP->renderV2() + "\"";  // Can toplevel be a String?
+          out = "\"" + name + "\":\"" + compoundValueP->toJson(true) + "\"";  // Can toplevel be a String?
         }
       }
     }
@@ -415,15 +410,15 @@ std::string ContextAttribute::renderV2
       {
         if (compoundValueP->isObject())
         {
-          out = "\"" + name + "\":{" + compoundValueP->renderV2() + "}";
+          out = "\"" + name + "\":{" + compoundValueP->toJson(true) + "}";
         }
         else if (compoundValueP->isVector())
         {
-          out = "\"" + name + "\":[" + compoundValueP->renderV2() + "]";
+          out = "\"" + name + "\":[" + compoundValueP->toJson(true) + "]";
         }
         else
         {
-          out = "\"" + name + "\":\"" + compoundValueP->renderV2() + "\"";  // Can toplevel be a String?
+          out = "\"" + name + "\":\"" + compoundValueP->toJson(true) + "\"";  // Can toplevel be a String?
         }
       }
     }
@@ -435,13 +430,13 @@ std::string ContextAttribute::renderV2
 
     if (metadataVector.size() > 0)
     {
-      out += "," + metadataVector.renderV2(ciP, request, false);
+      out += "," + metadataVector.toJson(true);
     }
 
     out += "}";
   }
 
-  if (comma)
+  if (!isLastElement)
   {
     out += ",";
   }

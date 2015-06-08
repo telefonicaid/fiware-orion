@@ -124,22 +124,22 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
 
 /* ****************************************************************************
 *
-* StatusCode::renderV2 -
+* StatusCode::toJson -
 *
 * For version 2 of the API, the unnecessary 'reasonPhrase' is removed.
 */
-std::string StatusCode::renderV2(bool comma)
+std::string StatusCode::toJson(bool isLastElement)
 {
   std::string  out  = "";
 
   if (strstr(details.c_str(), "\"") != NULL)
   {
     int    len = details.length() * 2;
-    char*  s2    = (char*) calloc(1, len + 1);
+    char*  s    = (char*) calloc(1, len + 1);
 
-    strReplace(s2, len, details.c_str(), "\"", "\\\"");
-    details = s2;
-    free(s2);
+    strReplace(s, len, details.c_str(), "\"", "\\\"");
+    details = s;
+    free(s);
   }
 
   char codeV[16];
@@ -157,7 +157,7 @@ std::string StatusCode::renderV2(bool comma)
 
   out += "}";
 
-  if (comma)
+  if (!isLastElement)
   {
     out += ",";
   }

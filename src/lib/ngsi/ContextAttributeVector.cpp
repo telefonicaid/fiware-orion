@@ -80,11 +80,7 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retreive that information.
 */
-std::string ContextAttributeVector::renderV2
-(
-  ConnectionInfo*     ciP,
-  RequestType         request
-)
+std::string ContextAttributeVector::toJson(bool isLastElement)
 {
   if (vec.size() == 0)
   {
@@ -93,7 +89,7 @@ std::string ContextAttributeVector::renderV2
 
 
   //
-  // Pass 1 - count the total number of atrtributes valid for rendering.
+  // Pass 1 - count the total number of attributes valid for rendering.
   //
   // Attributes named 'id' or 'type' are not rendered.
   // This gives us a small problem in the logic here, about knowing whether the
@@ -129,7 +125,7 @@ std::string ContextAttributeVector::renderV2
     }
 
     ++renderedAttributes;
-    out += vec[ix]->renderV2(ciP, request, renderedAttributes < validAttributes);
+    out += vec[ix]->toJson(renderedAttributes == validAttributes);
   }
 
   return out;

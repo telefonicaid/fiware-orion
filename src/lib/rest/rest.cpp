@@ -225,10 +225,14 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
     headerP->servicePathReceived = true;
   }
   else
+  {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
+  }
 
   if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
+  {
     LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
+  }
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
    * to "deactivate" this part of the string in the checking done at connectionTreat() */
@@ -251,15 +255,14 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 *
 * wantedOutputSupported - 
 */
-static Format wantedOutputSupported(const std::string& acceptList, std::string* charsetP)
+static Format wantedOutputSupported(const std::string& apiVersion, const std::string& acceptList, std::string* charsetP)
 {
   std::vector<std::string>  vec;
   char*                     copy;
 
   if (acceptList.length() == 0) 
   {
-    /* HTTP RFC states that a missing Accept header must be interpreted as if the client is
-     * accepting any type */
+    /* HTTP RFC states that a missing Accept header must be interpreted as if the client is accepting any type */
     copy = strdup("*/*");
   }
   else 
@@ -323,9 +326,9 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
      }
 
      std::string format = vec[ix].c_str();
-     if (format == "*/*")              xml  = true;
+     if (format == "*/*")              { xml  = true; json = true; }
      if (format == "*/xml")            xml  = true;
-     if (format == "application/*")    xml  = true;
+     if (format == "application/*")    { xml  = true; json = true; }
      if (format == "application/xml")  xml  = true;
      if (format == "application/json") json = true;
      if (format == "*/json")           json = true;
@@ -339,10 +342,32 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
         *charsetP = "";
   }
 
-  if (xml == true)
-    return XML;
-  else if (json == true)
-    return JSON;
+  //
+  // API version 1 has XML as default format, v2 has JSON
+  //
+  if (apiVersion == "v1")
+  {
+    if (xml == true)
+    {
+      return XML;
+    }
+    else if (json == true)
+    {
+      return JSON;
+    }
+  }
+  else if (apiVersion == "v2")
+  {
+    if (json == true)
+    {
+      return JSON;
+    }
+    else if (xml == true)
+    {
+      return XML;
+    }
+  }
+
 
   LM_W(("Bad Input (no valid 'Accept-format' found)"));
   return NOFORMAT;
@@ -391,7 +416,7 @@ static void requestCompleted
 */
 static int outFormatCheck(ConnectionInfo* ciP)
 {
-  ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+  ciP->outFormat  = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
   if (ciP->outFormat == NOFORMAT)
   {
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */

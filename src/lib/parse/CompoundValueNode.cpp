@@ -453,9 +453,9 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
 
 /* ****************************************************************************
 *
-* renderV2 -
+* toJson -
 */
-std::string CompoundValueNode::renderV2(void)
+std::string CompoundValueNode::toJson(bool isLastElement)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;

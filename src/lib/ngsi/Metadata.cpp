@@ -179,9 +179,9 @@ void Metadata::fill(const struct Metadata& md)
 
 /* ****************************************************************************
 *
-* renderV2 - 
+* toJson - 
 */
-std::string Metadata::renderV2(ConnectionInfo* ciP, RequestType request, bool comma)
+std::string Metadata::toJson(bool isLastElement)
 {
   std::string  out;
   bool         isNumber = false;
@@ -210,7 +210,7 @@ std::string Metadata::renderV2(ConnectionInfo* ciP, RequestType request, bool co
     out += "}";
   }
 
-  if (comma)
+  if (!isLastElement)
   {
     out += ",";
   }

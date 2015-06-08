@@ -87,7 +87,7 @@ std::string MetadataVector::render(Format format, const std::string& indent, boo
 
 /* ****************************************************************************
 *
-* MetadataVector::renderV2 -
+* MetadataVector::toJson -
 *
 * Metadatas named 'value' or 'type' are not rendered in API version 2, due to the 
 * compact way in which API v2 is rendered. Metadatas named 'value' or 'type' would simply
@@ -96,7 +96,7 @@ std::string MetadataVector::render(Format format, const std::string& indent, boo
 * If anybody needs a metadata named 'value' or 'type', then API v1
 * will have to be used to retreive that information.
 */
-std::string MetadataVector::renderV2(ConnectionInfo* ciP, RequestType requestType, bool comma)
+std::string MetadataVector::toJson(bool isLastElement)
 {
   if (vec.size() == 0)
   {
@@ -141,10 +141,10 @@ std::string MetadataVector::renderV2(ConnectionInfo* ciP, RequestType requestTyp
     }
 
     ++renderedMetadatas;
-    out += vec[ix]->renderV2(ciP, requestType, renderedMetadatas < validMetadatas);
+    out += vec[ix]->toJson(renderedMetadatas == validMetadatas);
   }
 
-  if (comma)
+  if (!isLastElement)
   {
     out += ",";
   }
