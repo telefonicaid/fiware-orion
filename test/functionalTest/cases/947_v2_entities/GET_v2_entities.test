@@ -39,7 +39,7 @@ brokerStart CB
 
 echo "01. GET /v2/entities"
 echo "===================="
-orionCurl --url /v2/entities
+orionCurl --url /v2/entities --json
 echo
 echo
 
@@ -171,10 +171,12 @@ echo
 --REGEXPECT--
 01. GET /v2/entities
 ====================
-HTTP/1.1 404 Not Found
-Content-Length: 0
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
 Date: REGEX(.*)
 
+[]
 
 
 02. POST /v1/updateContext

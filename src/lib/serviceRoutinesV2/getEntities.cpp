@@ -76,8 +76,8 @@ std::string getEntities
   // 03. Render Entities response
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
   {
-    ciP->httpStatusCode = SccContextElementNotFound;
-    answer = "";
+    ciP->httpStatusCode = SccOk;
+    answer = "[]";
   }
   else
   {

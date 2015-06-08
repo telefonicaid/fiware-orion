@@ -115,7 +115,12 @@ void Entities::release(void)
 */
 void Entities::fill(QueryContextResponse* qcrsP)
 {
-  if (qcrsP->errorCode.code != SccOk)
+  if (qcrsP->errorCode.code == SccContextElementNotFound)
+  {
+    errorCode.fill(SccOk);
+    return;
+  }
+  else if (qcrsP->errorCode.code != SccOk)
   {
     errorCode.fill(qcrsP->errorCode);
     return;

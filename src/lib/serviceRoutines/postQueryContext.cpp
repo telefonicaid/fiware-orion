@@ -308,7 +308,7 @@ std::string postQueryContext
   // entities is returned in the errorCode of the payload.
   //
   // In API version 2, this has changed completely. Here, the total count of local entities is returned
-  // if the URI parameter 'count' is set to 'on', and it is returned in the HTTP header X-Total-Count.
+  // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header X-Total-Count.
   //
   if ((ciP->apiVersion == "v2") && (ciP->uriParam["count"] == "true"))
   {

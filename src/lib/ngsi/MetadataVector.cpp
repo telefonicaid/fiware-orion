@@ -93,7 +93,7 @@ std::string MetadataVector::render(Format format, const std::string& indent, boo
 * compact way in which API v2 is rendered. Metadatas named 'value' or 'type' would simply
 * collide with the 'value' and 'type' of the attribute itself (holder of the metadata).
 *
-* If anybody (stupid enough) needs a metadata named 'value' or 'type', then API v1
+* If anybody needs a metadata named 'value' or 'type', then API v1
 * will have to be used to retreive that information.
 */
 std::string MetadataVector::renderV2(ConnectionInfo* ciP, RequestType requestType, bool comma)

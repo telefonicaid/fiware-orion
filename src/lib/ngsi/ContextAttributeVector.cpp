@@ -77,7 +77,7 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 * compact way in which API v2 is rendered. Attributes named 'id' or 'type' would simply
 * collide with the 'id' and 'type' of the entity itself (holder of the attribute).
 *
-* If anybody (stupid enough) needs an attribute named 'id' or 'type', then API v1
+* If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retreive that information.
 */
 std::string ContextAttributeVector::renderV2
