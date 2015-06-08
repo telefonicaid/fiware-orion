@@ -345,18 +345,7 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
   //
   // API version 1 has XML as default format, v2 has JSON
   //
-  if (apiVersion == "v1")
-  {
-    if (xml == true)
-    {
-      return XML;
-    }
-    else if (json == true)
-    {
-      return JSON;
-    }
-  }
-  else if (apiVersion == "v2")
+  if (apiVersion == "v2")
   {
     if (json == true)
     {
@@ -365,6 +354,17 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
     else if (xml == true)
     {
       return XML;
+    }
+  }
+  else
+  {
+    if (xml == true)
+    {
+      return XML;
+    }
+    else if (json == true)
+    {
+      return JSON;
     }
   }
 
@@ -887,7 +887,7 @@ static int connectionTreat
     char tenant[128];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
-    ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+    ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
 
