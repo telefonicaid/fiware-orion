@@ -101,7 +101,7 @@ typedef enum RequestType
   ContextEntitiesByEntityIdAndType,
   EntityByIdAttributeByNameIdAndType,
 
-  // Version 2 ConvOps: /v2/*
+  // /v2 API
   EntitiesRequest = 70,
   EntitiesResponse,
 
