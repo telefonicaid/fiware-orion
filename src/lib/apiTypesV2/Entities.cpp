@@ -61,7 +61,7 @@ Entities::~Entities()
 */
 std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
 {
-  if (errorCode.description == "")
+  if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     return vec.render(ciP, requestType, false);
   }

@@ -67,7 +67,7 @@ std::string ErrorCode::toJson(bool isLastElement)
 {
   std::string  out  = "";
 
-  if (description == "")
+  if ((description == "") && ((error == "") || (error == "OK")))
   {
     return "";
   }
@@ -84,8 +84,22 @@ std::string ErrorCode::toJson(bool isLastElement)
 
   out += "{";
 
-  out += JSON_VALUE("error", error);
-  out += "," + JSON_VALUE("description", description);
+  bool comma = false;
+  if ((error != "") && (error == "OK"))
+  {
+    out += JSON_VALUE("error", error);
+    comma = true;
+  }
+
+  if (description != "")
+  {
+    if (comma == true)
+    {
+      out += ",";
+    }
+
+    out += JSON_VALUE("description", description);
+  }
 
   out += "}";
 
