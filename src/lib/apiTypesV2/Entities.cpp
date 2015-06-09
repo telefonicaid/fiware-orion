@@ -112,6 +112,12 @@ void Entities::release(void)
 /* ****************************************************************************
 *
 * Entities::fill - 
+*
+* NOTE
+*   The errorCode field from qcrsP is not used at all if errorCode::code equals SccOk. 
+*   This means that e.g. the "Count:" in errorCode::details (from v1 logic) will not be
+*   present in the Entities for v2 (that number is in the HTTP header X-Total-Count for v2).
+*   Other values for "details" are lost as well, if errorCode::code equals SccOk.
 */
 void Entities::fill(QueryContextResponse* qcrsP)
 {
