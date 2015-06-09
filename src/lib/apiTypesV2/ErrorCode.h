@@ -1,9 +1,9 @@
-#ifndef MONGO_QUERY_CONTEXT_H
-#define MONGO_QUERY_CONTEXT_H
+#ifndef SRC_LIB_APITYPESV2_ERRORCODE_H_
+#define SRC_LIB_APITYPESV2_ERRORCODE_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,28 +23,35 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan Marquez
+* Author: Ken Zangelin
 */
 #include <string>
-#include <map>
 
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "common/Format.h"
+#include "ngsi/Request.h"
+#include "ngsi/StatusCode.h"
+#include "rest/HttpStatusCode.h"
 
 
 
 /* ****************************************************************************
 *
-* mongoQueryContext - 
+* ErrorCode - 
 */
-extern HttpStatusCode mongoQueryContext
-(
-  QueryContextRequest*                  requestP,
-  QueryContextResponse*                 responseP,
-  const std::string&                    tenant,
-  const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams,
-  long long*                            countP = NULL
-);
+typedef struct ErrorCode
+{
+  std::string     error;            // Mandatory
+  std::string     description;      // Mandatory
 
-#endif
+  ErrorCode();
+  ErrorCode(const std::string& _error, const std::string& _description);
+
+  std::string  toJson(bool isLastElement);
+  void         fill(const std::string& _error, const std::string& _description);
+  //void         fill(StatusCode* scP);
+  void         fill(const StatusCode& sc);
+  void         present(const std::string& indent);
+  void         release(void);
+} ErrorCode;
+
+#endif  // SRC_LIB_APITYPESV2_ERRORCODE_H_

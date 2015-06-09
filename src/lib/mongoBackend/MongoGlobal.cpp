@@ -978,7 +978,6 @@ bool entitiesQuery
   const std::vector<std::string>&  servicePath,
   int                              offset,
   int                              limit,
-  bool                             details,
   long long*                       countP
 )
 {
@@ -1061,7 +1060,7 @@ bool entitiesQuery
       finalQuery.appendElements(filters[ix]);
     }
 
-    LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
+    LM_T(LmtPagination, ("Offset: %d, Limit: %d, countP: %p", offset, limit, countP));
 
     /* Do the query on MongoDB */
     auto_ptr<DBClientCursor>  cursor;
@@ -1074,7 +1073,7 @@ bool entitiesQuery
     connection = getMongoConnection();
     try
     {
-        if ((details == true) && (countP != NULL))
+        if (countP != NULL)
         {
           *countP = connection->count(getEntitiesCollectionName(tenant).c_str(), bquery);
         }

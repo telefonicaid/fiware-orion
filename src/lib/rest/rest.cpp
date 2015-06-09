@@ -225,10 +225,14 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
     headerP->servicePathReceived = true;
   }
   else
+  {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
+  }
 
   if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
+  {
     LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
+  }
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
    * to "deactivate" this part of the string in the checking done at connectionTreat() */
@@ -251,15 +255,14 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 *
 * wantedOutputSupported - 
 */
-static Format wantedOutputSupported(const std::string& acceptList, std::string* charsetP)
+static Format wantedOutputSupported(const std::string& apiVersion, const std::string& acceptList, std::string* charsetP)
 {
   std::vector<std::string>  vec;
   char*                     copy;
 
   if (acceptList.length() == 0) 
   {
-    /* HTTP RFC states that a missing Accept header must be interpreted as if the client is
-     * accepting any type */
+    /* HTTP RFC states that a missing Accept header must be interpreted as if the client is accepting any type */
     copy = strdup("*/*");
   }
   else 
@@ -323,9 +326,9 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
      }
 
      std::string format = vec[ix].c_str();
-     if (format == "*/*")              xml  = true;
+     if (format == "*/*")              { xml  = true; json = true; }
      if (format == "*/xml")            xml  = true;
-     if (format == "application/*")    xml  = true;
+     if (format == "application/*")    { xml  = true; json = true; }
      if (format == "application/xml")  xml  = true;
      if (format == "application/json") json = true;
      if (format == "*/json")           json = true;
@@ -339,10 +342,32 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
         *charsetP = "";
   }
 
-  if (xml == true)
-    return XML;
-  else if (json == true)
-    return JSON;
+  //
+  // API version 1 has XML as default format, v2 has JSON
+  //
+  if (apiVersion == "v2")
+  {
+    if (json == true)
+    {
+      return JSON;
+    }
+    else if (xml == true)
+    {
+      return XML;
+    }
+  }
+  else
+  {
+    if (xml == true)
+    {
+      return XML;
+    }
+    else if (json == true)
+    {
+      return JSON;
+    }
+  }
+
 
   LM_W(("Bad Input (no valid 'Accept-format' found)"));
   return NOFORMAT;
@@ -391,7 +416,7 @@ static void requestCompleted
 */
 static int outFormatCheck(ConnectionInfo* ciP)
 {
-  ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+  ciP->outFormat  = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
   if (ciP->outFormat == NOFORMAT)
   {
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
@@ -578,19 +603,28 @@ int servicePathSplit(ConnectionInfo* ciP)
 * NOTE
 *   Any failure about Content-Type is an error in the HTTP layer (not exclusively NGSI)
 *   so we don't want to use the default 200
+*
+* NOTE
+*   In version 2 of the protocol, we admit ONLY application/json
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
   //
-  // Four cases:
+  // Five cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
   //   3. text/xml used and acceptTextXml is setto true (iotAgent only)
   //   4. Content-Type present but not supported
+  //   5. API version 2 and not 'application/json'
+  //
+
 
   // Case 1
   if (ciP->httpHeaders.contentLength == 0)
+  {
     return 0;
+  }
+
 
   // Case 2
   if (ciP->httpHeaders.contentType == "")
@@ -599,15 +633,31 @@ static int contentTypeCheck(ConnectionInfo* ciP)
     ciP->httpStatusCode = SccUnsupportedMediaType;
     ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
     ciP->httpStatusCode = SccUnsupportedMediaType;
+
     return 1;
   }
 
+
   // Case 3
   if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
+  {
     return 0;
+  }
+
 
   // Case 4
   if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+  {
+    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    return 1;
+  }
+
+
+  // Case 5
+  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -719,6 +769,27 @@ std::string defaultServicePath(const char* url, const char* method)
 
 /* ****************************************************************************
 *
+* apiVersionGet - 
+*
+* This function returns the version of the API for the incoming message,
+* based on the URL.
+* If the URL starts with "/v2" then the request is considered API version 2.
+* Otherwise, API version 1.
+*/
+static std::string apiVersionGet(const char* path)
+{
+  if ((path[1] == 'v') && (path[2] == '2'))
+  {
+    return "v2";
+  }
+
+  return "v1";
+}
+
+
+
+/* ****************************************************************************
+*
 * connectionTreat - 
 *
 * This is the MHD_AccessHandlerCallback function for MHD_start_daemon
@@ -816,7 +887,7 @@ static int connectionTreat
     char tenant[128];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
-    ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+    ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
 
@@ -833,6 +904,8 @@ static int connectionTreat
       LM_W(("Bad Input (error in ServicePath http-header)"));
       restReply(ciP, ciP->answer);
     }
+
+    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     if (contentTypeCheck(ciP) != 0)
     {

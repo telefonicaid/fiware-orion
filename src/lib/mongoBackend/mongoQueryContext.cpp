@@ -238,6 +238,13 @@ void processGenericEntities(EntityIdVector& enV, ContextElementResponseVector& c
 /* ****************************************************************************
 *
 * mongoQueryContext - 
+*
+* NOTE
+*   If the in/out-parameter countP is non-NULL then the number of matching entities
+*   must be returned in *countP.
+*
+*   This replaces the 'uriParams[URI_PARAM_PAGINATION_DETAILS]' way of passing this information.
+*   The old method was one-way, using the new method 
 */
 HttpStatusCode mongoQueryContext
 (
@@ -245,7 +252,8 @@ HttpStatusCode mongoQueryContext
   QueryContextResponse*                responseP,
   const std::string&                   tenant,
   const std::vector<std::string>&      servicePathV,
-  std::map<std::string, std::string>&  uriParams
+  std::map<std::string, std::string>&  uriParams,
+  long long*                           countP
 )
 {
     int         offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
@@ -264,7 +272,6 @@ HttpStatusCode mongoQueryContext
 
     std::string err;
     bool        ok;
-    long long   count = -1;
     bool        reqSemTaken;
 
     ContextElementResponseVector rawCerV;
@@ -280,8 +287,7 @@ HttpStatusCode mongoQueryContext
                        servicePathV,
                        offset,
                        limit,
-                       details,
-                       &count);
+                       countP);
     reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
 
     if (!ok)
@@ -383,11 +389,11 @@ HttpStatusCode mongoQueryContext
       // the number of hits without pagination.
       //
 
-      if (details && (count > 0) && (offset >= count))
+      if ((countP != NULL) && (*countP > 0) && (offset >= *countP))
       {
         char details[256];
 
-        snprintf(details, sizeof(details), "Number of matching entities: %lld. Offset is %d", count, offset);
+        snprintf(details, sizeof(details), "Number of matching entities: %lld. Offset is %d", *countP, offset);
         responseP->errorCode.fill(SccContextElementNotFound, details);
       }
       else
@@ -395,7 +401,7 @@ HttpStatusCode mongoQueryContext
         responseP->errorCode.fill(SccContextElementNotFound);
       }
     }
-    else if (details)
+    else if (countP != NULL)
     {
       //
       // If all was OK, but the details URI param was set to 'on', then the responses error code details
@@ -404,7 +410,7 @@ HttpStatusCode mongoQueryContext
 
       char details[64];
 
-      snprintf(details, sizeof(details), "Count: %lld", count);
+      snprintf(details, sizeof(details), "Count: %lld", *countP);
       responseP->errorCode.fill(SccOk, details);
     }
 
