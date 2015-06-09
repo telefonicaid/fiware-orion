@@ -367,65 +367,65 @@ std::string ContextAttribute::toJson(bool isLastElement)
   {
     if (isNumber == true)
     {
-      out = "\"" + name + "\":" + value;
+      out = JSON_VALUE_NUMBER(name, value);
     }
     else
     {
       if (compoundValueP == NULL)
       {
-        out = "\"" + name + "\":\"" + value + "\"";
+        out = JSON_VALUE(name, value);
       }
       else
       {
         if (compoundValueP->isObject())
         {
-          out = "\"" + name + "\":{" + compoundValueP->toJson(true) + "}";
+          out = JSON_STR(name) + ":{" + compoundValueP->toJson(true) + "}";
         }
         else if (compoundValueP->isVector())
         {
-          out = "\"" + name + "\":[" + compoundValueP->toJson(true) + "]";
+          out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
         }
         else
         {
-          out = "\"" + name + "\":\"" + compoundValueP->toJson(true) + "\"";  // Can toplevel be a String?
+          out = JSON_STR(name) + ":" + "\"" + compoundValueP->toJson(true) + "\"";  // Can toplevel be a String?
         }
       }
     }
   }
   else
   {
-    out = "\"" + name + "\":{";
+    out = JSON_STR(name) + ":{";
 
     if (isNumber == true)
     {
-      out += "\"value\":" + value;
+      out += JSON_VALUE_NUMBER("value", value);
     }
     else
     {
       if (compoundValueP == NULL)
       {
-        out += "\"value\":\"" + value + "\"";
+        out += JSON_VALUE("value", value);
       }
       else
       {
         if (compoundValueP->isObject())
         {
-          out = "\"" + name + "\":{" + compoundValueP->toJson(true) + "}";
+          out = JSON_STR(name) + ":{" + compoundValueP->toJson(true) + "}";
         }
         else if (compoundValueP->isVector())
         {
-          out = "\"" + name + "\":[" + compoundValueP->toJson(true) + "]";
+          out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
         }
         else
         {
-          out = "\"" + name + "\":\"" + compoundValueP->toJson(true) + "\"";  // Can toplevel be a String?
+          out = JSON_STR(name) + ":\"" + compoundValueP->toJson(true) + "\"";  // Can toplevel be a String?
         }
       }
     }
 
     if ((type != "") && (isNumber == false))
     {
-      out += ",\"type\":\"" + type + "\"";
+      out += "," + JSON_VALUE("type", type);
     }
 
     if (metadataVector.size() > 0)

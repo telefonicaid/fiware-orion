@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "common/tag.h"
 #include "apiTypesV2/Entity.h"
 
 
@@ -55,11 +56,14 @@ Entity::~Entity()
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  std::string out = "{\"id\":\"" + id + "\"";
+  std::string out = "{";
+
+  out += JSON_VALUE("id", id);
 
   if (type != "")
   {
-    out += ",\"type\":\"" + type + "\"";
+    out += ",";
+    out += JSON_VALUE("type", type);
   }
 
   if (attributeVector.size() != 0)

@@ -195,18 +195,18 @@ std::string Metadata::toJson(bool isLastElement)
   {
     if (isNumber == true)
     {
-      out = "\"" + name + "\":" + value;
+      out = JSON_VALUE_NUMBER(name, value);
     }
     else
     {
-      out = "\"" + name + "\":\"" + value + "\"";
+      out = JSON_VALUE(name, value);
     }
   }
   else
   {
-    out = "\"" + name +"\":{";
-    out += "\"value\":\"" + value + "\"";
-    out += ",\"type\":\"" + type +"\"";
+    out = JSON_STR(name) + ":{";
+    out += JSON_VALUE("value", value);
+    out += "," + JSON_VALUE("type", type);
     out += "}";
   }
 
