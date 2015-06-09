@@ -22,6 +22,7 @@
 *
 * Author: Fermín Galán
 */
+#include <stdint.h>
 #include <utility>
 #include <map>
 #include <string>
@@ -255,7 +256,7 @@ static bool addTriggeredSubscriptions
   {
     queryNoPattern.append(CASUB_ATTRS, BSON("$size" << 0));
   }
-  queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << (int64) getCurrentTime()));
+  queryNoPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
 
 
   //
@@ -319,7 +320,7 @@ static bool addTriggeredSubscriptions
   BSONObjBuilder  queryPattern;
 
   queryPattern.append(entPatternQ, "true");
-  queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << (int64) getCurrentTime()));
+  queryPattern.append(CASUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
   queryPattern.appendCode("$where", function);
 
   BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern.obj() << queryPattern.obj()));
@@ -440,7 +441,7 @@ HttpStatusCode processRegisterContext
   }
 
   /* Calculate expiration (using the current time and the duration field in the request) */
-  int64 expiration = getCurrentTime() + requestP->duration.parse();
+  long long expiration = getCurrentTime() + requestP->duration.parse();
   LM_T(LmtMongo, ("Registration expiration: %lu", expiration));
 
   /* Create the mongoDB registration document */
