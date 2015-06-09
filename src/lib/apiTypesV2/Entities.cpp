@@ -36,7 +36,7 @@
 */
 Entities::Entities()
 {
-  errorCode.fill(SccOk);
+  errorCode.fill("OK", "");
 }
 
 
@@ -61,7 +61,7 @@ Entities::~Entities()
 */
 std::string Entities::render(ConnectionInfo* ciP, RequestType requestType)
 {
-  if ((errorCode.code == SccOk) || (errorCode.code == SccNone))
+  if (errorCode.description == "")
   {
     return vec.render(ciP, requestType, false);
   }
@@ -128,7 +128,7 @@ void Entities::fill(QueryContextResponse* qcrsP)
     // and an empty vector of entities ( [] )
     //
 
-    errorCode.fill(SccOk);
+    errorCode.fill("OK", "");
     return;
   }
   else if (qcrsP->errorCode.code != SccOk)

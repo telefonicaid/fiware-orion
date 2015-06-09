@@ -24,12 +24,14 @@ SET (SOURCES
     Entity.cpp
     EntityVector.cpp
     Entities.cpp
+    ErrorCode.cpp
 )
 
 SET (HEADERS
     Entity.h
     EntityVector.h
     Entities.h
+    ErrorCode.h
 )
 
 

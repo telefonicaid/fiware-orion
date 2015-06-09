@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_APITYPESV2_ENTITIES_H_
-#define SRC_LIB_APITYPESV2_ENTITIES_H_
+#ifndef SRC_LIB_APITYPESV2_ERRORCODE_H_
+#define SRC_LIB_APITYPESV2_ERRORCODE_H_
 
 /*
 *
@@ -26,32 +26,32 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "apiTypesV2/EntityVector.h"
-#include "apiTypesV2/ErrorCode.h"
+#include "common/Format.h"
+#include "ngsi/Request.h"
+#include "ngsi/StatusCode.h"
+#include "rest/HttpStatusCode.h"
 
 
-struct QueryContextResponse;
 
 /* ****************************************************************************
 *
-* Entities - 
+* ErrorCode - 
 */
-class Entities
+typedef struct ErrorCode
 {
-public:
-  EntityVector vec;          // Optional - mandatory if 200-OK
-  ErrorCode   errorCode;     // Optional - mandatory if not 200-OK
+  std::string     error;            // Mandatory
+  std::string     description;      // Mandatory
 
-  Entities();
-  ~Entities();
+  ErrorCode();
+  ErrorCode(const std::string& _error, const std::string& _description);
 
-  std::string  render(ConnectionInfo* ciP, RequestType requestType);
-  std::string  check(ConnectionInfo*  ciP, RequestType requestType);
+  std::string  toJson(bool isLastElement);
+  void         fill(const std::string& _error, const std::string& _description);
+  //void         fill(StatusCode* scP);
+  void         fill(const StatusCode& sc);
   void         present(const std::string& indent);
   void         release(void);
-  void         fill(QueryContextResponse* qcrsP);
-};
+} ErrorCode;
 
-#endif  // SRC_LIB_APITYPESV2_ENTITIES_H_
+#endif  // SRC_LIB_APITYPESV2_ERRORCODE_H_
