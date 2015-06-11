@@ -1,2 +1,4 @@
 Fix: Fixed a bug about pagination problem due to missing ErrorCode with details in the case of queries with forwarding to context providers.  (Issue #945)
 Fix: Add multiservice flag for the default configuration in the RPM. (Issue #964)
+Add: New operation "GET /v2/entities" (Issue #947)
+Add: New operation "GET /v2" (Issue #956)

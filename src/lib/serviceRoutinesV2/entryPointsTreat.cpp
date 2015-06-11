@@ -1,9 +1,6 @@
-#ifndef MONGO_QUERY_CONTEXT_H
-#define MONGO_QUERY_CONTEXT_H
-
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright (c) 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,28 +20,44 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan Marquez
+* Author: José Manuel Cantera
 */
 #include <string>
-#include <map>
+#include <vector>
 
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
+#include "common/string.h"
+#include "common/globals.h"
+#include "common/tag.h"
+
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "serviceRoutinesV2/entryPointsTreat.h"
 
 
 /* ****************************************************************************
 *
-* mongoQueryContext - 
+* entryPointsTreat -
 */
-extern HttpStatusCode mongoQueryContext
+std::string entryPointsTreat
 (
-  QueryContextRequest*                  requestP,
-  QueryContextResponse*                 responseP,
-  const std::string&                    tenant,
-  const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams,
-  long long*                            countP = NULL
-);
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
+{
+  std::string out = "{";
 
-#endif
+  out += JSON_VALUE("entities_url",      ENTITIES_URL)      + ",";
+  out += JSON_VALUE("types_url",         TYPES_URL)         + ",";
+  out += JSON_VALUE("subscriptions_url", SUBSCRIPTIONS_URL) + ",";
+  out += JSON_VALUE("registrations_url", REGISTRATIONS_URL);
+
+  out += "}";
+
+  ciP->httpStatusCode = SccOk;
+  return out;
+}

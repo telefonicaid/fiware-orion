@@ -1,9 +1,9 @@
-#ifndef MONGO_QUERY_CONTEXT_H
-#define MONGO_QUERY_CONTEXT_H
+#ifndef SRC_LIB_SERVICEROUTINES_GETENTITIES_H_
+#define SRC_LIB_SERVICEROUTINES_GETENTITIESH_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,28 +23,26 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan Marquez
+* Author: Ken Zangelin
 */
 #include <string>
-#include <map>
+#include <vector>
 
-#include "ngsi10/QueryContextRequest.h"
-#include "ngsi10/QueryContextResponse.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* mongoQueryContext - 
+* getEntities - 
 */
-extern HttpStatusCode mongoQueryContext
+extern std::string getEntities
 (
-  QueryContextRequest*                  requestP,
-  QueryContextResponse*                 responseP,
-  const std::string&                    tenant,
-  const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams,
-  long long*                            countP = NULL
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
 );
 
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_GETENTITIES_H_

@@ -92,12 +92,12 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
 
   if (strstr(details.c_str(), "\"") != NULL)
   {
-    int    len = details.length() * 2;
-    char*  s2    = (char*) calloc(1, len + 1);
+    int    len  = details.length() * 2;
+    char*  s    = (char*) calloc(1, len + 1);
 
-    strReplace(s2, len, details.c_str(), "\"", "\\\"");
-    details = s2;
-    free(s2);
+    strReplace(s, len, details.c_str(), "\"", "\\\"");
+    details = s;
+    free(s);
   }
 
   if (code == SccNone)
@@ -116,6 +116,51 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
   }
 
   out += endTag(indent, tag, format, comma);
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* StatusCode::toJson -
+*
+* For version 2 of the API, the unnecessary 'reasonPhrase' is removed.
+*/
+std::string StatusCode::toJson(bool isLastElement)
+{
+  std::string  out  = "";
+
+  if (strstr(details.c_str(), "\"") != NULL)
+  {
+    int    len = details.length() * 2;
+    char*  s    = (char*) calloc(1, len + 1);
+
+    strReplace(s, len, details.c_str(), "\"", "\\\"");
+    details = s;
+    free(s);
+  }
+
+  char codeV[16];
+
+  snprintf(codeV, sizeof(codeV), "%d", code);
+
+  out += "{";
+
+  out += std::string("\"code\":\"") + codeV + "\"";
+  
+  if (details != "")
+  {
+    out += ",\"details\":\"" + details + "\"";
+  }
+
+  out += "}";
+
+  if (!isLastElement)
+  {
+    out += ",";
+  }
 
   return out;
 }

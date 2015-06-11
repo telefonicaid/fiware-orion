@@ -52,6 +52,16 @@ typedef struct ContextRegistrationAttributeVector
                                          const std::string&  indent,
                                          const std::string&  predetectedError,
                                          int                 counter);
+
+  ContextRegistrationAttribute*  operator[](unsigned int ix)
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;
+  }
 } ContextRegistrationAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTREGISTRATIONATTRIBUTEVECTOR_H_

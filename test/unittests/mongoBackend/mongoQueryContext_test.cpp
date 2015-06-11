@@ -503,7 +503,8 @@ TEST(mongoQueryContextRequest, paginationDetails)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+    long long count;
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, &count);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -998,7 +999,8 @@ TEST(mongoQueryContextRequest, paginationNonExistingDetails)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
+    long long count;
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, &count);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

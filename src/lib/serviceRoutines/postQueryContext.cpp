@@ -297,13 +297,49 @@ std::string postQueryContext
   std::string                 answer;
   QueryContextRequestVector   requestV;
   QueryContextResponseVector  responseV;
+  long long                   count;
+  long long*                  countP = NULL;
+
+
+  //
+  // 00. Count or not count? That is the question ...
+  //
+  // For API version 1, if the URI parameter 'details' is set to 'on', then the total of local
+  // entities is returned in the errorCode of the payload.
+  //
+  // In API version 2, this has changed completely. Here, the total count of local entities is returned
+  // if the URI parameter 'count' is set to 'true', and it is returned in the HTTP header X-Total-Count.
+  //
+  if ((ciP->apiVersion == "v2") && (ciP->uriParam["count"] == "true"))
+  {
+    countP = &count;
+  }
+  else if ((ciP->apiVersion == "v1") && (ciP->uriParam["details"] == "on"))
+  {
+    countP = &count;
+  }
+
 
 
   //
   // 01. Call mongoBackend/mongoQueryContext
   //
   qcrsP->errorCode.fill(SccOk);
-  ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam);
+  ciP->httpStatusCode = mongoQueryContext(qcrP, qcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, countP);
+
+
+  //
+  // If API version 2, add count, if asked for, in HTTP header X-Total-Count
+  //
+  if ((ciP->apiVersion == "v2") && (countP != NULL))
+  {
+    char cV[32];
+
+    snprintf(cV, sizeof(cV), "%llu", *countP);
+    ciP->httpHeader.push_back("X-Total-Count");
+    ciP->httpHeaderValue.push_back(cV);
+  }
+
 
 
   //

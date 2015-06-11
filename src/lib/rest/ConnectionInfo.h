@@ -146,6 +146,7 @@ public:
   ParseData*                 parseDataP;
   unsigned short             port;
   std::string                ip;
+  std::string                apiVersion;
 
   std::map<std::string, std::string>   uriParam;
 

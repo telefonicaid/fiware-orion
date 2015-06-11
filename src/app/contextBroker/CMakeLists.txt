@@ -31,10 +31,12 @@ SET (STATIC_LIBS
     mongoBackend
     ngsiNotify
     serviceRoutines
+    serviceRoutinesV2
     mongoBackend
     rest
     jsonParse
     xmlParse
+    apiTypesV2
     convenience
     ngsi9
     ngsi10
