@@ -38,6 +38,8 @@ using ::testing::MatchesRegex;
 using ::testing::Throw;
 using ::testing::Return;
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * For mongoGetContextSubscriptionInfo:
@@ -76,7 +78,6 @@ static void prepareDatabase(void) {
      *
      * - E1:
      *     A1:  X
-     *     A1*: Y
      *     A2:  Z
      *     A3:  W
      *     A7:  R
@@ -92,9 +93,6 @@ static void prepareDatabase(void) {
      *     A4:  noise
      *     A6:  noise
      *     A7:  noise
-     *
-     * (*) Means that entity/type is using same name but different type. This is included to check that type
-     *     is taken into account.
      *
      * We create the following subscriptions:
      *
@@ -113,32 +111,33 @@ static void prepareDatabase(void) {
      */
 
     BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                          BSON("name" << "A1" << "type" << "TA1bis" << "value" << "Y") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                          BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
-                          BSON("name" << "A7" << "type" << "TA7" << "value" << "R")
+                       "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                          "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                          "A3" << BSON("type" << "TA3" << "value" << "W") <<
+                          "A7" << BSON("type" << "TA7" << "value" << "R")
                           )
                       );
 
     BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "S") <<
-                          BSON("name" << "A4" << "type" << "TA4" << "value" << "T") <<
-                          BSON("name" << "A6" << "type" << "TA6" << "value" << "U")
+                       "attrNames" << BSON_ARRAY("A1" << "A4" << "A6") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "S") <<
+                          "A4" << BSON("type" << "TA4" << "value" << "T") <<
+                          "A6" << BSON("type" << "TA6" << "value" << "U")
                           )
                       );
 
     BSONObj en3 = BSON("_id" << BSON("id" << "E3" << "type" << "T") <<
-                       "attrs" << BSON_ARRAY(
-                           BSON("name" << "A1" << "type" << "TA1" << "value" << "noise") <<
-                           BSON("name" << "A1" << "type" << "TA1bis" << "value" << "noise") <<
-                           BSON("name" << "A2" << "type" << "TA2" << "value" << "noise") <<
-                           BSON("name" << "A3" << "type" << "TA3" << "value" << "noise") <<
-                           BSON("name" << "A4" << "type" << "TA4" << "value" << "noise") <<
-                           BSON("name" << "A6" << "type" << "TA6" << "value" << "noise") <<
-                           BSON("name" << "A7" << "type" << "TA7" << "value" << "noise")
+                       "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A4" << "A6" << "A7") <<
+                       "attrs" << BSON(
+                           "A1" << BSON("type" << "TA1" << "value" << "noise") <<
+                           "A2" << BSON("type" << "TA2" << "value" << "noise") <<
+                           "A3" << BSON("type" << "TA3" << "value" << "noise") <<
+                           "A4" << BSON("type" << "TA4" << "value" << "noise") <<
+                           "A6" << BSON("type" << "TA6" << "value" << "noise") <<
+                           "A7" << BSON("type" << "TA7" << "value" << "noise")
                           )
                       );
 
@@ -279,9 +278,9 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
     ContextSubscriptionInfo csi;
     std::string err;
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
     ms = mongoGetContextSubscriptionInfo(subId, &csi, &err);
@@ -291,6 +290,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
     EXPECT_EQ("boom!!", err);
 
     /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 }
 
@@ -336,23 +336,19 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_ok)
     EXPECT_EQ("E1", cer0.contextElement.entityId.id);
     EXPECT_EQ("T", cer0.contextElement.entityId.type);
     EXPECT_EQ("false", cer0.contextElement.entityId.isPattern);
-    ASSERT_EQ(4, cer0.contextElement.contextAttributeVector.size());
+    ASSERT_EQ(3, cer0.contextElement.contextAttributeVector.size());
     ca0 = *cer0.contextElement.contextAttributeVector.get(0);
     ca1 = *cer0.contextElement.contextAttributeVector.get(1);
-    ca2 = *cer0.contextElement.contextAttributeVector.get(2);
-    ca3 = *cer0.contextElement.contextAttributeVector.get(3);
+    ca2 = *cer0.contextElement.contextAttributeVector.get(2);    
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
     EXPECT_EQ("X", ca0.value);
-    EXPECT_EQ("A1", ca1.name);
-    EXPECT_EQ("TA1bis", ca1.type);
-    EXPECT_EQ("Y", ca1.value);
-    EXPECT_EQ("A2", ca2.name);
-    EXPECT_EQ("TA2", ca2.type);
-    EXPECT_EQ("Z", ca2.value);
-    EXPECT_EQ("A3", ca3.name);
-    EXPECT_EQ("TA3", ca3.type);
-    EXPECT_EQ("W", ca3.value);
+    EXPECT_EQ("A2", ca1.name);
+    EXPECT_EQ("TA2", ca1.type);
+    EXPECT_EQ("Z", ca1.value);
+    EXPECT_EQ("A3", ca2.name);
+    EXPECT_EQ("TA3", ca2.type);
+    EXPECT_EQ("W", ca2.value);
 
     /* Context Element Response #2 */
     EXPECT_EQ(SccOk, cer1.statusCode.code);
@@ -414,23 +410,19 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_pattern)
     EXPECT_EQ("E1", cer0.contextElement.entityId.id);
     EXPECT_EQ("T", cer0.contextElement.entityId.type);
     EXPECT_EQ("false", cer0.contextElement.entityId.isPattern);
-    ASSERT_EQ(4, cer0.contextElement.contextAttributeVector.size());
+    ASSERT_EQ(3, cer0.contextElement.contextAttributeVector.size());
     ca0 = *cer0.contextElement.contextAttributeVector.get(0);
     ca1 = *cer0.contextElement.contextAttributeVector.get(1);
-    ca2 = *cer0.contextElement.contextAttributeVector.get(2);
-    ca3 = *cer0.contextElement.contextAttributeVector.get(3);
+    ca2 = *cer0.contextElement.contextAttributeVector.get(2);    
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
     EXPECT_EQ("X", ca0.value);
-    EXPECT_EQ("A1", ca1.name);
-    EXPECT_EQ("TA1bis", ca1.type);
-    EXPECT_EQ("Y", ca1.value);
-    EXPECT_EQ("A2", ca2.name);
-    EXPECT_EQ("TA2", ca2.type);
-    EXPECT_EQ("Z", ca2.value);
-    EXPECT_EQ("A3", ca3.name);
-    EXPECT_EQ("TA3", ca3.type);
-    EXPECT_EQ("W", ca3.value);
+    EXPECT_EQ("A2", ca1.name);
+    EXPECT_EQ("TA2", ca1.type);
+    EXPECT_EQ("Z", ca1.value);
+    EXPECT_EQ("A3", ca2.name);
+    EXPECT_EQ("TA3", ca2.type);
+    EXPECT_EQ("W", ca2.value);
 
     /* Context Element Response #2 */
     EXPECT_EQ(SccOk, cer1.statusCode.code);
@@ -488,7 +480,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_fail)
 * mongoGetContextElementResponses_dbfail -
 *
 * FIXME: not sure if this test should exist... it should be include in unit testing
-* for entityQuery()
+* for entitiesQuery()
 */
 TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
 {
@@ -514,21 +506,22 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
     ContextElementResponseVector cerV;
     std::string err;
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
-    ms = mongoGetContextElementResponses(enV, attrL, &cerV, &err);
+    ms = mongoGetContextElementResponses(enV, attrL, &cerV, &err);    
 
     /* Check results */
     EXPECT_EQ(SccOk, ms);
     EXPECT_EQ("collection: unittest.entities - "
               "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T\" }, { _id.id: \"E2\", _id.type: \"T\" } ], _id.servicePath: { $in: [ /^/.*/, null ] }, "
-              "attrs.name: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } }, orderby: { creDate: 1 } } - "
+              "attrNames: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } }, orderby: { creDate: 1 } } - "
               "exception: boom!!", err);    
 
     /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 }
 
@@ -623,7 +616,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, update("unittest.csubs",_,_,_,_))
+    ON_CALL(*connectionMock, update("unittest.csubs",_,_,_,_,_))
             .WillByDefault(Throw(e));
 
     TimerMock* timerMock = new TimerMock();
@@ -635,9 +628,11 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     std::string subId = "51307b66f481db11bf860001";
     std::string err;
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object)
+     * Note that we preserve the "actual" connection for future database checking */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Do operation */
     ms = mongoUpdateCsubNewNotification(subId, &err);
@@ -646,13 +641,11 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     EXPECT_EQ(SccReceiverInternalError, ms);
     EXPECT_EQ("boom!!", err);
 
-    /* Check that database is as expected (untouched) */
-    mongoDisconnect();
+    /* Check that database is as expected (untouched) */   
 
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
-    mongoConnect("localhost");
-    DBClientBase* connection = getMongoConnection();
+
     BSONObj sub1 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     BSONObj sub2 = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(20000000, sub1.getIntField("lastNotification"));
@@ -661,6 +654,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     EXPECT_EQ(30, sub2.getIntField("count"));
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete timerMock;
-
+    delete connectionMock;
 }

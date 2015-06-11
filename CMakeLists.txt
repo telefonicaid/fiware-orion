@@ -54,7 +54,7 @@ add_definitions(${RAPIDXML_VERSION})
 
 # Baseline compiler flags, any change here will affect all build types
 #set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -Werror")
-set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -g -Werror")
+set (CMAKE_CXX_FLAGS "-Wall -Wno-unknown-pragmas -D_LARGEFILE64_SOURCE -D_GNU_SOURCE -g -Werror -fno-var-tracking-assignments")
 
 #
 # Platform checks
@@ -135,7 +135,7 @@ if (${BUILD_ARCH} STREQUAL "x86_64")
 else (NOT ${BUILD_ARCH} STREQUAL "x86_64")
     link_directories("/usr/lib")
 endif (${BUILD_ARCH} STREQUAL "x86_64")
-
+link_directories("/usr/lib/x86_64-linux-gnu")
 #
 # Enabling test harness
 #
@@ -158,11 +158,12 @@ if (error EQUAL 0)
   ADD_SUBDIRECTORY(src/lib/orionTypes)
   ADD_SUBDIRECTORY(src/lib/ngsi)
   ADD_SUBDIRECTORY(src/lib/serviceRoutines)
+  ADD_SUBDIRECTORY(src/lib/serviceRoutinesV2)
   ADD_SUBDIRECTORY(src/lib/convenience)
-  ADD_SUBDIRECTORY(src/lib/convenienceMap)
   ADD_SUBDIRECTORY(src/lib/ngsi9)
   ADD_SUBDIRECTORY(src/lib/ngsi10)
   ADD_SUBDIRECTORY(src/lib/ngsiNotify)
+  ADD_SUBDIRECTORY(src/lib/apiTypesV2)
   ADD_SUBDIRECTORY(src/lib/parse)
   ADD_SUBDIRECTORY(src/lib/jsonParse)
   ADD_SUBDIRECTORY(src/lib/xmlParse)

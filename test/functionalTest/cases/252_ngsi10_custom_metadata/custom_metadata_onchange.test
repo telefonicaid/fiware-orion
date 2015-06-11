@@ -22,6 +22,7 @@
 
 --NAME--
 Custom metadata ONCHANGE subscription
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -226,7 +227,7 @@ orionCurl --url "$url" --payload "${payload}" --json
 echo
 
 echo "=== Get accumulated data (4 messages)"
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 
 --REGEXPECT--
@@ -629,3 +630,4 @@ Content-Type: application/json
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

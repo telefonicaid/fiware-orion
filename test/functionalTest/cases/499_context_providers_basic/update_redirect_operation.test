@@ -45,8 +45,6 @@
 Update Redirect
 --SHELL-INIT--
 
-rm -f /tmp/orionCurlURL
-
 dbInit CB
 dbInit CP1
 
@@ -358,7 +356,7 @@ Date: REGEX(.*)
 
 04. Update/UPDATE E1/A1(=BAD) in broker (is forwarded to CP and nothing is found/updated)
 HTTP/1.1 200 OK
-Content-Length: 448
+Content-Length: 668
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -370,6 +368,13 @@ Date: REGEX(.*)
         <entityId type="E" isPattern="false">
           <id>E1</id>
         </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
       </contextElement>
       <statusCode>
         <code>404</code>
@@ -383,7 +388,7 @@ Date: REGEX(.*)
 
 05. Query broker for E1/A1 (is forwarded to CP but nothing is found)
 HTTP/1.1 200 OK
-Content-Length: 227
+Content-Length: 155
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -392,7 +397,6 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
-    <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
   </errorCode>
 </queryContextResponse>
 
@@ -461,7 +465,7 @@ Date: REGEX(.*)
 
 08. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP) is found)
 HTTP/1.1 200 OK
-Content-Length: 692
+Content-Length: 616
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -484,7 +488,6 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -493,7 +496,7 @@ Date: REGEX(.*)
 
 09. Update/UPDATE E1/A1(=CP-2) broker (is forwarded to CP and now it is updated)
 HTTP/1.1 200 OK
-Content-Length: 692
+Content-Length: 616
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -516,7 +519,6 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -556,7 +558,7 @@ Date: REGEX(.*)
 
 11. Query broker for E1/A1 (is forwarded to CP and E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
-Content-Length: 694
+Content-Length: 618
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -579,7 +581,6 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
@@ -681,7 +682,7 @@ Date: REGEX(.*)
 
 15. Query broker for E1/A1 (will go to CP and E1/A1(=CP-2) is found)
 HTTP/1.1 200 OK
-Content-Length: 694
+Content-Length: 618
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -704,7 +705,6 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>

@@ -31,18 +31,22 @@
 *
 * TriggeredSubscription::TriggeredSubscription -
 */
-TriggeredSubscription::TriggeredSubscription(long long          _throttling,
-                                             long long          _lastNotification,
-                                             Format             _format,
-                                             const std::string& _reference,
-                                             AttributeList      _attrL)
+TriggeredSubscription::TriggeredSubscription
+(
+  long long          _throttling,
+  long long          _lastNotification,
+  Format             _format,
+  const std::string& _reference,
+  AttributeList      _attrL
+)
 {
-  throttling       = _throttling;
-  lastNotification = _lastNotification;
-  format           = _format;
-  reference        = _reference;
-  attrL            = _attrL;
+  throttling        = _throttling;
+  lastNotification  = _lastNotification;
+  format            = _format;
+  reference         = _reference;
+  attrL             = _attrL;
 }
+
 
 /* ****************************************************************************
 *
@@ -50,15 +54,18 @@ TriggeredSubscription::TriggeredSubscription(long long          _throttling,
 *
 * Constructor without throttling (for NGSI9 subscriptions)
 */
-TriggeredSubscription::TriggeredSubscription(Format             _format,
-                                             const std::string& _reference,
-                                             AttributeList      _attrL)
+TriggeredSubscription::TriggeredSubscription
+(
+  Format             _format,
+  const std::string& _reference,
+  AttributeList      _attrL
+)
 {
-  throttling       = -1;
-  lastNotification = -1;
-  format           = _format;
-  reference        = _reference;
-  attrL            = _attrL;
+  throttling        = -1;
+  lastNotification  = -1;
+  format            = _format;
+  reference         = _reference;
+  attrL             = _attrL;
 }
 
 
@@ -69,7 +76,9 @@ TriggeredSubscription::TriggeredSubscription(Format             _format,
 std::string TriggeredSubscription::toString(const std::string& delimiter)
 {
   std::stringstream ss;
+
   ss << throttling << delimiter << lastNotification << delimiter << formatToString(format) << delimiter << reference;
+
   return ss.str();
 }
 

@@ -30,6 +30,7 @@ SET (SOURCES
     idCheck.cpp
     wsStrip.cpp
     statistics.cpp
+    clockFunctions.cpp
 )
 
 SET (HEADERS
@@ -41,6 +42,7 @@ SET (HEADERS
     idCheck.h
     wsStrip.h
     statistics.h
+    clockFunctions.h
 )
 
 

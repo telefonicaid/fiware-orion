@@ -29,9 +29,11 @@
 #include "logMsg/traceLevels.h"
 
 #include "convenience/ContextAttributeResponse.h"
-#include "convenienceMap/mapGetIndividualContextEntityAttribute.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "rest/EntityTypeInfo.h"
+#include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 
 
@@ -39,6 +41,26 @@
 /* ****************************************************************************
 *
 * getIndividualContextEntityAttribute -
+*
+* GET /v1/contextEntities/{entityId::id}/attributes/{attributeName}
+* GET /ngsi10/contextEntities/{entityId::id}/attributes/{attributeName}
+*
+* Payload In:  None
+* Payload Out: ContextAttributeResponse
+*
+* URI parameters:
+*   - !exist=entity::type
+*   - exist=entity::type
+*   - entity::type=TYPE
+*   - attributesFormat=object
+*
+* 0. Take care of URI params
+* 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)
+* 2. Call standard operation
+* 3. Fill in ContextAttributeResponse from QueryContextResponse
+* 4. If 404 Not Found - enter request entity data into response StatusCode::details
+* 5. Render the ContextAttributeResponse
+* 6. Cleanup and return result
 */
 std::string getIndividualContextEntityAttribute
 (
@@ -49,15 +71,58 @@ std::string getIndividualContextEntityAttribute
 )
 {
   std::string               answer;
-  std::string               entityId      = compV[2];
-  std::string               attributeName = compV[4];
+  std::string               entityId       = compV[2];
+  std::string               entityType     = "";
+  EntityTypeInfo            typeInfo       = EntityTypeEmptyOrNotEmpty;
+  std::string               attributeName  = compV[4];
   ContextAttributeResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
+  // 0. Take care of URI params
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+  entityType = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
-  ciP->httpStatusCode = mapGetIndividualContextEntityAttribute(entityId, "", attributeName, &response, ciP);
+
+  // 1. Fill in QueryContextRequest (includes adding URI parameters as Scope in restriction)
+  parseDataP->qcr.res.fill(entityId, entityType, "false", typeInfo, attributeName);
+
+
+  // 2. Call standard operation
+  answer = postQueryContext(ciP, components, compV, parseDataP);
+
+
+  // 3. Fill in ContextAttributeResponse from QueryContextResponse
+  if (parseDataP->qcrs.res.contextElementResponseVector.size() != 0)  
+  {
+    response.contextAttributeVector.fill(&parseDataP->qcrs.res.contextElementResponseVector[0]->contextElement.contextAttributeVector);
+    response.statusCode.fill(parseDataP->qcrs.res.contextElementResponseVector[0]->statusCode);
+  }
+  else
+  {
+    response.statusCode.fill(parseDataP->qcrs.res.errorCode);
+  }
+
+
+  // 4. If 404 Not Found - enter request entity data into response StatusCode::details
+  if (response.statusCode.code == SccContextElementNotFound)
+  {
+    response.statusCode.details = "Entity id: /" + entityId + "/";
+  }
+
+
+  // 5. Render the ContextAttributeResponse
   answer = response.render(ciP, IndividualContextEntityAttribute, "");
+
+
+  // 6. Cleanup and return result
   response.release();
+  parseDataP->qcr.res.release();
 
   return answer;
 }

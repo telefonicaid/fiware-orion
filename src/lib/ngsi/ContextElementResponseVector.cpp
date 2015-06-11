@@ -44,7 +44,8 @@ std::string ContextElementResponseVector::render
   ConnectionInfo*     ciP,
   RequestType         requestType,
   const std::string&  indent,
-  bool                comma
+  bool                comma,
+  bool                omitAttributeValues
 )
 {
   std::string xmlTag   = "contextResponseList";
@@ -60,7 +61,7 @@ std::string ContextElementResponseVector::render
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    out += vec[ix]->render(ciP, requestType, indent + "  ", ix < (vec.size() - 1));
+    out += vec[ix]->render(ciP, requestType, indent + "  ", ix < (vec.size() - 1), omitAttributeValues);
   }
 
   out += endTag(indent, xmlTag, ciP->outFormat, comma, true);
@@ -104,11 +105,11 @@ std::string ContextElementResponseVector::check
 */
 void ContextElementResponseVector::present(const std::string& indent)
 {
-  PRINTF("%lu ContextElementResponses", (uint64_t) vec.size());
+  LM_F(("%s%lu ContextElementResponses", indent.c_str(), (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->present(indent, ix);
+    vec[ix]->present(indent + "  ", ix);
   }
 }
 
@@ -165,4 +166,42 @@ void ContextElementResponseVector::release(void)
   }
 
   vec.clear();
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponseVector::lookup -
+*/
+ContextElementResponse* ContextElementResponseVector::lookup(EntityId* eP, HttpStatusCode code)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->contextElement.entityId.equal(eP) == true)
+    {
+      if ((code == SccNone) || (vec[ix]->statusCode.code == code))
+      {
+        return vec[ix];
+      }
+    }
+  }
+
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextElementResponseVector::fill - 
+*/
+void ContextElementResponseVector::fill(ContextElementResponseVector& cerV)
+{
+  for (unsigned int ix = 0; ix < cerV.size(); ++ix)
+  {
+    ContextElementResponse* cerP = new ContextElementResponse(cerV[ix]);
+
+    push_back(cerP);
+  }
 }

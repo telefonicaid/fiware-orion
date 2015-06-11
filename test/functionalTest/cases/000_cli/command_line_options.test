@@ -20,9 +20,12 @@
 
 --NAME--
 broker version
+
 --SHELL-INIT--
+
 --SHELL--
 contextBroker -u
+
 --REGEXPECT--
 Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-u' (usage)]
@@ -41,6 +44,8 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-dbuser' <database user>]
                       [option '-dbpwd' <database password>]
                       [option '-db' <database name>]
+                      [option '-dbTimeout' <timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)>]
+                      [option '-dbPoolSize' <database connection pool size>]
                       [option '-fwdHost' <host for forwarding NGSI9 regs>]
                       [option '-fwdPort' <port for forwarding NGSI9 regs>]
                       [option '-ngsi9' (run as Configuration Manager)]
@@ -51,5 +56,10 @@ Usage: contextBroker  [option '-U' (extended usage)]
                       [option '-cert' <certificate key file (for https)>]
                       [option '-rush' <rush host (IP:port)>]
                       [option '-multiservice' (service multi tenancy mode)]
+                      [option '-httpTimeout' <timeout in milliseconds for forwards and notifications>]
+                      [option '-reqMutexPolicy' <mutex policy (none/read/write/all)>]
+                      [option '-mutexTimeStat' (measure total semaphore waiting time)]
+                      [option '-writeConcern' <db write concern (0:unacknowledged, 1:acknowledged)>]
+                      [option '-corsOrigin' <CORS allowed origin. use '__ALL' for any>]
                       
 --TEARDOWN--

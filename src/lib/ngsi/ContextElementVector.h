@@ -47,6 +47,7 @@ typedef struct ContextElementVector
   std::string      render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma);
   void             present(const std::string& indent);
   void             release(void);
+  ContextElement*  lookup(EntityId* eP);
 
   ContextElement*  operator[](unsigned int ix)
   {

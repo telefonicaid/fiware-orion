@@ -24,11 +24,13 @@
 */
 #include <semaphore.h>
 #include <errno.h>
+#include <time.h>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "common/clockFunctions.h"
 
 
 
@@ -36,9 +38,18 @@
 *
 * Globals -
 */
-static sem_t  reqSem;
-static sem_t  mongoSem;
-static sem_t  transSem;
+static sem_t           reqSem;
+static sem_t           transSem;
+static SemRequestType  reqPolicy;
+
+
+
+/* ****************************************************************************
+*
+* Time measuring variables - 
+*/
+static struct timespec accReqSemTime   = { 0, 0 };
+static struct timespec accTransSemTime = { 0, 0 };
 
 
 
@@ -46,34 +57,32 @@ static sem_t  transSem;
 *
 * semInit -
 *
-*   parameter #1: 0 - the semaphore is to be shared between threads,
-*   parameter #2: 1 - initially the semaphore is free
+*   parameter #2: 0 - the semaphore is to be shared between threads,
+*   parameter #3: 1 - initially the semaphore is free
 *
 * RETURN VALUE (of sem_init)
 *   0 on success,
 *  -1 on failure
 *
 */
-int semInit(int shared, int takenInitially)
+int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
 {
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
     LM_E(("Runtime Error (error initializing 'req' semaphore: %s)", strerror(errno)));
-    return 1;
-  }
-
-  if (sem_init(&mongoSem, shared, takenInitially) == -1)
-  {
-    LM_E(("Runtime Error (error initializing 'mongo' semaphore: %s)", strerror(errno)));
-    return 2;
+    return -1;
   }
 
   if (sem_init(&transSem, shared, takenInitially) == -1)
   {
     LM_E(("Runtime Error (error initializing 'transactionId' semaphore: %s)", strerror(errno)));
-    return 3;
+    return -1;
   }
 
+  reqPolicy = _reqPolicy;
+
+  // Measure accumulated semaphore waiting time?
+  semTimeStatistics = semTimeStat;
   return 0;
 }
 
@@ -83,14 +92,52 @@ int semInit(int shared, int takenInitially)
 *
 * reqSemTake -
 */
-int reqSemTake(const char* who, const char* what)
+int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken)
 {
   int r;
 
+  if (reqPolicy == SemNoneOp)
+  {
+    *taken = false;
+    return -1;
+  }
+
+  if ((reqPolicy == SemWriteOp) && (reqType == SemReadOp))
+  {
+    *taken = false;
+    return -1;
+  }
+
+  if ((reqPolicy == SemReadOp) && (reqType == SemWriteOp))
+  {
+    *taken = false;
+    return -1;
+  }
+
   LM_T(LmtReqSem, ("%s taking the 'req' semaphore for '%s'", who, what));
+
+  struct timespec startTime;
+  struct timespec endTime;
+  struct timespec diffTime;
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &startTime);
+  }
+
   r = sem_wait(&reqSem);
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &endTime);
+
+    clock_difftime(&endTime, &startTime, &diffTime);
+    clock_addtime(&accReqSemTime, &diffTime);
+  }
+
   LM_T(LmtReqSem, ("%s has the 'req' semaphore", who));
 
+  *taken = true;
   return r;
 }
 
@@ -98,17 +145,60 @@ int reqSemTake(const char* who, const char* what)
 
 /* ****************************************************************************
 *
-* mongoSemTake -
+* semTimeReqGet - get accumulated req semaphore waiting time
 */
-int mongoSemTake(const char* who, const char* what)
+void semTimeReqGet(char* buf, int bufLen)
 {
-  int r;
+  if (semTimeStatistics)
+  {
+    snprintf(buf, bufLen, "%lu.%09d", accReqSemTime.tv_sec, (int) accReqSemTime.tv_nsec);
+  }
+  else
+  {
+    snprintf(buf, bufLen, "Disabled");
+  }
+}
 
-  LM_T(LmtMongoSem, ("%s taking the 'mongo' semaphore for '%s'", who, what));
-  r = sem_wait(&mongoSem);
-  LM_T(LmtMongoSem, ("%s has the 'mongo' semaphore", who));
 
-  return r;
+
+/* ****************************************************************************
+*
+* semTimeTransGet - get accumulated trans semaphore waiting time
+*/
+void semTimeTransGet(char* buf, int bufLen)
+{
+  if (semTimeStatistics)
+  {
+    snprintf(buf, bufLen, "%lu.%09d", accTransSemTime.tv_sec, (int) accTransSemTime.tv_nsec);
+  }
+  else
+  {
+    snprintf(buf, bufLen, "Disabled");
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* semTimeReqReset - 
+*/
+void semTimeReqReset(void)
+{
+  accReqSemTime.tv_sec  = 0;
+  accReqSemTime.tv_nsec = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* semTimeTransReset - 
+*/
+void semTimeTransReset(void)
+{
+  accTransSemTime.tv_sec  = 0;
+  accTransSemTime.tv_nsec = 0;
 }
 
 
@@ -122,7 +212,26 @@ int transSemTake(const char* who, const char* what)
   int r;
 
   LM_T(LmtTransSem, ("%s taking the 'trans' semaphore for '%s'", who, what));
+
+  struct timespec startTime;
+  struct timespec endTime;
+  struct timespec diffTime;
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &startTime);
+  }
+
   r = sem_wait(&transSem);
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &endTime);
+
+    clock_difftime(&endTime, &startTime, &diffTime);
+    clock_addtime(&accTransSemTime, &diffTime);
+  }
+
   LM_T(LmtTransSem, ("%s has the 'trans' semaphore", who));
 
   return r;
@@ -134,8 +243,13 @@ int transSemTake(const char* who, const char* what)
 *
 * reqSemGive -
 */
-int reqSemGive(const char* who, const char* what)
+int reqSemGive(const char* who, const char* what, bool semTaken)
 {
+  if (semTaken == false)
+  {
+    return 0;
+  }
+
   if (what != NULL)
   {
     LM_T(LmtReqSem, ("%s gives the 'req' semaphore for '%s'", who, what));
@@ -146,26 +260,6 @@ int reqSemGive(const char* who, const char* what)
   }
 
   return sem_post(&reqSem);
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSemGive -
-*/
-int mongoSemGive(const char* who, const char* what)
-{
-  if (what != NULL)
-  {
-    LM_T(LmtMongoSem, ("%s gives the 'mongo' semaphore for '%s'", who, what));
-  }
-  else
-  {
-    LM_T(LmtMongoSem, ("%s gives the 'mongo' semaphore", who));
-  }
-
-  return sem_post(&mongoSem);
 }
 
 

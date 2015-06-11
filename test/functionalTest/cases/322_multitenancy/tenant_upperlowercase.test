@@ -22,6 +22,7 @@
 
 --NAME--
 tenant names with upper and lowercase letters in URL
+
 --SHELL-INIT--
 dbInit CB
 dbInit ${CB_DATABASE_NAME}-case

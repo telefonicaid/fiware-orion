@@ -104,12 +104,20 @@ int noOfRtUnsubscribeContextAvailabilityResponse         = -1;
 int noOfRtUnsubscribeContextResponse                     = -1;
 int noOfRtSubscribeResponse                              = -1;
 int noOfRtSubscribeError                                 = -1;
+int noOfContextElementResponse                           = -1;
+int noOfContextAttributeResponse                         = -1;
 
 int noOfEntityTypesRequest                               = -1;
 int noOfEntityTypesResponse                              = -1;
 int noOfAttributesForEntityTypeRequest                   = -1;
 int noOfAttributesForEntityTypeResponse                  = -1;
 int noOfContextEntitiesByEntityIdAndType                 = -1;
+
+int noOfEntitiesRequests                                 = -1;
+int noOfEntitiesResponses                                = -1;
+
+int noOfEntryPointsRequests                              = -1;
+int noOfEntryPointsResponses                             = -1;
 
 
 
@@ -192,10 +200,16 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case RtUnsubscribeContextResponse:                     ++noOfRtUnsubscribeContextResponse; break;
   case RtSubscribeResponse:                              ++noOfRtSubscribeResponse; break;
   case RtSubscribeError:                                 ++noOfRtSubscribeError; break;
-
+  case RtContextElementResponse:                         ++noOfContextElementResponse; break;
+  case RtContextAttributeResponse:                       ++noOfContextAttributeResponse; break;
   case EntityTypes:                                      ++noOfEntityTypesRequest; break;
   case AttributesForEntityType:                          ++noOfAttributesForEntityTypeRequest; break;
   case RtEntityTypesResponse:                            ++noOfEntityTypesResponse; break;
   case RtAttributesForEntityTypeResponse:                ++noOfAttributesForEntityTypeResponse; break;
+
+  case EntitiesRequest:                                  ++noOfEntitiesRequests; break;
+  case EntitiesResponse:                                 ++noOfEntitiesResponses; break;
+  case EntryPointsRequest:                               ++noOfEntryPointsRequests; break;
+  case EntryPointsResponse:                              ++noOfEntryPointsResponses; break;
   }
 }

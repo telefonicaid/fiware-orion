@@ -398,7 +398,7 @@ std::string qcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 }
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * qcrPresent -
@@ -410,7 +410,7 @@ void qcrPresent(ParseData* reqDataP)
     return;
   }
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   reqDataP->qcr.res.present("");
 }
 

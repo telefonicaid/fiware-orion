@@ -38,6 +38,14 @@
 
 /* ****************************************************************************
 *
+* Forward declaration
+*/
+struct UpdateContextResponse;
+
+
+
+/* ****************************************************************************
+*
 * AppendContextElementResponse - 
 *
 * FIXME P5: AppendContextElementResponse and UpdateContextElementResponse are
@@ -58,9 +66,9 @@
 */
 typedef struct AppendContextElementResponse
 {
-  EntityId                         entity;                  // See NOTE in type header above
-  ContextAttributeResponseVector   contextResponseVector;   // Optional, but mandatory if success
-  StatusCode                       errorCode;               // Optional, but mandatory if failure
+  EntityId                         entity;                          // See NOTE in type header above
+  ContextAttributeResponseVector   contextAttributeResponseVector;  // Optional, but mandatory if success
+  StatusCode                       errorCode;                       // Optional, but mandatory if failure
 
   AppendContextElementResponse();
 
@@ -72,6 +80,7 @@ typedef struct AppendContextElementResponse
                      std::string      indent,
                      std::string      predetectedError,
                      int              counter);
+  void         fill(UpdateContextResponse* ucrsP, const std::string& entityId = "", const std::string& entityType = "");
 } AppendContextElementResponse;
 
 #endif  // SRC_LIB_CONVENIENCE_APPENDCONTEXTELEMENTRESPONSE_H_

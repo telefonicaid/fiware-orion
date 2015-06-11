@@ -32,10 +32,11 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
-#include "ngsi/Request.h"
 #include "common/Format.h"
-#include "rest/HttpStatusCode.h"
+#include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
+#include "ngsi10/UpdateContextResponse.h"
+#include "rest/HttpStatusCode.h"
 
 
 
@@ -91,12 +92,12 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
 
   if (strstr(details.c_str(), "\"") != NULL)
   {
-    int    len = details.length() * 2;
-    char*  s2    = (char*) calloc(1, len + 1);
+    int    len  = details.length() * 2;
+    char*  s    = (char*) calloc(1, len + 1);
 
-    strReplace(s2, len, details.c_str(), "\"", "\\\"");
-    details = s2;
-    free(s2);
+    strReplace(s, len, details.c_str(), "\"", "\\\"");
+    details = s;
+    free(s);
   }
 
   if (code == SccNone)
@@ -123,6 +124,51 @@ std::string StatusCode::render(Format format, const std::string& indent, bool co
 
 /* ****************************************************************************
 *
+* StatusCode::toJson -
+*
+* For version 2 of the API, the unnecessary 'reasonPhrase' is removed.
+*/
+std::string StatusCode::toJson(bool isLastElement)
+{
+  std::string  out  = "";
+
+  if (strstr(details.c_str(), "\"") != NULL)
+  {
+    int    len = details.length() * 2;
+    char*  s    = (char*) calloc(1, len + 1);
+
+    strReplace(s, len, details.c_str(), "\"", "\\\"");
+    details = s;
+    free(s);
+  }
+
+  char codeV[16];
+
+  snprintf(codeV, sizeof(codeV), "%d", code);
+
+  out += "{";
+
+  out += std::string("\"code\":\"") + codeV + "\"";
+  
+  if (details != "")
+  {
+    out += ",\"details\":\"" + details + "\"";
+  }
+
+  out += "}";
+
+  if (!isLastElement)
+  {
+    out += ",";
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * StatusCode::fill -
 */
 void StatusCode::fill(HttpStatusCode _code, const std::string& _details)
@@ -141,6 +187,46 @@ void StatusCode::fill(HttpStatusCode _code, const std::string& _details)
 void StatusCode::fill(StatusCode* scP)
 {
   fill(scP->code, scP->details);
+}
+
+
+
+/* ****************************************************************************
+*
+* StatusCode::fill -
+*/
+void StatusCode::fill(const StatusCode& sc)
+{
+  fill(sc.code, sc.details);
+}
+
+
+
+/* ****************************************************************************
+*
+* StatusCode::fill - 
+*/
+void StatusCode::fill(const struct UpdateContextResponse& ucrs)
+{
+  if ((ucrs.errorCode.code != SccOk) && (ucrs.errorCode.code != SccNone))
+  {
+    fill(ucrs.errorCode);
+  }
+  else if (ucrs.contextElementResponseVector.vec.size() == 1)
+  {
+    fill(ucrs.contextElementResponseVector.vec[0]->statusCode);
+  }
+  else if (ucrs.contextElementResponseVector.vec.size() > 1)
+  {
+    LM_W(("Filling StatusCode from UpdateContextResponse with more than one contextElementResponse, picking one of them ..."));
+    fill(ucrs.contextElementResponseVector.vec[0]->statusCode);
+  }
+  else
+  {
+    // Empty UpdateContextResponse::contextElementResponseVector AND unfilled UpdateContextResponse::errorCode
+    LM_E(("Internal Error (can't fill StatusCode from UpdateContextResponse)"));
+    fill(SccReceiverInternalError, "can't fill StatusCode from UpdateContextResponse");
+  }
 }
 
 
@@ -179,10 +265,10 @@ std::string StatusCode::check
 */
 void StatusCode::present(const std::string& indent)
 {
-  PRINTF("%sCode:            %d\n",   indent.c_str(), code);
-  PRINTF("%sReasonPhrase:    '%s'\n", indent.c_str(), reasonPhrase.c_str());
-  PRINTF("%sDetail:          '%s'\n", indent.c_str(), details.c_str());
-  PRINTF("%sTag:             '%s'\n", indent.c_str(), tag.c_str());
+  LM_F(("%s%s:", indent.c_str(), tag.c_str()));
+  LM_F(("%s  Code:            %d",   indent.c_str(), code));
+  LM_F(("%s  ReasonPhrase:    '%s'", indent.c_str(), reasonPhrase.c_str()));
+  LM_F(("%s  Detail:          '%s'", indent.c_str(), details.c_str()));
 }
 
 

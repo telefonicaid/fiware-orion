@@ -35,6 +35,14 @@
 
 /* ****************************************************************************
 *
+* Incomplete type declarations
+*/
+struct UpdateContextResponse;
+
+
+
+/* ****************************************************************************
+*
 * StatusCode - 
 */
 typedef struct StatusCode
@@ -50,8 +58,11 @@ typedef struct StatusCode
   StatusCode(HttpStatusCode _code, const std::string& _details, const std::string& _tag = "statusCode");
 
   std::string  render(Format format, const std::string& indent, bool comma = false, bool showTag = true);
+  std::string  toJson(bool isLastElement);
   void         fill(HttpStatusCode _code, const std::string& _details = "");
   void         fill(StatusCode* scP);
+  void         fill(const StatusCode& sc);
+  void         fill(const struct UpdateContextResponse& ucrs);
   void         present(const std::string& indent);
   void         release(void);
   void         tagSet(const std::string& _tag);

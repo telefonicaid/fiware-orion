@@ -1,15 +1,15 @@
 # Orion Context Broker
 
 This is the code repository for the Orion Context Broker, a C++ implementation of the NGSI9/10 REST API binding
-developed as a part of the FI-WARE platform.
+developed as a part of the FIWARE platform.
 
 If this is your first contact with Orion Context Broker, it is highly recommended to have a look to the brief Quick Start guide:
 
-https://wiki.fi-ware.org/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Quick_Start_for_Programmers
+https://wiki.fiware.org/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Quick_Start_for_Programmers
 
-You will find all the information on Orion Context Broker in its page in the FI-WARE Catalogue:
+You will find all the information on Orion Context Broker in its page in the FIWARE Catalogue:
 
-http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
+http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
 
 Note that you don't need this repository code if you install the broker via its RPM package (check Orion Context
 Broker installation and administration manual about installing via RPM).
@@ -44,10 +44,10 @@ You can also use these commands to automate building and running from your favor
 The bootstrap script basically goes through the installation instructions in the README.
 ## Installing and Using the broker
 
-The administration and programming manuals for Orion Context Broker are found in the FI-WARE Catalogue page,
+The administration and programming manuals for Orion Context Broker are found in the FIWARE Catalogue page,
 under the "Documentation" tab.
 
-http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
+http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
 
 ## Building Orion Context Broker
 
@@ -81,7 +81,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * boost: 1.41 (the one that comes in EPEL6 repository)
 * libmicrohttpd: 0.9.22 (the one that comes in EPEL6 repository)
 * libcurl: 7.19.7
-* Mongo Driver: 2.2.3 (from source)
+* Mongo Driver: legacy-1.0.2 (from source)
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
 * cantcoap (for proxyCoap)
@@ -104,16 +104,14 @@ sudo yum install make cmake gcc-c++ scons
 sudo yum install libmicrohttpd-devel boost-devel libcurl-devel
 ```
 
-* Install the Mongo Driver from source (reference procedure http://docs.mongodb.org/ecosystem/tutorial/getting-started-with-cpp-driver/):
+* Install the Mongo Driver from source:
 
 ```
-wget http://downloads.mongodb.org/cxx-driver/mongodb-linux-x86_64-2.2.3.tgz
-# Don't pay attention to the '-linux-x86_64' in the name: it is actually source code for any platform
-tar xfvz mongodb-linux-x86_64-2.2.3.tgz
-cd mongo-cxx-driver-v2.2
-scons                                         # The build/libmongoclient.a library is generated as outcome
-sudo scons install                            # This puts .h files in /usr/local/include and libmongoclient.a in /usr/local/lib
-sudo chmod a+r -R /usr/local/include/mongo    # It seems that scons install breaks permissions
+wget https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.2.tar.gz
+tar xfvz legacy-1.0.2.tar.gz
+cd mongo-cxx-driver-legacy-1.0.2
+scons                                         # The build/linux2/normal/libmongoclient.a library is generated as outcome
+sudo scons install --prefix=/usr/local        # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
 ```
 
 * Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the
@@ -192,7 +190,7 @@ sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgr
 ```
 
 * (Optional proxyCoap) Install COAP client (an example application included in the libcoap sources).
-* 
+
 ```
 wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
 mv download libcoap-4.1.1.tar.gz

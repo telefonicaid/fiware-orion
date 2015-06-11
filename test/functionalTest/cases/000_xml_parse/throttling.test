@@ -22,6 +22,7 @@
 
 --NAME--
 XML throttling
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -93,3 +94,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

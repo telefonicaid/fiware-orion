@@ -71,15 +71,16 @@ using namespace mongo;
 #define REG_ATTRS_NAME              "name"
 #define REG_ATTRS_TYPE              "type"
 #define REG_ATTRS_ISDOMAIN          "isDomain"
+#define REG_SERVICE_PATH            "servicePath"
+#define REG_FORMAT                  "format"
 
 #define ENT_ATTRS                    "attrs"
+#define ENT_ATTRNAMES                "attrNames"
 #define ENT_ENTITY_ID                "id"
 #define ENT_ENTITY_TYPE              "type"
 #define ENT_SERVICE_PATH             "servicePath"
-#define ENT_ATTRS_NAME               "name"
 #define ENT_ATTRS_TYPE               "type"
 #define ENT_ATTRS_VALUE              "value"
-#define ENT_ATTRS_ID                 "id"
 #define ENT_ATTRS_CREATION_DATE      "creDate"
 #define ENT_ATTRS_MODIFICATION_DATE  "modDate"
 #define ENT_ATTRS_MD                 "md"
@@ -106,6 +107,7 @@ using namespace mongo;
 #define CSUB_ENTITY_ISPATTERN   "isPattern"
 #define CSUB_COUNT              "count"
 #define CSUB_FORMAT             "format"
+#define CSUB_SERVICE_PATH       "servicePath"
 
 #define CASUB_EXPIRATION        "expiration"
 #define CASUB_REFERENCE         "reference"
@@ -139,18 +141,35 @@ using namespace mongo;
 
 /*****************************************************************************
 *
-* Macro to ease extracting fields from BSON objects
+* Macros to ease extracting fields from BSON objects
 */
 #define STR_FIELD(i, sf) std::string(i.getStringField(sf))
 #define C_STR_FIELD(i, sf) i.getStringField(sf)
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
-* mongoConnect -
+* mongoStart - 
 */
-extern bool mongoConnect(const char* host, const char* db, const char* rplSet, const char* username, const char* passwd, bool multitenant);
-extern bool mongoConnect(const char* host);
+extern bool mongoStart
+(
+  const char* host,
+  const char* db,
+  const char* rplSet,
+  const char* username,
+  const char* passwd,
+  bool        _multitenant,
+  double      timeout,
+  int         writeConcern = 1,
+  int         poolSize     = 10,
+  bool        semTimeStat  = false
+);
+
+
+
 #ifdef UNIT_TEST
+extern bool mongoConnect(const char* host);
 extern bool mongoConnect(DBClientConnection* c);
 #endif
 
@@ -177,9 +196,15 @@ extern void mongoDisconnect();
 * getMongoConnection -
 *
 * I would prefer to have per-collection methods, to have a better encapsulation, but
-* the Mongo C++ API seems not working that way
+* the Mongo C++ API seems not to work that way
 */
 extern DBClientBase* getMongoConnection(void);
+
+/* ****************************************************************************
+*
+* releaseMongoConnection - 
+*/
+extern void releaseMongoConnection(DBClientBase* connection);
 
 /*****************************************************************************
 *
@@ -293,9 +318,15 @@ extern void destroyAllOntimeIntervalThreads(std::string tenant);
 
 /* ****************************************************************************
 *
+* matchEntity -
+*/
+extern bool matchEntity(EntityId* en1, EntityId* en2);
+
+/* ****************************************************************************
+*
 * includedEntity -
 */
-extern bool includedEntity(EntityId en, EntityIdVector* entityIdV);
+extern bool includedEntity(EntityId en, EntityIdVector& entityIdV);
 
 /* ****************************************************************************
 *
@@ -326,9 +357,15 @@ extern bool entitiesQuery
   const std::vector<std::string>&  servicePath,
   int                              offset  = DEFAULT_PAGINATION_OFFSET_INT,
   int                              limit   = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                             details = false,
   long long*                       countP  = NULL
 );
+
+/* ****************************************************************************
+*
+* pruneContextElements -
+*
+*/
+extern void pruneContextElements(ContextElementResponseVector& oldCerV, ContextElementResponseVector* newCerVP);
 
 /* ****************************************************************************
 *
@@ -342,10 +379,11 @@ extern bool registrationsQuery
   ContextRegistrationResponseVector*  crrV,
   std::string*                        err,
   const std::string&                  tenant,
-  int                                 offset  = DEFAULT_PAGINATION_OFFSET_INT,
-  int                                 limit   = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                                details = false,
-  long long*                          countP  = NULL
+  const std::vector<std::string>&     servicePathV,
+  int                                 offset       = DEFAULT_PAGINATION_OFFSET_INT,
+  int                                 limit        = DEFAULT_PAGINATION_LIMIT_INT,
+  bool                                details      = false,
+  long long*                          countP       = NULL
 );
 
 /* ****************************************************************************
@@ -370,7 +408,7 @@ extern AttributeList subToAttributeList(BSONObj attrL);
 
 /* ****************************************************************************
 *
-* processOnChangeCondition -
+* processOntimeIntervalCondition -
 *
 */
 extern void processOntimeIntervalCondition(std::string subId, int interval, std::string tenant);
@@ -380,14 +418,37 @@ extern void processOntimeIntervalCondition(std::string subId, int interval, std:
 * processOnChangeCondition -
 *
 */
-extern bool processOnChangeCondition(EntityIdVector enV, AttributeList attrV, ConditionValueList* condValues, std::string subId, std::string notifyUrl, Format format, std::string tenant);
+extern bool processOnChangeCondition
+(
+  EntityIdVector                   enV,
+  AttributeList                    attrV,
+  ConditionValueList*              condValues,
+  std::string                      subId,
+  std::string                      notifyUrl,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV
+);
 
 /* ****************************************************************************
 *
 * processConditionVector -
 *
 */
-extern BSONArray processConditionVector(NotifyConditionVector* ncvP, EntityIdVector enV, AttributeList attrL, std::string subId, std::string url, bool* notificationDone, Format format, std::string tenant);
+extern BSONArray processConditionVector
+(
+  NotifyConditionVector*           ncvP,
+  EntityIdVector                   enV,
+  AttributeList                    attrL,
+  std::string                      subId,
+  std::string                      url,
+  bool*                            notificationDone,
+  Format                           format,
+  std::string                      tenant,
+  const std::string&               xauthToken,
+  const std::vector<std::string>&  servicePathV
+);
 
 /* ****************************************************************************
 *
@@ -412,5 +473,92 @@ extern void slashEscape(const char* from, char* to, unsigned int toLen);
 *
 */
 extern void releaseTriggeredSubscriptions(std::map<std::string, TriggeredSubscription*>& subs);
+
+
+/* ****************************************************************************
+*
+* fillQueryServicePath -
+*
+*/
+extern BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath);
+
+/* ****************************************************************************
+*
+* fillContextProviders -
+*
+*/
+extern void fillContextProviders(ContextElementResponse* cer, ContextRegistrationResponseVector& crrV);
+
+/* ****************************************************************************
+*
+* someContextElementNotFound -
+*
+*/
+extern bool someContextElementNotFound(ContextElementResponse& cer);
+
+/* ****************************************************************************
+*
+* cprLookupByAttribute -
+*
+*/
+extern void cprLookupByAttribute(EntityId&                          en,
+                                 const std::string&                 attrName,
+                                 ContextRegistrationResponseVector& crrV,
+                                 std::string*                       perEntPa,
+                                 Format*                            perEntPaFormat,
+                                 std::string*                       perAttrPa,
+                                 Format*                            perAttrPaFormat);
+
+
+/* ****************************************************************************
+*
+* basePart, idPart -
+*
+* Helper functions for entitysQuery to split the attribute name string into part,
+* e.g. "A1__ID1" into "A1" and "ID1"
+*/
+inline std::string basePart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just 'name' */
+    return name;
+  }
+
+  /* If found, return substring */
+  return name.substr(0, pos);
+
+}
+
+inline std::string idPart(std::string name)
+{
+  /* Search for "__" */
+  std::size_t pos = name.find("__");
+  if (pos == std::string::npos)
+  {
+    /* If not found, return just "" */
+    return "";
+  }
+
+  /* If found, return substring */
+  return name.substr(pos + 2, name.length());
+
+}
+
+/* ****************************************************************************
+*
+* dbDotEncode -
+*
+*/
+extern std::string dbDotEncode(std::string fromString);
+
+/* ****************************************************************************
+*
+* dbDotDecode -
+*
+*/
+extern std::string dbDotDecode(std::string fromString);
 
 #endif

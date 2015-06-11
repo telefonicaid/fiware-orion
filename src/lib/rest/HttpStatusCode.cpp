@@ -30,7 +30,6 @@ std::string httpStatusCodeString(HttpStatusCode code)
   switch (code)
   {
   case SccOk:                                return "OK";
-  case SccFound:                             return "Found";
   case SccBadRequest:                        return "Bad Request";
   case SccForbidden:                         return "Forbidden";
   case SccContextElementNotFound:            return "No context element found"; // Standard HTTP for 404: "Not Found"

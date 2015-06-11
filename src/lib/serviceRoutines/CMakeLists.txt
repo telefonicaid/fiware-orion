@@ -48,11 +48,7 @@ postContextEntityTypeAttribute.cpp
 getIndividualContextEntity.cpp
 putIndividualContextEntity.cpp
 postIndividualContextEntity.cpp
-getIndividualContextEntityAttributes.cpp
-putIndividualContextEntityAttributes.cpp
 putIndividualContextEntityAttribute.cpp
-postIndividualContextEntityAttributes.cpp
-deleteIndividualContextEntityAttributes.cpp
 getIndividualContextEntityAttribute.cpp
 postIndividualContextEntityAttribute.cpp
 deleteIndividualContextEntityAttribute.cpp
@@ -99,6 +95,8 @@ getContextEntitiesByEntityIdAndType.cpp
 postContextEntitiesByEntityIdAndType.cpp
 getEntityByIdAttributeByNameWithTypeAndId.cpp
 postEntityByIdAttributeByNameWithTypeAndId.cpp
+postSubscribeContextConvOp.cpp
+postSubscribeContextAvailabilityConvOp.cpp
 )
 
 SET (HEADERS
@@ -128,11 +126,7 @@ postContextEntityTypeAttribute.h
 getIndividualContextEntity.h
 putIndividualContextEntity.h
 postIndividualContextEntity.h
-getIndividualContextEntityAttributes.h
-putIndividualContextEntityAttributes.h
 putIndividualContextEntityAttribute.h
-postIndividualContextEntityAttributes.h
-deleteIndividualContextEntityAttributes.h
 getIndividualContextEntityAttribute.h
 postIndividualContextEntityAttribute.h
 deleteIndividualContextEntityAttribute.h
@@ -166,6 +160,7 @@ getContextEntitiesByEntityIdAndType.h
 postContextEntitiesByEntityIdAndType.h
 getEntityByIdAttributeByNameWithTypeAndId.h
 postEntityByIdAttributeByNameWithTypeAndId.h
+postSubscribeContextConvOp.h
 )
 
 

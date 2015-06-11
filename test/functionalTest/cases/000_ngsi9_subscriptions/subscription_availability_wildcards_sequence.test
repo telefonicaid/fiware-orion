@@ -22,6 +22,7 @@
 
 --NAME--
 Subscription availability sequence with wildcards
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -186,7 +187,8 @@ orionCurl --url "$url" --payload "${payload}"
 
 echo "7: ++++++++++++++++++++"
 #Get accumulated data
-curl localhost:${LISTENER_PORT}/dump -s -S 
+accumulatorDump
+
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -426,3 +428,4 @@ Content-Type: application/xml
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

@@ -1,3 +1,3 @@
-Add:  Service-Path in ngsi10 notifications (Issue #674)
-Add:  Forbidden characters in the URL path are now detected (Issue #672)
-Fix:  Bug: POST /v1/conextEntities didn't save the entity type (from payload) (Issue #684)
+Fix: Fixed a bug about pagination problem due to missing ErrorCode with details in the case of queries with forwarding to context providers.  (Issue #945)
+Add: New operation "GET /v2/entities" (Issue #947)
+Add: New operation "GET /v2" (Issue #956)

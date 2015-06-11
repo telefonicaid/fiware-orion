@@ -42,10 +42,11 @@
 * AppendContextElementRequest - 
 *
 * NOTE
-* The field 'entity' is:
-*   o MANDATORY for "POST /v1/contextEntities"
-*   o FORBIDDEN for "POST /v1/contextEntities/{entityId::id}"
-*   o FORBIDDEN for "POST /v1/contextEntities/type/{entityId::type}/id/{entityId::id}"
+* The field 'entity' is MANDATORY for "POST /v1/contextEntities".
+* For other requests, data in the URL (path and parameters) must coincide
+* with the data in the payload.
+* If not, an error is raised.
+*
 */
 typedef struct AppendContextElementRequest
 {

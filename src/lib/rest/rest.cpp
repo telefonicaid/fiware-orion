@@ -31,6 +31,7 @@
 #include "common/string.h"
 #include "common/wsStrip.h"
 #include "common/globals.h"
+#include "common/defaultValues.h"
 #include "parse/forbiddenChars.h"
 #include "rest/RestService.h"
 #include "rest/rest.h"
@@ -79,6 +80,7 @@ IpVersion                        ipVersionUsed         = IPDUAL;
 bool                             multitenant           = false;
 std::string                      rushHost              = "";
 unsigned short                   rushPort              = 0;
+char                             restAllowedOrigin[64];
 static MHD_Daemon*               mhdDaemon             = NULL;
 static MHD_Daemon*               mhdDaemon_v6          = NULL;
 static struct sockaddr_in        sad;
@@ -155,7 +157,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     }
     else if (limit == 0)
     {
-      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unaccepted]");
+      OrionError error(SccBadRequest, std::string("Bad pagination limit: /") + value + "/ [a value of ZERO is unacceptable]");
       ciP->httpStatusCode = SccBadRequest;
       ciP->answer         = error.render(ciP->outFormat, "");
       return MHD_YES;
@@ -207,25 +209,30 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 
   LM_T(LmtHttpHeaders, ("HTTP Header:   %s: %s", key.c_str(), value));
 
-  if      (strcasecmp(key.c_str(), "user-agent") == 0)      headerP->userAgent      = value;
-  else if (strcasecmp(key.c_str(), "host") == 0)            headerP->host           = value;
-  else if (strcasecmp(key.c_str(), "accept") == 0)          headerP->accept         = value;
-  else if (strcasecmp(key.c_str(), "expect") == 0)          headerP->expect         = value;
-  else if (strcasecmp(key.c_str(), "connection") == 0)      headerP->connection     = value;
-  else if (strcasecmp(key.c_str(), "content-type") == 0)    headerP->contentType    = value;
-  else if (strcasecmp(key.c_str(), "content-length") == 0)  headerP->contentLength  = atoi(value);
-  else if (strcasecmp(key.c_str(), "fiware-service") == 0)  headerP->tenant         = value;
-  else if (strcasecmp(key.c_str(), "fiware-servicepath") == 0)
+  if      (strcasecmp(key.c_str(), "User-Agent") == 0)      headerP->userAgent      = value;
+  else if (strcasecmp(key.c_str(), "Host") == 0)            headerP->host           = value;
+  else if (strcasecmp(key.c_str(), "Accept") == 0)          headerP->accept         = value;
+  else if (strcasecmp(key.c_str(), "Expect") == 0)          headerP->expect         = value;
+  else if (strcasecmp(key.c_str(), "Connection") == 0)      headerP->connection     = value;
+  else if (strcasecmp(key.c_str(), "Content-Type") == 0)    headerP->contentType    = value;
+  else if (strcasecmp(key.c_str(), "Content-Length") == 0)  headerP->contentLength  = atoi(value);
+  else if (strcasecmp(key.c_str(), "Origin") == 0)          headerP->origin         = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Service") == 0)  headerP->tenant         = value;
+  else if (strcasecmp(key.c_str(), "X-Auth-Token") == 0)    headerP->xauthToken     = value;
+  else if (strcasecmp(key.c_str(), "Fiware-Servicepath") == 0)
   {
     headerP->servicePath         = value;
     headerP->servicePathReceived = true;
   }
   else
+  {
     LM_T(LmtHttpUnsupportedHeader, ("'unsupported' HTTP header: '%s', value '%s'", ckey, value));
-
+  }
 
   if ((strcasecmp(key.c_str(), "connection") == 0) && (headerP->connection != "") && (headerP->connection != "close"))
+  {
     LM_T(LmtRest, ("connection '%s' - currently not supported, sorry ...", headerP->connection.c_str()));
+  }
 
   /* Note that the strategy to "fix" the Content-Type is to replace the ";" with 0
    * to "deactivate" this part of the string in the checking done at connectionTreat() */
@@ -248,15 +255,14 @@ static int httpHeaderGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, co
 *
 * wantedOutputSupported - 
 */
-static Format wantedOutputSupported(const std::string& acceptList, std::string* charsetP)
+static Format wantedOutputSupported(const std::string& apiVersion, const std::string& acceptList, std::string* charsetP)
 {
   std::vector<std::string>  vec;
   char*                     copy;
 
   if (acceptList.length() == 0) 
   {
-    /* HTTP RFC states that a missing Accept header must be interpreted as if the client is
-     * accepting any type */
+    /* HTTP RFC states that a missing Accept header must be interpreted as if the client is accepting any type */
     copy = strdup("*/*");
   }
   else 
@@ -320,9 +326,9 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
      }
 
      std::string format = vec[ix].c_str();
-     if (format == "*/*")              xml  = true;
+     if (format == "*/*")              { xml  = true; json = true; }
      if (format == "*/xml")            xml  = true;
-     if (format == "application/*")    xml  = true;
+     if (format == "application/*")    { xml  = true; json = true; }
      if (format == "application/xml")  xml  = true;
      if (format == "application/json") json = true;
      if (format == "*/json")           json = true;
@@ -336,10 +342,32 @@ static Format wantedOutputSupported(const std::string& acceptList, std::string* 
         *charsetP = "";
   }
 
-  if (xml == true)
-    return XML;
-  else if (json == true)
-    return JSON;
+  //
+  // API version 1 has XML as default format, v2 has JSON
+  //
+  if (apiVersion == "v2")
+  {
+    if (json == true)
+    {
+      return JSON;
+    }
+    else if (xml == true)
+    {
+      return XML;
+    }
+  }
+  else
+  {
+    if (xml == true)
+    {
+      return XML;
+    }
+    else if (json == true)
+    {
+      return JSON;
+    }
+  }
+
 
   LM_W(("Bad Input (no valid 'Accept-format' found)"));
   return NOFORMAT;
@@ -388,7 +416,7 @@ static void requestCompleted
 */
 static int outFormatCheck(ConnectionInfo* ciP)
 {
-  ciP->outFormat  = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+  ciP->outFormat  = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
   if (ciP->outFormat == NOFORMAT)
   {
     /* This is actually an error in the HTTP layer (not exclusively NGSI) so we don't want to use the default 200 */
@@ -413,17 +441,26 @@ static int outFormatCheck(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* servicePathCheck - 
+* servicePathCheck - check vector of service paths
 *
-* Not static just to let unit tests call this function
+* This function is called for ALL requests, when a service-path URI-parameter is found.
+* So, '#' is considered a valid character at it is valid for discoveries and queries.
+* Later on, if the request is a registration or notification, another function is called
+* to make sure there is only ONE service path and that there is no '#' present.
+*
+* FIXME P5: updates should also call the other servicePathCheck (in common lib)
+*
+* [ Not static just to let unit tests call this function ]
 */
 int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 {
+  //
   // 1. Max 10 paths  - ONLY ONE path allowed at this moment
   // 2. Max 10 levels in each path
   // 3. Max 50 characters in each path component
   // 4. Only alphanum and underscore allowed (just like in tenants)
-  
+  //    OR: Last component is EXACTLY '#'
+  //
   std::vector<std::string> compV;
   int                      components;
 
@@ -506,6 +543,23 @@ static char* removeTrailingSlash(std::string path)
 */
 int servicePathSplit(ConnectionInfo* ciP)
 {
+#if 0
+  //
+  // Special case: empty service-path 
+  //
+  // FIXME P4: We're not sure what this 'fix' really fixes.
+  //           Must implement a functest to reproduce this situation.
+  //           And, if that is not possible, just remove the whole thing
+  //
+  if ((ciP->httpHeaders.servicePathReceived == true) && (ciP->servicePath == ""))
+  {
+    OrionError e(SccBadRequest, "empty service path");
+    ciP->answer = e.render(ciP->outFormat, "");
+    LM_W(("Bad Input (empty service path)"));
+    return -1;
+  }
+#endif
+
   int servicePaths = stringSplit(ciP->servicePath, ',', ciP->servicePathV);
 
   if (servicePaths == 0)
@@ -549,19 +603,28 @@ int servicePathSplit(ConnectionInfo* ciP)
 * NOTE
 *   Any failure about Content-Type is an error in the HTTP layer (not exclusively NGSI)
 *   so we don't want to use the default 200
+*
+* NOTE
+*   In version 2 of the protocol, we admit ONLY application/json
 */
 static int contentTypeCheck(ConnectionInfo* ciP)
 {
   //
-  // Four cases:
+  // Five cases:
   //   1. If there is no payload, the Content-Type is not interesting
   //   2. Payload present but no Content-Type 
   //   3. text/xml used and acceptTextXml is setto true (iotAgent only)
   //   4. Content-Type present but not supported
+  //   5. API version 2 and not 'application/json'
+  //
+
 
   // Case 1
   if (ciP->httpHeaders.contentLength == 0)
+  {
     return 0;
+  }
+
 
   // Case 2
   if (ciP->httpHeaders.contentType == "")
@@ -570,15 +633,31 @@ static int contentTypeCheck(ConnectionInfo* ciP)
     ciP->httpStatusCode = SccUnsupportedMediaType;
     ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
     ciP->httpStatusCode = SccUnsupportedMediaType;
+
     return 1;
   }
 
+
   // Case 3
   if ((acceptTextXml == true) && (ciP->httpHeaders.contentType == "text/xml"))
+  {
     return 0;
+  }
+
 
   // Case 4
   if ((ciP->httpHeaders.contentType != "application/xml") && (ciP->httpHeaders.contentType != "application/json"))
+  {
+    std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    ciP->answer = restErrorReplyGet(ciP, ciP->outFormat, "", "OrionError", SccUnsupportedMediaType, details);
+    ciP->httpStatusCode = SccUnsupportedMediaType;
+    return 1;
+  }
+
+
+  // Case 5
+  if ((ciP->apiVersion == "v2") && (ciP->httpHeaders.contentType != "application/json"))
   {
     std::string details = std::string("not supported content type: ") + ciP->httpHeaders.contentType;
     ciP->httpStatusCode = SccUnsupportedMediaType;
@@ -594,7 +673,7 @@ static int contentTypeCheck(ConnectionInfo* ciP)
 
 /* ****************************************************************************
 *
-* urlCheck - 
+* urlCheck - check for forbidden characters and remove trailing slashes
 *
 * Returns 'true' if the URL is OK, 'false' otherwise.
 * ciP->answer and ciP->httpStatusCode are set if an error is encountered.
@@ -611,7 +690,100 @@ bool urlCheck(ConnectionInfo* ciP, const std::string& url)
     return false;
   }
 
+  //
+  // Remove '/' at end of URL path
+  //
+  char* s = (char*) url.c_str();
+  while (s[strlen(s) - 1] == '/')
+  {
+    s[strlen(s) - 1] = 0;
+  }
+
   return true;
+}
+
+
+
+/* ****************************************************************************
+*
+* defaultServicePath
+*
+* Returns a default servicePath (to be used in the case Fiware-servicePath header
+* is not found in the request) depending on the RequestCheck
+*/
+std::string defaultServicePath(const char* url, const char* method)
+{
+  /* Look for standard operation (based on the URL). Given that some operations are
+   * a substring of other, we search first for the longest ones
+   *
+   *  updateContextAvailabilitySubscription
+   *  unsubscribeContextAvailability
+   *  subscribeContextAvailability
+   *  discoverContextAvailability
+   *  updateContextSubscription
+   *  unsubscribeContext
+   *  subscribeContext
+   *  registerContext
+   *  updateContext
+   *  queryContext
+   *
+   * Note that in the case of unsubscribeContext and unsubscribeContextAvailability doesn't
+   * actually use a servicePath, but we also provide a default in that case for the sake of
+   * completeness
+   */
+
+  // FIXME P5: this strategy can be improved taking into account full URL. Otherwise, it is
+  // ambigous (e.g. entity which id is "queryContext" and are using a conv op). However, it is
+  // highly improbable that the user uses entities which id (or type) match the name of a
+  // standard operation
+
+  // FIXME P5: unhardwire literals
+  if (strcasestr(url, "updateContextAvailabilitySubscription") != NULL) return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "unsubscribeContextAvailability") != NULL)        return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "subscribeContextAvailability") != NULL)          return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "discoverContextAvailability") != NULL)           return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "notifyContextAvailability") != NULL)             return DEFAULT_SERVICE_PATH;
+  if (strcasestr(url, "updateContextSubscription") != NULL)             return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "unsubscribeContext") != NULL)                    return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "subscribeContext") != NULL)                      return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "registerContext") != NULL)                       return DEFAULT_SERVICE_PATH;
+  if (strcasestr(url, "updateContext") != NULL)                         return DEFAULT_SERVICE_PATH;
+  if (strcasestr(url, "notifyContext") != NULL)                         return DEFAULT_SERVICE_PATH;
+  if (strcasestr(url, "queryContext") != NULL)                          return DEFAULT_SERVICE_PATH_RECURSIVE;
+
+  /* Look for convenience operation. Subscription-related operations are special, all the other depend on
+   * the method
+   */
+  if (strcasestr(url, "contextAvailabilitySubscriptions") != NULL)      return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasestr(url, "contextSubscriptions") != NULL)                  return DEFAULT_SERVICE_PATH_RECURSIVE;
+  if (strcasecmp(method, "POST") == 0)                                  return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "PUT") == 0)                                   return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "DELETE") == 0)                                return DEFAULT_SERVICE_PATH;
+  if (strcasecmp(method, "GET") == 0)                                   return DEFAULT_SERVICE_PATH_RECURSIVE;
+
+  LM_W(("Bad Input (cannot find default service path for: (%s, %s))", method, url));
+  return DEFAULT_SERVICE_PATH;
+}
+
+
+
+/* ****************************************************************************
+*
+* apiVersionGet - 
+*
+* This function returns the version of the API for the incoming message,
+* based on the URL.
+* If the URL starts with "/v2" then the request is considered API version 2.
+* Otherwise, API version 1.
+*/
+static std::string apiVersionGet(const char* path)
+{
+  if ((path[1] == 'v') && (path[2] == '2'))
+  {
+    return "v2";
+  }
+
+  return "v1";
 }
 
 
@@ -662,12 +834,13 @@ static int connectionTreat
     const union MHD_ConnectionInfo* mciP = MHD_get_connection_info(connection, MHD_CONNECTION_INFO_CLIENT_ADDRESS);
     if (mciP != NULL)
     {
-      port = (mciP->client_addr->sa_data[0] << 8) + mciP->client_addr->sa_data[1];
+      struct sockaddr* addr = (struct sockaddr*)mciP->client_addr;
+      port = (addr->sa_data[0] << 8) + addr->sa_data[1];
       snprintf(ip, sizeof(ip), "%d.%d.%d.%d",
-               mciP->client_addr->sa_data[2] & 0xFF,
-               mciP->client_addr->sa_data[3] & 0xFF,
-               mciP->client_addr->sa_data[4] & 0xFF,
-               mciP->client_addr->sa_data[5] & 0xFF);
+               addr->sa_data[2] & 0xFF,
+               addr->sa_data[3] & 0xFF,
+               addr->sa_data[4] & 0xFF,
+               addr->sa_data[5] & 0xFF);
     }
     else
     {
@@ -705,25 +878,20 @@ static int connectionTreat
     ciP->uriParam[URI_PARAM_PAGINATION_LIMIT]   = DEFAULT_PAGINATION_LIMIT;
     ciP->uriParam[URI_PARAM_PAGINATION_DETAILS] = DEFAULT_PAGINATION_DETAILS;
     
-    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
-    if (ciP->httpStatusCode != SccOk)
-    {
-      LM_W(("Bad Input (error in URI parameters)"));
-      restReply(ciP, ciP->answer);
-      return MHD_YES;
-    }
-    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
-
     MHD_get_connection_values(connection, MHD_HEADER_KIND, httpHeaderGet, &ciP->httpHeaders);
-    
+    if (!ciP->httpHeaders.servicePathReceived)
+    {
+      ciP->httpHeaders.servicePath = defaultServicePath(url, method);
+    }
+
     char tenant[128];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
-    ciP->outFormat            = wantedOutputSupported(ciP->httpHeaders.accept, &ciP->charset);
+    ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
 
-    if (urlCheck(ciP, url) == false)
+    if (urlCheck(ciP, ciP->url) == false)
     {
       LM_W(("Bad Input (error in URI path)"));
       restReply(ciP, ciP->answer);
@@ -736,6 +904,8 @@ static int connectionTreat
       LM_W(("Bad Input (error in ServicePath http-header)"));
       restReply(ciP, ciP->answer);
     }
+
+    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     if (contentTypeCheck(ciP) != 0)
     {
@@ -750,6 +920,15 @@ static int connectionTreat
     else
       ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
 
+    MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
+    if (ciP->httpStatusCode != SccOk)
+    {
+      LM_W(("Bad Input (error in URI parameters)"));
+      restReply(ciP, ciP->answer);
+      return MHD_YES;
+    }
+    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+
     // Set default mime-type for notifications
     if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
     {
@@ -758,7 +937,7 @@ static int connectionTreat
       else if (ciP->outFormat == JSON)
         ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
       else
-        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = DEFAULT_FORMAT_AS_STRING;
 
       LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
     }
@@ -815,9 +994,13 @@ static int connectionTreat
     restReply(ciP, errorMsg);
   }
   else if (ciP->answer != "")
+  {
     restReply(ciP, ciP->answer);
+  }
   else
+  {
     serveFunction(ciP);
+  }
 
   return MHD_YES;
 }
@@ -959,6 +1142,7 @@ void restInit
   bool                _multitenant,
   const std::string&  _rushHost,
   unsigned short      _rushPort,
+  const char*         _allowedOrigin,
   const char*         _httpsKey,
   const char*         _httpsCertificate,
   RestServeFunction   _serveFunction,
@@ -976,6 +1160,8 @@ void restInit
   multitenant   = _multitenant;
   rushHost      = _rushHost;
   rushPort      = _rushPort;
+
+  strncpy(restAllowedOrigin, _allowedOrigin, sizeof(restAllowedOrigin));
 
   strncpy(bindIp, LOCAL_IP_V4, MAX_LEN_IP - 1);
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);

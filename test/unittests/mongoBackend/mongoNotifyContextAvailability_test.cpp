@@ -25,6 +25,7 @@
 
 #include "gtest/gtest.h"
 #include "testInit.h"
+#include "unittest.h"
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -71,19 +72,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request */
   req.subscriptionId.set("51307b66f481db11bf860001");
@@ -95,7 +84,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -106,7 +95,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -132,9 +121,137 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
+
+}
+
+/* ****************************************************************************
+*
+* ce1_En1_At0_Ok_XML -
+*/
+TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok_XML)
+{
+  HttpStatusCode           ms;
+  NotifyContextAvailabilityRequest   req;
+  NotifyContextAvailabilityResponse  res;
+
+  utInit();
+
+  /* Forge the request */
+  req.subscriptionId.set("51307b66f481db11bf860001");
+  EntityId en("E1", "T1");
+  ContextRegistrationResponse crr;
+  crr.contextRegistration.entityIdVector.push_back(&en);
+  crr.contextRegistration.providingApplication.set("http://dummy.com");
+  crr.errorCode.fill(SccOk);
+  req.contextRegistrationResponseVector.push_back(&crr);
+
+  /* Invoke the function in mongoBackend library */
+  uriParams[URI_PARAM_NOTIFY_FORMAT] = "XML";
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
+
+  /* Check that every involved collection at MongoDB is as expected */
+  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* registrations collection: */
+  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
+  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
+  std::string oid = reg.getField("_id").OID().toString();
+  EXPECT_EQ(1360319100, reg.getIntField("expiration"));
+  EXPECT_STREQ("XML", reg.getStringField("format"));
+
+  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
+  ASSERT_EQ(1, contextRegistrationV.size());
+  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
+
+  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
+  ASSERT_EQ(1, entities.size());
+  BSONObj ent0 = entities[0].embeddedObject();
+  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
+
+  std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
+  EXPECT_EQ(0, attrs.size());
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk, res.responseCode.code);
+  EXPECT_EQ("OK", res.responseCode.reasonPhrase);
+  EXPECT_EQ(0, res.responseCode.details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
+
+}
+
+/* ****************************************************************************
+*
+* ce1_En1_At0_Ok_JSON -
+*/
+TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok_JSON)
+{
+  HttpStatusCode           ms;
+  NotifyContextAvailabilityRequest   req;
+  NotifyContextAvailabilityResponse  res;
+
+  utInit();
+
+  /* Forge the request */
+  req.subscriptionId.set("51307b66f481db11bf860001");
+  EntityId en("E1", "T1");
+  ContextRegistrationResponse crr;
+  crr.contextRegistration.entityIdVector.push_back(&en);
+  crr.contextRegistration.providingApplication.set("http://dummy.com");
+  crr.errorCode.fill(SccOk);
+  req.contextRegistrationResponseVector.push_back(&crr);
+
+  /* Invoke the function in mongoBackend library */
+  uriParams[URI_PARAM_NOTIFY_FORMAT] = "JSON";
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
+
+  /* Check that every involved collection at MongoDB is as expected */
+  /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+   * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* registrations collection: */
+  ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
+  BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
+  std::string oid = reg.getField("_id").OID().toString();
+  EXPECT_EQ(1360319100, reg.getIntField("expiration"));
+  EXPECT_STREQ("JSON", reg.getStringField("format"));
+
+  std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
+  ASSERT_EQ(1, contextRegistrationV.size());
+  BSONObj contextRegistration = contextRegistrationV[0].embeddedObject();
+
+  EXPECT_STREQ("http://dummy.com", C_STR_FIELD(contextRegistration, "providingApplication"));
+  std::vector<BSONElement> entities = contextRegistration.getField("entities").Array();
+  ASSERT_EQ(1, entities.size());
+  BSONObj ent0 = entities[0].embeddedObject();
+  EXPECT_STREQ("E1", C_STR_FIELD(ent0, "id"));
+  EXPECT_STREQ("T1", C_STR_FIELD(ent0, "type"));
+
+  std::vector<BSONElement> attrs = contextRegistration.getField("attrs").Array();
+  EXPECT_EQ(0, attrs.size());
+
+  /* Check response is as expected */
+  EXPECT_EQ(SccOk, ms);
+  EXPECT_EQ(SccOk, res.responseCode.code);
+  EXPECT_EQ("OK", res.responseCode.reasonPhrase);
+  EXPECT_EQ(0, res.responseCode.details.size());
+
+  /* Release connection */
+  mongoDisconnect();
+
+  utExit();
 
 }
 
@@ -148,19 +265,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
@@ -171,7 +276,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -182,7 +287,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -208,9 +313,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -224,19 +327,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
@@ -251,7 +342,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -262,7 +353,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -296,9 +387,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -312,19 +401,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "T1");
@@ -339,7 +416,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -350,7 +427,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -384,9 +461,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -400,19 +475,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
@@ -427,7 +490,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -438,7 +501,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -472,9 +535,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -488,19 +549,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   NotifyContextAvailabilityRequest   req;
   NotifyContextAvailabilityResponse  res;
 
-  /* Prepare mock */
-  NotifierMock* notifierMock = new NotifierMock();
-  EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-          .Times(0);
-  setNotifier(notifierMock);
-
-  TimerMock* timerMock = new TimerMock();
-  ON_CALL(*timerMock, getCurrentTime())
-          .WillByDefault(Return(1360232700));
-  setTimer(timerMock);
-
-  /* Setup database */
-  setupDatabase();
+  utInit();
 
   /* Forge the request (from "inside" to "outside") */
   EntityId en("E1", "");
@@ -515,7 +564,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   req.contextRegistrationResponseVector.push_back(&crr);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoNotifyContextAvailability(&req, &res);
+  ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
   /* Check that every involved collection at MongoDB is as expected */
   /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -526,7 +575,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   /* registrations collection: */
   ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
   BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-  std::string oid = reg.getField("_id").OID().str();
+  std::string oid = reg.getField("_id").OID().toString();
   EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
   std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -560,9 +609,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   /* Release connection */
   mongoDisconnect();
 
-  /* Delete mock */
-  delete timerMock;
-  delete notifierMock;
+  utExit();
 
 }
 
@@ -576,19 +623,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -601,7 +636,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -612,7 +647,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -641,9 +676,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -657,19 +690,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -682,7 +703,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -693,7 +714,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -722,9 +743,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -738,19 +757,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -767,7 +774,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -778,7 +785,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -815,9 +822,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -831,19 +836,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -860,7 +853,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -871,7 +864,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -908,9 +901,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -924,19 +915,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -953,7 +932,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -964,7 +943,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1001,9 +980,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1017,19 +994,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1046,7 +1011,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1057,7 +1022,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1094,9 +1059,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1110,19 +1073,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1138,7 +1089,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1149,7 +1100,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1185,9 +1136,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1201,19 +1150,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1229,7 +1166,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1240,7 +1177,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1276,9 +1213,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1292,19 +1227,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1328,7 +1251,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1339,7 +1262,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1392,9 +1315,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1408,19 +1329,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1444,7 +1353,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1455,7 +1364,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1508,9 +1417,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1524,19 +1431,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1560,7 +1455,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1571,7 +1466,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1624,9 +1519,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1640,19 +1533,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1676,7 +1557,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1687,7 +1568,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1740,9 +1621,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1756,19 +1635,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -1788,7 +1655,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1799,7 +1666,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1842,9 +1709,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1858,19 +1723,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -1890,7 +1743,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -1901,7 +1754,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -1944,9 +1797,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -1960,19 +1811,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -2000,7 +1839,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2011,7 +1850,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -2070,9 +1909,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2086,19 +1923,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "T1");
@@ -2126,7 +1951,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2137,7 +1962,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -2196,9 +2021,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2212,19 +2035,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -2252,7 +2063,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2263,7 +2074,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -2322,9 +2133,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }
 
@@ -2338,19 +2147,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     NotifyContextAvailabilityRequest   req;
     NotifyContextAvailabilityResponse  res;
 
-    /* Prepare mock */
-    NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
-            .Times(0);
-    setNotifier(notifierMock);
-
-    TimerMock* timerMock = new TimerMock();
-    ON_CALL(*timerMock, getCurrentTime())
-            .WillByDefault(Return(1360232700));
-    setTimer(timerMock);
-
-    /* Setup database */
-    setupDatabase();
+    utInit();
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en1("E1", "");
@@ -2378,7 +2175,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     req.contextRegistrationResponseVector.push_back(&crr2);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoNotifyContextAvailability(&req, &res);
+    ms = mongoNotifyContextAvailability(&req, &res, uriParams);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -2389,7 +2186,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     /* registrations collection: */
     ASSERT_EQ(1, connection->count(REGISTRATIONS_COLL, BSONObj()));
     BSONObj reg = connection->findOne(REGISTRATIONS_COLL, BSONObj());
-    std::string oid = reg.getField("_id").OID().str();
+    std::string oid = reg.getField("_id").OID().toString();
     EXPECT_EQ(1360319100, reg.getIntField("expiration"));
 
     std::vector<BSONElement> contextRegistrationV = reg.getField("contextRegistration").Array();
@@ -2448,8 +2245,6 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     /* Release connection */
     mongoDisconnect();
 
-    /* Delete mock */
-    delete timerMock;
-    delete notifierMock;
+    utExit();
 
 }

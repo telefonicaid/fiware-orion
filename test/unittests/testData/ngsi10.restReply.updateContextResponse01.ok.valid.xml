@@ -2,5 +2,6 @@
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>detail</details>
   </errorCode>
 </updateContextResponse>

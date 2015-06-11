@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
@@ -54,30 +55,6 @@ TypeEntity::TypeEntity(std::string  _type)
 }
 
 
-
-/* ****************************************************************************
-*
-* TypeEntity::renderAsJsonObject -
-*/
-std::string TypeEntity::renderAsJsonObject
-(
-  ConnectionInfo*     ciP,
-  const std::string&  indent,
-  bool                comma
-)
-{
-  std::string  out            = "";
-  std::string  jsonTag        = type;
-
-  out += startTag(indent, jsonTag, ciP->outFormat, false, false);
-  out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true);
-  out += endTag(indent, "", ciP->outFormat, comma, false);
-
-  return out;
-}
-
-
-
 /* ****************************************************************************
 *
 * TypeEntity::render -
@@ -103,20 +80,20 @@ std::string TypeEntity::render
   if ((typeNameBefore == true) && (ciP->outFormat == JSON))
   {
     out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
-    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", true, true);
+    out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", true, true, true);
   }
   else
   {
     out += startTag(indent, xmlTag, jsonTag, ciP->outFormat, false, false);
 
-    if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true")
+    if (ciP->uriParam[URI_PARAM_COLLAPSE] == "true" || contextAttributeVector.size() == 0)
     {
       out += valueTag(indent  + "  ", "name", type, ciP->outFormat, false);
     }
     else
     {
       out += valueTag(indent  + "  ", "name", type, ciP->outFormat, true);
-      out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true);
+      out += contextAttributeVector.render(ciP, EntityTypes, indent + "  ", false, true, true);
     }
 
     out += endTag(indent, xmlTag, ciP->outFormat, comma, false);
@@ -158,7 +135,7 @@ std::string TypeEntity::check
 */
 void TypeEntity::present(const std::string& indent)
 {
-  PRINTF("%stype:   %s", indent.c_str(), type.c_str());
+  LM_F(("%stype:   %s", indent.c_str(), type.c_str()));
   contextAttributeVector.present(indent);
 }
 

@@ -45,16 +45,20 @@ HttpStatusCode mongoSubscribeContext
   SubscribeContextRequest*             requestP,
   SubscribeContextResponse*            responseP,
   const std::string&                   tenant,
-  std::map<std::string, std::string>&  uriParam
+  std::map<std::string, std::string>&  uriParam,
+  const std::string&                   xauthToken,
+  const std::vector<std::string>&      servicePathV
 )
 {
-    std::string notifyFormat = uriParam[URI_PARAM_NOTIFY_FORMAT];
+    const std::string  notifyFormatAsString  = uriParam[URI_PARAM_NOTIFY_FORMAT];
+    Format             notifyFormat          = stringToFormat(notifyFormatAsString);
+    std::string        servicePath           = (servicePathV.size() == 0)? "" : servicePathV[0];
+    DBClientBase*      connection            = NULL;
+    bool               reqSemTaken           = false;
 
-    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormat.c_str()));
+    LM_T(LmtMongo, ("Subscribe Context Request: notifications sent in '%s' format", notifyFormatAsString.c_str()));
 
-    reqSemTake(__FUNCTION__, "ngsi10 subscribe request");
-
-    DBClientBase* connection = getMongoConnection();
+    reqSemTake(__FUNCTION__, "ngsi10 subscribe request", SemWriteOp, &reqSemTaken);
 
     /* If expiration is not present, then use a default one */
     if (requestP->duration.isEmpty()) {
@@ -78,13 +82,29 @@ HttpStatusCode mongoSubscribeContext
       sub.append(CSUB_THROTTLING, (long long) requestP->throttling.parse());
     }
 
+    if (servicePath != "")
+    {
+      sub.append(CSUB_SERVICE_PATH, servicePath);
+    }
+
+    
     /* Build entities array */
     BSONArrayBuilder entities;
-    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix) {
+    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
+    {
         EntityId* en = requestP->entityIdVector.get(ix);
-        entities.append(BSON(CSUB_ENTITY_ID << en->id <<
-                             CSUB_ENTITY_TYPE << en->type <<
-                             CSUB_ENTITY_ISPATTERN << en->isPattern));
+
+        if (en->type == "")
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
+        else
+        {
+          entities.append(BSON(CSUB_ENTITY_ID << en->id <<
+                               CSUB_ENTITY_TYPE << en->type <<
+                               CSUB_ENTITY_ISPATTERN << en->isPattern));
+        }
     }
     sub.append(CSUB_ENTITIES, entities.arr());
 
@@ -99,11 +119,13 @@ HttpStatusCode mongoSubscribeContext
     bool notificationDone = false;
     BSONArray conds = processConditionVector(&requestP->notifyConditionVector,
                                              requestP->entityIdVector,
-                                             requestP->attributeList, oid.str(),
+                                             requestP->attributeList, oid.toString(),
                                              requestP->reference.get(),
                                              &notificationDone,
-                                             (notifyFormat == "XML")? XML : JSON,
-                                             tenant);
+                                             notifyFormat,
+                                             tenant,
+                                             xauthToken,
+                                             servicePathV);
     sub.append(CSUB_CONDITIONS, conds);
     if (notificationDone) {
         sub.append(CSUB_LASTNOTIFICATION, getCurrentTime());
@@ -111,22 +133,24 @@ HttpStatusCode mongoSubscribeContext
     }
 
     /* Adding format to use in notifications */
-    sub.append(CSUB_FORMAT, notifyFormat);
+    sub.append(CSUB_FORMAT, notifyFormatAsString);
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
     LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextCollectionName(tenant).c_str(), subDoc.toString().c_str()));
+
     try
     {
-        mongoSemTake(__FUNCTION__, "insert into SubscribeContextCollection");
+        connection = getMongoConnection();
         connection->insert(getSubscribeContextCollectionName(tenant).c_str(), subDoc);
-        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection");
+        releaseMongoConnection(connection);
         LM_I(("Database Operation Successful (insert %s)", subDoc.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)");
+        releaseMongoConnection(connection);
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo db exception)", reqSemTaken);
+
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +
@@ -137,8 +161,9 @@ HttpStatusCode mongoSubscribeContext
     }    
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "insert into SubscribeContextCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)");
+        releaseMongoConnection(connection);
+        reqSemGive(__FUNCTION__, "ngsi10 subscribe request (mongo generic exception)", reqSemTaken);
+
         responseP->subscribeError.errorCode.fill(SccReceiverInternalError,
                                                  std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
                                                  " - insert(): " + subDoc.toString() +
@@ -148,11 +173,11 @@ HttpStatusCode mongoSubscribeContext
         return SccOk;
     }    
 
-    reqSemGive(__FUNCTION__, "ngsi10 subscribe request");
+    reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
 
     /* Fill the response element */
     responseP->subscribeResponse.duration = requestP->duration;
-    responseP->subscribeResponse.subscriptionId.set(oid.str());
+    responseP->subscribeResponse.subscriptionId.set(oid.toString());
     responseP->subscribeResponse.throttling = requestP->throttling;
 
     return SccOk;

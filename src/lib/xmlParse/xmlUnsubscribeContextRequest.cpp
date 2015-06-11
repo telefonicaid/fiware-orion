@@ -80,7 +80,6 @@ std::string uncrCheck(ParseData* reqData, ConnectionInfo* ciP)
 
 
 
-#define PRINTF printf
 /* ****************************************************************************
 *
 * uncrPresent -
@@ -90,7 +89,7 @@ void uncrPresent(ParseData* reqData)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   reqData->uncr.res.present("");
 }
 

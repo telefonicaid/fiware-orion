@@ -490,7 +490,7 @@ std::string jsonQcrCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * jsonQcrPresent -
@@ -500,6 +500,6 @@ void jsonQcrPresent(ParseData* reqDataP)
   if (!lmTraceIsSet(LmtPresent))
     return;
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   reqDataP->qcr.res.present("");
 }

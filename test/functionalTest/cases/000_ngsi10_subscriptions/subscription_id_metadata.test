@@ -24,7 +24,6 @@
 Subscription ID metadata
 
 --SHELL-INIT--
-
 dbInit CB
 brokerStart CB
 accumulatorStart
@@ -99,7 +98,8 @@ orionCurl --url "$url" --payload "$payload"
 
 echo
 echo "Accumulated data:"
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
+
 
 --REGEXPECT--
 HTTP/1.1 200 OK
@@ -184,24 +184,24 @@ Content-Type: application/xml
           <contextAttribute>
             <name>temperature</name>
             <type>degree</type>
-            <contextValue>23.5</contextValue>
-            <metadata>
-              <contextMetadata>
-                <name>ID</name>
-                <type>string</type>
-                <value>floor</value>
-              </contextMetadata>
-            </metadata>
-          </contextAttribute>
-          <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
             <contextValue>25.6</contextValue>
             <metadata>
               <contextMetadata>
                 <name>ID</name>
                 <type>string</type>
                 <value>ceiling</value>
+              </contextMetadata>
+            </metadata>
+          </contextAttribute>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>23.5</contextValue>
+            <metadata>
+              <contextMetadata>
+                <name>ID</name>
+                <type>string</type>
+                <value>floor</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>
@@ -219,3 +219,4 @@ Content-Type: application/xml
 
 brokerStop CB
 accumulatorStop
+dbDrop CB

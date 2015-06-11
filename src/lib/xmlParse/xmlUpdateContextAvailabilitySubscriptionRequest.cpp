@@ -240,7 +240,7 @@ std::string ucasCheck(ParseData* reqData, ConnectionInfo* ciP)
 
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * ucasPresent -
@@ -250,7 +250,7 @@ void ucasPresent(ParseData* reqData)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   reqData->ucas.res.present("");
 }
 

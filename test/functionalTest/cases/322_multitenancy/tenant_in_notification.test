@@ -22,6 +22,7 @@
 
 --NAME--
 Tenant as HTTP header in Notification
+
 --SHELL-INIT--
 dbInit CB
 dbInit kz
@@ -86,7 +87,8 @@ echo
 
 echo "3. Accumulator dump"
 echo "+++++++++++++++++++"
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
+
 
 --REGEXPECT--
 1. Subscribe to changes in  E/att

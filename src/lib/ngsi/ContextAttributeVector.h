@@ -46,6 +46,7 @@ typedef struct ContextAttributeVector
 
   void               present(const std::string& indent);
   void               push_back(ContextAttribute* item);
+  void               push_back(ContextAttributeVector* aVec);
   unsigned int       size(void);
   ContextAttribute*  get(unsigned int ix);
   void               release(void);
@@ -71,7 +72,9 @@ typedef struct ContextAttributeVector
                             RequestType         requestType,
                             const std::string&  indent,
                             bool                comma     = false,
-                            bool                omitValue = false);
+                            bool                omitValue = false,
+                            bool                attrsAsName = false);
+  std::string        toJson(bool isLastElement);
 } ContextAttributeVector;
 
 #endif  // SRC_LIB_NGSI_CONTEXTATTRIBUTEVECTOR_H_

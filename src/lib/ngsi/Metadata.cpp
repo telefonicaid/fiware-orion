@@ -144,10 +144,10 @@ std::string Metadata::check
 */
 void Metadata::present(const std::string& metadataType, int ix, const std::string& indent)
 {
-  PRINTF("%s%s Metadata %d:\n",   indent.c_str(), metadataType.c_str(), ix);
-  PRINTF("%s  Name:     %s\n", indent.c_str(), name.c_str());
-  PRINTF("%s  Type:     %s\n", indent.c_str(), type.c_str());
-  PRINTF("%s  Value:    %s\n", indent.c_str(), value.c_str());
+  LM_F(("%s%s Metadata %d:",   indent.c_str(), metadataType.c_str(), ix));
+  LM_F(("%s  Name:     %s", indent.c_str(), name.c_str()));
+  LM_F(("%s  Type:     %s", indent.c_str(), type.c_str()));
+  LM_F(("%s  Value:    %s", indent.c_str(), value.c_str()));
 }
 
 
@@ -173,4 +173,47 @@ void Metadata::fill(const struct Metadata& md)
   type        = md.type;
   value       = md.value;
   association = md.association;
+}
+
+
+
+/* ****************************************************************************
+*
+* toJson - 
+*/
+std::string Metadata::toJson(bool isLastElement)
+{
+  std::string  out;
+  bool         isNumber = false;
+
+  if (type == "number")
+  {
+    isNumber = true;
+  }
+
+  if ((type == "") || (isNumber == true))
+  {
+    if (isNumber == true)
+    {
+      out = JSON_VALUE_NUMBER(name, value);
+    }
+    else
+    {
+      out = JSON_VALUE(name, value);
+    }
+  }
+  else
+  {
+    out = JSON_STR(name) + ":{";
+    out += JSON_VALUE("value", value);
+    out += "," + JSON_VALUE("type", type);
+    out += "}";
+  }
+
+  if (!isLastElement)
+  {
+    out += ",";
+  }
+
+  return out;
 }

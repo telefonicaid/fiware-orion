@@ -26,6 +26,7 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <map>
 
 #include "ngsi9/RegisterContextRequest.h"
 #include "ngsi9/RegisterContextResponse.h"
@@ -36,6 +37,13 @@
 *
 * mongoRegisterContext - 
 */
-extern HttpStatusCode mongoRegisterContext(RegisterContextRequest* requestP, RegisterContextResponse* responseP, const std::string& tenant = "");
+extern HttpStatusCode mongoRegisterContext
+(
+  RegisterContextRequest*              requestP,
+  RegisterContextResponse*             responseP,
+  std::map<std::string, std::string>&  uriParam,
+  const std::string&                   tenant       = "",
+  const std::string&                   servicePath  = ""
+);
 
 #endif

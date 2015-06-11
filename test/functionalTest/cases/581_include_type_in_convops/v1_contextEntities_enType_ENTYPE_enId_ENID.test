@@ -49,7 +49,7 @@ brokerStart CB 0-255
 
 echo "01. PUT /v1/contextEntities/type/T1/id/E1 and see it fail"
 echo "========================================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
+payload1='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -60,7 +60,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" -X "PUT"
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "$payload1" -X "PUT"
 echo
 echo
 
@@ -74,7 +74,7 @@ echo
 
 echo "03. POST /v1/contextEntities/type/T1/id/E1 OK"
 echo "============================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
+payload3='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -85,14 +85,14 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" -X "POST"
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "$payload3" -X "POST"
 echo
 echo
 
 
 echo "04. PUT /v1/contextEntities/type/T1/id/E1 OK"
 echo "============================================"
-payload='<?xml version="1.0" encoding="UTF-8"?>
+payload4='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -103,7 +103,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </updateContextElementRequest>'
-orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "${payload}" -X "PUT"
+orionCurl --url /v1/contextEntities/type/T1/id/E1 --payload "$payload4" -X "PUT"
 echo
 echo
 
@@ -117,7 +117,7 @@ echo
 
 echo "06. POST /v1/contextEntities/type/T2/id/E1 OK"
 echo "============================================="
-payload='<?xml version="1.0" encoding="UTF-8"?>
+payload6='<?xml version="1.0" encoding="UTF-8"?>
 <appendContextElementRequest>
   <attributeDomainName></attributeDomainName>
   <contextAttributeList>
@@ -128,7 +128,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </contextAttribute>
   </contextAttributeList>
 </appendContextElementRequest>'
-orionCurl --url /v1/contextEntities/type/T2/id/E1 --payload "${payload}" -X "POST"
+orionCurl --url /v1/contextEntities/type/T2/id/E1 --payload "$payload6" -X "POST"
 echo
 echo
 
@@ -540,3 +540,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

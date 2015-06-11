@@ -95,7 +95,7 @@ std::string ContextAttributeResponseVector::check
 */
 void ContextAttributeResponseVector::present(std::string indent)
 {
-  PRINTF("%lu ContextAttributeResponses", (uint64_t) vec.size());
+  LM_F(("%lu ContextAttributeResponses", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -151,4 +151,16 @@ void ContextAttributeResponseVector::release(void)
   }
 
   vec.clear();
+}
+
+
+
+/* ****************************************************************************
+*
+* ContextAttributeResponseVector::fill -
+*/
+void ContextAttributeResponseVector::fill(ContextAttributeVector* cavP, const StatusCode& statusCode)
+{
+  vec.push_back(new ContextAttributeResponse());
+  vec[0]->fill(cavP, statusCode);
 }

@@ -32,10 +32,12 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "common/statistics.h"
+#include "common/sem.h"
 
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/statisticsTreat.h"
+#include "mongoBackend/mongoConnectionPool.h"
 
 
 
@@ -43,7 +45,8 @@
 *
 * TAG_ADD - 
 */
-#define TAG_ADD(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outFormat, true)
+#define TAG_ADD_COUNTER(tag, counter) valueTag(indent2, tag, counter + 1, ciP->outFormat, true)
+#define TAG_ADD_STRING(tag, value)  valueTag(indent2, tag, value, ciP->outFormat, true)
 
 
 
@@ -132,6 +135,10 @@ std::string statisticsTreat
     noOfInvalidRequests                             = -1;
     noOfRegisterResponses                           = -1;
 
+    semTimeReqReset();
+    semTimeTransReset();
+    mongoPoolConnectionSemWaitingTimeReset();
+
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
     indent2 = (ciP->outFormat == JSON)? indent + "  " : indent;
@@ -143,261 +150,276 @@ std::string statisticsTreat
 
   if (noOfXmlRequests != -1)
   {
-    out += TAG_ADD("xmlRequests", noOfXmlRequests);
+    out += TAG_ADD_COUNTER("xmlRequests", noOfXmlRequests);
   }
 
   if (noOfJsonRequests != -1)
   {
-    out += TAG_ADD("jsonRequests", noOfJsonRequests);
+    out += TAG_ADD_COUNTER("jsonRequests", noOfJsonRequests);
   }
 
   if (noOfRegistrations != -1)
   {
-    out += TAG_ADD("registrations", noOfRegistrations);
+    out += TAG_ADD_COUNTER("registrations", noOfRegistrations);
   }
 
   if (noOfRegistrationUpdates != -1)
   {
-    out += TAG_ADD("registrationUpdates", noOfRegistrationUpdates);
+    out += TAG_ADD_COUNTER("registrationUpdates", noOfRegistrationUpdates);
   }
 
   if (noOfDiscoveries != -1)
   {
-    out += TAG_ADD("discoveries", noOfDiscoveries);
+    out += TAG_ADD_COUNTER("discoveries", noOfDiscoveries);
   }
 
   if (noOfAvailabilitySubscriptions != -1)
   {
-    out += TAG_ADD("availabilitySubscriptions", noOfAvailabilitySubscriptions);
+    out += TAG_ADD_COUNTER("availabilitySubscriptions", noOfAvailabilitySubscriptions);
   }
 
   if (noOfAvailabilitySubscriptionUpdates != -1)
   {
-    out += TAG_ADD("availabilitySubscriptionUpdates", noOfAvailabilitySubscriptionUpdates);
+    out += TAG_ADD_COUNTER("availabilitySubscriptionUpdates", noOfAvailabilitySubscriptionUpdates);
   }
 
   if (noOfAvailabilityUnsubscriptions != -1)
   {
-    out += TAG_ADD("availabilityUnsubscriptions", noOfAvailabilityUnsubscriptions);
+    out += TAG_ADD_COUNTER("availabilityUnsubscriptions", noOfAvailabilityUnsubscriptions);
   }
 
   if (noOfAvailabilityNotificationsReceived != -1)
   {
-    out += TAG_ADD("availabilityNotificationsReceived", noOfAvailabilityNotificationsReceived);
+    out += TAG_ADD_COUNTER("availabilityNotificationsReceived", noOfAvailabilityNotificationsReceived);
   }
 
   if (noOfQueries != -1)
   {
-    out += TAG_ADD("queries", noOfQueries);
+    out += TAG_ADD_COUNTER("queries", noOfQueries);
   }
 
   if (noOfUpdates != -1)
   {
-    out += TAG_ADD("updates", noOfUpdates);
+    out += TAG_ADD_COUNTER("updates", noOfUpdates);
   }
 
   if (noOfSubscriptions != -1)
   {
-    out += TAG_ADD("subscriptions", noOfSubscriptions);
+    out += TAG_ADD_COUNTER("subscriptions", noOfSubscriptions);
   }
 
   if (noOfSubscriptionUpdates != -1)
   {
-    out += TAG_ADD("subscriptionUpdates", noOfSubscriptionUpdates);
+    out += TAG_ADD_COUNTER("subscriptionUpdates", noOfSubscriptionUpdates);
   }
 
   if (noOfUnsubscriptions != -1)
   {
-    out += TAG_ADD("unsubscriptions", noOfUnsubscriptions);
+    out += TAG_ADD_COUNTER("unsubscriptions", noOfUnsubscriptions);
   }
 
   if (noOfNotificationsReceived != -1)
   {
-    out += TAG_ADD("notificationsReceived", noOfNotificationsReceived);
+    out += TAG_ADD_COUNTER("notificationsReceived", noOfNotificationsReceived);
   }
 
   if (noOfQueryContextResponses != -1)
   {
-    out += TAG_ADD("queryResponsesReceived", noOfQueryContextResponses);
+    out += TAG_ADD_COUNTER("queryResponsesReceived", noOfQueryContextResponses);
   }
 
   if (noOfUpdateContextResponses != -1)
   {
-    out += TAG_ADD("updateResponsesReceived", noOfUpdateContextResponses);
+    out += TAG_ADD_COUNTER("updateResponsesReceived", noOfUpdateContextResponses);
   }
 
   if (noOfQueryContextResponses != -1)
   {
-    out += TAG_ADD("queryResponsesReceived", noOfQueryContextResponses);
+    out += TAG_ADD_COUNTER("queryResponsesReceived", noOfQueryContextResponses);
   }
 
   if (noOfUpdateContextResponses != -1)
   {
-    out += TAG_ADD("updateResponsesReceived", noOfUpdateContextResponses);
+    out += TAG_ADD_COUNTER("updateResponsesReceived", noOfUpdateContextResponses);
   }
 
   if (noOfContextEntitiesByEntityId != -1)
   {
-    out += TAG_ADD("contextEntitiesByEntityId", noOfContextEntitiesByEntityId);
+    out += TAG_ADD_COUNTER("contextEntitiesByEntityId", noOfContextEntitiesByEntityId);
   }
 
   if (noOfContextEntityAttributes != -1)
   {
-    out += TAG_ADD("contextEntityAttributes", noOfContextEntityAttributes);
+    out += TAG_ADD_COUNTER("contextEntityAttributes", noOfContextEntityAttributes);
   }
 
   if (noOfEntityByIdAttributeByName != -1)
   {
-    out += TAG_ADD("entityByIdAttributeByName", noOfEntityByIdAttributeByName);
+    out += TAG_ADD_COUNTER("entityByIdAttributeByName", noOfEntityByIdAttributeByName);
   }
 
   if (noOfContextEntityTypes != -1)
   {
-    out += TAG_ADD("contextEntityTypes", noOfContextEntityTypes);
+    out += TAG_ADD_COUNTER("contextEntityTypes", noOfContextEntityTypes);
   }
 
   if (noOfContextEntityTypeAttributeContainer != -1)
   {
-    out += TAG_ADD("contextEntityTypeAttributeContainer", noOfContextEntityTypeAttributeContainer);
+    out += TAG_ADD_COUNTER("contextEntityTypeAttributeContainer", noOfContextEntityTypeAttributeContainer);
   }
 
   if (noOfContextEntityTypeAttribute != -1)
   {
-    out += TAG_ADD("contextEntityTypeAttribute", noOfContextEntityTypeAttribute);
+    out += TAG_ADD_COUNTER("contextEntityTypeAttribute", noOfContextEntityTypeAttribute);
   }
 
 
   if (noOfIndividualContextEntity != -1)
   {
-    out += TAG_ADD("individualContextEntity", noOfIndividualContextEntity);
+    out += TAG_ADD_COUNTER("individualContextEntity", noOfIndividualContextEntity);
   }
 
   if (noOfIndividualContextEntityAttributes != -1)
   {
-    out += TAG_ADD("individualContextEntityAttributes", noOfIndividualContextEntityAttributes);
+    out += TAG_ADD_COUNTER("individualContextEntityAttributes", noOfIndividualContextEntityAttributes);
   }
 
   if (noOfIndividualContextEntityAttribute != -1)
   {
-    out += TAG_ADD("individualContextEntityAttribute", noOfIndividualContextEntityAttribute);
+    out += TAG_ADD_COUNTER("individualContextEntityAttribute", noOfIndividualContextEntityAttribute);
   }
 
   if (noOfUpdateContextElement != -1)
   {
-    out += TAG_ADD("updateContextElement", noOfUpdateContextElement);
+    out += TAG_ADD_COUNTER("updateContextElement", noOfUpdateContextElement);
   }
 
   if (noOfAppendContextElement != -1)
   {
-    out += TAG_ADD("appendContextElement", noOfAppendContextElement);
+    out += TAG_ADD_COUNTER("appendContextElement", noOfAppendContextElement);
   }
 
   if (noOfUpdateContextAttribute != -1)
   {
-    out += TAG_ADD("updateContextAttribute", noOfUpdateContextAttribute);
+    out += TAG_ADD_COUNTER("updateContextAttribute", noOfUpdateContextAttribute);
   }
 
 
   if (noOfNgsi10ContextEntityTypes != -1)
   {
-    out += TAG_ADD("contextEntityTypesNgsi10", noOfNgsi10ContextEntityTypes);
+    out += TAG_ADD_COUNTER("contextEntityTypesNgsi10", noOfNgsi10ContextEntityTypes);
   }
 
   if (noOfNgsi10ContextEntityTypesAttributeContainer != -1)
   {
-    out += TAG_ADD("contextEntityTypeAttributeContainerNgsi10", noOfNgsi10ContextEntityTypesAttributeContainer);
+    out += TAG_ADD_COUNTER("contextEntityTypeAttributeContainerNgsi10", noOfNgsi10ContextEntityTypesAttributeContainer);
   }
 
   if (noOfNgsi10ContextEntityTypesAttribute != -1)
   {
-    out += TAG_ADD("contextEntityTypeAttributeNgsi10", noOfNgsi10ContextEntityTypesAttribute);
+    out += TAG_ADD_COUNTER("contextEntityTypeAttributeNgsi10", noOfNgsi10ContextEntityTypesAttribute);
   }
 
   if (noOfNgsi10SubscriptionsConvOp != -1)
   {
-    out += TAG_ADD("subscriptionsNgsi10ConvOp", noOfNgsi10SubscriptionsConvOp);
+    out += TAG_ADD_COUNTER("subscriptionsNgsi10ConvOp", noOfNgsi10SubscriptionsConvOp);
   }
 
 
   if (noOfAllContextEntitiesRequests != -1)
   {
-    out += TAG_ADD("allContextEntitiesRequests", noOfAllContextEntitiesRequests);
+    out += TAG_ADD_COUNTER("allContextEntitiesRequests", noOfAllContextEntitiesRequests);
   }
 
   if (noOfAllEntitiesWithTypeAndIdRequests != -1)
   {
-    out += TAG_ADD("allContextEntitiesWithTypeAndIdRequests", noOfAllEntitiesWithTypeAndIdRequests);
+    out += TAG_ADD_COUNTER("allContextEntitiesWithTypeAndIdRequests", noOfAllEntitiesWithTypeAndIdRequests);
   }
 
   if (noOfIndividualContextEntityAttributeWithTypeAndId != -1)
   {
-    out += TAG_ADD("individualContextEntityAttributeWithTypeAndId", noOfIndividualContextEntityAttributeWithTypeAndId);
+    out += TAG_ADD_COUNTER("individualContextEntityAttributeWithTypeAndId", noOfIndividualContextEntityAttributeWithTypeAndId);
   }
 
   if (noOfAttributeValueInstanceWithTypeAndId != -1)
   {
-    out += TAG_ADD("attributeValueInstanceWithTypeAndId", noOfAttributeValueInstanceWithTypeAndId);
+    out += TAG_ADD_COUNTER("attributeValueInstanceWithTypeAndId", noOfAttributeValueInstanceWithTypeAndId);
   }
 
   if (noOfContextEntitiesByEntityIdAndType != -1)
   {
-    out += TAG_ADD("contextEntitiesByEntityIdAndType", noOfContextEntitiesByEntityIdAndType);
+    out += TAG_ADD_COUNTER("contextEntitiesByEntityIdAndType", noOfContextEntitiesByEntityIdAndType);
   }
 
   if (noOfEntityByIdAttributeByNameIdAndType != -1)
   {
-    out += TAG_ADD("entityByIdAttributeByNameIdAndType", noOfEntityByIdAttributeByNameIdAndType);
+    out += TAG_ADD_COUNTER("entityByIdAttributeByNameIdAndType", noOfEntityByIdAttributeByNameIdAndType);
   }
 
   if (noOfLogRequests != -1)
   {
-    out += TAG_ADD("logRequests", noOfLogRequests);
+    out += TAG_ADD_COUNTER("logRequests", noOfLogRequests);
   }
 
   if (noOfVersionRequests != -1)
   {
-    out += TAG_ADD("versionRequests", noOfVersionRequests);
+    out += TAG_ADD_COUNTER("versionRequests", noOfVersionRequests);
   }
 
   if (noOfExitRequests != -1)
   {
-    out += TAG_ADD("exitRequests", noOfExitRequests);
+    out += TAG_ADD_COUNTER("exitRequests", noOfExitRequests);
   }
 
   if (noOfLeakRequests != -1)
   {
-    out += TAG_ADD("leakRequests", noOfLeakRequests);
+    out += TAG_ADD_COUNTER("leakRequests", noOfLeakRequests);
   }
 
   if (noOfStatisticsRequests != -1)
   {
-    out += TAG_ADD("statisticsRequests", noOfStatisticsRequests);
+    out += TAG_ADD_COUNTER("statisticsRequests", noOfStatisticsRequests);
   }
 
   if (noOfInvalidRequests != -1)
   {
-    out += TAG_ADD("invalidRequests", noOfInvalidRequests);
+    out += TAG_ADD_COUNTER("invalidRequests", noOfInvalidRequests);
   }
 
   if (noOfRegisterResponses != -1)
   {
-    out += TAG_ADD("registerResponses", noOfRegisterResponses);
+    out += TAG_ADD_COUNTER("registerResponses", noOfRegisterResponses);
   }
 
 
   if (noOfRegistrationErrors != -1)
   {
-    out += TAG_ADD("registrationErrors", noOfRegistrationErrors);
+    out += TAG_ADD_COUNTER("registrationErrors", noOfRegistrationErrors);
   }
 
   if (noOfRegistrationUpdateErrors != -1)
   {
-    out += TAG_ADD("registrationUpdateErrors", noOfRegistrationUpdateErrors);
+    out += TAG_ADD_COUNTER("registrationUpdateErrors", noOfRegistrationUpdateErrors);
   }
 
   if (noOfDiscoveryErrors != -1)
   {
-    out += TAG_ADD("discoveryErrors", noOfDiscoveryErrors);
+    out += TAG_ADD_COUNTER("discoveryErrors", noOfDiscoveryErrors);
+  }
+
+  if (semTimeStatistics)
+  {
+    char requestSemaphoreWaitingTime[64];
+    semTimeReqGet(requestSemaphoreWaitingTime, sizeof(requestSemaphoreWaitingTime));
+    out += TAG_ADD_STRING("requestSemaphoreWaitingTime", requestSemaphoreWaitingTime);
+
+    char mongoPoolSemaphoreWaitingTime[64];
+    mongoPoolConnectionSemWaitingTimeGet(mongoPoolSemaphoreWaitingTime, sizeof(mongoPoolSemaphoreWaitingTime));
+    out += TAG_ADD_STRING("dbConnectionPoolWaitingTime", mongoPoolSemaphoreWaitingTime);
+
+    char transSemaphoreWaitingTime[64];
+    semTimeTransGet(transSemaphoreWaitingTime, sizeof(transSemaphoreWaitingTime));
+    out += TAG_ADD_STRING("transactionSemaphoreWaitingTime", transSemaphoreWaitingTime);
   }
 
   int now = getCurrentTime();

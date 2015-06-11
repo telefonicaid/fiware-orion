@@ -31,7 +31,7 @@ progName=$0
 #
 function usage
 {
-  echo "$progName <NEW_VERSION> <BROKER_RELEASE> <FIWARE_VERSION> <FIWARE_RELEASE> <changelog-file>"
+  echo "$progName <NEW_VERSION> <BROKER_RELEASE> <changelog-file>"
   exit 1
 }
 
@@ -45,7 +45,7 @@ then
   usage
 fi
 
-if [ $# != 5 ]
+if [ $# != 3 ]
 then
   usage
 fi
@@ -56,9 +56,7 @@ fi
 #
 export NEW_VERSION=$1
 export BROKER_RELEASE=$2
-export FIWARE_VERSION=$3
-export FIWARE_RELEASE=$4
-export CHANGELOG_FILE=$5
+export CHANGELOG_FILE=$3
 
 
 
@@ -66,7 +64,7 @@ export CHANGELOG_FILE=$5
 # correct date format
 #
 DATE=$(LANG=C date +"%a %b %d %Y")
-export dateLine="$DATE Fermin Galan <fermin@tid.es> ${NEW_VERSION}-${BROKER_RELEASE} (FIWARE-${FIWARE_VERSION}-${FIWARE_RELEASE})"
+export dateLine="$DATE Fermin Galan <fermin.galanmarquez@telefonica.com> ${NEW_VERSION}-${BROKER_RELEASE}"
 
 
 # Modify rpm/SPECS/contextBroker.spec only when step to a non-deve release
@@ -176,8 +174,9 @@ then
        git merge develop
        git push origin master
        git checkout -b release/$NEW_VERSION
-       git tag $NEW_VERSION-FIWARE-$FIWARE_VERSION
+       git tag $NEW_VERSION
        git push --tags origin release/$NEW_VERSION
+       git push origin release/$NEW_VERSION
 
        # Build release only when step to a non-dev release. Note that, taking into account
        # how the "make rpm" target works, it has to be done after commit has been done

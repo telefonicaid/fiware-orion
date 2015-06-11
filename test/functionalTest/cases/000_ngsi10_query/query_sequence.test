@@ -22,6 +22,7 @@
 
 --NAME--
 Query SEQ
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -744,9 +745,9 @@ Date: REGEX(.*)
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>12</contextValue>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
           </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
@@ -754,9 +755,9 @@ Date: REGEX(.*)
             <contextValue>p2300</contextValue>
           </contextAttribute>
           <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>12</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -817,9 +818,9 @@ Date: REGEX(.*)
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>12</contextValue>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
           </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
@@ -827,9 +828,9 @@ Date: REGEX(.*)
             <contextValue>p2300</contextValue>
           </contextAttribute>
           <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>12</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -845,9 +846,9 @@ Date: REGEX(.*)
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
           </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
@@ -855,9 +856,9 @@ Date: REGEX(.*)
             <contextValue>p23</contextValue>
           </contextAttribute>
           <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -1018,9 +1019,9 @@ Date: REGEX(.*)
         </entityId>
         <contextAttributeList>
           <contextAttribute>
-            <name>temperature</name>
-            <type>degree</type>
-            <contextValue>14</contextValue>
+            <name>lightstatus</name>
+            <type>light</type>
+            <contextValue>L23</contextValue>
           </contextAttribute>
           <contextAttribute>
             <name>pressure</name>
@@ -1028,9 +1029,9 @@ Date: REGEX(.*)
             <contextValue>p23</contextValue>
           </contextAttribute>
           <contextAttribute>
-            <name>lightstatus</name>
-            <type>light</type>
-            <contextValue>L23</contextValue>
+            <name>temperature</name>
+            <type>degree</type>
+            <contextValue>14</contextValue>
           </contextAttribute>
         </contextAttributeList>
       </contextElement>
@@ -1061,3 +1062,4 @@ Date: REGEX(.*)
 </queryContextResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

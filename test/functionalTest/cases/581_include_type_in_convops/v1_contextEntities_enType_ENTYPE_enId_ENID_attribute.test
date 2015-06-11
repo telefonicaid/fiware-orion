@@ -274,14 +274,14 @@ echo
 01. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 145
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "404", 
-        "details": "Entity id: /E1/", 
+        "details": "Entity-Attribute pair: /E1-A1/", 
         "reasonPhrase": "No context element found"
     }
 }
@@ -483,14 +483,14 @@ Date: REGEX(.*)
 13. GET /v1/contextEntities/type/T1/id/E1/attributes/A1 and see it fail
 =======================================================================
 HTTP/1.1 200 OK
-Content-Length: 130
+Content-Length: 145
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "statusCode": {
         "code": "404", 
-        "details": "Entity id: /E1/", 
+        "details": "Entity-Attribute pair: /E1-A1/", 
         "reasonPhrase": "No context element found"
     }
 }
@@ -564,3 +564,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

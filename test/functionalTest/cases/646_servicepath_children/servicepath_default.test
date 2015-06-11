@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Service path all children test
+Service path default test
 
 --SHELL-INIT--
 dbInit CB
@@ -66,8 +66,8 @@ orionCurl --servicePath '/' --url /v1/contextEntityTypes/T --json
 echo
 echo
 
-echo "Query on /# (returns: E1, E2, E3)"
-echo "================================="
+echo "03. Query on /# (returns: E1, E2, E3)"
+echo "====================================="
 orionCurl --servicePath '/#' --url /v1/contextEntityTypes/T --json
 echo
 echo
@@ -211,8 +211,8 @@ Date: REGEX(.*)
 }
 
 
-Query on /# (returns: E1, E2, E3)
-=================================
+03. Query on /# (returns: E1, E2, E3)
+=====================================
 HTTP/1.1 200 OK
 Content-Length: 1082
 Content-Type: application/json
@@ -347,3 +347,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

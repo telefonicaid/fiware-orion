@@ -22,6 +22,7 @@
 
 --NAME--
 Error in pagination URI parameters
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -36,7 +37,7 @@ echo
 echo
 
 echo "+++++ 2. bad characters in URI param 'offset'"
-url="/v1/queryContext?limit=0&offset=qwe"
+url="/v1/queryContext?offset=qwe"
 payload='NO PAYLOAD NECESSARY'
 orionCurl --url "$url" --payload "$payload"
 echo
@@ -89,7 +90,7 @@ Date: REGEX(.*)
 
 +++++ 3. URI param 'limit' == 0
 HTTP/1.1 400 Bad Request
-Content-Length: 173
+Content-Length: 175
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -97,7 +98,7 @@ Date: REGEX(.*)
 <orionError>
   <code>400</code>
   <reasonPhrase>Bad Request</reasonPhrase>
-  <details>Bad pagination limit: /000000/ [a value of ZERO is unaccepted]</details>
+  <details>Bad pagination limit: /000000/ [a value of ZERO is unacceptable]</details>
 </orionError>
 
 
@@ -117,3 +118,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

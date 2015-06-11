@@ -22,8 +22,8 @@
 
 --NAME--
 Forbidden characters in Input
---SHELL-INIT--
 
+--SHELL-INIT--
 dbInit CB
 brokerStart CB 0-255
 
@@ -765,4 +765,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbInit CB
+dbDrop CB

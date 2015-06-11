@@ -90,3 +90,24 @@ TEST(xmlRequest, parseError)
 
   utExit();
 }
+
+
+
+/* ****************************************************************************
+*
+* emptyPayload - 
+*/
+TEST(xmlRequest, emptyPayload)
+{
+  ConnectionInfo  ci("/ngsi/registerContext", "POST", "1.1");
+  ParseData       parseData;
+  const char*     payload = "";
+  std::string     out;
+
+  utInit();
+
+  out  = xmlTreat(payload, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
+  EXPECT_STREQ("OK", out.c_str());
+
+  utExit();
+}

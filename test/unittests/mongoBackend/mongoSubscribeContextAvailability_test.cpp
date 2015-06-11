@@ -39,13 +39,9 @@
 
 #include "mongo/client/dbclient.h"
 
-#include "commonMocks.h"
+#include "unittest.h"
 
-using ::testing::_;
-using ::testing::MatchesRegex;
-using ::testing::Throw;
-using ::testing::Return;
-
+extern void setMongoConnectionForUnitTest(DBClientBase*);
 
 /* ****************************************************************************
 *
@@ -349,7 +345,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -369,7 +365,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -425,7 +421,9 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res, JSON);
+    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "";
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams, JSON);
+    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "XML";
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -445,7 +443,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern_JSON)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
@@ -502,7 +500,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_AttrN_noPattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -522,7 +520,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_AttrN_noPattern)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -581,7 +579,7 @@ TEST(mongoSubscribeContextAvailability, EntN_Attr0_noPattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -601,7 +599,7 @@ TEST(mongoSubscribeContextAvailability, EntN_Attr0_noPattern)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -664,7 +662,7 @@ TEST(mongoSubscribeContextAvailability, EntN_AttrN_noPattern)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -684,7 +682,7 @@ TEST(mongoSubscribeContextAvailability, EntN_AttrN_noPattern)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -748,7 +746,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_pattern)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -768,7 +766,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_pattern)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -839,7 +837,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -859,7 +857,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -930,7 +928,9 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll_JSON)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res, JSON);
+    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "";
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams, JSON);
+    uriParams[URI_PARAM_NOTIFY_FORMAT]       = "XML";
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -950,7 +950,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll_JSON)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("JSON", C_STR_FIELD(sub, "format"));
@@ -1018,7 +1018,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneSingle)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1038,7 +1038,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneSingle)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1116,7 +1116,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneMulti)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1136,7 +1136,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneMulti)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1209,7 +1209,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsSubset)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1229,7 +1229,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsSubset)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1308,7 +1308,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralCREs)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1328,7 +1328,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralCREs)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1404,7 +1404,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralRegistrations)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1424,7 +1424,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralRegistrations)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1511,7 +1511,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntity)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1531,7 +1531,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntity)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1610,7 +1610,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiAttr)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1630,7 +1630,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiAttr)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1717,7 +1717,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntityAttrs)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1737,7 +1737,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntityAttrs)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1833,7 +1833,7 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1852,7 +1852,7 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -1936,7 +1936,7 @@ TEST(mongoSubscribeContextAvailability, pattern0Attr)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1955,7 +1955,7 @@ TEST(mongoSubscribeContextAvailability, pattern0Attr)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2022,7 +2022,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrSingle)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2041,7 +2041,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrSingle)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2116,7 +2116,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrMulti)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2135,7 +2135,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrMulti)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2218,7 +2218,7 @@ TEST(mongoSubscribeContextAvailability, patternNAttr)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2237,7 +2237,7 @@ TEST(mongoSubscribeContextAvailability, patternNAttr)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2330,7 +2330,7 @@ TEST(mongoSubscribeContextAvailability, patternNoType)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2349,7 +2349,7 @@ TEST(mongoSubscribeContextAvailability, patternNoType)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2439,7 +2439,7 @@ TEST(mongoSubscribeContextAvailability, mixPatternAndNotPattern)
     prepareDatabasePatternTrue();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2458,7 +2458,7 @@ TEST(mongoSubscribeContextAvailability, mixPatternAndNotPattern)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360236300, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2516,7 +2516,7 @@ TEST(mongoSubscribeContextAvailability, defaultDuration)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2536,7 +2536,7 @@ TEST(mongoSubscribeContextAvailability, defaultDuration)
     ASSERT_EQ(1, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj());
 
-    EXPECT_EQ(id, sub.getField("_id").OID().str());
+    EXPECT_EQ(id, sub.getField("_id").OID().toString());
     EXPECT_EQ(1360319100, sub.getIntField("expiration"));
     EXPECT_STREQ("http://notify.me", C_STR_FIELD(sub, "reference"));
     EXPECT_STREQ("XML", C_STR_FIELD(sub, "format"));
@@ -2573,11 +2573,11 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("unittest.casubs",_,_))
+    ON_CALL(*connectionMock, insert("unittest.casubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
             .Times(0);
     setNotifier(notifierMock);
 
@@ -2592,12 +2592,14 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object).
+     * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoSubscribeContextAvailability(&req, &res);
+    ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2609,17 +2611,16 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     std::string s2 = res.errorCode.details.substr(57+24, res.errorCode.details.size()-57-24);
     EXPECT_EQ("collection: unittest.casubs "
               "- insert(): { _id: ObjectId('", s1);
-    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: {}, format: \"XML\" } "
+    EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: [], format: \"XML\" } "
               "- exception: boom!!", s2);
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
     delete timerMock;
 
-    /* Reconnect to database to check it has not been touched */
-    mongoConnect("localhost");
-    DBClientBase* connection = getMongoConnection();
+    /* Check actual database has not been touched */
     ASSERT_EQ(0, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
 
 }

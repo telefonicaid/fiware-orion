@@ -181,47 +181,52 @@ static void prepareDatabase(void) {
    */
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
-                        BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
+                     "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                        "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                        "A3" << BSON("type" << "TA3" << "value" << "W") <<
+                        "A7" << BSON("type" << "TA7" << "value" << "W")
                         )
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
-                        BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
+                     "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                        "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                        "A3" << BSON("type" << "TA3" << "value" << "W") <<
+                        "A7" << BSON("type" << "TA7" << "value" << "W")
                         )
                     );
 
   BSONObj en3 = BSON("_id" << BSON("id" << "E1" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
-                        BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
+                     "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                        "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                        "A3" << BSON("type" << "TA3" << "value" << "W") <<
+                        "A7" << BSON("type" << "TA7" << "value" << "W")
                         )
                     );
 
   BSONObj en4 = BSON("_id" << BSON("id" << "E2" << "type" << "T") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
-                        BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
+                     "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                        "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                        "A3" << BSON("type" << "TA3" << "value" << "W") <<
+                        "A7" << BSON("type" << "TA7" << "value" << "W")
                         )
                     );
 
   BSONObj en5 = BSON("_id" << BSON("id" << "E1") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                        BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
-                        BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
+                     "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                        "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                        "A3" << BSON("type" << "TA3" << "value" << "W") <<
+                        "A7" << BSON("type" << "TA7" << "value" << "W")
                         )
                     );
 
@@ -321,11 +326,12 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
      */
 
     BSONObj en = BSON("_id" << BSON("id" << "E3" << "type" << "T3") <<
-                       "attrs" << BSON_ARRAY(
-                          BSON("name" << "A1" << "type" << "TA1" << "value" << "X") <<
-                          BSON("name" << "A2" << "type" << "TA2" << "value" << "Z") <<
-                          BSON("name" << "A3" << "type" << "TA3" << "value" << "W") <<
-                          BSON("name" << "A7" << "type" << "TA7" << "value" << "W")
+                      "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A7") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "X") <<
+                          "A2" << BSON("type" << "TA2" << "value" << "Z") <<
+                          "A3" << BSON("type" << "TA3" << "value" << "W") <<
+                          "A7" << BSON("type" << "TA7" << "value" << "W")
                           )
                       );
 
@@ -383,7 +389,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -407,7 +413,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -450,7 +456,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -474,7 +480,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -513,7 +519,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -537,7 +543,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -581,9 +587,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -607,7 +613,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -655,9 +661,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -681,7 +687,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -725,9 +731,9 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     expectedNcr2.subscriptionId.set("51307b66f481db11bf860004");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr1),"http://notify1.me", "", "", XML))
             .Times(1);
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr2),"http://notify4.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -751,7 +757,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -794,7 +800,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -818,7 +824,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -861,7 +867,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -885,7 +891,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -924,7 +930,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -948,7 +954,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -989,7 +995,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1013,7 +1019,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1056,7 +1062,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1080,7 +1086,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1119,7 +1125,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1143,7 +1149,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1184,7 +1190,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1208,7 +1214,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1249,7 +1255,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1273,7 +1279,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1314,7 +1320,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1338,7 +1344,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1368,7 +1374,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", XML))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1392,7 +1398,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1423,7 +1429,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", XML))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1447,7 +1453,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1477,7 +1483,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", XML))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1501,7 +1507,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1531,7 +1537,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify1.me", "", "", XML))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1555,7 +1561,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1596,7 +1602,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1622,7 +1628,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1666,7 +1672,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1692,7 +1698,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1731,7 +1737,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1757,7 +1763,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1798,7 +1804,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1824,7 +1830,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1867,7 +1873,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1893,7 +1899,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1932,7 +1938,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     expectedNcr.subscriptionId.set("51307b66f481db11bf860001");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify1.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1956,7 +1962,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1997,7 +2003,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2022,7 +2028,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2065,7 +2071,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2089,7 +2095,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2128,7 +2134,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2152,7 +2158,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2193,7 +2199,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2217,7 +2223,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2258,7 +2264,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2282,7 +2288,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2323,7 +2329,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2347,7 +2353,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2377,7 +2383,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", XML))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2401,7 +2407,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2432,7 +2438,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", XML))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2456,7 +2462,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2486,7 +2492,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", XML))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2510,7 +2516,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2540,7 +2546,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
 
     /* Prepare mock */
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,"http://notify2.me", "", "", XML))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2564,7 +2570,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2605,7 +2611,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2631,7 +2637,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2675,7 +2681,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2701,7 +2707,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2740,7 +2746,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2766,7 +2772,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2807,7 +2813,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2833,7 +2839,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2876,7 +2882,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2902,7 +2908,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2941,7 +2947,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     expectedNcr.subscriptionId.set("51307b66f481db11bf860002");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify2.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -2965,7 +2971,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3009,7 +3015,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(_,_,_,_,_))
             .Times(0);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -3028,7 +3034,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -3045,7 +3051,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
     EXPECT_EQ("Database Error", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check lastNotification */
     DBClientBase* connection = getMongoConnection();

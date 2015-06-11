@@ -22,6 +22,7 @@
 
 --NAME--
 Convenience NGSI10 Context Entity Types Attribute
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -115,7 +116,7 @@ orionCurl --url "/v1/contextEntityTypes/Room/attributes/temperature" -X "DELETE"
 --REGEXPECT--
 1: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 224
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -124,6 +125,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type/attribute::name pair not found</details>
   </errorCode>
 </queryContextResponse>
 2: ++++++++++++++++++++
@@ -308,7 +310,7 @@ Date: REGEX(.*)
 </queryContextResponse>
 7: ++++++++++++++++++++
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 224
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -317,6 +319,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>404</code>
     <reasonPhrase>No context element found</reasonPhrase>
+    <details>entityId::type/attribute::name pair not found</details>
   </errorCode>
 </queryContextResponse>
 8: ++++++++++++++++++++
@@ -327,3 +330,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

@@ -46,14 +46,18 @@
 */
 HttpStatusCode mongoUpdateContext
 (
-  UpdateContextRequest*            requestP,
-  UpdateContextResponse*           responseP,
-  const std::string&               tenant,
-  const std::vector<std::string>&  servicePathV,
-  std::map<std::string, std::string>&   uriParams    // FIXME P7: we need this to implement "restriction-based" filters
+  UpdateContextRequest*                 requestP,
+  UpdateContextResponse*                responseP,
+  const std::string&                    tenant,
+  const std::vector<std::string>&       servicePathV,
+  std::map<std::string, std::string>&   uriParams,    // FIXME P7: we need this to implement "restriction-based" filters
+  const std::string&                    xauthToken,
+  const std::string&                    caller
 )
 {
-    reqSemTake(__FUNCTION__, "ngsi10 update request");
+    bool reqSemTaken;
+
+    reqSemTake(__FUNCTION__, "ngsi10 update request", SemWriteOp, &reqSemTaken);
 
     /* Check that the service path vector has only one element, returning error otherwise */
     if (servicePathV.size() > 1)
@@ -65,18 +69,22 @@ HttpStatusCode mongoUpdateContext
     {
         /* Process each ContextElement */
         for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {
+
             processContextElement(requestP->contextElementVector.get(ix),
                                   responseP,
                                   requestP->updateActionType.get(),
                                   tenant,
                                   servicePathV,
-                                  uriParams);
+                                  uriParams,
+                                  xauthToken,
+                                  caller);
         }
 
         /* Note that although individual processContextElements() invocations return ConnectionError, this
            error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
            consider the overall mongoUpdateContext() as OK. */
-    }
-    reqSemGive(__FUNCTION__, "ngsi10 update request");
+        responseP->errorCode.fill(SccOk);
+    }    
+    reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
     return SccOk;
 }

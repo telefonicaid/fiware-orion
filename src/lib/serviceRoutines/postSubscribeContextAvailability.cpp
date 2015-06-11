@@ -29,6 +29,7 @@
 #include "ngsi/ParseData.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 #include "serviceRoutines/postSubscribeContextAvailability.h"
 
 
@@ -48,7 +49,9 @@ std::string postSubscribeContextAvailability
   SubscribeContextAvailabilityResponse  scar;
   std::string                           answer;
 
-  ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->inFormat, ciP->tenant);
+  Format notifyFormat = stringToFormat(ciP->uriParam[URI_PARAM_NOTIFY_FORMAT]);
+
+  ciP->httpStatusCode = mongoSubscribeContextAvailability(&parseDataP->scar.res, &scar, ciP->uriParam, notifyFormat, ciP->tenant);
   answer = scar.render(SubscribeContextAvailability, ciP->outFormat, "");
 
   return answer;

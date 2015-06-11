@@ -22,6 +22,7 @@
 
 --NAME--
 Convop query compound attributes by valueID (XML)
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -397,3 +398,4 @@ Date: REGEX(.*)
 </contextAttributeResponse>
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

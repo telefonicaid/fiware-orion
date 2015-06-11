@@ -32,7 +32,7 @@
 
 #include "onTimeIntervalThread.h"
 #include "senderThread.h"
-#include "rest/clientSocketHttp.h"
+#include "rest/httpRequestSend.h"
 
 
 /* ****************************************************************************
@@ -60,7 +60,7 @@ Notifier::~Notifier (void)
 *
 * Notifier::sendNotifyContextRequest -
 */
-void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, Format format)
+void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::string& url, const std::string& tenant, const std::string& xauthToken, Format format)
 {
     ConnectionInfo ci;
 
@@ -69,6 +69,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     // This is a comma-separated list of the service-paths in the same order as the entities come in the payload
     //
     std::string spathList;
+    bool atLeastOneNotDefault = false;
     for (unsigned int ix = 0; ix < ncr->contextElementResponseVector.size(); ++ix)
     {
       EntityId* eP = &ncr->contextElementResponseVector[ix]->contextElement.entityId;
@@ -78,6 +79,18 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
         spathList += ",";
       }
       spathList += eP->servicePath;
+      atLeastOneNotDefault = atLeastOneNotDefault || (eP->servicePath != "/");
+    }
+    // FIXME P8: the stuff about atLeastOneNotDefault was added after PR #729, which makes "/" the default servicePath in
+    // request not having that header. However, this causes as side-effect that a
+    // "Fiware-ServicePath: /" or "Fiware-ServicePath: /,/" header is added in notifications, thus breaking several tests harness.
+    // Given that the "clean" implementation of Fiware-ServicePath propagation will be implemented
+    // soon (it has been scheduled for version 0.19.0, see https://github.com/telefonicaid/fiware-orion/issues/714)
+    // we introduce the atLeastOneNotDefault hack. Once #714 gets implemented,
+    // this FIXME will be removed (and all the test harness adjusted, if needed)
+    if (!atLeastOneNotDefault)
+    {
+      spathList = "";
     }
     
     ci.outFormat = format;
@@ -99,7 +112,18 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     std::string content_type = (format == XML)? "application/xml" : "application/json";
 
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, spathList, uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    httpRequestSend(host,
+                    port,
+                    protocol,
+                    "POST",
+                    tenant,
+                    spathList,
+                    xauthToken,
+                    uriPath,
+                    content_type,
+                    payload,
+                    true,
+                    NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD
@@ -112,6 +136,7 @@ void Notifier::sendNotifyContextRequest(NotifyContextRequest* ncr, const std::st
     params->verb          = "POST";
     params->tenant        = tenant;
     params->servicePath   = spathList;
+    params->xauthToken    = xauthToken;
     params->resource      = uriPath;
     params->content_type  = content_type;
     params->content       = payload;
@@ -146,6 +171,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
     int          port;
     std::string  uriPath;
     std::string  protocol;
+
     if (!parseUrl(url, host, port, uriPath, protocol))
     {
       LM_W(("Bad Input (sending NotifyContextAvailabilityRequest: malformed URL: '%s')", url.c_str()));
@@ -157,7 +183,7 @@ void Notifier::sendNotifyContextAvailabilityRequest(NotifyContextAvailabilityReq
 
     /* Send the message (no wait for response, in a separated thread to avoid blocking response)*/
 #ifdef SEND_BLOCKING
-    sendHttpSocket(host, port, protocol, "POST", tenant, "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
+    httpRequestSend(host, port, protocol, "POST", tenant, "", "", uriPath, content_type, payload, true, NOTIFICATION_WAIT_MODE);
 #endif
 
 #ifdef SEND_IN_NEW_THREAD

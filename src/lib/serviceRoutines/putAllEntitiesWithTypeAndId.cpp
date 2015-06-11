@@ -31,15 +31,34 @@
 #include "ngsi/ParseData.h"
 #include "ngsi/EntityId.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
 #include "convenience/UpdateContextElementResponse.h"
-#include "convenienceMap/mapPutIndividualContextEntity.h"
 #include "serviceRoutines/putAllEntitiesWithTypeAndId.h"
+#include "serviceRoutines/postUpdateContext.h"
 
 
 
 /* ****************************************************************************
 *
 * putAllEntitiesWithTypeAndId - 
+*
+* PUT /v1/contextEntities/type/{entity::type}/id/{entity::id}
+*
+* Payload In:  UpdateContextElementRequest
+* Payload Out: UpdateContextElementResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+*   - entity::type=TYPE (must coincide with type in URL-path)
+*   - !exist=entity::type  (if set - error -- entity::type cannot be empty)
+*   - exist=entity::type   (not supported - ok if present, ok if not present ...)
+*
+* 01. Get values from URL (entityId::type, exist, !exist)
+* 02. Check validity of URI params
+* 03. Fill in UpdateContextRequest
+* 04. Call Standard Operation
+* 05. Fill in response from UpdateContextResponse
+* 06. Cleanup and return result
 */
 extern std::string putAllEntitiesWithTypeAndId
 (
@@ -49,14 +68,64 @@ extern std::string putAllEntitiesWithTypeAndId
   ParseData*                 parseDataP
 )
 {
-  std::string                   enType = compV[3];
-  std::string                   enId   = compV[5];
+  std::string                   entityType            = compV[3];
+  std::string                   entityId              = compV[5];
+  EntityTypeInfo                typeInfo              = EntityTypeEmptyOrNotEmpty;
+  std::string                   typeNameFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
   std::string                   answer;
   UpdateContextElementResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'PUT' request for entityId '%s', type '%s'", enId.c_str(), enType.c_str()));
-  ciP->httpStatusCode = mapPutIndividualContextEntity(enId, enType, &parseDataP->ucer.res, &response, ciP);
+  // FIXME P1: AttributeDomainName skipped
+  // FIXME P1: domainMetadataVector skipped
+
+
+  // 01. Get values from URL (entityId::type, esist, !exist)
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+
+
+  // 02. Check validity of URI params
+  if (typeInfo == EntityTypeEmpty)
+  {
+    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+
+    response.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
+
+    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    return answer;
+  }
+  else if ((typeNameFromUriParam != entityType) && (typeNameFromUriParam != ""))
+  {
+    LM_W(("Bad Input non-matching entity::types in URL"));
+
+    response.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
+
+    answer = response.render(ciP, AllEntitiesWithTypeAndId, "");
+    return answer;
+  }
+
+
+  // 03. Fill in UpdateContextRequest
+  parseDataP->upcr.res.fill(&parseDataP->ucer.res, entityId, entityType);
+
+
+  // 04. Call Standard Operation
+  answer = postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 05. Fill in response from UpdateContextResponse
+  response.fill(&parseDataP->upcrs.res);
+
+
+  // 06. Cleanup and return result
   answer = response.render(ciP, IndividualContextEntity, "");
+  parseDataP->upcr.res.release();
   response.release();
 
   return answer;

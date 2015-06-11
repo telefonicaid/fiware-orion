@@ -27,11 +27,11 @@
 
 #include "logMsg/logMsg.h"
 
-#include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
-#include "ngsi10/UpdateContextRequest.h"
-#include "ngsi10/UpdateContextResponse.h"
+#include "ngsi/StatusCode.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/uriParamNames.h"
+#include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutines/deleteAttributeValueInstanceWithTypeAndId.h"
 
 
@@ -40,7 +40,22 @@
 *
 * deleteAttributeValueInstanceWithTypeAndId - 
 *
-* DELETE /ngsi10/contextEntities/type/{type}/id/{id}/attributes/{attributeName}/{valueID}
+* DELETE /v1/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
+* DELETE /ngsi10/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}/{metaID}
+*
+* Mapped Standard Operation: UpdateContextRequest/DELETE
+*
+* URI params:
+*   - entity::type=TYPE
+*   - note that '!exist=entity::type' and 'exist=entity::type' are not supported by convenience operations
+*     that use the standard operation UpdateContext as there is no restriction within UpdateContext.
+*
+* 01. URI parameters
+* 02. Check validity of URI params
+* 03. Fill in UpdateContextRequest
+* 04. Call postUpdateContext standard service routine
+* 05. Translate UpdateContextResponse to StatusCode
+* 06. Cleanup and return result
 */
 std::string deleteAttributeValueInstanceWithTypeAndId
 (
@@ -50,58 +65,48 @@ std::string deleteAttributeValueInstanceWithTypeAndId
   ParseData*                 parseDataP
 )
 {
-  UpdateContextRequest            request;
-  UpdateContextResponse           response;
-  std::string                     entityType    = compV[3];
-  std::string                     entityId      = compV[5];
-  std::string                     attributeName = compV[7];
-  std::string                     valueId       = compV[8];
-  ContextAttribute*               attributeP    = new ContextAttribute(attributeName, "", "false");
-  Metadata*                       mP            = new Metadata("ID", "", valueId);
-  ContextElement*                 ceP           = new ContextElement();
+  StatusCode              response;
+  std::string             answer;
+  std::string             entityTypeFromUriParam;
+  std::string             entityTypeFromPath = compV[3];
+  std::string             entityId           = compV[5];
+  std::string             attributeName      = compV[7];
+  std::string             metaId             = compV[8];
 
-  attributeP->metadataVector.push_back(mP);
 
-  ceP->entityId.fill(entityId, entityType, "false");
-  ceP->attributeDomainName.set("");
-  ceP->contextAttributeVector.push_back(attributeP);
+  // 01. URI parameters
+  entityTypeFromUriParam    = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
 
-  request.contextElementVector.push_back(ceP);
-  request.updateActionType.set("DELETE");
 
-  response.errorCode.code = SccNone;
-  ciP->httpStatusCode = mongoUpdateContext(&request, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-
-  StatusCode statusCode;
-  if (response.contextElementResponseVector.size() == 0)
+  // 02. Check validity of URI params
+  if ((entityTypeFromUriParam != "") && (entityTypeFromUriParam != entityTypeFromPath))
   {
-    statusCode.fill(SccContextElementNotFound,
-                    std::string("Entity-Attribute pair: /") + entityId + "-" + attributeName + "/");
-  }
-  else if (response.contextElementResponseVector.size() == 1)
-  {
-     ContextElementResponse* cerP = response.contextElementResponseVector.get(0);
+    LM_W(("Bad Input non-matching entity::types in URL"));
 
-    if (response.errorCode.code != SccNone)
-    {
-      statusCode.fill(&response.errorCode);
-    }
-    else if (cerP->statusCode.code != SccNone)
-    {
-      statusCode.fill(&cerP->statusCode);
-    }
-    else
-    {
-      statusCode.fill(SccOk);
-    }
-  }
-  else
-  {
-    statusCode.fill(SccReceiverInternalError,
-                    "More than one response from deleteAttributeValueInstanceWithTypeAndId::mongoUpdateContext");
+    response.fill(SccBadRequest, "non-matching entity::types in URL");
+
+    answer = response.render(ciP->outFormat, "", false, false);
+
+    return answer;
   }
 
-  request.release();
 
-  return statusCode.render(ciP->outFormat, "", false, false);
+  // 03. Fill in UpdateContextRequest
+  parseDataP->upcr.res.fill(entityId, entityTypeFromPath, "false", attributeName, metaId, "DELETE");
+
+
+  // 04. Call postUpdateContext standard service routine
+  answer = postUpdateContext(ciP, components, compV, parseDataP);
+
+
+  // 05. Translate UpdateContextResponse to StatusCode
+  response.fill(parseDataP->upcrs.res);
+
+
+  // 06. Cleanup and return result
+  answer = response.render(ciP->outFormat, "", false, false);
+  response.release();
+  parseDataP->upcr.res.release();
+
+  return answer;
 }

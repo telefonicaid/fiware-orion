@@ -31,11 +31,12 @@ SET (STATIC_LIBS
     mongoBackend
     ngsiNotify
     serviceRoutines
-    convenienceMap
+    serviceRoutinesV2
     mongoBackend
     rest
     jsonParse
     xmlParse
+    apiTypesV2
     convenience
     ngsi9
     ngsi10
@@ -70,9 +71,9 @@ link_directories("/opt/lib/")
 
 ADD_EXECUTABLE(contextBroker ${SOURCES} ${HEADERS})
 
-IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS"))
+IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
   MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
 ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
   MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
@@ -80,18 +81,35 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.2_LTS")
+  # FIXME P4: Issue #476: remove or keep?
+  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lboost_regex -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")
+  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
 ELSEIF(${DISTRO} STREQUAL "openSUSE_13.1")
   MESSAGE("contextBroker: openSUSE DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)
-ELSEIF(${DISTRO} STREQUAL "CentOS_6.3")
+ELSEIF(${DISTRO} MATCHES "CentOS_6.*")
   MESSAGE("contextBroker: CentOS DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)
+
 ELSEIF(${DISTRO} STREQUAL "Fedora_20")
   MESSAGE("contextBroker: Fedora DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)
+ELSEIF(${DISTRO} MATCHES "Debian_.*")
+  MESSAGE("contextBroker: Debian DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lboost_regex -lssl -lcrypto)
 ELSE()
   MESSAGE("contextBroker: Other DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
+  TARGET_LINK_LIBRARIES(contextBroker ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)
+ENDIF()
+
+IF (${DISTRO} MATCHES "Ubuntu.*")
+  MESSAGE("contextBroker: INSTALL Ubuntu DISTRO: '${DISTRO}'")
+  INSTALL(PROGRAMS ${CMAKE_SOURCE_DIR}/etc/init.d/contextBroker.ubuntu DESTINATION /etc/init.d RENAME contextBroker)
+  INSTALL(FILES ${CMAKE_SOURCE_DIR}/etc/config/contextBroker DESTINATION /etc/default RENAME contextBroker)
 ENDIF()
 
 INSTALL(TARGETS               contextBroker

@@ -20,7 +20,11 @@
 
 --NAME--
 Max 10 chars in db-name
+
 --SHELL-INIT--
+dbInit 1234567890
+dbInit 12345678901
+
 --SHELL--
 
 echo "01. Starting broker with a -dbName of 11 chars - this must fail"
@@ -53,3 +57,6 @@ exitCode: 1
 
 brokerStop CB
 dbDrop 1234567890
+
+# Just in case ...
+dbDrop 12345678901

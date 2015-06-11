@@ -86,3 +86,14 @@ void UnsubscribeContextAvailabilityRequest::release(void)
 {
    subscriptionId.release();
 }
+
+
+
+/* ****************************************************************************
+*
+* UnsubscribeContextAvailabilityRequest::fill - 
+*/
+void UnsubscribeContextAvailabilityRequest::fill(const std::string& _subscriptionId)
+{
+  subscriptionId.set(_subscriptionId);
+}

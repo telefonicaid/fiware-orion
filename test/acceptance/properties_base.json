@@ -1,0 +1,28 @@
+{
+  "environment": {
+    "name": "orion",
+    "logs_path": "logs",
+    "log_level" : "ERROR"
+  },
+  "context_broker": {
+    "host": "localhost",
+    "port": "1026"
+  },
+  "mock": {
+    "port": "5566",
+    "bind_ip": "0.0.0.0"
+  },
+  "mongo": {
+    "host": "localhost",
+    "port": "27017"
+  },
+  "deploy_data": {
+    "host": "localhost",
+    "ssh_port": "",
+    "user": "",
+    "password": "",
+    "bin_path": "/usr/bin/contextBroker",
+    "log_path": "/tmp/acceptance",
+    "pid_file": "/tmp/acceptance/contextBroker.pid"
+  }
+}

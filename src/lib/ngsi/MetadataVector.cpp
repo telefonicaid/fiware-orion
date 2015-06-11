@@ -87,6 +87,75 @@ std::string MetadataVector::render(Format format, const std::string& indent, boo
 
 /* ****************************************************************************
 *
+* MetadataVector::toJson -
+*
+* Metadatas named 'value' or 'type' are not rendered in API version 2, due to the 
+* compact way in which API v2 is rendered. Metadatas named 'value' or 'type' would simply
+* collide with the 'value' and 'type' of the attribute itself (holder of the metadata).
+*
+* If anybody needs a metadata named 'value' or 'type', then API v1
+* will have to be used to retreive that information.
+*/
+std::string MetadataVector::toJson(bool isLastElement)
+{
+  if (vec.size() == 0)
+  {
+    return "";
+  }
+
+
+  //
+  // Pass 1 - count the total number of metadatas valid for rendering.
+  //
+  // Metadatas named 'value' or 'type' are not rendered.
+  // This gives us a small problem in the logic here, about knowing whether the
+  // comma should be rendered or not.
+  //
+  // To fix this problem we need to do two passes over the vector, the first pass to
+  // count the number of valid metadatas and the second to do the work.
+  // In the second pass, if the number of rendered metadatas "so far" is less than the total
+  // number of valid metadatas, then the comma must be rendered.
+  //
+  int validMetadatas = 0;
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if ((vec[ix]->name == "value") || (vec[ix]->name == "type"))
+    {
+      continue;
+    }
+
+    ++validMetadatas;
+  }
+
+
+  //
+  // And this is pass 2, where the real work is done.
+  //
+  std::string  out;
+  int          renderedMetadatas = 0;
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if ((vec[ix]->name == "value") || (vec[ix]->name == "type"))
+    {
+      continue;
+    }
+
+    ++renderedMetadatas;
+    out += vec[ix]->toJson(renderedMetadatas == validMetadatas);
+  }
+
+  if (!isLastElement)
+  {
+    out += ",";
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
 * MetadataVector::check -
 */
 std::string MetadataVector::check
@@ -119,11 +188,11 @@ std::string MetadataVector::check
 */
 void MetadataVector::present(const std::string& metadataType, const std::string& indent)
 {
-  PRINTF("%lu %s Metadata%s\n", (uint64_t) vec.size(), metadataType.c_str(), (vec.size() == 1)? "" : "s");
+  LM_F(("%s%lu %s Metadata%s", indent.c_str(), (uint64_t) vec.size(), metadataType.c_str(), (vec.size() == 1)? "" : "s"));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->present(metadataType, ix, indent);
+    vec[ix]->present(metadataType, ix, indent + "  ");
   }
 }
 
@@ -170,9 +239,12 @@ void MetadataVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    LM_T(LmtRelease, ("Releasing Metadata %d", ix));
-    vec[ix]->release();
-    delete vec[ix];
+    if (vec[ix] != NULL)
+    {
+      vec[ix]->release();
+      delete vec[ix];
+      vec[ix] = NULL;
+    }
   }
 
   vec.clear();
@@ -192,4 +264,23 @@ void MetadataVector::fill(MetadataVector* mvP)
 
     push_back(mP);
   }
+}
+
+
+
+/* ****************************************************************************
+*
+* MetadataVector::lookupByName - 
+*/
+Metadata* MetadataVector::lookupByName(const std::string& _name)
+{
+  for (unsigned int ix = 0; ix < vec.size(); ++ix)
+  {
+    if (vec[ix]->name == _name)
+    {
+      return vec[ix];
+    }
+  }
+
+  return NULL;
 }

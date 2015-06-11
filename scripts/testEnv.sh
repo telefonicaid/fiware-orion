@@ -47,6 +47,8 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 # o CP1_PORT       - port where the first contextProvider listens for connections
 # o CP2_PORT       - port where the second contextProvider listens for connections
 # o CP3_PORT       - port where the third contextProvider listens for connections
+# o CP4_PORT       - port where the fourth contextProvider listens for connections
+# o CP5_PORT       - port where the fifth contextProvider listens for connections
 #
 # o LISTENER_PORT  - port where listening (test) applications listen for connections
 # o LISTENER2_PORT - port where a second listening (test) application listens for connections
@@ -57,6 +59,8 @@ export COAP_PORT=${COAP_PORT:-5683}
 export CP1_PORT=${CP1_PORT:-9801}
 export CP2_PORT=${CP2_PORT:-9802}
 export CP3_PORT=${CP3_PORT:-9803}
+export CP4_PORT=${CP4_PORT:-9804}
+export CP5_PORT=${CP5_PORT:-9805}
 export LISTENER_PORT=${LISTENER_PORT:-9997}
 export LISTENER2_PORT=${LISTENER2_PORT:-9977}
 
@@ -71,12 +75,16 @@ export LISTENER2_PORT=${LISTENER2_PORT:-9977}
 # o CP1_LOG_DIR       - directory where contextProvider1 keeps its log file
 # o CP2_LOG_DIR       - directory where contextProvider2 keeps its log file
 # o CP3_LOG_DIR       - directory where contextProvider3 keeps its log file
+# o CP4_LOG_DIR       - directory where contextProvider4 keeps its log file
+# o CP5_LOG_DIR       - directory where contextProvider5 keeps its log file
 #
 export CB_LOG_DIR=${CB_LOG_DIR:-/var/log/contextBroker}
 export CM_LOG_DIR=${CM_LOG_DIR:-/tmp/configManager}
 export CP1_LOG_DIR=${CP1_LOG_DIR:-/tmp/orion/logs/contextProvider1}
 export CP2_LOG_DIR=${CP2_LOG_DIR:-/tmp/orion/logs/contextProvider2}
 export CP3_LOG_DIR=${CP3_LOG_DIR:-/tmp/orion/logs/contextProvider3}
+export CP4_LOG_DIR=${CP4_LOG_DIR:-/tmp/orion/logs/contextProvider4}
+export CP5_LOG_DIR=${CP5_LOG_DIR:-/tmp/orion/logs/contextProvider5}
 
 
 
@@ -90,12 +98,16 @@ export CP3_LOG_DIR=${CP3_LOG_DIR:-/tmp/orion/logs/contextProvider3}
 # o CP1_PID_FILE      - path to pid file for the first context provider
 # o CP2_PID_FILE      - path to pid file for the second context provider
 # o CP3_PID_FILE      - path to pid file for the third context provider
+# o CP4_PID_FILE      - path to pid file for the fourth context provider
+# o CP5_PID_FILE      - path to pid file for the fifth context provider
 #
 export CB_PID_FILE=${CB_PID_FILE:-/tmp/orion_${CB_PORT}.pid}
 export CM_PID_FILE=${CM_PID_FILE:-/tmp/orion_${CM_PORT}.pid}
 export CP1_PID_FILE=${CP1_PID_FILE:-/tmp/orion_${CP1_PORT}.pid}
 export CP2_PID_FILE=${CP2_PID_FILE:-/tmp/orion_${CP2_PORT}.pid}
 export CP3_PID_FILE=${CP3_PID_FILE:-/tmp/orion_${CP3_PORT}.pid}
+export CP4_PID_FILE=${CP4_PID_FILE:-/tmp/orion_${CP4_PORT}.pid}
+export CP5_PID_FILE=${CP5_PID_FILE:-/tmp/orion_${CP5_PORT}.pid}
 
 
 
@@ -119,9 +131,13 @@ export ORION_DATABASE_PASSWORD=${ORION_DATABASE_PASSWORD:-orion}
 # o CP1_DATABASE_NAME      - database for first context provider
 # o CP2_DATABASE_NAME      - database for second context provider
 # o CP3_DATABASE_NAME      - database for third context provider
+# o CP4_DATABASE_NAME      - database for fourth context provider
+# o CP5_DATABASE_NAME      - database for fifth context provider
 #
 export CB_DATABASE_NAME=${CB_DATABASE_NAME:-ftest}
 export CM_DATABASE_NAME=${CM_DATABASE_NAME:-ftest_cm}
 export CP1_DATABASE_NAME=${CP1_DATABASE_NAME:-ftest_cp1}
 export CP2_DATABASE_NAME=${CP2_DATABASE_NAME:-ftest_cp2}
 export CP3_DATABASE_NAME=${CP3_DATABASE_NAME:-ftest_cp3}
+export CP4_DATABASE_NAME=${CP4_DATABASE_NAME:-ftest_cp4}
+export CP5_DATABASE_NAME=${CP5_DATABASE_NAME:-ftest_cp5}

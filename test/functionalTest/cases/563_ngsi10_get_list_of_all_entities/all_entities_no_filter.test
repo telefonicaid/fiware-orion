@@ -26,6 +26,7 @@
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 
 echo "0. Query all entities using convop /v1/contextEntities"
@@ -308,7 +309,7 @@ Date: REGEX(.*)
 5. Statistics
 =============
 HTTP/1.1 200 OK
-Content-Length: 275
+Content-Length: 27REGEX(\d+)
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -325,3 +326,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

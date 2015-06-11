@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/ContextRegistrationAttributeVector.h"
@@ -89,7 +90,7 @@ std::string ContextRegistrationAttributeVector::check
 */
 void ContextRegistrationAttributeVector::present(const std::string& indent)
 {
-  PRINTF("%lu ContextRegistrationAttributes", (uint64_t) vec.size());
+  LM_F(("%lu ContextRegistrationAttributes", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

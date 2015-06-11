@@ -106,8 +106,7 @@ echo
 
 echo "05. Query accumulator"
 echo "====================="
-sleep 2
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 echo
 echo
 
@@ -293,3 +292,4 @@ Content-Type: application/json
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

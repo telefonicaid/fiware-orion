@@ -77,6 +77,7 @@
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
+#include "rest/httpRequestSend.h"
 
 #include "common/sem.h"
 #include "common/globals.h"
@@ -112,6 +113,8 @@
 #include "serviceRoutines/postNotifyContext.h"
 #include "serviceRoutines/postNotifyContextAvailability.h"
 
+#include "serviceRoutines/postSubscribeContextConvOp.h"
+#include "serviceRoutines/postSubscribeContextAvailabilityConvOp.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
 #include "serviceRoutines/postContextEntitiesByEntityId.h"
 #include "serviceRoutines/getContextEntityAttributes.h"
@@ -133,11 +136,7 @@
 #include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
-#include "serviceRoutines/getIndividualContextEntityAttributes.h"
-#include "serviceRoutines/putIndividualContextEntityAttributes.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
-#include "serviceRoutines/postIndividualContextEntityAttributes.h"
-#include "serviceRoutines/deleteIndividualContextEntityAttributes.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypesAttribute.h"
@@ -172,6 +171,10 @@
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
+
+#include "serviceRoutinesV2/getEntities.h"
+#include "serviceRoutinesV2/entryPointsTreat.h"
+
 #include "contextBroker/version.h"
 
 #include "common/string.h"
@@ -210,6 +213,13 @@ char            httpsCertFile[1024];
 bool            https;
 bool            mtenant;
 char            rush[256];
+char            allowedOrigin[64];
+long            dbTimeout;
+long            httpTimeout;
+int             dbPoolSize;
+char            reqMutexPolicy[16];
+bool            mutexTimeStat;
+int             writeConcern;
 
 
 
@@ -230,6 +240,7 @@ char            rush[256];
 #define DBUSER_DESC         "database user"
 #define DBPASSWORD_DESC     "database password"
 #define DB_DESC             "database name"
+#define DB_TMO_DESC         "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
 #define FWDHOST_DESC        "host for forwarding NGSI9 regs"
 #define FWDPORT_DESC        "port for forwarding NGSI9 regs"
 #define NGSI9_DESC          "run as Configuration Manager"
@@ -241,7 +252,13 @@ char            rush[256];
 #define HTTPSCERTFILE_DESC  "certificate key file (for https)"
 #define RUSH_DESC           "rush host (IP:port)"
 #define MULTISERVICE_DESC   "service multi tenancy mode"
-
+#define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '__ALL' for any"
+#define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
+#define DBPS_DESC           "database connection pool size"
+#define MAX_L               900000
+#define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
+#define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
+#define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
 
 
 /* ****************************************************************************
@@ -250,31 +267,39 @@ char            rush[256];
 */
 PaArgument paArgs[] =
 {
-  { "-fg",           &fg,           "FOREGROUND",     PaBool,   PaOpt, false,      false,  true,  FG_DESC            },
-  { "-localIp",      bindAddress,   "LOCALIP",        PaString, PaOpt, IP_ALL,     PaNL,   PaNL,  LOCALIP_DESC       },
-  { "-port",         &port,         "PORT",           PaInt,    PaOpt, 1026,       PaNL,   PaNL,  PORT_DESC          },
-  { "-pidpath",      pidPath,       "PID_PATH",       PaString, PaOpt, PIDPATH,    PaNL,   PaNL,  PIDPATH_DESC       },
+  { "-fg",            &fg,           "FOREGROUND",     PaBool,   PaOpt, false,      false,  true,  FG_DESC            },
+  { "-localIp",       bindAddress,   "LOCALIP",        PaString, PaOpt, IP_ALL,     PaNL,   PaNL,  LOCALIP_DESC       },
+  { "-port",          &port,         "PORT",           PaInt,    PaOpt, 1026,       PaNL,   PaNL,  PORT_DESC          },
+  { "-pidpath",       pidPath,       "PID_PATH",       PaString, PaOpt, PIDPATH,    PaNL,   PaNL,  PIDPATH_DESC       },
 
-  { "-dbhost",       dbHost,        "DB_HOST",        PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  DBHOST_DESC        },
-  { "-rplSet",       rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
-  { "-dbuser",       user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
-  { "-dbpwd",        pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
-  { "-db",           dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
+  { "-dbhost",        dbHost,        "DB_HOST",        PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  DBHOST_DESC        },
+  { "-rplSet",        rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
+  { "-dbuser",        user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
+  { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
+  { "-db",            dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
+  { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
+  { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
 
-  { "-fwdHost",      fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
-  { "-fwdPort",      &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
-  { "-ngsi9",        &ngsi9Only,    "CONFMAN",        PaBool,   PaOpt, false,      false,  true,  NGSI9_DESC         },
-  { "-ipv4",         &useOnlyIPv4,  "USEIPV4",        PaBool,   PaOpt, false,      false,  true,  USEIPV4_DESC       },
-  { "-ipv6",         &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
-  { "-harakiri",     &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
+  { "-fwdHost",       fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
+  { "-fwdPort",       &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
+  { "-ngsi9",         &ngsi9Only,    "CONFMAN",        PaBool,   PaOpt, false,      false,  true,  NGSI9_DESC         },
+  { "-ipv4",          &useOnlyIPv4,  "USEIPV4",        PaBool,   PaOpt, false,      false,  true,  USEIPV4_DESC       },
+  { "-ipv6",          &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
+  { "-harakiri",      &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
 
-  { "-https",        &https,        "HTTPS",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
-  { "-key",          httpsKeyFile,  "HTTPS_KEYFILE",  PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSKEYFILE_DESC  },
-  { "-cert",         httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
+  { "-https",         &https,        "HTTPS",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
+  { "-key",           httpsKeyFile,  "HTTPS_KEYFILE",  PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSKEYFILE_DESC  },
+  { "-cert",          httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
 
-  { "-rush",         rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
-  { "-multiservice", &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
+  { "-rush",          rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
+  { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
+  { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
+  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
+  { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
+  { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
+
+  { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
 
   PA_END_OF_ARGS
 };
@@ -302,6 +327,17 @@ PaArgument paArgs[] =
 *
 */
 
+
+//
+// /v2 API
+//
+
+#define EPS                EntryPointsRequest
+#define EPS_COMPS_V2       1, { "v2"             }
+
+#define ENT                EntitiesRequest
+#define ENT_COMPS_V2       2, { "v2", "entities" }
+#define ENT_COMPS_WORD     ""
 
 //
 // NGSI9
@@ -548,6 +584,15 @@ PaArgument paArgs[] =
 
 
 
+#define API_V2                                                                                           \
+  { "GET",    EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  entryPointsTreat                          }, \
+  { "*",      EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  badVerbAllFour                            }, \
+  { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
+  { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
+
+
+
+
 #define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
   { "POST",   RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   postRegisterContext                       }, \
   { "*",      RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -637,7 +682,7 @@ PaArgument paArgs[] =
   { "POST",   CTAA,  CTAA_COMPS_V0,        CTAA_POST_WORD,  postContextEntityTypeAttribute            }, \
   { "*",      CTAA,  CTAA_COMPS_V0,        "",              badVerbGetPostOnly                        }, \
                                                                                                          \
-  { "POST",   SCA,   SCA_COMPS_V0,         SCA_POST_WORD,   postSubscribeContextAvailability          }, \
+  { "POST",   SCA,   SCA_COMPS_V0,         SCA_POST_WORD,   postSubscribeContextAvailabilityConvOp    }, \
   { "*",      SCA,   SCA_COMPS_V0,         "",              badVerbPostOnly                           }, \
                                                                                                          \
   { "PUT",    SCAS,  SCAS_COMPS_V0,        SCAS_PUT_WORD,   putAvailabilitySubscriptionConvOp         }, \
@@ -687,10 +732,10 @@ PaArgument paArgs[] =
   { "DELETE", ICE,   ICE_COMPS_V0,         "",              deleteIndividualContextEntity             }, \
   { "*",      ICE,   ICE_COMPS_V0,         "",              badVerbAllFour                            }, \
                                                                                                          \
-  { "GET",    ICEA,  ICEA_COMPS_V0,        "",              getIndividualContextEntityAttributes      }, \
-  { "PUT",    ICEA,  ICEA_COMPS_V0,        ICEA_PUT_WORD,   putIndividualContextEntityAttributes      }, \
-  { "POST",   ICEA,  ICEA_COMPS_V0,        ICEA_POST_WORD,  postIndividualContextEntityAttributes     }, \
-  { "DELETE", ICEA,  ICEA_COMPS_V0,        "",              deleteIndividualContextEntityAttributes   }, \
+  { "GET",    ICEA,  ICEA_COMPS_V0,        "",              getIndividualContextEntity                }, \
+  { "PUT",    ICEA,  ICEA_COMPS_V0,        ICEA_PUT_WORD,   putIndividualContextEntity                }, \
+  { "POST",   ICEA,  ICEA_COMPS_V0,        ICEA_POST_WORD,  postIndividualContextEntity               }, \
+  { "DELETE", ICEA,  ICEA_COMPS_V0,        "",              deleteIndividualContextEntity             }, \
   { "*",      ICEA,  ICEA_COMPS_V0,        "",              badVerbAllFour                            }, \
                                                                                                          \
   { "GET",    ICEAA, ICEAA_COMPS_V0,       "",              getIndividualContextEntityAttribute       }, \
@@ -713,7 +758,7 @@ PaArgument paArgs[] =
   { "GET",    CETAA, CETAA_COMPS_V0,       "",              getNgsi10ContextEntityTypesAttribute      }, \
   { "*",      CETAA, CETAA_COMPS_V0,       "",              badVerbGetOnly                            }, \
                                                                                                          \
-  { "POST",   SC,    SC_COMPS_V0,          SC_POST_WORD,    postSubscribeContext                      }, \
+  { "POST",   SC,    SC_COMPS_V0,          SC_POST_WORD,    postSubscribeContextConvOp                }, \
   { "*",      SC,    SC_COMPS_V0,          "",              badVerbPostOnly                           }, \
                                                                                                          \
   { "PUT",    SCS,   SCS_COMPS_V0,         SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
@@ -729,10 +774,10 @@ PaArgument paArgs[] =
   { "DELETE", ICE,   ICE_COMPS_V1,           "",              deleteIndividualContextEntity             }, \
   { "*",      ICE,   ICE_COMPS_V1,           "",              badVerbAllFour                            }, \
                                                                                                            \
-  { "GET",    ICEA,  ICEA_COMPS_V1,          "",              getIndividualContextEntityAttributes      }, \
-  { "PUT",    ICEA,  ICEA_COMPS_V1,          ICEA_PUT_WORD,   putIndividualContextEntityAttributes      }, \
-  { "POST",   ICEA,  ICEA_COMPS_V1,          ICEA_POST_WORD,  postIndividualContextEntityAttributes     }, \
-  { "DELETE", ICEA,  ICEA_COMPS_V1,          "",              deleteIndividualContextEntityAttributes   }, \
+  { "GET",    ICEA,  ICEA_COMPS_V1,          "",              getIndividualContextEntity                }, \
+  { "PUT",    ICEA,  ICEA_COMPS_V1,          ICEA_PUT_WORD,   putIndividualContextEntity                }, \
+  { "POST",   ICEA,  ICEA_COMPS_V1,          ICEA_POST_WORD,  postIndividualContextEntity               }, \
+  { "DELETE", ICEA,  ICEA_COMPS_V1,          "",              deleteIndividualContextEntity             }, \
   { "*",      ICEA,  ICEA_COMPS_V1,          "",              badVerbAllFour                            }, \
                                                                                                            \
   { "GET",    ICEAA, ICEAA_COMPS_V1,         "",              getIndividualContextEntityAttribute       }, \
@@ -755,7 +800,7 @@ PaArgument paArgs[] =
   { "GET",    CETAA, CETAA_COMPS_V1,         "",              getNgsi10ContextEntityTypesAttribute      }, \
   { "*",      CETAA, CETAA_COMPS_V1,         "",              badVerbGetOnly                            }, \
                                                                                                            \
-  { "POST",   SC,    SC_COMPS_V1,            SC_POST_WORD,    postSubscribeContext                      }, \
+  { "POST",   SC,    SC_COMPS_V1,            SC_POST_WORD,    postSubscribeContextConvOp                }, \
   { "*",      SC,    SC_COMPS_V1,            "",              badVerbPostOnly                           }, \
                                                                                                            \
   { "PUT",    SCS,   SCS_COMPS_V1,           SCS_PUT_WORD,    putSubscriptionConvOp                     }, \
@@ -878,6 +923,8 @@ PaArgument paArgs[] =
 */
 RestService restServiceV[] =
 {
+  API_V2,
+
   REGISTRY_STANDARD_REQUESTS_V0,
   REGISTRY_STANDARD_REQUESTS_V1,
   STANDARD_REQUESTS_V0,
@@ -1131,6 +1178,8 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
   {
     LM_I(("Running in NGSI9 only mode"));
   }
+
+  httpRequestInit(httpTimeout);
 }
 
 
@@ -1139,11 +1188,22 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 *
 * mongoInit -
 */
-static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd)
+static void mongoInit
+(
+  const char*  dbHost,
+  const char*  rplSet,
+  std::string  dbName,
+  const char*  user,
+  const char*  pwd,
+  long         timeout,
+  int          writeConcern,
+  int          dbPoolSize,
+  bool         mutexTimeStat
+)
 {
-  LM_T(LmtBug, ("dbName: '%s'", dbName.c_str()));
+  double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant))
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -1271,8 +1331,39 @@ static void rushParse(char* rush, std::string* rushHostP, uint16_t* rushPortP)
 }
 
 
-#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 
+/* ****************************************************************************
+*
+* policyGet - 
+*/
+static SemRequestType policyGet(std::string mutexPolicy)
+{
+  if (mutexPolicy == "read")
+  {
+    return SemReadOp;
+  }
+  else if (mutexPolicy == "write")
+  {
+    return SemWriteOp;
+  }
+  else if (mutexPolicy == "all")
+  {
+    return SemReadWriteOp;
+  }
+  else if (mutexPolicy == "none")
+  {
+    return SemNoneOp;
+  }
+
+  //
+  // Default is to protect both reads and writes
+  //
+  return SemReadWriteOp;
+}
+
+
+
+#define LOG_FILE_LINE_FORMAT "time=DATE | lvl=TYPE | trans=TRANS_ID | function=FUNC | comp=Orion | msg=FILE[LINE]: TEXT"
 /* ****************************************************************************
 *
 * main -
@@ -1338,8 +1429,6 @@ int main(int argC, char* argV[])
   lmTraceLevelSet(LmtBug, true);
 #endif
 
-  LM_T(LmtBug, ("dbName: '%s'", dbName));
-
   if (strlen(dbName) > DB_NAME_MAX_LEN)
   {
     LM_X(1, ("dbName too long (max %d characters)", DB_NAME_MAX_LEN));
@@ -1394,8 +1483,9 @@ int main(int argC, char* argV[])
   }
 
   pidFile();
-  orionInit(orionExit, ORION_VERSION);
-  mongoInit(dbHost, rplSet, dbName, user, pwd);
+  SemRequestType policy = policyGet(reqMutexPolicy);
+  orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, mutexTimeStat);
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 
@@ -1422,14 +1512,14 @@ int main(int argC, char* argV[])
     LM_T(LmtHttps, ("httpsKeyFile:  '%s'", httpsKeyFile));
     LM_T(LmtHttps, ("httpsCertFile: '%s'", httpsCertFile));
 
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, httpsPrivateServerKey, httpsCertificate);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin, httpsPrivateServerKey, httpsCertificate);
 
     free(httpsPrivateServerKey);
     free(httpsCertificate);
   }
   else
   {
-    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort);
+    restInit(rsP, ipVersion, bindAddress, port, mtenant, rushHost, rushPort, allowedOrigin);
   }
 
   LM_I(("Startup completed"));

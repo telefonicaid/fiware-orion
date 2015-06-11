@@ -22,6 +22,7 @@
 
 --NAME--
 Associations Fail Tests JSON
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -117,7 +118,7 @@ orionCurl --json --url "/v1/registry/registerContext" --payload '{
               "type": "House",
               "isPattern": "false"
             },
-            "associations": [
+            "attributeAssociations": [
               {
                 "source": "measurement",
                 "target": "temperature"
@@ -139,7 +140,7 @@ orionCurl --json --url "/v1/registry/registerContext" --payload '{
               "isPattern": "false",
               "id": "house2"
             },
-            "associations": [
+            "attributeAssociations": [
               {
                 "source": "measurement",
                 "target": "temperature"
@@ -379,3 +380,4 @@ Date: REGEX(.*)
 }
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

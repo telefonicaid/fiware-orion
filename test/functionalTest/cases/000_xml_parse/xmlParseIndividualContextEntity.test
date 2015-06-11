@@ -22,6 +22,7 @@
 
 --NAME--
 XML Parse IndividualContextEntity
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -255,4 +256,4 @@ Date: REGEX(.*)
 </statusCode>
 --TEARDOWN--
 brokerStop CB
-
+dbDrop CB

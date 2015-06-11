@@ -38,6 +38,8 @@
 
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests
@@ -391,7 +393,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -497,7 +499,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   uriParams[URI_PARAM_PAGINATION_DETAILS]  = "off";
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -605,7 +607,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlyFirst)
   uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -657,7 +659,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlySecond)
   uriParams[URI_PARAM_PAGINATION_LIMIT]  = "1";
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -709,7 +711,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   uriParams[URI_PARAM_PAGINATION_LIMIT]  = "3";
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -789,7 +791,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExisting)
   uriParams[URI_PARAM_PAGINATION_LIMIT]  = "2";
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -828,7 +830,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingOverlap)
   uriParams[URI_PARAM_PAGINATION_LIMIT]  = "4";
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -880,7 +882,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingDetails)
   uriParams[URI_PARAM_PAGINATION_LIMIT]    = "2";
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -918,7 +920,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsAll)
   req.entityIdVector.push_back(&en);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -982,7 +984,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1047,7 +1049,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     req.attributeList.push_back("A1");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1124,7 +1126,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1187,7 +1189,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1269,7 +1271,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1350,7 +1352,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoEntity)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1398,7 +1400,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoAttribute)
     req.attributeList.push_back("A5");
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1447,7 +1449,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1551,7 +1553,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1630,7 +1632,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1726,7 +1728,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1832,7 +1834,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1918,7 +1920,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrSingle)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1979,7 +1981,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2059,7 +2061,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2152,7 +2154,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternFail)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2205,7 +2207,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2314,7 +2316,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2422,7 +2424,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
   setTimer(timerMock);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2501,7 +2503,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociationsFails)
   setTimer(timerMock);
 
   /* Invoke the function in mongoBackend library */
-  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+  ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
@@ -2549,7 +2551,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, targetAssociations)
     setTimer(timerMock);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2633,7 +2635,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     req.entityIdVector.push_back(&en);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2642,8 +2644,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
 
     EXPECT_EQ("collection: unittest.registrations "
               "- query(): { query: { $or: [ { contextRegistration.entities: { $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
-              "{ contextRegistration.entities.id: { $in: {} } } ], "
-              "expiration: { $gt: 1360232700 } }"
+              "{ contextRegistration.entities.id: { $in: [] } } ], "
+              "expiration: { $gt: 1360232700 }"
+              ", servicePath: { $in: [ /^/.*/, null ] } }"
               ", orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
@@ -2671,8 +2674,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     ON_CALL(*connectionMock, _query("unittest.associations",_,_,_,_,_,_))
             .WillByDefault(Throw(e));
 
-    /* Set MongoDB connection */
-    mongoConnect(connectionMock);
+    /* Set MongoDB connection (prepare database first with the "actual" connection object) */
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Forge the request (from "inside" to "outside") */
     EntityId en("E1", "T1");
@@ -2682,7 +2685,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     req.restriction.scopeVector.push_back(&sc);
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams);
+    ms = mongoDiscoverContextAvailability(&req, &res, "", uriParams, servicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -2692,6 +2695,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release mock */
+    setMongoConnectionForUnitTest(NULL);
     delete connectionMock;
 
 }

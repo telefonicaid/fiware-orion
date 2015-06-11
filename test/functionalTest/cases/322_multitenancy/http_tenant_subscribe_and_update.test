@@ -22,6 +22,7 @@
 
 --NAME--
 HTTP-Tenant subscribe and update
+
 --SHELL-INIT--
 dbInit CB
 dbInit ${CB_DATABASE_NAME}-t_01
@@ -136,13 +137,13 @@ echo
 
 echo "5. Dump accumulator t_01"
 echo "+++++++++++++++++++++++++"
-curl localhost:${LISTENER_PORT}/dump --silent
+accumulatorDump
 echo
 
 
 echo "6. Dump accumulator t_02"
 echo "+++++++++++++++++++++++++"
-curl localhost:${LISTENER2_PORT}/dump --silent
+accumulator2Dump
 echo
 
 

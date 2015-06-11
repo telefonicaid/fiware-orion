@@ -23,21 +23,16 @@
 #
 # Uncached/Cached update/DELETE
 #
-# 01. Start the contextBroker 'broker'
-# 02. Start contextProvider 'CP' (contextBroker functioning as contextProvider)
-#
-# 03. Register an entity/attribute E1/A1 in broker, with CP as providing application
-# 04. Update/APPEND E1/A1(=CP) in CP
+# 01. Register an entity/attribute E1/A1 in broker, with CP as providing application
+# 02. Update/APPEND E1/A1(=CP) in CP
+# 03. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
+# 04. Update/DELETE E1/A1 in broker (will fail as E1/A1 isn't local)
 # 05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
-# 06. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1(=CP-2) will be removed)
-# 07. Query broker for E1/A1 (will go to CP but but nothing is found)
 #
 
 --NAME--
 Update Redirect/DELETE
 --SHELL-INIT--
-
-rm -f /tmp/orionCurlURL
 
 dbInit CB
 dbInit CP1
@@ -46,13 +41,8 @@ brokerStart CB
 brokerStart CP1
 
 --SHELL--
-echo "01. contextBroker running"
-echo "02. contextProvider1 running (contextBroker functioning as contextProvider)"
-echo
-echo
-
-
-echo "03. Register an entity/attribute E1/A1 in broker, with CP as providing application"
+echo "01. Register an entity/attribute E1/A1 in broker, with CP as providing application"
+echo "=================================================================================="
 url="/v1/registry/registerContext"
 payload='<?xml version="1.0"?>
   <registerContextRequest>
@@ -80,7 +70,8 @@ echo
 echo
 
 
-echo "04. Update/APPEND E1/A1(=CP) in CP"
+echo "02. Update/APPEND E1/A1(=CP) in CP"
+echo "=================================="
 url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -105,7 +96,8 @@ echo
 echo
 
 
-echo "05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)"
+echo "03. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)"
+echo "=================================================================="
 url="/v1/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -123,7 +115,8 @@ echo
 echo
 
 
-echo "06. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1(=CP-2) will be removed)"
+echo "04. Update/DELETE E1/A1 in broker (will fail as E1/A1 isn't local)"
+echo "=================================================================="
 url="/v1/updateContext"
 payload='<?xml version="1.0" encoding="UTF-8"?>
 <updateContextRequest>
@@ -148,7 +141,8 @@ echo
 echo
 
 
-echo "07. Query broker for E1/A1 (will go to CP but but nothing is found)"
+echo "05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)"
+echo "=================================================================="
 url="/v1/queryContext"
 payload='<?xml version="1.0"?>
 <queryContextRequest>
@@ -167,11 +161,8 @@ echo
 
 
 --REGEXPECT--
-01. contextBroker running
-02. contextProvider1 running (contextBroker functioning as contextProvider)
-
-
-03. Register an entity/attribute E1/A1 in broker, with CP as providing application
+01. Register an entity/attribute E1/A1 in broker, with CP as providing application
+==================================================================================
 HTTP/1.1 200 OK
 Content-Length: 142
 Content-Type: application/xml
@@ -184,7 +175,8 @@ Date: REGEX(.*)
 </registerContextResponse>
 
 
-04. Update/APPEND E1/A1(=CP) in CP
+02. Update/APPEND E1/A1(=CP) in CP
+==================================
 HTTP/1.1 200 OK
 Content-Length: 616
 Content-Type: application/xml
@@ -215,9 +207,10 @@ Date: REGEX(.*)
 </updateContextResponse>
 
 
-05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
+03. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
+==================================================================
 HTTP/1.1 200 OK
-Content-Length: 692
+Content-Length: 616
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -240,16 +233,16 @@ Date: REGEX(.*)
       <statusCode>
         <code>200</code>
         <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
 
 
-06. Update/DELETE E1/A1 in broker (will go to CP and CP's E1/A1(=CP-2) will be removed)
+04. Update/DELETE E1/A1 in broker (will fail as E1/A1 isn't local)
+==================================================================
 HTTP/1.1 200 OK
-Content-Length: 692
+Content-Length: 668
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -270,34 +263,49 @@ Date: REGEX(.*)
         </contextAttributeList>
       </contextElement>
       <statusCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-        <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
+        <code>404</code>
+        <reasonPhrase>No context element found</reasonPhrase>
+        <details>E1</details>
       </statusCode>
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
 
 
-07. Query broker for E1/A1 (will go to CP but but nothing is found)
+05. Query broker for E1/A1 (will go to CP and E1/A1(=CP) is found)
+==================================================================
 HTTP/1.1 200 OK
-Content-Length: 227
+Content-Length: 616
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <queryContextResponse>
-  <errorCode>
-    <code>404</code>
-    <reasonPhrase>No context element found</reasonPhrase>
-    <details>Redirected to context provider localhost:REGEX(\d+)/v1</details>
-  </errorCode>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="E" isPattern="false">
+          <id>E1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>A1</name>
+            <type>T1</type>
+            <contextValue>CP</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
 </queryContextResponse>
 
 
 --TEARDOWN--
 brokerStop CB
 brokerStop CP1
-
 dbDrop CB
 dbDrop CP1

@@ -22,6 +22,7 @@
 
 --NAME--
 Query SEQ with attributes as JSON objects and compound values
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -165,3 +166,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

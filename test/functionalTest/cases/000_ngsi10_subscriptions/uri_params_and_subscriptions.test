@@ -27,6 +27,7 @@ URI params and subscriptions
 dbInit CB
 brokerStart CB 31,60
 accumulatorStart localhost $LISTENER_PORT
+
 --SHELL--
 
 # 0. URI params for orionCurl
@@ -247,7 +248,7 @@ echo "================================================"
 #    - E1/attr2 in JSON
 #    - E1/attr3 in XML
 #    - E1/attr4 in JSON
-curl localhost:${LISTENER_PORT}/dump 2> /dev/null
+accumulatorDump
 
 
 --REGEXPECT--
@@ -569,3 +570,4 @@ Content-Type: application/json
 --TEARDOWN--
 brokerStop CB
 accumulatorStop ${LISTENER_PORT}
+dbDrop CB

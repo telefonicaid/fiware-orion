@@ -30,7 +30,7 @@
 
 #include "rest/RestService.h"
 
-#define  MAX_LEN_IP   64
+#define  MAX_LEN_IP                      64
 
 /* ****************************************************************************
 *
@@ -53,6 +53,7 @@ extern IpVersion       ipVersionUsed;
 extern std::string     rushHost;
 extern unsigned short  rushPort;
 extern bool            multitenant;
+extern char            restAllowedOrigin[64];
 
 
 
@@ -77,6 +78,7 @@ extern void restInit
    bool                _multitenant   = false,
    const std::string&  _rushHost      = "",
    unsigned short      _rushPort      = 0,
+   const char*         _allowedOrigin = NULL,
    const char*         _httpsKey      = NULL,
    const char*         _httpsCert     = NULL,
    RestServeFunction   _serveFunction = NULL,

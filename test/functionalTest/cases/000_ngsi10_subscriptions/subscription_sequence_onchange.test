@@ -292,7 +292,7 @@ echo
 
 echo "Accumulated data:"
 echo "================="
-curl localhost:${LISTENER_PORT}/dump -s -S 2> /dev/null
+accumulatorDump
 echo
 
 --REGEXPECT--
@@ -733,3 +733,4 @@ Content-Type: application/xml
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

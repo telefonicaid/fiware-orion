@@ -29,10 +29,12 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "convenienceMap/mapGetContextEntitiesByEntityId.h"
 #include "ngsi/ParseData.h"
 #include "ngsi9/DiscoverContextAvailabilityResponse.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/EntityTypeInfo.h"
+#include "rest/uriParamNames.h"
+#include "serviceRoutines/postDiscoverContextAvailability.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
 
 
@@ -41,8 +43,18 @@
 *
 * getContextEntitiesByEntityIdAndType - 
 *
-* Invoked by:
-*  GET /v1/registry/contextEntities/type/{ETYPE}/id/{EID}
+* GET /v1/registry/contextEntities/type/{ETYPE}/id/{EID}
+*
+* URI parameters:
+*   - entity::type=XXX     (must coincide with entity::type in URL)
+*   - !exist=entity::type  (if set - error -- entity::type cannot be empty)
+*   - exist=entity::type   (not supported - ok if present, ok if not present ...)
+*
+* 01. Get values from URL (entityId::type, esist, !exist)
+* 02. Check validity of URI params
+* 03. Fill in DiscoverContextAvailabilityRequest
+* 04. Call standard operation postDiscoverContextAvailability
+* 05. Cleanup and return result
 */
 std::string getContextEntitiesByEntityIdAndType
 (
@@ -52,16 +64,55 @@ std::string getContextEntitiesByEntityIdAndType
   ParseData*                 parseDataP
 )
 {
-  std::string                          entityType = compV[4];
-  std::string                          entityId   = compV[6];
+  std::string                          entityType              = compV[4];
+  std::string                          entityId                = compV[6];
+  std::string                          entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  EntityTypeInfo                       typeInfo                = EntityTypeEmptyOrNotEmpty;
   std::string                          answer;
   DiscoverContextAvailabilityResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got a 'GET' request for entityId '%s', entityType '%s'", entityId.c_str(), entityType.c_str()));
 
-  ciP->httpStatusCode = mapGetContextEntitiesByEntityId(entityId, entityType, &response, ciP);
-  answer = response.render(DiscoverContextAvailability, ciP->outFormat, "");
-  response.release();
+  // 01. Get values from URL (entityId::type, esist, !exist)
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+
+
+  //
+  // 02. Check validity of URI params ...
+  //     and if OK:
+  // 03. Fill in DiscoverContextAvailabilityRequest
+  // 04. Call standard operation postDiscoverContextAvailability
+  //
+  if (typeInfo == EntityTypeEmpty)
+  {
+    parseDataP->dcars.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
+    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+    answer = parseDataP->dcars.res.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, "");
+  }
+  else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
+  {
+    parseDataP->dcars.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
+    LM_W(("Bad Input non-matching entity::types in URL"));
+    answer = parseDataP->dcars.res.render(ContextEntitiesByEntityIdAndType, ciP->outFormat, "");
+  }
+  else
+  {
+    // 03. Fill in DiscoverContextAvailabilityRequest
+    parseDataP->dcar.res.fill(entityId, entityType);
+
+    // 04. Call standard operation postDiscoverContextAvailability
+    answer = postDiscoverContextAvailability(ciP, components, compV, parseDataP);
+  }
+
+  // 05. Cleanup and return result
+  parseDataP->dcar.res.release();
+  parseDataP->dcars.res.release();
 
   return answer;
 }

@@ -142,24 +142,6 @@ Test suite for %{name}
 
 %files tests -f MANIFEST.broker-tests
 
-%package -n %{name}-fiware
-Requires: %{name} = %{broker_version}-%{broker_release}, %{name}-tests = %{broker_version}-%{broker_release}
-Summary: FI-WARE NGSI Broker - Telefónica I+D Implementation
-Version: %{fiware_version}
-Release: %{fiware_release}
-%description -n %{name}-fiware
-The Orion Context Broker is an implementation of the NGSI9 and NGSI10 interfaces. 
-Using these interfaces, clients can do several operations:
-* Register context producer applications, e.g. a temperature sensor within a room.
-* Update context information, e.g. send updates of temperature.
-* Being notified when changes on context information take place (e.g. the
-  temperature has changed) or with a given frecuency (e.g. get the temperature
-  each minute).
-* Query context information. The Orion Context Broker stores context information
-  updated from applications, so queries are resolved based on that information.
-
-%files -n %{name}-fiware
-
 %preun
 if [ "$1" == "0" ]; then
   /etc/init.d/%{name} stop
@@ -167,12 +149,6 @@ if [ "$1" == "0" ]; then
 fi
 
 %preun tests
-
-%preun -n %{name}-fiware
-if [ "$1" == "0" ]; then
-  /etc/init.d/%{name} stop
-  /sbin/chkconfig --del %{name}
-fi
 
 %postun 
 if [ "$1" == "0" ]; then
@@ -185,13 +161,82 @@ if [ "$1" == "0" ]; then
   rm -rf  /usr/share/contextBroker/tests
 fi
 
-%postun -n %{name}-fiware
-if [ "$1" == "0" ]; then
-  rm -rf  /usr/share/contextBroker
-  /usr/sbin/userdel -f %{owner}
-fi
-
 %changelog
+* Mon May 25 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.22.0-1
+- Add: CORS support for GET requests, configuring allowed origin with -corsOrigin CLI parameter (Issue #501)
+- Add: New CLI parameter for the mutex policy: -reqMutexPolicy (Issue #910)
+- Add: Measuring the accumulated time waiting for the DB semaphores.
+       The measures are added to the REST request /statistics, but only if
+       the new CLI parameter -mutexTimeStat is set (Issue #911)
+- Fix: Removing trailing slashes for path of URI before treating the request (Issue #828)
+- Fix: Fixed a bug regarding subscriptions with empty entity-type (Issue #691)
+- Fix: updateContext propagated to the entire Service Path subtree, instead of just scoping to the particular Service Path in the Fiware-Service header (Issue #885)
+- Fix: Mongo driver migrated to legacy-1.0.2
+- Add: Database connection pool for mongo. Default size of the pool is 10 connections. This is changed using the CLI parameter -dbPoolSize (Issue #909)
+- Add: New CLI parameter for Mongo write concern: -writeConcern (Issue #889)
+
+* Sun May 10 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.21.0-1
+- Add: support for MongoDB 2.6/3.0 (MongoDB 2.4 should *not* be used any longer as inverted geo-queries will not work in that version) (Issue #415)
+- Add: context providers full functionality (Issue #787)
+- Fix: unhardwire format to forward requests to context providers (Issue #722)
+- Fix: using proper GJSON for location.coords entities information (Issue #415)
+- Fix: attribute storing in DB (from vector to keymap) to enable CB Active/Active architectures. As a consecuence of this, '.' in the name of attributes is now stored as
+       '=' in the key (as MongoDB doesn't allow to use '.' for keys). This is transparant from the point of view of the user, given that '=' is a forbidden character in
+       the external API (Issue #878)
+- Fix: simplifying 'GET /v1/contextTypes' and 'GET /v1/contextTypes/<entityType>' operations, removing attribute types (no longer used as attribute identification since 0.17.0). As
+       a consequence, the 'attributeFormat' URI parameter is no longer needed in the 'GET /v1/contextTypes', so it is ignored.
+- Fix: DELETE updates are resolved locally, previously they were forwarded to CPrs (Issue #755)
+- Fix: The URI parameter 'notifyFormat' is now treated the same way for subscriptions as for registrations.
+- Add: Notifications and forwarded queries/updates are now controlled by a timeout. (Issue #880)
+       The default timeout is set to 5000 milliseconds (5 seconds), including connection, writing the request and reading the response.
+       To change this timeout, a new CLI option '-httpTimeout' has been added to the broker.
+- Fix: Changed the name, type and unit of the CLI option '-timeout'.
+       New name:  '-dbTimeout',
+       New type:  integer (was a floating point number)
+       New unit:  milliseconds (was seconds, but decimals were allowed as it was a floating point number)
+- Add: Updates of ngsi9 subscriptions now also support the URI parameter notifyFormat
+
+* Tue Mar 31 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.20.0-1
+- Add: new CLI parameter '-timeout' to specify DB connection timeout in the case of using MongoDB replica sets (Issue #589).
+- Fix: All convenience operations to use the service routines of standard operations (Issue #117)
+- Fix: Correct rendering of response to convop "POST /v1/contextEntities/{entityId::id}/attributes/{attributeName} (Issue #772)
+- Fix: Made 'POST /v1/contextEntities/{entityId::id}' and 'POST /v1/contextEntities' accept entity::id and entity::type
+       in both payload and URL, as long as the values coincide.
+- Fix: A few more of the 'responses without entityId::type filled in' found and fixed (Issue #585)
+- Fix: The convenience operations "/v1/contextAttributes/{entity::id}/attributes" now share implementation with
+       convenience operations "/v1/contextAttributes/{entity::id}" and are thus 100% identical.
+- Fix: The convenience operation "PUT /v1/contextAttributes/{entity::id}/attributes/{attribute::name}" had a bug
+       about the metadata in the update, this error has been fixed.
+- Fix: A registerContext request that uses associations must specify "attributeAssociations" instead of "attributes" to be consistent with DiscoveContextAvailability messages (Issue #823).
+- Fix: Fixed a bug that made the broker crash when compound attribute values were used in convenience operations.
+- Fix: Implemented URI-parameter 'notifyFormat=XML/JSON' for NGSI9 subscriptions.
+
+* Wed Feb 11 2015 Fermin Galan <fermin@tid.es> 0.19.0-1 (FIWARE-4.2.2-1)
+- Fix: The option '-multiservice' was ignored and the broker ran always in multiservice mode. Now the option is taken taken into account (Issue #725)
+- Fix: Forwarded requests always in XML (Issue #703)
+- Fix: internal substitution of servicePath defaults ("/" for update-like operations, "/#" for query-like operations)
+- Fix: Temporal hack to allow for forwarding of 'attribute not found in entity found' (Issue #716)
+- Fix: Broker crashes dealing with "GET /v1/contextTypes" operation when DB contains entities of the same type, ones with attributes and others without them (Issue #740)
+- Fix: Service-Path supported for registrations and discoveries (Issue #719)
+- Fix: Service-Path supported for forwarding of registrations between Config Manager and Context Broker (Issue #719)
+- Fix: Service-Path supported for forwarding to Context Providers (Issue #719)
+- Fix: Hash sign (#) in service-path, or multiple service-paths not valid for updateContext requests (Issue #746)
+- Fix: Not forwarding the default Service-Path to context providers (Issue #714)
+
+* Fri Jan 16 2015 Fermin Galan <fermin@tid.es> 0.18.1-1 (FIWARE-4.2.1-1)
+- Fix: Fixed the bug about recovering ONTIMEINTERVAL subscriptions (Issue #693)
+- Fix: Fixed the crash in queryContext with an invalid geoscope (Issue #690)
+- Fix: Protect the broker against payload-less responses to forwarded requests (Issue #699)
+- Fix: Fixed bug that prevented types from entities with no attributes from being listed (Issue #686)
+
+* Fri Dec 19 2014 Fermin Galan <fermin@tid.es> 0.18.0-1 (FIWARE-4.1.3-1)
+- Add:  Service-Path in ngsi10 notifications (Issue #674)
+- Add:  Forbidden characters in the URL path are now detected (Issue #672)
+- Add:  X-Auth-Token forwarded in ngsi10 notifications (Issue #673)
+- Add:  Service-Path is taken into account in ngsi10 subscriptions (Issue #675)
+- Fix:  Bug: POST /v1/conextEntities didn't save the entity type (from payload) (Issue #684)
+- Fix:  Service-Path is taken into account in 'GET /v1/contextTypes' and 'GET /v1/contextTypes/{entityType}' operations (Issue #676)
+
 * Fri Nov 28 2014 Fermin Galan <fermin@tid.es> 0.17.0-1 (FIWARE-4.1.2-1)
 Add: New convop: "POST /v1/contextEntities" (Issue #613).
      Note also that AppendContextElementRequest has been added an EntityId field.

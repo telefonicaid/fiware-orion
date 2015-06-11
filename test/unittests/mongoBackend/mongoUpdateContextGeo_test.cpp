@@ -73,16 +73,20 @@ static void prepareDatabase(void) {
 
 
   BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A1" << "type" << "TA1" << "value" << "-5, 2") <<
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "noloc")
+                     "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "TA1" << "value" << "-5, 2") <<
+                        "A2" << BSON("type" << "TA2" << "value" << "noloc")
                         ) <<
-                     "location" << BSON("attrName" << "A1" << "coords" << BSON_ARRAY(2.0 << -5.0))
+                     "location" << BSON("attrName" << "A1" <<
+                                        "coords" << BSON("type" << "Point" <<
+                                                         "coordinates" << BSON_ARRAY(2.0 << -5.0)))
                     );
 
   BSONObj en2 = BSON("_id" << BSON("id" << "E2" << "type" << "T2") <<
-                     "attrs" << BSON_ARRAY(
-                        BSON("name" << "A2" << "type" << "TA2" << "value" << "Y")
+                     "attrNames" << BSON_ARRAY("A2") <<
+                     "attrs" << BSON(
+                        "A2" << BSON("type" << "TA2" << "value" << "Y")
                         )
                     );
 
@@ -91,33 +95,27 @@ static void prepareDatabase(void) {
 
 }
 
-#define coordX(e) e.getObjectField("location").getField("coords").Array()[0].Double()
-#define coordY(e) e.getObjectField("location").getField("coords").Array()[1].Double()
+#define coordX(e) e.getObjectField("location").getObjectField("coords").getField("coordinates").Array()[0].Double()
+#define coordY(e) e.getObjectField("location").getObjectField("coords").getField("coordinates").Array()[1].Double()
 
 /* ****************************************************************************
 *
-* getAttr -
-*
-* We need this function because we can not trust on array index, at mongo will
-* not sort the elements within the array. This function assumes that always will
-* find a result, that is ok for testing code.
+* findAttr -
 *
 * FIXME P4: this functions is repeated in several places (e.g. mongoUpdateContext_test.cpp). Factorice in a common place.
+*
 */
-static BSONObj getAttr(std::vector<BSONElement> attrs, std::string name, std::string type, std::string id = "") {
+static bool findAttr(std::vector<BSONElement> attrs, std::string name)
+{
 
-    BSONElement be;
-    for (unsigned int ix = 0; ix < attrs.size(); ++ix) {
-        BSONObj attr = attrs[ix].embeddedObject();
-        std::string attrName = STR_FIELD(attr, "name");
-        std::string attrType = STR_FIELD(attr, "type");
-        std::string attrId = STR_FIELD(attr, "id");
-        if (attrName == name && attrType == type && ( id == "" || attrId == id )) {
-            be = attrs[ix];
-            break;
-        }
+  for (unsigned int ix = 0; ix < attrs.size(); ++ix)
+  {
+    if (attrs[ix].str() == name)
+    {
+      return true;
     }
-    return be.embeddedObject();
+  }
+  return false;
 
 }
 
@@ -148,14 +146,14 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -172,7 +170,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -181,8 +179,8 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(3, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -190,16 +188,18 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -213,10 +213,12 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -228,10 +230,12 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("creDate"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    BSONObj a3 = getAttr(attrs, "A3", "TA3");
-    EXPECT_STREQ("A3", C_STR_FIELD(a3, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    BSONObj a3 = attrs.getField("A3").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
     EXPECT_STREQ("TA3", C_STR_FIELD(a3, "type"));
     EXPECT_STREQ("4, -5", C_STR_FIELD(a3, "value"));
     EXPECT_EQ(1360232700, a3.getIntField("creDate"));
@@ -274,14 +278,14 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -298,7 +302,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -307,8 +311,8 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -316,16 +320,18 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -339,16 +345,18 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    BSONObj a5 = getAttr(attrs, "A5", "TA5");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    BSONObj a5 = attrs.getField("A5").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
-    EXPECT_STREQ("A5", C_STR_FIELD(a5, "name"));
     EXPECT_STREQ("TA5", C_STR_FIELD(a5, "type"));
     EXPECT_STREQ("8, -9", C_STR_FIELD(a5, "value"));
     EXPECT_EQ(1360232700, a5.getIntField("creDate"));
@@ -388,14 +396,14 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -409,7 +417,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -418,8 +426,8 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -427,16 +435,18 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("2, -4", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -450,10 +460,12 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -491,14 +503,14 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -512,7 +524,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
     /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
@@ -521,8 +533,8 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -530,10 +542,12 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_EQ(1360232700, ent.getIntField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -545,10 +559,12 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -594,14 +610,14 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -634,8 +650,8 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -643,18 +659,20 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_FALSE(a2.hasField("creDate"));
     EXPECT_FALSE(a2.hasField("modDate"));
     EXPECT_STREQ("A1", ent.getObjectField("location").getStringField("attrName"));
@@ -666,10 +684,12 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -709,14 +729,14 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -742,8 +762,8 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -751,16 +771,18 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -774,10 +796,12 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -817,14 +841,14 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -850,8 +874,8 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -859,16 +883,18 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -882,10 +908,12 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -926,14 +954,14 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -959,8 +987,8 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -968,16 +996,18 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -991,10 +1021,12 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1034,14 +1066,14 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1067,8 +1099,8 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1076,16 +1108,18 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1099,10 +1133,12 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1142,14 +1178,14 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1175,8 +1211,8 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1184,16 +1220,18 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1207,10 +1245,12 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1248,14 +1288,14 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1278,8 +1318,8 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1287,16 +1327,18 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1310,10 +1352,12 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1353,14 +1397,14 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();   
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1386,8 +1430,8 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1395,16 +1439,18 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1418,10 +1464,12 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1462,14 +1510,14 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams);
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
-    EXPECT_EQ(0, res.errorCode.code);
-    EXPECT_EQ(0, res.errorCode.reasonPhrase.size());
-    EXPECT_EQ(0, res.errorCode.details.size());
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
 
     ASSERT_EQ(1, res.contextElementResponseVector.size());
     /* Context Element response # 1 */
@@ -1495,8 +1543,8 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     DBClientBase* connection = getMongoConnection();
 
     /* entities collection */
-    BSONObj ent;
-    std::vector<BSONElement> attrs;
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
     ASSERT_EQ(2, connection->count(ENTITIES_COLL, BSONObj()));
 
     ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
@@ -1504,16 +1552,18 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("creDate"));
     EXPECT_FALSE(ent.hasField("modDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(2, attrs.size());
-    BSONObj a1 = getAttr(attrs, "A1", "TA1");
-    EXPECT_STREQ("A1", C_STR_FIELD(a1, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1", C_STR_FIELD(a1, "type"));
     EXPECT_STREQ("-5, 2", C_STR_FIELD(a1, "value"));
     EXPECT_FALSE(a1.hasField("creDate"));
     EXPECT_FALSE(a1.hasField("modDate"));
-    BSONObj a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("noloc", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1527,10 +1577,12 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_STREQ("T2", C_STR_FIELD(ent.getObjectField("_id"), "type"));
     EXPECT_FALSE(ent.hasField("modDate"));
     EXPECT_FALSE(ent.hasField("creDate"));
-    attrs = ent.getField("attrs").Array();
-    ASSERT_EQ(1, attrs.size());
-    a2 = getAttr(attrs, "A2", "TA2");
-    EXPECT_STREQ("A2", C_STR_FIELD(a2, "name"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA2", C_STR_FIELD(a2, "type"));
     EXPECT_STREQ("Y", C_STR_FIELD(a2, "value"));
     EXPECT_FALSE(a2.hasField("creDate"));
@@ -1542,6 +1594,3 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
 
     utExit();
 }
-
-
-

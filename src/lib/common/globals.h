@@ -30,6 +30,7 @@
 #include <string>
 
 #include "common/Timer.h"
+#include "common/sem.h"
 
 
 
@@ -41,12 +42,6 @@
 #define FIWARE_LOCATION_DEPRECATED  "FIWARE_Location"   // Deprecated (but still supported) in Orion 0.16.0
 
 
-
-/* ****************************************************************************
-*
-* PRINTF - 
-*/
-#define PRINTF printf
 
 
 /* ****************************************************************************
@@ -81,6 +76,7 @@ extern bool               harakiri;
 extern int                startTime;
 extern int                statisticsTime;
 extern OrionExitFunction  orionExitFunction;
+extern bool               semTimeStatistics;
 
 
 
@@ -88,7 +84,7 @@ extern OrionExitFunction  orionExitFunction;
 *
 * orionInit - 
 */
-extern void orionInit(OrionExitFunction exitFunction, const char* version);
+extern void orionInit(OrionExitFunction exitFunction, const char* version, SemRequestType reqPolicy, bool semTimeStat);
 
 
 
@@ -161,3 +157,4 @@ extern int64_t parse8601(const std::string& s);
 extern void transactionIdSet(void);
 
 #endif  // SRC_LIB_COMMON_GLOBALS_H_
+	

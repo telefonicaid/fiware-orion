@@ -26,13 +26,14 @@
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 
 #
 # 01. POST /v1/contextEntities without entityId in JSON payload and see it fail
-# 02. POST /v1/contextEntities/EID with entityId:id=EID in JSON payload and see it fail
+# 02. POST /v1/contextEntities/EID with entityId:id=EID2 in JSON payload and see it fail
 # 03. POST /v1/contextEntities without entityId in XML payload and see it fail
-# 04. POST /v1/contextEntities/EID with entityId:id=EID in XML payload and see it fail
+# 04. POST /v1/contextEntities/EID with entityId:id=EID2 in XML payload and see it fail
 
 # 05. POST /v1/contextEntities with entityId:id=EID in JSON payload OK
 # 06. POST /v1/contextEntities/EID without entityId in JSON payload OK
@@ -62,10 +63,10 @@ echo
 echo
 
 
-echo "02. POST /v1/contextEntities/EID with entityId:id=EID in JSON payload and see it fail"
-echo "====================================================================================="
+echo "02. POST /v1/contextEntities/EID with entityId:id=EID2 in JSON payload and see it fail"
+echo "======================================================================================"
 payload='{
-    "id": "EID",
+    "id": "EID2",
     "type": "ET",
     "isPattern": "false",
     "attributes": [
@@ -98,12 +99,12 @@ echo
 echo
 
 
-echo "04. POST /v1/contextEntities/EID with entityId:id=EID in XML payload and see it fail"
-echo "===================================================================================="
+echo "04. POST /v1/contextEntities/EID with entityId:id=EID2 in XML payload and see it fail"
+echo "====================================================================================="
 payload='<?xml version="1.0"?>
 <appendContextElementRequest>
   <entityId type="ET" isPattern="false">
-    <id>EID</id>
+    <id>EID2</id>
   </entityId>
   <contextAttributeList>
     <contextAttribute>
@@ -272,23 +273,23 @@ Date: REGEX(.*)
 {
     "errorCode": {
         "code": "400", 
-        "details": "invalid payload: mandatory entityId::id missing", 
+        "details": "invalid request: mandatory entityId::id missing", 
         "reasonPhrase": "Bad Request"
     }
 }
 
 
-02. POST /v1/contextEntities/EID with entityId:id=EID in JSON payload and see it fail
-=====================================================================================
+02. POST /v1/contextEntities/EID with entityId:id=EID2 in JSON payload and see it fail
+======================================================================================
 HTTP/1.1 200 OK
-Content-Length: 132
+Content-Length: 140
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400", 
-        "details": "invalid payload: unknown fields", 
+        "details": "entityId::id differs in URL and payload", 
         "reasonPhrase": "Bad Request"
     }
 }
@@ -306,15 +307,15 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>invalid payload: mandatory entityId::id missing</details>
+    <details>invalid request: mandatory entityId::id missing</details>
   </errorCode>
 </appendContextElementResponse>
 
 
-04. POST /v1/contextEntities/EID with entityId:id=EID in XML payload and see it fail
-====================================================================================
+04. POST /v1/contextEntities/EID with entityId:id=EID2 in XML payload and see it fail
+=====================================================================================
 HTTP/1.1 200 OK
-Content-Length: 213
+Content-Length: 221
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -323,7 +324,7 @@ Date: REGEX(.*)
   <errorCode>
     <code>400</code>
     <reasonPhrase>Bad Request</reasonPhrase>
-    <details>invalid payload: unknown fields</details>
+    <details>entityId::id differs in URL and payload</details>
   </errorCode>
 </appendContextElementResponse>
 
@@ -360,7 +361,7 @@ Date: REGEX(.*)
 06. POST /v1/contextEntities/EID without entityId in JSON payload OK
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 312
+Content-Length: 314
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -382,7 +383,7 @@ Date: REGEX(.*)
     ], 
     "id": "EID", 
     "isPattern": "false", 
-    "type": ""
+    "type": "ET"
 }
 
 
@@ -419,13 +420,13 @@ Date: REGEX(.*)
 08. POST /v1/contextEntities/EID without entityId in XML payload OK
 ===================================================================
 HTTP/1.1 200 OK
-Content-Length: 556
+Content-Length: 558
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <appendContextElementResponse>
-  <entityId type="" isPattern="false">
+  <entityId type="ET" isPattern="false">
     <id>EID</id>
   </entityId>
   <contextResponseList>
@@ -540,3 +541,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

@@ -46,7 +46,7 @@ typedef struct MetadataVector
 
   void          tagSet(const std::string& tagName);
   std::string   render(Format format, const std::string& indent, bool comma = false);
-
+  std::string   toJson(bool isLastElement);
   std::string   check(RequestType requestType,
                       Format format,
                       const std::string& indent,
@@ -57,6 +57,7 @@ typedef struct MetadataVector
   void          push_back(Metadata* item);
   unsigned int  size(void);
   Metadata*     get(int ix);
+  Metadata*     lookupByName(const std::string& _name);
   void          release();
   void          fill(MetadataVector* mV);
 } MetadataVector;

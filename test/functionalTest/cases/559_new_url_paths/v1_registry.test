@@ -26,6 +26,7 @@
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
+
 --SHELL--
 
 echo "1. POST /v1/registry/registerContext"
@@ -851,5 +852,6 @@ Date: REGEX(.*)
 
 
 
-----TEARDOWN--
+--TEARDOWN--
 brokerStop CB
+dbDrop CB

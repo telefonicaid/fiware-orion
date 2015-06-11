@@ -43,7 +43,9 @@
 #include "jsonParse/jsonUpdateContextAvailabilitySubscriptionRequest.h"
 
 #include "jsonParse/jsonQueryContextRequest.h"
+#include "jsonParse/jsonQueryContextResponse.h"
 #include "jsonParse/jsonUpdateContextRequest.h"
+#include "jsonParse/jsonUpdateContextResponse.h"
 #include "jsonParse/jsonSubscribeContextRequest.h"
 #include "jsonParse/jsonUnsubscribeContextRequest.h"
 #include "jsonParse/jsonNotifyContextRequest.h"
@@ -123,7 +125,10 @@ static JsonRequest jsonRequest[] =
   { AttributeValueInstanceWithTypeAndId,           "POST", "updateContextAttributeRequest",         FUNCS(Upcar) },
 
   { ContextEntitiesByEntityIdAndType,              "POST", "registerProviderRequest",               FUNCS(Rpr)   },
-  { EntityByIdAttributeByNameIdAndType,            "POST", "registerProviderRequest",               FUNCS(Rpr)   }
+  { EntityByIdAttributeByNameIdAndType,            "POST", "registerProviderRequest",               FUNCS(Rpr)   },
+
+  { RtQueryContextResponse,                        "POST", "queryContextResponse",                  FUNCS(Qcrs)  },
+  { RtUpdateContextResponse,                       "POST", "updateContextResponse",                 FUNCS(Upcrs) }
 };
 
 
@@ -171,6 +176,18 @@ std::string jsonTreat
   std::string   res   = "OK";
   JsonRequest*  reqP  = jsonRequestGet(request, ciP->method);
 
+
+  //
+  // If the payload is empty, the XML parsing library does an assert
+  // and the broker dies. I don't know about the JSON library, but just in case ...
+  // 
+  // 'OK' is returned as there is no error to send a request without payload.
+  //
+  if ((content == NULL) || (*content == 0))
+  {
+    return "OK";
+  }
+
   LM_T(LmtParse, ("Treating a JSON request: '%s'", content));
 
   ciP->parseDataP = parseDataP;
@@ -205,6 +222,7 @@ std::string jsonTreat
   }
   catch (const std::exception &e)
   {
+    LM_W(("Bad Input (JSON Parse Error)"));
     std::string errorReply  = restErrorReplyGet(ciP,
                                                 ciP->outFormat,
                                                 "",
@@ -217,6 +235,7 @@ std::string jsonTreat
   }
   catch (...)
   {
+    LM_W(("Bad Input (JSON Parse Error II)"));
     std::string errorReply  = restErrorReplyGet(ciP,
                                                 ciP->outFormat,
                                                 "",

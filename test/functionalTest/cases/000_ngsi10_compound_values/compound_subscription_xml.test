@@ -119,7 +119,7 @@ echo "3: ++++++++++ Update the entity attribute with object value ++++++++++"
 EOF
 
 #Get accumulated data
-curl localhost:${LISTENER_PORT}/dump -s -S
+accumulatorDump
 
 --REGEXPECT--
 1: +++++++++ Prepare subscription +++++++++++
@@ -267,3 +267,4 @@ Content-Type: application/xml
 --TEARDOWN--
 brokerStop CB
 accumulatorStop
+dbDrop CB

@@ -22,6 +22,7 @@
 
 --NAME--
 Custom metadata query/update
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -246,23 +247,6 @@ Date: REGEX(.*)
             {
                 "metadatas": [
                     {
-                        "name": "colour",
-                        "type": "string",
-                        "value": "black"
-                    },
-                    {
-                        "name": "flavour",
-                        "type": "string",
-                        "value": "sweet"
-                    }
-                ],
-                "name": "temperature",
-                "type": "centigrade",
-                "value": "23"
-            },
-            {
-                "metadatas": [
-                    {
                         "name": "taste",
                         "type": "string",
                         "value": "bitter"
@@ -276,6 +260,23 @@ Date: REGEX(.*)
                 "name": "pressure",
                 "type": "mmHg",
                 "value": "720"
+            },
+            {
+                "metadatas": [
+                    {
+                        "name": "colour",
+                        "type": "string",
+                        "value": "black"
+                    },
+                    {
+                        "name": "flavour",
+                        "type": "string",
+                        "value": "sweet"
+                    }
+                ],
+                "name": "temperature",
+                "type": "centigrade",
+                "value": "23"
             }
         ],
         "id": "Room1",
@@ -339,6 +340,23 @@ Date: REGEX(.*)
             {
                 "metadatas": [
                     {
+                        "name": "taste",
+                        "type": "string",
+                        "value": "bitter"
+                    }
+                ],
+                "name": "presence",
+                "type": "bool",
+                "value": "true"
+            },
+            {
+                "name": "pressure",
+                "type": "mmHg",
+                "value": "720"
+            },
+            {
+                "metadatas": [
+                    {
                         "name": "colour",
                         "type": "string",
                         "value": "red"
@@ -357,23 +375,6 @@ Date: REGEX(.*)
                 "name": "temperature",
                 "type": "centigrade",
                 "value": "43"
-            },
-            {
-                "metadatas": [
-                    {
-                        "name": "taste",
-                        "type": "string",
-                        "value": "bitter"
-                    }
-                ],
-                "name": "presence",
-                "type": "bool",
-                "value": "true"
-            },
-            {
-                "name": "pressure",
-                "type": "mmHg",
-                "value": "720"
             }
         ],
         "id": "Room1",
@@ -439,22 +440,17 @@ Date: REGEX(.*)
                     {
                         "name": "colour",
                         "type": "string",
-                        "value": "red"
+                        "value": "white"
                     },
                     {
-                        "name": "feeling",
+                        "name": "direction",
                         "type": "string",
-                        "value": "angry"
-                    },
-                    {
-                        "name": "flavour",
-                        "type": "string",
-                        "value": "sweet"
+                        "value": "up"
                     }
                 ],
-                "name": "temperature",
-                "type": "centigrade",
-                "value": "43"
+                "name": "humidity",
+                "type": "percentage",
+                "value": "60.5"
             },
             {
                 "metadatas": [
@@ -478,17 +474,22 @@ Date: REGEX(.*)
                     {
                         "name": "colour",
                         "type": "string",
-                        "value": "white"
+                        "value": "red"
                     },
                     {
-                        "name": "direction",
+                        "name": "feeling",
                         "type": "string",
-                        "value": "up"
+                        "value": "angry"
+                    },
+                    {
+                        "name": "flavour",
+                        "type": "string",
+                        "value": "sweet"
                     }
                 ],
-                "name": "humidity",
-                "type": "percentage",
-                "value": "60.5"
+                "name": "temperature",
+                "type": "centigrade",
+                "value": "43"
             }
         ],
         "id": "Room1",
@@ -536,24 +537,7 @@ Date: REGEX(.*)
 
 {
     "contextElement": {
-        "attributes": [
-            {
-                "metadatas": [
-                    {
-                        "name": "taste",
-                        "type": "string",
-                        "value": "bitter"
-                    }
-                ],
-                "name": "presence",
-                "type": "bool",
-                "value": "true"
-            },
-            {
-                "name": "pressure",
-                "type": "mmHg",
-                "value": "720"
-            },
+        "attributes": [            
             {
                 "metadatas": [
                     {
@@ -570,6 +554,23 @@ Date: REGEX(.*)
                 "name": "humidity",
                 "type": "percentage",
                 "value": "60.5"
+            },
+            {
+                "metadatas": [
+                    {
+                        "name": "taste",
+                        "type": "string",
+                        "value": "bitter"
+                    }
+                ],
+                "name": "presence",
+                "type": "bool",
+                "value": "true"
+            },
+            {
+                "name": "pressure",
+                "type": "mmHg",
+                "value": "720"
             }
         ],
         "id": "Room1",
@@ -583,3 +584,4 @@ Date: REGEX(.*)
 }
 --TEARDOWN--
 brokerStop CB
+dbDrop CB

@@ -44,87 +44,125 @@ HttpStatusCode mongoEntityTypes
   std::map<std::string, std::string>&   uriParams
 )
 {
-  unsigned int offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-  std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+  std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+  bool           details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  DBClientBase*  connection     = NULL;
+  bool           reqSemTaken    = false;
 
   LM_T(LmtMongo, ("Query Entity Types"));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
-  reqSemTake(__FUNCTION__, "query types request");
+  reqSemTake(__FUNCTION__, "query types request", SemReadOp, &reqSemTaken);
 
-  DBClientBase* connection = getMongoConnection();
-
-  /* Compose query based on this aggregation command:
-   *
-   * FIXME P9: taking into account that type is no longer used as part of the attribute "key", not sure if the
-   * aggregation query below is fully correct
+  /* Compose query based on this aggregation command:  
    *
    * db.runCommand({aggregate: "entities",
-   *                pipeline: [ {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
-   *                            {$unwind: "$attrs"},
-   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
+   *                pipeline: [ {$match: { "_id.servicePath": /.../ } },
+   *                            {$project: {_id: 1, "attrNames": 1} },
+   *                            {$project: { "attrNames"
+   *                                  {$cond: [ {$eq: [ "$attrNames", [ ] ] }, [null], "$attrNames"] }
+   *                               }
+   *                            },
+   *                            {$unwind: "$attrNames"},
+   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} },
    *                            {$sort: {_id: 1} }
    *                          ]
-   *                })
+   *                })   
+   *
+   * The $cond part is hard... more information at http://stackoverflow.com/questions/27510143/empty-array-prevents-document-to-appear-in-query
+   * As a consequence, some "null" values may appear in the resulting attrs vector, which are pruned by the result processing logic.
    *
    * FIXME P6: in the future, we can interpret the collapse parameter at this layer. If collapse=true so we don't need attributes, the
    * following command can be used:
    *
    * db.runCommand({aggregate: "entities", pipeline: [ {$group: {_id: "$_id.type"} }]})
    *
+   *
+   *
    */
 
   BSONObj result;
+
+  // Building the projection part of the query that includes types that have no attributes
+  // See bug: https://github.com/telefonicaid/fiware-orion/issues/686
+  BSONArrayBuilder emptyArrayBuilder;
+  BSONArrayBuilder nulledArrayBuilder;
+  nulledArrayBuilder.appendNull();
+
+  // We are using the $cond: [ .. ] and not the $cond: { .. } one, as the former is the only one valid in MongoDB 2.4
+  BSONObj projection = BSON(
+    "$project" << BSON(
+      ENT_ATTRNAMES << BSON(
+        "$cond" << BSON_ARRAY(
+          BSON("$eq" << BSON_ARRAY(S_ATTRNAMES << emptyArrayBuilder.arr()) ) <<
+          nulledArrayBuilder.arr() <<
+          S_ATTRNAMES
+        )
+      )
+    )
+  );
+
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
-                                              BSON("$project" << BSON("_id" << 1 << C_ATTR_NAME << 1 << C_ATTR_TYPE << 1)) <<
-                                              BSON("$unwind" << S_ATTRS) <<
-                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRS))) <<
+                                              BSON("$match" << BSON(C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
+                                              BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
+                                              projection <<
+                                              BSON("$unwind" << S_ATTRNAMES) <<
+                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
                                               BSON("$sort" << BSON("_id" << 1))
                                              )
-                    );
+                     );
 
   LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
 
-  mongoSemTake(__FUNCTION__, "aggregation command");  
   try
   {
-
+    connection = getMongoConnection();
     connection->runCommand(composeDatabaseName(tenant).c_str(), cmd, result);
-    mongoSemGive(__FUNCTION__, "aggregation command");
+    releaseMongoConnection(connection);
+
     LM_I(("Database Operation Successful (%s)", cmd.toString().c_str()));
   }
   catch (const DBException& e)
   {
-      mongoSemGive(__FUNCTION__, "aggregation command");
+      releaseMongoConnection(connection);
+
       std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
               " - command: " + cmd.toString() +
               " - exception: " + e.what();
 
       LM_E(("Database Error (%s)", err.c_str()));
       responseP->statusCode.fill(SccReceiverInternalError, err);
-      reqSemGive(__FUNCTION__, "query types request");
+      reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
       return SccOk;
   }
   catch (...)
   {
-      mongoSemGive(__FUNCTION__, "aggregation command");
+      releaseMongoConnection(connection);
+
       std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
               " - command: " + cmd.toString() +
               " - exception: " + "generic";
 
       LM_E(("Database Error (%s)", err.c_str()));
       responseP->statusCode.fill(SccReceiverInternalError, err);
-      reqSemGive(__FUNCTION__, "query types request");
+      reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
       return SccOk;
   }
 
-  /* Processing result to build response*/
+  /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
+
+  if (resultsArray.size() == 0)
+  {
+    responseP->statusCode.fill(SccContextElementNotFound);
+    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+    return SccOk;
+  }
 
   /* Another strategy to implement pagination is to use the $skip and $limit operators in the
    * aggregation framework. However, doing so, we don't know the total number of results, which can
@@ -137,20 +175,25 @@ HttpStatusCode mongoEntityTypes
    */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-
     BSONObj                  resultItem = resultsArray[ix].embeddedObject();
     TypeEntity*              type       = new TypeEntity(resultItem.getStringField("_id"));
     std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
 
-    for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
+    if (!attrsArray[0].isNull())
     {
-      BSONObj jAttr = attrsArray[jx].embeddedObject();
-      ContextAttribute* ca = new ContextAttribute(jAttr.getStringField(ENT_ATTRS_NAME), jAttr.getStringField(ENT_ATTRS_TYPE));
-      type->contextAttributeVector.push_back(ca);
+      for (unsigned int jx = 0; jx < attrsArray.size(); ++jx)
+      {
+        /* This is the place in which null elements in the resulting attrs vector are pruned */
+        if (attrsArray[jx].isNull())
+        {
+          continue;
+        }        
+        ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), "");
+        type->contextAttributeVector.push_back(ca);
+      }
     }
 
     responseP->typeEntityVector.push_back(type);
-
   }
 
   char detailsMsg[256];
@@ -179,7 +222,7 @@ HttpStatusCode mongoEntityTypes
     }
   }
 
-  reqSemGive(__FUNCTION__, "query types request");
+  reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
   return SccOk;
 
@@ -198,10 +241,12 @@ HttpStatusCode mongoAttributesForEntityType
   std::map<std::string, std::string>&   uriParams
 )
 {
-  unsigned int offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
-  unsigned int limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
-  std::string  detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool         details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  DBClientBase*  connection     = NULL;
+  unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
+  unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
+  std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
+  bool           details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
+  bool           reqSemTaken    = false;
 
   // Setting the name of the entity type for the response
   responseP->entityType.type = entityType;
@@ -209,23 +254,19 @@ HttpStatusCode mongoAttributesForEntityType
   LM_T(LmtMongo, ("Query Types Attribute for <%s>", entityType.c_str()));
   LM_T(LmtPagination, ("Offset: %d, Limit: %d, Details: %s", offset, limit, (details == true)? "true" : "false"));
 
-  reqSemTake(__FUNCTION__, "query types attributes request");
+  reqSemTake(__FUNCTION__, "query types attributes request", SemReadOp, &reqSemTaken);
 
-  DBClientBase* connection = getMongoConnection();
 
-  /* Compose query based on this aggregation command:
-   *
-   * FIXME P9: taking into account that type is no longer used as part of the attribute "key", not sure if the
-   * aggregation query below is fully correct
+  /* Compose query based on this aggregation command:   
    *
    * db.runCommand({aggregate: "entities",
-   *                pipeline: [ {$match: { "_id.type": "TYPE" } },
-   *                            {$project: {_id: 1, "attrs.name": 1, "attrs.type": 1} },
-   *                            {$unwind: "$attrs"},
-   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrs"}} },
+   *                pipeline: [ {$match: { "_id.type": "TYPE" , "_id.servicePath": /.../ } },
+   *                            {$project: {_id: 1, "attrNames": 1} },
+   *                            {$unwind: "$attrNames"},
+   *                            {$group: {_id: "$_id.type", attrs: {$addToSet: "$attrNames"}} },
    *                            {$unwind: "$attrs"},
    *                            {$group: {_id: "$attrs" }},
-   *                            {$sort: {_id.name: 1, _id.type: 1} }
+   *                            {$sort: {_id: 1}}
    *                          ]
    *                })
    *
@@ -234,48 +275,50 @@ HttpStatusCode mongoAttributesForEntityType
   BSONObj result;
   BSONObj cmd = BSON("aggregate" << COL_ENTITIES <<
                      "pipeline" << BSON_ARRAY(
-                                              BSON("$match" << BSON(C_ID_ENTITY << entityType)) <<
-                                              BSON("$project" << BSON("_id" << 1 << C_ATTR_NAME << 1 << C_ATTR_TYPE << 1)) <<
-                                              BSON("$unwind" << S_ATTRS) <<
-                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRS))) <<
-                                              BSON("$unwind" << S_ATTRS) <<
-                                              BSON("$group" << BSON("_id" << S_ATTRS)) <<
-                                              BSON("$sort" << BSON(C_ID_NAME << 1 << C_ID_TYPE << 1))
+                                              BSON("$match" << BSON(C_ID_ENTITY << entityType << C_ID_SERVICEPATH << fillQueryServicePath(servicePathV))) <<
+                                              BSON("$project" << BSON("_id" << 1 << ENT_ATTRNAMES << 1)) <<
+                                              BSON("$unwind" << S_ATTRNAMES) <<
+                                              BSON("$group" << BSON("_id" << CS_ID_ENTITY << "attrs" << BSON("$addToSet" << S_ATTRNAMES))) <<
+                                              BSON("$unwind" << "$attrs") <<
+                                              BSON("$group" << BSON("_id" << "$attrs")) <<
+                                              BSON("$sort" << BSON("_id" << 1))
                                              )
                     );
 
   LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
 
-  mongoSemTake(__FUNCTION__, "aggregation command"); 
   try
   {
-
+    connection = getMongoConnection();
     connection->runCommand(composeDatabaseName(tenant).c_str(), cmd, result);
-    mongoSemGive(__FUNCTION__, "aggregation command");
+    releaseMongoConnection(connection);
+
     LM_I(("Database Operation Successful (%s)", cmd.toString().c_str()));
   }
   catch (const DBException& e)
   {
-      mongoSemGive(__FUNCTION__, "aggregation command");
+      releaseMongoConnection(connection);
+
       std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
               " - command: " + cmd.toString() +
               " - exception: " + e.what();
 
       LM_E(("Database Error (%s)", err.c_str()));
       responseP->statusCode.fill(SccReceiverInternalError, err);
-      reqSemGive(__FUNCTION__, "query types request");
+      reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
       return SccOk;
   }
   catch (...)
   {
-      mongoSemGive(__FUNCTION__, "aggregation command");
+      releaseMongoConnection(connection);
+
       std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
               " - command: " + cmd.toString() +
               " - exception: " + "generic";
 
       LM_E(("Database Error (%s)", err.c_str()));
       responseP->statusCode.fill(SccReceiverInternalError, err);
-      reqSemGive(__FUNCTION__, "query types request");
+      reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
       return SccOk;
   }
 
@@ -283,6 +326,13 @@ HttpStatusCode mongoAttributesForEntityType
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
+
+  if (resultsArray.size() == 0)
+  {
+    responseP->statusCode.fill(SccContextElementNotFound);
+    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
+    return SccOk;
+  }
 
   /* See comment above in the other method regarding this strategy to implement pagination */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
@@ -301,8 +351,7 @@ HttpStatusCode mongoAttributesForEntityType
       continue;
     }
 
-    BSONObj            resultItem = idField.embeddedObject();
-    ContextAttribute*  ca         = new ContextAttribute(resultItem.getStringField(ENT_ATTRS_NAME), resultItem.getStringField(ENT_ATTRS_TYPE));
+    ContextAttribute*  ca = new ContextAttribute(idField.str(), "");
     responseP->entityType.contextAttributeVector.push_back(ca);
   }
 
@@ -332,7 +381,7 @@ HttpStatusCode mongoAttributesForEntityType
     }
   }
 
-  reqSemGive(__FUNCTION__, "query types request");
+  reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
 
   return SccOk;
 }

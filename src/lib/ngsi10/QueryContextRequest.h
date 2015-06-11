@@ -32,6 +32,7 @@
 #include "ngsi/EntityIdVector.h"
 #include "ngsi/Restriction.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/EntityTypeInfo.h"
 
 
 
@@ -46,13 +47,22 @@ typedef struct QueryContextRequest
   Restriction       restriction;    // Optional
 
   int               restrictions;
+  std::string       contextProvider;  // Not part of the payload - used internally only
 
   QueryContextRequest();
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, const std::string& attributeName);
+  QueryContextRequest(const std::string& _contextProvider, EntityId* eP, AttributeList& attributeList);
+
   std::string   render(RequestType requestType, Format format, const std::string& indent);
   std::string   check(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, const std::string& predetectedError, int counter);
   void          present(const std::string& indent);
   void          release(void);
   void          fill(const std::string& entityId, const std::string& entityType, const std::string& attributeName);
+  void          fill(const std::string&  entityId,
+                     const std::string&  entityType,
+                     const std::string&  isPattern,
+                     EntityTypeInfo      typeInfo,
+                     const std::string&  attributeName);
 } QueryContextRequest;
 
 #endif

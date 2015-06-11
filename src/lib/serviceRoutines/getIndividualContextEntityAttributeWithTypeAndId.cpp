@@ -29,9 +29,11 @@
 #include "logMsg/traceLevels.h"
 
 #include "convenience/ContextAttributeResponse.h"
-#include "convenienceMap/mapGetIndividualContextEntityAttribute.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/EntityTypeInfo.h"
+#include "rest/uriParamNames.h"
+#include "serviceRoutines/postQueryContext.h"
 #include "serviceRoutines/getIndividualContextEntityAttributeWithTypeAndId.h"
 
 
@@ -39,6 +41,25 @@
 /* ****************************************************************************
 *
 * getIndividualContextEntityAttributeWithTypeAndId -
+*
+* GET /v1/contextEntities/type/{entity::type}/id/{entity::id}/attributes/{attribute::name}
+*
+* Payload In:  None
+* Payload Out: ContextAttributeResponse
+*
+* URI parameters:
+*   - attributesFormat=object
+*   - entity::type=XXX     (must coincide with entity::type in URL)
+*   - !exist=entity::type  (if set - error -- entity::type cannot be empty)
+*   - exist=entity::type   (not supported - ok if present, ok if not present ...)
+*
+* 01. Get values from URL (entityId::type, esist, !exist)
+* 02. Check validity of URI params
+* 03. Fill in QueryContextRequest
+* 04. Call standard operation postQueryContext
+* 05. If 404 Not Found - enter request info into response context element
+* 06. Translate QueryContextResponse to ContextElementResponse
+* 07. Cleanup and return result
 */
 std::string getIndividualContextEntityAttributeWithTypeAndId
 (
@@ -49,15 +70,68 @@ std::string getIndividualContextEntityAttributeWithTypeAndId
 )
 {
   std::string               answer;
-  std::string               entityType    = compV[3];
-  std::string               entityId      = compV[5];
-  std::string               attributeName = compV[7];
+  std::string               entityType              = compV[3];
+  std::string               entityId                = compV[5];
+  std::string               attributeName           = compV[7];
+  std::string               entityTypeFromUriParam  = ciP->uriParam[URI_PARAM_ENTITY_TYPE];
+  EntityTypeInfo            typeInfo                = EntityTypeEmptyOrNotEmpty;
   ContextAttributeResponse  response;
 
-  LM_T(LmtConvenience, ("CONVENIENCE: got 'GET' request with %d components", components));
 
-  ciP->httpStatusCode = mapGetIndividualContextEntityAttribute(entityId, entityType, attributeName, &response, ciP);
-  answer = response.render(ciP, IndividualContextEntityAttribute, "");
+  // 01. Get values from URL (entityId::type, esist, !exist)
+  if (ciP->uriParam[URI_PARAM_NOT_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeEmpty;
+  }
+  else if (ciP->uriParam[URI_PARAM_EXIST] == URI_PARAM_ENTITY_TYPE)
+  {
+    typeInfo = EntityTypeNotEmpty;
+  }
+
+
+  //
+  // 02. Check validity of URI params ...
+  //     and if OK;
+  // 03. Fill in QueryContextRequest
+  // 04. Call standard operation postQueryContext
+  // 05. If 404 Not Found - enter request info into response context element
+  //
+  if (typeInfo == EntityTypeEmpty)
+  {
+    parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "entity::type cannot be empty for this request");
+    LM_W(("Bad Input (entity::type cannot be empty for this request)"));
+  }
+  else if ((entityTypeFromUriParam != entityType) && (entityTypeFromUriParam != ""))
+  {
+    parseDataP->qcrs.res.errorCode.fill(SccBadRequest, "non-matching entity::types in URL");
+    LM_W(("Bad Input non-matching entity::types in URL"));
+  }
+  else
+  {
+    // 03. Fill in QueryContextRequest
+    parseDataP->qcr.res.fill(entityId, entityType, attributeName);
+
+
+    // 04. Call standard operation postQueryContext
+    parseDataP->qcrs.res.errorCode.fill(SccOk);
+    postQueryContext(ciP, components, compV, parseDataP);
+
+    // 05. If 404 Not Found - enter request info into response context element
+    if (parseDataP->qcrs.res.errorCode.code == SccContextElementNotFound)
+    {
+      response.statusCode.details = "entityId::type/attribute::name pair not found";
+    }
+  }
+
+
+  // 06. Translate QueryContextResponse to ContextAttributeResponse
+  response.fill(&parseDataP->qcrs.res, entityId, entityType, attributeName, "");
+
+
+  // 07. Cleanup and return result
+  answer = response.render(ciP, RtContextAttributeResponse, "");
+  parseDataP->qcr.res.release();
+  parseDataP->qcrs.res.release();
   response.release();
 
   return answer;

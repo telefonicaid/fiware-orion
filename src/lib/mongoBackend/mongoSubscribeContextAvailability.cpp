@@ -23,6 +23,7 @@
 * Author: Fermin Galan Marquez
 */
 #include <string>
+#include <map>
 
 #include "common/globals.h"
 
@@ -33,6 +34,7 @@
 #include "mongoBackend/mongoSubscribeContextAvailability.h"
 #include "ngsi9/SubscribeContextAvailabilityRequest.h"
 #include "ngsi9/SubscribeContextAvailabilityResponse.h"
+#include "rest/uriParamNames.h"
 
 #include "common/Format.h"
 #include "common/sem.h"
@@ -41,13 +43,21 @@
 *
 * mongoSubscribeContextAvailability - 
 */
-HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityRequest* requestP, SubscribeContextAvailabilityResponse* responseP, Format inFormat, const std::string& tenant)
+HttpStatusCode mongoSubscribeContextAvailability
+(
+  SubscribeContextAvailabilityRequest*   requestP,
+  SubscribeContextAvailabilityResponse*  responseP,
+  std::map<std::string, std::string>&    uriParam,
+  Format                                 notifyFormat,
+  const std::string&                     tenant
+)
 {
-    reqSemTake(__FUNCTION__, "ngsi9 subscribe request");
+    DBClientBase*  connection = NULL;
+    bool           reqSemTaken;
 
-    LM_T(LmtMongo, ("Subscribe Context Availability Request"));
+    LM_T(LmtMongo, ("Subscribe Context Availability Request, notifyFormat: %s", formatToString(notifyFormat)));
 
-    DBClientBase* connection = getMongoConnection();
+    reqSemTake(__FUNCTION__, "ngsi9 subscribe request", SemWriteOp, &reqSemTaken);
 
     /* If expiration is not present, then use a default one */
     if (requestP->duration.isEmpty()) {
@@ -91,7 +101,7 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     sub.append(CASUB_ATTRS, attrs.arr());
 
     /* Adding format to use in notifications */
-    sub.append(CASUB_FORMAT, std::string(formatToString(inFormat)));
+    sub.append(CASUB_FORMAT, formatToString(notifyFormat));
 
     /* Insert document in database */
     BSONObj subDoc = sub.obj();
@@ -99,41 +109,46 @@ HttpStatusCode mongoSubscribeContextAvailability(SubscribeContextAvailabilityReq
     {
         LM_T(LmtMongo, ("insert() in '%s' collection: '%s'", getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc.toString().c_str()));
 
-        mongoSemTake(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
+        connection = getMongoConnection();
         connection->insert(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), subDoc);
-        mongoSemGive(__FUNCTION__, "insert into SubscribeContextAvailabilityCollection");
+        releaseMongoConnection(connection);
+
         LM_I(("Database Operation Successful (insert %s)", subDoc.toString().c_str()));
     }
     catch (const DBException &e)
     {
-        mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo db exception)");
-        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)");
+        releaseMongoConnection(connection);
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo db exception)", reqSemTaken);
+
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + e.what());
         LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+
         return SccOk;
     }
     catch (...)
     {
-        mongoSemGive(__FUNCTION__, "insert in SubscribeContextAvailabilityCollection (mongo generic exception)");
-        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)");
+        releaseMongoConnection(connection);
+        reqSemGive(__FUNCTION__, "ngsi9 subscribe request (mongo generic exception)", reqSemTaken);
+
         responseP->errorCode.fill(SccReceiverInternalError,
                                   std::string("collection: ") + getSubscribeContextAvailabilityCollectionName(tenant).c_str() +
                                   " - insert(): " + subDoc.toString() +
                                   " - exception: " + "generic");
         LM_E(("Database Error (%s)", responseP->errorCode.reasonPhrase.c_str()));
+
         return SccOk;
     }
 
     /* Send notifications for matching context registrations */
-    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.str(), requestP->reference.get(), inFormat, tenant);
+    processAvailabilitySubscription(requestP->entityIdVector, requestP->attributeList, oid.toString(), requestP->reference.get(), notifyFormat, tenant);
 
     /* Fill the response element */
     responseP->duration = requestP->duration;
-    responseP->subscriptionId.set(oid.str());
+    responseP->subscriptionId.set(oid.toString());
 
-    reqSemGive(__FUNCTION__, "ngsi9 subscribe request");
+    reqSemGive(__FUNCTION__, "ngsi9 subscribe request", reqSemTaken);
     return SccOk;
 }

@@ -66,7 +66,6 @@ SET (SOURCES
     serviceRoutines/badVerbGetPutDeleteOnly_test.cpp
     serviceRoutines/deleteIndividualContextEntity_test.cpp
     serviceRoutines/deleteIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/deleteIndividualContextEntityAttributes_test.cpp
     serviceRoutines/getContextEntitiesByEntityId_test.cpp
     serviceRoutines/getEntityByIdAttributeByName_test.cpp
     serviceRoutines/getContextEntityTypes_test.cpp
@@ -78,14 +77,12 @@ SET (SOURCES
     serviceRoutines/getIndividualContextEntity_test.cpp
     serviceRoutines/getContextEntityAttributes_test.cpp
     serviceRoutines/getIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/getIndividualContextEntityAttributes_test.cpp
     serviceRoutines/postContextEntitiesByEntityId_test.cpp
     serviceRoutines/postContextEntityAttributes_test.cpp
     serviceRoutines/postDiscoverContextAvailability_test.cpp
     serviceRoutines/postEntityByIdAttributeByName_test.cpp
     serviceRoutines/postIndividualContextEntity_test.cpp
     serviceRoutines/postIndividualContextEntityAttribute_test.cpp
-    serviceRoutines/postIndividualContextEntityAttributes_test.cpp
     serviceRoutines/logTraceTreat_test.cpp
     serviceRoutines/postRegisterContext_test.cpp
     serviceRoutines/postSubscribeContext_test.cpp
@@ -96,7 +93,6 @@ SET (SOURCES
     serviceRoutines/postUpdateContextAvailabilitySubscription_test.cpp
     serviceRoutines/postUpdateContextSubscription_test.cpp
     serviceRoutines/putIndividualContextEntity_test.cpp
-    serviceRoutines/putIndividualContextEntityAttributes_test.cpp
     serviceRoutines/putIndividualContextEntityAttribute_test.cpp
     serviceRoutines/postQueryContext_test.cpp
     serviceRoutines/getNgsi10ContextEntityTypes_test.cpp
@@ -115,19 +111,6 @@ SET (SOURCES
     serviceRoutines/getAttributeValueInstance_test.cpp
 
     convenience/Convenience_test.cpp
-    convenienceMap/mapDeleteIndividualContextEntity_test.cpp
-    convenienceMap/mapGetIndividualContextEntity_test.cpp
-    convenienceMap/mapPostIndividualContextEntity_test.cpp
-    convenienceMap/mapPutIndividualContextEntity_test.cpp
-
-    convenienceMap/mapGetIndividualContextEntityAttribute_test.cpp
-    convenienceMap/mapPostIndividualContextEntityAttribute_test.cpp
-
-    convenienceMap/mapDeleteIndividualContextEntityAttributes_test.cpp
-    convenienceMap/mapGetIndividualContextEntityAttributes_test.cpp
-    convenienceMap/mapPostIndividualContextEntityAttributes_test.cpp
-    convenienceMap/mapDeleteIndividualContextEntityAttribute_test.cpp
-
     convenience/AppendContextElementRequest_test.cpp
     convenience/AppendContextElementResponse_test.cpp
     convenience/ContextAttributeResponse_test.cpp
@@ -269,7 +252,6 @@ SET (STATIC_LIBS
     parse
     convenience
     serviceRoutines
-    convenienceMap
     rest
     ngsi9
     ngsi10
@@ -305,14 +287,16 @@ link_directories("/opt/lib/")
 add_definitions(-DUNIT_TEST)
 
 
+
 # Executable declaration
 # ------------------------------------------------------------
 
 ADD_EXECUTABLE(unitTest ${SOURCES} ${HEADERS})
 
-IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS"))
+IF ((${DISTRO} STREQUAL "Ubuntu_13.04") OR (${DISTRO} STREQUAL "Ubuntu_12.04.1_LTS") OR (${DISTRO} STREQUAL "Ubuntu_12.04.2_LTS"))
+  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
 ELSEIF(${DISTRO} STREQUAL "Ubuntu_13.10")
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
@@ -320,14 +304,22 @@ ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.04.1_LTS")
   # FIXME P4: Issue #476: remove or keep?
   MESSAGE("unitTest: Ubuntu DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
+ELSEIF(${DISTRO} STREQUAL "Ubuntu_14.10")
+  # ADDED FOR UBUNTU 14.10
+  MESSAGE("contextBroker: Ubuntu DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread -lssl -lcrypto -lgnutls -lgcrypt)
 ELSEIF(${DISTRO} STREQUAL "openSUSE_12.3")
   MESSAGE("unitTest: openSUSE DISTRO: '${DISTRO}'")
   TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lpthread -lssl -lcrypto)
-ELSEIF(${DISTRO} STREQUAL "CentOS_6.3")
+ELSEIF(${DISTRO} MATCHES "CentOS_6.*")
   MESSAGE("unitTest: CentOS DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient
+-lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)
+ELSEIF(${DISTRO} MATCHES "Debian_.*")
+  MESSAGE("unitTest: Debian DISTRO: '${DISTRO}'")
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt -lboost_regex-mt)
 ELSE()
   MESSAGE("unitTest: Other DISTRO: '${DISTRO}'")
-  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread-mt -lboost_filesystem-mt -lboost_system-mt)
+  TARGET_LINK_LIBRARIES(unitTest ${STATIC_LIBS} -lmicrohttpd -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lpthread)
 ENDIF()
 

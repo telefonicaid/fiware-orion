@@ -46,6 +46,7 @@ typedef struct UnsubscribeContextAvailabilityRequest
 
   std::string     check(RequestType requestType, Format format, const std::string& indent, const std::string& predetectedError, int counter);
   void            release(void);
+  void            fill(const std::string& _subscriptionId);
 } UnsubscribeContextAvailabilityRequest;
 
 #endif
