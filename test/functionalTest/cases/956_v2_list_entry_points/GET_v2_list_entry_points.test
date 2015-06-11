@@ -1,4 +1,4 @@
-# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+# Copyright (c) 2015 Telefonica Investigacion y Desarrollo, S.A.U
 #
 # This file is part of Orion Context Broker.
 #
@@ -18,25 +18,37 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
-SET (SOURCES
-getEntities.cpp
-entryPointsTreat.cpp
-)
+--NAME--
+/v2 Retrieve the entry points
 
-SET (HEADERS
-getEntities.h
-entryPointsTreat.h
-)
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+echo "1: ++++++++++++++++++++"
+orionCurl --url /v2 --json
+echo
+echo
+
+--REGEXPECT--
+1: ++++++++++++++++++++
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "entities_url": "/v2/entities",
+    "registrations_url": "/v2/registrations",
+    "subscriptions_url": "/v2/subscriptions",
+    "types_url": "/v2/types"
+}
 
 
-
-# Include directories
-# -----------------------------------------------------------------
-include_directories("${PROJECT_SOURCE_DIR}/src/lib")
-
-
-# Library declaration
-# -----------------------------------------------------------------
-ADD_LIBRARY(serviceRoutinesV2 STATIC ${SOURCES} ${HEADERS})
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
