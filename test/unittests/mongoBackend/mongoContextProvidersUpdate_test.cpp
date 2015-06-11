@@ -500,8 +500,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -561,8 +560,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);  
   utExit();
 
 }
@@ -628,8 +626,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -701,8 +698,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -764,8 +760,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -832,8 +827,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   EXPECT_EQ(0, RES_CER(1).contextAttributeVector.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -916,8 +910,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1050,8 +1043,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
   EXPECT_EQ("", RES_CER_STATUS(1).details);
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1126,8 +1118,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1172,8 +1163,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern0Attr)
   // TBD
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1214,8 +1204,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrSingle)
   // TBD
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1258,8 +1247,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, pattern1AttrMulti)
   // TBD
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1304,8 +1292,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNAttr)
   // TBD
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1346,8 +1333,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternFail)
   //TBD
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1394,8 +1380,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, patternNoType)
   // TBD
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1441,8 +1426,7 @@ TEST(DISABLED_mongoContextProvidersUpdateRequest, mixPatternAndNotPattern)
   //TBD
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1651,8 +1635,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
   EXPECT_EQ(1360232700, a3.getIntField("modDate"));
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1861,8 +1844,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
   EXPECT_EQ(1360232700, a3.getIntField("modDate"));
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1921,8 +1903,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -1979,7 +1960,6 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }

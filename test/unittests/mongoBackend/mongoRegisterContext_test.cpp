@@ -185,8 +185,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok)
   EXPECT_EQ(0, res.errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -254,8 +253,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_XML)
   EXPECT_EQ(0, res.errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -323,8 +321,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_At0_Ok_JSON)
   EXPECT_EQ(0, res.errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -390,8 +387,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_At0_Ok)
   EXPECT_EQ(0, res.errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -469,8 +465,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtN_Ok)
   EXPECT_EQ(0, res.errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -548,8 +543,7 @@ TEST(mongoRegisterContextRequest, ce1_En1_AtNnt_Ok)
   EXPECT_EQ(0, res.errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -618,8 +612,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtN_Ok)
   EXPECT_STREQ("true", C_STR_FIELD(rattr1, "isDomain"));
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -697,8 +690,7 @@ TEST(mongoRegisterContextRequest, ce1_En1nt_AtNnt_Ok)
   EXPECT_EQ(0, res.errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -769,8 +761,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_At0_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -841,8 +832,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_At0_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -926,8 +916,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtN_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1011,8 +1000,7 @@ TEST(mongoRegisterContextRequest, ce1_EnN_AtNnt_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1096,8 +1084,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtN_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1181,8 +1168,7 @@ TEST(mongoRegisterContextRequest, ce1_EnNnt_AtNnt_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1262,8 +1248,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_At0_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1343,8 +1328,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_At0_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1449,8 +1433,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtN_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1555,8 +1538,7 @@ TEST(mongoRegisterContextRequest, ceN_En1_AtNnt_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1661,8 +1643,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtN_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1767,8 +1748,7 @@ TEST(mongoRegisterContextRequest, ceN_En1nt_AtNnt_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1859,8 +1839,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_At0_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -1951,8 +1930,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_At0_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -2067,8 +2045,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtN_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -2183,8 +2160,7 @@ TEST(mongoRegisterContextRequest, ceN_EnN_AtNnt_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -2299,8 +2275,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtN_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -2415,8 +2390,7 @@ TEST(mongoRegisterContextRequest, ceN_EnNnt_AtNnt_Ok)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -2479,7 +2453,7 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability1)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Release connection */
-  mongoDisconnect();
+  setMongoConnectionForUnitTest(NULL);
 
   /* Delete mock */
   delete timerMock;
@@ -2551,8 +2525,7 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability2)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   /* Delete mock */
   delete timerMock;
   delete notifierMock;
@@ -2620,8 +2593,7 @@ TEST(mongoRegisterContextRequest, NotifyContextAvailability3)
    * testbed by other unit tests, so we don't include checking in the present unit test */
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   /* Delete mock */
   delete timerMock;
   delete notifierMock;
@@ -2688,8 +2660,7 @@ TEST(mongoRegisterContextRequest, defaultDuration)
   EXPECT_EQ(0, res.errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -2764,6 +2735,8 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
     EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
     EXPECT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
 
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -2846,8 +2819,7 @@ TEST(mongoRegisterContextRequest, AssociationsOk)
     EXPECT_STREQ("B2", C_STR_FIELD(attrAssoc1, "tgt"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -2911,6 +2883,7 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     /* check collections have not been touched */  
     EXPECT_EQ(0, connection->count(ASSOCIATIONS_COLL, BSONObj()));
     EXPECT_EQ(0, connection->count(REGISTRATIONS_COLL, BSONObj()));
+
 
     utExit();
 }

@@ -145,10 +145,9 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
-
+ 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -203,7 +202,7 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
-  mongoDisconnect();
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }
@@ -258,8 +257,9 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterNotExist)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
+
   /* Release connection */
-  mongoDisconnect();
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }

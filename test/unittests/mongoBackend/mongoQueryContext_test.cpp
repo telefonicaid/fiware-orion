@@ -503,8 +503,7 @@ TEST(mongoQueryContextRequest, paginationDetails)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
 
     /* Invoke the function in mongoBackend library */
-    long long count;
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, &count);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -587,8 +586,7 @@ TEST(mongoQueryContextRequest, paginationDetails)
     EXPECT_EQ(0, RES_CER_STATUS(5).details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -698,7 +696,7 @@ TEST(mongoQueryContextRequest, paginationAll)
     EXPECT_EQ(0, RES_CER_STATUS(5).details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -749,7 +747,7 @@ TEST(mongoQueryContextRequest, paginationOnlyFirst)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -801,7 +799,7 @@ TEST(mongoQueryContextRequest, paginationOnlySecond)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -877,7 +875,7 @@ TEST(mongoQueryContextRequest, paginationRange)
     EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -918,7 +916,7 @@ TEST(mongoQueryContextRequest, paginationNonExisting)
     ASSERT_EQ(0, res.contextElementResponseVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -970,7 +968,7 @@ TEST(mongoQueryContextRequest, paginationNonExistingOverlap)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -999,8 +997,7 @@ TEST(mongoQueryContextRequest, paginationNonExistingDetails)
     uriParams[URI_PARAM_PAGINATION_DETAILS]  = "on";
 
     /* Invoke the function in mongoBackend library */
-    long long count;
-    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams, &count);
+    ms = mongoQueryContext(&req, &res, "", servicePathVector , uriParams);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
@@ -1012,7 +1009,7 @@ TEST(mongoQueryContextRequest, paginationNonExistingDetails)
     ASSERT_EQ(0, res.contextElementResponseVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1085,6 +1082,9 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_2levels)
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
+
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }
@@ -1194,6 +1194,9 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   EXPECT_EQ("OK", RES_CER_STATUS(5).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(5).details.size());
 
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+
   utExit();
 }
 
@@ -1279,6 +1282,9 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
 
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+
   utExit();
 }
 
@@ -1338,6 +1344,9 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1levelbis)
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }
@@ -1409,6 +1418,9 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
 
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+
   utExit();
 }
 
@@ -1456,6 +1468,9 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }
@@ -1505,6 +1520,9 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+ 
   utExit();
 }
 
@@ -1553,6 +1571,9 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }
@@ -1638,6 +1659,9 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
 
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+  
   utExit();
 }
 
@@ -1758,6 +1782,9 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   EXPECT_EQ("OK", RES_CER_STATUS(6).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(6).details.size());
 
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+
   utExit();
 }
 
@@ -1843,6 +1870,9 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
 
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+
   utExit();
 }
 
@@ -1903,6 +1933,9 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1levelbis)
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+
   utExit();
 }
 
@@ -1938,6 +1971,9 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternTypeFail)
   EXPECT_EQ("", res.errorCode.details);
 
   EXPECT_EQ(0, res.contextElementResponseVector.size());
+
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 }
@@ -1986,6 +2022,10 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternTypeOk)
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+
 
   utExit();
 }
@@ -2046,6 +2086,10 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
+
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+
 
   utExit();
 }
@@ -2109,6 +2153,9 @@ TEST(mongoQueryContextRequest, queryWithSeveralServicePaths)
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
 
+  /* Release connection */
+  setMongoConnectionForUnitTest(NULL);
+
   utExit();
 }
 
@@ -2165,9 +2212,8 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -2215,7 +2261,8 @@ TEST(mongoQueryContextRequest, query1Ent1Attr)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2284,9 +2331,8 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************
@@ -2337,9 +2383,9 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2403,9 +2449,9 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2471,9 +2517,9 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2509,9 +2555,9 @@ TEST(mongoQueryContextRequest, query1Ent0AttrFail)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2549,9 +2595,9 @@ TEST(mongoQueryContextRequest, query1Ent1AttrFail)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 
@@ -2589,9 +2635,9 @@ TEST(mongoQueryContextRequest, query1EntWA0AttrFail)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2636,9 +2682,10 @@ TEST(mongoQueryContextRequest, query1EntWA1Attr)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
+
 }
 
 /* ****************************************************************************
@@ -2701,9 +2748,9 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2753,7 +2800,8 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2829,9 +2877,9 @@ TEST(mongoQueryContextRequest, queryNoType)
     EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
     EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2888,7 +2936,8 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -2941,7 +2990,8 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 
@@ -2993,7 +3043,7 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase); 
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */
@@ -3010,9 +3060,9 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -3060,7 +3110,8 @@ TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -3119,9 +3170,9 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -3184,9 +3235,9 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -3220,8 +3271,6 @@ TEST(mongoQueryContextRequest, queryPatternFail)
     EXPECT_EQ("", res.errorCode.details);
     EXPECT_EQ(0,res.contextElementResponseVector.size());
 
-    /* Release connection */
-    mongoDisconnect();
 }
 
 /* ****************************************************************************
@@ -3300,9 +3349,9 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -3402,9 +3451,9 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
 
     /* Release dynamic memory used by response (mongoBackend allocates it) */
     res.contextElementResponseVector.release();
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -3488,7 +3537,8 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************
@@ -3560,7 +3610,8 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 }
 
 /* ****************************************************************************

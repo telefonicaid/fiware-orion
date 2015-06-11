@@ -185,11 +185,6 @@ extern Notifier* getNotifier();
 */
 extern void setNotifier(Notifier* n);
 
-/*****************************************************************************
-*
-* getMongoConnection -
-*/
-extern void mongoDisconnect();
 
 /*****************************************************************************
 *
