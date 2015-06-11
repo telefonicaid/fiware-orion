@@ -173,7 +173,6 @@
 #include "serviceRoutines/badRequest.h"
 
 #include "serviceRoutinesV2/getEntities.h"
-#include "serviceRoutinesV2/entryPointsTreat.h"
 
 #include "contextBroker/version.h"
 
@@ -331,10 +330,6 @@ PaArgument paArgs[] =
 //
 // /v2 API
 //
-
-#define EPS                EntryPointsRequest
-#define EPS_COMPS_V2       1, { "v2"             }
-
 #define ENT                EntitiesRequest
 #define ENT_COMPS_V2       2, { "v2", "entities" }
 #define ENT_COMPS_WORD     ""
@@ -585,11 +580,8 @@ PaArgument paArgs[] =
 
 
 #define API_V2                                                                                           \
-  { "GET",    EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  entryPointsTreat                          }, \
-  { "*",      EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  badVerbAllFour                            }, \
   { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
   { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
-
 
 
 

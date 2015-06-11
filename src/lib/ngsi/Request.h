@@ -104,8 +104,7 @@ typedef enum RequestType
   // /v2 API
   EntitiesRequest = 70,
   EntitiesResponse,
-  EntryPointsRequest,
-  EntryPointsResponse,
+
 
   InvalidRequest = 100
 } RequestType;
