@@ -188,12 +188,6 @@ extern void setNotifier(Notifier* n);
 /*****************************************************************************
 *
 * getMongoConnection -
-*/
-extern void mongoDisconnect();
-
-/*****************************************************************************
-*
-* getMongoConnection -
 *
 * I would prefer to have per-collection methods, to have a better encapsulation, but
 * the Mongo C++ API seems not to work that way
