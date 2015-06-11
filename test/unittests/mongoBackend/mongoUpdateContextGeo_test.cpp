@@ -245,8 +245,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     EXPECT_EQ(4, coordY(ent));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 
 }
@@ -366,8 +365,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     EXPECT_EQ(8, coordY(ent));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -473,8 +471,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -572,8 +569,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -697,8 +693,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -809,8 +804,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -921,8 +915,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1034,8 +1027,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1146,8 +1138,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1258,8 +1249,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1365,8 +1355,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1477,8 +1466,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -1590,7 +1578,6 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     EXPECT_FALSE(ent.hasField("location"));
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }

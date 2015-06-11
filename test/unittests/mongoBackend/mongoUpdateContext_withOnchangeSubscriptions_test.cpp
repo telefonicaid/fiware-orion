@@ -1,3 +1,4 @@
+
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -424,7 +425,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -491,7 +493,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -552,9 +554,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-
+    
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -626,7 +629,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_noType)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -700,7 +703,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_noType)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -770,7 +773,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -835,7 +839,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -900,9 +904,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860003")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -965,7 +968,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1030,7 +1033,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1097,7 +1100,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1160,7 +1163,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1225,7 +1228,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchDisjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1290,7 +1293,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatchDisjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1355,7 +1359,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1409,7 +1414,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateNoMatch)
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1464,7 +1470,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendNoMatch)
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1518,7 +1525,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1572,7 +1579,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatchWithoutChang
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1639,7 +1646,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMixMatchNoMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1709,7 +1716,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMixMatchNoMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1774,7 +1781,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1841,7 +1848,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_update2Matches1Notifica
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1910,7 +1917,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_append2Matches1Notifica
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1972,8 +1979,11 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
+
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
+
 
     /* Release mock */
     delete notifierMock;
@@ -2039,7 +2049,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2106,7 +2117,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2169,7 +2180,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2234,7 +2246,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchDisjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2299,7 +2311,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMatchDisjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2364,7 +2377,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2418,7 +2431,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateNoMatch)
     EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2473,9 +2486,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendNoMatch)
     EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
+
     delete notifierMock;
     delete timerMock;
 }
@@ -2527,7 +2541,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2581,7 +2595,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMatchWithoutChang
     EXPECT_EQ(30000000, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2648,7 +2662,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_updateMixMatchNoMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2717,8 +2731,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_appendMixMatchNoMatch)
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860002")));
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
-        /* Release connection */
-    mongoDisconnect();
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2783,7 +2797,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2850,7 +2864,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_update2Matches1Notifica
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2919,7 +2933,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_append2Matches1Notifica
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2982,7 +2996,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     EXPECT_EQ(1360232700, sub.getIntField("lastNotification"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -3057,6 +3071,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     DBClientBase* connection = getMongoConnection();
     BSONObj sub = connection->findOne(SUBSCRIBECONTEXT_COLL, BSON("_id" << OID("51307b66f481db11bf860001")));
     EXPECT_EQ(20000000, sub.getIntField("lastNotification"));
+
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
