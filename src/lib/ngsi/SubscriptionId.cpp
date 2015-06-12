@@ -123,11 +123,11 @@ void SubscriptionId::present(const std::string& indent)
 {
   if (string != "")
   {
-    PRINTF("%sSubscriptionId: %s\n", indent.c_str(), string.c_str());
+    LM_F(("%sSubscriptionId: %s\n", indent.c_str(), string.c_str()));
   }
   else
   {
-    PRINTF("%sNo SubscriptionId\n", indent.c_str());
+    LM_F(("%sNo SubscriptionId\n", indent.c_str()));
   }
 }
 

@@ -171,6 +171,10 @@
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
+
+#include "serviceRoutinesV2/getEntities.h"
+#include "serviceRoutinesV2/entryPointsTreat.h"
+
 #include "contextBroker/version.h"
 
 #include "common/string.h"
@@ -323,6 +327,17 @@ PaArgument paArgs[] =
 *
 */
 
+
+//
+// /v2 API
+//
+
+#define EPS                EntryPointsRequest
+#define EPS_COMPS_V2       1, { "v2"             }
+
+#define ENT                EntitiesRequest
+#define ENT_COMPS_V2       2, { "v2", "entities" }
+#define ENT_COMPS_WORD     ""
 
 //
 // NGSI9
@@ -566,6 +581,15 @@ PaArgument paArgs[] =
 #define INV9_COMPS         2, { "ngsi9",   "*"                           }
 #define INV10_COMPS        2, { "ngsi10",  "*"                           }
 #define INV_ALL_COMPS      0, { "*", "*", "*", "*", "*", "*"             }
+
+
+
+#define API_V2                                                                                           \
+  { "GET",    EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  entryPointsTreat                          }, \
+  { "*",      EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  badVerbAllFour                            }, \
+  { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
+  { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
+
 
 
 
@@ -899,6 +923,8 @@ PaArgument paArgs[] =
 */
 RestService restServiceV[] =
 {
+  API_V2,
+
   REGISTRY_STANDARD_REQUESTS_V0,
   REGISTRY_STANDARD_REQUESTS_V1,
   STANDARD_REQUESTS_V0,

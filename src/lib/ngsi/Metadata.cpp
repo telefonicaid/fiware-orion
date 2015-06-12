@@ -174,3 +174,46 @@ void Metadata::fill(const struct Metadata& md)
   value       = md.value;
   association = md.association;
 }
+
+
+
+/* ****************************************************************************
+*
+* toJson - 
+*/
+std::string Metadata::toJson(bool isLastElement)
+{
+  std::string  out;
+  bool         isNumber = false;
+
+  if (type == "number")
+  {
+    isNumber = true;
+  }
+
+  if ((type == "") || (isNumber == true))
+  {
+    if (isNumber == true)
+    {
+      out = JSON_VALUE_NUMBER(name, value);
+    }
+    else
+    {
+      out = JSON_VALUE(name, value);
+    }
+  }
+  else
+  {
+    out = JSON_STR(name) + ":{";
+    out += JSON_VALUE("value", value);
+    out += "," + JSON_VALUE("type", type);
+    out += "}";
+  }
+
+  if (!isLastElement)
+  {
+    out += ",";
+  }
+
+  return out;
+}

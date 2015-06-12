@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "ngsi/NotifyConditionVector.h"
@@ -92,7 +94,7 @@ std::string NotifyConditionVector::check
 */
 void NotifyConditionVector::present(const std::string& indent)
 {
-  PRINTF("%lu NotifyConditions", (uint64_t) vec.size());
+  LM_F(("%lu NotifyConditions", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

@@ -43,7 +43,8 @@ extern HttpStatusCode mongoQueryContext
   QueryContextResponse*                 responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
-  std::map<std::string, std::string>&   uriParams
+  std::map<std::string, std::string>&   uriParams,
+  long long*                            countP = NULL
 );
 
 #endif

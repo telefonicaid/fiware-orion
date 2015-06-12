@@ -89,10 +89,10 @@ std::string ConditionValueList::check
 */
 void ConditionValueList::present(const std::string& indent)
 {
-  PRINTF("%sConditionValue List\n",    indent.c_str());
+  LM_F(("%sConditionValue List\n",    indent.c_str()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    PRINTF("%s  %s\n", indent.c_str(), vec[ix].c_str());
+    LM_F(("%s  %s\n", indent.c_str(), vec[ix].c_str()));
 }
 
 

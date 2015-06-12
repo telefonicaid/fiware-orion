@@ -1,0 +1,199 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entities V2 with Pagination
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v1/updateContext, creating 5 entities
+# 02. GET /v2/entities?limit=2&count=true
+# 03. GET /v2/entities?offset=2
+#
+
+echo "01. POST /v1/updateContext"
+echo "=========================="
+payload='{
+  "contextElements": [
+    {
+      "id":   "E1",
+      "type": "T1"
+    },
+    {
+      "id":   "E2",
+      "type": "T2"
+    },
+    {
+      "id":   "E3",
+      "type": "T3"
+    },
+    {
+      "id":   "E4",
+      "type": "T4"
+    },
+    {
+      "id":   "E5",
+      "type": "T5"
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "02. GET /v2/entities?limit=2&count=true"
+echo "======================================="
+orionCurl --url '/v2/entities?limit=2&count=true' --json
+echo
+echo
+
+
+echo "03. GET /v2/entities?offset=2"
+echo "============================="
+orionCurl --url /v2/entities?offset=2 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v1/updateContext
+==========================
+HTTP/1.1 200 OK
+Content-Length: 1072
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "id": "E1", 
+                "isPattern": "false", 
+                "type": "T1"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "id": "E2", 
+                "isPattern": "false", 
+                "type": "T2"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "id": "E3", 
+                "isPattern": "false", 
+                "type": "T3"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "id": "E4", 
+                "isPattern": "false", 
+                "type": "T4"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }, 
+        {
+            "contextElement": {
+                "id": "E5", 
+                "isPattern": "false", 
+                "type": "T5"
+            }, 
+            "statusCode": {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+02. GET /v2/entities?limit=2&count=true
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 49
+Content-Type: application/json
+X-Total-Count: 5
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1", 
+        "type": "T1"
+    }, 
+    {
+        "id": "E2", 
+        "type": "T2"
+    }
+]
+
+
+03. GET /v2/entities?offset=2
+=============================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E3", 
+        "type": "T3"
+    }, 
+    {
+        "id": "E4", 
+        "type": "T4"
+    }, 
+    {
+        "id": "E5", 
+        "type": "T5"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+
