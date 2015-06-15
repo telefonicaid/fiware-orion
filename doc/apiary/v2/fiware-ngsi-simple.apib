@@ -50,11 +50,16 @@ to keep your client decoupled from implementation details.
 
 ## Context Entities [/v2/entities{?type,pattern,limit,offset}]
 
-### List all entities [GET /v2/entities{?limit,offset}]
+### List entities [GET /v2/entities{?limit,offset,count,type,id}]
+
+Detailed description
 
 + Parameters
     + limit: 20 (optional, number) - Limit the number of entities to be retrieved
     + offset: 20 (optional, number) - Skip a number of records. Pagination
+    + type: Room (optional, string) - Only retrieve entities of this type
+    + id: Bcn-Welt (optional, string) - Retrieve entities by id
+    + idPattern: (optional, string) - Retrieve entities by pattern id
 
 + Response 200 (application/json)
 
@@ -84,42 +89,8 @@ to keep your client decoupled from implementation details.
          }
         ]
 
-### List all entities of an specific type [GET /v2/entities{?type}]
 
-+ Parameters
-    + type: Room (optional, string) - Only retrieve entities of this type
-
-+ Response 200 (application/json)
-
-        [
-         {
-            "type": "Room",
-            "id": "DC_S1-D41",
-            "temperature": 35.6
-         },
-         {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": 22.5
-         }
-        ]
-
-### List all entities by pattern matching [GET /v2/entities{?pattern}]
-
-+ Parameters
-    + pattern: DC_* (optional, string) - Only retrieve entities which id matches this pattern.
-
-+ Response 200 (application/json)
-
-        [
-         {
-            "type": "Room",
-            "id": "DC_S1-D41",
-            "temperature": 35.6
-         }
-        ]
-
-### List all Entities. Pagination [GET /v2/entities{?limit,offset,count}]
+### Entity Pagination [GET /v2/entities{?limit,offset,count}]
 
 + Parameters
     + count: true
@@ -166,13 +137,7 @@ to keep your client decoupled from implementation details.
         }]
 
 
-### Query Entities. No results [GET /v2/entities{?q,limit,coords,geometry,attrs}]
-
-+ Response 200 (application/json)
-
-        []
-
-### Create a new entity [POST /v2/entities]
+### Create entity [POST /v2/entities]
 
 + Request (application/json)
 
@@ -182,20 +147,20 @@ to keep your client decoupled from implementation details.
             "temperature": 21.7,
             "humidity": 60,
             "location": {
-                "value":  "41.3763726, 2.1864475,14",
+                "value":  "41.3763726, 2.1864475",
                 "type": "geo:point",
                 "crs": "WGS84"
             },
         }
 
-+ Response 201 (application/json)
++ Response 201
 
     + Headers
 
-            Location: /entities/Bcn-Welt
+            Location: /v2/entities/Bcn-Welt
 
 
-### Create a new entity. Error [POST /v2/entities]
+### Create entity. Error [POST /v2/entities]
 
 + Request (application/json)
 
@@ -208,15 +173,14 @@ to keep your client decoupled from implementation details.
 + Response 422 (application/json)
 
         {
-            "code": 1234,
-            "message": "Already exists",
+            "error": "AlreadyExists",
             "description": "An entity with the same id and type is already present"
         }
 
 
 ## ContextEntity [/v2/entities/{entityId}]
 
-### Retrieve all entity data by Id [GET /v2/entities/{entityId}]
+### Retrieve entity data by Id [GET /v2/entities/{entityId}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity Id.
@@ -229,13 +193,13 @@ to keep your client decoupled from implementation details.
             "temperature": 21.7,
             "humidity": 60,
             "location": {
-                "value":  "41.3763726, 2.1864475,14",
+                "value":  "41.3763726, 2.1864475",
                 "type": "geo:point",
                 "crs": "WGS84"
             }
         }
 
-### Retrieve all entity data by Id. Not exists [GET /v2/entities/{entityId}]
+### Retrieve entity data by Id. Not exists [GET /v2/entities/{entityId}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity Id.
@@ -243,12 +207,11 @@ to keep your client decoupled from implementation details.
 + Response 404 (application/json)
 
         {
-            "code": 4567,
-            "message": "Not Found",
+            "error": "NotFound",
             "description": "There is no entity with such an id"
         }
 
-### Retrieve all entity data by id and type [GET /v2/entities/type/{entityType}/id/{entityId}]
+### Retrieve entity data by id and type [GET /v2/entities/type/{entityType}/id/{entityId}]
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
@@ -262,30 +225,7 @@ to keep your client decoupled from implementation details.
             "temperature": 22.5
         }
 
-### Get one entity attribute [GET /v2/entities/{entityId}{?attrs}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrs: temperature (optional, string) - Attribute to be retrieved
-
-+ Response 200 (application/json)
-
-        {
-            "temperature": 21.7
-        }
-
-### Get one entity attribute. Not present [GET /v2/entities/{entityId}{?attrs}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrs: mistake (optional, string) - Attribute to be retrieved
-
-+ Response 200 (application/json)
-
-        {
-        }
-
-### Get several entity attributes [GET /v2/entities/{entityId}{?attrs}]
+### Get entity attributes [GET /v2/entities/{entityId}{?attrs}]
 
 + Parameters
     + entityId: 'Bcn_Welt' (required, string) - Entity ID
@@ -298,16 +238,23 @@ to keep your client decoupled from implementation details.
             "humidity": 60,
         }
 
-### Update or append an entity attribute. POST or PATCH [POST /v2/entities/{entityId}]
+### Get entity attributes. Not present [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrs: mistake (optional, string) - Attribute to be retrieved
+
++ Response 200 (application/json)
+
+        {
+        }
+
+### Update or append  entity attributes. POST [POST /v2/entities/{entityId}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
 
 + Request (application/json)
-
-    + Headers
-
-            X-HTTP-Method-Override: PATCH
 
     + Body
 
@@ -318,7 +265,7 @@ to keep your client decoupled from implementation details.
 + Response 204
 
 
-### Update or append several entity attributes. POST or PATCH. [PATCH /v2/entities/{entityId}]
+### Update entity attributes. [PATCH /v2/entities/{entityId}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -333,7 +280,7 @@ to keep your client decoupled from implementation details.
 + Response 204
 
 
-### Update one or more entity attributes. POST or PATCH [POST /v2/entities/{entityId}{?op}]
+### Update entity attributes. POST [POST /v2/entities/{entityId}{?op}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -362,7 +309,7 @@ to keep your client decoupled from implementation details.
 
 + Response 204
 
-### Remove one or more entity attributes[DELETE /v2/entities/{entityId}{?attrs}]
+### Remove entity attributes[DELETE /v2/entities/{entityId}{?attrs}]
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
@@ -383,7 +330,7 @@ to keep your client decoupled from implementation details.
             "temperature": 21.7,
             "humidity": 60,
             "location": {
-                "value":  "41.3763726, 2.1864475,14",
+                "value":  "41.3763726, 2.1864475",
                 "type": "geo:point",
                 "crs": "WGS84"
             }
@@ -407,27 +354,11 @@ to keep your client decoupled from implementation details.
 
 + Response 200
 
-### Get a single attribute value [GET /v2/entities/{entityId}/attrs/{attrId}]
+### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrId}]
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
     + attrId: temperature (required, string) - Attribute to be retrieved.
-
-+ Response 200 (text/plain)
-
-        21.7
-
-### Get a single attribute value as JSON [GET /v2/entities/{entityId}/attrs/{attrId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrId: temperature (required, string) - Attribute to be retrieved.
-
-+ Request
-
-    + Headers
-
-            Accept: application/json
 
 + Response 200 (application/json)
 
@@ -444,22 +375,9 @@ to keep your client decoupled from implementation details.
 + Response 404 (application/json)
 
         {
-            "code": 4567,
-            "message": "Not found",
+            "error": "NotFound",
             "description": "The entity does not have such an attribute"
         }
-
-### Update an attribute value [PUT /v2/entities/{entityId}/attrs/{attrId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrId: temperature (required, string) - Attribute ID
-
-+ Request (text/plain)
-
-        17.9
-
-+ Response 200
 
 ### Update an attribute value - JSON [PUT /v2/entities/{entityId}/attrs/{attrId}]
 
