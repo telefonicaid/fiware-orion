@@ -37,6 +37,110 @@ It is recommended to follow the “url” link values,
 applicable to retrieve resources. Instead of constructing your own URLs,
 to keep your client decoupled from implementation details.
 
+## JSON entity representation
+
+An entity is represented by a a JSON object which contain the following properties:
+
+* `id` for the entity ID, represented by a JSON string. If the entity has an `id` attribute itself it will be ignored.
+* `type` for the entity type, represented by a JSON string. If the entity has a `type` attribute itself it will be ignored.
+  If the entity doesn't have a type, then this property is not included.
+* A collection of properties, one per entity attribute. Property values can be single values or they can include,
+  `type` and properties representing metadata as well. Property values which correspond to the primitive JSON datatypes
+  "string", "number" and "boolean" and with no metadata are rendered as regular JSON values. Property values
+  which specify a custom type or include metadata are rendered as JSON objects with the following properties:
+  * `value`: for the attribute value, rendered as a regular JSON value depending on the type. Attributes with an
+    user-defined informative types are rendered as JSON strings (TBD).
+  * `type`: a JSON string which represents the attribute type provided at attribute creation time.
+  * A collection of properties one per metadata field associated to the attribute value. Metadata properties follow the
+    same representation rules that applies to properties which represent attributes (except that a metadata
+    cannot have metadata properties). 
+
+Canonical format description (TBD).
+
+### Predefined types
+
+All attribute types not included in the list below are considered *user-defined informative* types. The values of
+user-defined informative types are represented by JSON string.
+
+* `number` (or `Number`):  identifies numbers, either integer or float.
+They are associated to JSON number type (see https://developer.mozilla.org/en-US/docs/Glossary/Number).
+Operators allowed are: greater than, lesser than, greater or equal, lesser or equal and range.
+
+```
+"temperature": 32.5
+```
+
+* `string` (or `String`): identifies text string. They are represented by JSON strings (see https://developer.mozilla.org/en-US/docs/Glossary/String).
+
+```
+"msg": "Hello world"
+```
+
+* `boolean` (or `Boolean`): identifies a logical value, either true or false. They are represented by JSON booleans (see https://developer.mozilla.org/en-US/docs/Glossary/Boolean).
+
+```
+"active": true
+```
+
+* `date` (or `Date`):  identifies dates, in ISO8601 format. They are represented by JSON strings. Operators allowed are:
+greater than, lesser than, greater or equal, lesser or equal and range.
+
+```
+"timestamp": "2017-06-17T07:21:24.238Z"
+```
+
+
+* `geo:point`: identifies a geolocation. They are represented by JSON strings. An
+entity can only have one `geo:point` attribute (TBD: this is yet under discussion, one possibility is
+there can be multiple points associated to an entity but an entity can only be located on one place).
+
+```
+{
+  ...
+  "location": {
+    "value": "41.3763726, 2.1864475,14",
+    "type": "geo:point"
+  }
+}
+```
+
+At creation or update time, the type has to be coherent with the value of the attribute, e.g the following
+will result in an error response:
+
+(TBD: this behaviour is under discussion, specially the case for the "myType" with JSON number for the value)
+
+```
+{
+  "value": "23.5", -> value should be: 23.5
+  "type": "number"
+}
+
+
+{
+  "value": 23.5,   -> value should be: "23.5"
+  "type": "string"
+}
+
+{
+  "value": "23.5", -> value should be: "23.5" (user defined types always use JSON strings as value)
+  "type": "myType"
+}
+
+{
+  "value": "foo, bar", -> it is not correctly formated as coordinates
+  "type": "geo:point"
+}
+```
+
+## Error responses
+
+In the case of being present, the error payload is JSON object including the following fields:
+
+* `error` (mandatory): a textual description of the error.
+* `description` (optional): additional information about the error.
+
+# API entry point
+
 ## Retrieve the Entry Point [GET]
 
 + Response 200 (application/json)
@@ -48,18 +152,166 @@ to keep your client decoupled from implementation details.
             "registrations_url": "/v2/registrations"
         }
 
-## Context Entities [/v2/entities{?type,pattern,limit,offset}]
+## Context Entities [/v2/entities]
 
-### List entities [GET /v2/entities{?limit,offset,count,type,id}]
+### List entities [GET /v2/entities{?limit,offset,count,type,id,idPattern,q,geometry,coords,attrs}]
 
-Detailed description
+Retrieves a list of entities which match criteria defined by the following parameters: `id`, `type`, `idPattern`, `q`,
+`geometry` and `coords` attribute (see below for a detailed description of these parameters). A given entity
+have to match all the criteria to be retrieved (i.e. criteria are combined in a logical AND way).
+
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">id</td><td>A comma separated list of elements.
+  Retrieve entities which ID match one of the elements in the list.</td>
+</tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">type</td><td>A comma separated list of elements.
+  Retrieve entities which type match one of the elements in the list.</td>
+</tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">idPattern</td><td>A correctly formated regular
+  expression. Retrieve entities which ID matches the regular expression.</td>
+</tr>
+<tr><td style="padding-right: 40px; width: 140px;">q</td><td>
+
+<p>A query expression, composed of a list of statements separated by <code>;</code>, i.e.</p>
+
+<p><code>
+q=statement;statements;statement
+</code></p>
+
+<p>Each statement express a matching condition. The result of the query is the match on each one of the statements, e.g. a
+AND logical condition among the different statements. There are two kind of statements: <em>unary statements</em> and
+<em>binary staments</em>.</p>
+
+<p>Binary statements are composed by an attribute name (e.g. "temperature"), operator and value (which format
+depends on the operator), e.g.:</p>
+
+<p><code>
+temperature==50<br/>
+temperature<=20
+</code></p>
+
+<p>The list of operators (and the format of the values they use) is as follows:</p>
+
+<ul>
+  <li>Equal: <code>==</code>. It accepts the following values:
+    <ul>
+      <li>Single element, e.g. <code>temperature==40</code>. It matches entities whose attribute value
+      that exact value.</li>
+      <li>A list of comma-separated values, e.g. <code>color==black,red</code>. It matches entities whose
+      attribute value is one of the values (OR clause). Eg. entities which <code>color</code> is set to
+      <code>black</code> will match, while entities which <code>color</code> is set to <code>white</code>
+      will not match.</li>
+      <li>A range, specified as a minimum and maximum separated by <code>..</code>. It match if
+      the value is in the interval between the minimum and the maximum (both included). It can only be used
+      with attributes which contain dates or numbers. E.g. <code>temperature==10..20</code> matchs if the
+      temperature is greater or equal than 10 and lower or equal than 20.</li>
+    </ul>
+  </li>
+  <li>Unequal: <code>!=</code>. It accepts the following values:
+    <ul>
+      <li>The value is a single element, e.g. <code>temperature!=40</code>. It matches entities whose attribute
+      value is not that exact value.</li>
+      <li>A list of comma-separated values, e.g. <code>color!=black,red</code>. It matches entities whose
+      attribute value is not any of the values (AND clause). Eg. entities whose <code>color</code> is set
+      to <code>black</code> will not match, while entities whose <code>color</code> is set to
+      <code>white</code> match.</li>
+      <li>A range, specified as a minimum and maximum separated by <code>..</code>. It match
+      if the value is not in the interval between the minimum and the maximum (both included). It can only
+      be used with attributes which contain dates or numbers. E.g. <code>temperature!=10..20</code>matchs if
+      the temperature is lower than 10 or greater than 20 (it will not match if the tempeature is 10 or the
+      temperature is 20).</li>
+    </ul>
+  </li>
+  <li>Greater than: <code>&gt;</code>. The value is a single element, e.g. <code>temperature&gt;40</code>. It
+  matches entities which attribute value is strictly greater than that value. It can only
+  be used with attributes which contain dates or numbers.</li>
+  <li>Lesser than: <code>&lt;</code>. The value is a single element, e.g. <code>temperature&lt;40</code>. It
+  matches entities which attribute value is strictly lesser than that value. It can only
+  be used with attributes which contain dates or numbers.</li>
+  <li>Greater or equal than: <code>&gt;=</code>. The value is a single element, e.g. <code>temperature&gt;=40</code>.
+  It matches entities which attribute value is greater than or equal to that value. It can only
+  be used with attributes which contain dates or numbers.</li>
+  <li>Lesser or equal than: <code>&lt;=</code>. The value is a single element, e.g. <code>temperature&lt;=40</code>. It
+  matches entities which attribute value is lesser than or equal to that value. It can only
+  be used with attributes which contain dates or numbers.</li>
+</ul>
+
+<p>In the case of equal or inequal, if the value to match include a <code>,</code>, you can use simple quote
+(<code>'</code>), e.g: <code>color=='light,green','deep,blue'</code>.</p>
+
+<p>Unary statements are composed of a unary operator (either <code>+</code>or <code>-</code>) and are used in two situations:</p>
+
+<ul>
+  <li>To check for attribute existence. E.g. <code>+temperature</code>matches entities which have
+  a temperature attribute (no matter its value), while <code>-temperature</code>matches entities which don't have
+  a temperature attribute.</li>
+  <li>To check for entity type existence, with the <code>type</code>keyword. E.g, <code>-type</code>
+  matches entities which don't have a type.</li>
+</ul>
+
+</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">geometry</td><td>
+
+<p>Defines a geografical area so only the entities located in that area matches the query. It is composed of a tokens list
+separated by <code>;</code>. The first token is the shape of the geometry, the rest of the tokens (if any) depends
+on the shape. In particular, the following geometries can be defined so far:</p>
+
+<ul>
+  <li><code>geometry=circle;radius:4000</code>, inside a circle (radius is in meters).</li>
+  <li><code>geometry=circle;radius:4000;external</code>, outside a circle (radius is in meters).</li>
+  <li><code>geometry=polygon</code>, inside a polygon.</li>
+  <li><code>geometry=polygon;external</code>, outside a polygon.</li>
+</ul>
+
+</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">coords</td><td>
+
+<p>List of coordinates (separated by <code>;</code>) are interpreted depending on the geometry parameter as follows:</p>
+
+<ul>
+  <li>In the case of <code>circle</code>geometry, the parameter includes just one element, which
+  is the center of the circle.</li>
+  <li>In the case of <code>polygon</code>includes a list of elements, which are the vertices of
+  the polygon.</li>
+</ul>
+
+</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">attrs</td>
+    <td>List of comma separated attributes to include in the entities of the response. If this parameter is not
+    included, all the attributes are retrieved.</td>
+</tr>
+<tr><td style="padding-right: 40px; width: 140px;">limit</td><td>Limit the number of entities to be retrieved</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">offset</td><td>Skip a number of records</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">options</td><td>
+This operation supports two options:
+
+<ul>
+  <li><code>count</code>: when used, the total entities number is returned as a HTTP in the response name <code>X-Total-Count</code>.</li>
+  <li><code>cannonical</code>: when used, the response payload used the "cannonical form". See JSON entity representation format section
+  for details.</li>
+</td></tr>
+</table>
+
+The response payload is an Array which contains one object per matching entity. Each entity follows
+the JSON entity representation format (described in a section above).
+
+Response code:
+
+* Successful operation uses 200 OK
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Resposnes for more detail.
 
 + Parameters
-    + limit: 20 (optional, number) - Limit the number of entities to be retrieved
-    + offset: 20 (optional, number) - Skip a number of records. Pagination
-    + type: Room (optional, string) - Only retrieve entities of this type
-    + id: Bcn-Welt (optional, string) - Retrieve entities by id
-    + idPattern: (optional, string) - Retrieve entities by pattern id
+    + limit: 20 (optional, number)
+    + offset: 20 (optional, number)
+    + type: Room (optional, string)
+    + id: Bcn_Welt (optional, string)
+    + idPattern: (optional, string)
 
 + Response 200 (application/json)
 
@@ -88,54 +340,6 @@ Detailed description
             }
          }
         ]
-
-
-### Entity Pagination [GET /v2/entities{?limit,offset,count}]
-
-+ Parameters
-    + count: true
-    + limit: 2
-    + offset: 2
-
-+ Response 200 (application/json)
-
-    + Headers
-
-            X-Total-Count: 30
-            Link: http://context.example.org/v2/entities?offset=4&limit=2; rel="next", http://context.example.org/v2/entities?offset=28&limit=2; rel="last", http://context.example.org/v2/entities?offset=0&limit=2; rel="first", http://context.example.org/v2/entities?offset=2&limit=2; rel="prev"
-
-    + Body
-
-            [{
-                "type": "Room",
-                "id": "DC_S1-D41",
-                "temperature": 35.6
-            },
-            {
-                "type": "Room",
-                "id": "Boe_Idearium",
-                "temperature": 22.5
-            }]
-
-### Query Entities [GET /v2/entities{?q,limit,offset,coords,geometry,attrs,count}]
-
-+ Parameters
-    + q: temperature=22.5;humidity=60 (optional, string) - General query parameter that allows to filter by attribute content
-    + coords: 41.3763726, 2.1864475 (optional, string) - Coordinates. Comma separated values. The number of values will depend on the 'geometry' attribute.
-    + geometry: point (optional, string)- It can be any type defined by the GeoJSON spec or 'circle;radius=&lt;a radius&gt;'.
-    The 'exterior' modifier allows to indicate that the referred area is the outside of the region, for instance, 'polygon;exterior'
-    + limit: 20 - Limit the number of results (optional, number) - Maximum number of results to return
-    + attrs: seatsNumber (optional, string) - Attributes to be returned
-    + count: true (optional, string) - If 'true' the total number of records will be returned
-
-+ Response 200 (application/json)
-
-        [{
-            "type": "Room",
-            "id": "Bcn-Welt",
-            seatsNumber: 15
-        }]
-
 
 ### Create entity [POST /v2/entities]
 
