@@ -540,6 +540,37 @@ function accumulator2Dump()
   fi
 }
 
+# ------------------------------------------------------------------------------
+#
+# accumulatorCount
+#
+function accumulatorCount()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER_PORT}/number -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER_PORT}/number -s -S 2> /dev/null
+  fi
+}
+
+# ------------------------------------------------------------------------------
+#
+# accumulator2Count
+#
+function accumulator2Count()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER2_PORT}/number -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER2_PORT}/number -s -S 2> /dev/null
+  fi
+}
 
 # ------------------------------------------------------------------------------
 #
@@ -1184,6 +1215,8 @@ export -f accumulatorStart
 export -f accumulatorStop
 export -f accumulatorDump
 export -f accumulator2Dump
+export -f accumulatorCount
+export -f accumulator2Count
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd

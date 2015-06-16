@@ -92,11 +92,11 @@ orionCurl --url "$url" --payload "$payload" --host "127.0.0.1" 2> /dev/null
 
 echo "4: ++++++++++++++++++++"
 # Get accumulated data
-curl -g [::1]:${LISTENER2_PORT}/number -s -S 2> /dev/null
+accumulator2Count IPV6
 
 echo "5: ++++++++++++++++++++"
 # Get accumulated data
-curl 127.0.0.1:${LISTENER_PORT}/number -s -S 2> /dev/null
+accumulatorCount
 
 
 --REGEXPECT--

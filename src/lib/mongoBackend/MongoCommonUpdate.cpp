@@ -507,13 +507,17 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 *
 * appendAttribute -
 *
-* In the case of "actual append", it always return true
-* In the case of "append as update", it returns true in the case of actual update,
-* false othewise (i.e. when the new value equals to the existing one)
+* The "actualUpdate" argument (passed by reference) is set to true 1) in the case
+* of actual append that, or 2) in the case of append as update if the
+* original value of the attribute was different than the one used in the update (this is
+* important for ONCHANGE notifications). Otherwise it is false
+*
+* (Previous versions of this function used the return value for that, but we have
+* modified to make in similar to updateAttribute()
 *
 * Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document
 */
-static bool appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuilder* toPush, ContextAttribute* caP)
+static void appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuilder* toPush, ContextAttribute* caP, bool& actualUpdate)
 {
   std::string effectiveName = dbDotEncode(caP->name);
 
@@ -525,10 +529,8 @@ static bool appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuil
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    bool actualUpdate;
-
     updateAttribute(attrs, toSet, caP, actualUpdate);
-    return actualUpdate;
+    return;
   }
 
   /* Build the attribute to append */
@@ -557,7 +559,7 @@ static bool appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuil
   toSet->append(composedName, ab.obj());
   toPush->append(caP->name);
 
-  return true;
+  actualUpdate = true;
 }
 
 
@@ -1243,7 +1245,7 @@ static bool processContextAttributeVector
     setResponseMetadata(targetAttr, ca);
     cerP->contextElement.contextAttributeVector.push_back(ca);
 
-    /* actualUpdate could be changed to false in the "update" case. For "delete" and
+    /* actualUpdate could be changed to false in the "update" case (or "append as update"). For "delete" and
      * "append" it would keep the true value untouched */
     bool actualUpdate = true;
     if (strcasecmp(action.c_str(), "update") == 0)
@@ -1301,7 +1303,8 @@ static bool processContextAttributeVector
     {
       if (legalIdUsage(attrs, targetAttr))
       {
-        entityModified = appendAttribute(attrs, toSet, toPush, targetAttr) || entityModified;
+        appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate);
+        entityModified = actualUpdate || entityModified;
 
         /* Check aspects related with location */
         if (targetAttr->getLocation().length() > 0)
