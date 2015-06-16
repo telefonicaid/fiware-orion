@@ -294,10 +294,29 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 {
   BSONObjBuilder ab;
 
-  /* 1. Add value */
-  valueBson(caP, ab);
+  /* 1. Add value, if present in the resquest (it could be omitted in the case of updating only metadata)  */
+  if (caP->value != "" || caP->compoundValueP != NULL)
+  {
+    valueBson(caP, ab);
+  }
+  else
+  {
+    /* Slightly different treatment, depending if the attribute value in DB is compound or not */
+    if (attr.getField(ENT_ATTRS_VALUE).type() == Object)
+    {
+      ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
+    }
+    else if (attr.getField(ENT_ATTRS_VALUE).type() == Array)
+    {
+      ab.appendArray(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
+    }
+    else
+    {
+      ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+    }
+  }
 
-  /* Add type, if present in request. If not, just use the one that is already present in the database. */
+  /* 2. Add type, if present in request. If not, just use the one that is already present in the database. */
   if (caP->type != "")
   {
     ab.append(ENT_ATTRS_TYPE, caP->type);
@@ -1824,7 +1843,7 @@ void processContextElement
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
 
-      if ((aP->value.size() == 0) && (aP->compoundValueP == NULL))
+      if ((aP->value.size() == 0) && (aP->compoundValueP == NULL) && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
