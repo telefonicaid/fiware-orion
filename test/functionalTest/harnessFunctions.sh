@@ -661,7 +661,6 @@ function dbInsertEntity()
 #   --in          (input payload)  (default: xml => application/xml, If 'json': application/json)
 #   --out         (output payload  (default: xml => application/xml, If 'json': application/json)
 #   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides) 
-#   --httpTenant  <tenant>         (tenant in HTTP header)
 #   --tenant      <tenant>         (tenant in HTTP header)
 #   --servicePath <path>           (Service Path in HTTP header)
 #   --xauthToken  <token>          (X-Auth token value)
@@ -716,7 +715,7 @@ function orionCurl()
     elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck='on';
     elif [ "$1" == "--servicePath" ]; then     _servicePath='--header "Fiware-ServicePath: '${2}'"'; shift;
     elif [ "$1" == "--tenant" ]; then          _tenant='--header "Fiware-Service: '${2}'"'; shift;
-    elif [ "$1" == "--httpTenant" ]; then      _tenant='--header "Fiware-Service: '${2}'"'; shift;
+    #elif [ "$1" == "--httpTenant" ]; then      _tenant='--header "Fiware-Service: '${2}'"'; shift;
     elif [ "$1" == "--origin" ]; then          _origin='--header "Origin: '${2}'"'; shift;
     elif [ "$1" == "-H" ]; then                _headers=${_headers}" --header $2"; shift;
     elif [ "$1" == "--header" ]; then          _headers=${_headers}" --header $2"; shift;
@@ -846,7 +845,7 @@ function orionCurl()
   fi
 }
 
-
+#FIXME :Can be removed this function?¿
 
 function orionCurlOld()
 {
@@ -861,7 +860,8 @@ function orionCurlOld()
   _inFormat=application/xml
   _outFormat=application/xml
   _json=""
-  _httpTenant=""
+  _tenant=""
+ # _httpTenant=""
   _servicePath=""
   _urlParams=''
   _xtra=''
@@ -880,7 +880,8 @@ function orionCurlOld()
     elif [ "$1" == "--in" ]; then              _inFormat="$2"; shift;
     elif [ "$1" == "--out" ]; then             _outFormat="$2"; shift;
     elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json;
-    elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
+    elif [ "$1" == "--tenant" ]; then          _tenant="$2"; shift;
+    #elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
     elif [ "$1" == "--urlParams" ]; then       _urlParams=$2; shift;
     elif [ "$1" == "--xauthToken" ]; then      _xauthToken=$2; shift;
@@ -970,15 +971,15 @@ function orionCurlOld()
   # FIXME P10: This 'if' should be refactored: if we use the $_HTTP_TENANT variable within curl,
   #            it will not render correctly. We have to find another way.
   #
-  if [ "$_httpTenant" != "" ]
+  if [ "$_tenant" != "" ]
   then
      if [ "$_servicePath" != "" ]
      then
        vMsg _URL1: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_tenant" --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
      else
        vMsg _URL2: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
+       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_tenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
      fi
   else
      if [ "$_servicePath" != "" ]
@@ -1058,7 +1059,8 @@ function coapCurl()
   _inFormat=""
   _outFormat=""
   _json=""
-  _httpTenant=""
+  _tenant=""
+  #_httpTenant=""
   _servicePath=""
   _xtra=''
   _noPayloadCheck='off'
@@ -1073,7 +1075,8 @@ function coapCurl()
     elif [ "$1" == "--in" ]; then              _inFormat="$2"; shift;
     elif [ "$1" == "--out" ]; then             _outFormat="$2"; shift;
     elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json;
-    elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
+    #elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
+    elif [ "$1" == "--tenant" ]; then          _tenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
     elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck=on;
     else                                       _xtra="$_xtra $1"; shift;
