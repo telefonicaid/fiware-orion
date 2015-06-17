@@ -124,7 +124,7 @@ TEST(mongoUnsubscribeContextAvailability, subscriptionNotFound)
     ASSERT_EQ(2, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -169,7 +169,7 @@ TEST(mongoUnsubscribeContextAvailability, unsubscribe)
     EXPECT_EQ("51307b66f481db11bf860002", sub.getField("_id").OID().toString());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;

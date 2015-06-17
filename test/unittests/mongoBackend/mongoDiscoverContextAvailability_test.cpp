@@ -474,8 +474,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationDetails)
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -580,8 +579,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationAll)
   EXPECT_EQ(0, res.responseVector.get(4)->errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -632,8 +630,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlyFirst)
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -684,8 +681,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationOnlySecond)
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -764,8 +760,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationRange)
   EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -803,8 +798,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExisting)
   ASSERT_EQ(0,res.responseVector.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -855,8 +849,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingOverlap)
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -894,8 +887,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, paginationNonExistingDetails)
   ASSERT_EQ(0,res.responseVector.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -951,8 +943,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsAll)
   EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 }
 
@@ -1009,8 +1000,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneSingle)
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1088,8 +1078,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrOneMulti)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1154,8 +1143,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternAttrsSubset)
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1236,8 +1224,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralCREs)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1318,8 +1305,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternSeveralRegistrations)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1363,8 +1349,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoEntity)
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1411,8 +1396,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoAttribute)
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1515,8 +1499,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntity)
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1591,8 +1574,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiAttr)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1686,8 +1668,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternMultiEntityAttrs)
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1795,8 +1776,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, noPatternNoType)
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1885,8 +1865,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern0Attr)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -1945,8 +1924,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrSingle)
     EXPECT_EQ(0, res.responseVector.get(0)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -2023,8 +2001,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, pattern1AttrMulti)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -2120,8 +2097,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNAttr)
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -2165,8 +2141,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternFail)
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -2277,8 +2252,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, patternNoType)
     EXPECT_EQ(0, res.responseVector.get(3)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -2387,8 +2361,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, mixPatternAndNotPattern)
     EXPECT_EQ(0, res.responseVector.get(2)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -2468,8 +2441,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociations)
   EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   /* Delete mock */
   delete timerMock;
 
@@ -2514,10 +2486,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, sourceAssociationsFails)
 
   ASSERT_EQ(0, res.responseVector.size());
 
-
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   /* Delete mock */
   delete timerMock;
 
@@ -2595,8 +2565,7 @@ TEST(mongoDiscoverContextAvailabilityRequest, targetAssociations)
     EXPECT_EQ(0, res.responseVector.get(1)->errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Delete mock */
     delete timerMock;
 
@@ -2650,6 +2619,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
               ", orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete connectionMock;
     delete timerMock;
@@ -2694,8 +2665,9 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     EXPECT_EQ("Database error: collection: unittest.associations - query(): { query: { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } }, orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
-    /* Release mock */
+    /* Release connection */
     setMongoConnectionForUnitTest(NULL);
+    /* Release mock */
     delete connectionMock;
 
 }

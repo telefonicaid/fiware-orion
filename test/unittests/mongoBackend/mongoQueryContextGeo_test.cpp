@@ -37,6 +37,8 @@
 
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests
@@ -249,8 +251,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn1)
     res.contextElementResponseVector.release();
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -366,7 +367,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleIn2)
     res.contextElementResponseVector.release();
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -442,7 +443,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoCircleOut)
     res.contextElementResponseVector.release();
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -540,7 +541,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn1)
     res.contextElementResponseVector.release();
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -638,7 +639,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn2)
     res.contextElementResponseVector.release();
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -714,7 +715,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonIn3)
     res.contextElementResponseVector.release();
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -792,7 +793,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut1)
     res.contextElementResponseVector.release();
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -890,7 +891,7 @@ TEST(mongoQueryContextGeoRequest, queryGeoPolygonOut2)
     res.contextElementResponseVector.release();
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }

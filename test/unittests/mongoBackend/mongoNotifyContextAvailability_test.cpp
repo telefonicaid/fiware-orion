@@ -42,6 +42,8 @@ using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests
@@ -119,8 +121,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -184,8 +185,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok_XML)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -249,7 +249,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_At0_Ok_JSON)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 
@@ -311,7 +311,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_At0_Ok)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 
@@ -385,7 +385,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtN_Ok)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 
@@ -459,7 +459,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1_AtNnt_Ok)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 
@@ -533,7 +533,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtN_Ok)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 
@@ -607,7 +607,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_En1nt_AtNnt_Ok)
   EXPECT_EQ(0, res.responseCode.details.size());
 
   /* Release connection */
-  mongoDisconnect();
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 
@@ -674,7 +674,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_At0_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -741,7 +741,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_At0_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -820,7 +820,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtN_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -899,7 +899,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnN_AtNnt_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -978,7 +978,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtN_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1057,7 +1057,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ce1_EnNnt_AtNnt_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1134,7 +1134,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_At0_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1211,7 +1211,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_At0_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1313,7 +1313,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtN_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1415,7 +1415,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1_AtNnt_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1517,7 +1517,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtN_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1619,7 +1619,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_En1nt_AtNnt_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1707,7 +1707,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_At0_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1795,7 +1795,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_At0_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -1907,7 +1907,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtN_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -2019,7 +2019,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnN_AtNnt_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -2131,7 +2131,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtN_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 
@@ -2243,7 +2243,7 @@ TEST(mongoNotifyContextAvailabilityRequest, ceN_EnNnt_AtNnt_Ok)
     EXPECT_EQ(0, res.responseCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 

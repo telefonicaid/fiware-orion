@@ -585,7 +585,7 @@ TEST(mongoUpdateContextSubscription, subscriptionNotFound)
     EXPECT_EQ(0, res.subscribeError.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -674,7 +674,7 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     EXPECT_EQ(100, cond1.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -771,7 +771,7 @@ TEST(mongoUpdateContextSubscription, updateThrottling)
     EXPECT_EQ(500, cond1.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -855,7 +855,7 @@ TEST(mongoUpdateContextSubscription, clearThrottling)
     EXPECT_EQ(500, cond1.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -937,7 +937,8 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0)
     EXPECT_EQ(60, cond0.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1020,7 +1021,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T1_C0_JSON)
     EXPECT_EQ(60, cond0.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1105,7 +1106,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T1_C0)
     EXPECT_EQ(60, cond0.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1196,7 +1197,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_C0)
     EXPECT_EQ(120, cond1.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1289,7 +1290,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_C0)
     EXPECT_EQ(120, cond1.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1374,7 +1375,8 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_C1)
     EXPECT_EQ("A10", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1461,7 +1463,8 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_C1)
     EXPECT_EQ("A10", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1554,7 +1557,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CN)
     EXPECT_EQ("A20", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1640,7 +1643,8 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_T0_CNbis)
     EXPECT_EQ("A20", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1736,7 +1740,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CN)
     EXPECT_EQ("A20", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1824,7 +1828,8 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_T0_CNbis)
     EXPECT_EQ("A20", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1931,7 +1936,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CN)
     EXPECT_EQ("A20", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2031,7 +2036,7 @@ TEST(mongoUpdateContextSubscription, Ent1_Attr0_TN_CNbis)
     EXPECT_EQ("A20", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2140,7 +2145,7 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CN)
     EXPECT_EQ("A20", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2242,7 +2247,8 @@ TEST(mongoUpdateContextSubscription, Ent1_AttrN_TN_CNbis)
     EXPECT_EQ("A20", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2329,10 +2335,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T1_C0)
     EXPECT_EQ(60, cond0.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
-
-    /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2420,9 +2423,9 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T1_C0)
     EXPECT_STREQ("ONTIMEINTERVAL", C_STR_FIELD(cond0, "type"));
     EXPECT_EQ(60, cond0.getIntField("value"));
 
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2517,7 +2520,8 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_C0)
     EXPECT_EQ(120, cond1.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2614,7 +2618,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_C0)
     EXPECT_EQ(120, cond1.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2703,7 +2707,8 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_C1)
     EXPECT_EQ("A10", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2794,7 +2799,8 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_C1)
     EXPECT_EQ("A10", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2891,7 +2897,8 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CN)
     EXPECT_EQ("A20", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2981,7 +2988,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_T0_CNbis)
     EXPECT_EQ("A20", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -3080,7 +3087,8 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CN)
     EXPECT_EQ("A20", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -3172,7 +3180,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_T0_CNbis)
     EXPECT_EQ("A20", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -3283,7 +3291,8 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CN)
     EXPECT_EQ("A20", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -3387,7 +3396,7 @@ TEST(mongoUpdateContextSubscription, EntN_Attr0_TN_CNbis)
     EXPECT_EQ("A20", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -3500,7 +3509,8 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CN)
     EXPECT_EQ("A20", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -3606,7 +3616,7 @@ TEST(mongoUpdateContextSubscription, EntN_AttrN_TN_CNbis)
     EXPECT_EQ("A20", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -3706,7 +3716,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1)
     EXPECT_EQ("A1", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -3807,7 +3817,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_C1_JSON)
     EXPECT_EQ("A1", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -3908,7 +3919,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1)
     EXPECT_EQ("A1", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -4009,7 +4021,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_C1_disjoint)
     EXPECT_EQ("A3", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -4124,7 +4136,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1)
     EXPECT_EQ("A1", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -4239,7 +4251,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1NoType_AttrN_T0_C1_disjoint)
     EXPECT_EQ("A3", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -4347,7 +4359,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1)
     EXPECT_EQ("A1", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -4455,7 +4467,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1Pattern_AttrN_T0_C1_disjoint)
     EXPECT_EQ("A3", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -4575,7 +4587,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1)
     EXPECT_EQ("A1", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -4695,7 +4707,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1PatternNoType_AttrN_T0_C1_disjoint
     EXPECT_EQ("A3", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -4805,7 +4817,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN)
     EXPECT_EQ("A2", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -4915,7 +4927,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CN_partial)
     EXPECT_EQ("A5", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -5019,7 +5031,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_T0_CNbis)
     EXPECT_EQ("A2", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -5129,7 +5141,8 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_disjoint)
     EXPECT_EQ("A3", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -5239,7 +5252,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial)
     EXPECT_EQ("A5", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -5349,7 +5362,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CN_partial_disjoint)
     EXPECT_EQ("A5", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -5452,7 +5465,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_T0_CNbis)
     EXPECT_EQ("A2", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -5575,7 +5588,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CN)
     EXPECT_EQ("A2", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -5691,7 +5704,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_Attr0_TN_CNbis)
     EXPECT_EQ("A2", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -5814,7 +5827,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CN)
     EXPECT_EQ("A2", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -5930,7 +5943,7 @@ TEST(mongoUpdateContextSubscription, matchEnt1_AttrN_TN_CNbis)
     EXPECT_EQ("A2", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -6043,7 +6056,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_C1)
     EXPECT_EQ("A1", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -6154,7 +6167,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_C1)
     EXPECT_EQ("A1", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -6275,7 +6288,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CN)
     EXPECT_EQ("A2", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -6389,7 +6402,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_T0_CNbis)
     EXPECT_EQ("A2", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -6508,7 +6521,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CN)
     EXPECT_EQ("A2", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -6618,7 +6631,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_T0_CNbis)
     EXPECT_EQ("A2", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -6751,7 +6764,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CN)
     EXPECT_EQ("A2", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -6877,7 +6890,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_Attr0_TN_CNbis)
     EXPECT_EQ("A2", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -7008,7 +7021,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CN)
     EXPECT_EQ("A2", condValues[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -7132,7 +7145,7 @@ TEST(mongoUpdateContextSubscription, matchEntN_AttrN_TN_CNbis)
     EXPECT_EQ("A2", condValues[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -7219,7 +7232,7 @@ TEST(mongoUpdateContextSubscription, updateDurationAndNotifyConditions)
     EXPECT_EQ(60, cond0.getIntField("value"));
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
