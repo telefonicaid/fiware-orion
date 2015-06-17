@@ -29,7 +29,6 @@ SET (SOURCES
     orionReply.cpp
     OrionError.cpp
     HttpStatusCode.cpp
-    curl_context.cpp
 )
 
 SET (HEADERS
@@ -44,7 +43,6 @@ SET (HEADERS
     orionReply.h
     OrionError.h
     HttpStatusCode.h
-    curl_context.h
 )
 
 
