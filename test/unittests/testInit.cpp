@@ -45,24 +45,18 @@ void setupDatabase(void)
     DBClientBase*  connection   = NULL;
     static bool    mongoStarted = false;
 
+    /* mongoStart is needed one time to create the connection pool */
     if (mongoStarted == false)
     {
       mongoStart("localhost", "", "", "", "", false, 0, 10);
-
-      connection = mongoInitialConnectionGetForUnitTest();
-      setMongoConnectionForUnitTest(connection);
       mongoStarted = true;
     }
-    else
-    {
-      connection = getMongoConnection();
 
-      if (connection == NULL)
-      {
-        extern void setMongoConnectionForUnitTest(DBClientBase*);
-        connection = mongoInitialConnectionGetForUnitTest();
-        setMongoConnectionForUnitTest(connection);
-      }
+    connection = getMongoConnection();
+    if (connection == NULL)
+    {
+      connection = mongoInitialConnectionGetForUnitTest();
+      setMongoConnectionForUnitTest(connection);
     }
 
     connection->dropCollection(REGISTRATIONS_COLL);
@@ -70,6 +64,8 @@ void setupDatabase(void)
     connection->dropCollection(SUBSCRIBECONTEXT_COLL);
     connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);
     connection->dropCollection(ASSOCIATIONS_COLL);
+
+    releaseMongoConnection(connection);
 
     setDbPrefix(DBPREFIX);
     setRegistrationsCollectionName("registrations");

@@ -36,6 +36,8 @@
 #include "ngsi/Scope.h"
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests

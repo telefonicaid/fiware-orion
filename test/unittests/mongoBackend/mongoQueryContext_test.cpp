@@ -3043,7 +3043,7 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase); 
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Context Element response # 2 */

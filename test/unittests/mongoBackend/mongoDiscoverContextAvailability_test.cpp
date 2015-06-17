@@ -2619,6 +2619,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
               ", orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete connectionMock;
     delete timerMock;
@@ -2663,6 +2665,8 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDBQueryAssociationFail)
     EXPECT_EQ("Database error: collection: unittest.associations - query(): { query: { srcEnt: { $in: [ { id: \"E1\", type: \"T1\" } ] }, attrs.src: { $in: [ \"A4\" ] } }, orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete connectionMock;
 

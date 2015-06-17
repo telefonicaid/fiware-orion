@@ -38,6 +38,8 @@
 
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests

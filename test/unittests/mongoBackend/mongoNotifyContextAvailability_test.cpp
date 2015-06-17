@@ -42,6 +42,8 @@ using ::testing::_;
 using ::testing::Throw;
 using ::testing::Return;
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests
