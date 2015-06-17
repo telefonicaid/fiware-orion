@@ -206,7 +206,7 @@ orionCurl --url "$url" --payload "$payload"
 echo "8: ++++++++++++++++++++"
 accumulatorDump | head -n 32
 
-NUMBER=$(curl localhost:${LISTENER_PORT}/number -s -S )
+NUMBER=$(accumulatorCount)
 echo "NUMBER: $NUMBER"
 
 TIMES=$(curl localhost:${LISTENER_PORT}/times -s -S )

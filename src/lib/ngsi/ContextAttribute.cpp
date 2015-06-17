@@ -351,23 +351,37 @@ std::string ContextAttribute::render
 
 /* ****************************************************************************
 *
-* toJson - 
+* toJson -
+*
+* FIXME: Refactor this method in order to simplify
+*        the code paths of the rendering process
+*
 */
 std::string ContextAttribute::toJson(bool isLastElement)
 {
   std::string  out;
   bool         isNumber = false;
+  bool         isString = false;
 
   if (type == "number")
   {
     isNumber = true;
   }
 
-  if (((type == "") || (isNumber == true)) && (metadataVector.size() == 0))
+  if (type == "string")
+  {
+    isString = true;
+  }
+
+  if (((type == "") || (isNumber == true || isString == true)) && (metadataVector.size() == 0))
   {
     if (isNumber == true)
     {
       out = JSON_VALUE_NUMBER(name, value);
+    }
+    else if (isString == true)
+    {
+      out = JSON_VALUE(name, value);
     }
     else
     {

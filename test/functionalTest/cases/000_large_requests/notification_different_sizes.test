@@ -145,7 +145,7 @@ echo
 
 echo "4: ++++++++++++++++++++"
 echo "** Notifications sent:"
-curl localhost:$LISTENER_PORT/number -s -S 2> /dev/null
+accumulatorCount
 
 # ----------------------------------------------------------------------
 # These two tests make reference to the old functionality provided by
