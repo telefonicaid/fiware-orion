@@ -55,7 +55,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-orionCurl --url "${url}" --payload "${payload}" --httpTenant "t_01"
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_01"
 echo
 echo
 
@@ -85,7 +85,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     <duration>PT1H</duration>
     <registrationId></registrationId>
   </registerContextRequest>'
-orionCurl --url "${url}" --payload "${payload}" --httpTenant "t_02"
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_02"
 echo
 echo
 
@@ -101,7 +101,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </entityId>
   </entityIdList>
 </discoverContextAvailabilityRequest>'
-orionCurl --url "${url}" --payload "${payload}" --httpTenant "t_01"
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_01"
 echo
 echo
 
@@ -117,7 +117,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </entityId>
   </entityIdList>
 </discoverContextAvailabilityRequest>'
-orionCurl --url "${url}" --payload "${payload}" --httpTenant "t_02"
+orionCurl --url "${url}" --payload "${payload}" --tenant "t_02"
 
 --REGEXPECT--
 1. Register entity E with HTTP-Tenant t_01

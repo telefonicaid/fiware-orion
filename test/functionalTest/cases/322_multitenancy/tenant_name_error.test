@@ -81,21 +81,21 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
 
 # 1. OK (50 chars in tenant name)
 echo "1: ++++++++++"
-orionCurl --url "/v1/registry/registerContext" --payload "$payload" --httpTenant "01234567890123456789012345678901234567890123456789"
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "01234567890123456789012345678901234567890123456789"
 echo
 echo
 
 
 # 2. Long tenant name (51 chars in tenant name)
 echo "2: ++++++++++"
-orionCurl --url "/v1/registry/registerContext" --payload "$payload" --httpTenant "012345678901234567890123456789012345678901234567890"
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "012345678901234567890123456789012345678901234567890"
 echo
 echo
 
 
 # 3. Bad character in tenant name"
 echo "3: ++++++++++"
-orionCurl --url "/v1/registry/registerContext" --payload "$payload" --httpTenant "kz+fg"
+orionCurl --url "/v1/registry/registerContext" --payload "$payload" --tenant "kz+fg"
 echo
 echo
 

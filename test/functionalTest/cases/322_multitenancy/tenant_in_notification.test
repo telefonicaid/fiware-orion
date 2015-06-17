@@ -54,7 +54,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
     </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-orionCurl --url "$url" --payload "$payload" --httpTenant "kz"
+orionCurl --url "$url" --payload "$payload" --tenant "kz"
 echo
 echo
 
@@ -80,7 +80,7 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload" --httpTenant "kz"
+orionCurl --url "$url" --payload "$payload" --tenant "kz"
 echo
 echo
 
