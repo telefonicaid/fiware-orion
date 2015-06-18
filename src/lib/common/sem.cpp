@@ -523,7 +523,12 @@ int get_curl_context(const std::string& key, struct curl_context *pcc)
 
 int release_curl_context(struct curl_context *pcc)
 {
-
+  // Reset context if not an empty context
+  if (pcc->curl != NULL)
+  {
+    curl_easy_reset(pcc->curl);
+    pcc->curl = NULL; // It will remain in global map
+  }
   // Unlock the mutex if not an empty context
   if (pcc->pmutex != NULL)
     {
@@ -533,14 +538,9 @@ int release_curl_context(struct curl_context *pcc)
       LM_E(("pthread_mutex_unlock"));
       return s;
     }
-    pcc->pmutex = NULL;
+    pcc->pmutex = NULL; // It will remain in global map
   }
-  // Reset context if not an empty context
-  if (pcc->curl != NULL)
-  {
-    curl_easy_reset(pcc->curl);
-    pcc->curl = NULL;
-  }
+
   return 0;
 }
 
