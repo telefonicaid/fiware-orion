@@ -138,6 +138,7 @@ std::string statisticsTreat
     semTimeReqReset();
     semTimeTransReset();
     mongoPoolConnectionSemWaitingTimeReset();
+    mutexTimeCCReset();
 
     out += startTag(indent, tag, ciP->outFormat, true, true);
     out += valueTag(indent2, "message", "All statistics counter reset", ciP->outFormat);
@@ -420,6 +421,10 @@ std::string statisticsTreat
     char transSemaphoreWaitingTime[64];
     semTimeTransGet(transSemaphoreWaitingTime, sizeof(transSemaphoreWaitingTime));
     out += TAG_ADD_STRING("transactionSemaphoreWaitingTime", transSemaphoreWaitingTime);
+
+    char ccMutextWaitingTime[64];
+    mutexTimeCCGet(ccMutextWaitingTime, sizeof(ccMutextWaitingTime));
+    out += TAG_ADD_STRING("curlContextMutextWaitingTime", ccMutextWaitingTime);
   }
 
   int now = getCurrentTime();

@@ -28,6 +28,12 @@
 #include <stdio.h>
 
 
+// curl context includes
+#include <string>
+
+#include <pthread.h>
+#include <curl/curl.h>
+
 
 /* ****************************************************************************
 *
@@ -90,5 +96,39 @@ extern void semTimeTransGet(char* buf, int bufLen);
 */
 extern void semTimeReqReset(void);
 extern void semTimeTransReset(void);
+
+/* ****************************************************************************
+*
+* curl context functions -
+*/
+
+struct curl_context {
+  CURL *curl;
+  pthread_mutex_t *pmutex;
+};
+
+/* ****************************************************************************
+*
+* get_curl_context -
+*/
+extern int get_curl_context(const std::string& key, struct curl_context *pcc);
+
+/* ****************************************************************************
+*
+* release_curl_context -
+*/
+extern int release_curl_context(struct curl_context *pcc);
+
+/* ****************************************************************************
+*
+* mutexTimeCCGet -
+*/
+extern void mutexTimeCCGet(char* buf, int bufLen);
+
+/* ****************************************************************************
+*
+* mutexTimeCCReset -
+*/
+void mutexTimeCCReset(void);
 
 #endif  // SRC_LIB_COMMON_SEM_H_
