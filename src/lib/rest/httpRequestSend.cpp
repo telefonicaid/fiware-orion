@@ -365,7 +365,6 @@ std::string httpRequestSend
 
     // Cleanup curl environment
     curl_slist_free_all(headers);
-    //curl_easy_cleanup(curl);
     release_curl_context(&cc);
 
     free(httpResponse->memory);
@@ -430,7 +429,6 @@ std::string httpRequestSend
 
   // Cleanup curl environment
   curl_slist_free_all(headers);
-  //curl_easy_cleanup(curl);
   release_curl_context(&cc);
 
   free(httpResponse->memory);
