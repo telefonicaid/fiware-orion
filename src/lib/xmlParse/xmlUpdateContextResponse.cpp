@@ -365,7 +365,7 @@ std::string upcrsCheck(ParseData* parseDataP, ConnectionInfo* ciP)
 }
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * upcrsPresent -
@@ -375,6 +375,6 @@ void upcrsPresent(ParseData* parseDataP)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   parseDataP->upcrs.res.present("");
 }

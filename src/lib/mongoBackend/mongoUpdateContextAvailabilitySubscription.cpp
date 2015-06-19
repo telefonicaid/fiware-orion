@@ -53,25 +53,28 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   LM_T(LmtMongo, ("Update Context Subscription, notifyFormat: '%s'", formatToString(notifyFormat)));
   reqSemTake(__FUNCTION__, "ngsi9 update subscription request", SemWriteOp, &reqSemTaken);
 
-  DBClientBase* connection = getMongoConnection();
+  DBClientBase* connection = NULL;
 
   /* Look for document */
   BSONObj  sub;
   try {
       OID id = OID(requestP->subscriptionId.get());
 
-      mongoSemTake(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
+      connection = getMongoConnection();
       sub = connection->findOne(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << id));
-      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection");
+      releaseMongoConnection(connection);
+      
       LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
   }
   catch (const AssertionException &e)
   {
-      /* This happens when OID format is wrong */
+      //
+      // This happens when OID format is wrong
       // FIXME: this checking should be done at parsing stage, without progressing to
       // mongoBackend. By the moment we can live this here, but we should remove in the future
       // (old issue #95)
-      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo assertion exception)");
+      //
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo assertion exception)", reqSemTaken);
 
       responseP->errorCode.fill(SccContextElementNotFound);
@@ -80,7 +83,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
   catch (const DBException &e)
   {
-      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo db exception)");
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)", reqSemTaken);
 
       responseP->errorCode.fill(SccReceiverInternalError,
@@ -92,7 +95,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
   catch (...)
   {
-      mongoSemGive(__FUNCTION__, "findOne from SubscribeContextAvailabilityCollection (mongo generic exception)");
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)", reqSemTaken);
 
       responseP->errorCode.fill(SccReceiverInternalError,
@@ -178,14 +181,15 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
                   update.toString().c_str()));
   try
   {
-      mongoSemTake(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+      connection = getMongoConnection();
       connection->update(getSubscribeContextAvailabilityCollectionName(tenant).c_str(), BSON("_id" << OID(requestP->subscriptionId.get())), update);
-      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection");
+      releaseMongoConnection(connection);
+
       LM_I(("Database Operation Successful (update _id: %s)", requestP->subscriptionId.get().c_str()));
   }
   catch (const DBException &e)
   {
-      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo db exception)");
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo db exception)", reqSemTaken);
 
       responseP->errorCode.fill(SccReceiverInternalError,
@@ -199,7 +203,7 @@ HttpStatusCode mongoUpdateContextAvailabilitySubscription
   }
   catch (...)
   {
-      mongoSemGive(__FUNCTION__, "update in SubscribeContextAvailabilityCollection (mongo generic exception)");
+      releaseMongoConnection(connection);
       reqSemGive(__FUNCTION__, "ngsi9 update subscription request (mongo generic exception)", reqSemTaken);
 
       responseP->errorCode.fill(SccReceiverInternalError,

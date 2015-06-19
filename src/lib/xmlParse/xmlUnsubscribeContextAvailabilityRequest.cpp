@@ -80,7 +80,7 @@ std::string ucarCheck(ParseData* reqData, ConnectionInfo* ciP)
 }
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * ucarPresent -
@@ -90,7 +90,7 @@ void ucarPresent(ParseData* reqData)
   if (!lmTraceIsSet(LmtDump))
     return;
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   reqData->ucar.res.subscriptionId.present("");
 }
 

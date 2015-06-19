@@ -41,6 +41,7 @@
 
 #include "unittest.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
 
 /* ****************************************************************************
 *
@@ -380,7 +381,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -458,8 +459,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_noPattern_JSON)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -537,8 +537,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_AttrN_noPattern)
     EXPECT_EQ("A2", attrs[1].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -618,8 +617,7 @@ TEST(mongoSubscribeContextAvailability, EntN_Attr0_noPattern)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -703,8 +701,7 @@ TEST(mongoSubscribeContextAvailability, EntN_AttrN_noPattern)
     EXPECT_EQ("A2", attrs[1].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -781,8 +778,7 @@ TEST(mongoSubscribeContextAvailability, Ent1_Attr0_pattern)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -872,8 +868,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -965,8 +960,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsAll_JSON)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1054,8 +1048,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneSingle)
     EXPECT_EQ("A4", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1152,8 +1145,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrOneMulti)
     EXPECT_EQ("A1", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1246,8 +1238,7 @@ TEST(mongoSubscribeContextAvailability, noPatternAttrsSubset)
     EXPECT_EQ("A2", attrs[1].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1343,8 +1334,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralCREs)
     ASSERT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1439,8 +1429,7 @@ TEST(mongoSubscribeContextAvailability, noPatternSeveralRegistrations)
     ASSERT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1550,8 +1539,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntity)
     ASSERT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1648,8 +1636,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiAttr)
     EXPECT_EQ("A5", attrs[2].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1759,8 +1746,7 @@ TEST(mongoSubscribeContextAvailability, noPatternMultiEntityAttrs)
     EXPECT_EQ("A5", attrs[2].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1868,8 +1854,7 @@ TEST(mongoSubscribeContextAvailability, noPatternNoType)
     EXPECT_EQ("A1", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -1970,8 +1955,7 @@ TEST(mongoSubscribeContextAvailability, pattern0Attr)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -2057,8 +2041,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrSingle)
     EXPECT_EQ("A4", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -2151,8 +2134,7 @@ TEST(mongoSubscribeContextAvailability, pattern1AttrMulti)
     EXPECT_EQ("A1", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -2254,8 +2236,7 @@ TEST(mongoSubscribeContextAvailability, patternNAttr)
     EXPECT_EQ("A2", attrs[1].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -2365,8 +2346,7 @@ TEST(mongoSubscribeContextAvailability, patternNoType)
     EXPECT_EQ("A2", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -2477,8 +2457,7 @@ TEST(mongoSubscribeContextAvailability, mixPatternAndNotPattern)
     ASSERT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     /* Release mock */
     delete notifierMock;
     delete timerMock;
@@ -2551,7 +2530,7 @@ TEST(mongoSubscribeContextAvailability, defaultDuration)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2591,9 +2570,11 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     req.duration.set("PT1H");
     req.reference.set("http://notify.me");
 
-    /* Prepare database */
+    /* Set MongoDB connection (prepare database first with the "actual" connection object).
+     * The "actual" conneciton is preserved for later use */
     prepareDatabase();
-    mongoConnect(connectionMock);
+    DBClientBase* connection = getMongoConnection();
+    setMongoConnectionForUnitTest(connectionMock);
 
     /* Invoke the function in mongoBackend library */
     ms = mongoSubscribeContextAvailability(&req, &res, uriParams);
@@ -2612,13 +2593,12 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
               "- exception: boom!!", s2);
 
     /* Release mocks */
+    setMongoConnectionForUnitTest(NULL);
     delete notifierMock;
     delete connectionMock;
     delete timerMock;
 
-    /* Reconnect to database to check it has not been touched */
-    mongoConnect("localhost");
-    DBClientBase* connection = getMongoConnection();
+    /* Check actual database has not been touched */
     ASSERT_EQ(0, connection->count(SUBSCRIBECONTEXTAVAIL_COLL, BSONObj()));
 
 }

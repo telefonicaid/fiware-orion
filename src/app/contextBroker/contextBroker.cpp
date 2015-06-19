@@ -171,6 +171,10 @@
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
+
+#include "serviceRoutinesV2/getEntities.h"
+#include "serviceRoutinesV2/entryPointsTreat.h"
+
 #include "contextBroker/version.h"
 
 #include "common/string.h"
@@ -212,7 +216,8 @@ char            rush[256];
 char            allowedOrigin[64];
 long            dbTimeout;
 long            httpTimeout;
-char            mutexPolicy[16];
+int             dbPoolSize;
+char            reqMutexPolicy[16];
 bool            mutexTimeStat;
 int             writeConcern;
 
@@ -249,6 +254,7 @@ int             writeConcern;
 #define MULTISERVICE_DESC   "service multi tenancy mode"
 #define ALLOWED_ORIGIN_DESC "CORS allowed origin. use '__ALL' for any"
 #define HTTP_TMO_DESC       "timeout in milliseconds for forwards and notifications"
+#define DBPS_DESC           "database connection pool size"
 #define MAX_L               900000
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
 #define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
@@ -261,38 +267,39 @@ int             writeConcern;
 */
 PaArgument paArgs[] =
 {
-  { "-fg",           &fg,           "FOREGROUND",     PaBool,   PaOpt, false,      false,  true,  FG_DESC            },
-  { "-localIp",      bindAddress,   "LOCALIP",        PaString, PaOpt, IP_ALL,     PaNL,   PaNL,  LOCALIP_DESC       },
-  { "-port",         &port,         "PORT",           PaInt,    PaOpt, 1026,       PaNL,   PaNL,  PORT_DESC          },
-  { "-pidpath",      pidPath,       "PID_PATH",       PaString, PaOpt, PIDPATH,    PaNL,   PaNL,  PIDPATH_DESC       },
+  { "-fg",            &fg,           "FOREGROUND",     PaBool,   PaOpt, false,      false,  true,  FG_DESC            },
+  { "-localIp",       bindAddress,   "LOCALIP",        PaString, PaOpt, IP_ALL,     PaNL,   PaNL,  LOCALIP_DESC       },
+  { "-port",          &port,         "PORT",           PaInt,    PaOpt, 1026,       PaNL,   PaNL,  PORT_DESC          },
+  { "-pidpath",       pidPath,       "PID_PATH",       PaString, PaOpt, PIDPATH,    PaNL,   PaNL,  PIDPATH_DESC       },
 
-  { "-dbhost",       dbHost,        "DB_HOST",        PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  DBHOST_DESC        },
-  { "-rplSet",       rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
-  { "-dbuser",       user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
-  { "-dbpwd",        pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
-  { "-db",           dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
-  { "-dbTimeout",    &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
+  { "-dbhost",        dbHost,        "DB_HOST",        PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  DBHOST_DESC        },
+  { "-rplSet",        rplSet,        "RPL_SET",        PaString, PaOpt, _i "",      PaNL,   PaNL,  RPLSET_DESC        },
+  { "-dbuser",        user,          "DB_USER",        PaString, PaOpt, _i "",      PaNL,   PaNL,  DBUSER_DESC        },
+  { "-dbpwd",         pwd,           "DB_PASSWORD",    PaString, PaOpt, _i "",      PaNL,   PaNL,  DBPASSWORD_DESC    },
+  { "-db",            dbName,        "DB",             PaString, PaOpt, _i "orion", PaNL,   PaNL,  DB_DESC            },
+  { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
+  { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
 
-  { "-fwdHost",      fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
-  { "-fwdPort",      &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
-  { "-ngsi9",        &ngsi9Only,    "CONFMAN",        PaBool,   PaOpt, false,      false,  true,  NGSI9_DESC         },
-  { "-ipv4",         &useOnlyIPv4,  "USEIPV4",        PaBool,   PaOpt, false,      false,  true,  USEIPV4_DESC       },
-  { "-ipv6",         &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
-  { "-harakiri",     &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
+  { "-fwdHost",       fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
+  { "-fwdPort",       &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
+  { "-ngsi9",         &ngsi9Only,    "CONFMAN",        PaBool,   PaOpt, false,      false,  true,  NGSI9_DESC         },
+  { "-ipv4",          &useOnlyIPv4,  "USEIPV4",        PaBool,   PaOpt, false,      false,  true,  USEIPV4_DESC       },
+  { "-ipv6",          &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
+  { "-harakiri",      &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
 
-  { "-https",        &https,        "HTTPS",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
-  { "-key",          httpsKeyFile,  "HTTPS_KEYFILE",  PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSKEYFILE_DESC  },
-  { "-cert",         httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
+  { "-https",         &https,        "HTTPS",          PaBool,   PaOpt, false,      false,  true,  HTTPS_DESC         },
+  { "-key",           httpsKeyFile,  "HTTPS_KEYFILE",  PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSKEYFILE_DESC  },
+  { "-cert",          httpsCertFile, "HTTPS_CERTFILE", PaString, PaOpt, _i "",      PaNL,   PaNL,  HTTPSCERTFILE_DESC },
 
-  { "-rush",         rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
-  { "-multiservice", &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
+  { "-rush",          rush,          "RUSH",           PaString, PaOpt, _i "",      PaNL,   PaNL,  RUSH_DESC          },
+  { "-multiservice",  &mtenant,      "MULTI_SERVICE",  PaBool,   PaOpt, false,      false,  true,  MULTISERVICE_DESC  },
 
-  { "-httpTimeout",  &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
-  { "-mutexPolicy",  mutexPolicy,   "MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
-  { "-mutexTimeStat",&mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
-  { "-writeConcern", &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,              0,     1,  WRITE_CONCERN_DESC },
+  { "-httpTimeout",   &httpTimeout,  "HTTP_TIMEOUT",   PaLong,   PaOpt, -1,         -1,     MAX_L, HTTP_TMO_DESC      },
+  { "-reqMutexPolicy",reqMutexPolicy,"MUTEX_POLICY",   PaString, PaOpt, _i "all",   PaNL,   PaNL,  MUTEX_POLICY_DESC  },
+  { "-mutexTimeStat", &mutexTimeStat,"MUTEX_TIME_STAT",PaBool,   PaOpt, false,      false,  true,  MUTEX_TIMESTAT_DESC},
+  { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
-  { "-corsOrigin",   allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
+  { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
 
   PA_END_OF_ARGS
 };
@@ -320,6 +327,17 @@ PaArgument paArgs[] =
 *
 */
 
+
+//
+// /v2 API
+//
+
+#define EPS                EntryPointsRequest
+#define EPS_COMPS_V2       1, { "v2"             }
+
+#define ENT                EntitiesRequest
+#define ENT_COMPS_V2       2, { "v2", "entities" }
+#define ENT_COMPS_WORD     ""
 
 //
 // NGSI9
@@ -563,6 +581,15 @@ PaArgument paArgs[] =
 #define INV9_COMPS         2, { "ngsi9",   "*"                           }
 #define INV10_COMPS        2, { "ngsi10",  "*"                           }
 #define INV_ALL_COMPS      0, { "*", "*", "*", "*", "*", "*"             }
+
+
+
+#define API_V2                                                                                           \
+  { "GET",    EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  entryPointsTreat                          }, \
+  { "*",      EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  badVerbAllFour                            }, \
+  { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
+  { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
+
 
 
 
@@ -896,6 +923,8 @@ PaArgument paArgs[] =
 */
 RestService restServiceV[] =
 {
+  API_V2,
+
   REGISTRY_STANDARD_REQUESTS_V0,
   REGISTRY_STANDARD_REQUESTS_V1,
   STANDARD_REQUESTS_V0,
@@ -1080,7 +1109,6 @@ void orionExit(int code, const std::string& reason)
     destroyAllOntimeIntervalThreads(dbs[ix]);
   }
 
-  mongoDisconnect();
   exit(code);
 }
 
@@ -1159,11 +1187,22 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 *
 * mongoInit -
 */
-static void mongoInit(const char* dbHost, const char* rplSet, std::string dbName, const char* user, const char* pwd, long timeout, int writeConcern)
+static void mongoInit
+(
+  const char*  dbHost,
+  const char*  rplSet,
+  std::string  dbName,
+  const char*  user,
+  const char*  pwd,
+  long         timeout,
+  int          writeConcern,
+  int          dbPoolSize,
+  bool         mutexTimeStat
+)
 {
   double tmo = timeout / 1000.0;  // milliseconds to float value in seconds
 
-  if (!mongoConnect(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern))
+  if (!mongoStart(dbHost, dbName.c_str(), rplSet, user, pwd, mtenant, tmo, writeConcern, dbPoolSize, mutexTimeStat))
   {
     LM_X(1, ("Fatal Error (MongoDB error)"));
   }
@@ -1443,9 +1482,9 @@ int main(int argC, char* argV[])
   }
 
   pidFile();
-  SemRequestType policy = policyGet(mutexPolicy);
+  SemRequestType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
-  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern);
+  mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, mutexTimeStat);
   contextBrokerInit(ngsi9Only, dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 

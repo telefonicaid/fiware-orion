@@ -141,25 +141,33 @@ using namespace mongo;
 
 /*****************************************************************************
 *
-* Macro to ease extracting fields from BSON objects
+* Macros to ease extracting fields from BSON objects
 */
 #define STR_FIELD(i, sf) std::string(i.getStringField(sf))
 #define C_STR_FIELD(i, sf) i.getStringField(sf)
 
-/*****************************************************************************
+
+
+/* ****************************************************************************
 *
-* mongoConnect -
-*
-* Default value for writeConcern == 1 (0: unacknowledged, 1: acknowledged)
+* mongoStart - 
 */
-extern bool mongoConnect(const char* host,
-                         const char* db,
-                         const char* rplSet,
-                         const char* username,
-                         const char* passwd,
-                         bool        _multitenant,
-                         double      timeout,
-                         int         writeConcern = 1);
+extern bool mongoStart
+(
+  const char* host,
+  const char* db,
+  const char* rplSet,
+  const char* username,
+  const char* passwd,
+  bool        _multitenant,
+  double      timeout,
+  int         writeConcern = 1,
+  int         poolSize     = 10,
+  bool        semTimeStat  = false
+);
+
+
+
 #ifdef UNIT_TEST
 extern bool mongoConnect(const char* host);
 extern bool mongoConnect(DBClientConnection* c);
@@ -177,20 +185,21 @@ extern Notifier* getNotifier();
 */
 extern void setNotifier(Notifier* n);
 
-/*****************************************************************************
-*
-* getMongoConnection -
-*/
-extern void mongoDisconnect();
 
 /*****************************************************************************
 *
 * getMongoConnection -
 *
 * I would prefer to have per-collection methods, to have a better encapsulation, but
-* the Mongo C++ API seems not working that way
+* the Mongo C++ API seems not to work that way
 */
 extern DBClientBase* getMongoConnection(void);
+
+/* ****************************************************************************
+*
+* releaseMongoConnection - 
+*/
+extern void releaseMongoConnection(DBClientBase* connection);
 
 /*****************************************************************************
 *
@@ -343,7 +352,6 @@ extern bool entitiesQuery
   const std::vector<std::string>&  servicePath,
   int                              offset  = DEFAULT_PAGINATION_OFFSET_INT,
   int                              limit   = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                             details = false,
   long long*                       countP  = NULL
 );
 

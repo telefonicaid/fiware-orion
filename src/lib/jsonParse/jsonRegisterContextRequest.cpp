@@ -646,7 +646,7 @@ void jsonRcrPresent(ParseData* reqDataP)
     return;
   }
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
 
   reqDataP->rcr.res.contextRegistrationVector.present("");
   reqDataP->rcr.res.duration.present("");

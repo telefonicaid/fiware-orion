@@ -1535,7 +1535,7 @@ def CheckSpacingForFunctionCall(filename, line, linenum, error):
       error(filename, linenum, 'whitespace/parens', 2,
             'Extra space after (')
     if (Search(r'\w\s+\(', fncall) and
-        not Search(r'#\s*define|typedef', fncall)):
+        not Search(r'#\s*define|typedef|catch', fncall)):
       error(filename, linenum, 'whitespace/parens', 4,
             'Extra space before ( in function call')
     # If the ) is followed only by a newline or a { + newline, assume it's

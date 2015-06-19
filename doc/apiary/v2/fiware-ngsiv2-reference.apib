@@ -1,0 +1,950 @@
+FORMAT: 1A
+HOST: http://fiware-ngsi2.apiblueprint.org/
+
+# FIWARE-NGSI-Simple
+
+<!--
+ Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+
+ This file is part of Orion Context Broker.
+
+ Orion Context Broker is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+
+ Orion Context Broker is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+ General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+
+ For those usages not covered by this license please contact with
+ iot_support at tid dot es
+-->
+
+FIWARE-NGSI Simple API.
+
+# FIWARE-NGSI-Simple API Root [/v2]
+
+This resource does not have any attributes. Instead it offers the initial
+API affordances in the form of the links in the JSON body.
+
+It is recommended to follow the “url” link values,
+[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
+applicable to retrieve resources. Instead of constructing your own URLs,
+to keep your client decoupled from implementation details.
+
+## JSON entity representation
+
+An entity is represented by a a JSON object which contain the following properties:
+
+* `id` for the entity ID, represented by a JSON string. If the entity has an `id` attribute itself it will be ignored.
+* `type` for the entity type, represented by a JSON string. If the entity has a `type` attribute itself it will be ignored.
+  If the entity doesn't have a type, then this property is not included.
+* A collection of properties, one per entity attribute. Property values can be single values or they can include,
+  `type` and properties representing metadata as well. Property values which correspond to the primitive JSON datatypes
+  "string", "number" and "boolean" and with no metadata are rendered as regular JSON values. Property values
+  which specify a custom type or include metadata are rendered as JSON objects with the following properties:
+  * `value`: for the attribute value, rendered as a regular JSON value depending on the type. Attributes with an
+    user-defined informative types are rendered as JSON strings (TBD).
+  * `type`: a JSON string which represents the attribute type provided at attribute creation time.
+  * A collection of properties one per metadata field associated to the attribute value. Metadata properties follow the
+    same representation rules that applies to properties which represent attributes (except that a metadata
+    cannot have metadata properties). 
+
+Canonical format description (TBD).
+
+### Predefined types
+
+All attribute types not included in the list below are considered *user-defined informative* types. The values of
+user-defined informative types are represented by JSON string.
+
+* `number` (or `Number`):  identifies numbers, either integer or float.
+They are associated to JSON number type (see https://developer.mozilla.org/en-US/docs/Glossary/Number).
+Operators allowed are: greater than, lesser than, greater or equal, lesser or equal and range.
+
+```
+"temperature": 32.5
+```
+
+* `string` (or `String`): identifies text string. They are represented by JSON strings (see https://developer.mozilla.org/en-US/docs/Glossary/String).
+
+```
+"msg": "Hello world"
+```
+
+* `boolean` (or `Boolean`): identifies a logical value, either true or false. They are represented by JSON booleans (see https://developer.mozilla.org/en-US/docs/Glossary/Boolean).
+
+```
+"active": true
+```
+
+* `date` (or `Date`):  identifies dates, in ISO8601 format. They are represented by JSON strings. Operators allowed are:
+greater than, lesser than, greater or equal, lesser or equal and range.
+
+```
+"timestamp": "2017-06-17T07:21:24.238Z"
+```
+
+
+* `geo:point`: identifies a geolocation. They are represented by JSON strings. An
+entity can only have one `geo:point` attribute (TBD: this is yet under discussion, one possibility is
+there can be multiple points associated to an entity but an entity can only be located on one place).
+
+```
+{
+  ...
+  "location": {
+    "value": "41.3763726, 2.1864475,14",
+    "type": "geo:point"
+  }
+}
+```
+
+At creation or update time, the type has to be coherent with the value of the attribute, e.g the following
+will result in an error response:
+
+(TBD: this behaviour is under discussion, specially the case for the "myType" with JSON number for the value)
+
+```
+{
+  "value": "23.5", -> value should be: 23.5
+  "type": "number"
+}
+
+
+{
+  "value": 23.5,   -> value should be: "23.5"
+  "type": "string"
+}
+
+{
+  "value": "23.5", -> value should be: "23.5" (user defined types always use JSON strings as value)
+  "type": "myType"
+}
+
+{
+  "value": "foo, bar", -> it is not correctly formated as coordinates
+  "type": "geo:point"
+}
+```
+
+## Error responses
+
+In the case of being present, the error payload is JSON object including the following fields:
+
+* `error` (mandatory): a textual description of the error.
+* `description` (optional): additional information about the error.
+
+# API entry point
+
+## Retrieve the Entry Point [GET]
+
++ Response 200 (application/json)
+
+        {
+            "entities_url":      "/v2/entities",
+            "types_url":         "/v2/types",
+            "subscriptions_url": "/v2/subscriptions",
+            "registrations_url": "/v2/registrations"
+        }
+
+## Context Entities [/v2/entities]
+
+### List entities [GET /v2/entities{?limit,offset,count,type,id,idPattern,q,geometry,coords,attrs}]
+
+Retrieves a list of entities which match criteria defined by the following parameters: `id`, `type`, `idPattern`, `q`,
+`geometry` and `coords` attribute (see below for a detailed description of these parameters). A given entity
+have to match all the criteria to be retrieved (i.e. criteria are combined in a logical AND way).
+
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">id</td><td>A comma separated list of elements.
+  Retrieve entities which ID match one of the elements in the list.</td>
+</tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">type</td><td>A comma separated list of elements.
+  Retrieve entities which type match one of the elements in the list.</td>
+</tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">idPattern</td><td>A correctly formated regular
+  expression. Retrieve entities which ID matches the regular expression.</td>
+</tr>
+<tr><td style="padding-right: 40px; width: 140px;">q</td><td>
+
+<p>A query expression, composed of a list of statements separated by <code>;</code>, i.e.</p>
+
+<p><code>
+q=statement;statements;statement
+</code></p>
+
+<p>Each statement express a matching condition. The result of the query is the match on each one of the statements, e.g. a
+AND logical condition among the different statements. There are two kind of statements: <em>unary statements</em> and
+<em>binary staments</em>.</p>
+
+<p>Binary statements are composed by an attribute name (e.g. "temperature"), operator and value (which format
+depends on the operator), e.g.:</p>
+
+<p><code>
+temperature==50<br/>
+temperature<=20
+</code></p>
+
+<p>The list of operators (and the format of the values they use) is as follows:</p>
+
+<ul>
+  <li>Equal: <code>==</code>. It accepts the following values:
+    <ul>
+      <li>Single element, e.g. <code>temperature==40</code>. It matches entities whose attribute value
+      that exact value.</li>
+      <li>A list of comma-separated values, e.g. <code>color==black,red</code>. It matches entities whose
+      attribute value is one of the values (OR clause). Eg. entities which <code>color</code> is set to
+      <code>black</code> will match, while entities which <code>color</code> is set to <code>white</code>
+      will not match.</li>
+      <li>A range, specified as a minimum and maximum separated by <code>..</code>. It match if
+      the value is in the interval between the minimum and the maximum (both included). It can only be used
+      with attributes which contain dates or numbers. E.g. <code>temperature==10..20</code> matchs if the
+      temperature is greater or equal than 10 and lower or equal than 20.</li>
+    </ul>
+  </li>
+  <li>Unequal: <code>!=</code>. It accepts the following values:
+    <ul>
+      <li>The value is a single element, e.g. <code>temperature!=40</code>. It matches entities whose attribute
+      value is not that exact value.</li>
+      <li>A list of comma-separated values, e.g. <code>color!=black,red</code>. It matches entities whose
+      attribute value is not any of the values (AND clause). Eg. entities whose <code>color</code> is set
+      to <code>black</code> will not match, while entities whose <code>color</code> is set to
+      <code>white</code> match.</li>
+      <li>A range, specified as a minimum and maximum separated by <code>..</code>. It match
+      if the value is not in the interval between the minimum and the maximum (both included). It can only
+      be used with attributes which contain dates or numbers. E.g. <code>temperature!=10..20</code>matchs if
+      the temperature is lower than 10 or greater than 20 (it will not match if the tempeature is 10 or the
+      temperature is 20).</li>
+    </ul>
+  </li>
+  <li>Greater than: <code>&gt;</code>. The value is a single element, e.g. <code>temperature&gt;40</code>. It
+  matches entities which attribute value is strictly greater than that value. It can only
+  be used with attributes which contain dates or numbers.</li>
+  <li>Lesser than: <code>&lt;</code>. The value is a single element, e.g. <code>temperature&lt;40</code>. It
+  matches entities which attribute value is strictly lesser than that value. It can only
+  be used with attributes which contain dates or numbers.</li>
+  <li>Greater or equal than: <code>&gt;=</code>. The value is a single element, e.g. <code>temperature&gt;=40</code>.
+  It matches entities which attribute value is greater than or equal to that value. It can only
+  be used with attributes which contain dates or numbers.</li>
+  <li>Lesser or equal than: <code>&lt;=</code>. The value is a single element, e.g. <code>temperature&lt;=40</code>. It
+  matches entities which attribute value is lesser than or equal to that value. It can only
+  be used with attributes which contain dates or numbers.</li>
+</ul>
+
+<p>In the case of equal or inequal, if the value to match include a <code>,</code>, you can use simple quote
+(<code>'</code>), e.g: <code>color=='light,green','deep,blue'</code>.</p>
+
+<p>Unary statements are composed of a unary operator (either <code>+</code>or <code>-</code>) and are used in two situations:</p>
+
+<ul>
+  <li>To check for attribute existence. E.g. <code>+temperature</code>matches entities which have
+  a temperature attribute (no matter its value), while <code>-temperature</code>matches entities which don't have
+  a temperature attribute.</li>
+  <li>To check for entity type existence, with the <code>type</code>keyword. E.g, <code>-type</code>
+  matches entities which don't have a type.</li>
+</ul>
+
+</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">geometry</td><td>
+
+<p>Defines a geografical area so only the entities located in that area matches the query. It is composed of a tokens list
+separated by <code>;</code>. The first token is the shape of the geometry, the rest of the tokens (if any) depends
+on the shape. In particular, the following geometries can be defined so far:</p>
+
+<ul>
+  <li><code>geometry=circle;radius:4000</code>, inside a circle (radius is in meters).</li>
+  <li><code>geometry=circle;radius:4000;external</code>, outside a circle (radius is in meters).</li>
+  <li><code>geometry=polygon</code>, inside a polygon.</li>
+  <li><code>geometry=polygon;external</code>, outside a polygon.</li>
+</ul>
+
+</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">coords</td><td>
+
+<p>List of coordinates (separated by <code>;</code>) are interpreted depending on the geometry parameter as follows:</p>
+
+<ul>
+  <li>In the case of <code>circle</code>geometry, the parameter includes just one element, which
+  is the center of the circle.</li>
+  <li>In the case of <code>polygon</code>includes a list of elements, which are the vertices of
+  the polygon.</li>
+</ul>
+
+</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">attrs</td>
+    <td>List of comma separated attributes to include in the entities of the response. If this parameter is not
+    included, all the attributes are retrieved.</td>
+</tr>
+<tr><td style="padding-right: 40px; width: 140px;">limit</td><td>Limit the number of entities to be retrieved</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">offset</td><td>Skip a number of records</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">options</td><td>
+This operation supports two options:
+
+<ul>
+  <li><code>count</code>: when used, the total entities number is returned as a HTTP in the response name <code>X-Total-Count</code>.</li>
+  <li><code>cannonical</code>: when used, the response payload used the "cannonical form". See JSON entity representation format section
+  for details.</li>
+</td></tr>
+</table>
+
+The response payload is an Array which contains one object per matching entity. Each entity follows
+the JSON entity representation format (described in a section above).
+
+Response code:
+
+* Successful operation uses 200 OK
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Resposnes for more detail.
+
++ Parameters
+    + limit: 20 (optional, number)
+    + offset: 20 (optional, number)
+    + type: Room (optional, string)
+    + id: Bcn_Welt (optional, string)
+    + idPattern: (optional, string)
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1-D41",
+            "temperature": 35.6
+         },
+         {
+            "type": "Room",
+            "id": "Boe-Idearium",
+            "temperature": 22.5
+         },
+         {
+            "type": "Car",
+            "id": "P-9873-K",
+            "speed": {
+                "value": 100,
+                "type": "number",
+                "accuracy": 2,
+                "timestamp": {
+                    "value": "2015-06-04T07:20:27.378Z",
+                    "type": "date"
+                }
+            }
+         }
+        ]
+
+### Create entity [POST /v2/entities]
+
++ Request (application/json)
+
+        {
+            "type": "Room",
+            "id": "Bcn-Welt",
+            "temperature": 21.7,
+            "humidity": 60,
+            "location": {
+                "value":  "41.3763726, 2.1864475",
+                "type": "geo:point",
+                "crs": "WGS84"
+            },
+        }
+
++ Response 201
+
+    + Headers
+
+            Location: /v2/entities/Bcn-Welt
+
+
+### Create entity. Error [POST /v2/entities]
+
++ Request (application/json)
+
+        {
+            "type": "Room",
+            "id": "Bcn-Welt",
+            "temperature": 21.7
+        }
+
++ Response 422 (application/json)
+
+        {
+            "error": "AlreadyExists",
+            "description": "An entity with the same id and type is already present"
+        }
+
+
+## ContextEntity [/v2/entities/{entityId}]
+
+### Retrieve entity data by Id [GET /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity Id.
+
++ Response 200 (application/json)
+
+        {
+            "type": "Room",
+            "id": "Bcn_Welt",
+            "temperature": 21.7,
+            "humidity": 60,
+            "location": {
+                "value":  "41.3763726, 2.1864475",
+                "type": "geo:point",
+                "crs": "WGS84"
+            }
+        }
+
+### Retrieve entity data by Id. Not exists [GET /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity Id.
+
++ Response 404 (application/json)
+
+        {
+            "error": "NotFound",
+            "description": "There is no entity with such an id"
+        }
+
+### Retrieve entity data by id and type [GET /v2/entities/type/{entityType}/id/{entityId}]
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+    + entityType: Room (required, string) - Entity Type
+
++ Response 200 (application/json)
+
+        {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": 22.5
+        }
+
+### Get entity attributes [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: 'Bcn_Welt' (required, string) - Entity ID
+    + attrs: temperature, humidity (optional, string) - Attributes to be retrieved. Coma separated list.
+
++ Response 200 (application/json)
+
+        {
+            "temperature": 21.7,
+            "humidity": 60,
+        }
+
+### Get entity attributes. Not present [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrs: mistake (optional, string) - Attribute to be retrieved
+
++ Response 200 (application/json)
+
+        {
+        }
+
+### Update or append  entity attributes. POST [POST /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "ambientNoise": 31.5
+            }
+
++ Response 204
+
+
+### Update entity attributes. [PATCH /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+
++ Request (application/json)
+
+        {
+            "temperature": 25.5,
+            "seatsNumber": 6
+        }
+
++ Response 204
+
+
+### Update entity attributes. POST [POST /v2/entities/{entityId}{?op}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + op: update - Indicates that an update must be forced
+
++ Request (application/json)
+
+    + Headers
+
+            X-HTTP-Method-Override: PATCH
+
+    + Body
+
+            {
+                "temperature": 21.7,
+                "humidity": 60,
+            }
+
++ Response 200
+
+
+### Remove an entity[DELETE /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+
++ Response 204
+
+### Remove entity attributes[DELETE /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+    + attrs: humidity, seatsNumber - Attributes
+
++ Response 204
+
+## Context Entity Attributes [/v2/entities/{entityId}/attrs]
+
+### List all attributes [GET /v2/entities/{entityId}/attrs]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+
++ Response 200 (application/json)
+
+        {
+            "temperature": 21.7,
+            "humidity": 60,
+            "location": {
+                "value":  "41.3763726, 2.1864475",
+                "type": "geo:point",
+                "crs": "WGS84"
+            }
+        }
+
+### Replace all attributes [PUT /v2/entities/{entityId}/attrs]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+
++ Request (application/json)
+
+        {
+            "temperature": 21.7,
+            "relativeHumidity": {
+                "value": 60,
+                "accuracy": 1
+            },
+            "seatsNumber": 12
+        }
+
++ Response 200
+
+### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrId: temperature (required, string) - Attribute to be retrieved.
+
++ Response 200 (application/json)
+
+        {
+            "value": 21.7
+        }
+
+### Get a single attribute value. Not exists [GET /v2/entities/{entityId}/attrs/{attrId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrId: mistake (required, string) - Attribute to be retrieved.
+
++ Response 404 (application/json)
+
+        {
+            "error": "NotFound",
+            "description": "The entity does not have such an attribute"
+        }
+
+### Update an attribute value - JSON [PUT /v2/entities/{entityId}/attrs/{attrId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrId: temperature (required, string) - Attribute ID
+
++ Request (application/json)
+
+        {
+            "value": 25.0,
+            "unitCode": "CEL"
+        }
+
++ Response 200
+
+
+### Remove a single attribute [DELETE /v2/entities/{entityId}/attrs/{attrId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrId: temperature (required, string) - Attribute ID
+
++ Response 204
+
+
+## Context Entity Subscriptions [/v2/entities/{entityId}/subscriptions]
+
+### List all subscriptions present in the system [GET /v2/subscriptions]
+
++ Response 200
+
+        [
+            {
+                "id": "abcdefg",
+                "entity": {
+                    "id": "Bcn_Welt",
+                    "type": "Room"
+                },
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234",
+                "options": {
+                    "duration": "1M",
+                    "condition": "ONCHANGE",
+                    "throttling": "PT5S"
+                }
+            },
+             {
+                "id": "wyztrew",
+                "entity": {
+                    "pattern": "DC_*",
+                    "type": "Room"
+                },
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234"
+            }
+        ]
+
+### Get the details of a subscription [GET /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: abcdefg (required, string) - ID of the suscription
+
++ Response 200
+
+        {
+            "id": "abcdefg",
+            "entity": {
+                "id": "Bcn_Welt",
+                "type": "Room"
+            },
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://localhost:1234",
+            "options": {
+                "duration": "1M",
+                "condition": "ONCHANGE",
+                "throttling": "PT5S"
+            }
+        }
+
+### Remove a suscription [DELETE /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: abcdefg (required, string) - ID of the suscription
+
++ Response 204
+
+
+### Create a new subscription [POST /v2/subscriptions]
+
++ Request (application/json)
+
+        {
+            "entity": {
+                "pattern": "Boe_*",
+                "type": "Room"
+            },
+            "attributes": [
+                "humidity"
+            ],
+            "callback": "http://subscriber.example.com/notify"
+        }
+
++ Response 201
+
+    + Headers
+
+            Location: /subscriptions/abcde98765
+
+### Partial - Update an existing subscription [PATCH /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: abcdefgh (required, string) - ID of the suscription
+
++ Request
+
+        {
+            "duration": "1Y"
+        }
+
++ Response 204
+
+### List all subscriptions associated to an entity [GET /v2/entities/{entityId}/subscriptions]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+
++ Response 200 (application/json)
+
+        [
+            {
+                "id": "abcdefg",
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234",
+                "options": {
+                    "duration": "1M",
+                    "condition": "ONCHANGE",
+                    "throttling": "PT5S"
+                }
+            }
+        ]
+
+
+### Create a new subscription associated to an entity [POST /v2/entities/{entityId}/subscriptions]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+
++ Request
+
+        {
+            "attributes": [
+                "humidity"
+            ],
+            "callback": "http://subscriber.example.com/notify"
+        }
+
++ Response 201
+
+    + Headers
+
+            Location: /subscriptions/abcd9867hshshs
+
+### Get the details of a subscription associated to an entity [GET /v2/entities/{entityId}/subscriptions/{subscriptionId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+    + subscriptionId: abcdefgh (required, string) - ID of the subscription
+
++ Response 200 (application/json)
+
+        {
+            "id": "abcdefgh",
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://localhost:1234",
+            "options": {
+                "duration": "1M",
+                "condition": "ONCHANGE",
+                "throttling": "PT5S"
+            }
+        }
+
+
+## Context Entity Registrations [/v2/registrations]
+
+### List all registrations present in the system [GET /v2/registrations]
+
++ Response 200
+
+        [
+            {
+                "id": "abcdefg",
+                "entity": {
+                    "id": "Bcn_Welt",
+                    "type": "Room"
+                },
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234",
+                "options": {
+                    "duration": "1M"
+                }
+            },
+             {
+                "id": "wyztrew",
+                "entity": {
+                    "pattern": "DC_*",
+                    "type": "Room"
+                },
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234"
+            }
+        ]
+
+### Get the details of a registration [GET /v2/subscriptions/{registrationId}]
+
++ Parameters
+    + registrationId: abcdefg (required, string) - ID of the registration
+
++ Response 200
+
+        {
+            "id": "abcdefg",
+            "entity": {
+                "id": "Bcn_Welt",
+                "type": "Room"
+            },
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://localhost:1234",
+        }
+
+### Create a new registration [POST /v2/registrations]
+
++ Request
+
+        {
+            "entity": {
+                "pattern": "Boe_*",
+                "type": "Room"
+            },
+            "attributes": [
+                "humidity"
+            ],
+            "callback": "http://provider.example.com/provide"
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /registrations/abcde98765
+
+### Partial update an existing registration [PATCH /v2/registration/{registrationId}]
+
++ Parameters
+    + registrationId: r1234avfd (required, string) - ID of the registration
+
++ Request
+
+        {
+            "duration": "1Y"
+        }
+
++ Response 204
+
+### Full update of an existing registration [PUT /v2/registration/{registrationId}]
+
++ Parameters
+    + registrationId: r1234avfd (required, string) - ID of the registration
+
++ Request
+
+        {
+            "entity": {
+                "pattern": "Boe_*",
+                "type": "Room"
+            },
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://provider2.example.com/provide"
+        }
+
++ Response 204
+
+### Remove a registration [DELETE /v2/registrations/{registrationId}]
+
++ Parameters
+    + registrationId: abcdefg (required, string) - ID of the registration
+
++ Response 204
+
+### List all registrations associated to an entity [GET /v2/entities/{entityId}/registrations]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+
++ Response 200 (application/json)
+
+        [
+            {
+                "id": "abcdefg",
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234",
+                "options": {
+                    "duration": "1M"
+                }
+            }
+        ]
+
+
+### Create a new registration associated to an entity [POST /v2/entities/{entityId}/registrations]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+
++ Request
+
+        {
+            "attributes": [
+                "humidity"
+            ],
+            "callback": "http://provider.example.com/provide"
+        }
+
++ Response 201
+
+    + Headers
+
+            Location: /registration/abcd9867hshshs
+
+### Get the details of a registration associated to an entity [GET /v2/entities/{entityId}/registrations/{registrationId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+    + registrationId: abcdefgh (required, string) - ID of the registration
+
++ Response 200 (application/json)
+
+        {
+            "id": "abcdefgh",
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://localhost:1234",
+            "options": {
+                "duration": "1M"
+            }
+        }

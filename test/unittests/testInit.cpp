@@ -38,10 +38,26 @@ using namespace mongo;
 *
 * This function (which is called before every test) cleans the database
 */
-void setupDatabase(void) {
+extern DBClientBase* mongoInitialConnectionGetForUnitTest();
+extern void          setMongoConnectionForUnitTest(DBClientBase*);
+void setupDatabase(void)
+{
+    DBClientBase*  connection   = NULL;
+    static bool    mongoStarted = false;
 
-    mongoConnect("localhost");
-    DBClientBase* connection = getMongoConnection();
+    /* mongoStart is needed one time to create the connection pool */
+    if (mongoStarted == false)
+    {
+      mongoStart("localhost", "", "", "", "", false, 0, 10);
+      mongoStarted = true;
+    }
+
+    connection = getMongoConnection();
+    if (connection == NULL)
+    {
+      connection = mongoInitialConnectionGetForUnitTest();
+      setMongoConnectionForUnitTest(connection);
+    }
 
     connection->dropCollection(REGISTRATIONS_COLL);
     connection->dropCollection(ENTITIES_COLL);
@@ -49,6 +65,7 @@ void setupDatabase(void) {
     connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);
     connection->dropCollection(ASSOCIATIONS_COLL);
 
+    releaseMongoConnection(connection);
 
     setDbPrefix(DBPREFIX);
     setRegistrationsCollectionName("registrations");
@@ -56,7 +73,6 @@ void setupDatabase(void) {
     setSubscribeContextCollectionName("csubs");
     setSubscribeContextAvailabilityCollectionName("casubs");
     setAssociationsCollectionName("associations");
-
 }
 
 /* ****************************************************************************

@@ -68,7 +68,6 @@ extern int semInit
 * xxxSemTake -
 */
 extern int reqSemTake(const char* who, const char* what, SemRequestType reqType, bool* taken);
-extern int mongoSemTake(const char* who, const char* what);
 extern int transSemTake(const char* who, const char* what);
 
 
@@ -78,7 +77,6 @@ extern int transSemTake(const char* who, const char* what);
 * xxxSemGive -
 */
 extern int reqSemGive(const char* who, const char* what = NULL, bool taken = true);
-extern int mongoSemGive(const char* who, const char* what = NULL);
 extern int transSemGive(const char* who, const char* what = NULL);
 
 
@@ -88,7 +86,6 @@ extern int transSemGive(const char* who, const char* what = NULL);
 * semTimeXxxGet - get accumulated semaphore waiting time
 */
 extern void semTimeReqGet(char* buf, int bufLen);
-extern void semTimeMongoGet(char* buf, int bufLen);
 extern void semTimeTransGet(char* buf, int bufLen);
 
 
@@ -98,7 +95,6 @@ extern void semTimeTransGet(char* buf, int bufLen);
 * semTimeXxxReset - 
 */
 extern void semTimeReqReset(void);
-extern void semTimeMongoReset(void);
 extern void semTimeTransReset(void);
 
 /* ****************************************************************************

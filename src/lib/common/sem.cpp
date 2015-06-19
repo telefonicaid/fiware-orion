@@ -30,6 +30,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
+#include "common/clockFunctions.h"
 
 // includes for curl contexts
 #include <map>
@@ -41,7 +42,6 @@
 * Globals -
 */
 static sem_t           reqSem;
-static sem_t           mongoSem;
 static sem_t           transSem;
 static SemRequestType  reqPolicy;
 
@@ -52,7 +52,6 @@ static SemRequestType  reqPolicy;
 * Time measuring variables - 
 */
 static struct timespec accReqSemTime   = { 0, 0 };
-static struct timespec accMongoSemTime = { 0, 0 };
 static struct timespec accTransSemTime = { 0, 0 };
 
 
@@ -74,19 +73,13 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
     LM_E(("Runtime Error (error initializing 'req' semaphore: %s)", strerror(errno)));
-    return 1;
-  }
-
-  if (sem_init(&mongoSem, shared, takenInitially) == -1)
-  {
-    LM_E(("Runtime Error (error initializing 'mongo' semaphore: %s)", strerror(errno)));
-    return 2;
+    return -1;
   }
 
   if (sem_init(&transSem, shared, takenInitially) == -1)
   {
     LM_E(("Runtime Error (error initializing 'transactionId' semaphore: %s)", strerror(errno)));
-    return 3;
+    return -1;
   }
 
   reqPolicy = _reqPolicy;
@@ -94,42 +87,6 @@ int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenIn
   // Measure accumulated semaphore waiting time?
   semTimeStatistics = semTimeStat;
   return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* clock_difftime - 
-*/
-static void clock_difftime(struct timespec* endTime, struct timespec* startTime, struct timespec* diffTime)
-{
-  diffTime->tv_nsec = endTime->tv_nsec - startTime->tv_nsec;
-  diffTime->tv_sec  = endTime->tv_sec  - startTime->tv_sec;
-
-  if (diffTime->tv_nsec < 0)
-  {
-    diffTime->tv_sec -= 1;
-    diffTime->tv_nsec += 1000000000;
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* clock_addtime - 
-*/
-static void clock_addtime(struct timespec* accTime, struct timespec* diffTime)
-{
-  accTime->tv_nsec += diffTime->tv_nsec;
-  accTime->tv_sec  += diffTime->tv_sec;
-
-  if (accTime->tv_nsec >= 1000000000)
-  {
-    accTime->tv_sec  += 1;
-    accTime->tv_nsec -= 1000000000;
-  }
 }
 
 
@@ -209,24 +166,6 @@ void semTimeReqGet(char* buf, int bufLen)
 
 /* ****************************************************************************
 *
-* semTimeMongoGet - get accumulated mongo semaphore waiting time
-*/
-void semTimeMongoGet(char* buf, int bufLen)
-{
-  if (semTimeStatistics)
-  {
-    snprintf(buf, bufLen, "%lu.%09d", accMongoSemTime.tv_sec, (int) accMongoSemTime.tv_nsec);
-  }
-  else
-  {
-    snprintf(buf, bufLen, "Disabled");
-  }
-}
-
-
-
-/* ****************************************************************************
-*
 * semTimeTransGet - get accumulated trans semaphore waiting time
 */
 void semTimeTransGet(char* buf, int bufLen)
@@ -257,60 +196,12 @@ void semTimeReqReset(void)
 
 /* ****************************************************************************
 *
-* semTimeMongoReset - 
-*/
-void semTimeMongoReset(void)
-{
-  accMongoSemTime.tv_sec  = 0;
-  accMongoSemTime.tv_nsec = 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * semTimeTransReset - 
 */
 void semTimeTransReset(void)
 {
   accTransSemTime.tv_sec  = 0;
   accTransSemTime.tv_nsec = 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSemTake -
-*/
-int mongoSemTake(const char* who, const char* what)
-{
-  int r;
-
-  LM_T(LmtMongoSem, ("%s taking the 'mongo' semaphore for '%s'", who, what));
-
-  struct timespec startTime;
-  struct timespec endTime;
-  struct timespec diffTime;
-
-  if (semTimeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &startTime);
-  }
-
-  r = sem_wait(&mongoSem);
-
-  if (semTimeStatistics)
-  {
-    clock_gettime(CLOCK_REALTIME, &endTime);
-
-    clock_difftime(&endTime, &startTime, &diffTime);
-    clock_addtime(&accMongoSemTime, &diffTime);
-  }
-
-  LM_T(LmtMongoSem, ("%s has the 'mongo' semaphore", who));
-
-  return r;
 }
 
 
@@ -372,26 +263,6 @@ int reqSemGive(const char* who, const char* what, bool semTaken)
   }
 
   return sem_post(&reqSem);
-}
-
-
-
-/* ****************************************************************************
-*
-* mongoSemGive -
-*/
-int mongoSemGive(const char* who, const char* what)
-{
-  if (what != NULL)
-  {
-    LM_T(LmtMongoSem, ("%s gives the 'mongo' semaphore for '%s'", who, what));
-  }
-  else
-  {
-    LM_T(LmtMongoSem, ("%s gives the 'mongo' semaphore", who));
-  }
-
-  return sem_post(&mongoSem);
 }
 
 

@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <string>
 
+#include "logMsg/logMsg.h"
 #include "common/Format.h"
 #include "common/tag.h"
 #include "common/globals.h"
@@ -103,7 +104,7 @@ std::string AttributeAssociationList::check
 */
 void AttributeAssociationList::present(const std::string& indent)
 {
-  PRINTF("%lu Attribute Associations", (uint64_t) vec.size());
+  LM_F(("%lu Attribute Associations", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

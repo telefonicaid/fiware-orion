@@ -1,9 +1,7 @@
-- Add: CORS support for GET requests, configuring allowed origin with -corsOrigin CLI parameter (Issue #501)
-- Add: New CLI parameter for the mutex policy: -mutexPolicy (Issue #910)
-- Add: Measuring the accumulated time waiting for the DB semaphores.
-       The measures are added to the REST request /statistics, but only if
-       the new CLI parameter -mutexTimeStat is set (Issue #911)
-- Fix: Removing trailing slashes for path of URI before treating the request (Issue #828)
-- Fix: Fixed a bug regarding subscriptions with empty entity-type (Issue #691)
-- Fix: updateContext propagated to the entire Service Path subtree, instead of just scoping to the particular Service Path in the Fiware-Service header (Issue # 885)
-- Mongo driver migrated to legacy-1.0.2
+Fix: Fixed a bug about pagination problem due to missing ErrorCode with details in the case of queries with forwarding to context providers.  (Issue #945)
+Fix: Add multiservice flag for the default configuration in the RPM. (Issue #964)
+Add: New operation "GET /v2/entities" (Issue #947)
+Add: New operation "GET /v2" (Issue #956)
+Fix: ONCHANGE subscription sends notification when value under condition it is not updated with updateContext-APPEND in some cases (Issue #943)
+Add: Reuse curl context for outgoing notifications
+

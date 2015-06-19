@@ -35,6 +35,9 @@
 
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
+
 /* ****************************************************************************
 *
 * Tests
@@ -293,8 +296,7 @@ TEST(mongoQueryTypes, queryAllType)
     EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
-
+    setMongoConnectionForUnitTest(NULL);
     utExit();
 }
 
@@ -411,7 +413,7 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
     EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -529,7 +531,7 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
     EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -604,7 +606,7 @@ TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
     EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -659,7 +661,7 @@ TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
     EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -739,7 +741,7 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
     EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -775,7 +777,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExisting)
     ASSERT_EQ(0, res.typeEntityVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -837,7 +839,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
     EXPECT_EQ(0, ca->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -873,7 +875,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingDetails)
     ASSERT_EQ(0, res.typeEntityVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -897,7 +899,7 @@ TEST(mongoQueryTypes, queryAllDbException)
   utInit();
 
   /* Set MongoDB connection */
-  mongoConnect(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
   ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
@@ -913,6 +915,7 @@ TEST(mongoQueryTypes, queryAllDbException)
 
   /* Release mock */
   delete connectionMock;
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
 
@@ -937,7 +940,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
   utInit();
 
   /* Set MongoDB connection */
-  mongoConnect(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
   ms = mongoEntityTypes(&res, "", servicePathVector, uriParams);
@@ -954,7 +957,7 @@ TEST(mongoQueryTypes, queryAllGenericException)
 
   /* Release mock */
   delete connectionMock;
-
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1022,7 +1025,7 @@ TEST(mongoQueryTypes, queryGivenTypeBasic)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(4)->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1092,7 +1095,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationDetails)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(4)->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1162,7 +1165,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationAll)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(4)->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1204,7 +1207,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationOnlyFirst)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1247,7 +1250,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationOnlySecond)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(0)->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1304,7 +1307,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationRange)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(2)->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1340,7 +1343,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExisting)
     ASSERT_EQ(0, res.entityType.contextAttributeVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1390,7 +1393,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingOverlap)
     EXPECT_EQ(0, res.entityType.contextAttributeVector.get(1)->metadataVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1426,7 +1429,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingDetails)
     ASSERT_EQ(0, res.entityType.contextAttributeVector.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
@@ -1450,7 +1453,7 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
   utInit();
 
   /* Set MongoDB connection */
-  mongoConnect(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
   ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
@@ -1467,9 +1470,9 @@ TEST(mongoQueryTypes, queryGiveyTypeDbException)
 
   /* Release mock */
   delete connectionMock;
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
-
 }
 
 /* ****************************************************************************
@@ -1491,7 +1494,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
   utInit();
 
   /* Set MongoDB connection */
-  mongoConnect(connectionMock);
+  setMongoConnectionForUnitTest(connectionMock);
 
   /* Invoke the function in mongoBackend library */
   ms = mongoAttributesForEntityType("Car", &res, "", servicePathVector, uriParams);
@@ -1508,7 +1511,7 @@ TEST(mongoQueryTypes, queryGivenTypeGenericException)
 
   /* Release mock */
   delete connectionMock;
+  setMongoConnectionForUnitTest(NULL);
 
   utExit();
-
 }
