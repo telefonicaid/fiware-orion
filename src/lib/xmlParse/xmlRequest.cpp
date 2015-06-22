@@ -371,8 +371,6 @@ std::string xmlTreat
     }
   }
 
-  reqP->present(parseDataP);
-
   if (check != "OK")
   {
     if (errorMsgP)
