@@ -395,6 +395,9 @@ std::string httpRequestSend
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) httpResponse); // Custom data for response handling
 
+  // To solve issue 1016
+  curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+
   //
   // Timeout 
   //
