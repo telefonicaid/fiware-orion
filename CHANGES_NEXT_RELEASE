@@ -4,4 +4,5 @@ Add: New operation "GET /v2/entities" (Issue #947)
 Add: New operation "GET /v2" (Issue #956)
 Fix: ONCHANGE subscription sends notification when value under condition it is not updated with updateContext-APPEND in some cases (Issue #943)
 Add: Reuse curl context for outgoing notifications, so now connections are persistent if the HTTP server doesn't close them
+Fix: remove unconditional tracing on xmlTreat()/jsonTreat() which was impacting on performance (specially in high-load scenarios)
 
