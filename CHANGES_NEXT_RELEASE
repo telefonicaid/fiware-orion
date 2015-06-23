@@ -5,4 +5,7 @@ Add: New operation "GET /v2" (Issue #956)
 Fix: ONCHANGE subscription sends notification when value under condition it is not updated with updateContext-APPEND in some cases (Issue #943)
 Add: Reuse curl context for outgoing notifications, so now connections are persistent if the HTTP server doesn't close them
 Fix: remove unconditional tracing on xmlTreat()/jsonTreat() which was impacting on performance (specially in high-load scenarios)
+Fix: use NOSIGNAL as libcurl option to avoid crashes in that library. (Issue #1016)
+Add: CLI paramter -cprForwardLimit to cap the number of forwarding request for a single client request. (Issue #1016).
+
 

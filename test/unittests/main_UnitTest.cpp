@@ -63,6 +63,8 @@ bool  harakiri          = true;
 int   logFd             = -1;
 int   fwdPort           = -1;
 char  fwdHost[64];
+unsigned cprForwardLimit = 1000;
+
 
 
 

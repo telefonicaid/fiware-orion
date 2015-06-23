@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 #include "common/string.h"
 #include "common/defaultValues.h"
+#include "common/globals.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/UpdateContextResponse.h"
@@ -645,7 +646,8 @@ std::string postUpdateContext
   // Calling each of the Context Providers, merging their results into the
   // total response 'response'
   //
-  for (unsigned int ix = 0; ix < requestV.size(); ++ix)
+
+  for (unsigned int ix = 0; ix < requestV.size() && ix < cprForwardLimit; ++ix)
   {
     if (requestV[ix]->contextProvider == "")
     {
