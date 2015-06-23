@@ -63,4 +63,5 @@ Date: REGEX(.*)
 </orionError>
 
 --TEARDOWN--
+dbDrop CB
 brokerStop CB
