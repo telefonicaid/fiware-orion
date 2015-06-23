@@ -358,7 +358,8 @@ extern bool entitiesQuery
   int                              offset  = DEFAULT_PAGINATION_OFFSET_INT,
   int                              limit   = DEFAULT_PAGINATION_LIMIT_INT,
   bool                             details = false,
-  long long*                       countP  = NULL
+  long long*                       countP  = NULL,
+  bool*                            limitReached = NULL
 );
 
 /* ****************************************************************************
