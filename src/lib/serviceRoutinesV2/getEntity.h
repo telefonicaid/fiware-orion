@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_SERVICEROUTINES_GETENTITYV2_H_
+#define SRC_LIB_SERVICEROUTINES_GETENTITYV2_H_
+
 /*
 *
-* Copyright (c) 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -20,46 +23,27 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: José Manuel Cantera
+* Author: Ken Zangelin
 */
 #include <string>
 #include <vector>
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-#include "common/string.h"
-#include "common/globals.h"
-#include "common/tag.h"
-
-#include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
-#include "serviceRoutinesV2/entryPointsTreat.h"
+#include "ngsi/ParseData.h"
+
 
 
 /* ****************************************************************************
 *
-* entryPointsTreat -
+* getEntity -
 */
-std::string entryPointsTreat
+extern std::string getEntity
 (
   ConnectionInfo*            ciP,
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP
-)
-{
-  std::string out = "{";
+);
 
-  out += JSON_VALUE("entity_url",        ENTITY_URL)        + ",";
-  out += JSON_VALUE("entities_url",      ENTITIES_URL)      + ",";
-  out += JSON_VALUE("types_url",         TYPES_URL)         + ",";
-  out += JSON_VALUE("subscriptions_url", SUBSCRIPTIONS_URL) + ",";
-  out += JSON_VALUE("registrations_url", REGISTRATIONS_URL);
+#endif  // SRC_LIB_SERVICEROUTINES_GETENTITYV2_H_
 
-
-  out += "}";
-
-  ciP->httpStatusCode = SccOk;
-  return out;
-}

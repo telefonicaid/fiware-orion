@@ -27,6 +27,7 @@
 
 #include "common/tag.h"
 #include "apiTypesV2/Entity.h"
+#include "ngsi10/QueryContextResponse.h"
 
 
 
@@ -128,7 +129,31 @@ void Entity::fill(const std::string& _id, const std::string& _type, const std::s
   attributeVector.fill(aVec);
 }
 
+void Entity::fill(QueryContextResponse* qcrsP)
+{
 
+  if (qcrsP->errorCode.code != SccOk)
+  {
+    //
+    // If no entity has been found, we respond with a 404 NOT FOUND
+    // If any other error - use the error for the response
+    //
+    errorCode.fill(qcrsP->errorCode);
+  }
+  else if (qcrsP->contextElementResponseVector.size()>1)
+  {
+      //
+      // If there are more than one entity, we return an error
+      // TODO: determine error for this case
+      //
+      errorCode.fill("TOO MANY", "Talk to Fermin!");
+  }
+  else
+  {
+    ContextElement* ceP = &qcrsP->contextElementResponseVector[0]->contextElement;
+    this->fill(ceP->entityId.id, ceP->entityId.type, ceP->entityId.isPattern, &ceP->contextAttributeVector);
+  }
+}
 
 /* ****************************************************************************
 *

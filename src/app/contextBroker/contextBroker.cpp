@@ -175,6 +175,7 @@
 
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/entryPointsTreat.h"
+#include "serviceRoutinesV2/getEntity.h"
 
 #include "contextBroker/version.h"
 
@@ -345,6 +346,11 @@ PaArgument paArgs[] =
 #define ENT                EntitiesRequest
 #define ENT_COMPS_V2       2, { "v2", "entities" }
 #define ENT_COMPS_WORD     ""
+
+
+#define IENT                EntityRequest
+#define IENT_COMPS_V2       3, { "v2", "entity", "*" }
+#define IENT_COMPS_WORD     ""
 
 //
 // NGSI9
@@ -595,7 +601,9 @@ PaArgument paArgs[] =
   { "GET",    EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  entryPointsTreat                          }, \
   { "*",      EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  badVerbAllFour                            }, \
   { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
-  { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
+  { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }, \
+  { "GET",    IENT,  IENT_COMPS_V2,        IENT_COMPS_WORD, getEntity                                 }, \
+  { "*",      IENT,  IENT_COMPS_V2,        IENT_COMPS_WORD, badVerbGetOnly                            }
 
 
 
