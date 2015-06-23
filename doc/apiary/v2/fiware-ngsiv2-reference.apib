@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: http://fiware-ngsi2.apiblueprint.org/
+HOST: http://orion.lab.fiware.org/
 
 # FIWARE-NGSI-Simple
 
@@ -26,16 +26,6 @@ HOST: http://fiware-ngsi2.apiblueprint.org/
 -->
 
 FIWARE-NGSI Simple API.
-
-# FIWARE-NGSI-Simple API Root [/v2]
-
-This resource does not have any attributes. Instead it offers the initial
-API affordances in the form of the links in the JSON body.
-
-It is recommended to follow the “url” link values,
-[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
-applicable to retrieve resources. Instead of constructing your own URLs,
-to keep your client decoupled from implementation details.
 
 ## JSON entity representation
 
@@ -139,9 +129,17 @@ In the case of being present, the error payload is JSON object including the fol
 * `error` (mandatory): a textual description of the error.
 * `description` (optional): additional information about the error.
 
-# API entry point
+## Entry Point [/v2]
 
-## Retrieve the Entry Point [GET]
+### Retrieve the Entry Point [GET /v2]
+
+This resource does not have any attributes. Instead it offers the initial
+API affordances in the form of the links in the JSON body.
+
+It is recommended to follow the “url” link values,
+[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
+applicable to retrieve resources. Instead of constructing your own URLs,
+to keep your client decoupled from implementation details.
 
 + Response 200 (application/json)
 
@@ -152,9 +150,9 @@ In the case of being present, the error payload is JSON object including the fol
             "registrations_url": "/v2/registrations"
         }
 
-## Context Entities [/v2/entities]
+## Context Entities [/v2/entities{?limit,offset,options,type,id,idPattern,q,geometry,coords,attrs}]
 
-### List entities [GET /v2/entities{?limit,offset,count,type,id,idPattern,q,geometry,coords,attrs}]
+### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,geometry,coords,attrs}]
 
 Retrieves a list of entities which match criteria defined by the following parameters: `id`, `type`, `idPattern`, `q`,
 `geometry` and `coords` attribute (see below for a detailed description of these parameters). A given entity
@@ -283,7 +281,7 @@ on the shape. In particular, the following geometries can be defined so far:</p>
 
 </td></tr>
 <tr><td style="padding-right: 40px; width: 140px;">attrs</td>
-    <td>List of comma separated attributes to include in the entities of the response. If this parameter is not
+    <td>Comma-separated list of attribute names which data will be included in the response. If this parameter is not
     included, all the attributes are retrieved.</td>
 </tr>
 <tr><td style="padding-right: 40px; width: 140px;">limit</td><td>Limit the number of entities to be retrieved</td></tr>
@@ -304,7 +302,7 @@ the JSON entity representation format (described in a section above).
 Response code:
 
 * Successful operation uses 200 OK
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Resposnes for more detail.
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + limit: 20 (optional, number)
@@ -343,6 +341,15 @@ Response code:
 
 ### Create entity [POST /v2/entities]
 
+The payload is an object representing the entity to be created. The object follows
+the JSON entity representation format (described in a section above).
+
+Response:
+
+* Successful operation uses 201 Created. Reponse includes a `Location` header with the URL of the
+  created entity.
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+
 + Request (application/json)
 
         {
@@ -364,30 +371,37 @@ Response code:
             Location: /v2/entities/Bcn-Welt
 
 
-### Create entity. Error [POST /v2/entities]
+## ContextEntity by ID [/v2/entities/{entityId}{?attrs,options}]
 
-+ Request (application/json)
+### Retrieve entity [GET /v2/entities/{entityId}{?attrs}]
 
-        {
-            "type": "Room",
-            "id": "Bcn-Welt",
-            "temperature": 21.7
-        }
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">attrs</td>
+  <td>Comma-separated list of attribute names which data will be included in the response. If this parameter is not
+  included, all the attributes are retrieved.</td>
+</tr>
+</table>
 
-+ Response 422 (application/json)
+The response is an object representing the entity identified by the ID. The object follows
+the JSON entity representation format (described in a section above).
 
-        {
-            "error": "AlreadyExists",
-            "description": "An entity with the same id and type is already present"
-        }
+This operation must return only one entity element, but it may happen that there are more
+than one entity with the same ID (e.g. entities with same ID but different type). In those cases
+an error mesage is returned, specifying in the description the URL that could be used to get
+the list of conflicting entities, i.e. all the entities with such an ID.
 
+Response:
 
-## ContextEntity [/v2/entities/{entityId}]
-
-### Retrieve entity data by Id [GET /v2/entities/{entityId}]
+* Successful operation uses 200 OK
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity Id.
+    + attrs: temperature,humidity (optional, string) - Attributes to be retrieved. Coma separated list.
 
 + Response 200 (application/json)
 
@@ -403,60 +417,39 @@ Response code:
             }
         }
 
-### Retrieve entity data by Id. Not exists [GET /v2/entities/{entityId}]
+### Update or append entity attributes [POST /v2/entities/{entityId}?{options}]
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity Id.
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">op</td>
+  <td>Operation options. Allowed values: <code>append</code>.</td>
+</tr>
+</table>
 
-+ Response 404 (application/json)
+The request payload is an object representing the attributes to append or update. The object follows
+the JSON entity representation format (described in a section above), except that `id` and `type`
+are not allowed.
 
-        {
-            "error": "NotFound",
-            "description": "There is no entity with such an id"
-        }
+The entity attributes are updated with the ones in the payload. In particular, depending on
+whether `append` option is used or not.
 
-### Retrieve entity data by id and type [GET /v2/entities/type/{entityType}/id/{entityId}]
+* If `append` is not used: the entity attributes are updated (if they previously exist) or appended
+  (in they don't previously exists) with the ones in the payload.
+* If `append` is used (i.e. strict append semantics): all the attributes in the payload not previously
+  existing in the entity are appended. In addition to that, in the case some of the attributes in the
+  payload already exist in the entity, an error if returned.
 
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
+Response:
 
-+ Response 200 (application/json)
-
-        {
-            "type": "Room",
-            "id": "Boe_Idearium",
-            "temperature": 22.5
-        }
-
-### Get entity attributes [GET /v2/entities/{entityId}{?attrs}]
-
-+ Parameters
-    + entityId: 'Bcn_Welt' (required, string) - Entity ID
-    + attrs: temperature, humidity (optional, string) - Attributes to be retrieved. Coma separated list.
-
-+ Response 200 (application/json)
-
-        {
-            "temperature": 21.7,
-            "humidity": 60,
-        }
-
-### Get entity attributes. Not present [GET /v2/entities/{entityId}{?attrs}]
+* Successful operation uses 204 No Content
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrs: mistake (optional, string) - Attribute to be retrieved
-
-+ Response 200 (application/json)
-
-        {
-        }
-
-### Update or append  entity attributes. POST [POST /v2/entities/{entityId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
+    + options: append (optional, string) - Strict append.
 
 + Request (application/json)
 
@@ -468,8 +461,20 @@ Response code:
 
 + Response 204
 
+### Update existing entity attributes [PATCH /v2/entities/{entityId}]
 
-### Update entity attributes. [PATCH /v2/entities/{entityId}]
+The request payload is an object representing the attributes to update. The object follows
+the JSON entity representation format (described in a section above), except that `id` and `type`
+are not allowed.
+
+The entity attributes are updated with the ones in the payload. In addition to that, if one or more
+attributes in the payload doesn't exist in the entity, an error if returned.
+
+Response:
+
+* Successful operation uses 204 No Content
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -483,41 +488,224 @@ Response code:
 
 + Response 204
 
+### Replace all entity attributes [PUT /v2/entities/{entityId}]
 
-### Update entity attributes. POST [POST /v2/entities/{entityId}{?op}]
+The request payload is an object representing the new entity attributes. The object follows
+the JSON entity representation format (described in a section above), except that `id` and `type`
+are not allowed.
+
+The attributes previously existing in the entity are removed and replaced by the ones in the
+request.
+
+Response:
+
+* Successful operation uses 204 No Content
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + op: update - Indicates that an update must be forced
 
 + Request (application/json)
 
-    + Headers
+        {
+            "temperature": 25.5,
+            "seatsNumber": 6
+        }
 
-            X-HTTP-Method-Override: PATCH
++ Response 204
+
+### Remove entity atributes [DELETE /v2/entities/{entityId}?{attrs}]
+
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">attrs</td>
+  <td>Comma-separated list of attribute names which data will be removed. If this parameter is not
+  included, the entity itself is removed.</td>
+</tr>
+</table>
+
+Response:
+
+* Successful operation uses 204 No Content
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+    + attrs: temperature,humidity (optional, string) - Attributes to be removed. Coma separated list.
+
++ Response 204
+
+## ContextEntity by type and ID [/v2/entities/type/{entityType}/id/{entityId}{?attrs,options}]
+
+### Retrieve entity [GET /v2/entities/type/{entityType}/id/{entityId}?{attrs}]
+
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">attrs</td>
+  <td>Comma-separated list of attribute names which data will be included in the response. If this parameter is not
+  included, all the attributes are retrieved.</td>
+</tr>
+</table>
+
+The response is an object representing the entity identified by the type and ID. The object
+follows the JSON entity representation format (described in a section above).
+
+This operation must return only one entity element, but it may happen that there are more
+than one entity with the same ID and type (e.g. entities with same ID and type in different
+service paths). In those cases  an error mesage is returned, specifying in the description the
+URL that could be used to get the list of conflicting entities, i.e. all the entities with such type and ID.
+
+Response:
+
+* Successful operation uses 20O OK
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+    + entityType: Room (required, string) - Entity Type
+    + attrs: temperature, humidity (optional, string) - Attributes to be retrieved. Coma separated list.
+
++ Response 200 (application/json)
+
+        {
+            "type": "Room",
+            "id": "Bcn_Welt",
+            "temperature": 21.7,
+            "humidity": 60,
+            "location": {
+                "value":  "41.3763726, 2.1864475",
+                "type": "geo:point",
+                "crs": "WGS84"
+            }
+        }
+
+### Update or append entity attributes [POST /v2/entities/type/{entityType}/id/{entityId}?{options}]
+
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">op</td>
+  <td>Operation options. Allowed values: <code>append</code>.</td>
+</tr>
+</table>
+
+The request payload is an object representing the attributes to append or update. The object follows
+the JSON entity representation format (described in a section above), except that `id` and `type`
+are not allowed.
+
+The entity attributes are updated with the ones in the payload. In particular, depending on
+whether `append` option is used:
+
+* If `append` is not used: the entity attributes are updated (if they previously exist) or appended
+  (in they don't previously exists) with the ones in the payload.
+* If `append` is used (i.e. strict append semantics): all the attributes in the payload not previously
+  existing in the entity are appended. In addition to that, in the case some of the attributes in the
+  payload already exist in the entity, an error if returned.
+
+Response:
+
+* Successful operation uses 204 No Content.
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + entityType: Room (required, string) - Entity Type
+    + options: append (optional, string) - Strict append.
+
++ Request (application/json)
 
     + Body
 
             {
-                "temperature": 21.7,
-                "humidity": 60,
+                "ambientNoise": 31.5
             }
-
-+ Response 200
-
-
-### Remove an entity[DELETE /v2/entities/{entityId}]
-
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
 
 + Response 204
 
-### Remove entity attributes[DELETE /v2/entities/{entityId}{?attrs}]
+### Update existing entity attributes [PATCH /v2/entities/type/{entityType}/id/{entityId}]
+
+The request payload is an object representing the attributes to update. The object follows
+the JSON entity representation format (described in a section above), except that `id` and `type`
+are not allowed.
+
+The entity attributes are updated with the ones in the payload. In addition to that, if one or more
+attributes in the payload doesn't exist in the entity, an error if returned.
+
+Response:
+
+* Successful operation uses 204 No Content
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + entityType: Room (required, string) - Entity Type
+
++ Request (application/json)
+
+        {
+            "temperature": 25.5,
+            "seatsNumber": 6
+        }
+
++ Response 204
+
+### Replace all entity attributes [PUT /v2/entities/type/{entityType}/id/{entityId}]
+
+The request payload is an object representing the new entity attributes. The object follows
+the JSON entity representation format (described in a section above), except that `id` and `type`
+are not allowed.
+
+The attributes previously existing in the entity are removed and replaced by the ones in the
+request.
+
+Response:
+
+* Successful operation uses 204 No Content
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + entityType: Room (required, string) - Entity Type
+
++ Request (application/json)
+
+        {
+            "temperature": 25.5,
+            "seatsNumber": 6
+        }
+
++ Response 204
+
+### Remove entity attributes [DELETE /v2/entities/type/{entityType}/id/{entityId}?{attrs}]
+
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr>
+  <td style="padding-right: 40px; width: 140px;">attrs</td>
+  <td>Comma-separated list of attribute names which data will be removed. If this parameter is not
+  included, the entity itself is removed.</td>
+</tr>
+</table>
+
+Response:
+
+* Successful operation uses 204 No Content
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
-    + attrs: humidity, seatsNumber - Attributes
+    + entityType: Room (required, string) - Entity Type
+    + attrs: temperature,humidity (optional, string) - Attributes to be deleted. Coma separated list.
 
 + Response 204
 
@@ -607,344 +795,50 @@ Response code:
 
 + Response 204
 
+## Standard queryContext [/v2/queryContext]
 
-## Context Entity Subscriptions [/v2/entities/{entityId}/subscriptions]
-
-### List all subscriptions present in the system [GET /v2/subscriptions]
-
-+ Response 200
-
-        [
-            {
-                "id": "abcdefg",
-                "entity": {
-                    "id": "Bcn_Welt",
-                    "type": "Room"
-                },
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234",
-                "options": {
-                    "duration": "1M",
-                    "condition": "ONCHANGE",
-                    "throttling": "PT5S"
-                }
-            },
-             {
-                "id": "wyztrew",
-                "entity": {
-                    "pattern": "DC_*",
-                    "type": "Room"
-                },
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234"
-            }
-        ]
-
-### Get the details of a subscription [GET /v2/subscriptions/{subscriptionId}]
-
-+ Parameters
-    + subscriptionId: abcdefg (required, string) - ID of the suscription
-
-+ Response 200
-
-        {
-            "id": "abcdefg",
-            "entity": {
-                "id": "Bcn_Welt",
-                "type": "Room"
-            },
-            "attributes": [
-                "temperature"
-            ],
-            "callback": "http://localhost:1234",
-            "options": {
-                "duration": "1M",
-                "condition": "ONCHANGE",
-                "throttling": "PT5S"
-            }
-        }
-
-### Remove a suscription [DELETE /v2/subscriptions/{subscriptionId}]
-
-+ Parameters
-    + subscriptionId: abcdefg (required, string) - ID of the suscription
-
-+ Response 204
-
-
-### Create a new subscription [POST /v2/subscriptions]
-
-+ Request (application/json)
+### queryContext [POST /v2/queryContest]
 
-        {
-            "entity": {
-                "pattern": "Boe_*",
-                "type": "Room"
-            },
-            "attributes": [
-                "humidity"
-            ],
-            "callback": "http://subscriber.example.com/notify"
-        }
-
-+ Response 201
-
-    + Headers
-
-            Location: /subscriptions/abcde98765
-
-### Partial - Update an existing subscription [PATCH /v2/subscriptions/{subscriptionId}]
-
-+ Parameters
-    + subscriptionId: abcdefgh (required, string) - ID of the suscription
-
-+ Request
-
-        {
-            "duration": "1Y"
-        }
-
-+ Response 204
-
-### List all subscriptions associated to an entity [GET /v2/entities/{entityId}/subscriptions]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-
-+ Response 200 (application/json)
-
-        [
-            {
-                "id": "abcdefg",
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234",
-                "options": {
-                    "duration": "1M",
-                    "condition": "ONCHANGE",
-                    "throttling": "PT5S"
-                }
-            }
-        ]
-
-
-### Create a new subscription associated to an entity [POST /v2/entities/{entityId}/subscriptions]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-
-+ Request
-
-        {
-            "attributes": [
-                "humidity"
-            ],
-            "callback": "http://subscriber.example.com/notify"
-        }
-
-+ Response 201
-
-    + Headers
-
-            Location: /subscriptions/abcd9867hshshs
-
-### Get the details of a subscription associated to an entity [GET /v2/entities/{entityId}/subscriptions/{subscriptionId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-    + subscriptionId: abcdefgh (required, string) - ID of the subscription
-
-+ Response 200 (application/json)
-
-        {
-            "id": "abcdefgh",
-            "attributes": [
-                "temperature"
-            ],
-            "callback": "http://localhost:1234",
-            "options": {
-                "duration": "1M",
-                "condition": "ONCHANGE",
-                "throttling": "PT5S"
-            }
-        }
-
-
-## Context Entity Registrations [/v2/registrations]
-
-### List all registrations present in the system [GET /v2/registrations]
-
-+ Response 200
-
-        [
-            {
-                "id": "abcdefg",
-                "entity": {
-                    "id": "Bcn_Welt",
-                    "type": "Room"
-                },
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234",
-                "options": {
-                    "duration": "1M"
-                }
-            },
-             {
-                "id": "wyztrew",
-                "entity": {
-                    "pattern": "DC_*",
-                    "type": "Room"
-                },
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234"
-            }
-        ]
-
-### Get the details of a registration [GET /v2/subscriptions/{registrationId}]
+## Standard updateContext [/v2/updateContext]
 
-+ Parameters
-    + registrationId: abcdefg (required, string) - ID of the registration
+### updateContext [POST /v2/updateContext]
 
-+ Response 200
+## Standard subscribeContext [/v2/subscribeContext]
 
-        {
-            "id": "abcdefg",
-            "entity": {
-                "id": "Bcn_Welt",
-                "type": "Room"
-            },
-            "attributes": [
-                "temperature"
-            ],
-            "callback": "http://localhost:1234",
-        }
+### subscribeContext [POST /v2/subscribeContext]
 
-### Create a new registration [POST /v2/registrations]
+## Standard updateContextSubscription [/v2/updateContextSubscription]
 
-+ Request
+### updateContextSubscription [POST /v2/updateContextSubscription]
 
-        {
-            "entity": {
-                "pattern": "Boe_*",
-                "type": "Room"
-            },
-            "attributes": [
-                "humidity"
-            ],
-            "callback": "http://provider.example.com/provide"
-        }
+## Standard unsubscribeContext [/v2/unsubscribeContext]
 
-+ Response 201 (application/json)
+### unsubscribeContext [POST /v2/unsubscribeContext]
 
-    + Headers
+## Standard notifyContext [/v2/notifyContext]
 
-            Location: /registrations/abcde98765
+### notifyContext [POST /v2/notifyContext]
 
-### Partial update an existing registration [PATCH /v2/registration/{registrationId}]
+## Standard registerContext [/v2/registerContext]
 
-+ Parameters
-    + registrationId: r1234avfd (required, string) - ID of the registration
+### registerContext [POST /v2/registerContext]
 
-+ Request
+## Standard discoverContextAvailability [/v2/discoverContextAvailability]
 
-        {
-            "duration": "1Y"
-        }
+### discoverContextAvailability [POST /v2/discoverContextAvailability]
 
-+ Response 204
+## Standard subscribeContextAvailability [/v2/subscribeContextAvailability]
 
-### Full update of an existing registration [PUT /v2/registration/{registrationId}]
+### subscribeContextAvailability [POST /v2/subscribeContextAvailability]
 
-+ Parameters
-    + registrationId: r1234avfd (required, string) - ID of the registration
+## Standard updateContextAvailabilitySubscription [/v2/updateContextAvailabilitySubscription]
 
-+ Request
+### updateContextAvailabilitySubscription [POST /v2/updateContextAvailabilitySubscription]
 
-        {
-            "entity": {
-                "pattern": "Boe_*",
-                "type": "Room"
-            },
-            "attributes": [
-                "temperature"
-            ],
-            "callback": "http://provider2.example.com/provide"
-        }
+## Standard unsubscribeContextAvailability [/v2/unsubscribeContextAvailability]
 
-+ Response 204
+### unsubscribeContextAvailability [POST /v2/unsubscribeContextAvailability]
 
-### Remove a registration [DELETE /v2/registrations/{registrationId}]
+## Standard notifyContextAvailability [/v2/notifyContextAvailability]
 
-+ Parameters
-    + registrationId: abcdefg (required, string) - ID of the registration
-
-+ Response 204
-
-### List all registrations associated to an entity [GET /v2/entities/{entityId}/registrations]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-
-+ Response 200 (application/json)
-
-        [
-            {
-                "id": "abcdefg",
-                "attributes": [
-                    "temperature"
-                ],
-                "callback": "http://localhost:1234",
-                "options": {
-                    "duration": "1M"
-                }
-            }
-        ]
-
-
-### Create a new registration associated to an entity [POST /v2/entities/{entityId}/registrations]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-
-+ Request
-
-        {
-            "attributes": [
-                "humidity"
-            ],
-            "callback": "http://provider.example.com/provide"
-        }
-
-+ Response 201
-
-    + Headers
-
-            Location: /registration/abcd9867hshshs
-
-### Get the details of a registration associated to an entity [GET /v2/entities/{entityId}/registrations/{registrationId}]
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - ID of the entity
-    + registrationId: abcdefgh (required, string) - ID of the registration
-
-+ Response 200 (application/json)
-
-        {
-            "id": "abcdefgh",
-            "attributes": [
-                "temperature"
-            ],
-            "callback": "http://localhost:1234",
-            "options": {
-                "duration": "1M"
-            }
-        }
+### notifyContextAvailability [POST /v2/notifyContextAvailability]
