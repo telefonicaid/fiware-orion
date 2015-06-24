@@ -9,7 +9,10 @@ This is a work in progress and is changing on a daily basis.
 Please send your comments to fiware-ngsi@lists.fiware.org
 
 In addition, note that a list of currently open discussions is available at
-https://github.com/telefonicaid/fiware-orion/issues/1022
+
+* https://github.com/telefonicaid/fiware-orion/issues/1022
+* https://github.com/telefonicaid/fiware-orion/issues/1034
+* https://github.com/telefonicaid/fiware-orion/issues/1035
 
 This specification is licensed under the
 [FIWARE Open Specification License]
@@ -118,9 +121,9 @@ In the case of being present, the error payload is JSON object including the fol
 * `error` (mandatory): a textual description of the error.
 * `description` (optional): additional information about the error.
 
-## Entry Point [/v2]
+## API Entry Point [/v2]
 
-### Retrieve the Entry Point [GET /v2]
+### Retrieve Entry Points [GET /v2]
 
 This resource does not have any attributes. Instead it offers the initial
 API affordances in the form of the links in the JSON body.
@@ -698,7 +701,7 @@ Response:
 
 + Response 204
 
-## Entity Attribute [/v2/entities/{entityId}/attrs/{attrName}]
+## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}]
 
 ### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]
 
@@ -760,7 +763,7 @@ Response:
 
 + Response 204
 
-## Entity Attribute [/v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
+## Attribute by Entity Type and ID [/v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
 
 ### Get attribute data [GET /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
 
@@ -825,7 +828,7 @@ Response:
 
 + Response 204
 
-## Entity Attribute Value [/v2/entities/{entityId}/attrs/{attrName}/value{?options}]
+## Attribute Value by Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value{?options}]
 
 ### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}/value{?options}]
 
@@ -879,7 +882,7 @@ Response:
 
 + Response 200
 
-## Entity Attribute Value [/v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}/value{?options}]
+## Attribute Value by Entity type and ID [/v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}/value{?options}]
 
 ### Get attribute data [GET /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}/value{?options}]
 
@@ -1005,7 +1008,171 @@ Response code:
             "temperature"
         ]
 
-## Standard OMA-NGSI operations [/v2/queryContext]
+## Context Subscriptions [/v2/entities/{entityId}/subscriptions]
+
+A subscription is represented by a JSON object with the following fields:
+
+* `id`: Subscription unique identifier. Automatically created at creation time.
+* `subject` : It s an object that describes the subject of the subscription.
+* `notification` : It is an object that describes the notification received by the subscriber.
+* `options` : It is a dictionary which can contain different parameters related to the subscription, including:
+  * `duration`: Duration of the subscription in ISO8601 format. Infinite if not specified.
+
+A 'subject' contains the following subfields:
+
+* `entity` : Id or pattern id which identifies the affected entities (optional)
+* `type` : Type of the affected entities (optional)
+* `attributes`: List of attributes to be monitored (if not specified it would mean all)
+* `condition`: Condition that will trigger the notification. It could be 'ONCHANGE' or 'ONTIMEINTERVAL'.
+By default will be ONCHANGE.
+* `expression`: Logical the expression on attributes. When its evaluation results in a
+`true` value the notification will be sent.
+
+Entity or type must be present.
+
+Please note that at the time of writing the editors are considering different options
+to model these parameters, thus this is likely to change.
+
+A 'notification' object contains the following subfields:
+
+* `attributes`: List of attributes to be included in the notification message.
+If not specified they will be the same as those which are monitored
+* `callback` : URL that will point to the service which will be invoked when a notification is generated
+* `throttling`: A period of time (in ISO8601 format) which must ellapse between two consecutive notifications.
+
+### List subscriptions [GET /v2/subscriptions]
+
+Returns a list of all the subscriptions present in the system
+
++ Response 200
+
+        [
+            {
+                "id": "abcdefg",
+                "subject": {
+                    "entity": "Bcn_Welt",
+                    "type": "Room",
+                    "attributes": [
+                        "temperature"
+                    ],
+                    "condition": "ONCHANGE"
+                },
+                "notification": {
+                    "callback": "http://localhost:1234",
+                    "attributes": ["temperature", "humidity"],
+                    "throttling": "PT5S"
+                },
+                "options": {
+                    "duration": "PT1M"
+                }
+            }
+        ]
+
+### Create a new subscription [POST /v2/subscriptions]
+
+Creates a new subscription.
+The subscription is represented by a JSON object as described at the beginning of this section.
+
++ Request (application/json)
+
+        {
+            "subject": {
+                "type": "Room",
+                "attributes": [
+                      "humidity"
+                ],
+                "condition": "ONTIMEINTERVAL"
+            },
+            "notification": {
+                "callback": "http://localhost:1234",
+                "attributes": ["temperature", "humidity"],
+                "throttling": "PT5S"
+            },
+            "options": {
+                "duration": "PT1M"
+            }
+        }
+
++ Response 201
+
+    + Headers
+
+            Location: /v2/subscriptions/abcde98765
+
+## Context Provider Registration [/v2/registrations]
+
+Context Registration allows to associate external services to context data. One of the main
+use cases of this functionality is the association of Context Providers.
+
+A context registration is represented by a JSON object with the following fields:
+
+* `id`: Unique identifier assigned to the registration. Automatically created at creation time.
+* `subject` : It s an object that describes the subject of the registration.
+* `callback` : URL of the service which is registered. In the case of a Context Provider
+corresponds to the URL of the provider service.
+* `options` : It is a dictionary which can contain different parameters related to the registration, namely:
+  * `duration`: Duration of the registration in ISO8601 format. Default duration is infinite.
+
+A `subject` contains the following subfields:
+
+* `entity` : Id or pattern id which identifies the affected entities (optional).
+* `type` : Type of the affected entities (optional).
+* `attributes`: List of attributes to be provided (if not specified it would mean all).
+
+Entity or type must be present.
+
+### List registrations [GET /v2/registrations]
+
+Lists all the registrations present in the system.
+
++ Response 200
+
+        [
+            {
+                "id": "abcdefg",
+                "subject": {
+                    "entity": "Bcn_Welt",
+                    "type": "Room",
+                    "attributes": [
+                        "temperature"
+                    ]
+                },
+                "callback": "http://localhost:1234",
+                "options": {
+                    "duration": "PT1M"
+                }
+            }
+        ]
+
+### Context provider registration [POST /v2/registrations]
+
+Creates a new registration. This is typically used for associating context providers
+to certain data.
+The registration is represented by a JSON object as described at the beginning of this section.
+
++ Request (application/json)
+
+        {
+            "subject": {
+                "type": "Room",
+                "attributes": [
+                      "humidity"
+                ]
+            },
+            "callback":  "http://localhost:1234",
+            "options": {
+                "duration": "PT1M"
+            }
+        }
+
++ Response 201
+
+    + Headers
+
+            Location: /v2/registrations/abcde98765
+
+
+## OMA-NGSI Operations [/v2/queryContext]
 
 For the sake of completness here is an enumeration of the OMA-NGSI (9 & 10) operations. Those
 operations will be supported under the 'v2' resource as well.
