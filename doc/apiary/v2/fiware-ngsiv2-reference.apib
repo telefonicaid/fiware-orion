@@ -3,29 +3,7 @@ HOST: http://orion.lab.fiware.org/
 
 # FIWARE-NGSI-Simple
 
-<!--
- Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
-
- This file is part of Orion Context Broker.
-
- Orion Context Broker is free software: you can redistribute it and/or
- modify it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
- License, or (at your option) any later version.
-
- Orion Context Broker is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
- General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
-
- For those usages not covered by this license please contact with
- iot_support at tid dot es
--->
-
-FIWARE-NGSI Simple API.
+FIWARE-NGSI Simple API (v2) Specification.
 
 This is a work in progress and is changing on a daily basis.
 Please send your comments to fiware-ngsi@lists.fiware.org
@@ -33,7 +11,9 @@ Please send your comments to fiware-ngsi@lists.fiware.org
 In addition, note that a list of currently open discussions is available at
 https://github.com/telefonicaid/fiware-orion/issues/1022
 
-Please check the following [FI-WARE Open Specification Legal Notice (essential patents license)](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_%28essential_patents_license%29) to understand the rights to use this specification.
+This specification is licensed under the
+[FIWARE Open Specification License]
+(http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_%28essential_patents_license%29).
 
 
 ## JSON entity representation
@@ -1025,50 +1005,31 @@ Response code:
             "temperature"
         ]
 
-## Standard queryContext [/v2/queryContext]
+## Standard OMA-NGSI operations [/v2/queryContext]
 
-### queryContext [POST /v2/queryContest]
+For the sake of completness here is an enumeration of the OMA-NGSI (9 & 10) operations. Those
+operations will be supported under the 'v2' resource as well.
 
-## Standard updateContext [/v2/updateContext]
+### queryContext [POST /v2/queryContext]
 
 ### updateContext [POST /v2/updateContext]
 
-## Standard subscribeContext [/v2/subscribeContext]
-
 ### subscribeContext [POST /v2/subscribeContext]
-
-## Standard updateContextSubscription [/v2/updateContextSubscription]
 
 ### updateContextSubscription [POST /v2/updateContextSubscription]
 
-## Standard unsubscribeContext [/v2/unsubscribeContext]
-
 ### unsubscribeContext [POST /v2/unsubscribeContext]
-
-## Standard notifyContext [/v2/notifyContext]
 
 ### notifyContext [POST /v2/notifyContext]
 
-## Standard registerContext [/v2/registerContext]
-
 ### registerContext [POST /v2/registerContext]
-
-## Standard discoverContextAvailability [/v2/discoverContextAvailability]
 
 ### discoverContextAvailability [POST /v2/discoverContextAvailability]
 
-## Standard subscribeContextAvailability [/v2/subscribeContextAvailability]
-
 ### subscribeContextAvailability [POST /v2/subscribeContextAvailability]
-
-## Standard updateContextAvailabilitySubscription [/v2/updateContextAvailabilitySubscription]
 
 ### updateContextAvailabilitySubscription [POST /v2/updateContextAvailabilitySubscription]
 
-## Standard unsubscribeContextAvailability [/v2/unsubscribeContextAvailability]
-
 ### unsubscribeContextAvailability [POST /v2/unsubscribeContextAvailability]
-
-## Standard notifyContextAvailability [/v2/notifyContextAvailability]
 
 ### notifyContextAvailability [POST /v2/notifyContextAvailability]
