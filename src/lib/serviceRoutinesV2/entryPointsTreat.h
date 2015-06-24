@@ -36,7 +36,7 @@ const std::string TYPES_URL         = "/v2/types";
 const std::string ENTITIES_URL      = "/v2/entities";
 const std::string SUBSCRIPTIONS_URL = "/v2/subscriptions";
 const std::string REGISTRATIONS_URL = "/v2/registrations";
-const std::string ENTITY_URL      = "/v2/entity";
+
 
 
 /* ****************************************************************************

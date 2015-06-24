@@ -38,15 +38,11 @@
 *
 * getEntity -
 *
-* GET /v2/entity
+* GET /v2/entities/:id:
 *
 * Payload In:  None
 * Payload Out: Entity
 *
-* URI parameters:
-*   - limit=NUMBER
-*   - offset=NUMBER
-*   - count=true/false
 *
 * 01. Fill in QueryContextRequest
 * 02. Call standard op postQueryContext
@@ -70,20 +66,13 @@ std::string getEntity
 
 
   // 02. Call standard op postQueryContext
-  answer = postQueryContext(ciP, components, compV, parseDataP);
+  postQueryContext(ciP, components, compV, parseDataP);
 
 
-  // 03. Render Entities response
-  if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)
-  {
-    ciP->httpStatusCode = SccContextElementNotFound;
-    answer = "";
-  }
-  else
-  {
-    entity.fill(&parseDataP->qcrs.res);
-    answer = entity.render(ciP, EntityResponse);
-  }
+  // 03. Render entity response
+  entity.fill(&parseDataP->qcrs.res);
+  answer = entity.render(ciP, EntityResponse);
+  ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
 
   // 04. Cleanup and return result
   entity.release();

@@ -57,30 +57,37 @@ Entity::~Entity()
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  std::string out = "{";
 
-  out += JSON_VALUE("id", id);
-
-  if (type != "")
+  if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
-    out += ",";
-    out += JSON_VALUE("type", type);
+      std::string out = "{";
+
+      out += JSON_VALUE("id", id);
+
+      if (type != "")
+      {
+        out += ",";
+        out += JSON_VALUE("type", type);
+      }
+
+      if (attributeVector.size() != 0)
+      {
+        out += ",";
+        out += attributeVector.toJson(true);
+      }
+
+      out += "}";
+
+      if (comma)
+      {
+        out += ",";
+      }
+
+      return out;
   }
 
-  if (attributeVector.size() != 0)
-  {
-    out += ",";
-    out += attributeVector.toJson(true);
-  }    
+  return errorCode.toJson(true);
 
-  out += "}";
-
-  if (comma)
-  {
-    out += ",";
-  }
-
-  return out;
 }
 
 
@@ -146,7 +153,7 @@ void Entity::fill(QueryContextResponse* qcrsP)
       // If there are more than one entity, we return an error
       // TODO: determine error for this case
       //
-      errorCode.fill("TOO MANY", "Talk to Fermin!");
+      errorCode.fill("Many entities with that ID", "/v2/entities?id="+qcrsP->contextElementResponseVector[0]->contextElement.entityId.id);
   }
   else
   {

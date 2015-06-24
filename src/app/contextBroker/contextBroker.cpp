@@ -349,7 +349,7 @@ PaArgument paArgs[] =
 
 
 #define IENT                EntityRequest
-#define IENT_COMPS_V2       3, { "v2", "entity", "*" }
+#define IENT_COMPS_V2       3, { "v2", "entities", "*" }
 #define IENT_COMPS_WORD     ""
 
 //

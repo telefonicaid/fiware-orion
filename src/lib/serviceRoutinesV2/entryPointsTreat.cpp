@@ -51,7 +51,6 @@ std::string entryPointsTreat
 {
   std::string out = "{";
 
-  out += JSON_VALUE("entity_url",        ENTITY_URL)        + ",";
   out += JSON_VALUE("entities_url",      ENTITIES_URL)      + ",";
   out += JSON_VALUE("types_url",         TYPES_URL)         + ",";
   out += JSON_VALUE("subscriptions_url", SUBSCRIPTIONS_URL) + ",";
