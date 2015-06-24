@@ -7438,7 +7438,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, insert("utest.csubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -7480,7 +7480,7 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
 
     std::string s1 = res.subscribeError.errorCode.details.substr(0, 56);
     std::string s2 = res.subscribeError.errorCode.details.substr(56+24, res.subscribeError.errorCode.details.size()-56-24);
-    EXPECT_EQ("collection: unittest.csubs "
+    EXPECT_EQ("collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
     EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], conditions: [ { type: \"ONTIMEINTERVAL\", value: 60 } ], format: \"XML\" } "
               "- exception: boom!!", s2);

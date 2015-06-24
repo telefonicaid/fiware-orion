@@ -2551,7 +2551,7 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("unittest.casubs",_,_,_))
+    ON_CALL(*connectionMock, insert("utest.casubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2587,7 +2587,7 @@ TEST(mongoSubscribeContextAvailability, MongoDbInsertFail)
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
     std::string s1 = res.errorCode.details.substr(0, 57);
     std::string s2 = res.errorCode.details.substr(57+24, res.errorCode.details.size()-57-24);
-    EXPECT_EQ("collection: unittest.casubs "
+    EXPECT_EQ("collection: utest.casubs "
               "- insert(): { _id: ObjectId('", s1);
     EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: [], format: \"XML\" } "
               "- exception: boom!!", s2);

@@ -2687,11 +2687,11 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
             .WillByDefault(Return(1));
     ON_CALL(*connectionMock, findOne(_,_,_,_))
             .WillByDefault(Return(fakeEntity));
-    ON_CALL(*connectionMock, update("unittest.registrations",_,_,_,_,_))
+    ON_CALL(*connectionMock, update("utest.registrations",_,_,_,_,_))
             .WillByDefault(Throw(e));    
     ON_CALL(*cursorMockCAsub, more())
             .WillByDefault(Return(false));
-    ON_CALL(*connectionMock, _query("unittest.casubs",_,_,_,_,_,_))
+    ON_CALL(*connectionMock, _query("utest.casubs",_,_,_,_,_,_))
             .WillByDefault(Return(cursorMockCAsub));
 
     /* Forge the request (from "inside" to "outside") */
@@ -2722,7 +2722,7 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
      * but I don't know how to work with regex in C++ */
     std::string s1 = res.errorCode.details.substr(0, 71);
     std::string s2 = res.errorCode.details.substr(71+24, res.errorCode.details.size()-71-24);
-    EXPECT_EQ("collection: unittest.registrations "
+    EXPECT_EQ("collection: utest.registrations "
               "- upsert update(): { _id: ObjectId('",s1);
     EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"XML\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] } "
               "- exception: boom!!", s2);
@@ -2839,7 +2839,7 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     /* Prepare mock */   
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, insert("unittest.associations",_,_,_))
+    ON_CALL(*connectionMock, insert("utest.associations",_,_,_))
             .WillByDefault(Throw(e));
 
     /* Forge the request (from "inside" to "outside") */
