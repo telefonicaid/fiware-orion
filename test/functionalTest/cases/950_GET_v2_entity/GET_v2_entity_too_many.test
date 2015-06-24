@@ -142,7 +142,7 @@ Date: REGEX(.*)
 
 02. GET /v2/entities/E1
 =============================
-HTTP/1.1 200 OK
+HTTP/1.1 409 Conflict
 Content-Length: 73
 Content-Type: application/json
 Date: REGEX(.*)

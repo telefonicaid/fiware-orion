@@ -72,7 +72,17 @@ std::string getEntity
   // 03. Render entity response
   entity.fill(&parseDataP->qcrs.res);
   answer = entity.render(ciP, EntityResponse);
-  ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+  if ( parseDataP->qcrs.res.errorCode.code == SccOk &&
+       parseDataP->qcrs.res.contextElementResponseVector.size()>1)
+  {
+      // No problem found, but we expect only one entity
+      ciP->httpStatusCode = SccConflict;
+  }
+  else
+  {
+      // the same of the wrapped operation
+      ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+  }
 
   // 04. Cleanup and return result
   entity.release();

@@ -41,6 +41,7 @@ typedef enum HttpStatusCode
   SccContextElementNotFound = 404,   // No context element found
   SccBadVerb                = 405,   // Request ok but verb/method NOT OK
   SccNotAcceptable          = 406,   // The Accept header in the request is not supported
+  SccConflict               = 409,
   SccLengthRequired         = 411,   // Content-Length header missing
   SccRequestEntityTooLarge  = 413,   // Request Entity Too Large - over 1Mb of payload
   SccUnsupportedMediaType   = 415,   // Unsupported Media Type (only support application/xml and application/json)
@@ -52,7 +53,8 @@ typedef enum HttpStatusCode
   SccEntityTypeRequired     = 481,   // The EntityType is required by the receiver
   SccAttributeListRequired  = 482,   // The Attribute List is required by the receiver
   SccReceiverInternalError  = 500,   // An unknown error at the receiver has occurred
-  SccNotImplemented         = 501    // The given operation is not implemented
+  SccNotImplemented         = 501   // The given operation is not implemented
+
 } HttpStatusCode;
 
 
