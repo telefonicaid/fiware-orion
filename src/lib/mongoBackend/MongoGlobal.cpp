@@ -158,21 +158,7 @@ bool mongoStart
 }
 
 
-/* ****************************************************************************
-*
-* mongoDisconnect -
-*
-* This method is intended for unit testing, that needs the DBClientConnection
-* object to be mocked.
-*
-*/
-void mongoDisconnect(void)
-{
-  // FIXME P4: with the adding of the connection pool, this function is no longer needed.
-  //           However, as it is called from MANY places, especially in unit tests, the
-  //           function will stay for now.
-  //           FUNCTION TO BE REMOVED - see github issue #929
-}
+
 
 
 #ifdef UNIT_TEST

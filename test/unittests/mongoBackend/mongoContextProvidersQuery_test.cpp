@@ -35,6 +35,8 @@
 
 #include "mongo/client/dbclient.h"
 
+extern void setMongoConnectionForUnitTest(DBClientBase*);
+
 /* ****************************************************************************
 *
 * Tests
@@ -624,8 +626,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsAll)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);  	
   utExit();
 }
 
@@ -684,8 +686,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneSingle)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -751,8 +753,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrOneMulti)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -819,8 +821,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternAttrsSubset)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -900,8 +902,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralCREs)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -975,8 +977,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternSeveralRegistrations)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1014,6 +1016,7 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoEntity)
 
   ASSERT_EQ(0, res.contextElementResponseVector.size());
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1057,8 +1060,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoAttribute)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1172,8 +1175,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntity)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1241,8 +1244,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiAttr)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1333,8 +1336,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternMultiEntityAttrs)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1436,8 +1439,8 @@ TEST(mongoContextProvidersQueryRequest, noPatternNoType)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1539,8 +1542,8 @@ TEST(mongoContextProvidersQueryRequest, pattern0Attr)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1599,8 +1602,8 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrSingle)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1680,8 +1683,8 @@ TEST(mongoContextProvidersQueryRequest, pattern1AttrMulti)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1774,8 +1777,8 @@ TEST(mongoContextProvidersQueryRequest, patternNAttr)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1816,8 +1819,8 @@ TEST(mongoContextProvidersQueryRequest, patternFail)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -1933,8 +1936,8 @@ TEST(mongoContextProvidersQueryRequest, patternNoType)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -2076,8 +2079,8 @@ TEST(mongoContextProvidersQueryRequest, mixPatternAndNotPattern)
   /* Check entities collection hasn't been touched */
   DBClientBase* connection = getMongoConnection();
   ASSERT_EQ(0, connection->count(ENTITIES_COLL, BSONObj()));
-  mongoDisconnect();
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -2177,6 +2180,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs1)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -2269,6 +2273,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs2)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -2344,6 +2349,7 @@ TEST(mongoContextProvidersQueryRequest, severalCprs3)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(0).details.size());
 
+  setMongoConnectionForUnitTest(NULL);
   utExit();
 
 }
@@ -2419,6 +2425,8 @@ TEST(mongoContextProvidersQueryRequest, severalCprsFormat)
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
+  setMongoConnectionForUnitTest(NULL);  
+  
   utExit();
 
 }

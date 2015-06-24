@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "common/string.h"
+#include "common/globals.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/ParseData.h"
 #include "ngsi10/QueryContextRequest.h"
@@ -494,7 +495,8 @@ std::string postQueryContext
   // 
   //
   QueryContextResponse* qP;
-  for (unsigned int fIx = 0; fIx < requestV.size(); ++fIx)
+
+  for (unsigned int fIx = 0; fIx < requestV.size() && fIx < cprForwardLimit; ++fIx)
   {
     if (requestV[fIx]->contextProvider == "")
     {

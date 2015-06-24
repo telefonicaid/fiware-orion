@@ -62,6 +62,7 @@
 #include <curl/curl.h>
 #include <string>
 #include <vector>
+#include <limits.h>
 
 #include "mongoBackend/MongoGlobal.h"
 
@@ -220,6 +221,7 @@ int             dbPoolSize;
 char            reqMutexPolicy[16];
 bool            mutexTimeStat;
 int             writeConcern;
+unsigned        cprForwardLimit;
 
 
 
@@ -259,6 +261,8 @@ int             writeConcern;
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
 #define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
 #define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
+#define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
+
 
 
 /* ****************************************************************************
@@ -300,6 +304,9 @@ PaArgument paArgs[] =
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
   { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
+
+  { "-cprForwardLimit", &cprForwardLimit, "CPR_FORWARD_LIMIT", PaUInt, PaOpt, 1000, 0, UINT_MAX, CPR_FORWARD_LIMIT_DESC},
+
 
   PA_END_OF_ARGS
 };
@@ -1109,7 +1116,6 @@ void orionExit(int code, const std::string& reason)
     destroyAllOntimeIntervalThreads(dbs[ix]);
   }
 
-  mongoDisconnect();
   exit(code);
 }
 
