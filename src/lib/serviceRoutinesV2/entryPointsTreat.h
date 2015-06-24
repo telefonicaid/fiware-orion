@@ -38,7 +38,6 @@ const std::string SUBSCRIPTIONS_URL = "/v2/subscriptions";
 const std::string REGISTRATIONS_URL = "/v2/registrations";
 
 
-
 /* ****************************************************************************
 *
 * entryPointsTreat -

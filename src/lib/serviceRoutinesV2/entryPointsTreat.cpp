@@ -56,7 +56,6 @@ std::string entryPointsTreat
   out += JSON_VALUE("subscriptions_url", SUBSCRIPTIONS_URL) + ",";
   out += JSON_VALUE("registrations_url", REGISTRATIONS_URL);
 
-
   out += "}";
 
   ciP->httpStatusCode = SccOk;
