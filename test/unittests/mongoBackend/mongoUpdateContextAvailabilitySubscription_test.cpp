@@ -430,7 +430,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -504,7 +505,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_noPattern_JSON)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -581,7 +583,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_AttrN_noPattern)
     EXPECT_EQ("A2", attrs[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -660,7 +663,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_Attr0_noPattern)
     ASSERT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -743,7 +747,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, EntN_AttrN_noPattern)
     EXPECT_EQ("A2", attrs[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -819,7 +823,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, Ent1_Attr0_pattern)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -909,7 +913,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -999,7 +1004,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsAll_JSON)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1087,7 +1092,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneSingle)
     EXPECT_EQ("A4", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1184,7 +1189,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrOneMulti)
     EXPECT_EQ("A1", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1277,7 +1282,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternAttrsSubset)
     EXPECT_EQ("A2", attrs[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1373,7 +1378,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralCREs)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1468,7 +1473,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternSeveralRegistrations)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1578,7 +1583,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntity)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1675,7 +1681,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiAttr)
     EXPECT_EQ("A5", attrs[2].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1785,7 +1791,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternMultiEntityAttrs)
     EXPECT_EQ("A5", attrs[2].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -1892,9 +1898,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, noPatternNoType)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     EXPECT_EQ("A1", attrs[0].String());
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -1995,7 +2001,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern0Attr)
     ASSERT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2081,7 +2087,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrSingle)
     EXPECT_EQ("A4", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2172,9 +2179,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, pattern1AttrMulti)
     std::vector<BSONElement> attrs = sub.getField("attrs").Array();
     ASSERT_EQ(1, attrs.size());
     EXPECT_EQ("A1", attrs[0].String());
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2276,7 +2283,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNAttr)
     EXPECT_EQ("A2", attrs[1].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2386,7 +2394,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, patternNoType)
     EXPECT_EQ("A2", attrs[0].String());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
 
     /* Release mock */
     delete notifierMock;
@@ -2497,7 +2505,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, mixPatternAndNotPattern)
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2579,9 +2588,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndEntN_AttrN_noP
     ASSERT_EQ(2, attrs.size());
     EXPECT_EQ("A1", attrs[0].String());
     EXPECT_EQ("A2", attrs[1].String());
-
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2668,7 +2677,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, updateDurationAndNoPatternAttrs
     EXPECT_EQ(0, attrs.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;
@@ -2712,7 +2722,8 @@ TEST(mongoUpdateContextAvailabilitySubscription, subscriptionNotFound)
     EXPECT_EQ(0, res.errorCode.details.size());
 
     /* Release connection */
-    mongoDisconnect();
+    setMongoConnectionForUnitTest(NULL);
+
 
     /* Release mock */
     delete notifierMock;

@@ -433,6 +433,6 @@ void jsonNcrPresent(ParseData* parseDataP)
   if (!lmTraceIsSet(LmtPresent))
     return;
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   parseDataP->ncr.res.present("");
 }

@@ -38,12 +38,14 @@
 #include <sstream>
 
 #include "common/string.h"
+#include "common/sem.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"
 #include "rest/rest.h"
 #include "serviceRoutines/versionTreat.h"
+
 
 
 
@@ -147,8 +149,6 @@ static char* curlVersionGet(char* buf, int bufLen)
   return buf;
 }
 
-
-
 /* ****************************************************************************
 *
 * httpRequestSend -
@@ -180,6 +180,7 @@ std::string httpRequestSend
   CURLcode                   res;
   int                        outgoingMsgSize       = 0;
   CURL*                      curl;
+  struct curl_context        cc;
 
   ++callNo;
 
@@ -233,13 +234,14 @@ std::string httpRequestSend
     return "error";
   }
 
-  if ((curl = curl_easy_init()) == NULL)
+  get_curl_context(ip, &cc);
+  if ((curl = cc.curl) == NULL)
   {
     LM_E(("Runtime Error (could not init libcurl)"));
     LM_TRANSACTION_END();
+    release_curl_context(&cc);
     return "error";
   }
-
 
   // Allocate to hold HTTP response
   httpResponse = new MemoryStruct;
@@ -363,7 +365,7 @@ std::string httpRequestSend
 
     // Cleanup curl environment
     curl_slist_free_all(headers);
-    curl_easy_cleanup(curl);
+    release_curl_context(&cc);
 
     free(httpResponse->memory);
     delete httpResponse;
@@ -392,6 +394,14 @@ std::string httpRequestSend
   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers); // Put headers in place
   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeMemoryCallback); // Send data here
   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void*) httpResponse); // Custom data for response handling
+
+  //
+  // There is a known problem in libcurl (see http://stackoverflow.com/questions/9191668/error-longjmp-causes-uninitialized-stack-frame)
+  // which is solved using CURLOPT_NOSIGNAL. If we update some day from libcurl 7.19 (the one that comes with CentOS 6.x) to a newer version
+  // (there are some reports about the bug is no longer in libcurl 7.32), using CURLOPT_NOSIGNAL could be not necessary and this be removed).
+  // See issue #1016 for more details.
+  //
+  curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
 
   //
   // Timeout 
@@ -427,7 +437,7 @@ std::string httpRequestSend
 
   // Cleanup curl environment
   curl_slist_free_all(headers);
-  curl_easy_cleanup(curl);
+  release_curl_context(&cc);
 
   free(httpResponse->memory);
   delete httpResponse;
@@ -436,6 +446,7 @@ std::string httpRequestSend
 
   return result;
 }
+
 
 #else // Old functionality()
 

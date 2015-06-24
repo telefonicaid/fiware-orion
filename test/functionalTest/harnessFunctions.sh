@@ -35,6 +35,15 @@ fi
 
 export CONTEXTBROKER_HARNESS_FUNCTIONS_SOURCED="YES"
 
+if [ "$ORION_FT_DEBUG" == "1" ]
+then
+  _debug='on'
+else
+  _debug='off'
+fi
+
+
+
 # ------------------------------------------------------------------------------
 #
 # harnessExit - 
@@ -67,12 +76,28 @@ function vMsg()
 
 # ------------------------------------------------------------------------------
 #
+# dMsg - debug output
+#
+function dMsg()
+{
+  if [ "$ORION_FT_DEBUG" == 1 ] || [ "$_debug" == "on"  ]
+  then
+    echo $* >> /tmp/orionFuncTestDebug.log
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
 # dbInit - 
 #
 function dbInit()
 {
   role=$1  
   db=$1
+
+  dMsg initializing database;
 
   if [ "$role" == "CB" ]
   then
@@ -155,6 +180,8 @@ function localBrokerStart()
 
   IPvOption=""
 
+  dMsg starting broker for role $role
+
   if [ "$ipVersion" == "IPV4" ]
   then
     IPvOption="-ipv4" 
@@ -215,6 +242,9 @@ function localBrokerStart()
     echo "Unable to start contextBroker"
     exit 1
   fi
+
+  ps=$(ps aux | grep contextBroker)
+  dMsg $ps
 }
 
 
@@ -510,6 +540,37 @@ function accumulator2Dump()
   fi
 }
 
+# ------------------------------------------------------------------------------
+#
+# accumulatorCount
+#
+function accumulatorCount()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER_PORT}/number -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER_PORT}/number -s -S 2> /dev/null
+  fi
+}
+
+# ------------------------------------------------------------------------------
+#
+# accumulator2Count
+#
+function accumulator2Count()
+{
+  valgrindSleep 2
+
+  if [ "$1" == "IPV6" ]
+  then
+    curl -g [::1]:${LISTENER2_PORT}/number -s -S 2> /dev/null
+  else
+    curl localhost:${LISTENER2_PORT}/number -s -S 2> /dev/null
+  fi
+}
 
 # ------------------------------------------------------------------------------
 #
@@ -595,174 +656,169 @@ function dbInsertEntity()
 #   --host        <host>           (default: localhost)
 #   --port        <port>           (default: $CB_PORT)
 #   --url         <URL>            (default: empty string)
+#   --urlParams   <params>         (URI parameters 'in' URL-string)
 #   --payload     <payload>        (default: NO PAYLOAD. Possible values: [filename | "${string}"])
 #   --in          (input payload)  (default: xml => application/xml, If 'json': application/json)
 #   --out         (output payload  (default: xml => application/xml, If 'json': application/json)
 #   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides) 
-#   --httpTenant  <tenant>         (tenant in HTTP header)
+#   --tenant      <tenant>         (tenant in HTTP header)
 #   --servicePath <path>           (Service Path in HTTP header)
-#   --urlParams   <params>         (URI parameters 'in' URL-string)
 #   --xauthToken  <token>          (X-Auth token value)
 #   --origin      <origin>         (Origin in HTTP header)
-#   --verbose                      (verbose output)
 #   --noPayloadCheck               (don't check the payload)
+#   --header      <HTTP header>    (more headers)
+#   -H            <HTTP header>    (more headers)
+#   --verbose                      (verbose output)
+#   -v                             (verbose output)
+#   --debug                        (debug mode - output to /tmp/orionFuncTestDebug.log
 #
 # Any parameters are sent as is to 'curl'
 # 
 function orionCurl()
 {
-  #
-  # Default values
-  #
-  _method=""
-  _host="localhost"
-  _port=$CB_PORT
-  _url=""
-  _payload=""
-  _inFormat=application/xml
-  _outFormat=application/xml
-  _json=""
-  _httpTenant=""
-  _servicePath=""
-  _urlParams=''
-  _xtra=''
-  _verbose='off'
-  _debug='off'
-  _xauthToken=''
-  _origin=''
-  _noPayloadCheck='off'
+  payloadCheckFormat='xml'
 
+  dMsg 
+  dMsg $(date)
+  dMsg orionCurl $*
+
+  _host='localhost'
+  _port=$CB_PORT
+  _url=''
+  _method=''
+  _payload=''
+  _servicePath=''
+  _xtra=''
+  _headers=''
+  _noPayloadCheck='off'
+  _tenant=''
+  _origin=''
+  _inFormat='--header "Content-Type: application/xml"'
+  _outFormat='--header "Accept: application/xml"'
+  _in='';
+  _out='';
+  _json=''
+  _urlParams=''
+  _xauthToken=''
+
+  #
+  # Parsing parameters
+  #
   while [ "$#" != 0 ]
   do
-    if   [ "$1" == "-X" ]; then                _method="$2"; shift;
-    elif [ "$1" == "--host" ]; then            _host="$2"; shift;
-    elif [ "$1" == "--port" ]; then            _port="$2"; shift;
-    elif [ "$1" == "--url" ]; then             _url="$2"; shift;
-    elif [ "$1" == "--payload" ]; then         _payload="$2"; shift;
-    elif [ "$1" == "--in" ]; then              _inFormat="$2"; shift;
-    elif [ "$1" == "--out" ]; then             _outFormat="$2"; shift;
-    elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json;
-    elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
-    elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
+    if   [ "$1" == "--host" ]; then            _host=$2; shift;
+    elif [ "$1" == "--port" ]; then            _port=$2; shift;
+    elif [ "$1" == "--url" ]; then             _url=$2; shift;
     elif [ "$1" == "--urlParams" ]; then       _urlParams=$2; shift;
-    elif [ "$1" == "--xauthToken" ]; then      _xauthToken=$2; shift;
-    elif [ "$1" == "--origin" ]; then          _origin=$2; shift;
+    elif [ "$1" == "-X" ]; then                _method="-X $2"; shift;
+    elif [ "$1" == "--payload" ]; then         _payload=$2; shift;
+    elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck='on';
+    elif [ "$1" == "--servicePath" ]; then     _servicePath='--header "Fiware-ServicePath: '${2}'"'; shift;
+    elif [ "$1" == "--tenant" ]; then          _tenant='--header "Fiware-Service: '${2}'"'; shift;
+    elif [ "$1" == "--origin" ]; then          _origin='--header "Origin: '${2}'"'; shift;
+    elif [ "$1" == "-H" ]; then                _headers=${_headers}" --header $2"; shift;
+    elif [ "$1" == "--header" ]; then          _headers=${_headers}" --header $2"; shift;
+    elif [ "$1" == "--in" ]; then              _in="$2"; shift;
+    elif [ "$1" == "--out" ]; then             _out="$2"; shift;
+    elif [ "$1" == "--json" ]; then            _in='json'; _out='json'; payloadCheckFormat='json'
+    elif [ "$1" == "--xauthToken" ]; then      _xauthToken='--header "X-Auth-Token: '${2}'"'; shift;
+    elif [ "$1" == "-v" ]; then                _verbose=on;
     elif [ "$1" == "--verbose" ]; then         _verbose=on;
     elif [ "$1" == "--debug" ]; then           _debug=on;
-    elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck=on;
+    elif [ "$1" == "-d" ]; then                _debug=on;
     else                                       _xtra="$_xtra $1";
     fi
-
     shift
   done
 
-  vMsg urlParams: $_urlParams
-  vMsg xauthToken: $_xauthToken
-  vMsg URL: $_URL
-
-
   #
-  # Sanity check of parameters
+  # Check the parameters
   #
+
+  # 1. Do we have a URL present?
   if [ "$_url" == "" ]
   then
     echo "No URL";
     return 1;
   fi
 
-
-  #
-  # Fix for 'Content-Type' and 'Accept' short names 'xml' and 'json'
-  #
-  if [ "$_inFormat" == "xml" ];   then _inFormat=application/xml;   fi;
-  if [ "$_outFormat" == "xml" ];  then _outFormat=application/xml;  fi;
-  if [ "$_inFormat" == "json" ];  then _inFormat=application/json;  fi;
-  if [ "$_outFormat" == "json" ]; then _outFormat=application/json; fi;
-
-
-
-  #
-  # Cleanup 'compound' variables, so that we don't inherit values from previous calls
-  # 
+  # 2. Payload can be either data or a path to a file - if data, a file is created with the data as contents
   _PAYLOAD=''
-  _METHOD=''
-  _URL=''
-  _HTTP_TENANT=''
-  _SERVICE_PATH=''
-
-  #
-  # Set up the compound variables
-  #
   if [ "$_payload" != "" ]
   then
     if [ -f "$_payload" ]
     then
       _PAYLOAD="-d @$_payload"
     else
-      _PAYLOAD="-d @-"
+      echo $_payload > /tmp/orionFuncTestPayload
+      _PAYLOAD="-d @/tmp/orionFuncTestPayload"
     fi
   fi
-
-
-  if [ "$_method" != "" ];     then    _METHOD=' -X '$_method;   fi
-  #if [ "$_httpTenant" != "" ]; then    _HTTP_TENANT='--header "Fiware-Service:'$_httpTenant'"';  fi
-  #if [ "$_origin" != "" ];     then    _ORIGIN='--header "Origin: '$_origin'"'; fi
-
-  _URL=$_host:$_port$_url
   
-  if [ "$_urlParams" != "" ]
-  then
-    _URL=$_URL'?'$_urlParams
+  # 3. Fix for 'Content-Type' and 'Accept' short names 'xml' and 'json'
+  if   [ "$_in"   == "application/xml" ];  then _in='xml';   fi
+  if   [ "$_in"   == "application/json" ]; then _in='json';  fi
+  if   [ "$_out"  == "application/xml" ];  then _out='xml';  fi
+  if   [ "$_out"  == "application/json" ]; then _out='json'; fi
+
+  if   [ "$_in"  == "xml" ];   then _inFormat='--header "Content-Type: application/xml"'
+  elif [ "$_in"  == "json" ];  then _inFormat='--header "Content-Type: application/json"'
+  elif [ "$_in"  != "" ];      then _inFormat='--header "Content-Type: '${_in}'"'
   fi
-  vMsg URL: $_URL
 
-  _BUILTINS='-s -S --dump-header /tmp/httpHeaders.out'
+  if   [ "$_out" == "xml" ];   then _outFormat='--header "Accept: application/xml"'; payloadCheckFormat='xml'
+  elif [ "$_out" == "json" ];  then _outFormat='--header "Accept: application/json"'; payloadCheckFormat='json'
+  elif [ "$_out" != "" ];      then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
+  fi
 
-#   echo '==============================================================================================================================================================='
-#   echo "echo \"${_payload}\" | curl $_URL $_PAYLOAD $_METHOD ${_HTTP_TENANT} --header \"Expect:\" --header \"Content-Type: $_inFormat\" --header \"Accept: $_outFormat\"  $_BUILTINS --header "Fiware-ServicePath: $_servicePath" $_xtra"
-#   echo '==============================================================================================================================================================='   
-  
-  # FIXME P10: we are taking advantage that --cors is not used with any other header. The if needs
-  #            urgent refactor: it not following (deliverately) the ident style
-  if [ "$_origin" != "" ]
-  then
-    vMsg _URL: $_URL
-    _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD $_ORIGIN --header "Origin: $_origin" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
-  else
-  # FIXME P10: This 'if' should be refactored: if we use the $_HTTP_TENANT variable within curl,
-  #            it will not render correctly. We have to find another way.
+
+  dMsg $_in: $_in
+  dMsg _out: $_out
+  dMsg _outFormat: $_outFormat
+  dMsg _inFormat: $_inFormat
+  dMsg payloadCheckFormat: $payloadCheckFormat
+  dMsg _noPayloadCheck: $_noPayloadCheck
+
+
   #
-  if [ "$_httpTenant" != "" ]
-  then
-     if [ "$_servicePath" != "" ]
-     then
-       vMsg _URL1: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
-     else
-       vMsg _URL2: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-Service: $_httpTenant" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
-     fi
-  else
-     if [ "$_servicePath" != "" ]
-     then
-       vMsg _URL3: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Fiware-ServicePath: $_servicePath" --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken"  $_BUILTINS $_xtra)
-     else
-       vMsg _URL4: $_URL
-       _response=$(echo "${_payload}" | curl $_URL $_PAYLOAD $_METHOD --header "Expect:" --header "Content-Type: $_inFormat" --header "Accept: $_outFormat" --header "X-Auth-Token: $_xauthToken" $_BUILTINS $_xtra)
-     fi
-  fi
-  fi
-  
+  # Assemble the command
   #
-  # Remove "Connection: Keep-Alive" and "Connection: close" headers and print headers out
+  command='curl "'$_host':'${_port}${_url}'"'
+
+  if [ "$_urlParams"   != "" ]; then  command=${command}'?'${_urlParams};   fi
+  if [ "$_PAYLOAD"     != "" ]; then  command=${command}' '${_PAYLOAD};     fi
+  if [ "$_method"      != "" ]; then  command=${command}' '${_method};      fi
+  if [ "$_tenant"      != "" ]; then  command=${command}' '${_tenant};      fi
+  if [ "$_servicePath" != "" ]; then  command=${command}' '${_servicePath}; fi 
+  if [ "$_inFormat"    != "" ]; then  command=${command}' '${_inFormat};    fi
+  if [ "$_outFormat"   != "" ]; then  command=${command}' '${_outFormat};   fi
+  if [ "$_origin"      != "" ]; then  command=${command}' '${_origin};      fi
+  if [ "$_xauthToken"  != "" ]; then  command=${command}' '${_xauthToken};  fi
+  if [ "$_headers"     != "" ]; then  command=${command}' '${_headers};     fi
+  if [ "$_xtra"        != "" ]; then  command=${command}' '${_xtra};        fi
+
+  command=${command}' --header "Expect:"'
+  command=${command}' -s -S --dump-header /tmp/httpHeaders.out'
+  dMsg command: $command
+
+
+  #
+  # Execute the command
+  #
+  dMsg Executing the curl-command
+  _response=$(eval $command 2> /dev/null)
+
+
+  #
+  # Remove "Connection: Keep-Alive" and "Connection: close" headers
   #
   sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
   sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
   sed '/Connection: Close/d'      /tmp/httpHeaders.out  
   
+
   #
-  # Print and beautify response body, if any  (and if option --noPayloadCheck hasn't been set)
+  # Print and beautify response body, if any - and if option --noPayloadCheck hasn't been set
   #
   if [ "$_noPayloadCheck" == "on" ]
   then
@@ -770,11 +826,13 @@ function orionCurl()
   else
     if [ "$_response" != "" ]
     then
-      if [ "$_outFormat" == application/xml ] || [ "$_outFormat" == "" ]
+      dMsg buffer to $payloadCheckFormat beautify: $_response
+
+      if [ "$payloadCheckFormat" == xml ] || [ "$payloadCheckFormat" == "" ]
       then
         vMsg Running xmllint tool for $_response
         echo $_response | xmllint --format -
-      elif [ "$_outFormat" == application/json ]
+      elif [ "$payloadCheckFormat" == json ]
       then
         vMsg Running python tool for $_response
         echo $_response | python -mjson.tool
@@ -785,7 +843,6 @@ function orionCurl()
     fi
   fi
 }
-
 
 
 # ------------------------------------------------------------------------------
@@ -801,7 +858,7 @@ function orionCurl()
 #   --in          (input payload)  (default: xml => application/xml, If 'json': application/json)
 #   --out         (output payload  (default: xml => application/xml, If 'json': application/json)
 #   --json        (in/out JSON)    (if --in/out is used AFTER --json, it overrides)
-#   --httpTenant  <tenant>         (tenant in HTTP header)
+#   --tenant      <tenant>         (tenant in HTTP header)
 #   --servicePath <path>           (Service Path in HTTP header)
 #   --noPayloadCheck               (skip paylosd check filter)
 #
@@ -820,7 +877,7 @@ function coapCurl()
   _inFormat=""
   _outFormat=""
   _json=""
-  _httpTenant=""
+  _tenant=""
   _servicePath=""
   _xtra=''
   _noPayloadCheck='off'
@@ -835,7 +892,7 @@ function coapCurl()
     elif [ "$1" == "--in" ]; then              _inFormat="$2"; shift;
     elif [ "$1" == "--out" ]; then             _outFormat="$2"; shift;
     elif [ "$1" == "--json" ]; then            _inFormat=application/json; _outFormat=application/json;
-    elif [ "$1" == "--httpTenant" ]; then      _httpTenant="$2"; shift;
+    elif [ "$1" == "--tenant" ]; then          _tenant="$2"; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath="$2"; shift;
     elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck=on;
     else                                       _xtra="$_xtra $1"; shift;
@@ -977,9 +1034,12 @@ export -f accumulatorStart
 export -f accumulatorStop
 export -f accumulatorDump
 export -f accumulator2Dump
+export -f accumulatorCount
+export -f accumulator2Count
 export -f orionCurl
 export -f dbInsertEntity
 export -f mongoCmd
 export -f coapCurl
 export -f vMsg
+export -f dMsg
 export -f valgrindSleep

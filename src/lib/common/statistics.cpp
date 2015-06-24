@@ -113,6 +113,12 @@ int noOfAttributesForEntityTypeRequest                   = -1;
 int noOfAttributesForEntityTypeResponse                  = -1;
 int noOfContextEntitiesByEntityIdAndType                 = -1;
 
+int noOfEntitiesRequests                                 = -1;
+int noOfEntitiesResponses                                = -1;
+
+int noOfEntryPointsRequests                              = -1;
+int noOfEntryPointsResponses                             = -1;
+
 
 
 /* ****************************************************************************
@@ -200,5 +206,10 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case AttributesForEntityType:                          ++noOfAttributesForEntityTypeRequest; break;
   case RtEntityTypesResponse:                            ++noOfEntityTypesResponse; break;
   case RtAttributesForEntityTypeResponse:                ++noOfAttributesForEntityTypeResponse; break;
+
+  case EntitiesRequest:                                  ++noOfEntitiesRequests; break;
+  case EntitiesResponse:                                 ++noOfEntitiesResponses; break;
+  case EntryPointsRequest:                               ++noOfEntryPointsRequests; break;
+  case EntryPointsResponse:                              ++noOfEntryPointsResponses; break;
   }
 }

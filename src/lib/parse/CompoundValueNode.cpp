@@ -30,7 +30,6 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
-
 #include "parse/CompoundValueNode.h"
 
 
@@ -443,6 +442,80 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
         out += childV[ix]->render(format, indent);
+      }
+    }
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* toJson -
+*/
+std::string CompoundValueNode::toJson(bool isLastElement)
+{
+  std::string  out       = "";
+  bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
+  std::string  tagName   = (container->type == Vector)? "item" : name;
+
+  if (type == String)
+  {
+    LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
+    out = valueTag("", tagName, value, JSON, jsonComma, false, container->type == Vector);
+  }
+  else if ((type == Vector) && (container != this))
+  {
+    LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
+    out += "[";
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
+      out += childV[ix]->render(JSON, "");
+    }
+
+    out += "]";
+  }
+  else if ((type == Vector) && (container == this))
+  {
+    LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
+      out += childV[ix]->render(JSON, "");
+    }
+  }
+  else if ((type == Object) && (container->type == Vector))
+  {
+    LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
+    out += "{";
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
+      out += childV[ix]->render(JSON, "");
+    }
+
+    out += "}";
+  }
+  else if (type == Object)
+  {
+    if (rootP != this)
+    {
+      LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));
+      out += "{";
+
+      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      {
+        out += childV[ix]->render(JSON, "");
+      }
+
+      out += "}";
+    }
+    else
+    {
+      LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
+      for (uint64_t ix = 0; ix < childV.size(); ++ix)
+      {
+        out += childV[ix]->render(JSON, "");
       }
     }
   }

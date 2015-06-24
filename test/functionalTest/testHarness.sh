@@ -41,6 +41,26 @@ cd - > /dev/null 2>&1
 
 
 
+# ------------------------------------------------------------------------------
+#
+# Debug mode?
+#
+if [ "$ORION_FT_DEBUG" == "1" ]
+then
+  _debug='on'
+fi
+
+
+
+# -----------------------------------------------------------------------------
+#
+# Log file for debugging
+#
+rm -f /tmp/orionFuncTestDebug.log
+echo $(date) > /tmp/orionFuncTestDebug.log
+
+
+
 # -----------------------------------------------------------------------------
 #
 # Env vars
@@ -305,6 +325,7 @@ fi
 #
 # Preparations - cd to the test directory
 #
+dMsg Functional Tests Starting ...
 if [ "$dirOrFile" != "" ] && [ -d "$dirOrFile" ]
 then
   cd $dirOrFile

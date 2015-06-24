@@ -257,7 +257,7 @@ std::string jsonDcarCheck(ParseData* reqDataP, ConnectionInfo* ciP)
 
 
 
-#define PRINTF printf
+
 /* ****************************************************************************
 *
 * jsonDcarPresent - 
@@ -269,7 +269,7 @@ void jsonDcarPresent(ParseData* reqDataP)
     return;
   }
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   reqDataP->dcar.res.present("");
 }
 

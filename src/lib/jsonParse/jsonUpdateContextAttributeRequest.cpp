@@ -187,7 +187,7 @@ void jsonUpcarPresent(ParseData* reqData)
     return;
   }
 
-  PRINTF("\n\n");
+  LM_F(("\n\n"));
   reqData->upcar.res.present("");
 }
 

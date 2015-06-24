@@ -185,11 +185,6 @@ extern Notifier* getNotifier();
 */
 extern void setNotifier(Notifier* n);
 
-/*****************************************************************************
-*
-* getMongoConnection -
-*/
-extern void mongoDisconnect();
 
 /*****************************************************************************
 *
@@ -357,9 +352,8 @@ extern bool entitiesQuery
   const std::vector<std::string>&  servicePath,
   int                              offset  = DEFAULT_PAGINATION_OFFSET_INT,
   int                              limit   = DEFAULT_PAGINATION_LIMIT_INT,
-  bool                             details = false,
-  long long*                       countP  = NULL,
-  bool*                            limitReached = NULL
+  bool*                            limitReached = NULL,
+  long long*                       countP  = NULL
 );
 
 /* ****************************************************************************

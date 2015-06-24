@@ -62,6 +62,7 @@
 #include <curl/curl.h>
 #include <string>
 #include <vector>
+#include <limits.h>
 
 #include "mongoBackend/MongoGlobal.h"
 
@@ -171,6 +172,10 @@
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
+
+#include "serviceRoutinesV2/getEntities.h"
+#include "serviceRoutinesV2/entryPointsTreat.h"
+
 #include "contextBroker/version.h"
 
 #include "common/string.h"
@@ -216,6 +221,7 @@ int             dbPoolSize;
 char            reqMutexPolicy[16];
 bool            mutexTimeStat;
 int             writeConcern;
+unsigned        cprForwardLimit;
 
 
 
@@ -255,6 +261,8 @@ int             writeConcern;
 #define MUTEX_POLICY_DESC   "mutex policy (none/read/write/all)"
 #define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
 #define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
+#define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
+
 
 
 /* ****************************************************************************
@@ -297,6 +305,9 @@ PaArgument paArgs[] =
 
   { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
 
+  { "-cprForwardLimit", &cprForwardLimit, "CPR_FORWARD_LIMIT", PaUInt, PaOpt, 1000, 0, UINT_MAX, CPR_FORWARD_LIMIT_DESC},
+
+
   PA_END_OF_ARGS
 };
 
@@ -323,6 +334,17 @@ PaArgument paArgs[] =
 *
 */
 
+
+//
+// /v2 API
+//
+
+#define EPS                EntryPointsRequest
+#define EPS_COMPS_V2       1, { "v2"             }
+
+#define ENT                EntitiesRequest
+#define ENT_COMPS_V2       2, { "v2", "entities" }
+#define ENT_COMPS_WORD     ""
 
 //
 // NGSI9
@@ -566,6 +588,15 @@ PaArgument paArgs[] =
 #define INV9_COMPS         2, { "ngsi9",   "*"                           }
 #define INV10_COMPS        2, { "ngsi10",  "*"                           }
 #define INV_ALL_COMPS      0, { "*", "*", "*", "*", "*", "*"             }
+
+
+
+#define API_V2                                                                                           \
+  { "GET",    EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  entryPointsTreat                          }, \
+  { "*",      EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  badVerbAllFour                            }, \
+  { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
+  { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
+
 
 
 
@@ -899,6 +930,8 @@ PaArgument paArgs[] =
 */
 RestService restServiceV[] =
 {
+  API_V2,
+
   REGISTRY_STANDARD_REQUESTS_V0,
   REGISTRY_STANDARD_REQUESTS_V1,
   STANDARD_REQUESTS_V0,
@@ -1083,7 +1116,6 @@ void orionExit(int code, const std::string& reason)
     destroyAllOntimeIntervalThreads(dbs[ix]);
   }
 
-  mongoDisconnect();
   exit(code);
 }
 

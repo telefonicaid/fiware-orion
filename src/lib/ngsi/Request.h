@@ -101,7 +101,13 @@ typedef enum RequestType
   ContextEntitiesByEntityIdAndType,
   EntityByIdAttributeByNameIdAndType,
 
-  InvalidRequest
+  // /v2 API
+  EntitiesRequest = 70,
+  EntitiesResponse,
+  EntryPointsRequest,
+  EntryPointsResponse,
+
+  InvalidRequest = 100
 } RequestType;
 
 

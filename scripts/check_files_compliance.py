@@ -27,7 +27,7 @@ import re
 from sys import argv
 
 header = []
-header.append('\s*Copyright 201[3|4|5] Telefonica Investigacion y Desarrollo, S.A.U$')
+header.append('\s*Copyright( \(c\))? 201[3|4|5] Telefonica Investigacion y Desarrollo, S.A.U$')
 header.append('\s*$')
 header.append('\s*This file is part of Orion Context Broker.$')
 header.append('\s*$')
@@ -110,6 +110,9 @@ def ignore(root, file):
     if '.idea' in root:
         return True
 
+    if file.endswith('.apib'):
+      return True
+
     # Particular cases of files that are also ignored
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'README.md', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
@@ -133,7 +136,7 @@ def supported_extension(root, file):
     :return:
     """
     extensions = ['py', 'cpp', 'h', 'xml', 'json', 'test', 'vtest', 'txt', 'sh', 'spec', 'cfg', 'DISABLED', 'xtest',
-                  'centos', 'js', 'jmx', 'vtestx', 'feature', 'apib']
+                  'centos', 'js', 'jmx', 'vtestx', 'feature']
     names = ['makefile', 'Makefile']
 
     # Check extensions

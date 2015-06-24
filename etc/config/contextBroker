@@ -54,3 +54,4 @@ BROKER_DATABASE_NAME=orion
 
 # Use the following variable if you need extra ops
 #BROKER_EXTRA_OPS="-t 0-255"
+BROKER_EXTRA_OPS="-multiservice"
