@@ -21,27 +21,36 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Two Attributes In CPr One Local
+Five Different CPrs In One Query with Limits
 
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
 dbInit CP2
-brokerStart CB
+dbInit CP3
+dbInit CP4
+dbInit CP5
+brokerStart CB 0 IPV4 "-cprForwardLimit 3"
 brokerStart CP1
 brokerStart CP2
+brokerStart CP3
+brokerStart CP4
+brokerStart CP5
 
 --SHELL--
 
 #
 # 01. Update/APPEND E1/T1/A1 in CP1
-# 02. Update/APPEND E1/T1/A2 in CP1
-# 03. Update/APPEND E2/T1/A4 in CP2
-# 04. Update/APPEND E1/T1/A3 in CB
-# 05. Register E1/T1/A1 in CB, provApp: CP1
-# 06. Register E1/T1/A2 in CB, provApp: CP1
-# 07. Register E2/T1/A4 in CB, provApp: CP2
-# 08. Query E1+E2/T1/A1+A2+A3+A4 (Find E1-A3 in CB, E1-A1+A2 in CP1, E2-A4 in CP2)
+# 02. Update/APPEND E1/T1/A2 in CP2
+# 03. Update/APPEND E1/T1/A3 in CP3
+# 04. Update/APPEND E1/T1/A4 in CP4
+# 05. Update/APPEND E1/T1/A5 in CP5
+# 06. Register E1/T1/A1 in CB, provApp: CP1
+# 07. Register E1/T1/A2 in CB, provApp: CP2
+# 08. Register E1/T1/A3 in CB, provApp: CP3
+# 09. Register E1/T1/A4 in CB, provApp: CP4
+# 10. Register E1/T1/A5 in CB, provApp: CP5
+# 11. Query E1/T1/A1+A2+A3+A4+A5 (only A1, A2 and A3 are returned)
 #
 
 
@@ -68,7 +77,7 @@ echo
 echo
 
 
-echo "02. Update/APPEND E1/T1/A2 in CP1"
+echo "02. Update/APPEND E1/T1/A2 in CP2"
 echo "================================="
 payload='{
   "contextElements": [
@@ -79,30 +88,7 @@ payload='{
         {
           "name": "A2",
           "type": "string",
-          "value": "A2 in CP1"
-        }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
-echo
-echo
-
-
-echo "03. Update/APPEND E2/T1/A4 in CP2"
-echo "================================="
-payload='{
-  "contextElements": [
-    {
-      "type": "T1",
-      "id":   "E2",
-      "attributes": [
-        {
-          "name": "A4",
-          "type": "string",
-          "value": "A4 in CP2"
+          "value": "A2 in CP2"
         }
       ]
     }
@@ -114,8 +100,8 @@ echo
 echo
 
 
-echo "04. Update/APPEND E1/T1/A3 in CB"
-echo "================================"
+echo "03. Update/APPEND E1/T1/A3 in CP3"
+echo "================================="
 payload='{
   "contextElements": [
     {
@@ -125,19 +111,65 @@ payload='{
         {
           "name": "A3",
           "type": "string",
-          "value": "A3 in CB"
+          "value": "A3 in CP3"
         }
       ]
     }
   ],
   "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP3_PORT
 echo
 echo
 
 
-echo "05. Register E1/T1/A1 in CB, provApp: CP1"
+echo "04. Update/APPEND E1/T1/A4 in CP4"
+echo "================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A4",
+          "type": "string",
+          "value": "A4 in CP4"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP4_PORT
+echo
+echo
+
+
+echo "05. Update/APPEND E1/T1/A5 in CP5"
+echo "================================="
+payload='{
+  "contextElements": [
+    {
+      "type": "T1",
+      "id":   "E1",
+      "attributes": [
+        {
+          "name": "A5",
+          "type": "string",
+          "value": "A5 in CP5"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP5_PORT
+echo
+echo
+
+
+echo "06. Register E1/T1/A1 in CB, provApp: CP1"
 echo "========================================="
 payload='{
   "contextRegistrations": [
@@ -166,7 +198,7 @@ echo
 echo
 
 
-echo "06. Register E1/T1/A2 in CB, provApp: CP1"
+echo "07. Register E1/T1/A2 in CB, provApp: CP2"
 echo "========================================="
 payload='{
   "contextRegistrations": [
@@ -185,35 +217,6 @@ payload='{
         "isDomain": "false"
       }
     ],
-    "providingApplication": "http://localhost:'${CP1_PORT}'/v1"
-    }
- ],
- "duration": "P1M"
-}'
-orionCurl --url /v1/registry/registerContext --payload "$payload" --json
-echo
-echo
-
-
-echo "07. Register E2/T1/A4 in CB, provApp: CP2"
-echo "========================================="
-payload='{
-  "contextRegistrations": [
-  {
-    "entities": [
-      {
-         "type": "T1",
-         "isPattern": "false",
-         "id": "E2"
-      }
-    ],
-    "attributes": [
-      {
-        "name": "A4",
-        "type": "string",
-        "isDomain": "false"
-      }
-    ],
     "providingApplication": "http://localhost:'${CP2_PORT}'/v1"
     }
  ],
@@ -224,16 +227,99 @@ echo
 echo
 
 
-echo "08. Query E1+E2/T1/A1+A2+A3+A4 (Find E1-A3 in CB, E1-A1+A2 in CP1, E2-A4 in CP2)"
-echo "================================================================================"
+echo "08. Register E1/T1/A3 in CB, provApp: CP3"
+echo "========================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A3",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${CP3_PORT}'/v1"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "09. Register E1/T1/A4 in CB, provApp: CP4"
+echo "========================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A4",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${CP4_PORT}'/v1"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Register E1/T1/A5 in CB, provApp: CP5"
+echo "========================================="
+payload='{
+  "contextRegistrations": [
+  {
+    "entities": [
+      {
+         "type": "T1",
+         "isPattern": "false",
+         "id": "E1"
+      }
+    ],
+    "attributes": [
+      {
+        "name": "A5",
+        "type": "string",
+        "isDomain": "false"
+      }
+    ],
+    "providingApplication": "http://localhost:'${CP5_PORT}'/v1"
+    }
+ ],
+ "duration": "P1M"
+}'
+orionCurl --url /v1/registry/registerContext --payload "$payload" --json
+echo
+echo
+
+
+echo "11. Query E1/T1/A1+A2+A3+A4+A5 (only A1, A2 and A3 are returned)"
+echo "================================================================"
 payload='{
   "entities": [
     {
       "id":   "E1",
-      "type": "T1"
-    },
-    {
-      "id":   "E2",
       "type": "T1"
     }
   ],
@@ -241,7 +327,8 @@ payload='{
     "A1",
     "A2",
     "A3",
-    "A4"
+    "A4",
+    "A5"
   ]
 }'
 orionCurl --url /v1/queryContext --payload "$payload" --json
@@ -263,17 +350,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "string", 
+                        "name": "A1",
+                        "type": "string",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -281,7 +368,7 @@ Date: REGEX(.*)
 }
 
 
-02. Update/APPEND E1/T1/A2 in CP1
+02. Update/APPEND E1/T1/A2 in CP2
 =================================
 HTTP/1.1 200 OK
 Content-Length: 383
@@ -294,17 +381,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A2", 
-                        "type": "string", 
+                        "name": "A2",
+                        "type": "string",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -312,7 +399,7 @@ Date: REGEX(.*)
 }
 
 
-03. Update/APPEND E2/T1/A4 in CP2
+03. Update/APPEND E1/T1/A3 in CP3
 =================================
 HTTP/1.1 200 OK
 Content-Length: 383
@@ -325,17 +412,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A4", 
-                        "type": "string", 
+                        "name": "A3",
+                        "type": "string",
                         "value": ""
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -343,8 +430,8 @@ Date: REGEX(.*)
 }
 
 
-04. Update/APPEND E1/T1/A3 in CB
-================================
+04. Update/APPEND E1/T1/A4 in CP4
+=================================
 HTTP/1.1 200 OK
 Content-Length: 383
 Content-Type: application/json
@@ -356,17 +443,17 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A3", 
-                        "type": "string", 
+                        "name": "A4",
+                        "type": "string",
                         "value": ""
                     }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -374,49 +461,10 @@ Date: REGEX(.*)
 }
 
 
-05. Register E1/T1/A1 in CB, provApp: CP1
-=========================================
+05. Update/APPEND E1/T1/A5 in CP5
+=================================
 HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-06. Register E1/T1/A2 in CB, provApp: CP1
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-07. Register E2/T1/A4 in CB, provApp: CP2
-=========================================
-HTTP/1.1 200 OK
-Content-Length: 74
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "duration": "P1M", 
-    "registrationId": "REGEX([0-9a-f]{24})"
-}
-
-
-08. Query E1+E2/T1/A1+A2+A3+A4 (Find E1-A3 in CB, E1-A1+A2 in CP1, E2-A4 in CP2)
-================================================================================
-HTTP/1.1 200 OK
-Content-Length: 985
+Content-Length: 383
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -426,45 +474,123 @@ Date: REGEX(.*)
             "contextElement": {
                 "attributes": [
                     {
-                        "name": "A3", 
-                        "type": "string", 
-                        "value": "A3 in CB"
-                    }, 
+                        "name": "A5",
+                        "type": "string",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+06. Register E1/T1/A1 in CB, provApp: CP1
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+07. Register E1/T1/A2 in CB, provApp: CP2
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+08. Register E1/T1/A3 in CB, provApp: CP3
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+09. Register E1/T1/A4 in CB, provApp: CP4
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+10. Register E1/T1/A5 in CB, provApp: CP5
+=========================================
+HTTP/1.1 200 OK
+Content-Length: 74
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "duration": "P1M",
+    "registrationId": "REGEX([0-9a-f]{24})"
+}
+
+
+11. Query E1/T1/A1+A2+A3+A4+A5 (only A1, A2 and A3 are returned)
+================================================================
+HTTP/1.1 200 OK
+Content-Length: 626
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
                     {
-                        "name": "A1", 
-                        "type": "string", 
+                        "name": "A1",
+                        "type": "string",
                         "value": "A1 in CP1"
-                    }, 
+                    },
                     {
-                        "name": "A2", 
-                        "type": "string", 
-                        "value": "A2 in CP1"
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "attributes": [
+                        "name": "A2",
+                        "type": "string",
+                        "value": "A2 in CP2"
+                    },
                     {
-                        "name": "A4", 
-                        "type": "string", 
-                        "value": "A4 in CP2"
+                        "name": "A3",
+                        "type": "string",
+                        "value": "A3 in CP3"
                     }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
+                ],
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -476,8 +602,12 @@ Date: REGEX(.*)
 brokerStop CB
 brokerStop CP1
 brokerStop CP2
-
+brokerStop CP3
+brokerStop CP4
+brokerStop CP5
 dbDrop CB
 dbDrop CP1
 dbDrop CP2
-
+dbDrop CP3
+dbDrop CP4
+dbDrop CP5

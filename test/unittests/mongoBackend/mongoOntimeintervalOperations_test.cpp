@@ -270,7 +270,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs",_,_,_))
             .WillByDefault(Throw(e));
 
     /* Forge the parameters */
@@ -489,7 +489,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock,_query("unittest.entities",_,_,_,_,_,_))
+    ON_CALL(*connectionMock,_query("utest.entities",_,_,_,_,_,_))
             .WillByDefault(Throw(e));
 
     /* Forge the parameters */
@@ -515,7 +515,7 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
 
     /* Check results */
     EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("collection: unittest.entities - "
+    EXPECT_EQ("collection: utest.entities - "
               "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T\" }, { _id.id: \"E2\", _id.type: \"T\" } ], _id.servicePath: { $in: [ /^/.*/, null ] }, "
               "attrNames: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } }, orderby: { creDate: 1 } } - "
               "exception: boom!!", err);    
@@ -616,7 +616,7 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, update("unittest.csubs",_,_,_,_,_))
+    ON_CALL(*connectionMock, update("utest.csubs",_,_,_,_,_))
             .WillByDefault(Throw(e));
 
     TimerMock* timerMock = new TimerMock();

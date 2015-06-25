@@ -130,11 +130,11 @@ include_directories("/usr/include")
 # Library directories
 #
 MESSAGE("Building for ${BUILD_ARCH}")
-if (${BUILD_ARCH} STREQUAL "x86_64")
+if ("${BUILD_ARCH}" STREQUAL "x86_64")
     link_directories("/usr/lib64")
-else (NOT ${BUILD_ARCH} STREQUAL "x86_64")
+else (NOT "${BUILD_ARCH}" STREQUAL "x86_64")
     link_directories("/usr/lib")
-endif (${BUILD_ARCH} STREQUAL "x86_64")
+endif ("${BUILD_ARCH}" STREQUAL "x86_64")
 link_directories("/usr/lib/x86_64-linux-gnu")
 #
 # Enabling test harness

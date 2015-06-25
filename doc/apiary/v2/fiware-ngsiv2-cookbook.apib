@@ -1,0 +1,881 @@
+FORMAT: 1A
+HOST: http://fiware-ngsi2.apiblueprint.org/
+
+# FIWARE-NGSI Simple API (v2) Cookbook
+
+FIWARE-NGSI Simple API (v2) Cookbook.
+
+This is a cookbook with recipes that show how to use FIWARE-NGSI v2 aka FIWARE-NGSI Simple API.
+Use this examples for learning and enjoy!
+
+This is a work in progress and is changing on a daily basis.
+Please send your comments to fiware-ngsi@lists.fiware.org. You can
+trace the discussions checking the archives of the mailing list:
+https://lists.fiware.org/private/fiware-ngsi/ (list subscription
+required).
+
+Please check the following [FI-WARE Open Specification Legal Notice (essential patents license)](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_%28essential_patents_license%29) to understand the rights to use this specification.
+
+# FIWARE-NGSI Simple API Root [/v2]
+
+This resource allows you to obtain a list of subresources published by the API:
+
+* entities to deal with your NGSI entities
+* types to deal with your entity types
+* subscriptions to deal with subscriptions to context changes
+* registrations to deal with context data by registering external providers
+
+## Retrieve the Entry Point [GET]
+
++ Response 200 (application/json)
+
+        {
+            "entities_url":      "/v2/entities",
+            "types_url":         "/v2/types",
+            "subscriptions_url": "/v2/subscriptions",
+            "registrations_url": "/v2/registrations"
+        }
+
+## Listing context entities [/v2/entities{?type,id,idPattern,attrs,limit,offset,options}]
+
+### List all entities [GET /v2/entities]
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": 35.6
+         },
+         {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": 22.5
+         },
+         {
+            "type": "Car",
+            "id": "P-9873-K",
+            "speed": {
+                "value": 100,
+                "type": "number",
+                "accuracy": 2,
+                "timestamp": {
+                    "value": "2015-06-04T07:20:27.378Z",
+                    "type": "date"
+                }
+            }
+         }
+        ]
+
+### List entities by id [GET /v2/entities{?id}]
+
++ Parameters
+    + id: DC_S1_D41 (optional, string) - Only retrieve entities with this id
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": 35.6
+         }
+        ]
+
+### List all entities of an specific type [GET /v2/entities{?type}]
+
++ Parameters
+    + type: Room (optional, string) - Only retrieve entities of this type
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": 35.6
+         },
+         {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": 22.5
+         }
+        ]
+
+### List entities by id list [GET /v2/entities{?id}]
+
++ Parameters
+    + id: DC_S1_D41, Boe_Idearium (optional, string) - Id list with the entities to be retrieved
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": 35.6
+         },
+         {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": 22.5
+         }
+        ]
+
+
+### List entities by type list [GET /v2/entities{?type}]
+
++ Parameters
+    + type: Room,Car (optional, string) - Type list
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": 35.6
+         },
+         {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": 22.5
+         },
+         {
+            "type": "Car",
+            "id": "P-9873-K",
+            "speed": {
+                "value": 100,
+                "type": "number",
+                "accuracy": 2,
+                "timestamp": {
+                    "value": "2015-06-04T07:20:27.378Z",
+                    "type": "date"
+                }
+            }
+         }
+        ]
+
+### List all entities which id matches a pattern [GET /v2/entities{?idPattern}]
+
++ Parameters
+    + idPattern: DC_* (optional, string) - Only retrieve entities which id matches this pattern.
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1_D41",
+            "temperature": 35.6
+         }
+        ]
+
+### Paginate over a list of entities [GET /v2/entities{?limit,offset,options}]
+
++ Parameters
+    + options: count
+    + limit: 2
+    + offset: 2
+
++ Response 200 (application/json)
+
+    + Headers
+
+            X-Total-Count: 30
+            Link: http://context.example.org/v2/entities?offset=4&limit=2; rel="next", http://context.example.org/v2/entities?offset=28&limit=2; rel="last", http://context.example.org/v2/entities?offset=0&limit=2; rel="first", http://context.example.org/v2/entities?offset=2&limit=2; rel="prev"
+
+    + Body
+
+            [
+             {
+                "type": "Room",
+                "id": "DC_S1_D41",
+                "temperature": 35.6
+             },
+             {
+                "type": "Room",
+                "id": "Boe_Idearium",
+                "temperature": 22.5
+             }
+            ]
+
+## Querying context [/v2/entities{?q,limit,offset,coords,geometry,attrs,options}]
+
+
+### Query Entities [GET /v2/entities{?q,limit,offset,coords,geometry,attrs,options}]
+
++ Parameters
+    + q: temperature==22.5;humidity==60 (optional, string) - General query parameter that allows
+    to filter by attribute content
+    + coords: 41.3763726, 2.1864475 (optional, string) - Coordinates. Comma separated values.
+    The number of values will depend on the 'geometry' attribute.
+    + geometry: circle;radius=10000 (optional, string) - It can be any type defined by the
+    GeoJSON spec or 'circle;radius=&lt;a radius&gt;'.
+    The 'exterior' modifier allows to indicate that the referred area is the outside
+    of the region, for instance, 'polygon;exterior'
+    + limit: 20 - Limit the number of results (optional, number) - Maximum number of results to return
+    + attrs: seatsNumber (optional, string) - Attributes to be returned
+    + options: count (optional, string) - count indicates that the total number of records must be returned
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "Bcn-Welt",
+            "seatsNumber": 15
+         }
+        ]
+
+
+### Query Entities. No results [GET /v2/entities{?q,limit,coords,geometry,attrs}]
+
++ Response 200 (application/json)
+
+        []
+
+## Creating entities [/v2/entities]
+
+### Create a new entity [POST /v2/entities]
+
++ Request (application/json)
+
+        {
+            "type": "Room",
+            "id": "Bcn-Welt",
+            "temperature": 21.7,
+            "humidity": 60,
+            "location": {
+                "value":  "41.3763726, 2.1864475",
+                "type": "geo:point",
+                "crs": "WGS84"
+            },
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /v2/entities/Bcn-Welt
+
+
+### Create a new entity. Error [POST /v2/entities]
+
++ Request (application/json)
+
+        {
+            "type": "Room",
+            "id": "Bcn-Welt",
+            "temperature": 21.7
+        }
+
++ Response 422 (application/json)
+
+        {
+            "error": "AlreadyExists",
+            "description": "An entity with the same id and type is already present"
+        }
+
+
+## ContextEntity [/v2/entities/{entityId}]
+
+### Retrieve all entity data by Id [GET /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity Id.
+
++ Response 200 (application/json)
+
+        {
+            "type": "Room",
+            "id": "Bcn_Welt",
+            "temperature": 21.7,
+            "humidity": 60,
+            "location": {
+                "value":  "41.3763726, 2.1864475",
+                "type": "geo:point",
+                "crs": "WGS84"
+            }
+        }
+
+### Retrieve all entity data by Id. Not exists [GET /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity Id.
+
++ Response 404 (application/json)
+
+        {
+            "error": "NotFound",
+            "description": "There is no entity with such an id"
+        }
+
+### Retrieve all entity data by id and type [GET /v2/entities/type/{entityType}/id/{entityId}]
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+    + entityType: Room (required, string) - Entity Type
+
++ Response 200 (application/json)
+
+        {
+            "type": "Room",
+            "id": "Boe_Idearium",
+            "temperature": 22.5
+        }
+
+### Get one entity attribute [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrs: temperature (optional, string) - Attribute to be retrieved
+
++ Response 200 (application/json)
+
+        {
+            "temperature": 21.7
+        }
+
+### Get one entity attribute. Not present [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrs: mistake (optional, string) - Attribute to be retrieved
+
++ Response 200 (application/json)
+
+        {
+        }
+
+### Get several entity attributes [GET /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: 'Bcn_Welt' (required, string) - Entity ID
+    + attrs: temperature, humidity (optional, string) - Attributes to be retrieved. Coma separated list.
+
++ Response 200 (application/json)
+
+        {
+            "temperature": 21.7,
+            "humidity": 60,
+        }
+
+### Update entity attributes. [PATCH /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+
++ Request (application/json)
+
+    + Body
+
+            {
+                "temperature": 21.7,
+                "ambientNoise": 31.5
+            }
+
++ Response 204
+
+
+### Update or append entity attributes. [POST /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+
++ Request (application/json)
+
+        {
+            "temperature": 25.5,
+            "seatsNumber": 6
+        }
+
++ Response 204
+
+
+### Remove an entity[DELETE /v2/entities/{entityId}]
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+
++ Response 204
+
+### Remove one or more entity attributes[DELETE /v2/entities/{entityId}{?attrs}]
+
++ Parameters
+    + entityId: Boe_Idearium (required, string) - Entity ID
+    + attrs: humidity, seatsNumber - Attributes
+
++ Response 204
+
+## Context Entity Attributes [/v2/entities/{entityId}/attrs]
+
+### List all attributes [GET /v2/entities/{entityId}/attrs]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+
++ Response 200 (application/json)
+
+        {
+            "temperature": 21.7,
+            "humidity": 60,
+            "location": {
+                "value":  "41.3763726, 2.1864475",
+                "type": "geo:point",
+                "crs": "WGS84"
+            }
+        }
+
+### Replace all attributes [PUT /v2/entities/{entityId}/attrs]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+
++ Request (application/json)
+
+        {
+            "temperature": 21.7,
+            "relativeHumidity": {
+                "value": 60,
+                "accuracy": 1
+            },
+            "seatsNumber": 12
+        }
+
++ Response 200
+
+
+### Get a single attribute, including type and metadata values [GET /v2/entities/{entityId}/attrs/{attrName}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: illuminance (required, string) - Attribute to be retrieved.
+
++ Response 200 (application/json)
+
+        {
+            "value": 300,
+            "type": "number",
+            "accuracy": 1.0,
+            "unitCode": "LX"
+        }
+
+### Get an attribute value as text [GET /v2/entities/{entityId}/attrs/{attrName}/value{?options}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute to be retrieved.
+    + options: text (optional, string) - Indicates format as text
+
++ Response 200 (text/plain)
+
+        300
+
+### Get an attribute value as JSON [GET /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute to be retrieved.
+
++ Response 200 (application/json)
+
+        {
+            "value": 300
+        }
+
+### Get an attribute. Not exists [GET /v2/entities/{entityId}/attrs/{attrName}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: mistake (required, string) - Attribute to be retrieved.
+
++ Response 404 (application/json)
+
+        {
+            "error": "NotFound",
+            "description": "The entity does not have such an attribute"
+        }
+
+
+### Update an attribute [PUT /v2/entities/{entityId}/attrs/{attrName}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute Name
+
++ Request (application/json)
+
+        {
+            "value": 25.0,
+            "unitCode": "CEL"
+        }
+
++ Response 200
+
+
+### Update an attribute value [PUT /v2/entities/{entityId}/attrs/{attrName}/value]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute Name
+
++ Request (application/json)
+
+        {
+            "value": 25.0
+        }
+
++ Response 200
+
+
+### Remove an attribute [DELETE /v2/entities/{entityId}/attrs/{attrName}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute Name
+
++ Response 204
+
+
+## Context Entity Subscriptions [/v2/entities/{entityId}/subscriptions]
+
+### List all subscriptions present in the system [GET /v2/subscriptions]
+
++ Response 200
+
+        [
+            {
+                "id": "abcdefg",
+                "entity": {
+                    "id": "Bcn_Welt",
+                    "type": "Room"
+                },
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234",
+                "options": {
+                    "duration": "1M",
+                    "condition": "ONCHANGE",
+                    "throttling": "PT5S"
+                }
+            },
+             {
+                "id": "wyztrew",
+                "entity": {
+                    "pattern": "DC_*",
+                    "type": "Room"
+                },
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234"
+            }
+        ]
+
+### Get the details of a subscription [GET /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: abcdefg (required, string) - ID of the suscription
+
++ Response 200
+
+        {
+            "id": "abcdefg",
+            "entity": {
+                "id": "Bcn_Welt",
+                "type": "Room"
+            },
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://localhost:1234",
+            "options": {
+                "duration": "1M",
+                "condition": "ONCHANGE",
+                "throttling": "PT5S"
+            }
+        }
+
+### Remove a suscription [DELETE /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: abcdefg (required, string) - ID of the suscription
+
++ Response 204
+
+
+### Create a new subscription [POST /v2/subscriptions]
+
++ Request (application/json)
+
+        {
+            "entity": {
+                "pattern": "Boe_*",
+                "type": "Room"
+            },
+            "attributes": [
+                "humidity"
+            ],
+            "callback": "http://subscriber.example.com/notify"
+        }
+
++ Response 201
+
+    + Headers
+
+            Location: /subscriptions/abcde98765
+
+### Partial - Update an existing subscription [PATCH /v2/subscriptions/{subscriptionId}]
+
++ Parameters
+    + subscriptionId: abcdefgh (required, string) - ID of the suscription
+
++ Request
+
+        {
+            "duration": "1Y"
+        }
+
++ Response 204
+
+### List all subscriptions associated to an entity [GET /v2/entities/{entityId}/subscriptions]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+
++ Response 200 (application/json)
+
+        [
+            {
+                "id": "abcdefg",
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234",
+                "options": {
+                    "duration": "1M",
+                    "condition": "ONCHANGE",
+                    "throttling": "PT5S"
+                }
+            }
+        ]
+
+
+### Create a new subscription associated to an entity [POST /v2/entities/{entityId}/subscriptions]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+
++ Request
+
+        {
+            "attributes": [
+                "humidity"
+            ],
+            "callback": "http://subscriber.example.com/notify"
+        }
+
++ Response 201
+
+    + Headers
+
+            Location: /subscriptions/abcd9867hshshs
+
+### Get the details of a subscription associated to an entity [GET /v2/entities/{entityId}/subscriptions/{subscriptionId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+    + subscriptionId: abcdefgh (required, string) - ID of the subscription
+
++ Response 200 (application/json)
+
+        {
+            "id": "abcdefgh",
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://localhost:1234",
+            "options": {
+                "duration": "1M",
+                "condition": "ONCHANGE",
+                "throttling": "PT5S"
+            }
+        }
+
+
+## Context Entity Registrations [/v2/registrations]
+
+### List all registrations present in the system [GET /v2/registrations]
+
++ Response 200
+
+        [
+            {
+                "id": "abcdefg",
+                "entity": {
+                    "id": "Bcn_Welt",
+                    "type": "Room"
+                },
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234",
+                "options": {
+                    "duration": "1M"
+                }
+            },
+             {
+                "id": "wyztrew",
+                "entity": {
+                    "pattern": "DC_*",
+                    "type": "Room"
+                },
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234"
+            }
+        ]
+
+### Get the details of a registration [GET /v2/subscriptions/{registrationId}]
+
++ Parameters
+    + registrationId: abcdefg (required, string) - ID of the registration
+
++ Response 200
+
+        {
+            "id": "abcdefg",
+            "entity": {
+                "id": "Bcn_Welt",
+                "type": "Room"
+            },
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://localhost:1234",
+        }
+
+### Create a new registration [POST /v2/registrations]
+
++ Request
+
+        {
+            "entity": {
+                "pattern": "Boe_*",
+                "type": "Room"
+            },
+            "attributes": [
+                "humidity"
+            ],
+            "callback": "http://provider.example.com/provide"
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /registrations/abcde98765
+
+### Partial update an existing registration [PATCH /v2/registration/{registrationId}]
+
++ Parameters
+    + registrationId: r1234avfd (required, string) - ID of the registration
+
++ Request
+
+        {
+            "duration": "1Y"
+        }
+
++ Response 204
+
+### Full update of an existing registration [PUT /v2/registration/{registrationId}]
+
++ Parameters
+    + registrationId: r1234avfd (required, string) - ID of the registration
+
++ Request
+
+        {
+            "entity": {
+                "pattern": "Boe_*",
+                "type": "Room"
+            },
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://provider2.example.com/provide"
+        }
+
++ Response 204
+
+### Remove a registration [DELETE /v2/registrations/{registrationId}]
+
++ Parameters
+    + registrationId: abcdefg (required, string) - ID of the registration
+
++ Response 204
+
+### List all registrations associated to an entity [GET /v2/entities/{entityId}/registrations]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+
++ Response 200 (application/json)
+
+        [
+            {
+                "id": "abcdefg",
+                "attributes": [
+                    "temperature"
+                ],
+                "callback": "http://localhost:1234",
+                "options": {
+                    "duration": "1M"
+                }
+            }
+        ]
+
+
+### Create a new registration associated to an entity [POST /v2/entities/{entityId}/registrations]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+
++ Request
+
+        {
+            "attributes": [
+                "humidity"
+            ],
+            "callback": "http://provider.example.com/provide"
+        }
+
++ Response 201
+
+    + Headers
+
+            Location: /registration/abcd9867hshshs
+
+### Get the details of a registration associated to an entity [GET /v2/entities/{entityId}/registrations/{registrationId}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - ID of the entity
+    + registrationId: abcdefgh (required, string) - ID of the registration
+
++ Response 200 (application/json)
+
+        {
+            "id": "abcdefgh",
+            "attributes": [
+                "temperature"
+            ],
+            "callback": "http://localhost:1234",
+            "options": {
+                "duration": "1M"
+            }
+        }

@@ -190,7 +190,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.casubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.casubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -215,7 +215,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbFindOneFail)
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
     EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.casubs "
+    EXPECT_EQ("collection: utest.casubs "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);
     
@@ -252,9 +252,9 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
                                        "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                                        "attrs" << BSONArray());
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.casubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.casubs",_,_,_))
             .WillByDefault(Return(fakeSub));
-    ON_CALL(*connectionMock, remove("unittest.casubs",_,_,_))
+    ON_CALL(*connectionMock, remove("utest.casubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -279,7 +279,7 @@ TEST(mongoUnsubscribeContextAvailability, MongoDbRemoveFail)
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
     EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.casubs "
+    EXPECT_EQ("collection: utest.casubs "
               "- remove() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);
 
