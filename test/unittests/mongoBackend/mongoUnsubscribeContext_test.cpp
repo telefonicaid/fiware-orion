@@ -216,7 +216,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -245,7 +245,7 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
     EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.csubs "
+    EXPECT_EQ("collection: utest.csubs "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);
 
@@ -284,9 +284,9 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
                                        "attrs" << BSONArray() <<
                                        "conditions" << BSONArray());
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs",_,_,_))
             .WillByDefault(Return(fakeSub));
-    ON_CALL(*connectionMock, remove("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, remove("utest.csubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -315,7 +315,7 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
     EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.csubs "
+    EXPECT_EQ("collection: utest.csubs "
               "- remove() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.statusCode.details);
 

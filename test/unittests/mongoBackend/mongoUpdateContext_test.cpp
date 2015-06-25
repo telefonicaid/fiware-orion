@@ -9002,11 +9002,11 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
             .WillByDefault(Return(fakeEn));
     ON_CALL(*cursorMockCsub, more())
             .WillByDefault(Return(false));
-    ON_CALL(*connectionMock, _query("unittest.entities",_,_,_,_,_,_))
+    ON_CALL(*connectionMock, _query("utest.entities",_,_,_,_,_,_))
             .WillByDefault(Return(cursorMockEnt));
-    ON_CALL(*connectionMock, _query("unittest.csubs",_,_,_,_,_,_))
+    ON_CALL(*connectionMock, _query("utest.csubs",_,_,_,_,_,_))
             .WillByDefault(Return(cursorMockCsub));
-    ON_CALL(*connectionMock, update("unittest.entities",_,_,_,_,_))
+    ON_CALL(*connectionMock, update("utest.entities",_,_,_,_,_))
             .WillByDefault(Throw(e));
 
     /* Set MongoDB connection */
@@ -9044,7 +9044,7 @@ TEST(mongoUpdateContextRequest, mongoDbUpdateFail)
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
 
-    EXPECT_EQ("collection: unittest.entities "
+    EXPECT_EQ("collection: utest.entities "
               "- update() query: { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } "
               "- update() doc: { $set: { attrs.A1: { value: \"new_val\", type: \"TA1\", modDate: 1360232700 }, modDate: 1360232700 }, $unset: { location: 1 } } "
               "- exception: boom!!", RES_CER_STATUS(0).details);
@@ -9105,7 +9105,7 @@ TEST(mongoUpdateContextRequest, mongoDbQueryFail)
     EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ(SccReceiverInternalError, RES_CER_STATUS(0).code);
     EXPECT_EQ("Internal Server Error", RES_CER_STATUS(0).reasonPhrase);
-    EXPECT_EQ("collection: unittest.entities "
+    EXPECT_EQ("collection: utest.entities "
               "- query(): { _id.id: \"E1\", _id.type: \"T1\", _id.servicePath: { $exists: false } } "
               "- exception: boom!!", RES_CER_STATUS(0).details);
 

@@ -2743,7 +2743,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbFindOneFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.casubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.casubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -2769,7 +2769,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbFindOneFail)
     EXPECT_TRUE(res.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.casubs "
+    EXPECT_EQ("collection: utest.casubs "
               "- findOne() _id: 51307b66f481db11bf860010 "
               "- exception: boom!!", res.errorCode.details);
 
@@ -2799,9 +2799,9 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
                                        "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                                        "attrs" << BSONArray());
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, update("unittest.casubs",_,_,_,_,_))
+    ON_CALL(*connectionMock, update("utest.casubs",_,_,_,_,_))
             .WillByDefault(Throw(e));
-    ON_CALL(*connectionMock, findOne("unittest.casubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.casubs",_,_,_))
             .WillByDefault(Return(fakeSub));
     NotifierMock* notifierMock = new NotifierMock();
     EXPECT_CALL(*notifierMock, sendNotifyContextAvailabilityRequest(_,_,_,_))
@@ -2831,7 +2831,7 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
     EXPECT_TRUE(res.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.casubs "
+    EXPECT_EQ("collection: utest.casubs "
               "- update() _id: 51307b66f481db11bf860010 "
               "- update() doc: { entities: [ { id: \"E5\", type: \"T5\", isPattern: \"false\" } ], attrs: [], expiration: 1360250700, reference: \"http://notify1.me\", format: \"XML\" } "
               "- exception: boom!!", res.errorCode.details);
@@ -2843,3 +2843,5 @@ TEST(mongoUpdateContextAvailabilitySubscription, MongoDbUpdateFail)
     delete timerMock;
 
 }
+
+
