@@ -2720,8 +2720,8 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
      * random. ObjectId is 24 characters long.*/
     /* FIXME: a better approach would be to pass a regex filter to relace ObjectId by a constant string,
      * but I don't know how to work with regex in C++ */
-    std::string s1 = res.errorCode.details.substr(0, 71);
-    std::string s2 = res.errorCode.details.substr(71+24, res.errorCode.details.size()-71-24);
+    std::string s1 = res.errorCode.details.substr(0, 68);
+    std::string s2 = res.errorCode.details.substr(68+24, res.errorCode.details.size()-68-24);
     EXPECT_EQ("collection: utest.registrations "
               "- upsert update(): { _id: ObjectId('",s1);
     EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"XML\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] } "
