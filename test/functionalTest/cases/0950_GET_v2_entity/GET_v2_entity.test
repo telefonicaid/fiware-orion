@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entitity V2 simple
+GET Entity V2 simple
 
 --SHELL-INIT--
 dbInit CB
@@ -30,12 +30,12 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v1/updateContext
-# 03. GET /v2/entities
+# 01. POST /v1/updateContext to create 8787GHY entity
+# 03. GET /v2/entities/8787GHY
 #
 
-echo "01. POST /v1/updateContext"
-echo "=========================="
+echo "01. POST /v1/updateContext to create 8787GHY entity"
+echo "==================================================="
 payload='{
   "contextElements": [
     {
@@ -75,15 +75,15 @@ orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
-echo "02. GET /v2/entities"
-echo "===================="
+echo "02. GET /v2/entities/8787GHY"
+echo "============================"
 orionCurl --url /v2/entities/8787GHY --json
 echo
 echo
 
 --REGEXPECT--
-01. POST /v1/updateContext
-==========================
+01. POST /v1/updateContext to create 8787GHY entity
+===================================================
 HTTP/1.1 200 OK
 Content-Length: 841
 Content-Type: application/json
@@ -133,8 +133,8 @@ Date: REGEX(.*)
 }
 
 
-02. GET /v2/entities
-====================
+02. GET /v2/entities/8787GHY
+============================
 HTTP/1.1 200 OK
 Content-Length: 153
 Content-Type: application/json

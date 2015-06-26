@@ -29,20 +29,20 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. GET /v2/entities
-# 02. POST /v1/updateContext
-# 03. GET /v2/entities
+# 01. GET /v2/entities/E1 (error)
+# 02. POST /v1/updateContext to create E1
+# 03. GET /v2/entities/E1 (ok)
 #
 
-echo "01. GET /v2/entities"
-echo "===================="
+echo "01. GET /v2/entities/E1 (error)"
+echo "==============================="
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
 
-echo "02. POST /v1/updateContext"
-echo "=========================="
+echo "02. POST /v1/updateContext to create E1"
+echo "======================================="
 payload='{
   "contextElements": [
     {
@@ -122,16 +122,16 @@ echo
 echo
 
 
-echo "03. GET /v2/entities"
-echo "===================="
+echo "03. GET /v2/entities/E1 (ok)"
+echo "============================"
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
 
 --REGEXPECT--
-01. GET /v2/entities
-====================
+01. GET /v2/entities/E1 (error)
+===============================
 HTTP/1.1 404 Not Found
 Content-Length: 36
 Content-Type: application/json
@@ -142,8 +142,8 @@ Date: REGEX(.*)
 }
 
 
-02. POST /v1/updateContext
-==========================
+02. POST /v1/updateContext to create E1
+=======================================
 HTTP/1.1 200 OK
 Content-Length: 1854
 Content-Type: application/json
@@ -237,8 +237,8 @@ Date: REGEX(.*)
 }
 
 
-03. GET /v2/entities
-====================
+03. GET /v2/entities/E1 (ok)
+============================
 HTTP/1.1 200 OK
 Content-Length: 230
 Content-Type: application/json

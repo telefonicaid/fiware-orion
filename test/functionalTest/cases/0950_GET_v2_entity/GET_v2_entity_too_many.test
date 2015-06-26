@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entities V2 with Pagination
+GET Entity V2 To Many Entities
 
 --SHELL-INIT--
 dbInit CB
@@ -30,12 +30,12 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v1/updateContext, creating 5 entities
-# 02. GET /v2/entities/E1
+# 01. POST /v1/updateContext, creating 5 entities with id E1
+# 02. GET /v2/entities/E1 (too many entities error)
 #
 
-echo "01. POST /v1/updateContext"
-echo "=========================="
+echo "01. POST /v1/updateContext, creating 5 entities with id E1"
+echo "=========================================================="
 payload='{
   "contextElements": [
     {
@@ -65,15 +65,15 @@ orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
 
-echo "02. GET /v2/entities/E1"
-echo "============================="
+echo "02. GET /v2/entities/E1 (too many entities error)"
+echo "================================================="
 orionCurl --url '/v2/entities/E1' --json
 echo
 echo
 
 --REGEXPECT--
-01. POST /v1/updateContext
-==========================
+01. POST /v1/updateContext, creating 5 entities with id E1
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: 1072
 Content-Type: application/json
@@ -140,8 +140,8 @@ Date: REGEX(.*)
 }
 
 
-02. GET /v2/entities/E1
-=============================
+02. GET /v2/entities/E1 (too many entities error)
+=================================================
 HTTP/1.1 409 Conflict
 Content-Length: 73
 Content-Type: application/json
