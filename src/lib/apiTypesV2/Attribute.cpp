@@ -91,7 +91,6 @@ void Attribute::fill(QueryContextResponse* qcrsP)
   {
     //
     // If there are more than one entity, we return an error
-    // TODO: determine error for this case
     //
     errorCode.fill("Many entities with that ID", "/v2/entities?id="+qcrsP->contextElementResponseVector[0]->contextElement.entityId.id);
   }
