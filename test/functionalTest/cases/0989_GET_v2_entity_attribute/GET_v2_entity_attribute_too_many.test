@@ -213,14 +213,14 @@ Date: REGEX(.*)
 
 02. GET /v2/entities/E1/attrs/NONE
 ==================================
-HTTP/1.1 404 Not Found
-Content-Length: 79
+HTTP/1.1 409 Conflict
+Content-Length: 105
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "The entity does not have such an attribute",
-    "error": "NotFound"
+    "description": "There is more than one entity with that id. Refine your query.",
+    "error": "TooManyResults"
 }
 
 
