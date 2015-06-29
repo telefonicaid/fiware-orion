@@ -58,7 +58,7 @@ std::string getEntity
 )
 {
   std::string  answer;
-  Entity     entity;
+  Entity       entity;
 
 
   // 01. Fill in QueryContextRequest
@@ -72,8 +72,7 @@ std::string getEntity
   // 03. Render entity response
   entity.fill(&parseDataP->qcrs.res);
   answer = entity.render(ciP, EntityResponse);
-  if ( parseDataP->qcrs.res.errorCode.code == SccOk &&
-       parseDataP->qcrs.res.contextElementResponseVector.size()>1)
+  if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {
       // No problem found, but we expect only one entity
       ciP->httpStatusCode = SccConflict;
