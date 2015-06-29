@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. POST /v1/updateContext to create 8787GHY entity
-# 03. GET /v2/entities/8787GHY
+# 02. GET /v2/entities/8787GHY
 #
 
 echo "01. POST /v1/updateContext to create 8787GHY entity"
