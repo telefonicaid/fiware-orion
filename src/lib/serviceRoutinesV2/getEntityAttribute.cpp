@@ -73,8 +73,7 @@ std::string getEntityAttribute
   // 03. Render entity atttrinbute response
   attribute.fill(&parseDataP->qcrs.res);
   answer = attribute.render(ciP, EntityAttributeResponse);
-  if ( parseDataP->qcrs.res.errorCode.code == SccOk &&
-       parseDataP->qcrs.res.contextElementResponseVector.size()>1)
+  if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {
       // No problem found, but we expect only one entity
       ciP->httpStatusCode = SccConflict;
