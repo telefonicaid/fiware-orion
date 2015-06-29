@@ -1016,7 +1016,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     /* Prepare mock */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.registrations",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.registrations",_,_,_))
             .WillByDefault(Throw(e));
 
     /* Forge the request (from "inside" to "outside") */
@@ -1046,7 +1046,7 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     EXPECT_TRUE(res.registrationId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.registrations "
+    EXPECT_EQ("collection: utest.registrations "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.errorCode.details);
 

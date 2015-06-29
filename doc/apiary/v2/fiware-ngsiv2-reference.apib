@@ -139,6 +139,14 @@ In the case of being present, the error payload is JSON object including the fol
 * `error` (mandatory): a textual description of the error.
 * `description` (optional): additional information about the error.
 
+Error list (HTTP response code in paranthesis):
+
+* NotFound (404). The context element referred in the request has not been found.
+* TooManyResults (409). There are several results that match with the resource identification used
+  in the request. This typically the case of requesting an entity with not enough information and the
+  solution is to enhance entity identification adding more information, e.g. adding entity type
+  and/or service path.
+
 # API entry point
 
 ## Retrieve the Entry Point [GET]

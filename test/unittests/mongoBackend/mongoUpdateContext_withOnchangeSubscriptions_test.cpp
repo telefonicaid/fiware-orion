@@ -3010,7 +3010,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
 *
 * FIXME: given that we can no "bypass" calls to the mocked function in which we
 * are not interested given the problem described in the mock constructor above
-* (in particular, I will need to bypass queries to "unittest.entities), I will leave
+* (in particular, I will need to bypass queries to "utest.entities), I will leave
 * finalization of this tests (current version is not working) upon resolution of
 * old issue #87
 */
@@ -3026,7 +3026,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, DISABLED_MongoDbQueryFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, _query("unittest.csubs",_,_,_,_,_,_))
+    ON_CALL(*connectionMock, _query("utest.csubs",_,_,_,_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();

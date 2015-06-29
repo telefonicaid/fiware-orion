@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_SERVICEROUTINES_GETENTITYV2_H_
-#define SRC_LIB_SERVICEROUTINES_GETENTITYV2_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_GETENTITY_H_
+#define SRC_LIB_SERVICEROUTINESv2_GETENTITY_H_
 
 /*
 *
@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
 #include <string>
 #include <vector>
@@ -45,5 +45,5 @@ extern std::string getEntity
   ParseData*                 parseDataP
 );
 
-#endif  // SRC_LIB_SERVICEROUTINES_GETENTITYV2_H_
+#endif  // SRC_LIB_SERVICEROUTINESv2_GETENTITY_H_
 

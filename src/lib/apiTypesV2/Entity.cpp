@@ -139,26 +139,28 @@ void Entity::fill(const std::string& _id, const std::string& _type, const std::s
 void Entity::fill(QueryContextResponse* qcrsP)
 {
 
-  if (qcrsP->errorCode.code != SccOk)
+  if (qcrsP->errorCode.code == SccContextElementNotFound)
+  {
+    errorCode.fill("NotFound",  "The requested entity has not been found. Check type and id");
+  }
+  else if (qcrsP->errorCode.code != SccOk)
   {
     //
-    // If no entity has been found, we respond with a 404 NOT FOUND
-    // If any other error - use the error for the response
+    // any other error distinct from Not Found
     //
     errorCode.fill(qcrsP->errorCode);
   }
-  else if (qcrsP->contextElementResponseVector.size()>1)
+  else if (qcrsP->contextElementResponseVector.size() > 1) // qcrsP->errorCode.code == SccOk
   {
       //
       // If there are more than one entity, we return an error
-      // TODO: determine error for this case
       //
-      errorCode.fill("Many entities with that ID", "/v2/entities?id="+qcrsP->contextElementResponseVector[0]->contextElement.entityId.id);
+      errorCode.fill("TooManyResults", "There is more than one entity with that id. Refine your query.");
   }
   else
   {
     ContextElement* ceP = &qcrsP->contextElementResponseVector[0]->contextElement;
-    this->fill(ceP->entityId.id, ceP->entityId.type, ceP->entityId.isPattern, &ceP->contextAttributeVector);
+    fill(ceP->entityId.id, ceP->entityId.type, ceP->entityId.isPattern, &ceP->contextAttributeVector);
   }
 }
 

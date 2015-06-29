@@ -21,7 +21,8 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entity V2 Complex
+GET Entity V2 Not found
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
@@ -29,22 +30,20 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. GET /v2/entities
-# 02. POST /v1/updateContext
-# 03. GET /v2/entities
-# 04. GET /v2/entities?count=true
-# 05. POST /v1/updateContext with compound attribute value
+# 01. GET /v2/entities/E1 (error)
+# 02. POST /v1/updateContext to create E1
+# 03. GET /v2/entities/E1 (ok)
 #
 
-echo "01. GET /v2/entities"
-echo "===================="
-orionCurl --url /v2/entities/averyfarwayentitythatdoesnotexist --json
+echo "01. GET /v2/entities/E1 (error)"
+echo "==============================="
+orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
 
-echo "02. POST /v1/updateContext"
-echo "=========================="
+echo "02. POST /v1/updateContext to create E1"
+echo "======================================="
 payload='{
   "contextElements": [
     {
@@ -124,57 +123,29 @@ echo
 echo
 
 
-echo "03. GET /v2/entities"
-echo "===================="
+echo "03. GET /v2/entities/E1 (ok)"
+echo "============================"
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
 
-echo "04. POST /v1/updateContext with compound attribute value"
-echo "========================================================"
-payload='{
-  "contextElements": [
-    {
-      "id":   "E2",
-      "type": "T1",
-      "attributes" : [
-        {
-          "name" : "A0",
-          "value" : { "i1": 1, "s1": "s" }
-        }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload" --json
-echo
-echo
-
-
-echo "05. GET /v2/entities"
-echo "===================="
-orionCurl --url /v2/entities/E2 --json
-echo
-echo
-
-
 --REGEXPECT--
-01. GET /v2/entities
-====================
+01. GET /v2/entities/E1 (error)
+===============================
 HTTP/1.1 404 Not Found
-Content-Length: 36
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "error": "No context element found"
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
 }
 
 
-02. POST /v1/updateContext
-==========================
+02. POST /v1/updateContext to create E1
+=======================================
 HTTP/1.1 200 OK
 Content-Length: 1854
 Content-Type: application/json
@@ -268,8 +239,8 @@ Date: REGEX(.*)
 }
 
 
-03. GET /v2/entities
-====================
+03. GET /v2/entities/E1 (ok)
+============================
 HTTP/1.1 200 OK
 Content-Length: 230
 Content-Type: application/json
@@ -298,54 +269,6 @@ Date: REGEX(.*)
         "value": "E1/T1/A4/M1-3"
     },
     "id": "E1",
-    "type": "T1"
-}
-
-
-04. POST /v1/updateContext with compound attribute value
-========================================================
-HTTP/1.1 200 OK
-Content-Length: 377
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A0",
-                        "type": "",
-                        "value": ""
-                    }
-                ],
-                "id": "E2",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
-
-
-05. GET /v2/entities
-====================
-HTTP/1.1 200 OK
-Content-Length: 54
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "A0": {
-        "i1": "1",
-        "s1": "s"
-    },
-    "id": "E2",
     "type": "T1"
 }
 

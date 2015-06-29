@@ -53,7 +53,7 @@ typedef enum HttpStatusCode
   SccEntityTypeRequired     = 481,   // The EntityType is required by the receiver
   SccAttributeListRequired  = 482,   // The Attribute List is required by the receiver
   SccReceiverInternalError  = 500,   // An unknown error at the receiver has occurred
-  SccNotImplemented         = 501   // The given operation is not implemented
+  SccNotImplemented         = 501    // The given operation is not implemented
 } HttpStatusCode;
 
 
