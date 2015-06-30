@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
 #include <string>
 #include <vector>

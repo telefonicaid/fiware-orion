@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
 #include <string>
 #include <vector>
@@ -36,9 +36,6 @@
 */
 std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-
-  LM_I(("pcontextAttribute %p", pcontextAttribute));
-
   if (pcontextAttribute)
   {
       std::string out = "{";
@@ -48,12 +45,9 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
       {
         out += ",";
       }
-
       return out;
   }
-
   return errorCode.toJson(true);
-
 }
 
 
@@ -66,7 +60,7 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 
 //
 // Caution
-// The Query should be for an indvidual entity and for a specific attribute
+// The Query should be for an indvidual entity
 //
 
 void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)

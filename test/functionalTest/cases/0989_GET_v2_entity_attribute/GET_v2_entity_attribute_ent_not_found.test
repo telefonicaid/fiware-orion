@@ -21,7 +21,8 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entity Attribute V2 Not found
+GET Entity Attribute V2 Entity not found
+
 --SHELL-INIT--
 dbInit CB
 brokerStart CB
