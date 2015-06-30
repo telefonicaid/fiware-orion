@@ -119,6 +119,9 @@ int noOfEntitiesResponses                                = -1;
 int noOfEntryPointsRequests                              = -1;
 int noOfEntryPointsResponses                             = -1;
 
+int noOfEntityRequests                                   = -1;
+int noOfEntityResponses                                  = -1;
+
 
 
 /* ****************************************************************************
@@ -211,5 +214,8 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case EntitiesResponse:                                 ++noOfEntitiesResponses; break;
   case EntryPointsRequest:                               ++noOfEntryPointsRequests; break;
   case EntryPointsResponse:                              ++noOfEntryPointsResponses; break;
+  case EntityRequest:                                    ++noOfEntityRequests; break;
+  case EntityResponse:                                   ++noOfEntityResponses; break;
+
   }
 }

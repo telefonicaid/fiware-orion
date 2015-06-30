@@ -3648,7 +3648,7 @@ TEST(mongoQueryContextRequest, mongoDbQueryFail)
 
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.entities - "
+    EXPECT_EQ("collection: utest.entities - "
               "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T1\" } ], _id.servicePath: { $in: [ /^/.*/, null ] } }, orderby: { creDate: 1 } } - "
               "exception: boom!!", res.errorCode.details);
     EXPECT_EQ(0,res.contextElementResponseVector.size());    
