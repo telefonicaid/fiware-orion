@@ -110,11 +110,13 @@ def ignore(root, file):
     if '.idea' in root:
         return True
 
-    if file.endswith('.apib'):
-      return True
+    # Apib files have an "inline" license, so they are ignored
+    extensions_to_ignore = [ 'apib', 'md' ]
+    if os.path.splitext(file)[1][1:] in extensions_to_ignore:
+        return True
 
     # Particular cases of files that are also ignored
-    files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'README.md', 'LICENSE',
+    files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
                    'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu']
     if file in files_names:
