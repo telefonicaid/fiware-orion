@@ -294,14 +294,16 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 {
   BSONObjBuilder ab;
 
-  /* 1. Add value, if present in the resquest (it could be omitted in the case of updating only metadata)  */
+  /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
+   *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
+   *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
   if (caP->value != "" || caP->compoundValueP != NULL)
   {
     valueBson(caP, ab);
   }
   else
   {
-    /* Slightly different treatment, depending if the attribute value in DB is compound or not */
+    /* Slightly different treatment, depending on whether the attribute value in DB is compound or not */
     if (attr.getField(ENT_ATTRS_VALUE).type() == Object)
     {
       ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
