@@ -85,7 +85,7 @@ std::string ErrorCode::toJson(bool isLastElement)
   out += "{";
 
   bool comma = false;
-  if ((error != "") && (error == "OK"))
+  if ((error != "") && (error != "OK"))
   {
     out += JSON_VALUE("error", error);
     comma = true;

@@ -106,6 +106,10 @@ typedef enum RequestType
   EntitiesResponse,
   EntryPointsRequest,
   EntryPointsResponse,
+  EntityRequest,
+  EntityResponse,
+  EntityAttributeRequest,
+  EntityAttributeResponse,
 
   InvalidRequest = 100
 } RequestType;

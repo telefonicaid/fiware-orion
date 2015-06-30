@@ -175,6 +175,8 @@
 
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutinesV2/entryPointsTreat.h"
+#include "serviceRoutinesV2/getEntity.h"
+#include "serviceRoutinesV2/getEntityAttribute.h"
 
 #include "contextBroker/version.h"
 
@@ -345,6 +347,15 @@ PaArgument paArgs[] =
 #define ENT                EntitiesRequest
 #define ENT_COMPS_V2       2, { "v2", "entities" }
 #define ENT_COMPS_WORD     ""
+
+
+#define IENT                EntityRequest
+#define IENT_COMPS_V2       3, { "v2", "entities", "*" }
+#define IENT_COMPS_WORD     ""
+
+#define IENTATTR                EntityAttributeRequest
+#define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
+#define IENTATTR_COMPS_WORD     ""
 
 //
 // NGSI9
@@ -591,12 +602,15 @@ PaArgument paArgs[] =
 
 
 
-#define API_V2                                                                                           \
-  { "GET",    EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  entryPointsTreat                          }, \
-  { "*",      EPS,   EPS_COMPS_V2,         ENT_COMPS_WORD,  badVerbAllFour                            }, \
-  { "GET",    ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  getEntities                               }, \
-  { "*",      ENT,   ENT_COMPS_V2,         ENT_COMPS_WORD,  badVerbGetOnly                            }
-
+#define API_V2                                                                                                   \
+  { "GET",    EPS,       EPS_COMPS_V2,         ENT_COMPS_WORD,      entryPointsTreat                          }, \
+  { "*",      EPS,       EPS_COMPS_V2,         ENT_COMPS_WORD,      badVerbAllFour                            }, \
+  { "GET",    ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,      getEntities                               }, \
+  { "*",      ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,      badVerbGetOnly                            }, \
+  { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,     getEntity                                 }, \
+  { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,     badVerbGetOnly                            }, \
+  { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD, getEntityAttribute                        }, \
+  { "*",      IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD, badVerbGetOnly                            }
 
 
 

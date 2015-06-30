@@ -101,6 +101,11 @@ const char* requestType(RequestType rt)
 
   case EntryPointsRequest:                               return "EntryPointsRequest";
   case EntryPointsResponse:                              return "EntryPointsResponse";
+
+  case EntityRequest:                                    return "EntityRequest";
+  case EntityResponse:                                   return "EntityResponse";
+  case EntityAttributeRequest:                           return "EntityAttributeRequest";
+  case EntityAttributeResponse:                          return "EntityAttributeResponse";
   }
 
   return "";

@@ -29,8 +29,9 @@
 #include <vector>
 
 #include "ngsi/ContextAttributeVector.h"
+#include "apiTypesV2/ErrorCode.h"
 
-
+struct QueryContextResponse;
 
 /* ****************************************************************************
 *
@@ -43,6 +44,7 @@ public:
   std::string             type;             // Optional
   std::string             isPattern;        // Optional
   ContextAttributeVector  attributeVector;  // Optional
+  ErrorCode   errorCode;                    // Optional - mandatory if not 200-OK
 
   std::string             servicePath;      // Not part of payload, just an internal field
 
@@ -54,6 +56,7 @@ public:
   void         present(const std::string& indent);
   void         release(void);
   void         fill(const std::string& id, const std::string& type, const std::string& isPattern, ContextAttributeVector* aVec);
+  void         fill(QueryContextResponse* qcrsP);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ENTITY_H_

@@ -25,6 +25,7 @@ SET (SOURCES
     EntityVector.cpp
     Entities.cpp
     ErrorCode.cpp
+    Attribute.cpp
 )
 
 SET (HEADERS
@@ -32,6 +33,7 @@ SET (HEADERS
     EntityVector.h
     Entities.h
     ErrorCode.h
+    Attribute.h
 )
 
 
