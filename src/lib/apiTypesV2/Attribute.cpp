@@ -42,7 +42,7 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
   if (pcontextAttribute)
   {
       std::string out = "{";
-      out += pcontextAttribute->toJson(true /* is the last and only element*/);
+      out += pcontextAttribute->toJson(true /* is the last and only element */);
       out += "}";
       if (comma)
       {
@@ -69,35 +69,42 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 // The Query should be for an indvidual entity and for a specific attribute
 //
 
-void Attribute::fill(QueryContextResponse* qcrsP)
+void Attribute::fill(QueryContextResponse* qcrsP, std::string attrName)
 {
-
 
   if (qcrsP->errorCode.code == SccContextElementNotFound)
   {
-    //
-    // The entity does not exist OR the attribute does not exist for that entity
-    //
-    errorCode.error = "NotFound";
-    errorCode.description = "The entity does not have such an attribute";
+    errorCode.fill("NotFound",  "The requested entity has not been found. Check type and id");
   }
   else if (qcrsP->errorCode.code != SccOk)
   {
     //
-    // Any error except not found - use the error for the response
+    // any other error distinct from Not Found
     //
     errorCode.fill(qcrsP->errorCode);
   }
-  else if (qcrsP->contextElementResponseVector.size()>1)
+  else if (qcrsP->contextElementResponseVector.size() > 1) // qcrsP->errorCode.code == SccOk
   {
     //
     // If there are more than one entity, we return an error
     //
-    errorCode.fill("Many entities with that ID", "/v2/entities?id="+qcrsP->contextElementResponseVector[0]->contextElement.entityId.id);
+    errorCode.fill("TooManyResults", "There is more than one entity with that id. Refine your query.");
   }
   else
   {
-    // At least, one attribute was found
-    pcontextAttribute = qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector[0];
+    pcontextAttribute = NULL;
+    // Look for the attribute by name
+    for(std::size_t i = 0; i < qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector.size();
+          ++i)
+    {
+      if (qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector[i]->name == attrName)
+      {
+        pcontextAttribute = qcrsP->contextElementResponseVector[0]->contextElement.contextAttributeVector[i];
+        break;
+      }
+    }
+    if (pcontextAttribute == NULL) {
+        errorCode.fill("NotFound",  "The entity does not have such an attribute");
+    }
   }
 }

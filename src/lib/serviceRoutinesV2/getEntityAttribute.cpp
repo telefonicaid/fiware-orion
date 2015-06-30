@@ -63,28 +63,28 @@ std::string getEntityAttribute
 
 
   // 01. Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, compV[4]);
+  parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
 
 
   // 02. Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
 
 
-  // 03. Render entity atttrinbute response
-  attribute.fill(&parseDataP->qcrs.res);
+  // 03. Render entity attribute response
+  attribute.fill(&parseDataP->qcrs.res, compV[4]);
   answer = attribute.render(ciP, EntityAttributeResponse);
-  if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
+  if (attribute.errorCode.error == "TooManyResults")
   {
-      // No problem found, but we expect only one entity
-      ciP->httpStatusCode = SccConflict;
+    ciP->httpStatusCode = SccConflict;
   }
-  else if (attribute.errorCode.error == "NotFound"){
-      ciP->httpStatusCode = SccContextElementNotFound; // Attribute to be precise!
+  else if (attribute.errorCode.error == "NotFound")
+  {
+    ciP->httpStatusCode = SccContextElementNotFound; // Attribute to be precise!
   }
   else
   {
       // the same of the wrapped operation
-      ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
+    ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
   }
 
   // 04. Cleanup and return result

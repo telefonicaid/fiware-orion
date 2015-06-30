@@ -45,9 +45,9 @@ public:
   ContextAttribute *pcontextAttribute ;
   ErrorCode   errorCode;                    // Optional - mandatory if not 200-OK
 
-  Attribute(): pcontextAttribute(0) {};
+  Attribute(): pcontextAttribute(0) {}
   std::string  render(ConnectionInfo* ciP, RequestType requestType, bool comma = false);
-  void         fill(QueryContextResponse* qcrsP);
+  void         fill(QueryContextResponse* qcrsP, std::string attrName);
 };
 
 #endif  // SRC_LIB_APITYPESV2_ATTRIBUTE_H_

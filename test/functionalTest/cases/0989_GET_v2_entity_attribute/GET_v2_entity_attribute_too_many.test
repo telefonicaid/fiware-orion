@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entities V2 with Pagination
+GET Entity attribute -- Too many entities
 
 --SHELL-INIT--
 dbInit CB
