@@ -128,7 +128,6 @@ payload='{
 orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
-sleep 0.5s
 
 
 echo "02. Create en4/ping in CP1"

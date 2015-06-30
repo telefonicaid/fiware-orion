@@ -20,10 +20,6 @@
 
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
-# This is a variant of pagination_with_cprs_mix_entities.test but with the
-# en4 entity (the one with an attribute registered for the CPr) in the middle
-# by creDate, instead that at the end
-
 --NAME--
 Pagination Mixing Local and Remote entitiets - variant
 
@@ -34,6 +30,10 @@ brokerStart CB
 brokerStart CP1
 
 --SHELL--
+
+# This is a variant of pagination_with_cprs_mix_entities.test but with the
+# en4 entity (the one with an attribute registered for the CPr) in the middle
+# by creDate, instead that at the end
 
 #
 # 01. Create en1, en2/t, en3/t, en4/t in CB (with a small delay to have different creDates)
@@ -132,7 +132,6 @@ payload='{
 orionCurl --url /v1/updateContext --payload "$payload" --json
 echo
 echo
-sleep 0.5s
 
 
 echo "02. Create en4/ping in CP1"

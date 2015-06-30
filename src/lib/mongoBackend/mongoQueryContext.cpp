@@ -109,7 +109,14 @@ void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP,
 * limit has been reached with local entities.
 *
 */
-void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* enP, ContextRegistrationAttribute* craP, const ProvidingApplication& pa, bool limitReached)
+void addContextProviderAttribute
+(
+  ContextElementResponseVector&   cerV,
+  EntityId*                       enP,
+  ContextRegistrationAttribute*   craP,
+  const ProvidingApplication&     pa,
+  bool                            limitReached
+)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
@@ -206,9 +213,9 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
       if (!limitReached)
       {
         /* Registration without attributes */
-        for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
+        for (unsigned int eIx = 0; eIx < cr.entityIdVector.size(); ++eIx)
         {
-          addContextProviderEntity(cerV, cr.entityIdVector.get(jx), cr.providingApplication);
+          addContextProviderEntity(cerV, cr.entityIdVector.get(eIx), cr.providingApplication);
         }
       }
     }
