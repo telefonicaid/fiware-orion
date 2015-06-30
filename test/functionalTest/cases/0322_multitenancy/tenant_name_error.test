@@ -25,6 +25,7 @@ Erroneous tenant url names
 
 --SHELL-INIT--
 dbInit CB
+dbInit ${CB_DATABASE_NAME}-01234567890123456789012345678901234567890123456789
 brokerStart CB 0 IPV4 -multiservice
 
 --SHELL--

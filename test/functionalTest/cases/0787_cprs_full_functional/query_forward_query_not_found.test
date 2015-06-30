@@ -25,6 +25,7 @@ Forward local query that fails
 
 --SHELL-INIT--
 dbInit CB
+dbInit CP1
 brokerStart CB
 brokerStart CP1
 

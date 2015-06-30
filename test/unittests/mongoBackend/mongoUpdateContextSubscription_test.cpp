@@ -7255,7 +7255,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     /* Prepare mocks */
     const DBException e = DBException("boom!!", 33);
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs",_,_,_))
             .WillByDefault(Throw(e));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -7285,7 +7285,7 @@ TEST(mongoUpdateContextSubscription, MongoDbFindOneFail)
     EXPECT_TRUE(res.subscribeError.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.csubs "
+    EXPECT_EQ("collection: utest.csubs "
               "- findOne() _id: 51307b66f481db11bf860001 "
               "- exception: boom!!", res.subscribeError.errorCode.details);
 
@@ -7318,9 +7318,9 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
                                        "conditions" << BSONArray());
 
     DBClientConnectionMock* connectionMock = new DBClientConnectionMock();
-    ON_CALL(*connectionMock, update("unittest.csubs",_,_,_,_,_))
+    ON_CALL(*connectionMock, update("utest.csubs",_,_,_,_,_))
             .WillByDefault(Throw(e));
-    ON_CALL(*connectionMock, findOne("unittest.csubs",_,_,_))
+    ON_CALL(*connectionMock, findOne("utest.csubs",_,_,_))
             .WillByDefault(Return(fakeSub));
 
     NotifierMock* notifierMock = new NotifierMock();
@@ -7355,7 +7355,7 @@ TEST(mongoUpdateContextSubscription, MongoDbUpdateFail)
     EXPECT_TRUE(res.subscribeError.subscriptionId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
-    EXPECT_EQ("collection: unittest.csubs "
+    EXPECT_EQ("collection: utest.csubs "
               "- update() _id: 51307b66f481db11bf860001 "
               "- update() doc: { entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], reference: \"http://notify1.me\", expiration: 1360250700, conditions: [], lastNotification: 15000000, format: \"XML\" } "
               "- exception: boom!!", res.subscribeError.errorCode.details);
