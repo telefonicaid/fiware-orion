@@ -30,7 +30,7 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v1/updateContext, creating 5 entities
+# 01. POST /v1/updateContext, creating 2 entities
 # 02. GET /v2/entities/E1/attrs/A0
 #
 
@@ -68,7 +68,7 @@ echo
 echo
 
 echo "02. GET /v2/entities/E1/attrs/A0"
-echo "=================================="
+echo "================================"
 orionCurl --url '/v2/entities/E1/attrs/A0' --json
 echo
 echo
@@ -124,7 +124,7 @@ Date: REGEX(.*)
 
 
 02. GET /v2/entities/E1/attrs/A0
-==================================
+================================
 HTTP/1.1 409 Conflict
 Content-Length: 105
 Content-Type: application/json
