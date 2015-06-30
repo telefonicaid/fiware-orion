@@ -1,0 +1,279 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entity V2 Not found
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET /v2/entities/E1 (error)
+# 02. POST /v1/updateContext to create E1
+# 03. GET /v2/entities/E1 (ok)
+#
+
+echo "01. GET /v2/entities/E1 (error)"
+echo "==============================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "02. POST /v1/updateContext to create E1"
+echo "======================================="
+payload='{
+  "contextElements": [
+    {
+      "id":   "E1",
+      "type": "T1",
+      "attributes" : [
+        {
+          "name" : "A0",
+          "type": "number",
+          "value" : 255
+        },
+        {
+          "name" : "A1",
+          "value" : "E1/T1/A1"
+        },
+        {
+          "name": "A2",
+          "value": "E1/T1/A2",
+          "type": "AT2"
+        },
+        {
+          "name": "A3",
+          "type": "a",
+          "value": "E1/T1/A3/M1",
+          "metadatas": [
+            {
+              "name": "m1",
+              "value": "M1"
+            }
+          ]
+        },
+        {
+          "name": "A4",
+          "type": "a4",
+          "value": "E1/T1/A4/M1-3",
+          "metadatas": [
+            {
+              "name": "m1",
+              "value": "M1"
+            },
+            {
+              "name": "m2",
+              "type": "tm2",
+              "value": "M2"
+            },
+            {
+              "name": "m3",
+              "type": "number",
+              "value": 3
+            },
+            {
+              "name": "type",
+              "value": "TYPE"
+            },
+            {
+              "name": "value",
+              "value": "VALUE"
+            }
+          ]
+        },
+        {
+          "name": "id",
+          "value": "ID"
+        },
+        {
+          "name": "type",
+          "type": "VALUE",
+          "value": "TYPE"
+        }
+      ]
+    }
+  ],
+  "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json
+echo
+echo
+
+
+echo "03. GET /v2/entities/E1 (ok)"
+echo "============================"
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. GET /v2/entities/E1 (error)
+===============================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+02. POST /v1/updateContext to create E1
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 1854
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "A0",
+                        "type": "number",
+                        "value": ""
+                    },
+                    {
+                        "name": "A1",
+                        "type": "",
+                        "value": ""
+                    },
+                    {
+                        "name": "A2",
+                        "type": "AT2",
+                        "value": ""
+                    },
+                    {
+                        "metadatas": [
+                            {
+                                "name": "m1",
+                                "type": "",
+                                "value": "M1"
+                            }
+                        ],
+                        "name": "A3",
+                        "type": "a",
+                        "value": ""
+                    },
+                    {
+                        "metadatas": [
+                            {
+                                "name": "m1",
+                                "type": "",
+                                "value": "M1"
+                            },
+                            {
+                                "name": "m2",
+                                "type": "tm2",
+                                "value": "M2"
+                            },
+                            {
+                                "name": "m3",
+                                "type": "number",
+                                "value": "3"
+                            },
+                            {
+                                "name": "type",
+                                "type": "",
+                                "value": "TYPE"
+                            },
+                            {
+                                "name": "value",
+                                "type": "",
+                                "value": "VALUE"
+                            }
+                        ],
+                        "name": "A4",
+                        "type": "a4",
+                        "value": ""
+                    },
+                    {
+                        "name": "id",
+                        "type": "",
+                        "value": ""
+                    },
+                    {
+                        "name": "type",
+                        "type": "VALUE",
+                        "value": ""
+                    }
+                ],
+                "id": "E1",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+
+03. GET /v2/entities/E1 (ok)
+============================
+HTTP/1.1 200 OK
+Content-Length: 230
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A0": 255,
+    "A1": "E1/T1/A1",
+    "A2": {
+        "type": "AT2",
+        "value": "E1/T1/A2"
+    },
+    "A3": {
+        "m1": "M1",
+        "type": "a",
+        "value": "E1/T1/A3/M1"
+    },
+    "A4": {
+        "m1": "M1",
+        "m2": {
+            "type": "tm2",
+            "value": "M2"
+        },
+        "m3": 3,
+        "type": "a4",
+        "value": "E1/T1/A4/M1-3"
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

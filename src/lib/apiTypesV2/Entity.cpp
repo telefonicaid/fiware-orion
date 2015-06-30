@@ -27,6 +27,7 @@
 
 #include "common/tag.h"
 #include "apiTypesV2/Entity.h"
+#include "ngsi10/QueryContextResponse.h"
 
 
 
@@ -56,30 +57,37 @@ Entity::~Entity()
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-  std::string out = "{";
 
-  out += JSON_VALUE("id", id);
-
-  if (type != "")
+  if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
-    out += ",";
-    out += JSON_VALUE("type", type);
+      std::string out = "{";
+
+      out += JSON_VALUE("id", id);
+
+      if (type != "")
+      {
+        out += ",";
+        out += JSON_VALUE("type", type);
+      }
+
+      if (attributeVector.size() != 0)
+      {
+        out += ",";
+        out += attributeVector.toJson(true);
+      }
+
+      out += "}";
+
+      if (comma)
+      {
+        out += ",";
+      }
+
+      return out;
   }
 
-  if (attributeVector.size() != 0)
-  {
-    out += ",";
-    out += attributeVector.toJson(true);
-  }    
+  return errorCode.toJson(true);
 
-  out += "}";
-
-  if (comma)
-  {
-    out += ",";
-  }
-
-  return out;
 }
 
 
@@ -128,7 +136,33 @@ void Entity::fill(const std::string& _id, const std::string& _type, const std::s
   attributeVector.fill(aVec);
 }
 
+void Entity::fill(QueryContextResponse* qcrsP)
+{
 
+  if (qcrsP->errorCode.code == SccContextElementNotFound)
+  {
+    errorCode.fill("NotFound",  "The requested entity has not been found. Check type and id");
+  }
+  else if (qcrsP->errorCode.code != SccOk)
+  {
+    //
+    // any other error distinct from Not Found
+    //
+    errorCode.fill(qcrsP->errorCode);
+  }
+  else if (qcrsP->contextElementResponseVector.size() > 1) // qcrsP->errorCode.code == SccOk
+  {
+      //
+      // If there are more than one entity, we return an error
+      //
+      errorCode.fill("TooManyResults", "There is more than one entity with that id. Refine your query.");
+  }
+  else
+  {
+    ContextElement* ceP = &qcrsP->contextElementResponseVector[0]->contextElement;
+    fill(ceP->entityId.id, ceP->entityId.type, ceP->entityId.isPattern, &ceP->contextAttributeVector);
+  }
+}
 
 /* ****************************************************************************
 *
