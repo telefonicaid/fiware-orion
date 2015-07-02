@@ -3,10 +3,10 @@ Fix: Add multiservice flag for the default configuration in the RPM. (Issue #964
 Add: New operation "GET /v2/entities" (Issue #947)
 Add: New operation "GET /v2" (Issue #956)
 Fix: ONCHANGE subscription sends notification when value under condition it is not updated with updateContext-APPEND in some cases (Issue #943)
+Fix: updating attribute metadata without updating attribute value at the same time is now supported (Issue #766)
 Add: Reuse curl context for outgoing notifications, so now connections are persistent if the HTTP server doesn't close them
 Fix: remove unconditional tracing on xmlTreat()/jsonTreat() which was impacting on performance (specially in high-load scenarios)
 Fix: use NOSIGNAL as libcurl option to avoid crashes in that library. (Issue #1016)
 Add: CLI paramter -cprForwardLimit to cap the number of forwarding request for a single client request. (Issue #1016).
 Add: New operation "GET /v2/entities/{entityId}" (Issue #950)
 Add: New operation "GET /v2/entities/{entityId}/attrs/{attrName}" (Issue #989)
-
