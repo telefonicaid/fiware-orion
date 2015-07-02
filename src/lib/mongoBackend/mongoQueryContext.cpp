@@ -105,9 +105,18 @@ void addContextProviderEntity(ContextElementResponseVector& cerV, EntityId* enP,
 *
 * addContextProviderAttribute -
 *
+* The limitReached parameter is to prevent the addition of new entities, which is needed in the case of the pagination
+* limit has been reached with local entities.
 *
 */
-void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* enP, ContextRegistrationAttribute* craP, const ProvidingApplication& pa)
+void addContextProviderAttribute
+(
+  ContextElementResponseVector&   cerV,
+  EntityId*                       enP,
+  ContextRegistrationAttribute*   craP,
+  const ProvidingApplication&     pa,
+  bool                            limitReached
+)
 {
   for (unsigned int ix = 0; ix < cerV.size(); ++ix)
   {
@@ -134,19 +143,22 @@ void addContextProviderAttribute(ContextElementResponseVector& cerV, EntityId* e
 
   }
 
-  /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
-  ContextElementResponse* cerP            = new ContextElementResponse();
-  cerP->contextElement.entityId.id        = enP->id;
-  cerP->contextElement.entityId.type      = enP->type;
-  cerP->contextElement.entityId.isPattern = "false";
+  if (!limitReached)
+  {
+    /* Reached this point, it means that the cerV doesn't contain a proper CER, so we create it */
+    ContextElementResponse* cerP            = new ContextElementResponse();
+    cerP->contextElement.entityId.id        = enP->id;
+    cerP->contextElement.entityId.type      = enP->type;
+    cerP->contextElement.entityId.isPattern = "false";
 
-  cerP->statusCode.fill(SccOk);
+    cerP->statusCode.fill(SccOk);
 
-  ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
-  caP->providingApplication = pa;
-  cerP->contextElement.contextAttributeVector.push_back(caP);
+    ContextAttribute* caP = new ContextAttribute(craP->name, "", "");
+    caP->providingApplication = pa;
+    cerP->contextElement.contextAttributeVector.push_back(caP);
 
-  cerV.push_back(cerP);
+    cerV.push_back(cerP);
+  }
 }
 
 
@@ -177,12 +189,15 @@ bool matchEntityInCrr(ContextRegistration& cr, EntityId* enP)
 * (except the ones corresponding to some locally found attribute, i.e. info already in the
 * CER vector)
 *
+* The limitReached parameter is to prevent the addition of new entities, which is needed in the case of the pagination
+* limit has been reached with local entities.
+*
 * The enP parameter is optional. If not NULL, then before adding a CPr the function checks that the
 * containting CRR matches the entity (this is used for funcionality related to  "generic queries", see
 * processGenericEntities() function)
 *
 */
-void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, EntityId* enP = NULL)
+void addContextProviders(ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached, EntityId* enP = NULL)
 {
   for (unsigned int ix = 0; ix < crrV.size(); ++ix)
   {
@@ -195,10 +210,13 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
 
     if (cr.contextRegistrationAttributeVector.size() == 0)
     {
-      /* Registration without attributes */
-      for (unsigned int jx = 0; jx < cr.entityIdVector.size(); ++jx)
+      if (!limitReached)
       {
-        addContextProviderEntity(cerV, cr.entityIdVector.get(jx), cr.providingApplication);
+        /* Registration without attributes */
+        for (unsigned int eIx = 0; eIx < cr.entityIdVector.size(); ++eIx)
+        {
+          addContextProviderEntity(cerV, cr.entityIdVector.get(eIx), cr.providingApplication);
+        }
       }
     }
     else
@@ -208,7 +226,7 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
       {
         for (unsigned int aIx = 0; aIx < cr.contextRegistrationAttributeVector.size(); ++aIx)
         {
-          addContextProviderAttribute(cerV, cr.entityIdVector.get(eIx), cr.contextRegistrationAttributeVector.get(aIx), cr.providingApplication);
+          addContextProviderAttribute(cerV, cr.entityIdVector.get(eIx), cr.contextRegistrationAttributeVector.get(aIx), cr.providingApplication, limitReached);
         }
       }
     }
@@ -222,15 +240,18 @@ void addContextProviders(ContextElementResponseVector& cerV, ContextRegistration
 * If the request included some "generic" entity, some additional CPr could be needed in the CER array. There are
 * three cases of "generic" entities: 1) not pattern + null type, 2) pattern + not null type, 3) pattern + null type
 *
+* The limitReached parameter is to prevent the addition of new entities, which is needed in the case of the pagination
+* limit has been reached with local entities.
+*
 */
-void processGenericEntities(EntityIdVector& enV, ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV)
+void processGenericEntities(EntityIdVector& enV, ContextElementResponseVector& cerV, ContextRegistrationResponseVector& crrV, bool limitReached)
 {
   for (unsigned int ix = 0; ix < enV.size(); ++ix)
   {
     EntityId* enP = enV.get(ix);
     if (enP->type == "" || isTrue(enP->isPattern))
     {
-      addContextProviders(cerV, crrV, enP);
+      addContextProviders(cerV, crrV, limitReached, enP);
     }
   }
 }
@@ -272,10 +293,10 @@ HttpStatusCode mongoQueryContext
 
     std::string err;
     bool        ok;
+    bool        limitReached = false;
     bool        reqSemTaken;
 
-    ContextElementResponseVector rawCerV;
-
+    ContextElementResponseVector rawCerV;    
     reqSemTake(__FUNCTION__, "ngsi10 query request", SemReadOp, &reqSemTaken);
     ok = entitiesQuery(requestP->entityIdVector,
                        requestP->attributeList,
@@ -287,6 +308,7 @@ HttpStatusCode mongoQueryContext
                        servicePathV,
                        offset,
                        limit,
+                       &limitReached,
                        countP);
     reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
 
@@ -306,7 +328,7 @@ HttpStatusCode mongoQueryContext
       {
         if (crrV.size() > 0)
         {
-          processGenericEntities(requestP->entityIdVector, rawCerV, crrV);
+          processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
         }
       }
       else
@@ -325,7 +347,7 @@ HttpStatusCode mongoQueryContext
         if (crrV.size() > 0)
         {
           fillContextProviders(rawCerV, crrV);
-          processGenericEntities(requestP->entityIdVector, rawCerV, crrV);
+          processGenericEntities(requestP->entityIdVector, rawCerV, crrV, limitReached);
         }
       }
       else
@@ -364,7 +386,7 @@ HttpStatusCode mongoQueryContext
       {
         if (crrV.size() > 0)
         {
-          addContextProviders(rawCerV, crrV);
+          addContextProviders(rawCerV, crrV, limitReached);
         }
       }
       else

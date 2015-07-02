@@ -1055,6 +1055,7 @@ bool entitiesQuery
   const std::vector<std::string>&  servicePath,
   int                              offset,
   int                              limit,
+  bool*                            limitReached,
   long long*                       countP
 )
 {
@@ -1410,6 +1411,18 @@ bool entitiesQuery
 
     cer->statusCode.fill(SccOk);
     cerV->push_back(cer);
+  }
+
+  /* If we have already reached the pagination limit with local entities, we have ended: no more "potential"
+   * entities are added. Only if limitReached is being used, i.e. not NULL
+   * FIXME P10 (it is easy :) limit should be unsigned int */
+  if (limitReached != NULL)
+  {
+    *limitReached = (cerV->size() >= (unsigned int) limit);
+    if (*limitReached)
+    {
+      return true;
+    }
   }
 
   /* All the not-patterned entities in the request not in the response are added (without attributes), as they are
