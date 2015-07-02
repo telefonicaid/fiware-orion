@@ -303,8 +303,7 @@ Fields:
     notification sent associated to a given subscription.
 -   **count**: the number of notifications sent associated to
     the subscription.
--   **format**: the format to use to send notifications, either "XML"
-    or "JSON".
+-   **format**: the format to use to send notifications,"JSON".
 
 Example document:
 
@@ -331,6 +330,6 @@ Example document:
    ],
    "lastNotification" : 1381132312,
    "count": 42,
-   "format": "XML"
+   "format": "JSON"
  }
 ```

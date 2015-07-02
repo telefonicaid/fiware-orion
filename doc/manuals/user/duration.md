@@ -7,11 +7,10 @@ subscribeContextAvailability a default of 24 hours is used. You will get
 a confirmation of the duration in these cases in the response, e.g. for
 a registerContext:
 
-      <?xml version="1.0"?>                                             {
-      <registerContextResponse>                                             "duration": "PT24H",
-        <registrationId>51bf1e0ada053170df590f20</registrationId>           "registrationId": "52f38a64261c371af12b8565"
-        <duration>PT24H</duration>                                      }
-      </registerContextResponse>                                    
+      {
+      "duration": "PT24H",
+         "registrationId": "52f38a64261c371af12b8565"
+      }                             
 
 ## Extending duration
 

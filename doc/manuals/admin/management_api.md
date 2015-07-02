@@ -31,7 +31,6 @@ A sample <i>statistics</i> response:
 
 ```
  <orion>
-   <xmlRequests>16</xmlRequests>
    <jsonRequests>1</jsonRequests>
    <registrations>5</registrations>
    <discoveries>10</discoveries>
