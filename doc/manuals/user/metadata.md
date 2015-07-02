@@ -138,6 +138,7 @@ We can check that temperature includes both attributes
 	  "reasonPhrase": "OK"
 	}
       }
+      
 Note that, from the point of view of [ONCHANGE
 subscription](#ONCHANGE "wikilink"), changing the metadata of a given
 attribute or adding a new metadata element is considered a change even

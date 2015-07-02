@@ -129,30 +129,30 @@ Let's illustrate this with an example.
     "the process is *completely* transparent"). The client can use
     (or ignore) that information. Orion doesn't store the
     Street4 temperature.
-     {
-	"contextResponses": [
-	{
-	    "contextElement": {
-		"attributes": [
-		{
-		    "name": "temperature",
-		    "type": "float",
-		    "value": "16"
-		}
-		],
-            "id": "Street4",
-            "isPattern": "false",
-            "type": "Street"
-            },
-            "statusCode": {
-              "code": "200",
-	      "details": "Redirected to context provider http://sensor48.mycity.com/ngsi10"
-	      "reasonPhrase": "OK"
-            }
-       }
-       ]
-     }
-                                                                   
+    
+      {
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		    "attributes": [
+			{
+			      "name": "temperature",
+			      "type": "float",
+			      "value": "16"
+			}
+			],
+		      "id": "Street4",
+		      "isPattern": "false",
+		      "type": "Street"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "details": "Redirected to context provider http://sensor48.mycity.com/ngsi10",
+		      "reasonPhrase": "OK"
+		  }
+	    }
+	  ]
+      }                                                    
   
 The Context Providers and request forwarding functionality was developed
 in release 0.15.0. Previous version

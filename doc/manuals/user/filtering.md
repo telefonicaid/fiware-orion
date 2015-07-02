@@ -14,7 +14,7 @@ element:
       {
 	"entities": [
         {
-	    type": "myEntityType",
+	    "type": "myEntityType",
             "isPattern": "true",
 	    "id": ".*"
         }
