@@ -236,8 +236,7 @@ Fields:
     below (we think they're quite straightforward)
 -   **count**: the number of notifications sent associated to
     the subscription.
--   **format**: the format to use to send notifications, either "XML"
-    or "JSON".
+-   **format**: the format to use to send notifications, or "JSON".
 
 Example document:
 
@@ -273,7 +272,7 @@ Example document:
        }
    ],
    "count": 27,
-   "format": "XML"
+   "format": "JSON"
  }
 ```
 
