@@ -302,7 +302,7 @@ Fields:
     notification sent associated to a given subscription.
 -   **count**: the number of notifications sent associated to
     the subscription.
--   **format**: the format to use to send notifications,"JSON".
+-   **format**: the format to use to send notifications, "JSON".
 
 Example document:
 

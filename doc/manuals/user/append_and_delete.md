@@ -108,23 +108,23 @@ Now, a query to the entity shows attribute B:
       curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
       {
-      "contextElement": {
-        "attributes": [
-        {
-            "name": "B",
-            "type": "TB",
-            "value": "2"
-        }
-        ],
-            "id": "E1",
-            "isPattern": "false",
-            "type": ""
-        },
-        "statusCode": {
-	  "code": "200",
-          "reasonPhrase": "OK"
-          }
-        }
+	  "contextElement": {
+	      "attributes": [
+		  {
+		      "name": "B",
+		      "type": "TB",
+		      "value": "2"
+		  }
+	      ],
+	      "id": "E1",
+	      "isPattern": "false",
+	      "type": ""
+	  },
+	  "statusCode": {
+	      "code": "200",
+	      "reasonPhrase": "OK"
+	  }
+      }
         
   
 You can also use convenience operations with POST and DELETE verbs to

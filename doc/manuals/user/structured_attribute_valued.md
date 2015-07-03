@@ -59,7 +59,7 @@ The value of the attribute is stored internally by Orion Context Broker
 in a format-independent representation. 
 
 Note that in order to align JSON representations, the final "leaf"
-elements of the structured attribute values after travesing all vectors
+elements of the structured attribute values after traversing all vectors
 and key-maps are always considered as strings.Thus, take into account that
 although you can use for instance a JSON integer as a field value in updates
 (such as {"x": 3 }),you will retrieve a string in queries and notifications 

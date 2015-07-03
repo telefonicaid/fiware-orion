@@ -12,23 +12,23 @@ element:
  
       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
-	"entities": [
-        {
-	    "type": "myEntityType",
-            "isPattern": "true",
-	    "id": ".*"
-        }
-        ],
-        "restriction": {
-        "scopes": [
-        {
-            "type" : "FIWARE::Filter::foobar",
-            "value" : ...
-        }
-        ]
-        }
-       }
-       EOF                                                                                                                 
+	  "entities": [
+	      {
+		  "type": "myEntityType",
+		  "isPattern": "true",
+		  "id": ".*"
+	      }
+	  ],
+	  "restriction": {
+	      "scopes": [
+		  {
+		      "type": "FIWARE::Filter::foobar",
+		      "value": "..."
+		  }
+	      ]
+	  }
+      }
+      EOF                                                                                                                 
 
 while filters in convenience operations are included as parameters in
 the URL:
@@ -45,14 +45,16 @@ result is a logic "and" between all of them.
 The scope correspoding to this type is "FIWARE::Filter::Existence". 
 
       ...                                                           
-        "restriction": {
-          "scopes": [
-          {
-              "type" : "FIWARE::Filter::Existence",
-              "value" : "entity::type"
-          }
-          ]
-        }
+	{
+	  "restriction": {
+		"scopes": [
+		  {
+			"type": "FIWARE::Filter::Existence",
+			"value": "entity::type"
+		  }
+		]
+	    }
+	}
       ...                                                           
   
 The URL parameter corresponding to this filter is 'exist'.
@@ -67,14 +69,16 @@ existence is the entity type, corresponding to "entity::type".
 The scope corresponding to this type is "FIWARE::Filter::Not::Existence".
 
       ...                                                                
-        "restriction": {
-          "scopes": [
-          {
-              "type" : "FIWARE::Filter::Not::Existence",
-              "value" : "entity::type"
-          }
-          ]
-        }
+	{
+	  "restriction": {
+	      "scopes": [
+		  {
+		      "type": "FIWARE::Filter::Not::Existence",
+		      "value": "entity::type"
+		  }
+	      ]
+	  }
+	}
       ...                                                                
   
 The URL parameter corresponding to this filter is '!exist'.
