@@ -23,7 +23,7 @@ element:
 	      "scopes": [
 		  {
 		      "type": "FIWARE::Filter::foobar",
-		      "value": "..."
+		      "value": ""
 		  }
 	      ]
 	  }
