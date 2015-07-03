@@ -294,55 +294,86 @@ int transSemGive(const char* who, const char* what)
 static pthread_mutex_t contexts_mutex = PTHREAD_MUTEX_INITIALIZER;
 static std::map<std::string, struct curl_context> contexts;
 
-//Statistics
+// Statistics
 static struct timespec accCCMutexTime = { 0, 0 };
 
 
-int get_curl_context(const std::string& key, struct curl_context *pcc)
+/* ****************************************************************************
+*
+* curl_context_cleanup - 
+*/
+void curl_context_cleanup(void)
 {
-  pcc->curl = NULL;
-  pcc->pmutex = NULL;
-  int s = pthread_mutex_lock(&contexts_mutex);
-  if(s!=0)
+  for (std::map<std::string, struct curl_context>::iterator it = contexts.begin(); it != contexts.end(); ++it)
   {
-       LM_E(("pthread_mutex_lock"));
-       return s;
+    curl_easy_reset(it->second.curl);
+    curl_easy_cleanup(it->second.curl);
+    it->second.curl = NULL;
+    release_curl_context(&it->second);
+    contexts.erase(it);
   }
+
+  contexts.clear();
+  curl_global_cleanup();
+}
+
+
+
+/* ****************************************************************************
+*
+* get_curl_context - 
+*/
+int get_curl_context(const std::string& key, struct curl_context* pcc)
+{
+  pcc->curl   = NULL;
+  pcc->pmutex = NULL;
+
+  int s = pthread_mutex_lock(&contexts_mutex);
+
+  if (s != 0)
+  {
+    LM_E(("pthread_mutex_lock failure"));
+    return s;
+  }
+
   std::map<std::string, struct curl_context>::iterator it;
   it = contexts.find(key);
-  if (it==contexts.end())
+  if (it == contexts.end())
   {
-      //not found, create it
-      pcc->curl = curl_easy_init();
-      if (pcc->curl != NULL)
+    // not found, create it
+    pcc->curl = curl_easy_init();
+    if (pcc->curl != NULL)
+    {
+      pthread_mutex_t* pm = (pthread_mutex_t *) malloc(sizeof(*pm));
+
+      if (pm == NULL)
       {
-        pthread_mutex_t *pm = (pthread_mutex_t *) malloc(sizeof(*pm));
-        if (pm==NULL)
-        {
-          LM_E(("malloc"));
-          return -1;
-        }
-        int s = pthread_mutex_init(pm, NULL);
-        if(s!=0)
-        {
-           LM_E(("pthread_mutex_init"));
-           free(pm);
-           return s;
-        }
-        pcc->pmutex = pm;
-        contexts[key] = *pcc;
+        LM_E(("malloc"));
+        return -1;
       }
-      else  // curl_easy returned null
+
+      int s = pthread_mutex_init(pm, NULL);
+      if (s != 0)
       {
-       pcc->pmutex = NULL;    //unnecessary but clearer
+        LM_E(("pthread_mutex_init"));
+        free(pm);
+        return s;
       }
+      pcc->pmutex   = pm;
+      contexts[key] = *pcc;
+    }
+    else  // curl_easy returned null
+    {
+      pcc->pmutex = NULL;    // unnecessary but clearer
+    }
   }
-  else //previuos context found
+  else // previous context found
   {
-      *pcc=it->second;
+    *pcc = it->second;
   }
+
   s = pthread_mutex_unlock(&contexts_mutex);
-  if(s!=0)
+  if (s != 0)
   {
     LM_E(("pthread_mutex_unlock"));
     return s;
@@ -350,48 +381,55 @@ int get_curl_context(const std::string& key, struct curl_context *pcc)
 
   // lock the mutex, if everything was right
   // and cc is not {NULL, NULl}
-  if (pcc->pmutex != NULL) {
+  if (pcc->pmutex != NULL)
+  {
+    struct timespec  startTime;
+    struct timespec  endTime;
+    struct timespec  diffTime;
 
-      struct timespec startTime;
-      struct timespec endTime;
-      struct timespec diffTime;
+    if (semTimeStatistics)
+    {
+      clock_gettime(CLOCK_REALTIME, &startTime);
+    }
 
-      if (semTimeStatistics)
-      {
-        clock_gettime(CLOCK_REALTIME, &startTime);
-      }
+    s = pthread_mutex_lock(pcc->pmutex);
+    if (s != 0)
+    {
+      LM_E(("pthread_mutex_lock"));
+      return s;
+    }
 
-      s = pthread_mutex_lock(pcc->pmutex);
-      if(s!=0)
+    if (semTimeStatistics)
+    {
+      clock_gettime(CLOCK_REALTIME, &endTime);
+      clock_difftime(&endTime, &startTime, &diffTime);
+
+      int s = pthread_mutex_lock(&contexts_mutex);
+      if (s != 0)
       {
         LM_E(("pthread_mutex_lock"));
         return s;
       }
 
-      if (semTimeStatistics)
+      clock_addtime(&accCCMutexTime, &diffTime);
+      s = pthread_mutex_unlock(&contexts_mutex);
+      if (s != 0)
       {
-        clock_gettime(CLOCK_REALTIME, &endTime);
-        clock_difftime(&endTime, &startTime, &diffTime);
-        int s = pthread_mutex_lock(&contexts_mutex);
-        if(s!=0)
-        {
-             LM_E(("pthread_mutex_lock"));
-             return s;
-        }
-        clock_addtime(&accCCMutexTime, &diffTime);
-        s = pthread_mutex_unlock(&contexts_mutex);
-        if(s!=0)
-        {
-          LM_E(("pthread_mutex_unlock"));
-          return s;
-        }
-
+        LM_E(("pthread_mutex_unlock"));
+        return s;
       }
+    }
   }
+
   return 0;
 }
 
 
+
+/* ****************************************************************************
+*
+* release_curl_context - 
+*/
 int release_curl_context(struct curl_context *pcc)
 {
   // Reset context if not an empty context
@@ -400,20 +438,26 @@ int release_curl_context(struct curl_context *pcc)
     curl_easy_reset(pcc->curl);
     pcc->curl = NULL; // It will remain in global map
   }
+
   // Unlock the mutex if not an empty context
   if (pcc->pmutex != NULL)
-    {
+  {
     int s = pthread_mutex_unlock(pcc->pmutex);
-    if(s!=0)
+
+    free(pcc->pmutex);
+
+    if (s != 0)
     {
       LM_E(("pthread_mutex_unlock"));
       return s;
     }
+
     pcc->pmutex = NULL; // It will remain in global map
   }
 
   return 0;
 }
+
 
 
 /* ****************************************************************************
@@ -426,9 +470,11 @@ void mutexTimeCCReset(void)
   accCCMutexTime.tv_nsec = 0;
 }
 
+
+
 /* ****************************************************************************
 *
-* mutexTimeCCGet - get accumulated curl contexts mutext waiting time
+* mutexTimeCCGet - get accumulated curl contexts mutex waiting time
 */
 void mutexTimeCCGet(char* buf, int bufLen)
 {
@@ -441,4 +487,3 @@ void mutexTimeCCGet(char* buf, int bufLen)
     snprintf(buf, bufLen, "Disabled");
   }
 }
-

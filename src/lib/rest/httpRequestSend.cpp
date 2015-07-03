@@ -234,7 +234,7 @@ std::string httpRequestSend
     return "error";
   }
 
-  get_curl_context(ip, &cc);
+  get_curl_context(ip, &cc);  // LEAK of 40 (or more)
   if ((curl = cc.curl) == NULL)
   {
     LM_E(("Runtime Error (could not init libcurl)"));
@@ -364,8 +364,8 @@ std::string httpRequestSend
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
 
     // Cleanup curl environment
-    curl_slist_free_all(headers);
     release_curl_context(&cc);
+    curl_slist_free_all(headers);
 
     free(httpResponse->memory);
     delete httpResponse;
@@ -436,8 +436,8 @@ std::string httpRequestSend
   }
 
   // Cleanup curl environment
-  curl_slist_free_all(headers);
   release_curl_context(&cc);
+  curl_slist_free_all(headers);
 
   free(httpResponse->memory);
   delete httpResponse;

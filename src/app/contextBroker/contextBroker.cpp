@@ -1141,6 +1141,7 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
+  curl_context_cleanup();
   curl_global_cleanup();
 
   if (unlink(pidPath) != 0)
