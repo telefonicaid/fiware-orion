@@ -234,7 +234,7 @@ std::string httpRequestSend
     return "error";
   }
 
-  get_curl_context(ip, &cc);  // LEAK of 40 (or more)
+  get_curl_context(ip, &cc);
   if ((curl = cc.curl) == NULL)
   {
     LM_E(("Runtime Error (could not init libcurl)"));
