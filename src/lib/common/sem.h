@@ -97,15 +97,27 @@ extern void semTimeTransGet(char* buf, int bufLen);
 extern void semTimeReqReset(void);
 extern void semTimeTransReset(void);
 
+
+
 /* ****************************************************************************
 *
-* curl context functions -
+* curl context -
 */
-
-struct curl_context {
+struct curl_context
+{
   CURL *curl;
   pthread_mutex_t *pmutex;
 };
+
+
+
+/* ****************************************************************************
+*
+* curl_context_cleanup - 
+*/
+extern void curl_context_cleanup(void);
+
+
 
 /* ****************************************************************************
 *
@@ -113,17 +125,23 @@ struct curl_context {
 */
 extern int get_curl_context(const std::string& key, struct curl_context *pcc);
 
+
+
 /* ****************************************************************************
 *
 * release_curl_context -
 */
 extern int release_curl_context(struct curl_context *pcc);
 
+
+
 /* ****************************************************************************
 *
 * mutexTimeCCGet -
 */
 extern void mutexTimeCCGet(char* buf, int bufLen);
+
+
 
 /* ****************************************************************************
 *
