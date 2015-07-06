@@ -309,7 +309,7 @@ void curl_context_cleanup(void)
     curl_easy_reset(it->second.curl);
     curl_easy_cleanup(it->second.curl);
     it->second.curl = NULL;
-    release_curl_context(&it->second);
+    release_curl_context(&it->second, true);
     contexts.erase(it);
   }
 
@@ -430,7 +430,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
 *
 * release_curl_context - 
 */
-int release_curl_context(struct curl_context *pcc)
+int release_curl_context(struct curl_context *pcc, bool final)
 {
   // Reset context if not an empty context
   if (pcc->curl != NULL)
@@ -444,7 +444,10 @@ int release_curl_context(struct curl_context *pcc)
   {
     int s = pthread_mutex_unlock(pcc->pmutex);
 
-    free(pcc->pmutex);
+    if (final)
+    {
+      free(pcc->pmutex);
+    }
 
     if (s != 0)
     {
