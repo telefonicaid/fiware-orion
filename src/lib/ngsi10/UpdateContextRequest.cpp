@@ -322,6 +322,20 @@ void UpdateContextRequest::fill
 
 /* ****************************************************************************
 *
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill(const Entity* entP, const std::string& _updateActionType)
+{
+  ContextElement*  ceP = new ContextElement(entP->id, entP->type, "false");
+
+  contextElementVector.push_back(ceP);
+  updateActionType.set(_updateActionType);
+}
+
+
+
+/* ****************************************************************************
+*
 * UpdateContextRequest::attributeLookup - 
 */
 ContextAttribute* UpdateContextRequest::attributeLookup(EntityId* eP, const std::string& attributeName)

@@ -22,6 +22,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
 getEntities.cpp
+postEntities.cpp
 entryPointsTreat.cpp
 getEntity.cpp
 getEntityAttribute.cpp
@@ -29,6 +30,7 @@ getEntityAttribute.cpp
 
 SET (HEADERS
 getEntities.h
+postEntities.h
 entryPointsTreat.h
 getEntity.h
 getEntityAttribute.h

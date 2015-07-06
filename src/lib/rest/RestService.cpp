@@ -33,13 +33,14 @@
 #include "common/globals.h"
 #include "common/statistics.h"
 #include "common/string.h"
+#include "ngsi/ParseData.h"
+#include "parse/jsonRequestTreat.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/RestService.h"
 #include "rest/restReply.h"
 #include "rest/rest.h"
 #include "rest/uriParamNames.h"
-#include "ngsi/ParseData.h"
 
 
 
@@ -56,7 +57,15 @@
 *
 * payloadParse - 
 */
-std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService* service, XmlRequest** reqPP, JsonRequest** jsonPP)
+std::string payloadParse
+(
+  ConnectionInfo*            ciP,
+  ParseData*                 parseDataP,
+  RestService*               service,
+  XmlRequest**               reqPP,
+  JsonRequest**              jsonPP,
+  std::vector<std::string>&  compV
+)
 {
   std::string result = "NONE";
 
@@ -65,11 +74,26 @@ std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService
 
   if (ciP->inFormat == XML)
   {
+    if (compV[0] == "v2")
+    {
+      LM_W(("Bad Input (payload mime-type is not JSON)"));
+      return "Bad inFormat";
+    }
+
     LM_T(LmtParsedPayload, ("Calling xmlTreat for service request %d, payloadWord '%s'", service->request, service->payloadWord.c_str()));
     result = xmlTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, reqPP);
   }
   else if (ciP->inFormat == JSON)
-    result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, jsonPP);
+  {
+    if (compV[0] == "v2")
+    {
+      result = jsonRequestTreat(ciP, parseDataP, service->request);
+    }
+    else
+    {
+      result = jsonTreat(ciP->payload, ciP, parseDataP, service->request, service->payloadWord, jsonPP);
+    }
+  }
   else
   {
     LM_W(("Bad Input (payload mime-type is neither JSON nor XML)"));
@@ -352,7 +376,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       ciP->parseDataP = &parseData;
-      response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP);
+      response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
