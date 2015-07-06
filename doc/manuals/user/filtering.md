@@ -45,16 +45,16 @@ result is a logic "and" between all of them.
 The scope correspoding to this type is "FIWARE::Filter::Existence". 
 
       ...                                                           
-	{
+      {
 	  "restriction": {
-		"scopes": [
+	      "scopes": [
 		  {
-			"type": "FIWARE::Filter::Existence",
-			"value": "entity::type"
+		      "type": "FIWARE::Filter::Existence",
+		      "value": "entity::type"
 		  }
-		]
-	    }
-	}
+	      ]
+	  }
+      }
       ...                                                           
   
 The URL parameter corresponding to this filter is 'exist'.
@@ -69,7 +69,7 @@ existence is the entity type, corresponding to "entity::type".
 The scope corresponding to this type is "FIWARE::Filter::Not::Existence".
 
       ...                                                                
-	{
+      {
 	  "restriction": {
 	      "scopes": [
 		  {
@@ -78,7 +78,7 @@ The scope corresponding to this type is "FIWARE::Filter::Not::Existence".
 		  }
 	      ]
 	  }
-	}
+      }
       ...                                                                
   
 The URL parameter corresponding to this filter is '!exist'.
@@ -100,11 +100,11 @@ the usual entity type:
   JSON
   --------------------------------------------------------------------------------------
       ...                                            
-          {
-            "type": "Room",
-	    "isPattern": "...",
-	    "id": "..."
-          }
+      {
+	  "type": "Room",
+	  "isPattern": "...",
+	  "id": "..."
+      }
       ...
   --------------------------------------------------------------------------------------
 

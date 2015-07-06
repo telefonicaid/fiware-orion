@@ -8,45 +8,28 @@ with an example.
 We start creating a simple entity 'E1' with one attribute named 'A':
 
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	"contextElements": [
-        {
-          "type": "T",
-          "isPattern": "false",
-          "id": "E1",
-          "attributes": [
-          {
-              "name": "A",
-              "type": "TA",
-              "value": "1"
-          }
-          ]
-        }
-        ],
-        "updateAction": "APPEND"
-      }
-      EOF                                                                                                                      
+                                                                                                                    
   
 Now, in order to append a new attribute (let's name it 'B') we use
 updateContext APPEND with an entityId matching 'E1':
 
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
-	"contextElements": [
-	{
-          "type": "T",
-          "isPattern": "false",
-          "id": "E1",
-          "attributes": [
-          {
-              "name": "B",
-              "type": "TB",
-              "value": "2"
-          }
-          ]
-        }
-        ],
-        "updateAction": "APPEND"
+	  "contextElements": [
+	      {
+		  "type": "T",
+		  "isPattern": "false",
+		  "id": "E1",
+		  "attributes": [
+		      {
+			  "name": "A",
+			  "type": "TA",
+			  "value": "1"
+		      }
+		  ]
+	      }
+	  ],
+	  "updateAction": "APPEND"
       }
       EOF                                                                                                                      
   
@@ -54,59 +37,58 @@ Now we can check with a query to that entity that both attributes A and
 B are there:
 
      curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
-     {
-       "contextElement": {
-	  "attributes": [
-          {
-            "name": "B",
-	    "type": "TB",
-	    "value": "2"
-          },
-          {
-            "name": "A",
-            "type": "TA",
-            "value": "1"
-          }
-          ],
-              "id": "E1",
-              "isPattern": "false",
+      {
+	  "contextElement": {
+	      "attributes": [
+		  {
+		      "name": "B",
+		      "type": "TB",
+		      "value": "2"
+		  },
+		  {
+		      "name": "A",
+		      "type": "TA",
+		      "value": "1"
+		  }
+	      ],
+	      "id": "E1",
+	      "isPattern": "false",
 	      "type": ""
-          },
-        "statusCode": {
-	  "code": "200",
-          "reasonPhrase": "OK"
-        }
-     }
+	  },
+	  "statusCode": {
+	      "code": "200",
+	      "reasonPhrase": "OK"
+	  }
+      }
+
   
 We can also remove attributes in a similar way, using the DELETE action
 type. For example, to remove attribute 'A' we will use (note the empty
 contextValue element):
 
      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-     {
-      "contextElements": [
       {
-         "type": "T",
-         "isPattern": "false",
-         "id": "E1",
-         "attributes": [
-         {
-              "name": "A",
-              "type": "TA",
-              "value": ""
-         }
-         ]
-       }
-       ],
-        "updateAction": "DELETE"
-     }
-     EOF                                                                                                                      
+	  "contextElements": [
+	      {
+		  "type": "T",
+		  "isPattern": "false",
+		  "id": "E1",
+		  "attributes": [
+		      {
+			  "name": "A",
+			  "type": "TA",
+			  "value": ""
+		      }
+		  ]
+	      }
+	  ],
+	  "updateAction": "DELETE"
+      }
+      EOF                                                                                                                      
   
 Now, a query to the entity shows attribute B:
 
       curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
       {
 	  "contextElement": {
 	      "attributes": [
@@ -125,6 +107,7 @@ Now, a query to the entity shows attribute B:
 	      "reasonPhrase": "OK"
 	  }
       }
+
         
   
 You can also use convenience operations with POST and DELETE verbs to
@@ -133,21 +116,21 @@ add and delete attributes. Try the following:
 Add a new attribute 'C' and 'D':
 
      (curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-     {
-	"attributes" : [
-        {
-          "name" : "C",
-          "type" : "TC",
-          "value" : "3"
-        },
-        {
-          "name" : "D",
-          "type" : "TD",
-          "value" : "4"
-        }
-        ]
-     }
-     EOF
+      {
+	  "attributes": [
+	      {
+		  "name": "C",
+		  "type": "TC",
+		  "value": "3"
+	      },
+	      {
+		  "name": "D",
+		  "type": "TD",
+		  "value": "4"
+	      }
+	  ]
+      }
+      EOF
                                                                                                                                            
   
 Remove attribute 'B':
@@ -157,30 +140,29 @@ Remove attribute 'B':
 Query entity (should see 'C' and 'D', but not 'B'):
   
       curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
       {
-      "contextElement": {
-        "attributes": [
-        {
-            "name": "C",
-            "type": "TC",
-            "value": "3"
-        },
-        {
-            "name": "D",
-            "type": "TD",
-            "value": "4"
-        }
-        ],
-        "id": "E1",
-        "isPattern": "false",
-        "type": ""
-        },
-        "statusCode": {
-	  "code": "200",
-          "reasonPhrase": "OK"
-          }
-       }                
+	  "contextElement": {
+	      "attributes": [
+		  {
+		      "name": "C",
+		      "type": "TC",
+		      "value": "3"
+		  },
+		  {
+		      "name": "D",
+		      "type": "TD",
+		      "value": "4"
+		  }
+	      ],
+	      "id": "E1",
+	      "isPattern": "false",
+	      "type": ""
+	  },
+	  "statusCode": {
+	      "code": "200",
+	      "reasonPhrase": "OK"
+	  }
+      }               
   
 # Deleting entities
 
@@ -194,14 +176,14 @@ attributeList, as in the following example:
 
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
-	"contextElements": [
-	{
-          "type": "T",
-          "isPattern": "false",
-          "id": "E1"
-        }
-        ],
-        "updateAction": "DELETE"
+	  "contextElements": [
+	      {
+		  "type": "T",
+		  "isPattern": "false",
+		  "id": "E1"
+	      }
+	  ],
+	  "updateAction": "DELETE"
       }
       EOF                                                                                                                     
  

@@ -18,8 +18,8 @@ operations). The update is done issuing a new registerContextRequest,
 with the *registrationId* set:
 
       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-	{
-	    "contextRegistrations": [
+      {
+	  "contextRegistrations": [
 	      {
 		  "entities": [
 		      {
@@ -37,11 +37,11 @@ with the *registrationId* set:
 		  ],
 		  "providingApplication": "http://mysensors.com/Rooms"
 	      }
-	    ],
+	  ],
 	  "duration": "P1M",
 	  "registrationId": "51bf1e0ada053170df590f20"
-	}
-	EOF                                                                                                                                  
+      }
+      EOF                                                                                                                                  
   
 This "update registration" replaces the existing registration associated
 to that ID with the new content, including [expiration
