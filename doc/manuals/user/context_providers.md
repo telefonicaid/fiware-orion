@@ -27,7 +27,7 @@ Let's illustrate this with an example.
 
 ![](QueryContextWithContextProvider.png "QueryContextWithContextProvider.png")
 
-<!-- -->
+
 -     First (message number 1), the application (maybe on behalf of a
       Context Provider) registers the Context Provider at Orion for the
       Street4 temperature. Let's assume that the Context Provider exposes
@@ -79,7 +79,7 @@ Let's illustrate this with an example.
       }
       EOF
 
-<!-- -->
+
 
 -     Orion doesn't know the Street 4 temperature, but it knows (due to
       the registration in the previous step) that the Context Provider at
@@ -105,7 +105,6 @@ Let's illustrate this with an example.
       }
 
 
-<!-- -->
 
 -     The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
       with the data (message number 4).
@@ -134,7 +133,6 @@ Let's illustrate this with an example.
 	  ]
       }
 
-<!-- -->                         
 
 -     Orion fordwars the response to the client (message number 5). Note
       that the response is not exactly the same, as it includes a
