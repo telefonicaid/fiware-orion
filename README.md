@@ -25,6 +25,8 @@ If this is your first approach with Orion Context Broker, it is highly recommend
 The recommended procedure is to install using RPM packages in CentOS 6.x. If you are interested in
 building from sources, check [this document](doc/md/admin/build_source.md).
 
+If you want to build using docker containers, please refer to [this document](docker/dev/centos/README.md) for instructions on how to build an image for building from source. This image is based on CentOS 6.
+
 ### Requirements
 
 * System resources: see [these recommendations](doc/md/admin/resources.md#resources-recommendations)

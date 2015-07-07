@@ -12,11 +12,11 @@ You only need to do this once.
     
 ## Run the container
 
-This assumes that there is another docker running with name $mongodb$. If you don't, type this:
+This assumes that there is another docker running with name *mongodb*. If you don't, type this:
 
     docker run -d --name mongodb mongo
 
-The following line will run the container exposing port 1026, give it a name -in this case $orionDev$-, link it to the mongodb docker, and present a bash prompt. Keep in mind that /path/to/orion/source is the path to your Orion Context Broker code in the host, not the container. 
+The following line will run the container exposing port 1026, give it a name -in this case *orionDev*-, link it to the mongodb docker, and present a bash prompt. Keep in mind that /path/to/orion/source is the path to your Orion Context Broker code in the host, not the container. 
 
     docker run -p 1026:1026 --name orionDev -v /path/to/orion/source:/root/src --link mongodb:mongodb -t -i orion-dev:centos6 /bin/bash
 
