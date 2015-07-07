@@ -625,7 +625,7 @@ Additional comments:
 
 <!-- -->
 
-    (curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      (curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "entities": [
 	      {
@@ -635,7 +635,7 @@ Additional comments:
 	      }
 	  ]
       }
-    EOF
+      EOF
 
 
 
@@ -1314,30 +1314,30 @@ Now, let's do the same with Room2:
 which response is:
 
       {
-	"contextResponses": [
-	  {
-	    "attributes": [
+	  "contextResponses": [
 	      {
-		"name": "temperature",
-		"type": "float",
-		"value": ""
-	      },
-	      {
-		"name": "pressure",
-		"type": "integer",
-		"value": ""
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "value": ""
+		      },
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "value": ""
+		      }
+		    ],
+		    "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
 	      }
-	    ],
-	    "statusCode": {
-	      "code": "200",
-	      "reasonPhrase": "OK"
-	    }
-	  }
-	],
-	"id": "Room2", 
-	"isPattern": "false", 
-	"type": ""
-      }          
+	  ],
+	  "id": "Room2",
+	  "isPattern": "false",
+	  "type": ""
+      }         
 
 You can also create an attribute (and the containing entity along the
 way) in the following way (additional attributes could be added after
@@ -1465,63 +1465,81 @@ differences:
     "Room1" by "/type/Room/id/Room1" in the URl to define the type (in
     general: "/type/<type>/id/<id>").
 
-You can also
-query by all the entities belonging to the same type, either all the
-attributes or a particular one, as shown below. First, create an couple
-of entities of type Car using standard updateContext APPEND operations
-(given that, as described in previous section, you cannot create
-entities with types using convenience operations):
+You can also query by all the entities belonging to the same type, either 
+all the attributes or a particular one, as shown below. First, create an 
+couple of entities of type Car using standard updateContext APPEND operations
+(given that, as described in previous section, you cannot create entities with
+types using convenience operations):
 
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
-	"contextElements": [
-	  {
-	    "type": "Car",
-	    "isPattern": "false",
-	    "id": "Car1",
-	    "attributes": [
+	  "contextElements": [
 	    {
-	      "name": "speed",
-	      "type": "integer",
-	      "value": "75"
-	    },
-	    {
-	      "name": "fuel",
-	      "type": "float",
-	      "value": "12.5"
+	      "type": "Car",
+	      "isPattern": "false",
+	      "id": "Car1",
+	      "attributes": [
+	      {
+		"name": "speed",
+		"type": "integer",
+		"value": "75"
+	      },
+	      {
+		"name": "fuel",
+		"type": "float",
+		"value": "12.5"
+	      }
+	      ]
 	    }
-	    ]
-	  }
-	  ],
-	  "updateAction": "APPEND"
-	}
-	EOF                                                                                                                    
+	    ],
+	    "updateAction": "APPEND"
+      }
+      EOF                                                                                                                    
  
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
-	"contextElements": [
-	  {
-	    "type": "Car",
-	    "isPattern": "false",
-	    "id": "Car2",
-	    "attributes": [
+	  "contextElements": [
 	    {
-	      "name": "speed",
-	      "type": "integer",
-	      "value": "90"
-	    },
-	    {
-	      "name": "fuel",
-	      "type": "float",
-	      "value": "25.7"
+	      "type": "Car",
+	      "isPattern": "false",
+	      "id": "Car2",
+	      "attributes": [
+	      {
+		"name": "speed",
+		"type": "integer",
+		"value": "90"
+	      },
+	      {
+		"name": "fuel",
+		"type": "float",
+		"value": "25.7"
+	      }
+	      ]
 	    }
-	    ]
-	  }
-	],
-	"updateAction": "APPEND"
-      }
+	  ],
+	  "updateAction": "APPEND"
+	}
       EOF                                                                         
-  
+        	"contextElements": [
+       	  {
+       	    "type": "Car",
+       	    "isPattern": "false",
+       	    "id": "Car1",
+       	    "attributes": [
+       	    {
+       	      "name": "speed",
+       	      "type": "integer",
+       	      "value": "75"
+       	    },
+       	    {
+       	      "name": "fuel",
+       	      "type": "float",
+       	      "value": "12.5"
+       	    }
+       	    ]
+       	  }
+       	  ],
+       	  "updateAction": "APPEND"
 Request to get all the attributes:
 
       curl localhost:1026/v1/contextEntityTypes/Car -s -S --header 'Accept: application/json' | python -mjson.tool
@@ -1560,7 +1578,7 @@ Response:
 		    }
 		},
 	      {
-		  "contextElement": {
+	  "contextElement": {
 		      "attributes": [
 			  {
 			      "name": "speed",
@@ -2220,17 +2238,17 @@ case, you have to set isPattern to "true" as shown below:
 
       (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "true",
-		  "id": "Room.*"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ]
-      }
+	    "entities": [
+		{
+		    "type": "Room",
+		    "isPattern": "true",
+		    "id": "Room.*"
+		}
+	    ],
+	    "attributes": [
+		"temperature"
+	    ]
+	}
       EOF
 This will produce the exact same response as the previous example.
 
@@ -2679,11 +2697,11 @@ The response is just an acknowledgement that the cancellation was
 successful.
   
       {
-      "statusCode": {
-        "code": "200",
-        "reasonPhrase": "OK"
-      },
-          "subscriptionId": "52a745e011f5816465943d59"
+	"statusCode": {
+	  "code": "200",
+	  "reasonPhrase": "OK"
+	},
+	    "subscriptionId": "52a745e011f5816465943d59"
       }                    
   ---------------------------------------------------------------------------------------------------------------------------------
 

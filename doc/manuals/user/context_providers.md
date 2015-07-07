@@ -57,9 +57,10 @@ its API on <http://sensor48.mycity.com/ngsi10>
       }
       EOF
       
--Next, consider that a client queries the Street4 temperature
-(message number 2).
-
+-     Next, consider that a client queries the Street4 temperature
+      (message number 2).
+      
+<!-- -->
     
       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
@@ -75,16 +76,19 @@ its API on <http://sensor48.mycity.com/ngsi10>
 	  ]
       }
       EOF
-  
 
--Orion doesn't know the Street 4 temperature, but it knows (due to
-the registration in the previous step) that the Context Provider at
-<http://sensor48.mycity.com/v1> knows that, so it forwards the query
-(message number 3) to the URL
-<http://sensor48.mycity.com/v1/queryContext> (i.e. the URL used in
-the Providing Application field at registration time, plus the
-"/queryContext" operation).
+<!-- -->
 
+-     Orion doesn't know the Street 4 temperature, but it knows (due to
+      the registration in the previous step) that the Context Provider at
+      <http://sensor48.mycity.com/v1> knows that, so it forwards the query
+      (message number 3) to the URL
+      <http://sensor48.mycity.com/v1/queryContext> (i.e. the URL used in
+      the Providing Application field at registration time, plus the
+      "/queryContext" operation).
+
+
+<!-- -->
       {
 	  "entities": [
 	      {
@@ -97,9 +101,12 @@ the Providing Application field at registration time, plus the
 	      "temperature"
 	  ]
       }
-      
--The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
-with the data (message number 4).
+
+
+<!-- -->
+
+-     The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
+      with the data (message number 4).
 
       {
 	  "contextResponses": [
@@ -123,16 +130,18 @@ with the data (message number 4).
 	      }
 	  ]
       }
-                                  
-  
--Orion fordwars the response to the client (message number 5). Note
-that the response is not exactly the same, as it includes a
-reference to the Context Provider that has resolved it (that's why
-it is said that "the process is *mostly* transparent" instead of
-"the process is *completely* transparent"). The client can use
-(or ignore) that information. Orion doesn't store the
-Street4 temperature.
-    
+
+<!-- -->                         
+
+-     Orion fordwars the response to the client (message number 5). Note
+      that the response is not exactly the same, as it includes a
+      reference to the Context Provider that has resolved it (that's why
+      it is said that "the process is *mostly* transparent" instead of
+      "the process is *completely* transparent"). The client can use
+      (or ignore) that information. Orion doesn't store the
+      Street4 temperature.
+ 
+<!-- --> 
       {
 	  "contextResponses": [
 	      {
