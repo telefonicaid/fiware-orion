@@ -1015,9 +1015,9 @@ step) command:
 The response is very similar to the one for subscribeContext request:
 
       {
-	"subscribeResponse" : {
-	  "subscriptionId" : "51c04a21d714fb3b37d7d5a7",
-	}
+	  "subscribeResponse" : {
+	    "subscriptionId" : "51c04a21d714fb3b37d7d5a7",
+	  }
       }             
 
 You can check in accumulator-server.py that the notification frequency
@@ -1039,11 +1039,11 @@ The response is just an acknowledgement of that the cancellation was
 successful.
 
       {
-	  "statusCode": {
-	      "code": "200",
-	      "reasonPhrase": "OK"
-	  },
-	  "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+	    "statusCode": {
+		"code": "200",
+		"reasonPhrase": "OK"
+	    },
+	    "subscriptionId": "51c04a21d714fb3b37d7d5a7"
       }                              
 
 You can have a look at accumulator-server.py to check that the
@@ -1764,7 +1764,6 @@ information of a given type (by the time being, that information consits
 of a list of all its attributes):
 
       curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
       {
         "attributes": [
           "hummidity",

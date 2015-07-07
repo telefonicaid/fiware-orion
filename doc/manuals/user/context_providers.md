@@ -27,10 +27,12 @@ Let's illustrate this with an example.
 
 ![](QueryContextWithContextProvider.png "QueryContextWithContextProvider.png")
 
--First (message number 1), the application (maybe on behalf of a
-Context Provider) registers the Context Provider at Orion for the
-Street4 temperature. Let's assume that the Context Provider exposes
-its API on <http://sensor48.mycity.com/ngsi10>
+<!-- -->
+-     First (message number 1), the application (maybe on behalf of a
+      Context Provider) registers the Context Provider at Orion for the
+      Street4 temperature. Let's assume that the Context Provider exposes
+      its API on <http://sensor48.mycity.com/ngsi10>
+<!-- -->
 
       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
@@ -108,6 +110,7 @@ its API on <http://sensor48.mycity.com/ngsi10>
 -     The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
       with the data (message number 4).
 
+<!-- -->
       {
 	  "contextResponses": [
 	      {
