@@ -924,9 +924,8 @@ Let's examine in detail the different elements included in the payload:
 
 The response corresponding to that request contains a subscription ID (a
 24 hexadecimal number used for updating and cancelling the subscription
-- write it down because you will need it later in this tutorial) and a
+-Write it down because you will need it later in this tutorial) and a
 duration acknowledgement:
-
 
       {
 	  "subscribeResponse": {
@@ -1032,7 +1031,7 @@ step):
 
       (curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
-	"subscriptionId": "51c04a21d714fb3b37d7d5a7"
+	  "subscriptionId": "51c04a21d714fb3b37d7d5a7"
       }
       EOF                                                                                                                          
 
@@ -1251,18 +1250,18 @@ its initial values)
 
       (curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
       {
-	"attributes" : [
-	  {
-	    "name" : "temperature",
-	    "type" : "float",
-	    "value" : "23"
-	  },
-	  {
-	    "name" : "pressure",
-	    "type" : "integer",
-	    "value" : "720"
-	  }
-	]
+	  "attributes": [
+	      {
+		  "name": "temperature",
+		  "type": "float",
+		  "value": "23"
+	      },
+	      {
+		  "name": "pressure",
+		  "type": "integer",
+		  "value": "720"
+	      }
+	  ]
       }
       EOF
 
@@ -1298,21 +1297,19 @@ Now, let's do the same with Room2:
 
       (curl localhost:1026/v1/contextEntities/Room2 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
       {
-	"attributes" : [
-	  {
-	    "name" : "temperature",
-	    "type" : "float",
-	    "value" : "21"
-	  },
-	  {
-	    "name" : "pressure",
-	    "type" : "integer",
-	    "value" : "711"
-	  }
-	]
+	  "attributes": [
+	      {
+		  "name": "temperature",
+		  "type": "float",
+		  "value": "21"
+	      },
+	      {
+		  "name": "pressure",
+		  "type": "integer",
+		  "value": "711"
+	      }
+	  ]
       }
-
-      EOF
       
 which response is:
 
@@ -1408,28 +1405,28 @@ e.g. Room1 attributes:
 which response is:
 
       {
-	"contextElement": {
-	  "attributes": [
-	  {
-	    "name": "temperature",
-	    "type": "float",
-	    "value": "23"
+	  "contextElement": {
+	      "attributes": [
+		  {
+		      "name": "temperature",
+		      "type": "float",
+		      "value": "23"
+		  },
+		  {
+		      "name": "pressure",
+		      "type": "integer",
+		      "value": "720"
+		  }
+	      ],
+	      "id": "Room1",
+	      "isPattern": "false",
+	      "type": "Room"
 	  },
-	  {
-	    "name": "pressure",
-	    "type": "integer",
-	    "value": "720"
+	  "statusCode": {
+	      "code": "200",
+	      "reasonPhrase": "OK"
 	  }
-	  ],
-	  "id": "Room1",
-	  "isPattern": "false",
-	  "type": "Room"
-	},
-	"statusCode": {
-	  "code": "200",
-	  "reasonPhrase": "OK"
-	}
-      }                     
+      }                 
 
 We can also query a single attribute of a given entity, e.g. Room2
 temperature:
@@ -1439,17 +1436,17 @@ temperature:
 which response is:
 
       {
-	"attributes": [
-	{
-	  "name": "temperature",
-	  "type": "float",
-	  "value": "21"
-	}
-	],
-	"statusCode": {
-	  "code": "200",
-	  "reasonPhrase": "OK"
-	}
+	  "attributes": [
+	      {
+		  "name": "temperature",
+		  "type": "float",
+		  "value": "21"
+	      }
+	  ],
+	  "statusCode": {
+	      "code": "200",
+	      "reasonPhrase": "OK"
+	  }
       }     
 
 Comparing to [standard queryContext
@@ -1862,7 +1859,7 @@ You can update a single attribute of a given entity in the following way:
 
       (curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
       {
-	"value" : "26.3"
+	    "value" : "26.3"
       }
       EOF                                                                                                                                                            
 
@@ -2056,7 +2053,7 @@ registrations for Room1 using:
 		  "id": "Room1"
 	      }
 	    ]
-	}
+      }
       EOF                                                                                                                                              
   
 This would produce the following response:
@@ -3008,7 +3005,7 @@ entities with types using convenience operations):
 			  "id": "Car2"
 		      }
 		  ],
-		  "attributes": [
+		  "attributes": [ 
 		      {
 			  "name": "fuel",
 			  "type": "float",

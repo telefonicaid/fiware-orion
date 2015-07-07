@@ -27,10 +27,10 @@ Let's illustrate this with an example.
 
 ![](QueryContextWithContextProvider.png "QueryContextWithContextProvider.png")
 
--   First (message number 1), the application (maybe on behalf of a
-    Context Provider) registers the Context Provider at Orion for the
-    Street4 temperature. Let's assume that the Context Provider exposes
-    its API on <http://sensor48.mycity.com/ngsi10>
+-First (message number 1), the application (maybe on behalf of a
+Context Provider) registers the Context Provider at Orion for the
+Street4 temperature. Let's assume that the Context Provider exposes
+its API on <http://sensor48.mycity.com/ngsi10>
 
       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
@@ -57,8 +57,8 @@ Let's illustrate this with an example.
       }
       EOF
       
--   Next, consider that a client queries the Street4 temperature
-    (message number 2).
+-Next, consider that a client queries the Street4 temperature
+(message number 2).
 
     
       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
@@ -77,13 +77,13 @@ Let's illustrate this with an example.
       EOF
   
 
--   Orion doesn't know the Street 4 temperature, but it knows (due to
-    the registration in the previous step) that the Context Provider at
-    <http://sensor48.mycity.com/v1> knows that, so it forwards the query
-    (message number 3) to the URL
-    <http://sensor48.mycity.com/v1/queryContext> (i.e. the URL used in
-    the Providing Application field at registration time, plus the
-    "/queryContext" operation).
+-Orion doesn't know the Street 4 temperature, but it knows (due to
+the registration in the previous step) that the Context Provider at
+<http://sensor48.mycity.com/v1> knows that, so it forwards the query
+(message number 3) to the URL
+<http://sensor48.mycity.com/v1/queryContext> (i.e. the URL used in
+the Providing Application field at registration time, plus the
+"/queryContext" operation).
 
       {
 	  "entities": [
@@ -98,8 +98,8 @@ Let's illustrate this with an example.
 	  ]
       }
       
--   The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
-    with the data (message number 4).
+-The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
+with the data (message number 4).
 
       {
 	  "contextResponses": [
@@ -125,13 +125,13 @@ Let's illustrate this with an example.
       }
                                   
   
--   Orion fordwars the response to the client (message number 5). Note
-    that the response is not exactly the same, as it includes a
-    reference to the Context Provider that has resolved it (that's why
-    it is said that "the process is *mostly* transparent" instead of
-    "the process is *completely* transparent"). The client can use
-    (or ignore) that information. Orion doesn't store the
-    Street4 temperature.
+-Orion fordwars the response to the client (message number 5). Note
+that the response is not exactly the same, as it includes a
+reference to the Context Provider that has resolved it (that's why
+it is said that "the process is *mostly* transparent" instead of
+"the process is *completely* transparent"). The client can use
+(or ignore) that information. Orion doesn't store the
+Street4 temperature.
     
       {
 	  "contextResponses": [
