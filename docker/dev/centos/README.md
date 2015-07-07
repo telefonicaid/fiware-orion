@@ -18,7 +18,7 @@ This assumes that there is another docker running with name $mongodb$. If you do
 
 The following line will run the container exposing port 1026, give it a name -in this case $orionDev$-, link it to the mongodb docker, and present a bash prompt. Keep in mind that /path/to/orion/source is the path to your Orion Context Broker code in the host, not the container. 
 
-    docker run -p 1026:1026 --name orionDev -v ~/src/fiware-orion:/root/src --link mongodb:mongodb -t -i orion-dev:centos6 /bin/bash
+    docker run -p 1026:1026 --name orionDev -v /path/to/orion/source:/root/src --link mongodb:mongodb -t -i orion-dev:centos6 /bin/bash
 
 ## Compile Orion
 
@@ -42,5 +42,5 @@ Or as on the background
     
     contextBroker -t 0-255
 
-Take a look a the [documentation](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Command_line_options) for all command-line options.
+Take a look a the [documentation](../.../.../doc/admin/cli.md) for all command-line options.
 
