@@ -75,5 +75,5 @@ std::string postEntities
   // 03. Cleanup and return result
   eP->release();
 
-  return "OK";
+  return "";
 }

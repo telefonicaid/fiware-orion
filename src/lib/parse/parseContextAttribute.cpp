@@ -29,7 +29,7 @@
 #include "ngsi/ContextAttribute.h"
 #include "parse/jsonParseTypeNames.h"
 #include "parse/parseContextAttribute.h"
-#include "parse/parseMetadataObject.h"
+#include "parse/parseMetadata.h"
 
 using namespace rapidjson;
 
@@ -94,58 +94,15 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     }
     else  // Metadata
     {
-      //
-      // Two options here:
-      //   "m1": "123"    (Value is  string or boolean or number)
-      //   "m1": { "value": "123", "type": "mt" }   (type is needed so a complex 'value' to the metadata)
-      //
-      if (type == "Object")
+      Metadata*   mP = new Metadata();
+      std::string r  = parseMetadata(iter->value, mP);
+
+      caP->metadataVector.push_back(mP);
+
+      if (r != "OK")
       {
-        Metadata* mP = new Metadata();
-        parseMetadataObject(iter->value, mP);
-        caP->metadataVector.push_back(mP);
-      }
-      else if (type == "Vector")
-      {
-        LM_E(("Bad Input (ContextAttribute::Metadata::Value cannot be a Vector"));
+        LM_W(("Bad Input (error parsing Metadata)"));
         return "Parse Error";
-      }
-      else  // Simple value to the metadata 
-      {
-        Metadata* mP = new Metadata();
-
-        mP->name = name;
-        mP->type = "";
-
-        if (type == "String")
-        {
-          mP->value               = iter->value.GetString();
-          mP->valueType           = MetadataValueTypeString;
-          mP->valueValue.string   = (char*) iter->value.GetString();
-        }
-        else if (type == "Number")
-        {
-          mP->value               = "";
-          mP->valueType           = MetadataValueTypeNumber;
-          mP->valueValue.number   = iter->value.GetDouble();
-        }
-        else if (type == "True")
-        {
-          mP->valueType           = MetadataValueTypeBoolean;
-          mP->valueValue.boolean  = true;
-        }
-        else if (type == "False")
-        {
-          mP->valueType           = MetadataValueTypeBoolean;
-          mP->valueValue.boolean  = false;
-        }
-        else
-        {
-          LM_E(("Bad Input (unknown value type of Entity::ContextAttribute::Metadata::value)"));
-          return "Parse Error (unknown value type of Entity::ContextAttribute::Metadata::value)";
-        }
-
-        caP->metadataVector.push_back(mP);
       }
     }
   }

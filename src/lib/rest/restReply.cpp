@@ -79,14 +79,20 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   }
 
   for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
+  {
     MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
+  }
 
   if (answer != "")
   {
     if (ciP->outFormat == XML)
+    {
       MHD_add_response_header(response, "Content-Type", "application/xml");
+    }
     else if (ciP->outFormat == JSON)
+    {
       MHD_add_response_header(response, "Content-Type", "application/json");
+    }
 
     // At the present version, CORS is support only for GET requests
     if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
@@ -104,6 +110,7 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     }
   }
 
+  LM_M(("KZ: Really sending response - ciP->httpStatusCode == %d, payload == '%s'", ciP->httpStatusCode, answer.c_str()));
   MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
 }

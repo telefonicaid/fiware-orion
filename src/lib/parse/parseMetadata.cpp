@@ -27,8 +27,8 @@
 #include "logMsg/logMsg.h"
 
 #include "ngsi/Metadata.h"
-#include "parse/parseMetadataObject.h"
 #include "parse/jsonParseTypeNames.h"
+#include "parse/parseMetadata.h"
 
 
 
@@ -36,7 +36,7 @@
 *
 * parseMetadataObject - 
 */
-std::string parseMetadataObject(const Value& start, Metadata* mP)
+static std::string parseMetadataObject(const Value& start, Metadata* mP)
 {
   for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
@@ -101,6 +101,11 @@ std::string parseMetadataObject(const Value& start, Metadata* mP)
 /* ****************************************************************************
 *
 * parseMetadata - 
+*
+* Two options here:
+*   "m1": "123"    (Value is  string or boolean or number)
+*   "m1": { "value": "123", "type": "mt" }   (type is needed so a complex 'value' to the metadata)
+*
 */
 std::string parseMetadata(const Value& val, Metadata* mP)
 {
@@ -109,7 +114,11 @@ std::string parseMetadata(const Value& val, Metadata* mP)
   
   mP->name = name;
 
-  if (type == "String")
+  if (type == "Object")
+  {
+    return parseMetadataObject(val, mP);
+  }
+  else if (type == "String")
   {
     mP->type               = "";
     mP->value              = val.GetString();
@@ -137,10 +146,6 @@ std::string parseMetadata(const Value& val, Metadata* mP)
   else if (type == "Vector")
   {
     return "Parse Error";
-  }
-  else if (type == "Object")
-  {
-    return parseMetadataObject(val, mP);
   }
   else
   {

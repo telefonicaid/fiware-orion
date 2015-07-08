@@ -45,7 +45,7 @@ payload='{
     "value": "24"
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload" --json --noPayloadCheck
 echo
 echo
 
@@ -60,26 +60,25 @@ echo
 --REGEXPECT--
 01. POST /v2/entities
 ====================
-HTTP/1.1 200 OK
-Content-Length: 
+HTTP/1.1 201 Created
+Content-Length: 0
 Date: REGEX(.*)
 
-{
-}
 
-
-02. GET /v2/entities
-====================
+02. GET /v2/entities/E1
+=======================
 HTTP/1.1 200 OK
 Content-Length: 
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
+  "id": "E1",
+  "type": "T1"
 }
 
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB
 

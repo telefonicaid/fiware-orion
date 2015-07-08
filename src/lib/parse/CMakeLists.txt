@@ -28,7 +28,7 @@ SET (SOURCES
     jsonRequestTreat.cpp
     parseEntity.cpp
     parseContextAttribute.cpp
-    parseMetadataObject.cpp
+    parseMetadata.cpp
     jsonParseTypeNames.cpp
 )
 
@@ -40,7 +40,7 @@ SET (HEADERS
     jsonRequestTreat.h
     parseEntity.h
     parseContextAttribute.h
-    parseMetadataObject.h
+    parseMetadata.h
     jsonParseTypeNames.h
 )
 

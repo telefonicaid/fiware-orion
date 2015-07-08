@@ -376,7 +376,9 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       ciP->parseDataP = &parseData;
+      LM_M(("Calling payloadParse"));
       response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP, compV);
+      LM_M(("KZ: ciP->httpStatusCode == %d", ciP->httpStatusCode));
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
@@ -393,6 +395,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         }
 
         compV.clear();
+        LM_M(("KZ: Error reply sent"));
         return response;
       }
     }
@@ -431,6 +434,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       compV.clear();
         
+      LM_M(("KZ: tenant error - reply sent"));
       return response;
     }
 
@@ -438,7 +442,10 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
+    LM_M(("KZ: treating request"));
+    LM_M(("KZ: ciP->httpStatusCode == %d", ciP->httpStatusCode));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
+    LM_M(("KZ: ciP->httpStatusCode == %d", ciP->httpStatusCode));
     filterRelease(&parseData, serviceV[ix].request);
 
     if (reqP != NULL)
@@ -458,6 +465,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
       orionExitFunction(0, "Received a 'DIE' request on REST interface");
     }
 
+    LM_M(("KZ: Calling restReply (ciP->httpStatusCode == %d)", ciP->httpStatusCode));
     restReply(ciP, response);
     return response;
   }

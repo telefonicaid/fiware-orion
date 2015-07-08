@@ -497,7 +497,12 @@ std::string postUpdateContext
   //
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
-  ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
+  HttpStatusCode httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
+  if (ciP->httpStatusCode != SccCreated)
+  {
+    ciP->httpStatusCode = httpStatusCode;
+  }
+
   foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
 
 

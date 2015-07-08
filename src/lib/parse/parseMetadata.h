@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_PARSE_PARSEMETADATAOBJECT_H_
-#define SRC_LIB_PARSE_PARSEMETADATAOBJECT_H_
+#ifndef SRC_LIB_PARSE_PARSEMETADATA_H_
+#define SRC_LIB_PARSE_PARSEMETADATA_H_
 
 /*
 *
@@ -33,8 +33,8 @@ using namespace rapidjson;
 
 /* ****************************************************************************
 *
-* parseMetadataObject - 
+* parseMetadata - 
 */
-extern std::string parseMetadataObject(const Value& iter, Metadata* caP);
+extern std::string parseMetadata(const Value& iter, Metadata* caP);
 
-#endif  // SRC_LIB_PARSE_PARSEMETADATAOBJECT_H_
+#endif  // SRC_LIB_PARSE_PARSEMETADATA_H_
