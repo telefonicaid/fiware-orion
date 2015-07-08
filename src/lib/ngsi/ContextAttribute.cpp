@@ -330,13 +330,13 @@ std::string ContextAttribute::render
       else if (valueType == ValueTypeNumber)
       {
         out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                        valueValue.number,
+                        numberValue.,
                         ciP->outFormat, commaAfterContextValue);
       }
       else if (valueType == ValueTypeBoolean)
       {
         out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                        valueValue.boolean,
+                        booleanValue,
                         ciP->outFormat, commaAfterContextValue);
       }
 #endif
@@ -524,15 +524,15 @@ void ContextAttribute::present(const std::string& indent, int ix)
   {
     if (valueType == ValueTypeString)
     {
-      LM_F(("%s  String Value:      %s", indent.c_str(), valueValue.string));
+      LM_F(("%s  String Value:      %s", indent.c_str(), value.c_str()));
     }
     else if (valueType == ValueTypeNumber)
     {
-      LM_F(("%s  Number Value:      %f", indent.c_str(), valueValue.number));
+      LM_F(("%s  Number Value:      %f", indent.c_str(), numberValue));
     }
     else if (valueType == ValueTypeBoolean)
     {
-      LM_F(("%s  Boolean Value:      %s", indent.c_str(), (valueValue.boolean == false)? "false" : "true"));
+      LM_F(("%s  Boolean Value:      %s", indent.c_str(), (boolValue == false)? "false" : "true"));
     }
     else
     {

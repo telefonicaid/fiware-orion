@@ -59,22 +59,21 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
       {
         mP->value               = iter->value.GetString();
         mP->valueType           = MetadataValueTypeString;
-        mP->valueValue.string   = (char*) mP->value.c_str();
       }
       else if (type == "Number")
       {
-        mP->valueType           = MetadataValueTypeNumber;
-        mP->valueValue.number   = iter->value.GetDouble();
+        mP->valueType     = MetadataValueTypeNumber;
+        mP->numberValue   = iter->value.GetDouble();
       }
       else if (type == "True")
       {
-        mP->valueType           = MetadataValueTypeBoolean;
-        mP->valueValue.boolean  = true;
+        mP->valueType     = MetadataValueTypeBoolean;
+        mP->boolValue     = true;
       }
       else if (type == "False")
       {
-        mP->valueType           = MetadataValueTypeBoolean;
-        mP->valueValue.boolean  = false;
+        mP->valueType     = MetadataValueTypeBoolean;
+        mP->boolValue     = false;
       }
       else if (type == "Vector")
       {
@@ -118,30 +117,28 @@ std::string parseMetadata(const Value& val, Metadata* mP)
   {
     return parseMetadataObject(val, mP);
   }
-  else if (type == "String")
+
+  mP->type = "";
+
+  if (type == "String")
   {
-    mP->type               = "";
-    mP->value              = val.GetString();
-    mP->valueType          = MetadataValueTypeString;
-    mP->valueValue.string  = (char*) val.GetString();
+    mP->value        = val.GetString();
+    mP->valueType    = MetadataValueTypeString;
   }
   else if (type == "Number")
   {
-    mP->type               = "";
-    mP->valueType          = MetadataValueTypeNumber;
-    mP->valueValue.number  = val.GetDouble();
+    mP->valueType    = MetadataValueTypeNumber;
+    mP->numberValue  = val.GetDouble();
   }
   else if (type == "True")
   {
-    mP->type               = "";
-    mP->valueType          = MetadataValueTypeBoolean;
-    mP->valueValue.boolean = true;
+    mP->valueType    = MetadataValueTypeBoolean;
+    mP->boolValue    = true;
   }
   else if (type == "False")
   {
-    mP->type               = "";
-    mP->valueType          = MetadataValueTypeBoolean;
-    mP->valueValue.boolean = false;
+    mP->valueType    = MetadataValueTypeBoolean;
+    mP->boolValue    = false;
   }
   else if (type == "Vector")
   {

@@ -54,19 +54,6 @@ typedef enum ContextAttributeValueType
 
 /* ****************************************************************************
 *
-* ContextAttributeValue - 
-*/
-typedef union ContextAttributeValue
-{
-  char*         string;
-  double        number;
-  bool          boolean;
-} ContextAttributeValue;
-
-
-
-/* ****************************************************************************
-*
 * ContextAttribute -
 */
 typedef struct ContextAttribute
@@ -78,10 +65,10 @@ typedef struct ContextAttribute
                                            //          E.g. /v1/contextTypes
   MetadataVector  metadataVector;          // Optional
 
-  ContextAttributeValueType  valueType;               // Type of value: from json parse
+  ContextAttributeValueType  valueType;    // Type of value: from json parse
+  double                     numberValue;  // "value" as a Number
+  bool                       boolValue;    // "value" as a Boolean
 
-  // FIXME P5:  The field name valueValue to be changed to 'value' and all old uses of 'value to be converted
-  ContextAttributeValue      valueValue;              // union of values
 
   ProvidingApplication       providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
   bool                       found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)

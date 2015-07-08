@@ -60,36 +60,33 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     {
       if (type == "String")
       {
-        caP->value             = iter->value.GetString();
-        caP->valueType         = ValueTypeString;
-        caP->valueValue.string = (char*) caP->value.c_str();
+        caP->value        = iter->value.GetString();
+        caP->valueType    = ValueTypeString;
       }
       else if (type == "Number")
       {
-        caP->valueType          = ValueTypeNumber;
-        caP->valueValue.number  = iter->value.GetDouble();
+        caP->numberValue  = iter->value.GetDouble();
+        caP->valueType    = ValueTypeNumber;
       }
       else if (type == "True")
       {
-        caP->valueType          = ValueTypeBoolean;
-        caP->valueValue.boolean = true;
+        caP->boolValue    = true;
+        caP->valueType    = ValueTypeBoolean;
       }
       else if (type == "False")
       {
-        caP->valueType          = ValueTypeBoolean;
-        caP->valueValue.boolean = false;
+        caP->boolValue    = false;
+        caP->valueType    = ValueTypeBoolean;
       }
       else if (type == "Vector")
       {
-        caP->value             = iter->value.GetString();
-        caP->valueType         = ValueTypeCompoundVector;
-        caP->valueValue.string = (char*) caP->value.c_str();
+        caP->value        = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
+        caP->valueType    = ValueTypeCompoundVector;
       }
       else if (type == "Object")
       {
-        caP->value             = iter->value.GetString();
-        caP->valueType         = ValueTypeCompoundObject;
-        caP->valueValue.string = (char*) caP->value.c_str();
+        caP->value        = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
+        caP->valueType    = ValueTypeCompoundObject;
       }
     }
     else  // Metadata
@@ -125,28 +122,27 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
 
   if (type == "String")
   {
-    caP->type               = "";
-    caP->value              = iter->value.GetString();
-    caP->valueType          = ValueTypeString;
-    caP->valueValue.string  = (char*) iter->value.GetString();
+    caP->type        = "";
+    caP->value       = iter->value.GetString();
+    caP->valueType   = ValueTypeString;
   }
   else if (type == "Number")
   {
-    caP->type               = "";
-    caP->valueType          = ValueTypeNumber;
-    caP->valueValue.number  = iter->value.GetDouble();
+    caP->type        = "";
+    caP->valueType   = ValueTypeNumber;
+    caP->numberValue = iter->value.GetDouble();
   }
   else if (type == "True")
   {
-    caP->type               = "";
-    caP->valueType          = ValueTypeBoolean;
-    caP->valueValue.boolean = true;
+    caP->type        = "";
+    caP->valueType   = ValueTypeBoolean;
+    caP->boolValue   = true;
   }
   else if (type == "False")
   {
-    caP->type               = "";
-    caP->valueType          = ValueTypeBoolean;
-    caP->valueValue.boolean = false;
+    caP->type        = "";
+    caP->valueType   = ValueTypeBoolean;
+    caP->boolValue   = false;
   }
   else if (type == "Vector")
   {
@@ -175,7 +171,6 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
     {
       caP->value              = iter->value.GetString();
       caP->valueType          = ValueTypeCompoundObject;
-      caP->valueValue.string  = (char*) caP->value.c_str();
     }
   }
   else
