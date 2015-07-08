@@ -74,6 +74,10 @@ TEST(RestService, payloadParse)
   ParseData       parseData;
   const char*     infile1  = "ngsi9.registerContext.ok.valid.json";
   std::string     out;
+  std::vector<std::string>  compV;
+
+  compV.push_back("ngsi9");
+  compV.push_back("registerContext");
 
   utInit();
 
@@ -87,7 +91,7 @@ TEST(RestService, payloadParse)
   ci.payload      = testBuf;
   ci.payloadSize  = strlen(testBuf);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL);
+  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, compV);
   EXPECT_EQ("OK", out);
 
 
@@ -101,7 +105,7 @@ TEST(RestService, payloadParse)
   ci.payload      = (char*) "123";
   ci.payloadSize  = strlen(ci.payload);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL);  // Call restService?
+  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, compV);  // Call restService?
   EXPECT_EQ("Bad inFormat", out);
 
   utExit();

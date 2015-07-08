@@ -249,10 +249,11 @@ SET (STATIC_LIBS
     ngsiNotify
     jsonParse
     xmlParse
-    parse
+    apiTypesV2
     convenience
     serviceRoutines
     rest
+    parse
     ngsi9
     ngsi10
     ngsi
