@@ -328,6 +328,8 @@ void UpdateContextRequest::fill(const Entity* entP, const std::string& _updateAc
 {
   ContextElement*  ceP = new ContextElement(entP->id, entP->type, "false");
 
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &entP->attributeVector);
+
   contextElementVector.push_back(ceP);
   updateActionType.set(_updateActionType);
 }

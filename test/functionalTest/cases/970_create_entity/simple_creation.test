@@ -62,19 +62,22 @@ echo
 ====================
 HTTP/1.1 201 Created
 Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 46
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-  "id": "E1",
-  "type": "T1"
+    "id": "E1",
+    "temp": 23, 
+    "temp2": "24", 
+    "type": "T1"
 }
 
 
