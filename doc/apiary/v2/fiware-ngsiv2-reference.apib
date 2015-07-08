@@ -1208,6 +1208,110 @@ operations will be supported under the 'v2' resource as well.
 
 ### queryContext [POST /v2/queryContext]
 
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">limit</td><td>Limit the number of entities to be retrieved</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">offset</td><td>Skip a number of records</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">options</td><td>
+This operation supports two options:
+
+<ul>
+  <li><code>count</code>: when used, the total entities number is returned as a HTTP in the response name <code>X-Total-Count</code>.</li>
+  <li><code>cannonical</code>: when used, the response payload used the "cannonical form". See JSON entity representation format section
+  for details.</li>
+</td></tr>
+</table>
+
+The response payload is an Array which contains one object per matching entity. Each entity follows
+the JSON entity representation format (described in a section above).
+
+The payload may contain the following elements (all them optional):
+
+* `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
+  elements:
+   * `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
+     or pattern (in the case of `idPattern`) of the entities to search for. If ommited, it means "any entity
+     ID".
+   * `type`: specified the type of the entities to search for. If ommited, it means "any entity type".
+* `attributes`: a list of attributes names to search for. If ommited, it means "any attribute".
+* `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
+   object with at `type` (a JSON string) and `value` (which type depends on the `type` property). The
+   different available scopes are described elsewhere.
+
+Response code:
+
+* Successful operation uses 200 OK
+* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+
++ Parameters
+    + limit: 20 (optional, number)
+    + offset: 20 (optional, number)
+
++ Request (application/json)
+
+        {
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "myFooType"
+                },
+                {
+                    "id": "myBar",
+                    "type": "myBarType"
+                }
+            ],
+            "attributes": [
+                "temperature",
+                "hummidity"
+            ],
+            "scopes": [
+                {
+                    "type": "FIWARE::Filter::qString",
+                    "value": "temperature>40;colour=black,red;+status"
+                },
+                {
+                    "type": "FIWARE::Filter::Location",
+                    "value": {
+                        "circle": {
+                            "centerLatitude": "40.418889",
+                            "centerLongitude": "-3.691944",
+                            "radius": "13500"
+                        }
+                    }
+                }
+            ]
+        }
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1-D41",
+            "temperature": 35.6
+         },
+         {
+            "type": "Room",
+            "id": "Boe-Idearium",
+            "temperature": 22.5
+         },
+         {
+            "type": "Car",
+            "id": "P-9873-K",
+            "speed": {
+                "value": 100,
+                "type": "number",
+                "accuracy": 2,
+                "timestamp": {
+                    "value": "2015-06-04T07:20:27.378Z",
+                    "type": "date"
+                }
+            }
+         }
+        ]
+
 ### updateContext [POST /v2/updateContext]
 
 ### subscribeContext [POST /v2/subscribeContext]
