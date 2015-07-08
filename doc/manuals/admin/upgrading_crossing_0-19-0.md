@@ -22,7 +22,7 @@ at least one entity document.
 
 -   Apply the script to your DBs, using the following (where 'db' is the
     database name). Note that if you are using
-    [multitenant/multiservice](../user/multitenancy.md)
+    [multitenant/multiservice](database_admin.md#multiservice/multitenant-database-separation)
     you need to apply the procedure to each per-tenant/service database.
     The script can take a while (e.g. around 30 minutes in a database
     with around 50.000 entities), you can monitor progress using the

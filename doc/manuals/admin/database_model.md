@@ -6,7 +6,7 @@ fault recovery, etc.) it is useful to know how the database is
 structured. This section provides that information.
 
 In the case you need to access database directly, be very careful when manipulation it, as some actions could be irreversible ([doing a
-backup](database_admin#Backing_up_and_restoring_database) at the beginning
+backup](database_admin.md#backing-up-and-restoring-database) at the beginning
 it's a good idea).
 
 Orion Context Broker uses four collections in the database, described in
@@ -25,7 +25,7 @@ Fields:
     -   **id**: entity NGSI ID
     -   **type**: entity NGSI type
     -   **servicePath**: related with [the service
-        path](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Entity_service_paths "wikilink") functionality.
+        path](../user/service_path.md) functionality.
 -   **attrs** is an keymap of the different attributes that have been
     created for that entity. The key is generated with the attribute
     name (changing "." for "=", as "." is not a valid character in
@@ -39,7 +39,7 @@ Fields:
         is always a string, but in 0.11.0 this value can be also a JSON
         object or JSON vector to represent an structured value (see
         section about [structured attribute values in user
-        manual](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Structured_attribute_values "wikilink")).
+        manual](../user/structured_attribute_valued.md)).
     -   **md** (optional): custom metadata. This is a vector of metadata
         objects, each one with a **name**, **type** and **value**.
     -   **creDate**: the timestamp corresponding to attribute creation
@@ -66,7 +66,7 @@ Fields:
         -   *Note*: you may wonder why the coordinates are stored in the
             coords duple as longitude-latitude and in the opposite order
             in the [geo-location
-            API](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Geo-located_queries "wikilink").
+            API](../user/geolocation.md).
             This is due to the internal [MongoDB geolocation
             functionality](http://docs.mongodb.org/manual/tutorial/query-a-2dsphere-index/),
             which uses longitude-latitude order. However, other systems
@@ -141,18 +141,18 @@ Fields:
     registration IDs will be very fast (as there is an automatic default
     index in \_id).
 -   **servicePath**: related with [the service
-    path](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Entity_service_paths "wikilink") functionality.
+    path](../user/service_path.md) functionality.
 -   **fwdRegId**: the ID corresponding to the registration in the
     forward Context Broker. Used only in "ConfMan mode", (see
     [programmers
-    guide](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Configuration_Manager_role "wikilink")).
+    guide](../deprecated.md#configuration-manager-role)).
 -   **expiration**: this is the timestamp for which the
     registration expires. The expiration is calculated using the
     duration parameter included in the registerContext operation
     (basically, sum "now" and duration) and will be recalculated when a
     registerContext for updating (i.e. using a not null registration ID
     in the request) is received (see [programmers
-    guide](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Extending_duration "wikilink")).
+    guide](../user/duration.md)).
 -   **contextRegistration**: is an array whose elements contain the
     following information:
     -   **entities**: an array containing a list of
@@ -216,13 +216,13 @@ Fields:
     queries by subscription IDs are very fast (as there is an automatic
     default index in \_id).
 -   **servicePath**: related with [the service
-    path](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Entity_service_paths "wikilink") functionality.
+    path](../user/service_path.md) functionality.
 -   **expiration**: this is the timestamp on which the
     subscription expires. This is calculated using the duration
     parameter included in the subscribeContext operation (basically, sum
     "now" and duration) and will be recalculated when an
     updateContextSubscription is received (see [programmers
-    guide](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Extending_duration "wikilink")).
+    guide](../user/duration.md)).
 -   **lastNotification**: the time when last notification was sent. This
     is updated each time a notification is sent, to avoid
     violating throttling.
@@ -294,7 +294,7 @@ Fields:
     in the subscribeContextAvailability operation (basically, sum "now"
     and duration) and will be recalculated when an
     updateContextAvailabilitySubscription is received (see [programmers
-    guide](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Extending_duration "wikilink")).
+    guide](../user/duration.md)).
 -   **reference**: the URL to send notifications
 -   **entities**: an array of entities (mandatory). The JSON for each
     entity contains **id**, **type** and **isPattern**.

@@ -3,12 +3,12 @@
 Apart from simple strings such as "22.5" or "yellow", you can use
 complex structures as attribute values. In particular, an attribute can
 be set to a vector or to a key-value map (usually referred to as an
-"object") using [updateContext](#Update_context_elements "wikilink") (or
+"object") using [updateContext](walkthrough_apiv1.md#update-context-elements) (or
 equivalent [convenience
-operation](#Convenience_Update_Context "wikilink")). These values are
-retrieved with a [queryContext](#Query_Context_operation "wikilink") on
+operation](walkthrough_apiv1.md#Convenience_Update_Context)). These values are
+retrieved with a [queryContext](walkthrough_apiv1.md#query-context-operation) on
 that attribute (or equivalent [convenience
-operation](#Convenience_Query_Context "wikilink")) and notifyContext
+operation](walkthrough_apiv1.md#Convenience_Query_Context)) and notifyContext
 notifications sent as a consequence of a NGSI10 subscriptions.
 
 Vector or key-map values correspond directly to JSON vectors and JSON

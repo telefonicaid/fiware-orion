@@ -9,9 +9,9 @@ with it. Thus, Orion can implement a "fire and forget" policy for
 notification sending, realying in Rush (a piece of sofware hihgly
 specialized in that task) for that.
 
-In addition, you can send notifications using HTTPS using Rush (see
+In addition, you can send notifications using HTTPS using Rush ,see
 [security section in Users and Programmers
-manual](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Security_considerations "wikilink")).
+manual](../user/security.md).
 
 In order to use Rush you need:
 

@@ -1,7 +1,7 @@
 # Adding and removing attributes and entities with APPEND and DELETE in updateContext
 
 We have seen how to use updateContext with APPEND action type to [create
-new entities](#Entity_Creation "wikilink"). In addition, APPEND can be
+new entities](walkthrough_apiv1.md#entity-creation). In addition, APPEND can be
 used to add a new attribute after entity creation. Let's illustrate this
 with an example.
 
@@ -168,7 +168,7 @@ Query entity (should see 'C' and 'D', but not 'B'):
 
 Apart from deleting individual attributes from a given entity (see
 [previous section on that
-topic](#Adding_and_removing_attributes_with_APPEND_and_DELETE_in_updateContext "wikilink")),
+topic](#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)),
 you can also delete an entire entity, including all its attributes with
 their corresponding metadata. In order to do so, the updateContext
 operation is used, with DELETE as actionType and with an empty

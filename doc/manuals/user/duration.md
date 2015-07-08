@@ -24,7 +24,7 @@ The behavior of the broker regarding expired elements is the following:
 
 -   For registrations: an expired registration is not taken into account
     in discoverContextAvailability request processing, but it is still
-    [updatable](#Updating_registrations "wikilink").
+    [updatable](../admin/database_admin.md#updating-registrations).
 -   For subscriptions: an expired subscription is not taken into account
     to send new notifications based on it, but it is still updatable
     (using updateContextSubscription/updateContextSubscriptionAvailability)
@@ -33,8 +33,7 @@ The behavior of the broker regarding expired elements is the following:
 
 Note that Orion Context Broker doesn't remove expired elements from the
 database, but that they can be easily deleted [as described in the
-administration
-manual](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Deleting_expired_documents "wikilink").
+administration manual](../admin/database_admin.md#deleting-expired-documents).
 
 Finally, take into account that the expiration is *recalculated* on
 updates, not *expanded*. Let's clarify this with an example. Let's

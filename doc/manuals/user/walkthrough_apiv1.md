@@ -6,10 +6,10 @@ in the process :).
 
 The Walkthrough can be also found (partically) in apiary format [here](http://telefonicaid.github.io/fiware-orion/api/v1/).
 
-The first two sections on [context management using
-NGSI10](#Context_management_using_NGSI10 "wikilink") and [context
+The first two sections on [Context management using
+NGSI10](#context-management-using-ngsi10) and [Context
 availability management using
-NGSI9](#Context_availability_management_using_NGSI9 "wikilink") are the
+NGSI9](#context-availability-management-using-ngsi9) are the
 main ones. They describe the basic context broker functionality, both
 for context management (information about entities, such as the
 temperature of a car) and context availability management (information
@@ -29,7 +29,7 @@ information). Some remarks to take into account to use this stuff:
 -   Before starting (or if you get lost in the middle and
     need to start from scratch :), restart Orion Context Broker as
     described in [starting the broker for the
-    walkthrough](#Starting_the_broker_for_the_tutorials "wikilink").
+    tutorials](#starting-the-broker-for-the_tutorials).
 -   It is recommended to start with the part on standard operations,
     and then do the part on convenience operations (some
     explanations and concepts described in the former are needed for
@@ -60,7 +60,7 @@ sense).
 Most of the time we will use Room1 and Room2 in the tutorials. Room3,
 Room4, Car1 and Car2 will be used only in the section regarding [context
 availability
-subscriptions](#Context_availability_subscriptions "wikilink").
+subscriptions](#context-availability-subscriptions).
 
 The Orion Context Broker interacts with context producer applications
 (which provide sensor information) and a context consumer application
@@ -72,12 +72,12 @@ tutorials.
 
 Before starting, you need to install the broker as described in the
 [Installation and Administration
-Guide](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Installation "wikilink").
+Guide](../../../README.md#installation).
 
 The tutorials assume that you don't have any previous content in the
 Orion Context Broker database. In order to do so, follow the [delete
 database
-procedure](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Delete_complete_database "wikilink").
+procedure](../admin/database_admin.md#delete-complete-database).
 
 To start the broker (as root or using the sudo command):
 
@@ -109,7 +109,7 @@ command:
 # ./accumulator-server.py 1028 /accumulate ::1 on
 ```
 
-The accumulator-server.py is also part of the contextBroker-test package (see in the administrator manual [how to install](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Optional_packages "wikilink")). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
+The accumulator-server.py is also part of the contextBroker-test package (see in the administrator manual [how to install](../../../README.md#optional-packages "wikilink")). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
 
 ### Issuing commands to the broker
 
@@ -213,13 +213,11 @@ Orion Context Broker supports, showing examples of requests and
 responses. We use the term "standard" as they are directly derived from
 the OMA NGSI specification, to distinguish them from the other family of
 operations ("convenience") which has been defined by the FIWARE project
-to ease the usage of NGSI implementations (see the section on
-[additional information later in this
-manual](#Additional_information_and_resources "wikilink")).
+to ease the usage of NGSI implementations.
 
 **Don't forget to restart the broker before starting this tutorial as
 described [previously in this
-document](#Starting_the_broker_for_the_tutorials "wikilink")**.
+document](#starting-the-broker-for-the-tutorials)**
 
 At the end of this section, you will have the basic knowledge to create
 applications (both context producers and consumers) using Orion Context
@@ -239,7 +237,7 @@ particular, we are going to "create" Room1 and Room2 entities, each one
 with two attributes (temperature and pressure). We do this using the
 updateContext operation with APPEND action type (the other main action
 type, UPDATE, [will be discussed in a next
-section](#Update_context_elements "wikilink")).
+section](#update-context-elements)).
 
 First, we are going to create Room1. Let's assume that at entity
 creation time temperature and pressure of Room1 are 23 ºC and 720 mmHg
@@ -385,8 +383,8 @@ The response to this request is:
 Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures or custom metadata. These are advance
 topics, described in [this
-section](#Structured_attribute_values "wikilink") and [this
-other](#Custom_attribute_metadata "wikilink"), respectively.
+section](structured_attribute_valued.md#structured-attribute-values ) and [this
+other](metadata.md#custom-attribute-metadata ), respectively.
 
 #### Query Context operation
 
@@ -613,11 +611,11 @@ Additional comments:
 
 -   You can also use geographical scopes in your queries. This is an
     advance topic, described in [this
-    section](#Geolocation_capabilities "wikilink").
+    section](geolocation.md#geolocation-capabilities).
 -   Note that by default only 20 entities are returned (which is fine
     for this tutorial, but probably not for a real
     utilization scenario). In order to change this behaviour, see [the
-    section on pagination](#Pagination "wikilink") in this manual.
+    section on pagination](pagination.md#pagination ) in this manual.
 -   In the case of JSON
     responses, you can use the *?attributeFormat=object* URI parameter
     to get attributes as a JSON object (i.e. key-values map) instead of
@@ -683,7 +681,7 @@ given moment wants to set the temperature and pressure of Room1 to 26.5
 
 As you can see, the structure of the request is exactly the same we used
 for [updateContext with APPEND for creating
-entities](#Entity_Creation "wikilink"), except we use UPDATE now as
+entities](#entity-creation), except we use UPDATE now as
 action type.
 
 Upon receipt of this request, the broker will update the values for the
@@ -720,7 +718,7 @@ following:
 
 Again, the structure of the response is exactly the same one we used for
 [updateContext with APPEND for creating
-entities](#Entity_Creation "wikilink").
+entities](#entity-creation ).
 
 The updateContext operation is quite flexible as it allows you to update
 as many entities and attributes as you want: it is just a matter of
@@ -827,12 +825,12 @@ The responses for these requests are respectively:
       }
 
 Now, you can use queryContext operation [as previously
-described](#Query_Context_operation "wikilink") to check that Room1 and
+described](#query-context-operation) to check that Room1 and
 Room2 attributes has been actually updated.
 
 Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures. This is an advance topic, described in
-[this section](#Structured_attribute_values "wikilink").
+[this section](structured_attribute_valued.md#structured-attribute-values).
 
 #### Context subscriptions
 
@@ -848,7 +846,7 @@ the Orion Context Broker will let you know the information when it
 comes.
 
 Before starting to play with feature, [start the accumulator
-server](#Starting_accumulator_server_for_the_tutorials "wikilink") to
+server](#starting-accumulator-server-for-the-tutorials) to
 capture notifications.
 
 Actually, there are two kinds of subscribeContext: ONTIMEINTERVAL and
@@ -908,9 +906,9 @@ Let's examine in detail the different elements included in the payload:
     that duration is expired, the subscription is simply ignored
     (however, it is still stored in the broker database and needs to be
     purged using the procedure described in the [administration
-    manual](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Deleting_expired_documents "wikilink")).
+    manual](../admin/database_admin.md#deleting-expired-documents)).
     You can extend the duration of a subscription by updating it, as
-    described [later in this document](#Extending_duration "wikilink").
+    described [later in this document](duration.md#extending-duration).
     We are using "P1M" which means "one month".
 -   The notifyCondition element defines the "trigger" for
     the subscription. There is a type element (which value in this case
@@ -976,14 +974,14 @@ notifyContextRequest payload. Apart from the subscriptionId element
 (that matches the one in the response to subscribeContext request) and
 the originator element, there is a contextResponseList element which is
 the same that the one used in the [queryContext
-responses](#Query_Context_operation "wikilink").
+responses](#query-context-operation).
 
 Currently, the originator is always "localhost". We will look into a
 more flexible way of using this in a later version.
 
 You can do a small exercise: change the temperature value of Room1 (have
 a look at the [update context elements
-section](#Update_context_elements "wikilink") in this manual to see how
+section](#update-context-elements) in this manual to see how
 to do it) and after that, check that in the next received
 notifyContextRequest for accumulator-server.py the contextValue element
 contains the new value. This exercise demanstrates that the Orion
@@ -1052,8 +1050,8 @@ notification flow has stopped.
 ##### ONCHANGE
 
 We assume that the accumulator-server.py program is still running.
-Otherwise, start it [as described
-here](#Starting_accumulator_server_for_the_tutorials "wikilink").
+Otherwise, start it as described
+here [Starting accumulator server for the tutorials](#starting-accumulator-server-for-the-tutorials).
 
 ONCHANGE subscriptions are used when you want to be notified not when a
 given time interval has passed but when some attribute changes. Let's
@@ -1093,8 +1091,8 @@ one used in ONTIMEINTERVAL, with two exceptions:
     but, in this case the condValueList contains an actual list of
     condValue elements, each one with an attribute name. They define the
     "triggering attributes", i.e. attributes that upon creation/change
-    due to [entity creation](#Entity_Creation "wikilink") or
-    [update](#Update_context_elements "wikilink") trigger
+    due to [Entity Creation](#entity-creation) or
+    [Update context elements](#update-context-elements) trigger
     the notification. The rule is that if at least one of the attributes
     in the list changes (e.g. some kind of "OR" condition), then a
     notification is sent. But note that that notification includes the
@@ -1183,7 +1181,7 @@ application can get the initial status using queryContext. Thus, this
 behavior could be changed in a later version. What's your opinion? :)
 
 Now, do the following exercise, based on what you know from [update
-context](#Update_context_elements "wikilink"): Do the following 4
+context](#update-context-elements): Do the following 4
 updates, in sequence and letting pass more than 5 seconds between one
 and the next (to avoid losing notifications due to throttling):
 
@@ -1225,18 +1223,16 @@ part of the FIWARE NGSI REST API NGSI10 that Orion Context Broker
 supports, showing examples of requests and responses. Convenience
 operations are a set of operations that have been defined by FIWARE
 project to ease the usage of NGSI implementations as a complement to the
-standard operations defined in the OMA NGSI specification (see the
-section on [additional information later in this
-manual](#Additional_information_and_resources "wikilink")).
+standard operations defined in the OMA NGSI specification.
 
 **Don't forget to restart the broker before starting this tutorial as
 described [previously in this
-document](#Starting_the_broker_for_the_tutorials "wikilink")**.
+document](#starting-the-broker-for-the-tutorials)**.
 
 At the end of this section, you will have learnt to use convenience
 operations as a handy alternative to some standard operations described
 in [the previous
-section](#Tutorial_on_NGSI10_standard_operations "wikilink"). It is
+section](#tutorial-on-ngsi10-standard-operations). It is
 highly recommended to do that tutorial before, to get familiar with
 update and query context, etc. and to be able to compare between the two
 approaches.
@@ -1342,7 +1338,7 @@ which response is:
 You can also create an attribute (and the containing entity along the
 way) in the following way (additional attributes could be added after
 that, as described in [this
-section](#Adding_and_removing_attributes_with_APPEND_and_DELETE_in_updateContext "wikilink")):
+section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)):
 
       (curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
       {
@@ -1351,7 +1347,7 @@ section](#Adding_and_removing_attributes_with_APPEND_and_DELETE_in_updateContext
       EOF                                                                                                                                                               
  
 Compared to [entity creation based on standard
-operation](#Entity_Creation "wikilink") we observe the following
+operation](#entity_creation) we observe the following
 differences:
 
 -   We are using the POST verb on the /v1/contextEntities/{EntityID}
@@ -1391,8 +1387,8 @@ is independent of that fields, as shown below:
 Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures or custom metadata. These are advance
 topics, described in [this
-section](#Structured_attribute_values "wikilink") and [this
-other](#Custom_attribute_metadata "wikilink"), respectively.
+section](Structured_attribute_valued.md#structured-attribute-values) and [this
+other](metadata.md#custom-attribute-metadata "), respectively.
 
 #### Convenience Query Context
 
@@ -1450,7 +1446,7 @@ which response is:
       }     
 
 Comparing to [standard queryContext
-operation](#Query_Context_operation "wikilink") we observe the following
+operation](#query-context-operation) we observe the following
 differences:
 
 -   Convenience operations use the GET method without payload in the
@@ -1607,7 +1603,7 @@ Additional comments:
 
 -   You can also use geographical scopes in your queries. This is an
     advanced topic, described in [this
-    section](#Geolocation_capabilities "wikilink").
+    section](geolocation.md#geolocation-capabilities).
 -   You can use the *?attributeFormat=object* URI parameter
     to get attributes as a JSON object (i.e. key-values map) instead of
     a vector (default behaviour):
@@ -1705,16 +1701,16 @@ Additional comments:
 
 -   Getting all the entities stored in Orion isn't a really good idea
     (except if you have a limited number of entities). Have a look at
-    the [section on filters](#Filters "wikilink").
+    the [section on filters](filtering.md#filters ).
 -   Note that by default, only 20 entities are returned (which is fine
     for this tutorial, but probably not for a real
     utilization scenario). In order to change this behaviour, see [the
-    section on pagination](#Pagination "wikilink") in this manual.
+    section on pagination](pagination.md#pagination ) in this manual.
 -   You can use the
     *?attributeFormat=object* URI parameter to get attributes as a JSON
     object (i.e. key-values map) instead of a vector (default
     behaviour), as described in the [previous
-    section](#Convenience_Query_Context "wikilink").
+    section](#convenience-query-context).
 
 #### Browsing all types and detailed information on a type
 
@@ -1777,7 +1773,7 @@ of a list of all its attributes):
 	    }
       }
        
-Note that [pagination mechanism](#Pagination "wikilink") also works in
+Note that [pagination mechanism](pagination.md#pagination) also works in
 the operations described above.
 
 In addition, note that this convenience operation doesn't have any standard operation counterpart.
@@ -1881,7 +1877,7 @@ You can update a single attribute of a given entity in the following way:
       EOF                                                                                                                                                            
 
 Comparing to [standard updateContext
-operation](#Update_context_elements "wikilink") we observe the following
+operation](#update-context-elements) we observe the following
 differences:
 
 -   We cannot update more than one entity at a time using convenience
@@ -1896,8 +1892,8 @@ differences:
 Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures or custom metadata. These are advance
 topics, described in [this
-section](#Structured_attribute_values "wikilink") and [this
-other](#Custom_attribute_metadata "wikilink"), respectively.
+section](structured_attribute_valued.md#structured-attribute-values ) and [this
+other](metadata.md#custom-attribute-metadata ), respectively.
 
 #### Convenience operations for context subscriptions
 
@@ -1906,11 +1902,11 @@ subscriptions:
 
 -   POST /v1/contextSubscriptions, to create the subscription, using the
     same payload as [standard susbcribeContext
-    operation](#Context_subscriptions "wikilink").
+    operation](#context-subscriptions ).
 -   PUT /v1/contextSubscriptions/{subscriptionID}, to update the
     subscription identified by {subscriptionID}, using the same payload
     as [standard updateContextSubscription
-    operation](#ONTIMEINTERVAL "wikilink"). The ID in the payload must
+    operation](#ontimeinterval). The ID in the payload must
     match the ID in the URL.
 -   DELETE /v1/contextSubscriptions/{subscriptionID}, to cancel the
     subscription identified by {subscriptionID}. In this case, payload
@@ -1936,13 +1932,11 @@ Orion Context Broker supports, showing examples of requests and
 responses. We use the term "standard" as they are directly derived from
 the OMA NGSI specification, to distinguish them from the other family of
 operations ("convenience") which has been defined by the FIWARE project
-to ease the usage of NGSI implementations (see the section on
-[additional information later in this
-manual](#Additional_information_and_resources "wikilink")).
+to ease the usage of NGSI implementations.
 
 **Don't forget to restart the broker before starting this tutorial as
 described [previously in this
-document](#Starting_the_broker_for_the_tutorials "wikilink")**.
+document](#starting-the-broker-for-the-tutorials)**.
 
 At the end of this section, you will have the basic knowledge to create
 applications (both context producers and consumers) using Orion Context
@@ -2018,7 +2012,7 @@ with the following information:
     example we are assuming that all the sensors are provided by
     <http://mysensors.com/Rooms> (of course, this is a fake URL :). More
     information on providing application [later in this
-    manual](#Registering_Context_Providers_and_request_forwarding "wikilink").
+    manual](context_providers.md#registering-context-providers-and-request-forwarding).
 
 Note that in this case we are registering both rooms using just one
 contextRegistration element, but we could also have used two
@@ -2035,7 +2029,7 @@ providing applications (e.g. <http://mysensors.com/Rooms1/temperature>,
 Finally, note that the payload includes a duration element. The duration
 element sets the duration of the registration so after that time has
 passed it can be considered as expired (however, [duration can be
-extended](#Extending_duration "wikilink")). We use the [ISO 8601
+extended](duration.md#extending-duration)). We use the [ISO 8601
 standard](http://www.wikipedia.org/wiki/ISO_8601) for duration format.
 We are using "P1M" which means "one month" (a very large amount,
 probably enough time to complete this tutorial :).
@@ -2052,7 +2046,7 @@ The registrationId (whose value will be different when you run the
 request, as it is generated using the timestamp of the current time :)
 is a 24 hexadecimal digit which provides an unique reference to the
 registration. It is used for updating the registration as explained
-[later in this manual](#Updating_registrations "wikilink").
+[later in this manual](context_providers.md#updating-registrations).
 
 #### Discover Context Availability operation
 
@@ -2254,7 +2248,7 @@ This will produce the exact same response as the previous example.
 Note that by default only 20 registrations are returned (which is fine
 for this tutorial, but probably not for a real utilization scenario). In
 order to change this behaviour, see [the section on
-pagination](#Pagination "wikilink") in this manual.
+pagination](pagination.md#pagination ) in this manual.
 
 #### Context availability subscriptions
 
@@ -2271,7 +2265,7 @@ Broker will let you know the information when it comes.
 
 We assume that the accumulator-server.py program is still running.
 Otherwise, start it as described in [the previous
-section](#Starting_accumulator_server_for_the_tutorials "wikilink").
+section](#starting-accumulator-server-for-the-tutorials).
 
 Context availability subscriptions are used when we want to be notified
 not about context information (i.e. the values of attributes of some
@@ -2284,7 +2278,7 @@ registration, e.g. because a new Room icon has to be drawn in the
 graphical user interface that the application is offering to final
 users. Thus, each time a new entity of type "Room" is registered in the
 broker (using [registerContext
-operation](#Register_Context_operation "wikilink")), the broker must be
+operation](#register-context-operation)), the broker must be
 able to send notifications.
 
 In order to configure this behavior, we use the following NGSI9
@@ -2329,18 +2323,18 @@ The payload has the following elements:
     interpreted as "<http://localhost:1028>".
 -   Subscriptions have a duration (specified in the duration elements in
     the same format as [registerContext
-    request](#Register_Context_operation "wikilink")). Once that
+    request](#register-context-operation)). Once that
     duration expires, the subscription is ignored (however, it is still
     stored in the broker database and needs to be purged using the
     procedure described in the [administration
-    manual](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Deleting_expired_documents "wikilink")).
+    manual](../admin/database_admin.md#deleting-expired-documents)).
     You can extend the duration of a subscription by updating it, as
-    described [later in this document](#Extending_duration "wikilink").
+    described [later in this document](duration.md#extending-duration ).
     We are using "P1M" which means "one month".
 
 As you can see, the structure of subscriptionContextAvailability is
 similar to the structure of [NGSI10
-subscribeContext](#Context_subscriptions "wikilink"), although in this
+subscribeContext](#context-subscriptions), although in this
 case we don't use notifyConditions nor throttling.
 
 The response to the subscribeContextAvailability request is a
@@ -2401,7 +2395,7 @@ subscriptionId element (that matches the one in the response to
 subscribeContextAvailability request) and the originator element, the
 contextResponseList element is the same than the one used in [the
 discoverContextAvailability
-responses](#Discover_Context_Availability_operation "wikilink").
+responses](#discover-context-availability-operation).
 
 Currently, the originator is always "localhost". We will look into a
 more flexible way of using this in a later version.
@@ -2725,18 +2719,16 @@ described as part of the FIWARE NGSI REST API NGSI9 that Orion Context
 Broker supports, showing examples of requests and responses. Convenience
 operations are a set of operations that have been defined by FIWARE
 project to ease the usage of NGSI implementations as a complement to the
-standard operations defined in the OMA NGSI specification (see the
-section on [additional information later in this
-manual](#Additional_information_and_resources "wikilink")).
+standard operations defined in the OMA NGSI specification.
 
 **Don't forget to restart the broker before starting this tutorial as
 described [previously in this
-document](#Starting_the_broker_for_the_tutorials "wikilink")**.
+document](#starting-the-broker-for-the-tutorials)**.
 
 At the end of this section, you will have learnt to use convenience
 operations as a handy alternative to some standard operations described
 in [the previous
-section](#Tutorial_on_NGSI9_standard_operations "wikilink"). It is
+section](#tutorial-on-ngsi9-standard-operations). It is
 highly recommended to do that tutorial before, to get familiar with
 register, discover, etc. to be able to compare between the two
 approaches.
@@ -2779,7 +2771,7 @@ and pressure, using the following commands:
       EOF                                                                                                                                                             
   
 So, what's the difference compared to [standard registerContext
-operation](#Register_Context_operation "wikilink")?
+operation](#register-context-operation)?
 
 -   We needed four requests, instead of just one request in the standard
     operation case.
@@ -2792,8 +2784,8 @@ operation](#Register_Context_operation "wikilink")?
     type (in general: "/type/<type>/id/<id>").
 -   From the Orion Context Broker perspective, there are 4 independent
     registrations (i.e. 4 different registration IDs) to all
-    effects (e.g. [updating](#Updating_registrations "wikilink"),
-    [extending duration](#Extending_duration "wikilink")).
+    effects (e.g. [updating](updating_regs_and_subs.md#updating-registrations),
+    [extending duration](duration.md#extending-duration )).
 -   It is possible to use /v1/registry/contextEntities/Room1 (without
     the attribute part). In that case, you are registering an entity
     without attributes. Note you cannot specify attributes in the
@@ -2963,14 +2955,14 @@ will produce the following error response:
                      
 
 Compared to [standard discoverContextAvailability
-operation](#Discover_Context_Availability_operation "wikilink"):
+operation](#discover-context-availability-operation ):
 
 -   Convenience operations use the GET method without needing any
     payload in the request (simpler than the standard operation).
     However, there are two differences in the content. First, each
     attribute always comes in a different contextRegistrationResponse
     element (as each attribute corresponds to a different registration,
-    [as explained before](#Convenience_Register_Context "wikilink")).
+    [as explained before](#convenience-register-context)).
     Secondly, as registrations done using convenience operations aren't
     typed, the type fields are empty for entities and attributes.
 -   You can replace
@@ -3122,7 +3114,7 @@ Response:
 Note that by default only 20 registrations are returned (which is fine
 for this tutorial, but probably not for a real utilization scenario). In
 order to change this behaviour, see [the section on
-pagination](#Pagination "wikilink") in this manual.
+pagination](pagination.md#pagination ) in this manual.
 
 #### Convenience operations for context availability subscriptions
 
@@ -3132,11 +3124,11 @@ availability subscriptions:
 -   POST /v1/registry/contextAvailabilitySubscriptions, to create the
     subscription, using the same payload as [standard
     susbcribeAvailabilityContext
-    operation](#Context_availability_subscriptions "wikilink").
+    operation](#context-availability-subscriptions ).
 -   PUT /v1/registry/contextAvailabilitySubscriptions/{subscriptionID},
     to update the subscription identified by {subscriptionID}, using the
     same payload as [standard updateContextAvailabilitySubscription
-    operation](#Context_availability_subscriptions "wikilink"). The ID
+    operation](#context-availability-subscriptions ). The ID
     in the payload must match the ID in the URL.
 -   DELETE
     /v1/registry/contextAvailabilitySubscriptions/{subscriptionID}, to

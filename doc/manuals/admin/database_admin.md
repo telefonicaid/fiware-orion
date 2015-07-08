@@ -19,7 +19,7 @@ mongodump --host <dbhost> --db <db>
 This will create the backup in the dump/ directory.
 
 Note that if you are using
-[multitenant/multiservice](../user/multitenancy.md)
+[multitenant/multiservice](#multitenant/multiservice-database-separation)
 you need to apply the procedures to each per-tenant/service database
 
 ## Restore
@@ -39,14 +39,14 @@ mongorestore --host <dbhost> --db <db> dump/<db>
 ```
 
 Note that if you are using
-[multitenant/multiservice](../user/multitenancy.md)
+[multitenant/multiservice](#multitenant/multiservice-database-separation)
 you need to apply the procedures to each per-tenant/service database
 
 ## Database authorization
 
 MongoDB authorization is configured with the `-db`, `-dbuser` and `-dbpwd`
 options ([see section on command line
-options](#Command_line_options "wikilink")). There are different cases
+options](cli.md)). There are different cases
 to take into account:
 
 -   If your MongoDB instance/cluster doesn't use authorization at all,
@@ -68,8 +68,7 @@ to take into account:
 
 Normally, Orion Context Broker uses just one database at MongoDB level
 (the one specified with the `-db` command line option, typically "orion").
-However, when [multitenant/multiservice is
-used](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Multi_service_tenancy "wikilink")
+However, when [multitenant/multiservice](#multitenant/multiservice-database-separation) is used
 the behaviour is different and the following databases are used (let
 `<db>` be the value of the `-db` command line option):
 
@@ -113,7 +112,7 @@ to decide what to priorize.
 However, in order to help administrator in that task, the following
 indexes could be recommended:
 
--   Collection [entities](#entities_collection "wikilink")
+-   Collection [entities](database_model.md#entities-collection)
     -   \_id.id (used by queryContext and related
         convenience operations)
     -   \_id.type (used by queryContext and related
@@ -122,7 +121,7 @@ indexes could be recommended:
         convenience operations)
     -   creDate (used to provided ordered results in queryContext and
         related convenience operations)
--   Collection [registrations](#registrations_collection "wikilink")
+-   Collection [registrations](database_model.md#registrations-collection)
     -   \_id (used to provided ordered results in
         discoverContextAvailability and related convenience operations).
         We include this index here for the sake of completeness, but the
@@ -132,9 +131,7 @@ indexes could be recommended:
 
 The only index that Orion Context Broker actually ensures is the
 "2dsphere" one in the location.coords field in the entities collection,
-due to functional needs (in order [geo-location
-functionality](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Geolocation_capabilities "wikilink")
-to work). The index is ensured at Orion startup or when entities are
+due to functional needs [geo-location functionality](../user/geolocation.md)to work. The index is ensured at Orion startup or when entities are
 created for first time.
 
 ### Analysis
@@ -151,7 +148,7 @@ particular set up, but the results in your particular environment may
 differ depending on hardware profile, the particular entities being used
 for the test, set up situation, etc. In this particular case, the
 resources of the system under test (a VMware-based VM) are: 2 vCPU (on a
-physical host based on Intel Xeon E5620@2.40GHz) and 4GB RAM. Both Orion
+physical host based on Intel Xeon E5620@ 2.40GHz) and 4GB RAM. Both Orion
 and MongoDB run in the same VM. The tool to generate load is JMeter
 using the configuration that can be found at [the following
 location](https://github.com/telefonicaid/fiware-orion/tree/develop/test/LoadTest)

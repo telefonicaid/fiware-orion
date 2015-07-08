@@ -20,7 +20,7 @@ options](#Command_line_options "wikilink") section.
 Command line options can be used directly (in the case of running [from
 the command line](#From_the_command_line "wikilink")) or indirectly
 through the different fields in /etc/sysconfig/contextBroker (in the
-case of running [as a system service](#As_system_service "wikilink")).
+case of running [as a system service](../../../README.md#as-system-service) )
 To obtain a list of available options, use:
 
     contextBroker -u
@@ -45,14 +45,14 @@ The list of available options is the following:
     that -ipv4.
 -   **-rush <host:port>**. Use <b>rush</b> in <i>host</i> and
     <i>port</i>. Default behavior is to <i>not</i> use Rush. See section
-    on [using Rush relayer](docs/md/admin/rush.md).
+    on [using Rush relayer](rush.md).
 -   **-multiservice**. Enables multiservice/multitenant mode (see [multi
-    service tenant section](docs/md/user/multitenancy.md)).
+    service tenant section](../user/multitenancy.md)).
 -   **-db <db>**. The MongoDB database to use or
     (if `-multiservice` is
     in use) the prefix to per-service/tenant databases (see section on
     [service/tenant database
-    separation](docs/md/user/multitenancy.md). This field is restricted to 10 characters
+    separation](../user/multitenancy.md). This field is restricted to 10 characters
     max length.
 -   **-dbhost <host>**. The MongoDB host and port to use, e.g. `-dbhost
     localhost:12345`.
@@ -66,10 +66,10 @@ The list of available options is the following:
     miliseconds for connections to the replica set.
 -   **-dbuser <user>**. The MongoDB user to use. If your MongoDB doesn't
     use authorization this option must be avoided. See [database
-    authorization section](docs/admin/database_admin.md#Database_authorization).
+    authorization section](database_admin.md#database-authorization).
 -   **-dbpwd <pass>**. The MongoDB password to use. If your MongoDB
     doesn't use authorization this option must be avoided. See [database
-    authorization section](docs/admin/database_admin.md#Database_authorization).
+    authorization section]( database_admin.md#database-authorization).
 -   **-dbPoolSize <size>**. Database connection pool. Default size of
     the pool is 10 connections.
 -   **-writeConcern <0|1>**. Write concern for MongoDB write operations:
@@ -94,7 +94,7 @@ The list of available options is the following:
     a combination of them (e.g. "-t 60,80-90"). If you want to use all
     trace levels for logging, use "-t 0-255". Note that trace levels can
     be changed dynamically using the [management REST
-    interface](docs/admin/management_api.md). The detail of the
+    interface](management_api.md). The detail of the
     available tracelevels and its numbers can be found
     [here](https://github.com/telefonicaid/fiware-orion/blob/develop/src/lib/logMsg/traceLevels.h)
     (as a C struct).

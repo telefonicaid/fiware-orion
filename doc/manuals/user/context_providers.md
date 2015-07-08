@@ -1,8 +1,7 @@
 # Context Providers registration and request forwarding
 
 The register context operation (both in
-[standard](#Register_Context_operation "wikilink") and
-[convenience](#Convenience_Register_Context "wikilink") cases) uses a
+[standard](walkthrough_apiv1.md#register-context-operation) and [convenience](walkthrough_apiv1.md#convenience-register-context) cases) uses a
 field named "providing application" which is a URL that identifies the
 source of the context information for the entities/attributes included
 in that registration. We call that source the "Context Provider" (or
@@ -173,8 +172,7 @@ The Context Providers and request forwarding functionality was developed
 in release 0.15.0. Previous version
 of Orion Context Broker just stores this field in the database. Thus,
 applications can access the Providing Application using the [discover
-context availability
-operation](#Discover_Context_Availability_operation "wikilink") and do
+context availability operation](walkthrough_apiv1.md#discover-context-availability-operation) and do
 whatever they want with it. This is typically the case when the Orion
 Context Broker is used just as a repository for NGSI9 registrations, but
 the actual management of context information is done by other components
@@ -186,7 +184,7 @@ Some additional comments:
 
 -   The "-httpTimeout"
     [CLI
-    parameter](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Command_line_options "wikilink")
+    parameter](admin/cli.md)
     is used to set the CPr timeout. If a request forwarded to a CPr is
     taking more that that timeout, then Orion closes the connection and
     assumes that the CPr is not responding.

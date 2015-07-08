@@ -130,9 +130,9 @@ The symptoms of a database connection problem are the following ones:
 
 In both cases, check that the connection to MonogDB is correctly
 configured (in particular, the BROKER\_DATABASE\_HOST if you are running
-Orion Context Broker [as a service](#As_system_service "wikilink") or
+Orion Context Broker [as a service](../../../README.md#as-system-service) or
 the "-dbhost" option if you are running it [from the command
-line](#From_the_command_line "wikilink")) and that the mongod or mongos
+line](cli.md)) and that the mongod or mongos
 process (depending if you are using sharding or not) is up and running.
 
 If the problem is that MongoDB is down, note that Orion Context Broker

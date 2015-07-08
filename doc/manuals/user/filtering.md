@@ -2,9 +2,7 @@
 
 Orion Context Broker implements several filters
 that can be used to filter the results in NGSI10 query operations. These
-filters are typically used with [queryContext with
-patterns](#Query_Context_operation "wikilink") or [the convenience
-operation to get all entities](#Getting_all_entities "wikilink").
+filters are typically used with [queryContext with patterns](walkthrough_apiv1.md#query-context-operation) or [the convenience operation to get all entities](walkthrough_apiv1.md#getting-all-entities).
 
 As a general rule, filters used in standard operation use a scope
 element:
@@ -89,7 +87,7 @@ In the current version, the only parameter than can be checked for
 no-existence is the entity type, corresponding to "entity::type". Note
 that this is the only way of selecting an "entity without type" (given
 that queries without type resolve to "any type", as explained in the
-[following section](#Using_empty_types "wikilink")).
+[following section](empty_types.md#using-empty-types)).
 
 ## Entity type filter
 
@@ -115,8 +113,7 @@ The URL parameter corresponding to this filter is 'entity::type'.
 ## Geo-location filter
 
 The scope corresponding to this type is "FIWARE::Location". It is
-described in detail in [the following
-section](#Geo-located_queries "wikilink").
+described in detail in [the following section](geolocation.md#geo-located-queries).
 
 In the current version of Orion, there is no equivalent convenience
 operation filter.

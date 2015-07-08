@@ -1,8 +1,8 @@
 # Updating registrations
 
 The response to a register context request (both in
-[standard](#Register_Context_operation "wikilink") and
-[convenience](#Convenience_Register_Context "wikilink")) includes a
+[standard](walkthrough_apiv1.md#register_context_operation) and
+[convenience](walkthrough_apiv1.md#convenience_context_operation)) includes a
 registration ID (a 24 hexadecimal digit number):
 
       {
@@ -45,21 +45,21 @@ with the *registrationId* set:
   
 This "update registration" replaces the existing registration associated
 to that ID with the new content, including [expiration
-recalculation](#Extending_duration "wikilink").
+recalculation](duration.md#extending-duration).
 
 Surprisingly, there is no way in NGSI to cancel a registration. A
 workaround is to update it with a non-existing entity and duration 0,
 but in order to do an actual delete you will need to remove the
 registration from the database (check [the administration manual about
 managing
-database](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Database_administration "wikilink")).
+database](../admin/database_admin.md#database-administration)).
 
 # Updating subscriptions
 
 You have previously seen in this document that [context
-subscriptions](#Context_subscriptions "wikilink") and [context
+subscriptions](walkthrough_apiv1.md#register-context-operation) and [context
 availability
-subscriptions](#Context_availability_subscriptions "wikilink") can be
+subscriptions](walkthrough_apiv1.md#convenience-register-context) can be
 updated. However, differently from registerContext, not everything can
 be updated. Let's look at this closely, depending on the type of
 subscription.

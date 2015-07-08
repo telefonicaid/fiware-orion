@@ -18,19 +18,19 @@ Orion is a C++ implementation of the NGSI9/10 REST API binding developed as a pa
 
 Orion Context Broker allows you to manage all the whole lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSI9/10 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to register context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. an interval of time has passed or the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this document.
 
-If this is your first approach with Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/md/quick_start_guide.md).
+If this is your first approach with Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/manuals/quick_start_guide.md).
 
 ## Build and Install
 
 The recommended procedure is to install using RPM packages in CentOS 6.x. If you are interested in
-building from sources, check [this document](doc/md/admin/build_source.md).
+building from sources, check [this document](doc/manuals/admin/build_source.md).
 
 ### Requirements
 
-* System resources: see [these recommendations](doc/md/admin/resources.md#resources-recommendations)
+* System resources: see [these recommendations](doc/manuals/admin/resources.md#resources-recommendations)
 * Operating system: CentOS/RedHat. The reference operating system is CentOS 6.3  
 but it should work also in any later CentOS/RedHat 6.x version.
-* Database: MongoDB is required running either in the same system where Orion Context Broker is going to be installed or in a different host accessible through the network. The recommended MongoDB version is 2.6.9 (although it should work with later MongoDB 2.6.x and 3.0.x versions). It is not recommended using MongoDB 2.4.x., as some [geolocated queries](doc/md/user/geolocation.md).
+* Database: MongoDB is required running either in the same system where Orion Context Broker is going to be installed or in a different host accessible through the network. The recommended MongoDB version is 2.6.9 (although it should work with later MongoDB 2.6.x and 3.0.x versions). It is not recommended using MongoDB 2.4.x., as some [geolocated queries](doc/manuals/user/geolocation.md).
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):
 	* The contextBroker package (mandatory) depends on the following packages: boost-filesystem, boost-thread, libmicrohttpd, logrotate, libcurl and boost-regex.
     * The contextBroker-test package (optional) depends on the following packages: python, python-flask, python-jinja2, curl, libxml2, libxslt, nc, mongo-10gen and contextBroker. The mongo-10gen dependency needs to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
@@ -84,9 +84,9 @@ You only need to pay attention to this if your upgrade path crosses 0.11.0 or 0.
 
 You only need to pay attention to this if your upgrade path crosses 0.14.1, 0.19.0 or 0.21.0. Otherwise, you can skip this section. You can also skip this section if your DB are not valuable (e.g. debug/testing environments) and you can flush your DB before upgrading.
 
-* [Upgrading to 0.14.1 and beyond from a pre-0.14.1 version](doc/md/admin/upgrading_crossing_0-14-1.md)
-* [Upgrading to 0.19.0 and beyond from a pre-0.19.0 version](doc/md/admin/upgrading_crossing_0-19-0.md)
-* [Upgrading to 0.21.0 and beyond from a pre-0.21.0 version](doc/md/admin/upgrading_crossing_0-21-0.md)
+* [Upgrading to 0.14.1 and beyond from a pre-0.14.1 version](doc/manuals/admin/upgrading_crossing_0-14-1.md)
+* [Upgrading to 0.19.0 and beyond from a pre-0.19.0 version](doc/manuals/admin/upgrading_crossing_0-19-0.md)
+* [Upgrading to 0.21.0 and beyond from a pre-0.21.0 version](doc/manuals/admin/upgrading_crossing_0-21-0.md)
 
 If your upgrade cover several segments (e.g. you are using 0.13.0 and
 want to upgrade to 0.19.0, so both "upgrading to 0.14.1 and beyond from
@@ -247,11 +247,11 @@ In order to update one of the entity atributes (temperature):
     }
     EOF
 
-Please have a look to the [Quick Start guide](doc/md/quick_start_guide.md) if you want to test these operations in an actual public instance of Oriion Context Broker. In addition, have a look to the API Walkthrough and API Reference sections below in order to know more details about the API (subscriptions, registrations, etc.).
+Please have a look to the [Quick Start guide](doc/manuals/quick_start_guide.md) if you want to test these operations in an actual public instance of Oriion Context Broker. In addition, have a look to the API Walkthrough and API Reference sections below in order to know more details about the API (subscriptions, registrations, etc.).
 
 ## API Walkthrough
 
-* [FIWARE NGSI v1](doc/md/user/walkthrough_apiv1.md) (Markdown)
+* [FIWARE NGSI v1](doc/manuals/user/walkthrough_apiv1.md) (Markdown)
 * [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/cookbook) (Apiary) - *ongoing*
 
 ## API Reference Documentation
@@ -280,39 +280,40 @@ Please have a look to the section [on building the source code](#from-sources) i
 ## Advanced topics:
 
 * Installation and administration
-        * [Building from sources](doc/md/admin/build_source.md)
-        * [Running Orion from command line](doc/md/admin/cli.md).
-	* [Database administration](doc/md/admin/database_admin.md)
-	* [Logs](doc/md/admin/logs.md)
-	* [Watchdog](doc/md/admin/watchdog.md)
-	* [Rush relayer](doc/md/admin/rush.md)
-	* [Management REST inferface](doc/md/admin/management_api.md)   
-	* [Data model](doc/md/admin/database_model.md)
-	* [Resources & I/O Flows](doc/md/admin/resources.md) 
-	* [Problem diagnosis procedures](doc/md/admin/diagnosis.md)
+
+        * [Building from sources](doc/manuals/admin/build_source.md)
+        * [Running Orion from command line](doc/manuals/admin/cli.md).
+	* [Database administration](doc/manuals/admin/database_admin.md)
+	* [Logs](doc/manuals/admin/logs.md)
+	* [Watchdog](doc/manuals/admin/watchdog.md)
+	* [Rush relayer](doc/manuals/admin/rush.md)
+	* [Management REST inferface](doc/manuals/admin/management_api.md)   
+	* [Data model](doc/manuals/admin/database_model.md)
+	* [Resources & I/O Flows](doc/manuals/admin/resources.md) 
+	* [Problem diagnosis procedures](doc/manuals/admin/diagnosis.md)
 * API
-	* [Pagination](doc/md/user/pagination.md)
-	* [Geolocation ](doc/md/user/geolocation.md)
-	* [Structured values for attributes](doc/md/user/structured_attribute_valued.md)
-        * [Context Providers registration and request forwarding](doc/md/user/context_providers.md)
-	* [Attribute metadata](doc/md/user/metadata.md)
-	* [Filtering results](doc/md/user/filtering.md)
-	* [Multy tenancy](doc/md/user/multitenancy.md)
-	* [Entity service paths](doc/md/user/service_path.md)
-	* [Adding and removing attributes and entities with APPEND and DELETE in updateContext](doc/md/user/append_and_delete.md)
-	* [Updating registrations and subscriptions](doc/md/user/updating_regs_and_subs.md)	 
-	* [Context broker federation](doc/md/user/federation.md)
-	* [Forbidden characters](doc/md/user/forbidden_characters.md)
-	* [Duration (for registration and subscriptions)](doc/md/user/duration.md)
-	* [Using empty types](doc/md/user/empty_types.md)
-	* [Mixing standard and convenience operations](doc/md/user/std_conv_mix.md)
-	* [HTTP and NGSI response codes](doc/md/user/http_and_ngsi_sc.md)
-	* [Security considerations](doc/md/user/security.md)
-	* [Known limitations](doc/md/user/known_limitations.md)	
+	* [Pagination](doc/manuals/user/pagination.md)
+	* [Geolocation ](doc/manuals/user/geolocation.md)
+	* [Structured values for attributes](doc/manuals/user/structured_attribute_valued.md)
+        * [Context Providers registration and request forwarding](doc/manuals/user/context_providers.md)
+	* [Attribute metadata](doc/manuals/user/metadata.md)
+	* [Filtering results](doc/manuals/user/filtering.md)
+	* [Multy tenancy](doc/manuals/user/multitenancy.md)
+	* [Entity service paths](doc/manuals/user/service_path.md)
+	* [Adding and removing attributes and entities with APPEND and DELETE in updateContext](doc/manuals/user/append_and_delete.md)
+	* [Updating registrations and subscriptions](doc/manuals/user/updating_regs_and_subs.md)	 
+	* [Context broker federation](doc/manuals/user/federation.md)
+	* [Forbidden characters](doc/manuals/user/forbidden_characters.md)
+	* [Duration (for registration and subscriptions)](doc/manuals/user/duration.md)
+	* [Using empty types](doc/manuals/user/empty_types.md)
+	* [Mixing standard and convenience operations](doc/manuals/user/std_conv_mix.md)
+	* [HTTP and NGSI response codes](doc/manuals/user/http_and_ngsi_sc.md)
+	* [Security considerations](doc/manuals/user/security.md)
+	* [Known limitations](doc/manuals/user/known_limitations.md)	
 * Container-based deployment
-	* [Vagrant](doc/md/vagrant.md) 
-* [Sample code contributions](doc/md/code_contributions.md)
-* [Deprecated features](doc/md/deprected.md)
+	* [Vagrant](doc/manuals/vagrant.md) 
+* [Sample code contributions](doc/manuals/code_contributions.md)
+* [Deprecated features](doc/manuals/deprecated.md)
 
 ## License
 
