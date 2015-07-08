@@ -39,6 +39,34 @@
 
 /* ****************************************************************************
 *
+* ContextAttributeValueType - 
+*/
+typedef enum ContextAttributeValueType
+{
+  ValueTypeString,
+  ValueTypeNumber,
+  ValueTypeBoolean,
+  ValueTypeCompoundVector,
+  ValueTypeCompoundObject
+} ContextAttributeValueType;
+
+
+
+/* ****************************************************************************
+*
+* ContextAttributeValue - 
+*/
+typedef union ContextAttributeValue
+{
+  char*         string;
+  double        number;
+  bool          boolean;
+} ContextAttributeValue;
+
+
+
+/* ****************************************************************************
+*
 * ContextAttribute -
 */
 typedef struct ContextAttribute
@@ -50,9 +78,14 @@ typedef struct ContextAttribute
                                            //          E.g. /v1/contextTypes
   MetadataVector  metadataVector;          // Optional
 
-  ProvidingApplication     providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
-  bool                     found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
-                                                    // It means attribute found either locally or remotely in providing application
+  ContextAttributeValueType  valueType;               // Type of value: from json parse
+
+  // FIXME P5:  The field name valueValue to be changed to 'value' and all old uses of 'value to be converted
+  ContextAttributeValue      valueValue;              // union of values
+
+  ProvidingApplication       providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
+  bool                       found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
+                                                      // It means attribute found either locally or remotely in providing application
 
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;

@@ -26,6 +26,10 @@ SET (SOURCES
     nullTreat.cpp
     forbiddenChars.cpp
     jsonRequestTreat.cpp
+    parseEntity.cpp
+    parseContextAttribute.cpp
+    parseMetadataObject.cpp
+    jsonParseTypeNames.cpp
 )
 
 SET (HEADERS
@@ -34,6 +38,10 @@ SET (HEADERS
     nullTreat.h
     forbiddenChars.h
     jsonRequestTreat.h
+    parseEntity.h
+    parseContextAttribute.h
+    parseMetadataObject.h
+    jsonParseTypeNames.h
 )
 
 
@@ -41,7 +49,7 @@ SET (HEADERS
 # Include directories
 # -----------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
-
+include_directories("/opt/rapidjson/rapidjson-1.0.2/include")
 
 # Library declaration
 # -----------------------------------------------------------------

@@ -22,36 +22,21 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
-#include "parse/jsonRequestTreat.h"
-#include "parse/parseEntity.h"
+#include "parse/jsonParseTypeNames.h"
 
 
 
 /* ****************************************************************************
 *
-* jsonRequestTreat - 
+* jsonParseTypeNames - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
+const char* jsonParseTypeNames[7] =
 {
-  std::string answer;
-
-  LM_M(("KZ: requestType: %d", requestType));
-  switch (requestType)
-  {
-  case EntitiesRequest:
-    answer = parseEntity(ciP, &parseDataP->ent.res);
-    break;
-
-  default:
-    answer = "Request Treat function not implemented";
-    break;
-  }
-  
-  return answer;
-}
+  "Null",
+  "False",
+  "True",
+  "Object",
+  "Array",
+  "String",
+  "Number"
+};

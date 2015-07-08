@@ -25,12 +25,9 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "rest/Request.h"
+#include "ngsi/Request.h"
 
 
 

@@ -358,6 +358,8 @@ PaArgument paArgs[] =
 #define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
 #define IENTATTR_COMPS_WORD     ""
 
+
+
 //
 // NGSI9
 //

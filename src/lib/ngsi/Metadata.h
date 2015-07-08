@@ -42,6 +42,32 @@
 
 /* ****************************************************************************
 *
+* MetadataValueType - 
+*/
+typedef enum MetadataValueType
+{
+  MetadataValueTypeString,
+  MetadataValueTypeNumber,
+  MetadataValueTypeBoolean
+} MetadataValueType;
+
+
+
+/* ****************************************************************************
+*
+* MetadataValue - 
+*/
+typedef union MetadataValue
+{
+  char*         string;
+  double        number;
+  bool          boolean;
+} MetadataValue;
+
+
+
+/* ****************************************************************************
+*
 * Metadata -
 *
 * FIXME
@@ -55,6 +81,12 @@ typedef struct Metadata
   std::string  type;         // Optional
   std::string  value;        // Mandatory
   Association  association;  // Optional (used if type == 'Association')
+
+  MetadataValueType  valueType;               // Type of value: from json parse
+
+  // FIXME P5:  The field name valueValue to be changed to 'value' and all old uses of 'value to be converted
+  MetadataValue      valueValue;              // union of values
+
 
   Metadata();
   Metadata(Metadata* mP);

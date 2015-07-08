@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_PARSE_PARSECONTEXTATTRIBUTE_H_
+#define SRC_LIB_PARSE_PARSECONTEXTATTRIBUTE_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,36 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
+#include "rapidjson/document.h"
 
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
-#include "parse/jsonRequestTreat.h"
-#include "parse/parseEntity.h"
+using namespace rapidjson;
 
 
 
 /* ****************************************************************************
 *
-* jsonRequestTreat - 
+* parseContextAttribute - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
-{
-  std::string answer;
+extern std::string parseContextAttribute(const Value::ConstMemberIterator& iter, ContextAttribute* caP);
 
-  LM_M(("KZ: requestType: %d", requestType));
-  switch (requestType)
-  {
-  case EntitiesRequest:
-    answer = parseEntity(ciP, &parseDataP->ent.res);
-    break;
-
-  default:
-    answer = "Request Treat function not implemented";
-    break;
-  }
-  
-  return answer;
-}
+#endif  // SRC_LIB_PARSE_PARSECONTEXTATTRIBUTE_H_

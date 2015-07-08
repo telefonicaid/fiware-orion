@@ -317,9 +317,29 @@ std::string ContextAttribute::render
   {
     if (omitValue == false)
     {
-      out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                      (request != RtUpdateContextResponse)? value : "",
-                      ciP->outFormat, commaAfterContextValue);
+      if ((valueType == ValueTypeString) || (ciP->apiVersion == "v1"))
+      {
+        out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                        (request != RtUpdateContextResponse)? value : "",
+                        ciP->outFormat, commaAfterContextValue);
+      }
+#if 0
+//
+// FIXME P10: The render function must change because of the new typed values of attributes
+//
+      else if (valueType == ValueTypeNumber)
+      {
+        out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                        valueValue.number,
+                        ciP->outFormat, commaAfterContextValue);
+      }
+      else if (valueType == ValueTypeBoolean)
+      {
+        out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                        valueValue.boolean,
+                        ciP->outFormat, commaAfterContextValue);
+      }
+#endif
     }
     else if (request == RtUpdateContextResponse)
     {
@@ -502,7 +522,22 @@ void ContextAttribute::present(const std::string& indent, int ix)
 
   if (compoundValueP == NULL)
   {
-    LM_F(("%s  Value:      %s", indent.c_str(), value.c_str()));
+    if (valueType == ValueTypeString)
+    {
+      LM_F(("%s  String Value:      %s", indent.c_str(), valueValue.string));
+    }
+    else if (valueType == ValueTypeNumber)
+    {
+      LM_F(("%s  Number Value:      %f", indent.c_str(), valueValue.number));
+    }
+    else if (valueType == ValueTypeBoolean)
+    {
+      LM_F(("%s  Boolean Value:      %s", indent.c_str(), (valueValue.boolean == false)? "false" : "true"));
+    }
+    else
+    {
+      LM_F(("%s  Unknown value type (%d)", indent.c_str(), valueType));
+    }
   }
   else
   {

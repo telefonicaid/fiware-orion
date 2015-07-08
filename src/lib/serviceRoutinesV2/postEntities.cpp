@@ -61,6 +61,9 @@ std::string postEntities
   Entity*  eP = &parseDataP->ent.res;
 
 
+  // Temp debug
+  eP->present("");
+
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "APPEND");
   
