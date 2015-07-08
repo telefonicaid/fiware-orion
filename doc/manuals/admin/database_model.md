@@ -236,8 +236,8 @@ Fields:
     below (we think they're quite straightforward)
 -   **count**: the number of notifications sent associated to
     the subscription.
--   **format**: the format to use to send notifications, either "XML"
-    or "JSON".
+-   **format**: the format to use to send notification, either "XML" or "JSON".
+    However, note that XML has been deprecated in Orion 0.23.0 and that this field eventually will be removed.
 
 Example document:
 
@@ -273,7 +273,7 @@ Example document:
        }
    ],
    "count": 27,
-   "format": "XML"
+   "format": "JSON"
  }
 ```
 
@@ -303,8 +303,8 @@ Fields:
     notification sent associated to a given subscription.
 -   **count**: the number of notifications sent associated to
     the subscription.
--   **format**: the format to use to send notifications, either "XML"
-    or "JSON".
+-   **format**: the format to use to send notification, either "XML" or "JSON".
+    However, note that XML has been deprecated in Orion 0.23.0 and that this field eventually will be removed.
 
 Example document:
 
@@ -331,6 +331,6 @@ Example document:
    ],
    "lastNotification" : 1381132312,
    "count": 42,
-   "format": "XML"
+   "format": "JSON"
  }
 ```

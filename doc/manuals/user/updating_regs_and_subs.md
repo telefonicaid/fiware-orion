@@ -5,11 +5,10 @@ The response to a register context request (both in
 [convenience](#Convenience_Register_Context "wikilink")) includes a
 registration ID (a 24 hexadecimal digit number):
 
-      <?xml version="1.0"?>                                             {
-      <registerContextResponse>                                             "duration": "PT24H",
-        <registrationId>51bf1e0ada053170df590f20</registrationId>           "registrationId": "51bf1e0ada053170df590f20"
-        <duration>PT24H</duration>                                      }
-      </registerContextResponse>                                    
+      {
+	"duration": "PT24H",
+        "registrationId": "51bf1e0ada053170df590f20"
+      }                                  
  
 This ID can be used to update the registration. There is no special
 operation to update a registration (in this sense, it is different from
@@ -18,31 +17,31 @@ updateContextSubscription and updateContextAvailabilitySubscription
 operations). The update is done issuing a new registerContextRequest,
 with the *registrationId* set:
 
-        (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                    {
-          <registerContextRequest>                                                                                                                 "contextRegistrations": [
-            <contextRegistrationList>                                                                                                                  {
-              <contextRegistration>                                                                                                                        "entities": [
-                <entityIdList>                                                                                                                                 {
-                  <entityId type="Room" isPattern="false">                                                                                                         "type": "Room",
-                    <id>Room8</id>                                                                                                                                 "isPattern": "false",
-                  </entityId>                                                                                                                                      "id": "Room8"
-                </entityIdList>                                                                                                                                }
-                <contextRegistrationAttributeList>                                                                                                         ],
-                  <contextRegistrationAttribute>                                                                                                           "attributes": [
-                    <name>humidity</name>                                                                                                                      {
-                    <type>percentage</type>                                                                                                                        "name": "humidity",
-                    <isDomain>false</isDomain>                                                                                                                     "type": "percentage",
-                  </contextRegistrationAttribute>                                                                                                                  "isDomain": "false"
-                </contextRegistrationAttributeList>                                                                                                            }
-                <providingApplication>http://mysensors.com/Rooms</providingApplication>                                                                    ],
-              </contextRegistration>                                                                                                                       "providingApplication": "http://mysensors.com/Rooms"
-            </contextRegistrationList>                                                                                                                 }
-            <duration>P1M</duration>                                                                                                               ],
-            <registrationId>51bf1e0ada053170df590f20</registrationId>                                                                              "duration": "P1M",
-          </registerContextRequest>                                                                                                                "registrationId": "51bf1e0ada053170df590f20"
-      EOF                                                                                                                                      }
-                                                                                                                                               EOF
+      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextRegistrations": [
+	      {
+		  "entities": [
+		      {
+			  "type": "Room",
+			  "isPattern": "false",
+			  "id": "Room8"
+		      }
+		  ],
+		  "attributes": [
+		      {
+			  "name": "humidity",
+			  "type": "percentage",
+			  "isDomain": "false"
+		      }
+		  ],
+		  "providingApplication": "http://mysensors.com/Rooms"
+	      }
+	  ],
+	  "duration": "P1M",
+	  "registrationId": "51bf1e0ada053170df590f20"
+      }
+      EOF                                                                                                                                  
   
 This "update registration" replaces the existing registration associated
 to that ID with the new content, including [expiration

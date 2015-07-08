@@ -10,26 +10,25 @@ As a general rule, filters used in standard operation use a scope
 element:
 
  
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                      {
-      <queryContextRequest>                                                                                                         "entities": [
-        <entityIdList>                                                                                                              {
-          <entityId type="myEntType" isPattern="true">                                                                                "type": "myEntityType",
-            <id>.*</id>                                                                                                               "isPattern": "true",
-          </entityId>                                                                                                                 "id": ".*"
-        </entityIdList>                                                                                                             }
-        <attributeList>                                                                                                             ],
-        </attributeList>                                                                                                            "restriction": {
-        <restriction>                                                                                                                 "scopes": [
-          <scope>                                                                                                                       {
-            <operationScope>                                                                                                              "type" : "FIWARE::Filter::foobar",
-              <scopeType>FIWARE::Filter::foobar</scopeType>                                                                               "value" : ...
-              <scopeValue>...</scopeValue>                                                                                              }
-            </operationScope>                                                                                                         ]
-          </scope>                                                                                                                  }
-        </restriction>                                                                                                            }
-      </queryContextRequest>                                                                                                      EOF
-      EOF                                                                                                                     
+      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "myEntityType",
+		  "isPattern": "true",
+		  "id": ".*"
+	      }
+	  ],
+	  "restriction": {
+	      "scopes": [
+		  {
+		      "type": "FIWARE::Filter::foobar",
+		      "value": ""
+		  }
+	      ]
+	  }
+      }
+      EOF                                                                                                                 
 
 while filters in convenience operations are included as parameters in
 the URL:
@@ -45,16 +44,18 @@ result is a logic "and" between all of them.
 
 The scope correspoding to this type is "FIWARE::Filter::Existence". 
 
-      ...                                                            ...
-        <restriction>                                                  "restriction": {
-          <scope>                                                        "scopes": [
-            <operationScope>                                               {
-              <scopeType>FIWARE::Filter::Existence</scopeType>               "type" : "FIWARE::Filter::Existence",
-              <scopeValue>entity::type</scopeValue>                          "value" : "entity::type"
-            </operationScope>                                              }
-          </scope>                                                       ]
-        </restriction>                                                 }
-      ...                                                            ...
+      ...                                                           
+      {
+	  "restriction": {
+	      "scopes": [
+		  {
+		      "type": "FIWARE::Filter::Existence",
+		      "value": "entity::type"
+		  }
+	      ]
+	  }
+      }
+      ...                                                           
   
 The URL parameter corresponding to this filter is 'exist'.
 
@@ -67,16 +68,18 @@ existence is the entity type, corresponding to "entity::type".
 
 The scope corresponding to this type is "FIWARE::Filter::Not::Existence".
 
-      ...                                                                 ...
-        <restriction>                                                       "restriction": {
-          <scope>                                                             "scopes": [
-            <operationScope>                                                    {
-              <scopeType>FIWARE::Filter::Not::Existence</scopeType>               "type" : "FIWARE::Filter::Not::Existence",
-              <scopeValue>entity::type</scopeValue>                               "value" : "entity::type"
-            </operationScope>                                                   }
-          </scope>                                                            ]
-        </restriction>                                                      }
-      ...                                                                 ...
+      ...                                                                
+      {
+	  "restriction": {
+	      "scopes": [
+		  {
+		      "type": "FIWARE::Filter::Not::Existence",
+		      "value": "entity::type"
+		  }
+	      ]
+	  }
+      }
+      ...                                                                
   
 The URL parameter corresponding to this filter is '!exist'.
 
@@ -94,15 +97,15 @@ There is no scope corresponding to this filter, given that you can use
 the usual entity type:
 
   --------------------------------------------------------------------------------------
-  XML                                              JSON
-  ------------------------------------------------ -------------------------------------
-      ...                                              ...
-          <entityId type="Room" isPattern="...">               {
-            <id>...</id>                                           "type": "Room",
-          </entityId>                                              "isPattern": "...",
-      ...                                                          "id": "..."
-                                                               }
-                                                       ...
+  JSON
+  --------------------------------------------------------------------------------------
+      ...                                            
+      {
+	  "type": "Room",
+	  "isPattern": "...",
+	  "id": "..."
+      }
+      ...
   --------------------------------------------------------------------------------------
 
 The URL parameter corresponding to this filter is 'entity::type'.

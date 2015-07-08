@@ -156,9 +156,7 @@ following:
 Regarding \[headers\] you have to include the following ones:
 
 -   Accept header to specify which payload format
-    you want to receive in the response. You should explicitly specify JSON,
-    as XML is the default (XML has been deprecated in Orion 0.23.0, but
-    the default has not been changed due to backward compability reasons).
+    you want to receive in the response. You should explicitly specify JSON.
 
 <!-- -->
 
@@ -175,8 +173,7 @@ Some additional remarks:
 
 -   We are using multi-line shell commands to provide the input to curl,
     using EOF to mark the beginning and the end of the multi-line block
-    (*here-documents*). An alternative to this is to put the XML in a
-    file (e.g. payload.xml), then use "--data-binary @payload.xml". In
+    (*here-documents*). In
     some cases (GET and DELETE) we omit "-d @-" as they don't
     use payload.
 -   In our examples we assume that the broker is listening on port 1026.
@@ -249,26 +246,27 @@ creation time temperature and pressure of Room1 are 23 ºC and 720 mmHg
 respectively.
 
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF                                                                                    {                                                                          
-	    "contextElements": [
-          {
-            "type": "Room",
-            "isPattern": "false",
-            "id": "Room1",
-            "attributes": [
-              {
-                "name": "temperature",
-                "type": "float",
-                "value": "23"
-              },
-              {
-                "name": "pressure",
-                "type": "integer",
-                "value": "720"
-              }
-            ]
-          }
-        ],
-        "updateAction": "APPEND"
+      {
+	  "contextElements": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1",
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "value": "23"
+		      },
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "value": "720"
+		      }
+		  ]
+	      }
+	  ],
+	  "updateAction": "APPEND"
       }
       EOF                                                                                                                         
 
@@ -291,34 +289,34 @@ Upon receipt of this request, the broker will create the entity in its
 internal database, set the values for its attributes and will response
 with the following:
 
-      <?xml version="1.0"?>                                  {
-      <updateContextResponse>                                    "contextResponses": [
-        <contextResponseList>                                        {
-          <contextElementResponse>                                       "contextElement": {
-            <contextElement>                                                 "attributes": [
-              <entityId type="Room" isPattern="false">                           {
-                <id>Room1</id>                                                       "name": "temperature",
-              </entityId>                                                            "type": "float",
-              <contextAttributeList>                                                 "value": ""
-                <contextAttribute>                                               },
-                  <name>temperature</name>                                       {
-                  <type>float</type>                                                 "name": "pressure",
-                  <contextValue/>                                                    "type": "integer",
-                </contextAttribute>                                                  "value": ""
-                <contextAttribute>                                               }
-                  <name>pressure</name>                                      ],
-                  <type>integer</type>                                       "id": "Room1",
-                  <contextValue/>                                            "isPattern": "false",
-                </contextAttribute>                                          "type": "Room"
-              </contextAttributeList>                                    },
-            </contextElement>                                            "statusCode": {
-            <statusCode>                                                     "code": "200",
-              <code>200</code>                                               "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                            }
-            </statusCode>                                            }
-          </contextElementResponse>                              ]
-        </contextResponseList>                               }
-      </updateContextResponse>                           
+      {
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "value": ""
+			  },
+			  {
+			      "name": "pressure",
+			      "type": "integer",
+			      "value": ""
+			  }
+		      ],
+		      "id": "Room1",
+		      "isPattern": "false",
+		      "type": "Room"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	    ]
+      }
+                           
 
 As you can see, it follows the same structure as the request, just to
 acknowledge that the request was correctly processed for these context
@@ -329,62 +327,60 @@ because you were the one to provide them in the request.
 Next, let's create Room2 in a similar way (in this case, setting
 temperature and pressure to 21 ºC and 711 mmHg respectively).
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool ) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                        {
-      <updateContextRequest>                                                                                                            "contextElements": [
-        <contextElementList>                                                                                                                {
-          <contextElement>                                                                                                                      "type": "Room",
-            <entityId type="Room" isPattern="false">                                                                                            "isPattern": "false",
-              <id>Room2</id>                                                                                                                    "id": "Room2",
-            </entityId>                                                                                                                         "attributes": [
-            <contextAttributeList>                                                                                                              {
-              <contextAttribute>                                                                                                                    "name": "temperature",
-                <name>temperature</name>                                                                                                            "type": "float",
-                <type>float</type>                                                                                                                  "value": "21"
-                <contextValue>21</contextValue>                                                                                                 },
-              </contextAttribute>                                                                                                               {
-              <contextAttribute>                                                                                                                    "name": "pressure",
-                <name>pressure</name>                                                                                                               "type": "integer",
-                <type>integer</type>                                                                                                                "value": "711"
-                <contextValue>711</contextValue>                                                                                                }
-              </contextAttribute>                                                                                                               ]
-            </contextAttributeList>                                                                                                         }
-          </contextElement>                                                                                                             ],
-        </contextElementList>                                                                                                           "updateAction": "APPEND"
-        <updateAction>APPEND</updateAction>                                                                                         }
-      </updateContextRequest>                                                                                                       EOF
+      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool ) <<EOF
+      {
+	  "contextElements": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room2",
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "value": "21"
+		      },
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "value": "711"
+		      }
+		  ]
+	      }
+	  ],
+	  "updateAction": "APPEND"
+      }
       EOF                                                                                                                       
   
 The response to this request is:
 
-      <?xml version="1.0"?>                                  {
-      <updateContextResponse>                                    "contextResponses": [
-        <contextResponseList>                                        {
-          <contextElementResponse>                                       "contextElement": {
-            <contextElement>                                                 "attributes": [
-              <entityId type="Room" isPattern="false">                           {
-                <id>Room2</id>                                                       "name": "temperature",
-              </entityId>                                                            "type": "float",
-              <contextAttributeList>                                                 "value": ""
-                <contextAttribute>                                               },
-                  <name>temperature</name>                                       {
-                  <type>float</type>                                                 "name": "pressure",
-                  <contextValue/>                                                    "type": "integer",
-                </contextAttribute>                                                  "value": ""
-                <contextAttribute>                                               }
-                  <name>pressure</name>                                      ],
-                  <type>integer</type>                                       "id": "Room2",
-                  <contextValue/>                                            "isPattern": "false",
-                </contextAttribute>                                          "type": "Room"
-              </contextAttributeList>                                    },
-            </contextElement>                                            "statusCode": {
-            <statusCode>                                                     "code": "200",
-              <code>200</code>                                               "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                            }
-            </statusCode>                                            }
-          </contextElementResponse>                              ]
-        </contextResponseList>                               }
-      </updateContextResponse>                           
+      {
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "value": ""
+			  },
+			  {
+			      "name": "pressure",
+			      "type": "integer",
+			      "value": ""
+			  }
+		      ],
+		      "id": "Room2",
+		      "isPattern": "false",
+		      "type": "Room"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+		}
+	    ]
+      }	             
 
 Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures or custom metadata. These are advance
@@ -400,219 +396,218 @@ interesting with it (e.g. show a graph with the room temperature in a
 graphical user interface). The NGSI10 queryContext request is used in
 this case, e.g. to get context information for Room1:
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                      {
-      <queryContextRequest>                                                                                                           "entities": [
-        <entityIdList>                                                                                                                    {
-          <entityId type="Room" isPattern="false">                                                                                            "type": "Room",
-            <id>Room1</id>                                                                                                                    "isPattern": "false",
-          </entityId>                                                                                                                         "id": "Room1"
-        </entityIdList>                                                                                                                   }
-        <attributeList/>                                                                                                              ]
-      </queryContextRequest>                                                                                                      }
-      EOF                                                                                                                         EOF
+      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      }
+	  ]
+      }
+      EOF
 
 The response includes all the attributes belonging to Room1 and we can
 check that temperature and pressure have the values that we set at
 entity creation with updateContext (23ºC and 720 mmHg).
 
-      <?xml version="1.0"?>                                  {
-      <queryContextResponse>                                     "contextResponses": [
-        <contextResponseList>                                        {
-          <contextElementResponse>                                       "contextElement": {
-            <contextElement>                                                 "attributes": [
-              <entityId type="Room" isPattern="false">                           {
-                <id>Room1</id>                                                       "name": "temperature",
-              </entityId>                                                            "type": "float",
-              <contextAttributeList>                                                 "value": "23"
-                <contextAttribute>                                               },
-                  <name>temperature</name>                                       {
-                  <type>float</type>                                                 "name": "pressure",
-                  <contextValue>23</contextValue>                                    "type": "integer",
-                </contextAttribute>                                                  "value": "720"
-                <contextAttribute>                                               }
-                  <name>pressure</name>                                      ],
-                  <type>integer</type>                                       "id": "Room1",
-                  <contextValue>720</contextValue>                           "isPattern": "false",
-                </contextAttribute>                                          "type": "Room"
-              </contextAttributeList>                                    },
-            </contextElement>                                            "statusCode": {
-            <statusCode>                                                     "code": "200",
-              <code>200</code>                                               "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                            }
-            </statusCode>                                            }
-          </contextElementResponse>                              ]
-        </contextResponseList>                               }
-      </queryContextResponse>                            
+      {
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "value": "23"
+			  },
+			  {
+			      "name": "pressure",
+			      "type": "integer",
+			      "value": "720"
+			  }
+		      ],
+		      "id": "Room1",
+		      "isPattern": "false",
+		      "type": "Room"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }
+                         
 
 If you use an empty attributes element in the request, the response will include all the attributes of the entity. If you include an actual list of attributes (e.g. temperature) only that are retrieved, as shown in the following request:
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                      {
-      <queryContextRequest>                                                                                                           "entities": [
-        <entityIdList>                                                                                                                {
-          <entityId type="Room" isPattern="false">                                                                                        "type": "Room",
-            <id>Room1</id>                                                                                                                "isPattern": "false",
-          </entityId>                                                                                                                     "id": "Room1"
-        </entityIdList>                                                                                                               }
-        <attributeList>                                                                                                               ],
-          <attribute>temperature</attribute>                                                                                          "attributes" : [
-        </attributeList>                                                                                                                  "temperature"
-      </queryContextRequest>                                                                                                          ]
-      EOF                                                                                                                         }
-                                                                                                                                  EOF
+      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      }
+	  ],
+	  "attributes": [
+	      "temperature"
+	  ]
+      }
+      EOF
 
 which response is as follows:
 
-      <?xml version="1.0"?>                                  {
-      <queryContextResponse>                                     "contextResponses": [
-        <contextResponseList>                                        {
-          <contextElementResponse>                                       "contextElement": {
-            <contextElement>                                                 "attributes": [
-              <entityId type="Room" isPattern="false">                           {
-                <id>Room1</id>                                                       "name": "temperature",
-              </entityId>                                                            "type": "float",
-              <contextAttributeList>                                                 "value": "23"
-                <contextAttribute>                                               }
-                  <name>temperature</name>                                   ],
-                  <type>float</type>                                         "id": "Room1",
-                  <contextValue>23</contextValue>                            "isPattern": "false",
-                </contextAttribute>                                          "type": "Room"
-              </contextAttributeList>                                    },
-            </contextElement>                                            "statusCode": {
-            <statusCode>                                                     "code": "200",
-              <code>200</code>                                               "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                            }
-            </statusCode>                                            }
-          </contextElementResponse>                              ]
-        </contextResponseList>                               }
-      </queryContextResponse>                            
+      {
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "value": "23"
+			  }
+		      ],
+		      "id": "Room1",
+		      "isPattern": "false",
+		      "type": "Room"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		    }
+	      }
+	  ]
+      }                       
 
 Moreover, a powerful feature of Orion Context Broker is that you can use
 a regular expression for the entity ID. For example, you can query
 entities which ID starts with "Room" using the regex "Room.\*". In this
 case, you have to set isPattern to "true" as shown below:
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                      {
-      <queryContextRequest>                                                                                                           "entities": [
-        <entityIdList>                                                                                                                {
-          <entityId type="Room" isPattern="false">                                                                                        "type": "Room",
-            <id>Room1</id>                                                                                                                "isPattern": "false",
-          </entityId>                                                                                                                     "id": "Room1"
-          <entityId type="Room" isPattern="false">                                                                                    },
-            <id>Room2</id>                                                                                                            {
-          </entityId>                                                                                                                     "type": "Room",
-        </entityIdList>                                                                                                                   "isPattern": "false",
-        <attributeList>                                                                                                                   "id": "Room2"
-          <attribute>temperature</attribute>                                                                                          }
-        </attributeList>                                                                                                              ],
-      </queryContextRequest>                                                                                                          "attributes" : [
-      EOF                                                                                                                                 "temperature"
-                                                                                                                                      ]
-                                                                                                                                  }
-                                                                                                                                  EOF
+      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      },
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room2"
+	      }
+	  ],
+	  "attributes": [
+	      "temperature"
+	  ]
+      }
+      EOF
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                      {
-      <queryContextRequest>                                                                                                           "entities": [
-        <entityIdList>                                                                                                                {
-          <entityId type="Room" isPattern="true">                                                                                         "type": "Room",
-            <id>Room.*</id>                                                                                                               "isPattern": "true",
-          </entityId>                                                                                                                     "id": "Room.*"
-        </entityIdList>                                                                                                               }
-        <attributeList>                                                                                                               ],
-          <attribute>temperature</attribute>                                                                                          "attributes" : [
-        </attributeList>                                                                                                              "temperature"
-      </queryContextRequest>                                                                                                          ]
-      EOF                                                                                                                         }
-                                                                                                                                  EOF
+      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "true",
+		  "id": "Room.*"
+	      }
+	  ],
+	  "attributes": [
+	      "temperature"
+	  ]
+      }
+      EOF                                                                                                                       }
+                                                                                                                                  
   
 
 Both produce the same response:
 
-      <?xml version="1.0"?>                                  {
-      <queryContextResponse>                                     "contextResponses": [
-        <contextResponseList>                                        {
-          <contextElementResponse>                                       "contextElement": {
-            <contextElement>                                                 "attributes": [
-              <entityId type="Room" isPattern="false">                           {
-                <id>Room1</id>                                                       "name": "temperature",
-              </entityId>                                                            "type": "float",
-              <contextAttributeList>                                                 "value": "23"
-                <contextAttribute>                                               }
-                  <name>temperature</name>                                   ],
-                  <type>float</type>                                         "id": "Room1",
-                  <contextValue>23</contextValue>                            "isPattern": "false",
-                </contextAttribute>                                          "type": "Room"
-              </contextAttributeList>                                    },
-            </contextElement>                                            "statusCode": {
-            <statusCode>                                                     "code": "200",
-              <code>200</code>                                               "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                            }
-            </statusCode>                                            },
-          </contextElementResponse>                                  {
-          <contextElementResponse>                                       "contextElement": {
-            <contextElement>                                                 "attributes": [
-              <entityId type="Room" isPattern="false">                           {
-                <id>Room2</id>                                                       "name": "temperature",
-              </entityId>                                                            "type": "float",
-              <contextAttributeList>                                                 "value": "21"
-                <contextAttribute>                                               }
-                  <name>temperature</name>                                   ],
-                  <type>float</type>                                         "id": "Room2",
-                  <contextValue>21</contextValue>                            "isPattern": "false",
-                </contextAttribute>                                          "type": "Room"
-              </contextAttributeList>                                    },
-            </contextElement>                                            "statusCode": {
-            <statusCode>                                                     "code": "200",
-              <code>200</code>                                               "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                            }
-            </statusCode>                                            }
-          </contextElementResponse>                              ]
-        </contextResponseList>                               }
-      </queryContextResponse>                            
+      {
+	  "contextResponses": [
+	    {
+		"contextElement": {
+		      "attributes": [
+			{
+			      "name": "temperature",
+			      "type": "float",
+			      "value": "23"
+			}
+		      ],
+		      "id": "Room1",
+		      "isPattern": "false",
+		      "type": "Room"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      },
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "value": "21"
+			  }
+		      ],
+		      "id": "Room2",
+		      "isPattern": "false",	
+		      "type": "Room"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }                        
 
 Finally, note that you will get an error in case you try to query a
 non-existing entity or attribute, as shown in the following cases below:
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                      {
-      <queryContextRequest>                                                                                                           "entities": [
-        <entityIdList>                                                                                                                {
-          <entityId type="Room" isPattern="false">                                                                                        "type": "Room",
-            <id>Room5</id>                                                                                                                "isPattern": "false",
-          </entityId>                                                                                                                     "id": "Room5"
-        </entityIdList>                                                                                                               }
-        <attributeList/>                                                                                                              ]
-      </queryContextRequest>                                                                                                      }
-      EOF                                                                                                                         EOF
+      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room5"
+	      }
+	  ]
+      }
+      EOF                                                                                                                   
   
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                      {
-      <queryContextRequest>                                                                                                           "entities": [
-        <entityIdList>                                                                                                                {
-          <entityId type="Room" isPattern="false">                                                                                        "type": "Room",
-            <id>Room1</id>                                                                                                                "isPattern": "false",
-          </entityId>                                                                                                                     "id": "Room1"
-        </entityIdList>                                                                                                               }
-        <attributeList>                                                                                                               ],
-          <attribute>humidity</attribute>                                                                                             "attributes" : [
-        </attributeList>                                                                                                                  "humidity"
-      </queryContextRequest>                                                                                                          ]
-      EOF                                                                                                                         }
-                                                                                                                                  EOF
+      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      }
+	  ],
+	  "attributes": [
+	      "humidity"
+	  ]
+      }
+      EOF
 
 
 Both requests will produce the same error response:
 
-      <?xml version="1.0"?>                                            {
-      <queryContextResponse>                                               "errorCode": {
-        <errorCode>                                                            "code": "404",
-          <code>404</code>                                                     "reasonPhrase": "No context elements found"
-          <reasonPhrase>No context elements found</reasonPhrase>           }
-        </errorCode>                                                   }
-      </queryContextResponse>                                      
+      {
+	  "errorCode": {
+	      "code": "404",
+	      "reasonPhrase": "No context elements found"
+	  }
+      }
+                                          
 
 Additional comments:
 
@@ -630,43 +625,19 @@ Additional comments:
 
 <!-- -->
 
-    (curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-    {
-        "entities": [
-           {
-               "type": "Room",
-               "isPattern": "false",
-               "id": "Room1"
-           }
-        ]
-    }
-    EOF
+      (curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      }
+	  ]
+      }
+      EOF
 
-    {
-        "contextResponses": [
-            {
-                "contextElement": {
-                    "attributes": {
-                        "pressure": {
-                            "type": "integer",
-                            "value": "720"
-                        },
-                        "temperature": {
-                            "type": "float",
-                            "value": "23"
-                        }
-                    },
-                    "id": "Room1",
-                    "isPattern": "false",
-                    "type": "Room"
-                },
-                "statusCode": {
-                    "code": "200",
-                    "reasonPhrase": "OK"
-                }
-            }
-        ]
-    }
+
 
 #### Update context elements
 
@@ -682,31 +653,33 @@ source of context information. Let's assume that this application in a
 given moment wants to set the temperature and pressure of Room1 to 26.5
 ºC and 763 mmHg respectively, so it issues the following request:
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                        {
-      <updateContextRequest>                                                                                                            "contextElements": [
-        <contextElementList>                                                                                                                {
-          <contextElement>                                                                                                                      "type": "Room",
-            <entityId type="Room" isPattern="false">                                                                                            "isPattern": "false",
-              <id>Room1</id>                                                                                                                    "id": "Room1",
-            </entityId>                                                                                                                         "attributes": [
-            <contextAttributeList>                                                                                                              {
-              <contextAttribute>                                                                                                                    "name": "temperature",
-                <name>temperature</name>                                                                                                            "type": "float",
-                <type>float</type>                                                                                                                  "value": "26.5"
-                <contextValue>26.5</contextValue>                                                                                               },
-              </contextAttribute>                                                                                                               {
-              <contextAttribute>                                                                                                                    "name": "pressure",
-                <name>pressure</name>                                                                                                               "type": "integer",
-                <type>integer</type>                                                                                                                "value": "763"
-                <contextValue>763</contextValue>                                                                                                }
-              </contextAttribute>                                                                                                               ]
-            </contextAttributeList>                                                                                                         }
-          </contextElement>                                                                                                             ],
-        </contextElementList>                                                                                                           "updateAction": "UPDATE"
-        <updateAction>UPDATE</updateAction>                                                                                         }
-      </updateContextRequest>                                                                                                       EOF
-      EOF                                                                                                                       
+      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextResponses": [
+	    {
+		  "contextElement": {
+		      "attributes": {
+			  "pressure": {
+			      "type": "integer",
+			      "value": "720"
+			  },
+			  "temperature": {
+			      "type": "float",
+			      "value": "23"
+			  }
+		      },
+		      "id": "Room1",
+		      "isPattern": "false",
+		      "type": "Room"
+		    },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }
+      EOF                                                                                                                    
 
 As you can see, the structure of the request is exactly the same we used
 for [updateContext with APPEND for creating
@@ -717,34 +690,33 @@ Upon receipt of this request, the broker will update the values for the
 entity attributes in its internal database and will response with the
 following:
 
-      <?xml version="1.0"?>                                  {
-      <updateContextResponse>                                    "contextResponses": [
-        <contextResponseList>                                        {
-          <contextElementResponse>                                       "contextElement": {
-            <contextElement>                                                 "attributes": [
-              <entityId type="Room" isPattern="false">                           {
-                <id>Room1</id>                                                       "name": "temperature",
-              </entityId>                                                            "type": "float",
-              <contextAttributeList>                                                 "value": ""
-                <contextAttribute>                                               },
-                  <name>temperature</name>                                       {
-                  <type>float</type>                                                 "name": "pressure",
-                  <contextValue/>                                                    "type": "integer",
-                </contextAttribute>                                                  "value": ""
-                <contextAttribute>                                               }
-                  <name>pressure</name>                                      ],
-                  <type>integer</type>                                       "id": "Room1",
-                  <contextValue/>                                            "isPattern": "false",
-                </contextAttribute>                                          "type": "Room"
-              </contextAttributeList>                                    },
-            </contextElement>                                            "statusCode": {
-            <statusCode>                                                     "code": "200",
-              <code>200</code>                                               "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                            }
-            </statusCode>                                            }
-          </contextElementResponse>                              ]
-        </contextResponseList>                               }
-      </updateContextResponse>                           
+      {
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "value": ""
+			  },
+			  {
+			      "name": "pressure",
+			      "type": "integer",
+			      "value": ""
+			  }
+		      ],
+		      "id": "Room1",
+		      "isPattern": "false",
+		      "type": "Room"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }                     
 
 Again, the structure of the response is exactly the same one we used for
 [updateContext with APPEND for creating
@@ -764,97 +736,95 @@ also illustrates that you don't need to include all the attributes of an
 entity in the updateContext, just the ones you want to update (the other
 attributes maintain their current value).
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                        {
-      <updateContextRequest>                                                                                                            "contextElements": [
-        <contextElementList>                                                                                                                {
-          <contextElement>                                                                                                                      "type": "Room",
-            <entityId type="Room" isPattern="false">                                                                                            "isPattern": "false",
-              <id>Room2</id>                                                                                                                    "id": "Room2",
-            </entityId>                                                                                                                         "attributes": [
-            <contextAttributeList>                                                                                                              {
-              <contextAttribute>                                                                                                                    "name": "temperature",
-                <name>temperature</name>                                                                                                            "type": "float",
-                <type>float</type>                                                                                                                  "value": "27.4"
-                <contextValue>27.4</contextValue>                                                                                               }
-              </contextAttribute>                                                                                                               ]
-            </contextAttributeList>                                                                                                         }
-          </contextElement>                                                                                                             ],
-        </contextElementList>                                                                                                           "updateAction": "UPDATE"
-        <updateAction>UPDATE</updateAction>                                                                                         }
-      </updateContextRequest>                                                                                                       EOF
+      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextElements": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room2",
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "value": "27.4"
+		      }
+		  ]
+	      }
+	    ],
+	    "updateAction": "UPDATE"
+      }
       EOF                                                                                                                       
  
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                        {
-      <updateContextRequest>                                                                                                            "contextElements": [
-        <contextElementList>                                                                                                                {
-          <contextElement>                                                                                                                      "type": "Room",
-            <entityId type="Room" isPattern="false">                                                                                            "isPattern": "false",
-              <id>Room2</id>                                                                                                                    "id": "Room2",
-            </entityId>                                                                                                                         "attributes": [
-            <contextAttributeList>                                                                                                              {
-              <contextAttribute>                                                                                                                    "name" : "pressure",
-                <name>pressure</name>                                                                                                               "type" : "integer",
-                <type>integer</type>                                                                                                                "value" : "755"
-                <contextValue>755</contextValue>                                                                                                }
-              </contextAttribute>                                                                                                               ]
-            </contextAttributeList>                                                                                                         }
-          </contextElement>                                                                                                             ],
-        </contextElementList>                                                                                                           "updateAction": "UPDATE"
-        <updateAction>UPDATE</updateAction>                                                                                         }
-      </updateContextRequest>                                                                                                       EOF
-      EOF                                                                                                                       
+      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextElements": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room2",
+		  "attributes": [
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "value": "755"
+		      }
+		  ]
+	      }
+	  ],
+	  "updateAction": "UPDATE"
+      }
+      EOF                                                                                                                
   
 The responses for these requests are respectively:
 
-      <?xml version="1.0"?>                                  {
-      <updateContextResponse>                                    "contextResponses": [
-        <contextResponseList>                                        {
-          <contextElementResponse>                                       "contextElement": {
-            <contextElement>                                                 "attributes": [
-              <entityId type="Room" isPattern="false">                           {
-                <id>Room2</id>                                                       "name": "temperature",
-              </entityId>                                                            "type": "float",
-              <contextAttributeList>                                                 "value": ""
-                <contextAttribute>                                               }
-                  <name>temperature</name>                                   ],
-                  <type>float</type>                                         "id": "Room2",
-                  <contextValue/>                                            "isPattern": "false",
-                </contextAttribute>                                          "type": "Room"
-              </contextAttributeList>                                    },
-            </contextElement>                                            "statusCode": {
-            <statusCode>                                                     "code": "200",
-              <code>200</code>                                               "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                            }
-            </statusCode>                                            }
-          </contextElementResponse>                              ]
-        </contextResponseList>                               }
-      </updateContextResponse>                           
+      {
+	  "contextResponses": [
+	      {
+		    "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "value": ""
+			  }
+		      ],
+		      "id": "Room2",
+		      "isPattern": "false",
+		      "type": "Room"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }
+                 
   
-      <?xml version="1.0"?>                                  {
-      <updateContextResponse>                                    "contextResponses": [
-        <contextResponseList>                                        {
-          <contextElementResponse>                                       "contextElement": {
-            <contextElement>                                                 "attributes": [
-              <entityId type="Room" isPattern="false">                           {
-                <id>Room2</id>                                                       "name": "pressure",
-              </entityId>                                                            "type": "integer",
-              <contextAttributeList>                                                 "value": ""
-                <contextAttribute>                                               }
-                  <name>pressure</name>                                      ],
-                  <type>integer</type>                                       "id": "Room2",
-                  <contextValue/>                                            "isPattern": "false",
-                </contextAttribute>                                          "type": "Room"
-              </contextAttributeList>                                    },
-            </contextElement>                                            "statusCode": {
-            <statusCode>                                                     "code": "200",
-              <code>200</code>                                               "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                            }
-            </statusCode>                                            }
-          </contextElementResponse>                              ]
-        </contextResponseList>                               }
-      </updateContextResponse>                           
+ 
+      {
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "pressure",
+			      "type": "integer",
+			      "value": ""
+			  }
+		      ],
+		      "id": "Room2",
+		      "isPattern": "false",
+		      "type": "Room"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }
 
 Now, you can use queryContext operation [as previously
 described](#Query_Context_operation "wikilink") to check that Room1 and
@@ -892,40 +862,38 @@ current version of the Orion Context Broker doesn't support it.
 The following is the request corresponding to an ONTIMEINTERVAL
 subscription:
 
-      (curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                           {
-      <subscribeContextRequest>                                                                                                           "entities": [
-        <entityIdList>                                                                                                                        {
-          <entityId type="Room" isPattern="false">                                                                                                "type": "Room",
-            <id>Room1</id>                                                                                                                        "isPattern": "false",
-          </entityId>                                                                                                                             "id": "Room1"
-        </entityIdList>                                                                                                                       }
-        <attributeList>                                                                                                                   ],
-          <attribute>temperature</attribute>                                                                                              "attributes": [
-        </attributeList>                                                                                                                      "temperature"
-        <reference>http://localhost:1028/accumulate</reference>                                                                           ],
-        <duration>P1M</duration>                                                                                                          "reference": "http://localhost:1028/accumulate",
-        <notifyConditions>                                                                                                                "duration": "P1M",
-          <notifyCondition>                                                                                                               "notifyConditions": [
-            <type>ONTIMEINTERVAL</type>                                                                                                       {
-            <condValueList>                                                                                                                       "type": "ONTIMEINTERVAL",
-              <condValue>PT10S</condValue>                                                                                                        "condValues": [
-            </condValueList>                                                                                                                          "PT10S"
-          </notifyCondition>                                                                                                                      ]
-        </notifyConditions>                                                                                                                   }
-      </subscribeContextRequest>                                                                                                          ]
-      EOF                                                                                                                             }
-                                                                                                                                      EOF
+      (curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      }
+	  ],
+	  "attributes": [
+	      "temperature"
+	  ],
+	  "reference": "http://localhost:1028/accumulate",
+	  "duration": "P1M",
+	  "notifyConditions": [
+	      {
+		  "type": "ONTIMEINTERVAL",
+		  "condValues": [
+		      "PT10S"
+		    ]
+	      }
+	  ]
+      }
+      EOF
+
 Let's examine in detail the different elements included in the payload:
 
 -   entityIdList and attributeList ('entities' and 'attributes' for
     short, in JSON) define which context elements will be included in
-    the notification message. They work the same way as the XML elements
-    with the same name in [queryContext
-    request](#Query_Context_operation "wikilink"). You can even include
-    lists or patterns to specify entities. In this example, we are
-    specifying that the notification has to include the temperature
-    attribute for entity Room1.
+    the notification message. 
+    In this example, we are specifying that the notification has to include 
+    the temperature attribute for entity Room1.
 -   The callback URL to send notifications is defined with the
     reference element. We are using the URL of the accumulator-server.py
     program started before. Only one reference can be included per
@@ -956,53 +924,51 @@ Let's examine in detail the different elements included in the payload:
 
 The response corresponding to that request contains a subscription ID (a
 24 hexadecimal number used for updating and cancelling the subscription
-- write it down because you will need it later in this tutorial) and a
+-Write it down because you will need it later in this tutorial) and a
 duration acknowledgement:
 
-
-      <?xml version="1.0"?>                                               {
-      <subscribeContextResponse>                                              "subscribeResponse": {
-        <subscribeResponse>                                                       "duration": "P1M",
-          <subscriptionId>51c04a21d714fb3b37d7d5a7</subscriptionId>               "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-          <duration>P1M</duration>                                            }
-        </subscribeResponse>                                              }
-      </subscribeContextResponse>                                       
+      {
+	  "subscribeResponse": {
+	      "duration": "P1M",
+	      "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+	  }
+      }                                   
 
 If you look at the accumulator-script.py terminal window, you will see
 that a message resembling the following one is received each 10 seconds:
 
 
-      POST http://localhost:1028/accumulate                             POST http://localhost:1028/accumulate
-      Content-Length: 739                                               Content-Length: 492
-      User-Agent: orion/0.9.0                                           User-Agent: orion/0.9.0
-      Host: localhost:1028                                              Host: localhost:1028
-      Accept: application/xml, application/json                         Accept: application/xml, application/json
-      Content-Type: application/xml                                     Content-Type: application/json
-                                                                    
-      <notifyContextRequest>                                            {
-        <subscriptionId>51c04a21d714fb3b37d7d5a7</subscriptionId>         "subscriptionId" : "51c04a21d714fb3b37d7d5a7",
-        <originator>localhost</originator>                                "originator" : "localhost",
-        <contextResponseList>                                             "contextResponses" : [
-          <contextElementResponse>                                          {
-            <contextElement>                                                  "contextElement" : {
-              <entityId type="Room" isPattern="false">                          "attributes" : [
-                <id>Room1</id>                                                    {
-              </entityId>                                                           "name" : "temperature",
-              <contextAttributeList>                                                "type" : "float",
-                <contextAttribute>                                                  "value" : "26.5"
-                  <name>temperature</name>                                        }
-                  <type>float</type>                                            ],
-                  <contextValue>26.5</contextValue>                             "type" : "Room",
-                </contextAttribute>                                             "isPattern" : "false",
-              </contextAttributeList>                                           "id" : "Room1"
-            </contextElement>                                                 },
-            <statusCode>                                                      "statusCode" : {
-              <code>200</code>                                                  "code" : "200",
-              <reasonPhrase>OK</reasonPhrase>                                   "reasonPhrase" : "OK"
-            </statusCode>                                                     }
-          </contextElementResponse>                                         }
-        </contextResponseList>                                            ]
-      </notifyContextRequest>                                           }  
+      POST http://localhost:1028/accumulate
+      Content-Length: 492
+      User-Agent: orion/0.9.0
+      Host: localhost:1028
+      Accept: application/xml, application/json
+      Content-Type: application/json
+
+      {
+	  "subscriptionId": "51c04a21d714fb3b37d7d5a7",
+	  "originator": "localhost",
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "value": "26.5"
+			  }
+		      ],
+		      "type": "Room",
+		      "isPattern": "false",
+		      "id": "Room1"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }
 
 Orion Context Broker notifies NGSI10 subscribeContext using the POST
 HTTP method (on the URL used as reference for the subscription) with a
@@ -1032,30 +998,27 @@ change the notification interval to 5 seconds we will use the following
 one that you have got in the subscribeContext response in the previous
 step) command:
 
-      (curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                     {
-      <updateContextSubscriptionRequest>                                                                                                            "subscriptionId": "51c04a21d714fb3b37d7d5a7",
-        <subscriptionId>51c04a21d714fb3b37d7d5a7</subscriptionId>                                                                                   "notifyConditions": [
-        <notifyConditions>                                                                                                                              {
-          <notifyCondition>                                                                                                                                 "type": "ONTIMEINTERVAL",
-            <type>ONTIMEINTERVAL</type>                                                                                                                     "condValues": [
-            <condValueList>                                                                                                                                     "PT5S"
-              <condValue>PT5S</condValue>                                                                                                                   ]
-            </condValueList>                                                                                                                            }
-          </notifyCondition>                                                                                                                        ]
-        </notifyConditions>                                                                                                                     }
-      </updateContextSubscriptionRequest>                                                                                                       EOF
-      EOF                                                                                                                                   
+      (curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "subscriptionId": "51c04a21d714fb3b37d7d5a7",
+	  "notifyConditions": [
+	      {
+		  "type": "ONTIMEINTERVAL",
+		  "condValues": [
+		      "PT5S"
+		  ]
+	      }
+	  ]
+      }
+      EOF                                                                                                                                 
   
 The response is very similar to the one for subscribeContext request:
 
-
-      <?xml version="1.0"?>                                               {
-      <updateContextSubscriptionResponse>                                   "subscribeResponse" : {
-        <subscribeResponse>                                                   "subscriptionId" : "51c04a21d714fb3b37d7d5a7",
-          <subscriptionId>51c04a21d714fb3b37d7d5a7</subscriptionId>         }
-        </subscribeResponse>                                              }
-      </updateContextSubscriptionResponse>                            
+      {
+	  "subscribeResponse" : {
+	    "subscriptionId" : "51c04a21d714fb3b37d7d5a7",
+	  }
+      }             
 
 You can check in accumulator-server.py that the notification frequency
 has changed to 5 seconds.
@@ -1066,24 +1029,22 @@ request payload (replace the subscriptionId value after copy-paste with
 the one that you get in the subscribeContext response in the previous
 step):
 
-      (curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                              {
-      <unsubscribeContextRequest>                                                                                                          "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-        <subscriptionId>51c04a21d714fb3b37d7d5a7</subscriptionId>                                                                        }
-      </unsubscribeContextRequest>                                                                                                       EOF
-      EOF                                                                                                                            
+      (curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+      }
+      EOF                                                                                                                          
 
 The response is just an acknowledgement of that the cancellation was
 successful.
 
-      <?xml version="1.0"?>                                             {
-      <unsubscribeContextResponse>                                          "statusCode": {
-        <subscriptionId>51c04a21d714fb3b37d7d5a7</subscriptionId>               "code": "200",
-        <statusCode>                                                            "reasonPhrase": "OK"
-          <code>200</code>                                                  },
-          <reasonPhrase>OK</reasonPhrase>                                   "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-        </statusCode>                                                   }
-      </unsubscribeContextResponse>                                 
+      {
+	    "statusCode": {
+		"code": "200",
+		"reasonPhrase": "OK"
+	    },
+	    "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+      }                              
 
 You can have a look at accumulator-server.py to check that the
 notification flow has stopped.
@@ -1098,31 +1059,31 @@ ONCHANGE subscriptions are used when you want to be notified not when a
 given time interval has passed but when some attribute changes. Let's
 consider the following example:
 
-      (curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                           {
-      <subscribeContextRequest>                                                                                                           "entities": [
-        <entityIdList>                                                                                                                        {
-          <entityId type="Room" isPattern="false">                                                                                                "type": "Room",
-            <id>Room1</id>                                                                                                                        "isPattern": "false",
-          </entityId>                                                                                                                             "id": "Room1"
-        </entityIdList>                                                                                                                       }
-        <attributeList>                                                                                                                   ],
-          <attribute>temperature</attribute>                                                                                              "attributes": [
-        </attributeList>                                                                                                                      "temperature"
-        <reference>http://localhost:1028/accumulate</reference>                                                                           ],
-        <duration>P1M</duration>                                                                                                          "reference": "http://localhost:1028/accumulate",
-        <notifyConditions>                                                                                                                "duration": "P1M",
-          <notifyCondition>                                                                                                               "notifyConditions": [
-            <type>ONCHANGE</type>                                                                                                             {
-            <condValueList>                                                                                                                       "type": "ONCHANGE",
-              <condValue>pressure</condValue>                                                                                                     "condValues": [
-            </condValueList>                                                                                                                          "pressure"
-          </notifyCondition>                                                                                                                      ]
-        </notifyConditions>                                                                                                                   }
-        <throttling>PT5S</throttling>                                                                                                     ],
-      </subscribeContextRequest>                                                                                                          "throttling": "PT5S"
-      EOF                                                                                                                             }
-                                                                                                                                      EOF
+      (curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      }
+	  ],
+	  "attributes": [
+	      "temperature"
+	  ],
+	  "reference": "http://localhost:1028/accumulate",
+	  "duration": "P1M",
+	  "notifyConditions": [
+	      {
+		  "type": "ONCHANGE",
+		  "condValues": [
+		      "pressure"
+		  ]
+	      }
+	  ],
+	  "throttling": "PT5S"
+      }
+      EOF
 
 
 Having a look at the payload we can check that it is very similar to the
@@ -1164,50 +1125,50 @@ As in ONTIMEINTERVAL subscriptions, the response consists of a
 subscription ID, a duration acknowledgement and (given that we used
 throttling in the request) a throttling acknowledgement:
 
-      <?xml version="1.0"?>                                               {
-      <subscribeContextResponse>                                              "subscribeResponse": {
-        <subscribeResponse>                                                       "duration": "P1M",
-          <subscriptionId>51c0ac9ed714fb3b37d7d5a8</subscriptionId>               "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
-          <duration>P1M</duration>                                                "throttling": "PT5S"
-          <throttling>PT5S</throttling>                                       }
-        </subscribeResponse>                                              }
-      </subscribeContextResponse>                                     
+      {
+	  "subscribeResponse": {
+	      "duration": "P1M",
+	      "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
+	      "throttling": "PT5S"
+	  }
+      }                                    
 
 Let's have a look now at accumulator-server.py. We will see one (and
 just one by the moment, no matter how much you wait)
 notifyContextRequest, similar to this one:
 
-      POST http://localhost:1028/accumulate                             POST http://localhost:1028/accumulate
-      Content-Length: 739                                               Content-Length: 492
-      User-Agent: orion/0.9.0                                           User-Agent: orion/0.9.0
-      Host: localhost:1028                                              Host: localhost:1028
-      Accept: application/xml, application/json                         Accept: application/xml, application/json
-      Content-Type: application/xml                                     Content-Type: application/json
-                                                                    
-      <notifyContextRequest>                                            {
-        <subscriptionId>51c0ac9ed714fb3b37d7d5a8</subscriptionId>         "subscriptionId" : "51c0ac9ed714fb3b37d7d5a8",
-        <originator>localhost</originator>                                "originator" : "localhost",
-        <contextResponseList>                                             "contextResponses" : [
-          <contextElementResponse>                                          {
-            <contextElement>                                                  "contextElement" : {
-              <entityId type="Room" isPattern="false">                          "attributes" : [
-                <id>Room1</id>                                                    {
-              </entityId>                                                           "name" : "temperature",
-              <contextAttributeList>                                                "type" : "float",
-                <contextAttribute>                                                  "value" : "26.5"
-                  <name>temperature</name>                                        }
-                  <type>float</type>                                            ],
-                  <contextValue>26.5</contextValue>                             "type" : "Room",
-                </contextAttribute>                                             "isPattern" : "false",
-              </contextAttributeList>                                           "id" : "Room1"
-            </contextElement>                                                 },
-            <statusCode>                                                      "statusCode" : {
-              <code>200</code>                                                  "code" : "200",
-              <reasonPhrase>OK</reasonPhrase>                                   "reasonPhrase" : "OK"
-            </statusCode>                                                     }
-          </contextElementResponse>                                         }
-        </contextResponseList>                                            ]
-      </notifyContextRequest>                                           }
+      POST http://localhost:1028/accumulate
+      Content-Length: 492
+      User-Agent: orion/0.9.0
+      Host: localhost:1028
+      Accept: application/xml, application/json
+      Content-Type: application/json
+    
+      {
+	  "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
+	  "originator": "localhost",
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "value": "26.5"
+			  }
+		      ],
+		      "type": "Room",
+		      "isPattern": "false",
+		      "id": "Room1"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }
+
 
 You may wonder why accumulator-server.py is getting this message if you
 don't actually do any update. This is because the Orion Context Broker
@@ -1287,112 +1248,106 @@ need to make it aware of the existence of certain entities. Thus, let's
 first create Room1 entity with temperature and pressure attributes (with
 its initial values)
 
-      (curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                                         {
-      <appendContextElementRequest>                                                                                                                    "attributes" : [
-        <contextAttributeList>                                                                                                                           {
-          <contextAttribute>                                                                                                                               "name" : "temperature",
-            <name>temperature</name>                                                                                                                       "type" : "float",
-            <type>float</type>                                                                                                                             "value" : "23"
-            <contextValue>23</contextValue>                                                                                                              },
-          </contextAttribute>                                                                                                                            {
-          <contextAttribute>                                                                                                                               "name" : "pressure",
-            <name>pressure</name>                                                                                                                          "type" : "integer",
-            <type>integer</type>                                                                                                                           "value" : "720"
-            <contextValue>720</contextValue>                                                                                                             }
-          </contextAttribute>                                                                                                                          ]
-        </contextAttributeList>                                                                                                                      }
-      </appendContextElementRequest>                                                                                                                 EOF
-      EOF                                                                                                                                        
-  
+      (curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+      {
+	  "attributes": [
+	      {
+		  "name": "temperature",
+		  "type": "float",
+		  "value": "23"
+	      },
+	      {
+		  "name": "pressure",
+		  "type": "integer",
+		  "value": "720"
+	      }
+	  ]
+      }
+      EOF
+
 the response is:
 
-      <?xml version="1.0"?>                         {
-      <appendContextElementResponse>                  "contextResponses": [
-        <entityId type="" isPattern="false">            {
-          <id>Room1</id>                                  "attributes": [
-        </entityId>                                         {
-        <contextResponseList>                                 "name": "temperature",
-          <contextAttributeResponse>                          "type": "float",
-            <contextAttributeList>                            "value": ""
-              <contextAttribute>                            },
-                <name>temperature</name>                    {
-                <type>float</type>                            "name": "pressure",
-                <contextValue/>                               "type": "integer",
-              </contextAttribute>                             "value": ""
-              <contextAttribute>                            }
-                <name>pressure</name>                     ],
-                <type>integer</type>                      "statusCode": {
-                <contextValue/>                             "code": "200",
-              </contextAttribute>                           "reasonPhrase": "OK"
-            </contextAttributeList>                       }
-            <statusCode>                                }
-              <code>200</code>                        ], 
-              <reasonPhrase>OK</reasonPhrase>         "id": "Room1", 
-            </statusCode>                             "isPattern": "false", 
-          </contextAttributeResponse>                 "type": ""
-        </contextResponseList>                      }
-      </appendContextElementResponse>           
+      {
+	  "contextResponses": [
+	      {
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "value": ""
+		      },
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "value": ""
+		      }
+		  ],
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ],
+	  "id": "Room1",
+	  "isPattern": "false",
+	  "type": ""
+      }        
 
 Now, let's do the same with Room2:
 
-      (curl localhost:1026/v1/contextEntities/Room2 -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/contextEntities/Room2 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                                         {
-      <appendContextElementRequest>                                                                                                                    "attributes" : [
-        <contextAttributeList>                                                                                                                           {
-          <contextAttribute>                                                                                                                               "name" : "temperature",
-            <name>temperature</name>                                                                                                                       "type" : "float",
-            <type>float</type>                                                                                                                             "value" : "21"
-            <contextValue>21</contextValue>                                                                                                              },
-          </contextAttribute>                                                                                                                            {
-          <contextAttribute>                                                                                                                               "name" : "pressure",
-            <name>pressure</name>                                                                                                                          "type" : "integer",
-            <type>integer</type>                                                                                                                           "value" : "711"
-            <contextValue>711</contextValue>                                                                                                             }
-          </contextAttribute>                                                                                                                          ]
-        </contextAttributeList>                                                                                                                      }
-      </appendContextElementRequest>                                                                                                             
-      EOF                                                                                                                                            EOF
-
+      (curl localhost:1026/v1/contextEntities/Room2 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+      {
+	  "attributes": [
+	      {
+		  "name": "temperature",
+		  "type": "float",
+		  "value": "21"
+	      },
+	      {
+		  "name": "pressure",
+		  "type": "integer",
+		  "value": "711"
+	      }
+	  ]
+      }
+      
 which response is:
 
-      <?xml version="1.0"?>                         {
-      <appendContextElementResponse>                  "contextResponses": [
-        <entityId type="" isPattern="false">            {
-          <id>Room2</id>                                  "attributes": [
-        </entityId>                                         {
-        <contextResponseList>                                 "name": "temperature",
-          <contextAttributeResponse>                          "type": "float",
-            <contextAttributeList>                            "value": ""
-              <contextAttribute>                            },
-                <name>temperature</name>                    {
-                <type>float</type>                            "name": "pressure",
-                <contextValue/>                               "type": "integer",
-              </contextAttribute>                             "value": ""
-              <contextAttribute>                            }
-                <name>pressure</name>                     ],
-                <type>integer</type>                      "statusCode": {
-                <contextValue/>                             "code": "200",
-              </contextAttribute>                           "reasonPhrase": "OK"
-            </contextAttributeList>                       }
-            <statusCode>                                }
-              <code>200</code>                        ],
-              <reasonPhrase>OK</reasonPhrase>         "id": "Room2", 
-            </statusCode>                             "isPattern": "false", 
-          </contextAttributeResponse>                 "type": ""
-        </contextResponseList>                      }
-      </appendContextElementResponse>           
+      {
+	  "contextResponses": [
+	      {
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "value": ""
+		      },
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "value": ""
+		      }
+		    ],
+		    "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ],
+	  "id": "Room2",
+	  "isPattern": "false",
+	  "type": ""
+      }         
 
 You can also create an attribute (and the containing entity along the
 way) in the following way (additional attributes could be added after
 that, as described in [this
 section](#Adding_and_removing_attributes_with_APPEND_and_DELETE_in_updateContext "wikilink")):
 
-      (curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S --header 'Content-Type: application/xml' -X POST -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                                                                {
-      <updateContextAttributeRequest>                                                                                                                                          "value" : "21"
-         <contextValue>21</contextValue>                                                                                                                                    }
-      </updateContextAttributeRequest>                                                                                                                                      EOF
+      (curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+      {
+	  "value" : "21"
+      }
       EOF                                                                                                                                                               
  
 Compared to [entity creation based on standard
@@ -1445,56 +1400,54 @@ Finally, let's describe convenience operations for querying context
 information. We can query all the attribute values of a given entity,
 e.g. Room1 attributes:
 
-      curl localhost:1026/v1/contextEntities/Room1 -s -S | xmllint --format -       curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Accept: application/json' | python -mjson.tool
 
 which response is:
 
-      <?xml version="1.0"?>                              {
-      <contextElementResponse>                             "contextElement": {
-        <contextElement>                                     "attributes": [
-          <entityId type="Room" isPattern="false">           {
-            <id>Room1</id>                                     "name": "temperature",
-          </entityId>                                          "type": "float",
-          <contextAttributeList>                               "value": "23"
-            <contextAttribute>                               },
-              <name>temperature</name>                       {
-              <type>float</type>                               "name": "pressure",
-              <contextValue>23</contextValue>                  "type": "integer",
-            </contextAttribute>                                "value": "720"
-            <contextAttribute>                               }
-              <name>pressure</name>                          ],
-              <type>integer</type>                           "id": "Room1",
-              <contextValue>720</contextValue>               "isPattern": "false",
-            </contextAttribute>                              "type": "Room"
-          </contextAttributeList>                          },
-        </contextElement>                                  "statusCode": {
-        <statusCode>                                         "code": "200",
-          <code>200</code>                                   "reasonPhrase": "OK"
-          <reasonPhrase>OK</reasonPhrase>                  }
-        </statusCode>                                    }
-      </contextElementResponse>                      
+      {
+	  "contextElement": {
+	      "attributes": [
+		  {
+		      "name": "temperature",
+		      "type": "float",
+		      "value": "23"
+		  },
+		  {
+		      "name": "pressure",
+		      "type": "integer",
+		      "value": "720"
+		  }
+	      ],
+	      "id": "Room1",
+	      "isPattern": "false",
+	      "type": "Room"
+	  },
+	  "statusCode": {
+	      "code": "200",
+	      "reasonPhrase": "OK"
+	  }
+      }                 
 
 We can also query a single attribute of a given entity, e.g. Room2
 temperature:
 
-      curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S | xmllint --format -       curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S --header 'Accept: application/json' | python -mjson.tool
 
 which response is:
 
-      <?xml version="1.0"?>                       {
-      <contextAttributeResponse>                    "attributes": [
-        <contextAttributeList>                      {
-          <contextAttribute>                          "name": "temperature",
-            <name>temperature</name>                  "type": "float",
-            <type>float</type>                        "value": "21"
-            <contextValue>21</contextValue>         }
-          </contextAttribute>                       ],
-        </contextAttributeList>                     "statusCode": {
-        <statusCode>                                  "code": "200",
-          <code>200</code>                            "reasonPhrase": "OK"
-          <reasonPhrase>OK</reasonPhrase>           }
-        </statusCode>                             }
-      </contextAttributeResponse>             
+      {
+	  "attributes": [
+	      {
+		  "name": "temperature",
+		  "type": "float",
+		  "value": "21"
+	      }
+	  ],
+	  "statusCode": {
+	      "code": "200",
+	      "reasonPhrase": "OK"
+	  }
+      }     
 
 Comparing to [standard queryContext
 operation](#Query_Context_operation "wikilink") we observe the following
@@ -1512,171 +1465,143 @@ differences:
     "Room1" by "/type/Room/id/Room1" in the URl to define the type (in
     general: "/type/<type>/id/<id>").
 
-You can also
-query by all the entities belonging to the same type, either all the
-attributes or a particular one, as shown below. First, create an couple
-of entities of type Car using standard updateContext APPEND operations
-(given that, as described in previous section, you cannot create
-entities with types using convenience operations):
+You can also query by all the entities belonging to the same type, either 
+all the attributes or a particular one, as shown below. First, create an 
+couple of entities of type Car using standard updateContext APPEND operations
+(given that, as described in previous section, you cannot create entities with
+types using convenience operations):
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                        {
-      <updateContextRequest>                                                                                                          "contextElements": [
-        <contextElementList>                                                                                                            {
-          <contextElement>                                                                                                                "type": "Car",
-            <entityId type="Car" isPattern="false">                                                                                       "isPattern": "false",
-              <id>Car1</id>                                                                                                               "id": "Car1",
-            </entityId>                                                                                                                   "attributes": [
-            <contextAttributeList>                                                                                                        {
-              <contextAttribute>                                                                                                            "name": "speed",
-                <name>speed</name>                                                                                                          "type": "integer",
-                <type>integer</type>                                                                                                        "value": "75"
-                <contextValue>75</contextValue>                                                                                           },
-              </contextAttribute>                                                                                                         {
-              <contextAttribute>                                                                                                            "name": "fuel",
-                <name>fuel</name>                                                                                                           "type": "float",
-                <type>float</type>                                                                                                          "value": "12.5"
-                <contextValue>12.5</contextValue>                                                                                         }
-              </contextAttribute>                                                                                                         ]
-            </contextAttributeList>                                                                                                     }
-          </contextElement>                                                                                                           ],
-        </contextElementList>                                                                                                         "updateAction": "APPEND"
-        <updateAction>APPEND</updateAction>                                                                                         }
-      </updateContextRequest>                                                                                                       EOF
-      EOF                                                                                                                       
+      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextElements": [
+	    {
+	      "type": "Car",
+	      "isPattern": "false",
+	      "id": "Car1",
+	      "attributes": [
+	      {
+		"name": "speed",
+		"type": "integer",
+		"value": "75"
+	      },
+	      {
+		"name": "fuel",
+		"type": "float",
+		"value": "12.5"
+	      }
+	      ]
+	    }
+	    ],
+	    "updateAction": "APPEND"
+      }
+      EOF                                                                                                                    
  
-      (curl localhost:1026/v1/updateContext -s -S -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                               {
-      <updateContextRequest>                                                                 "contextElements": [
-        <contextElementList>                                                                   {
-          <contextElement>                                                                       "type": "Car",
-            <entityId type="Car" isPattern="false">                                              "isPattern": "false",
-              <id>Car2</id>                                                                      "id": "Car2",
-            </entityId>                                                                          "attributes": [
-            <contextAttributeList>                                                               {
-              <contextAttribute>                                                                   "name": "speed",
-                <name>speed</name>                                                                 "type": "integer",
-                <type>integer</type>                                                               "value": "90"
-                <contextValue>90</contextValue>                                                  },
-              </contextAttribute>                                                                {
-              <contextAttribute>                                                                   "name": "fuel",
-                <name>fuel</name>                                                                  "type": "float",
-                <type>float</type>                                                                 "value": "25.7"
-                <contextValue>25.7</contextValue>                                                }
-              </contextAttribute>                                                                ]
-            </contextAttributeList>                                                            }
-          </contextElement>                                                                  ],
-        </contextElementList>                                                                "updateAction": "APPEND"
-        <updateAction>APPEND</updateAction>                                                }
-      </updateContextRequest>                                                              EOF
-      EOF                                                                              
-  
+      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextElements": [
+	    {
+	      "type": "Car",
+	      "isPattern": "false",
+	      "id": "Car2",
+	      "attributes": [
+	      {
+		"name": "speed",
+		"type": "integer",
+		"value": "90"
+	      },
+	      {
+		"name": "fuel",
+		"type": "float",
+		"value": "25.7"
+	      }
+	      ]
+	    }
+	  ],
+	  "updateAction": "APPEND"
+	}
+      EOF                                                                         
+        	"contextElements": [
+       	  {
+       	    "type": "Car",
+       	    "isPattern": "false",
+       	    "id": "Car1",
+       	    "attributes": [
+       	    {
+       	      "name": "speed",
+       	      "type": "integer",
+       	      "value": "75"
+       	    },
+       	    {
+       	      "name": "fuel",
+       	      "type": "float",
+       	      "value": "12.5"
+       	    }
+       	    ]
+       	  }
+       	  ],
+       	  "updateAction": "APPEND"
 Request to get all the attributes:
 
-      curl localhost:1026/v1/contextEntityTypes/Car -s -S | xmllint --format -       curl localhost:1026/v1/contextEntityTypes/Car -s -S --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/contextEntityTypes/Car -s -S --header 'Accept: application/json' | python -mjson.tool
 
 Response:
-
-      <?xml version="1.0"?>                                 {
-      <?xml version="1.0"?>                                   "contextResponses": [
-      <queryContextResponse>                                  {
-        <contextResponseList>                                   "contextElement": {
-          <contextElementResponse>                                "attributes": [
-            <contextElement>                                      {
-              <entityId type="Car" isPattern="false">               "name": "speed",
-                <id>Car1</id>                                       "type": "integer",
-              </entityId>                                           "value": "75"
-              <contextAttributeList>                              },
-                <contextAttribute>                                {
-                  <name>speed</name>                                "name": "fuel",
-                  <type>integer</type>                              "type": "float",
-                  <contextValue>75</contextValue>                   "value": "12.5"
-                </contextAttribute>                               }
-                <contextAttribute>                                ],
-                  <name>fuel</name>                               "id": "Car1",
-                  <type>float</type>                              "isPattern": "false",
-                  <contextValue>12.5</contextValue>               "type": "Car"
-                </contextAttribute>                             },
-              </contextAttributeList>                           "statusCode": {
-            </contextElement>                                     "code": "200",
-            <statusCode>                                          "reasonPhrase": "OK"
-              <code>200</code>                                  }
-              <reasonPhrase>OK</reasonPhrase>                 },
-            </statusCode>                                     {
-          </contextElementResponse>                             "contextElement": {
-          <contextElementResponse>                                "attributes": [
-            <contextElement>                                      {
-              <entityId type="Car" isPattern="false">               "name": "speed",
-                <id>Car2</id>                                       "type": "integer",
-              </entityId>                                           "value": "90"
-              <contextAttributeList>                              },
-                <contextAttribute>                                {
-                  <name>speed</name>                                "name": "fuel",
-                  <type>integer</type>                              "type": "float",
-                  <contextValue>90</contextValue>                   "value": "25.7"
-                </contextAttribute>                               }
-                <contextAttribute>                                ],
-                  <name>fuel</name>                               "id": "Car2",
-                  <type>float</type>                              "isPattern": "false",
-                  <contextValue>25.7</contextValue>               "type": "Car"
-                </contextAttribute>                             },
-              </contextAttributeList>                           "statusCode": {
-            </contextElement>                                     "code": "200",
-            <statusCode>                                          "reasonPhrase": "OK"
-              <code>200</code>                                  }
-              <reasonPhrase>OK</reasonPhrase>                 }
-            </statusCode>                                     ]
-          </contextElementResponse>                         }
-        </contextResponseList>                          
-      </queryContextResponse>                             
 
 Request to get only one attribute (e.g. speed):
 
-      curl localhost:1026/v1/contextEntityTypes/Car/attributes/speed -s -S | xmllint --format -       curl localhost:1026/v1/contextEntityTypes/Car/attributes/speed -s -S --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/contextEntityTypes/Car/attributes/speed -s -S --header 'Accept: application/json' | python -mjson.tool
 
 Response:
 
-      <?xml version="1.0"?>                                 {
-      <queryContextResponse>                                  "contextResponses": [
-        <contextResponseList>                                 {
-          <contextElementResponse>                              "contextElement": {
-            <contextElement>                                      "attributes": [
-              <entityId type="Car" isPattern="false">             {
-                <id>Car1</id>                                       "name": "speed",
-              </entityId>                                           "type": "integer",
-              <contextAttributeList>                                "value": "75"
-                <contextAttribute>                                }
-                  <name>speed</name>                              ],
-                  <type>integer</type>                            "id": "Car1",
-                  <contextValue>75</contextValue>                 "isPattern": "false",
-                </contextAttribute>                               "type": "Car"
-              </contextAttributeList>                           },
-            </contextElement>                                   "statusCode": {
-            <statusCode>                                          "code": "200",
-              <code>200</code>                                    "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                   }
-            </statusCode>                                     },
-          </contextElementResponse>                           {
-          <contextElementResponse>                              "contextElement": {
-            <contextElement>                                      "attributes": [
-              <entityId type="Car" isPattern="false">             {
-                <id>Car2</id>                                       "name": "speed",
-              </entityId>                                           "type": "integer",
-              <contextAttributeList>                                "value": "90"
-                <contextAttribute>                                }
-                  <name>speed</name>                              ],
-                  <type>integer</type>                            "id": "Car2",
-                  <contextValue>90</contextValue>                 "isPattern": "false",
-                </contextAttribute>                               "type": "Car"
-              </contextAttributeList>                           },
-            </contextElement>                                   "statusCode": {
-            <statusCode>                                          "code": "200",
-              <code>200</code>                                    "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>                   }
-            </statusCode>                                     }
-          </contextElementResponse>                           ]
-        </contextResponseList>                              }
-      </queryContextResponse>                           
+      {
+	  "contextResponses": [
+	      {
+		  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "speed",
+			      "type": "integer",
+			      "value": "75"
+			  },
+			  {
+			      "name": "fuel",
+			      "type": "float",
+			      "value": "12.5"
+			  }
+		      ],
+		      "id": "Car1",
+		      "isPattern": "false",
+		      "type": "Car"
+		    },
+		    "statusCode": {
+			"code": "200",
+			"reasonPhrase": "OK"
+		    }
+		},
+	      {
+	  "contextElement": {
+		      "attributes": [
+			  {
+			      "name": "speed",
+			      "type": "integer",
+			      "value": "90"
+			  },
+			  {
+			      "name": "fuel",
+			      "type": "float",
+			      "value": "25.7"
+			  }
+		      ],
+		      "id": "Car2",
+		      "isPattern": "false",
+		      "type": "Car"
+		  },
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }                        
 
 Additional comments:
 
@@ -1796,32 +1721,32 @@ Additional comments:
 The following operation can be used to get a list of all entity types
 existing at Orion Context Broker in a given moment:
 
-      curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/xml'  | xmllint --format -       curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
-      <entityTypesResponse>                     {
-        <typeEntities>                              "statusCode": {
-          <entityType>                                  "code": "200",
-            <name>Car</name>                            "reasonPhrase": "OK"
-            <contextAttributeList>                  },
-              <name>speed</name>                    "types": [
-              <name>fuel</name>                         {
-              <name>temperature</name>                      "attributes": [
-            </contextAttributeList>                             "speed",
-          </entityType>                                         "fuel",
-          <entityType>                                          "temperature"
-            <name>Room</name>                               ],
-            <contextAttributeList>                          "name": "Car"
-              <name>pressure</name>                     },
-              <name>hummidity</name>                    {
-              <name>temperature</name>                      "attributes": [
-            </contextAttributeList>                             "pressure",
-          </entityType>                                         "hummidity",
-        </typeEntities>                                         "temperature"
-        <statusCode>                                        ],
-          <code>200</code>                                  "name": "Room"
-          <reasonPhrase>OK</reasonPhrase>               }
-        </statusCode>                               ]
-      </entityTypesResponse>                    }
+      {
+	  "statusCode": {
+	      "code": "200",
+	      "reasonPhrase": "OK"
+	  },
+	  "types": [
+	      {
+		  "attributes": [
+		      "speed",
+		      "fuel",
+		      "temperature"
+		  ],
+		  "name": "Car"
+	      },
+	      {
+		  "attributes": [
+		      "pressure",
+		      "hummidity",
+		      "temperature"
+		  ],
+		  "name": "Room"
+	      }
+	  ]
+      }
 
 As you can see, attribute information for each type is provided. Some
 important remarks:
@@ -1838,23 +1763,20 @@ In addition, you can use the following operation to get detailed
 information of a given type (by the time being, that information consits
 of a list of all its attributes):
 
-      curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -       curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
-      entityTypeAttributesResponse>             {
-        <entityType>                                "attributes": [
-          <name>Room</name>                             "hummidity",
-          <contextAttributeList>                        "pressure",
-            <name>hummidity</name>                      "temperature"
-            <name>pressure</name>                   ],
-            <name>temperature</name>                "name": "Room",
-          </contextAttributeList>                   "statusCode": {
-        </entityType>                                   "code": "200",
-        <statusCode>                                    "reasonPhrase": "OK"
-          <code>200</code>                          }
-          <reasonPhrase>OK</reasonPhrase>       }
-        </statusCode>                       
-      </entityTypeAttributesResponse>       
-
+      curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+      {
+        "attributes": [
+          "hummidity",
+          "pressure",
+          "temperature"
+        ],
+           "name": "Room",
+	    "statusCode": {
+		"code": "200",
+		"reasonPhrase": "OK"
+	    }
+      }
+       
 Note that [pagination mechanism](#Pagination "wikilink") also works in
 the operations described above.
 
@@ -1864,104 +1786,99 @@ In addition, note that this convenience operation doesn't have any standard oper
 
 Let's set the Room1 temperature and pressure values:
 
-      (curl localhost:1026/v1/contextEntities/Room1/attributes -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/contextEntities/Room1/attributes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) << EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                                                   {
-      <updateContextElementRequest>                                                                                                                              "attributes" : [
-        <contextAttributeList>                                                                                                                                   {
-          <contextAttribute>                                                                                                                                       "name" : "temperature",
-            <name>temperature</name>                                                                                                                               "type" : "float",
-            <type>float</type>                                                                                                                                     "value" : "26.5"
-            <contextValue>26.5</contextValue>                                                                                                                    },
-          </contextAttribute>                                                                                                                                    {
-          <contextAttribute>                                                                                                                                       "name" : "pressure",
-            <name>pressure</name>                                                                                                                                  "type" : "integer",
-            <type>integer</name>                                                                                                                                   "value" : "763"
-            <contextValue>763</contextValue>                                                                                                                     }
-          </contextAttribute>                                                                                                                                    ]
-        </contextAttributeList>                                                                                                                                }
-      </updateContextElementRequest>                                                                                                                           EOF
-      EOF                                                                                                                                                  
+      (curl localhost:1026/v1/contextEntities/Room1/attributes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) << EOF
+      {
+	  "attributes": [
+	      {
+		  "name": "temperature",
+		  "type": "float",
+		  "value": "26.5"
+	      },
+	      {
+		  "name": "pressure",
+		  "type": "integer",
+		  "value": "763"
+	      }
+	  ]
+      }
+      EOF                                                                                                                                                
 
 the response is:
 
-      <?xml version="1.0"?>                         {
-      <updateContextElementResponse>                  "contextResponses": [
-        <contextResponseList>                         {
-          <contextAttributeResponse>                    "attributes": [
-            <contextAttributeList>                      {
-              <contextAttribute>                          "name": "temperature",
-                <name>temperature</name>                  "type": "float",
-                <type>float</type>                        "value": ""
-                <contextValue/>                         },
-              </contextAttribute>                       {
-              <contextAttribute>                          "name": "pressure",
-                <name>pressure</name>                     "type": "integer",
-                <type>integer</type>                      "value": ""
-                <contextValue/>                         }
-              </contextAttribute>                       ],
-            </contextAttributeList>                     "statusCode": {
-            <statusCode>                                  "code": "200",
-              <code>200</code>                            "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>           }
-            </statusCode>                             }
-          </contextAttributeResponse>                 ]
-        </contextResponseList>                      }
-      </updateContextElementResponse>           
+      {
+	  "contextResponses": [
+	      {
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "value": ""
+		      },
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "value": ""
+		      }
+		  ],
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }
 
 Now, let's do the same with Room2:
 
-      (curl localhost:1026/v1/contextEntities/Room2/attributes -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/contextEntities/Room2/attributes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) << EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                                                   {
-      <updateContextElementRequest>                                                                                                                              "attributes" : [
-        <contextAttributeList>                                                                                                                                   {
-          <contextAttribute>                                                                                                                                       "name" : "temperature",
-            <name>temperature</name>                                                                                                                               "type" : "float",
-            <type>float</type>                                                                                                                                     "value" : "27.4"
-            <contextValue>27.4</contextValue>                                                                                                                    },
-          </contextAttribute>                                                                                                                                    {
-          <contextAttribute>                                                                                                                                       "name" : "pressure",
-            <name>pressure</name>                                                                                                                                  "type" : "integer",
-            <type>integer</type>                                                                                                                                   "value" : "755"
-            <contextValue>755</contextValue>                                                                                                                     }
-          </contextAttribute>                                                                                                                                    ]
-        </contextAttributeList>                                                                                                                                }
-      </updateContextElementRequest>                                                                                                                           EOF
-      EOF                                                                                                                                                  
+      (curl localhost:1026/v1/contextEntities/Room2/attributes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) << EOF
+      {			
+	  "attributes": [
+	      {
+		  "name": "temperature",
+		  "type": "float",
+		  "value": "27.4"
+	      },
+	      {
+		  "name": "pressure",
+		  "type": "integer",
+		  "value": "755"
+	      }
+	  ]
+      }
+      EOF                                                                                                                                                 
  
 which response is:
 
-      <?xml version="1.0"?>                         {
-      <updateContextElementResponse>                  "contextResponses": [
-        <contextResponseList>                         {
-          <contextAttributeResponse>                    "attributes": [
-            <contextAttributeList>                      {
-              <contextAttribute>                          "name": "temperature",
-                <name>temperature</name>                  "type": "float",
-                <type>float</type>                        "value": ""
-                <contextValue/>                         },
-              </contextAttribute>                       {
-              <contextAttribute>                          "name": "pressure",
-                <name>pressure</name>                     "type": "integer",
-                <type>integer</type>                      "value": ""
-                <contextValue/>                         }
-              </contextAttribute>                       ],
-            </contextAttributeList>                     "statusCode": {
-            <statusCode>                                  "code": "200",
-              <code>200</code>                            "reasonPhrase": "OK"
-              <reasonPhrase>OK</reasonPhrase>           }
-            </statusCode>                             }
-          </contextAttributeResponse>                 ]
-        </contextResponseList>                      }
-      </updateContextElementResponse>           
+      {
+	  "contextResponses": [
+	      {
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "value": ""
+		      },
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "value": ""
+		      }
+		  ],
+		  "statusCode": {
+		      "code": "200",
+		      "reasonPhrase": "OK"
+		  }
+	      }
+	  ]
+      }
 
 You can update a single attribute of a given entity in the following way:
 
-      (curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/xml' -X PUT -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0" encoding="UTF-8"?>                                                                                                                               {
-      <updateContextAttributeRequest>                                                                                                                                         "value" : "26.3"
-         <contextValue>26.3</contextValue>                                                                                                                                 }
-      </updateContextAttributeRequest>                                                                                                                                     EOF
-      EOF                                                                                                                                                              
+      (curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
+      {
+	    "value" : "26.3"
+      }
+      EOF                                                                                                                                                            
 
 Comparing to [standard updateContext
 operation](#Update_context_elements "wikilink") we observe the following
@@ -2042,40 +1959,40 @@ Broker with NGSI9 standard operations:
 First of all you have to register Room1 and Room2. In order to do so, we
 use the following NGSI9 registerContext operation:
 
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                    {
-      <registerContextRequest>                                                                                                                     "contextRegistrations": [
-        <contextRegistrationList>                                                                                                                      {
-          <contextRegistration>                                                                                                                            "entities": [
-            <entityIdList>                                                                                                                                     {
-              <entityId type="Room" isPattern="false">                                                                                                             "type": "Room",
-                <id>Room1</id>                                                                                                                                     "isPattern": "false",
-              </entityId>                                                                                                                                          "id": "Room1"
-              <entityId type="Room" isPattern="false">                                                                                                         },
-                <id>Room2</id>                                                                                                                                 {
-              </entityId>                                                                                                                                          "type": "Room",
-            </entityIdList>                                                                                                                                        "isPattern": "false",
-            <contextRegistrationAttributeList>                                                                                                                     "id": "Room2"
-              <contextRegistrationAttribute>                                                                                                                   }
-                <name>temperature</name>                                                                                                                   ],
-                <type>float</type>                                                                                                                         "attributes": [
-                <isDomain>false</isDomain>                                                                                                                     {
-              </contextRegistrationAttribute>                                                                                                                      "name": "temperature",
-              <contextRegistrationAttribute>                                                                                                                       "type": "float",
-                <name>pressure</name>                                                                                                                              "isDomain": "false"
-                <type>integer</type>                                                                                                                           },
-                <isDomain>false</isDomain>                                                                                                                     {
-              </contextRegistrationAttribute>                                                                                                                      "name": "pressure",
-            </contextRegistrationAttributeList>                                                                                                                    "type": "integer",
-            <providingApplication>http://mysensors.com/Rooms</providingApplication>                                                                                "isDomain": "false"
-        </contextRegistration>                                                                                                                                 }
-        </contextRegistrationList>                                                                                                                         ],
-        <duration>P1M</duration>                                                                                                                           "providingApplication": "http://mysensors.com/Rooms"
-      </registerContextRequest>                                                                                                                        }
-      EOF                                                                                                                                          ],
-                                                                                                                                                   "duration": "P1M"
-                                                                                                                                               }
-                                                                                                                                               EOF
+      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextRegistrations": [
+	      {
+		  "entities": [
+		      {
+			  "type": "Room",
+			  "isPattern": "false",
+			   "id": "Room1"
+		      },
+		      {
+			  "type": "Room",
+			  "isPattern": "false",
+			  "id": "Room2"
+		      }
+		  ],
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "isDomain": "false"
+		      },
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "isDomain": "false"
+		      }
+		  ],
+		  "providingApplication": "http://mysensors.com/Rooms"
+	      }
+	    ],
+	  "duration": "P1M"
+      }
+      EOF
 
 The payload includes a list of contextRegistration elements, each one
 with the following information:
@@ -2123,14 +2040,13 @@ standard](http://www.wikipedia.org/wiki/ISO_8601) for duration format.
 We are using "P1M" which means "one month" (a very large amount,
 probably enough time to complete this tutorial :).
 
-We will get the following response (XML case):
+We will get the following response :
 
 
-      <?xml version="1.0"?>                                             {
-      <registerContextResponse>                                           "duration" : "P1M",
-        <duration>P1M</duration>                                          "registrationId" : "52a744b011f5816465943d58"
-        <registrationId>52a744b011f5816465943d58</registrationId>       }
-      </registerContextResponse>                                    
+      {
+      "duration" : "P1M",
+        "registrationId" : "52a744b011f5816465943d58"
+      }                                 
 
 The registrationId (whose value will be different when you run the
 request, as it is generated using the timestamp of the current time :)
@@ -2145,193 +2061,194 @@ How can we access that information? Using the NGSI9
 discoverContextAvailability operation. For example, we can discover
 registrations for Room1 using:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                                {
-      <discoverContextAvailabilityRequest>                                                                                                                     "entities": [
-        <entityIdList>                                                                                                                                             {
-          <entityId type="Room" isPattern="false">                                                                                                                     "type": "Room",
-            <id>Room1</id>                                                                                                                                             "isPattern": "false",
-          </entityId>                                                                                                                                                  "id": "Room1"
-        </entityIdList>                                                                                                                                            }
-        <attributeList/>                                                                                                                                       ]
-      </discoverContextAvailabilityRequest>                                                                                                                }
-      EOF                                                                                                                                                  EOF
+      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      }
+	    ]
+      }
+      EOF                                                                                                                                              
   
 This would produce the following response:
 
-      <?xml version="1.0"?>                                                                 {
-      <discoverContextAvailabilityResponse>                                                     "contextRegistrationResponses": [
-        <contextRegistrationResponseList>                                                           {
-          <contextRegistrationResponse>                                                                 "contextRegistration": {
-            <contextRegistration>                                                                           "attributes": [
-              <entityIdList>                                                                                    {
-                <entityId type="Room" isPattern="false">                                                            "isDomain": "false",
-                  <id>Room1</id>                                                                                    "name": "temperature",
-                </entityId>                                                                                         "type": "float"
-              </entityIdList>                                                                                   },
-              <contextRegistrationAttributeList>                                                                {
-                <contextRegistrationAttribute>                                                                      "isDomain": "false",
-                  <name>temperature</name>                                                                          "name": "pressure",
-                  <type>float</type>                                                                                "type": "integer"
-                  <isDomain>false</isDomain>                                                                    }
-                </contextRegistrationAttribute>                                                             ],
-                <contextRegistrationAttribute>                                                              "entities": [
-                  <name>pressure</name>                                                                         {
-                  <type>integer</type>                                                                              "id": "Room1",
-                  <isDomain>false</isDomain>                                                                        "isPattern": "false",
-                </contextRegistrationAttribute>                                                                     "type": "Room"
-              </contextRegistrationAttributeList>                                                               }
-              <providingApplication>http://mysensors.com/Rooms</providingApplication>                       ],
-            </contextRegistration>                                                                          "providingApplication": "http://mysensors.com/Rooms"
-          </contextRegistrationResponse>                                                                }
-        </contextRegistrationResponseList>                                                          }
-      </discoverContextAvailabilityResponse>                                                    ]                                                                                            
-
+      {
+	  "contextRegistrationResponses": [
+	      {
+		"contextRegistration": {
+		      "attributes": [
+			  {
+			      "isDomain": "false",
+			      "name": "temperature",
+			      "type": "float"
+			  },
+			  {
+			      "isDomain": "false",
+			      "name": "pressure",
+			      "type": "integer"
+			  }
+		      ],
+		      "entities": [
+			  {
+			      "id": "Room1",
+			      "isPattern": "false",
+			      "type": "Room"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Rooms"
+		  }
+	      }
+	  ]
+      }
+      
 Note that we used an empty attributes in the request. Doing so, the discover searches for Room1, no
 matter which attributes have been registered. If we want to be more
 precise, we can include the name of an attribute to search for:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                                {
-        <discoverContextAvailabilityRequest>                                                                                                                   "entities": [
-          <entityIdList>                                                                                                                                           {
-            <entityId type="Room" isPattern="false">                                                                                                                   "type": "Room",
-              <id>Room1</id>                                                                                                                                           "isPattern": "false",
-            </entityId>                                                                                                                                                "id": "Room1"
-          </entityIdList>                                                                                                                                          }
-          <attributeList>                                                                                                                                      ],
-            <attribute>temperature</attribute>                                                                                                                 "attributes": [
-          </attributeList>                                                                                                                                         "temperature"
-        </discoverContextAvailabilityRequest>                                                                                                                  ]
-      EOF                                                                                                                                                  }
-                                                                                                                                                           EOF
+      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      }
+	  ],
+	  "attributes": [
+	      "temperature"
+	  ]
+      }
+      EOF                                                                                                                                                   
 
 which produces the following response:
 
-      <?xml version="1.0"?>                                                                 {
-      <discoverContextAvailabilityResponse>                                                     "contextRegistrationResponses": [
-        <contextRegistrationResponseList>                                                           {
-          <contextRegistrationResponse>                                                                 "contextRegistration": {
-            <contextRegistration>                                                                           "attributes": [
-              <entityIdList>                                                                                    {
-                <entityId type="Room" isPattern="false">                                                            "isDomain": "false",
-                  <id>Room1</id>                                                                                    "name": "temperature",
-                </entityId>                                                                                         "type": "float"
-              </entityIdList>                                                                                   }
-              <contextRegistrationAttributeList>                                                            ],
-                <contextRegistrationAttribute>                                                              "entities": [
-                  <name>temperature</name>                                                                      {
-                  <type>float</type>                                                                                "id": "Room1",
-                  <isDomain>false</isDomain>                                                                        "isPattern": "false",
-                </contextRegistrationAttribute>                                                                     "type": "Room"
-              </contextRegistrationAttributeList>                                                               }
-              <providingApplication>http://mysensors.com/Rooms</providingApplication>                       ],
-            </contextRegistration>                                                                          "providingApplication": "http://mysensors.com/Rooms"
-          </contextRegistrationResponse>                                                                }
-        </contextRegistrationResponseList>                                                          }
-      </discoverContextAvailabilityResponse>                                                    ]
-                                                                                            }
+      {
+	  "contextRegistrationResponses": [
+	      {
+		  "contextRegistration": {
+		      "attributes": [
+			  {
+			      "isDomain": "false",
+			      "name": "temperature",
+			      "type": "float"
+			  }
+		      ],
+		      "entities": [
+			  {
+			      "id": "Room1",
+			      "isPattern": "false",
+			      "type": "Room"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Rooms"
+		    }
+	      }
+	  ]
+      }
 
 If the broker doesn't have any registration information, it will return
 a response telling so. Thus, the following request:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                                {
-        <discoverContextAvailabilityRequest>                                                                                                                   "entities": [
-          <entityIdList>                                                                                                                                       {
-            <entityId type="Room" isPattern="false">                                                                                                               "type": "Room",
-              <id>Room1</id>                                                                                                                                       "isPattern": "false",
-            </entityId>                                                                                                                                            "id": "Room1"
-          </entityIdList>                                                                                                                                      }
-          <attributeList>                                                                                                                                      ],
-            <attribute>humidity</attribute>                                                                                                                    "attributes": [
-          </attributeList>                                                                                                                                         "humidity"
-        </discoverContextAvailabilityRequest>                                                                                                                  ]
-      EOF                                                                                                                                                  }
-                                                                                                                                                           EOF
+      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		"type": "Room",
+		"isPattern": "false",
+		"id": "Room1"
+	      }
+	  ],
+	  "attributes": [
+	    "humidity"
+	  ]
+      }
+      EOF
+
 would produce the following response:
 
-      <?xml version="1.0"?>                                                         {
-      <discoverContextAvailabilityResponse>                                             "errorCode": {
-        <errorCode>                                                                         "code": "404",
-          <code>404</code>                                                                  "reasonPhrase": "No context element registrations found"
-          <reasonPhrase>No context element registrations found</reasonPhrase>           }
-        </errorCode>                                                                }
-      </discoverContextAvailabilityResponse>                                    
+      {
+	  "errorCode": {
+	      "code": "404",
+	      "reasonPhrase": "No context element registrations found"
+	  }
+      }                    
 
 You can also search for a list of entities, e.g. to discover temperature
 in both Room1 and Room2:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                                {
-        <discoverContextAvailabilityRequest>                                                                                                                   "entities": [
-          <entityIdList>                                                                                                                                       {
-            <entityId type="Room" isPattern="false">                                                                                                               "type": "Room",
-              <id>Room1</id>                                                                                                                                       "isPattern": "false",
-            </entityId>                                                                                                                                            "id": "Room1"
-            <entityId type="Room" isPattern="false">                                                                                                           },
-              <id>Room2</id>                                                                                                                                   {
-            </entityId>                                                                                                                                            "type": "Room",
-          </entityIdList>                                                                                                                                          "isPattern": "false",
-          <attributeList>                                                                                                                                          "id": "Room2"
-            <attribute>temperature</attribute>                                                                                                                 }
-          </attributeList>                                                                                                                                     ],
-        </discoverContextAvailabilityRequest>                                                                                                                  "attributes": [
-      EOF                                                                                                                                                      "temperature"
-                                                                                                                                                               ]
-                                                                                                                                                           }
-                                                                                                                                                           EOF
+      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1"
+	      },
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room2"
+	      }
+	  ],
+	  "attributes": [
+	      "temperature"
+	]
+      }
+      EOF
 
 which will produce the following response:
 
-      <?xml version="1.0"?>                                                                 {
-      <discoverContextAvailabilityResponse>                                                     "contextRegistrationResponses": [
-        <contextRegistrationResponseList>                                                           {
-          <contextRegistrationResponse>                                                                 "contextRegistration": {
-            <contextRegistration>                                                                           "attributes": [
-              <entityIdList>                                                                                    {
-                <entityId type="Room" isPattern="false">                                                            "isDomain": "false",
-                  <id>Room1</id>                                                                                    "name": "temperature",
-                </entityId>                                                                                         "type": "float"
-                <entityId type="Room" isPattern="false">                                                        }
-                  <id>Room2</id>                                                                            ],
-                </entityId>                                                                                 "entities": [
-              </entityIdList>                                                                                   {
-              <contextRegistrationAttributeList>                                                                    "id": "Room1",
-                <contextRegistrationAttribute>                                                                      "isPattern": "false",
-                  <name>temperature</name>                                                                          "type": "Room"
-                  <type>float</type>                                                                            },
-                  <isDomain>false</isDomain>                                                                    {
-                </contextRegistrationAttribute>                                                                     "id": "Room2",
-              </contextRegistrationAttributeList>                                                                   "isPattern": "false",
-              <providingApplication>http://mysensors.com/Rooms</providingApplication>                               "type": "Room"
-            </contextRegistration>                                                                              }
-          </contextRegistrationResponse>                                                                    ],
-        </contextRegistrationResponseList>                                                                  "providingApplication": "http://mysensors.com/Rooms"
-      </discoverContextAvailabilityResponse>                                                            }
-                                                                                                    }
-                                                                                                ]
-                                                                                            }
+      {
+	  "contextRegistrationResponses": [
+	      {
+		  "contextRegistration": {
+		      "attributes": [
+			  {
+			      "isDomain": "false",
+			      "name": "temperature",
+			      "type": "float"
+			  }
+		      ],
+		      "entities": [
+			  {
+			      "id": "Room1",
+			      "isPattern": "false",
+			      "type": "Room"
+			  },
+			  {
+			      "id": "Room2",
+			      "isPattern": "false",
+			      "type": "Room"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Rooms"
+		  }
+	      }
+	  ]
+      }
 
 Finally, a powerful feature of Orion Context Broker is that you can use
 a regular expression for the entity ID. For example, you can discover
 entities whose ID starts with "Room" using the regex "Room.\*". In this
 case, you have to set isPattern to "true" as shown below:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                                {
-        <discoverContextAvailabilityRequest>                                                                                                                   "entities": [
-          <entityIdList>                                                                                                                                       {
-            <entityId type="Room" isPattern="true">                                                                                                                "type": "Room",
-              <id>Room.*</id>                                                                                                                                      "isPattern": "true",
-            </entityId>                                                                                                                                            "id": "Room.*"
-          </entityIdList>                                                                                                                                      }
-          <attributeList>                                                                                                                                      ],
-            <attribute>temperature</attribute>                                                                                                                 "attributes": [
-          </attributeList>                                                                                                                                     "temperature"
-        </discoverContextAvailabilityRequest>                                                                                                                  ]
-      EOF                                                                                                                                                  }
-                                                                                                                                                           EOF
+      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	    "entities": [
+		{
+		    "type": "Room",
+		    "isPattern": "true",
+		    "id": "Room.*"
+		}
+	    ],
+	    "attributes": [
+		"temperature"
+	    ]
+	}
+      EOF
 This will produce the exact same response as the previous example.
 
 Note that by default only 20 registrations are returned (which is fine
@@ -2373,22 +2290,22 @@ able to send notifications.
 In order to configure this behavior, we use the following NGSI9
 subscribeContextAvailability request:
 
-      (curl localhost:1026/v1/registry/subscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF       (curl localhost:1026/v1/registry/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                                {
-      <subscribeContextAvailabilityRequest>                                                                                                                    "entities": [
-        <entityIdList>                                                                                                                                         {
-          <entityId type="Room" isPattern="true">                                                                                                                  "type": "Room",
-            <id>.*</id>                                                                                                                                            "isPattern": "true",
-          </entityId>                                                                                                                                              "id": ".*"
-        </entityIdList>                                                                                                                                        }
-        <attributeList>                                                                                                                                        ],
-          <attribute>temperature</attribute>                                                                                                                   "attributes": [
-        </attributeList>                                                                                                                                       "temperature"
-        <reference>http://localhost:1028/accumulate</reference>                                                                                                ],
-        <duration>P1M</duration>                                                                                                                               "reference": "http://localhost:1028/accumulate",
-      </subscribeContextAvailabilityRequest>                                                                                                                   "duration": "P1M"
-      EOF                                                                                                                                                  }
-                                                                                                                                                           EOF
+     (curl localhost:1026/v1/registry/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+     {
+	"entities": [
+        {
+             "type": "Room",
+             "isPattern": "true",
+             "id": ".*"
+        }
+        ],
+        "attributes": [
+	     "temperature"
+        ],
+        "reference": "http://localhost:1028/accumulate",
+        "duration": "P1M"
+     }
+     EOF
 
 
 The payload has the following elements:
@@ -2396,10 +2313,8 @@ The payload has the following elements:
 -   entityIdList and attributeList ('entities' and 'attributes' for
     short, in JSON) define which context availability information we are
     interested in. They are used to select the context registrations to
-    include in the notifications. They work in the same way as the XML
-    elements with the same name in [discoverContextAvailability
-    request](#Discover_Context_Availability_operation "wikilink"). In
-    this case, we are stating that we are interested in context
+    include in the notifications.
+    In this case, we are stating that we are interested in context
     availability about "temperature" attribute in any entity of type
     "Room" ("any" is represented by the ".\*" pattern, which is a
     regular expression that matches any string).
@@ -2434,52 +2349,51 @@ cancelling the subscription - write it down because you will need it in
 later steps of this tutorial) and a duration acknowledgement. Again,
 pretty similar to a subscribeContext.
 
-      <?xml version="1.0"?>                                             {
-      <subscribeContextAvailabilityResponse>                                "duration": "P1M",
-        <subscriptionId>52a745e011f5816465943d59</subscriptionId>           "subscriptionId": "52a745e011f5816465943d59"
-        <duration>P1M</duration>                                        }
-      </subscribeContextAvailabilityResponse>                       
+      {
+      "duration": "P1M",
+        "subscriptionId": "52a745e011f5816465943d59"
+      }
+             
 
 Looking at accumulator-server.py, we will see the following initial
 notification:
 
-      POST http://localhost:1028/accumulate                                                 POST http://localhost:1028/accumulate
-      Content-Length: 940                                                                   Content-Length: 638
-      User-Agent: orion/0.9.0                                                               User-Agent: orion/0.9.0
-      Host: localhost:1028                                                                  Host: localhost:1028
-      Accept: application/xml, application/json                                             Accept: application/xml, application/json
-      Content-Type: application/xml                                                         Content-Type: application/json
+      POST http://localhost:1028/accumulate
+      Content-Length: 638
+      User-Agent: orion/0.9.0
+      Host: localhost:1028
+      Accept: application/xml, application/json
+      Content-Type: application/json
                                                                                         
-      <notifyContextAvailabilityRequest>                                                    {
-        <subscriptionId>52a745e011f5816465943d59</subscriptionId>                             "subscriptionId" : "52a745e011f5816465943d59",
-        <contextRegistrationResponseList>                                                     "contextRegistrationResponses" : [
-          <contextRegistrationResponse>                                                         {
-            <contextRegistration>                                                                 "contextRegistration" : {
-              <entityIdList>                                                                        "entities" : [
-                <entityId type="Room" isPattern="false">                                              {
-                  <id>Room1</id>                                                                        "type" : "Room",
-                </entityId>                                                                             "isPattern" : "false",
-                <entityId type="Room" isPattern="false">                                                "id" : "Room1"
-                  <id>Room2</id>                                                                      },
-                </entityId>                                                                           {
-              </entityIdList>                                                                           "type" : "Room",
-              <contextRegistrationAttributeList>                                                        "isPattern" : "false",
-                <contextRegistrationAttribute>                                                          "id" : "Room2"
-                  <name>temperature</name>                                                            }
-                  <type>float</type>                                                                ],
-                  <isDomain>false</isDomain>                                                        "attributes" : [
-                </contextRegistrationAttribute>                                                       {
-              </contextRegistrationAttributeList>                                                       "name" : "temperature",
-              <providingApplication>http://mysensors.com/Rooms</providingApplication>                   "type" : "float",
-            </contextRegistration>                                                                      "isDomain" : "false"
-          </contextRegistrationResponse>                                                              }
-        </contextRegistrationResponseList>                                                          ],
-      </notifyContextAvailabilityRequest>                                                           "providingApplication" : "http://mysensors.com/Rooms"
-                                                                                                  }
-                                                                                                }
-                                                                                              ]
-                                                                                            }
-
+      {
+	  "subscriptionId": "52a745e011f5816465943d59",
+	  "contextRegistrationResponses": [
+	      {
+		  "contextRegistration": {
+		      "entities": [
+			  {
+			      "type": "Room",
+			      "isPattern": "false",
+			      "id": "Room1"
+			  },
+			  {
+			      "type": "Room",
+			      "isPattern": "false",
+			      "id": "Room2"
+			  }
+		      ],
+		      "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "isDomain": "false"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Rooms"
+		  }
+	      }
+	  ]
+	}
 Orion Context Broker notifies NGSI9 subscribeContextAvailability using
 the POST HTTP method (on the URL used as reference for the subscription)
 with a notifyContextAvailabilityRequest payload. Apart from the
@@ -2511,71 +2425,71 @@ could be changed in a later version. What is your opinion? :)
 Let's see what happens when we register a new room (Room3) with
 temperature and pressure:
 
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                    {
-          <registerContextRequest>                                                                                                                 "contextRegistrations": [
-            <contextRegistrationList>                                                                                                              {
-              <contextRegistration>                                                                                                                    "entities": [
-                <entityIdList>                                                                                                                         {
-                  <entityId type="Room" isPattern="false">                                                                                                 "type": "Room",
-                    <id>Room3</id>                                                                                                                         "isPattern": "false",
-                  </entityId>                                                                                                                              "id": "Room3"
-                </entityIdList>                                                                                                                        }
-                <contextRegistrationAttributeList>                                                                                                     ],
-                  <contextRegistrationAttribute>                                                                                                       "attributes": [
-                    <name>temperature</name>                                                                                                           {
-                    <type>float</type>                                                                                                                     "name": "temperature",
-                    <isDomain>false</isDomain>                                                                                                             "type": "float",
-                  </contextRegistrationAttribute>                                                                                                          "isDomain": "false"
-                  <contextRegistrationAttribute>                                                                                                       },
-                    <name>pressure</name>                                                                                                              {
-                    <type>integer</type>                                                                                                                   "name": "pressure",
-                    <isDomain>false</isDomain>                                                                                                             "type": "integer",
-                  </contextRegistrationAttribute>                                                                                                          "isDomain": "false"
-                </contextRegistrationAttributeList>                                                                                                    }
-                <providingApplication>http://mysensors.com/Rooms</providingApplication>                                                                ],
-              </contextRegistration>                                                                                                                   "providingApplication": "http://mysensors.com/Rooms"
-            </contextRegistrationList>                                                                                                             }
-            <duration>P1M</duration>                                                                                                               ],
-          </registerContextRequest>                                                                                                                "duration": "P1M"
-      EOF                                                                                                                                      }
-                                                                                                                                               EOF
+      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextRegistrations": [
+	      {
+		  "entities": [
+		      {
+			  "type": "Room",
+			  "isPattern": "false",
+			  "id": "Room3"
+		      }
+		  ],
+		    "attributes": [
+			{
+			  "name": "temperature",
+			  "type": "float",
+			  "isDomain": "false"
+			},
+			{
+			  "name": "pressure",
+			  "type": "integer",
+			  "isDomain": "false"
+			}
+			],
+		  "providingApplication": "http://mysensors.com/Rooms"
+	      }
+	    ],
+	    "duration": "P1M"
+      }
+      EOF
 
 As expected, the accumulator-server.py will be notified of the new
 registration. Again, although Room3 registration includes temperature
 and pressure, only the first attribute is included in the notification.
 
-      POST http://localhost:1028/accumulate                                                 POST http://localhost:1028/accumulate
-      Content-Length: 840                                                                   Content-Length: 522
-      User-Agent: orion/0.9.0                                                               User-Agent: orion/0.9.0
-      Host: localhost:1028                                                                  Host: localhost:1028
-      Accept: application/xml, application/json                                             Accept: application/xml, application/json
-      Content-Type: application/xml                                                         Content-Type: application/json
-                                                                                        
-      <notifyContextAvailabilityRequest>                                                    {
-        <subscriptionId>52a745e011f5816465943d59</subscriptionId>                             "subscriptionId" : "52a745e011f5816465943d59",
-        <contextRegistrationResponseList>                                                     "contextRegistrationResponses" : [
-          <contextRegistrationResponse>                                                         {
-            <contextRegistration>                                                                 "contextRegistration" : {
-              <entityIdList>                                                                        "entities" : [
-                <entityId type="Room" isPattern="false">                                              {
-                  <id>Room3</id>                                                                        "type" : "Room",
-                </entityId>                                                                             "isPattern" : "false",
-              </entityIdList>                                                                           "id" : "Room3"
-              <contextRegistrationAttributeList>                                                      }
-                <contextRegistrationAttribute>                                                      ],
-                  <name>temperature</name>                                                          "attributes" : [
-                  <type>float</type>                                                                  {
-                  <isDomain>false</isDomain>                                                            "name" : "temperature",
-                </contextRegistrationAttribute>                                                         "type" : "float",
-              </contextRegistrationAttributeList>                                                       "isDomain" : "false"
-              <providingApplication>http://mysensors.com/Rooms</providingApplication>                 }
-            </contextRegistration>                                                                  ],
-          </contextRegistrationResponse>                                                            "providingApplication" : "http://mysensors.com/Rooms"
-        </contextRegistrationResponseList>                                                        }
-      </notifyContextAvailabilityRequest>                                                       }
-                                                                                              ]
-                                                                                            }
+      POST http://localhost:1028/accumulate
+      Content-Length: 522
+      User-Agent: orion/0.9.0
+      Host: localhost:1028
+      Accept: application/xml, application/json
+      Content-Type: application/json
+
+      {
+	  "subscriptionId": "52a745e011f5816465943d59",
+	  "contextRegistrationResponses": [
+	      {
+		  "contextRegistration": {
+		      "entities": [
+			  {
+			      "type": "Room",
+			      "isPattern": "false",
+			      "id": "Room3"
+			  }
+		      ],
+		    "attributes": [
+			  {
+			      "name": "temperature",
+			      "type": "float",
+			      "isDomain": "false"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Rooms"
+		  }
+	      }
+	  ]
+      }
 
 We can also check that context registrations not matching the
 subscription doesn't trigger any notifications. For example, let's
@@ -2583,30 +2497,30 @@ register a room (Room4) with only attribute pressure (remember that the
 subscription only includes temperature in attributeList).
 
   
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                    {
-          <registerContextRequest>                                                                                                                 "contextRegistrations": [
-            <contextRegistrationList>                                                                                                              {
-              <contextRegistration>                                                                                                                    "entities": [
-                <entityIdList>                                                                                                                         {
-                  <entityId type="Room" isPattern="false">                                                                                                 "type": "Room",
-                    <id>Room4</id>                                                                                                                         "isPattern": "false",
-                  </entityId>                                                                                                                              "id": "Room4"
-                </entityIdList>                                                                                                                        }
-                <contextRegistrationAttributeList>                                                                                                     ],
-                  <contextRegistrationAttribute>                                                                                                       "attributes": [
-                    <name>pressure</name>                                                                                                              {
-                    <type>integer</type>                                                                                                                   "name": "pressure",
-                    <isDomain>false</isDomain>                                                                                                             "type": "integer",
-                  </contextRegistrationAttribute>                                                                                                          "isDomain": "false"
-                </contextRegistrationAttributeList>                                                                                                    }
-                <providingApplication>http://mysensors.com/Rooms</providingApplication>                                                                ],
-              </contextRegistration>                                                                                                                   "providingApplication": "http://mysensors.com/Rooms"
-            </contextRegistrationList>                                                                                                             }
-            <duration>P1M</duration>                                                                                                               ],
-          </registerContextRequest>                                                                                                                "duration": "P1M"
-      EOF                                                                                                                                      }
-                                                                                                                                               EOF
+      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextRegistrations": [
+	      {
+		  "entities": [
+		      {
+			  "type": "Room",
+			  "isPattern": "false",
+			  "id": "Room4"
+		      }
+		  ],
+		  "attributes": [
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "isDomain": "false"
+		      }
+		  ],
+		  "providingApplication": "http://mysensors.com/Rooms"
+	      }
+	  ],
+	  "duration": "P1M"
+      }
+      EOF
   
 You can now check that no new notification arrives to
 accumulator-server.py.
@@ -2621,151 +2535,149 @@ element). As always you have to replace the *subscriptionId* value after
 copy-pasting with the value you got from the
 subscribeContextAvailability response in the previous step).
 
-      (curl localhost:1026/v1/registry/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                                          {
-      <updateContextAvailabilitySubscriptionRequest>                                                                                                                     "entities": [
-        <entityIdList>                                                                                                                                                   {
-          <entityId type="Car" isPattern="true">                                                                                                                             "type": "Car",
-            <id>.*</id>                                                                                                                                                      "isPattern": "true",
-          </entityId>                                                                                                                                                        "id": ".*"
-        </entityIdList>                                                                                                                                                  }
-        <attributeList/>                                                                                                                                                 ],
-        <duration>P1M</duration>                                                                                                                                         "duration": "P1M",
-        <subscriptionId>52a745e011f5816465943d59</subscriptionId>                                                                                                        "subscriptionId": "52a745e011f5816465943d59"
-      </updateContextAvailabilitySubscriptionRequest>                                                                                                                }
-      EOF                                                                                                                                                            EOF
+      (curl localhost:1026/v1/registry/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "entities": [
+	      {
+		  "type": "Car",
+		  "isPattern": "true",
+		  "id": ".*"
+	      }
+	  ],
+	  "duration": "P1M",
+	  "subscriptionId": "52a745e011f5816465943d59"
+      }
+      EOF                                                                                                                                                           EOF
  
 The response is very similar to the one for subscribeContextAvailability
 request:
 
-      <?xml version="1.0"?>                                             {
-      <updateContextAvailabilitySubscriptionResponse>                       "duration": "P1M",
-        <subscriptionId>52a745e011f5816465943d59</subscriptionId>           "subscriptionId": "52a745e011f5816465943d59"
-        <duration>P1M</duration>                                        }
-      </updateContextAvailabilitySubscriptionResponse>              
+      {
+      "duration": "P1M",
+        "subscriptionId": "52a745e011f5816465943d59"
+      }
+           
 
 Given that there are currently no car entities registered, you will not
 receive any initial notification. So. let's register two cars: Car1 with
-an attribute named speed and Car2 with an attribute named location
-(don't worry about the [ISO6709](http://www.wikipedia.org/wiki/ISO_6709)
-reference in the XML, it's just standard for geo-location and nothing
-significant for this tutorial).
+an attribute named speed and Car2 with an attribute named location.
 
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                    {
-          <registerContextRequest>                                                                                                                 "contextRegistrations": [
-            <contextRegistrationList>                                                                                                              {
-              <contextRegistration>                                                                                                                    "entities": [
-                <entityIdList>                                                                                                                         {
-                  <entityId type="Car" isPattern="false">                                                                                                  "type": "Car",
-                    <id>Car1</id>                                                                                                                          "isPattern": "false",
-                  </entityId>                                                                                                                              "id": "Car1"
-                </entityIdList>                                                                                                                        }
-                <contextRegistrationAttributeList>                                                                                                     ],
-                  <contextRegistrationAttribute>                                                                                                       "attributes": [
-                    <name>speed</name>                                                                                                                 {
-                    <type>integer</type>                                                                                                                   "name": "speed",
-                    <isDomain>false</isDomain>                                                                                                             "type": "integer",
-                  </contextRegistrationAttribute>                                                                                                          "isDomain": "false"
-                </contextRegistrationAttributeList>                                                                                                    }
-                <providingApplication>http://mysensors.com/Cars</providingApplication>                                                                 ],
-              </contextRegistration>                                                                                                                   "providingApplication": "http://mysensors.com/Cars"
-            </contextRegistrationList>                                                                                                             }
-            <duration>P1M</duration>                                                                                                               ],
-          </registerContextRequest>                                                                                                                "duration": "P1M"
-      EOF                                                                                                                                      }
-                                                                                                                                               EOF
+     (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextRegistrations": [
+	      {
+		  "entities": [
+		      {
+			  "type": "Car",
+			  "isPattern": "false",
+			  "id": "Car1"
+		      }
+		    ],
+		  "attributes": [
+		      {
+			  "name": "speed",
+			  "type": "integer",
+			  "isDomain": "false"
+		      }
+		    ],
+		      "providingApplication": "http://mysensors.com/Cars"
+	      }
+	  ],
+	  "duration": "P1M"
+      }
+      EOF
   
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                    {
-          <registerContextRequest>                                                                                                                 "contextRegistrations": [
-            <contextRegistrationList>                                                                                                              {
-              <contextRegistration>                                                                                                                    "entities": [
-                <entityIdList>                                                                                                                         {
-                  <entityId type="Car" isPattern="false">                                                                                                  "type": "Car",
-                    <id>Car2</id>                                                                                                                          "isPattern": "false",
-                  </entityId>                                                                                                                              "id": "Car2"
-                </entityIdList>                                                                                                                        }
-                <contextRegistrationAttributeList>                                                                                                     ],
-                  <contextRegistrationAttribute>                                                                                                       "attributes": [
-                    <name>location</name>                                                                                                              {
-                    <type>ISO6709</type>                                                                                                                   "name": "location",
-                    <isDomain>false</isDomain>                                                                                                             "type": "ISO6709",
-                  </contextRegistrationAttribute>                                                                                                          "isDomain": "false"
-                </contextRegistrationAttributeList>                                                                                                    }
-                <providingApplication>http://mysensors.com/Cars</providingApplication>                                                                 ],
-              </contextRegistration>                                                                                                                   "providingApplication": "http://mysensors.com/Cars"
-            </contextRegistrationList>                                                                                                             }
-            <duration>P1M</duration>                                                                                                               ],
-          </registerContextRequest>                                                                                                                "duration": "P1M"
-      EOF                                                                                                                                      }
-                                                                                                                                               EOF
+     (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextRegistrations": [
+	      {
+		    "entities": [
+		      {
+			  "type": "Car",
+			  "isPattern": "false",
+			  "id": "Car2"
+		      }
+		  ],
+		  "attributes": [
+		      {
+			  "name": "location",
+			  "type": "ISO6709",
+			  "isDomain": "false"
+		      }
+		  ],
+		  "providingApplication": "http://mysensors.com/Cars"
+	      }
+	  ],
+	    "duration": "P1M"
+      }
+      EOF
 As both registrations match the entityIdList and attributeList used in
 the updateContextAvailabilitySubscription, we will get a notification
 for each car registration, as can be seen in accumulator-server.py:
 
-      POST http://localhost:1028/accumulate                                                POST http://localhost:1028/accumulate
-      Content-Length: 825                                                                  Content-Length: 529
-      User-Agent: orion/0.9.0                                                              User-Agent: orion/0.9.0
-      Host: localhost:1028                                                                 Host: localhost:1028
-      Accept: application/xml, application/json                                            Accept: application/xml, application/json
-      Content-Type: application/xml                                                        Content-Type: application/json
+      POST http://localhost:1028/accumulate
+      Content-Length: 529
+      User-Agent: orion/0.9.0
+      Host: localhost:1028
+      Accept: application/xml, application/json
+      Content-Type: application/json
                                                                                        
-      <notifyContextAvailabilityRequest>                                                   {
-        <subscriptionId>52a745e011f5816465943d59</subscriptionId>                            "subscriptionId" : "52a745e011f5816465943d59",
-        <contextRegistrationResponseList>                                                    "contextRegistrationResponses" : [
-          <contextRegistrationResponse>                                                        {
-            <contextRegistration>                                                                "contextRegistration" : {
-              <entityIdList>                                                                       "entities" : [
-                <entityId type="Car" isPattern="false">                                              {
-                  <id>Car1</id>                                                                        "type" : "Car",
-                </entityId>                                                                            "isPattern" : "false",
-              </entityIdList>                                                                          "id" : "Car1"
-              <contextRegistrationAttributeList>                                                     }
-                <contextRegistrationAttribute>                                                     ],
-                  <name>speed</name>                                                               "attributes" : [
-                  <type>integer</type>                                                               {
-                  <isDomain>false</isDomain>                                                           "name" : "speed",
-                </contextRegistrationAttribute>                                                        "type" : "integer",
-              </contextRegistrationAttributeList>                                                      "isDomain" : "false"
-              <providingApplication>http://mysensors.com/Cars</providingApplication>                 }
-            </contextRegistration>                                                                 ],
-          </contextRegistrationResponse>                                                           "providingApplication" : "http://mysensors.com/Cars"
-        </contextRegistrationResponseList>                                                       }
-      </notifyContextAvailabilityRequest>                                                      }
-                                                                                             ]
+      {
+	  "subscriptionId": "52a745e011f5816465943d59",
+	  "contextRegistrationResponses": [
+	      {
+		  "contextRegistration": {
+		      "entities": [
+			  {
+			      "type": "Car",
+			      "isPattern": "false",
+			      "id": "Car1"
+			  }
+		      ],
+		      "attributes": [
+			  {
+			      "name": "speed",
+			      "type": "integer",
+			      "isDomain": "false"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Cars"
+		  }
+	      }
+	  ]
+      }
 
-      POST http://localhost:1028/accumulate                                                POST http://localhost:1028/accumulate
-      Content-Length: 831                                                                  Content-Length: 535
-      User-Agent: orion/0.9.0                                                              User-Agent: orion/0.9.0
-      Host: localhost:1028                                                                 Host: localhost:1028
-      Accept: application/xml, application/json                                            Accept: application/xml, application/json
-      Content-Type: application/xml                                                        Content-Type: application/json
+      POST http://localhost:1028/accumulate
+      Content-Length: 535
+      User-Agent: orion/0.9.0
+      Host: localhost:1028
+      Accept: application/xml, application/json
+      Content-Type: application/json
                                                                                        
-      <notifyContextAvailabilityRequest>                                                   {
-        <subscriptionId>52a745e011f5816465943d59</subscriptionId>                            "subscriptionId" : "52a745e011f5816465943d59",
-        <contextRegistrationResponseList>                                                    "contextRegistrationResponses" : [
-          <contextRegistrationResponse>                                                        {
-            <contextRegistration>                                                                "contextRegistration" : {
-              <entityIdList>                                                                       "entities" : [
-                <entityId type="Car" isPattern="false">                                              {
-                  <id>Car2</id>                                                                        "type" : "Car",
-                </entityId>                                                                            "isPattern" : "false",
-              </entityIdList>                                                                          "id" : "Car2"
-              <contextRegistrationAttributeList>                                                     }
-                <contextRegistrationAttribute>                                                     ],
-                  <name>location</name>                                                            "attributes" : [
-                  <type>ISO6709</type>                                                               {
-                  <isDomain>false</isDomain>                                                           "name" : "location",
-                </contextRegistrationAttribute>                                                        "type" : "ISO6709",
-              </contextRegistrationAttributeList>                                                      "isDomain" : "false"
-              <providingApplication>http://mysensors.com/Cars</providingApplication>                 }
-            </contextRegistration>                                                                 ],
-          </contextRegistrationResponse>                                                           "providingApplication" : "http://mysensors.com/Cars"
-        </contextRegistrationResponseList>                                                       }
-      </notifyContextAvailabilityRequest>                                                      }
-                                                                                             ]
-                                                                                           }
+      {
+	  "subscriptionId": "52a745e011f5816465943d59",
+	  "contextRegistrationResponses": [
+	      {
+		  "contextRegistration": {
+		      "entities": [
+			  {
+			      "type": "Car",
+			      "isPattern": "false",
+			      "id": "Car2"
+			  }
+		      ],
+		      "attributes": [
+			  {
+			      "name": "location",
+			      "type": "ISO6709",
+			      "isDomain": "false"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Cars"
+		  }
+	      }
+	  ]
+      }
 
 Finally, you can cancel a subscription using the NGSI9
 unsubscribeContextAvailability operation, just using the subscriptionId
@@ -2773,24 +2685,23 @@ in the request payload (replace the subscriptionId value after
 copy-pasting with the one you received in the
 subscribeContextAvailability response in the previous step).
 
-      (curl localhost:1026/v1/registry/unsubscribeContextAvailability -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/unsubscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                                   {
-      <unsubscribeContextAvailabilityRequest>                                                                                                                     "subscriptionId": "52a745e011f5816465943d59"
-        <subscriptionId>52a745e011f5816465943d59</subscriptionId>                                                                                             }
-      </unsubscribeContextAvailabilityRequest>                                                                                                                EOF
-      EOF                                                                                                                                                 
+      (curl localhost:1026/v1/registry/unsubscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+            "subscriptionId": "52a745e011f5816465943d59"
+      }
+      EOF
+                                                                                                                                                  
  
 The response is just an acknowledgement that the cancellation was
 successful.
   
-      <?xml version="1.0"?>                                             {
-      <unsubscribeContextAvailabilityResponse>                              "statusCode": {
-        <subscriptionId>52a745e011f5816465943d59</subscriptionId>               "code": "200",
-        <statusCode>                                                            "reasonPhrase": "OK"
-          <code>200</code>                                                  },
-          <reasonPhrase>OK</reasonPhrase>                                   "subscriptionId": "52a745e011f5816465943d59"
-        </statusCode>                                                   }
-      </unsubscribeContextAvailabilityResponse>                     
+      {
+	"statusCode": {
+	  "code": "200",
+	  "reasonPhrase": "OK"
+	},
+	    "subscriptionId": "52a745e011f5816465943d59"
+      }                    
   ---------------------------------------------------------------------------------------------------------------------------------
 
 After cancelling, you can try to register a new car (e.g. Car3) to check
@@ -2892,11 +2803,11 @@ The response to each of these requests is the same as the response to a
 standard registerContext (one response for each of the four requests,
 with a different ID):
 
-      <?xml version="1.0"?>                                             {
-      <registerContextResponse>                                           "duration": "P1M",
-        <registrationId>51c1f5c31612797e4fe6b6b6</registrationId>         "registrationId": "51c1f5c31612797e4fe6b6b6"
-        <duration>P1M</duration>                                        }
-      </registerContextResponse>                                    
+      {
+      "duration": "P1M",
+        "registrationId": "51c1f5c31612797e4fe6b6b6"
+      }
+                                
 
 #### Only-type entity registrations using convenience operations
 
@@ -2978,108 +2889,84 @@ Using convenience operations you can discover registration information
 for a single entity or for an entity-attribute pair. For example, to
 discover registrations for Room1 (no matter the attributes):
 
-      curl localhost:1026/v1/registry/contextEntities/Room1 -s -S --header 'Content-Type: application/xml' | xmllint --format -       curl localhost:1026/v1/registry/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/registry/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 which produces the following response:
 
-      <discoverContextAvailabilityResponse>                                                 {
-        <contextRegistrationResponseList>                                                     "contextRegistrationResponses": [
-          <contextRegistrationResponse>                                                       {
-            <contextRegistration>                                                               "contextRegistration": {
-              <entityIdList>                                                                      "attributes": [
-                <entityId type="" isPattern="false">                                              {
-                  <id>Room1</id>                                                                    "isDomain": "false",
-                </entityId>                                                                         "name": "temperature",
-              </entityIdList>                                                                       "type": ""
-              <contextRegistrationAttributeList>                                                  }
-                <contextRegistrationAttribute>                                                    ],
-                  <name>temperature</name>                                                        "entities": [
-                  <type/>                                                                         {
-                  <isDomain>false</isDomain>                                                        "id": "Room1",
-                </contextRegistrationAttribute>                                                     "isPattern": "false",
-              </contextRegistrationAttributeList>                                                   "type": ""
-              <providingApplication>http://mysensors.com/Rooms</providingApplication>             }
-            </contextRegistration>                                                                ],
-          </contextRegistrationResponse>                                                          "providingApplication": "http://mysensors.com/Rooms"
-          <contextRegistrationResponse>                                                         }
-            <contextRegistration>                                                             },
-              <entityIdList>                                                                  {
-                <entityId type="" isPattern="false">                                            "contextRegistration": {
-                  <id>Room1</id>                                                                  "attributes": [
-                </entityId>                                                                       {
-              </entityIdList>                                                                       "isDomain": "false",
-              <contextRegistrationAttributeList>                                                    "name": "pressure",
-                <contextRegistrationAttribute>                                                      "type": ""
-                  <name>pressure</name>                                                           }
-                  <type/>                                                                         ],
-                  <isDomain>false</isDomain>                                                      "entities": [
-                </contextRegistrationAttribute>                                                   {
-              </contextRegistrationAttributeList>                                                   "id": "Room1",
-              <providingApplication>http://mysensors.com/Rooms</providingApplication>               "isPattern": "false",
-            </contextRegistration>                                                                  "type": ""
-          </contextRegistrationResponse>                                                          }
-        </contextRegistrationResponseList>                                                        ],
-      </discoverContextAvailabilityResponse>                                                      "providingApplication": "http://mysensors.com/Rooms"
-                                                                                                }
-                                                                                              }
-                                                                                              ]
-                                                                                            }
+
 
 Now, let's discover registrations for Room2-temperature:
 
-      curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/xml' | xmllint --format -       curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+     curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 The response is as follows:
 
-      <?xml version="1.0"?>                                                                 {
-      <discoverContextAvailabilityResponse>                                                   "contextRegistrationResponses": [
-        <contextRegistrationResponseList>                                                     {
-          <contextRegistrationResponse>                                                         "contextRegistration": {
-            <contextRegistration>                                                                 "attributes": [
-              <entityIdList>                                                                      {
-                <entityId type="" isPattern="false">                                                "isDomain": "false",
-                  <id>Room2</id>                                                                    "name": "temperature",
-                </entityId>                                                                         "type": ""
-              </entityIdList>                                                                     }
-              <contextRegistrationAttributeList>                                                  ],
-                <contextRegistrationAttribute>                                                    "entities": [
-                  <name>temperature</name>                                                        {
-                  <type/>                                                                           "id": "Room2",
-                  <isDomain>false</isDomain>                                                        "isPattern": "false",
-                </contextRegistrationAttribute>                                                     "type": ""
-              </contextRegistrationAttributeList>                                                 }
-              <providingApplication>http://mysensors.com/Rooms</providingApplication>             ],
-            </contextRegistration>                                                                "providingApplication": "http://mysensors.com/Rooms"
-          </contextRegistrationResponse>                                                        }
-        </contextRegistrationResponseList>                                                    }
-      </discoverContextAvailabilityResponse>                                                  ]
-                                                                                            }
+      {
+	  "contextRegistrationResponses": [
+	      {
+		  "contextRegistration": {
+		      "attributes": [
+			  {
+			      "isDomain": "false",
+			      "name": "temperature",
+			      "type": ""
+			  }
+		      ],
+		      "entities": [
+			  {
+			      "id": "Room1",
+			      "isPattern": "false",
+			      "type": ""
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Rooms"
+		  }
+	      },
+	      {
+		  "contextRegistration": {
+		      "attributes": [
+			  {
+			      "isDomain": "false",
+			      "name": "pressure",
+			      "type": ""
+			  }
+		      ],
+		      "entities": [
+			  {
+			      "id": "Room1",
+			      "isPattern": "false",
+			      "type": ""
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Rooms"
+		  }
+	      }
+	  ]
+      }
 
 Discovery of not registered elements (e.g. Room5 or the humidity of
 Room1) will produce an error. E.g. the following requests:
 
 
-      curl localhost:1026/v1/registry/contextEntities/Room3 -s -S --header 'Content-Type: application/xml' | xmllint --format -       curl localhost:1026/v1/registry/contextEntities/Room3 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/registry/contextEntities/Room3 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
-      curl localhost:1026/v1/registry/contextEntities/Room2/attributes/humidity -s -S --header 'Content-Type: application/xml' | xmllint --format -       curl localhost:1026/v1/registry/contextEntities/Room2/attributes/humidity -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/registry/contextEntities/Room2/attributes/humidity -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 will produce the following error response:
 
-      <?xml version="1.0"?>                                           {
-      <discoverContextAvailabilityResponse>                             "errorCode": {
-        <errorCode>                                                       "code": "404",
-          <code>404</code>                                                "reasonPhrase": "No context element found"
-          <reasonPhrase>No context element found</reasonPhrase>         }
-        </errorCode>                                                  }
-      </discoverContextAvailabilityResponse>                      
+      {
+	"errorCode": {
+	  "code": "404",
+	   "reasonPhrase": "No context element found"
+         }
+      }
+                     
 
 Compared to [standard discoverContextAvailability
 operation](#Discover_Context_Availability_operation "wikilink"):
 
 -   Convenience operations use the GET method without needing any
-    payload in the request (simpler than the standard operation)
--   The structure of the response XML (i.e.
-    discoverContextAvailabilityResponse) is the same in both cases.
+    payload in the request (simpler than the standard operation).
     However, there are two differences in the content. First, each
     attribute always comes in a different contextRegistrationResponse
     element (as each attribute corresponds to a different registration,
@@ -3099,135 +2986,138 @@ couple of entities of type Car using standard registerContext operations
 (given that, as described in previous section, you cannot register
 entities with types using convenience operations):
 
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                    {
-          <registerContextRequest>                                                                                                               "contextRegistrations": [
-            <contextRegistrationList>                                                                                                            {
-              <contextRegistration>                                                                                                                "entities": [
-                <entityIdList>                                                                                                                     {
-                  <entityId type="Car" isPattern="false">                                                                                            "type": "Car",
-                    <id>Car1</id>                                                                                                                    "isPattern": "false",
-                  </entityId>                                                                                                                        "id": "Car1"
-                </entityIdList>                                                                                                                    }
-                <contextRegistrationAttributeList>                                                                                                 ],
-                  <contextRegistrationAttribute>                                                                                                   "attributes": [
-                    <name>speed</name>                                                                                                             {
-                    <type>integer</type>                                                                                                             "name": "speed",
-                    <isDomain>false</isDomain>                                                                                                       "type": "integer",
-                  </contextRegistrationAttribute>                                                                                                    "isDomain": "false"
-                </contextRegistrationAttributeList>                                                                                                }
-                <providingApplication>http://mysensors.com/Cars</providingApplication>                                                             ],
-              </contextRegistration>                                                                                                               "providingApplication": "http://mysensors.com/Cars"
-            </contextRegistrationList>                                                                                                           }
-            <duration>P1M</duration>                                                                                                             ],
-          </registerContextRequest>                                                                                                              "duration": "P1M"
-      EOF                                                                                                                                      }
-                                                                                                                                               EOF
+      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextRegistrations": [
+	      {
+		  "entities": [
+		      {
+			  "type": "Car",
+			  "isPattern": "false",
+			  "id": "Car1"
+		      }
+		  ],
+		  "attributes": [
+		      {
+			  "name": "speed",
+			  "type": "integer",
+			  "isDomain": "false"
+		      }
+		  ],
+		  "providingApplication": "http://mysensors.com/Cars"
+	      }
+	  ],
+	  "duration": "P1M"
+      }
+      EOF
 
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF       (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      <?xml version="1.0"?>                                                                                                                    {
-          <registerContextRequest>                                                                                                               "contextRegistrations": [
-            <contextRegistrationList>                                                                                                            {
-              <contextRegistration>                                                                                                                "entities": [
-                <entityIdList>                                                                                                                     {
-                  <entityId type="Car" isPattern="false">                                                                                            "type": "Car",
-                    <id>Car2</id>                                                                                                                    "isPattern": "false",
-                  </entityId>                                                                                                                        "id": "Car2"
-                </entityIdList>                                                                                                                    }
-                <contextRegistrationAttributeList>                                                                                                 ],
-                  <contextRegistrationAttribute>                                                                                                   "attributes": [
-                    <name>fuel</name>                                                                                                              {
-                    <type>float</type>                                                                                                               "name": "fuel",
-                    <isDomain>false</isDomain>                                                                                                       "type": "float",
-                  </contextRegistrationAttribute>                                                                                                    "isDomain": "false"
-                </contextRegistrationAttributeList>                                                                                                }
-                <providingApplication>http://mysensors.com/Cars</providingApplication>                                                             ],
-              </contextRegistration>                                                                                                               "providingApplication": "http://mysensors.com/Cars"
-            </contextRegistrationList>                                                                                                           }
-            <duration>P1M</duration>                                                                                                             ],
-          </registerContextRequest>                                                                                                              "duration": "P1M"
-      EOF                                                                                                                                      }
-                                                                                                                                               EOF
+      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+      {
+	  "contextRegistrations": [
+	      {
+		  "entities": [
+		      {
+			  "type": "Car",
+			  "isPattern": "false",
+			  "id": "Car2"
+		      }
+		  ],
+		  "attributes": [ 
+		      {
+			  "name": "fuel",
+			  "type": "float",
+			  "isDomain": "false"
+		      }
+		  ],
+		  "providingApplication": "http://mysensors.com/Cars"
+	      }
+	  ],
+	  "duration": "P1M"
+      }
+      EOF
+                                                                                                                                         
 
 Request without specifying attributes:
 
-      curl localhost:1026/v1/registry/contextEntityTypes/Car -s -S --header 'Content-Type: application/xml' | xmllint --format -       curl localhost:1026/v1/registry/contextEntityTypes/Car -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+     curl localhost:1026/v1/registry/contextEntityTypes/Car -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 Response:
 
-      <?xml version="1.0"?>                                                                {
-      <discoverContextAvailabilityResponse>                                                  "contextRegistrationResponses": [
-        <contextRegistrationResponseList>                                                    {
-          <contextRegistrationResponse>                                                        "contextRegistration": {
-            <contextRegistration>                                                                "attributes": [
-              <entityIdList>                                                                     {
-                <entityId type="Car" isPattern="false">                                            "isDomain": "false",
-                  <id>Car1</id>                                                                    "name": "speed",
-                </entityId>                                                                        "type": "integer"
-              </entityIdList>                                                                    }
-              <contextRegistrationAttributeList>                                                 ],
-                <contextRegistrationAttribute>                                                   "entities": [
-                  <name>speed</name>                                                             {
-                  <type>integer</type>                                                             "id": "Car1",
-                  <isDomain>false</isDomain>                                                       "isPattern": "false",
-                </contextRegistrationAttribute>                                                    "type": "Car"
-              </contextRegistrationAttributeList>                                                }
-              <providingApplication>http://mysensors.com/Cars</providingApplication>             ],
-            </contextRegistration>                                                               "providingApplication": "http://mysensors.com/Cars"
-          </contextRegistrationResponse>                                                       }
-          <contextRegistrationResponse>                                                      },
-            <contextRegistration>                                                            {
-              <entityIdList>                                                                   "contextRegistration": {
-                <entityId type="Car" isPattern="false">                                          "attributes": [
-                  <id>Car2</id>                                                                  {
-                </entityId>                                                                        "isDomain": "false",
-              </entityIdList>                                                                      "name": "fuel",
-              <contextRegistrationAttributeList>                                                   "type": "float"
-                <contextRegistrationAttribute>                                                   }
-                  <name>fuel</name>                                                              ],
-                  <type>liter</type>                                                             "entities": [
-                  <isDomain>false</isDomain>                                                     {
-                </contextRegistrationAttribute>                                                    "id": "Car2",
-              </contextRegistrationAttributeList>                                                  "isPattern": "false",
-              <providingApplication>http://mysensors.com/Cars</providingApplication>               "type": "Car"
-            </contextRegistration>                                                               }
-          </contextRegistrationResponse>                                                         ],
-        </contextRegistrationResponseList>                                                       "providingApplication": "http://mysensors.com/Cars"
-      </discoverContextAvailabilityResponse>                                                   }
-                                                                                             }
-                                                                                             ]
-                                                                                           }
+      {
+	  "contextRegistrationResponses": [
+	      {
+		  "contextRegistration": {
+		      "attributes": [
+			  {
+			      "isDomain": "false",
+			      "name": "speed",
+			      "type": "integer"
+			  }
+		      ],
+		      "entities": [
+			  {
+			      "id": "Car1",
+			      "isPattern": "false",
+			      "type": "Car"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Cars"
+		  }
+	      },
+	      {
+		  "contextRegistration": {
+		      "attributes": [
+			  {
+			      "isDomain": "false",
+			      "name": "fuel",
+			      "type": "float"
+			  }
+		      ],
+		      "entities": [
+			  {
+			      "id": "Car2",
+			      "isPattern": "false",
+			      "type": "Car"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Cars"
+		  }
+	      }
+	  ]
+      }
+
 
 
 Request specifying one attribute (e.g. speed):
 
-      curl localhost:1026/v1/registry/contextEntityTypes/Car/attributes/speed -s -S --header 'Content-Type: application/xml' | xmllint --format -       curl localhost:1026/v1/registry/contextEntityTypes/Car/attributes/speed -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+     curl localhost:1026/v1/registry/contextEntityTypes/Car/attributes/speed -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 Response:
 
-      <?xml version="1.0"?>                                                                {
-      <discoverContextAvailabilityResponse>                                                  "contextRegistrationResponses": [
-        <contextRegistrationResponseList>                                                    {
-          <contextRegistrationResponse>                                                        "contextRegistration": {
-            <contextRegistration>                                                                "attributes": [
-              <entityIdList>                                                                     {
-                <entityId type="Car" isPattern="false">                                            "isDomain": "false",
-                  <id>Car1</id>                                                                    "name": "speed",
-                </entityId>                                                                        "type": "integer"
-              </entityIdList>                                                                    }
-              <contextRegistrationAttributeList>                                                 ],
-                <contextRegistrationAttribute>                                                   "entities": [
-                  <name>speed</name>                                                             {
-                  <type>integer</type>                                                             "id": "Car1",
-                  <isDomain>false</isDomain>                                                       "isPattern": "false",
-                </contextRegistrationAttribute>                                                    "type": "Car"
-              </contextRegistrationAttributeList>                                                }
-              <providingApplication>http://mysensors.com/Cars</providingApplication>             ],
-            </contextRegistration>                                                               "providingApplication": "http://mysensors.com/Cars"
-          </contextRegistrationResponse>                                                       }
-        </contextRegistrationResponseList>                                                   }
-      </discoverContextAvailabilityResponse>                                                 ]
-                                                                                           }
+      {
+	  "contextRegistrationResponses": [
+	      {
+		  "contextRegistration": {
+		      "attributes": [
+			  {
+			      "isDomain": "false",
+			      "name": "speed",
+			      "type": "integer"
+			  }
+		      ],
+		      "entities": [
+			  {
+			      "id": "Car1",
+			      "isPattern": "false",
+			      "type": "Car"
+			  }
+		      ],
+		      "providingApplication": "http://mysensors.com/Cars"
+		  }
+	      }
+	  ]
+      }
+
 
 Note that by default only 20 registrations are returned (which is fine
 for this tutorial, but probably not for a real utilization scenario). In
