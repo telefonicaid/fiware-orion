@@ -317,7 +317,7 @@ std::string ContextAttribute::render
   {
     if (omitValue == false)
     {
-      if ((valueType == ValueTypeString) || (ciP->apiVersion == "v1"))
+      if ((valueType == ValueTypeString) || (ciP->apiVersion != "v2"))
       {
         out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
                         (request != RtUpdateContextResponse)? value : "",
