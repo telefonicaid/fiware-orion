@@ -99,7 +99,33 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   }
 }
 
+/* ****************************************************************************
+*
+* ContextAttribute::ContextAttribute -
+*/
+ContextAttribute::ContextAttribute
+(
+  const std::string&  _name,
+  const std::string&  _type,
+  const char*         _value,
+  bool                _found
+)
+{
+  LM_T(LmtClone, ("Creating a string ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
+                  _name.c_str(),
+                  _type.c_str(),
+                  _value));
 
+  name                  = _name;
+  type                  = _type;
+  value                 = std::string(_value);
+  valueType             = ValueTypeString;
+  compoundValueP        = NULL;
+  found                 = _found;
+
+  providingApplication.set("");
+  providingApplication.setFormat(NOFORMAT);
+}
 
 /* ****************************************************************************
 *
@@ -632,6 +658,26 @@ void ContextAttribute::release(void)
 std::string ContextAttribute::toString(void)
 {
   return name;
+}
+
+/* ****************************************************************************
+*
+* toStringValue -
+*/
+std::string ContextAttribute::toStringValue(void)
+{
+  switch(valueType)
+  {
+    case ValueTypeString:
+      return value;
+    case ValueTypeNumber:
+    return "<double>";
+      //FIXME P10: return std::string(numberValue);
+    case ValueTypeBoolean:
+      return boolValue ? "true" : "false";
+    default:
+      return "<unkown type>";
+  }
 }
 
 

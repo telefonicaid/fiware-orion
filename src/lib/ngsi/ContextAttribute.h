@@ -80,7 +80,8 @@ typedef struct ContextAttribute
   ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP);
-  ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value = "", bool _found = true);
+  ContextAttribute(const std::string& _name, const std::string& _type, const char* _value, bool _found = true);
+  ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, bool _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
@@ -96,6 +97,9 @@ typedef struct ContextAttribute
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(void);
+
+  /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
+  std::string  toStringValue(void);
 
   std::string  check(RequestType         requestType,
                      Format              format,

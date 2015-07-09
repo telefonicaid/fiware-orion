@@ -1325,13 +1325,13 @@ bool entitiesQuery
         }
         else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object)
         {
-          caP = new ContextAttribute(ca.name, ca.type);
+          caP = new ContextAttribute(ca.name, ca.type, "");
           caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
           compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
         }
         else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array)
         {
-          caP = new ContextAttribute(ca.name, ca.type);
+          caP = new ContextAttribute(ca.name, ca.type, "");
           caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
           compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
         }
