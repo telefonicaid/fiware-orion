@@ -113,7 +113,7 @@ ContextAttribute::ContextAttribute
   bool                _found
 )
 {
-  LM_T(LmtClone, ("Creating a ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
+  LM_T(LmtClone, ("Creating a string ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
                   _name.c_str(),
                   _type.c_str(),
                   _value.c_str()));
@@ -121,6 +121,7 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   value                 = _value;
+  valueType             = ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
 
@@ -128,6 +129,61 @@ ContextAttribute::ContextAttribute
   providingApplication.setFormat(NOFORMAT);
 }
 
+/* ****************************************************************************
+*
+* ContextAttribute::ContextAttribute -
+*/
+ContextAttribute::ContextAttribute
+(
+  const std::string&  _name,
+  const std::string&  _type,
+  double              _value,
+  bool                _found
+)
+{
+  LM_T(LmtClone, ("Creating a number ContextAttribute '%s':'%s':'%d', setting its compound to NULL",
+                  _name.c_str(),
+                  _type.c_str(),
+                  _value));
+
+  name                  = _name;
+  type                  = _type;
+  numberValue           = _value;
+  valueType             = ValueTypeNumber;
+  compoundValueP        = NULL;
+  found                 = _found;
+
+  providingApplication.set("");
+  providingApplication.setFormat(NOFORMAT);
+}
+
+/* ****************************************************************************
+*
+* ContextAttribute::ContextAttribute -
+*/
+ContextAttribute::ContextAttribute
+(
+  const std::string&  _name,
+  const std::string&  _type,
+  bool                _value,
+  bool                _found
+)
+{
+  LM_T(LmtClone, ("Creating a boolean ContextAttribute '%s':'%s':'%s', setting its compound to NULL",
+                  _name.c_str(),
+                  _type.c_str(),
+                  _value ? "true" : "false"));
+
+  name                  = _name;
+  type                  = _type;
+  boolValue             = _value;
+  valueType             = ValueTypeBoolean;
+  compoundValueP        = NULL;
+  found                 = _found;
+
+  providingApplication.set("");
+  providingApplication.setFormat(NOFORMAT);
+}
 
 
 /* ****************************************************************************

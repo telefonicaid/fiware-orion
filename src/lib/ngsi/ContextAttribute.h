@@ -81,6 +81,8 @@ typedef struct ContextAttribute
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP);
   ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value = "", bool _found = true);
+  ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
+  ContextAttribute(const std::string& _name, const std::string& _type, bool _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Grabbers for metadata to which CB gives a special semantic */
