@@ -30,9 +30,11 @@ building from sources, check [this document](doc/manuals/admin/build_source.md).
 * System resources: see [these recommendations](doc/manuals/admin/resources.md#resources-recommendations)
 * Operating system: CentOS/RedHat. The reference operating system is CentOS 6.3  
 but it should work also in any later CentOS/RedHat 6.x version.
-* Database: MongoDB is required running either in the same system where Orion Context Broker is going to be installed or in a different host accessible through the network. The recommended MongoDB version is 2.6.9 (although it should work with later MongoDB 2.6.x and 3.0.x versions). It is not recommended using MongoDB 2.4.x., as some [geolocated queries](doc/manuals/user/geolocation.md).
+* Database: MongoDB is required running either in the same system where Orion Context Broker is going to be installed or in a different host accessible through the network. The recommended MongoDB version is 2.6.9 (although it should work with later MongoDB 2.6.x and 3.0.x versions). It is not recommended using MongoDB 2.4.x., as some [geolocated queries](doc/manuals/user/geolocation.md) may not work.
+    * Note that the officially supported MongoDB version is 2.6. In the case of using MongoDB 3.0 with its new authentication mechanism
+      (SCRAM_SHA1) you may need to compile from sources using special switches for the MongoDB driver. See [this issue](https://github.com/telefonicaid/fiware-orion/issues/1061) for details.
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):
-	* The contextBroker package (mandatory) depends on the following packages: boost-filesystem, boost-thread, libmicrohttpd, logrotate, libcurl and boost-regex.
+    * The contextBroker package (mandatory) depends on the following packages: boost-filesystem, boost-thread, libmicrohttpd, logrotate, libcurl and boost-regex.
     * The contextBroker-test package (optional) depends on the following packages: python, python-flask, python-jinja2, curl, libxml2, libxslt, nc, mongo-10gen and contextBroker. The mongo-10gen dependency needs to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
 
 ### Installation
@@ -280,9 +282,8 @@ Please have a look to the section [on building the source code](#from-sources) i
 ## Advanced topics:
 
 * Installation and administration
-
         * [Building from sources](doc/manuals/admin/build_source.md)
-        * [Running Orion from command line](doc/manuals/admin/cli.md).
+        * [Running Orion from command line](doc/manuals/admin/cli.md)
 	* [Database administration](doc/manuals/admin/database_admin.md)
 	* [Logs](doc/manuals/admin/logs.md)
 	* [Watchdog](doc/manuals/admin/watchdog.md)
@@ -294,7 +295,7 @@ Please have a look to the section [on building the source code](#from-sources) i
 * API
 	* [Pagination](doc/manuals/user/pagination.md)
 	* [Geolocation ](doc/manuals/user/geolocation.md)
-	* [Structured values for attributes](doc/manuals/user/structured_attribute_valued.md)
+        * [Structured values for attributes](doc/manuals/user/structured_attribute_valued.md)
         * [Context Providers registration and request forwarding](doc/manuals/user/context_providers.md)
 	* [Attribute metadata](doc/manuals/user/metadata.md)
 	* [Filtering results](doc/manuals/user/filtering.md)
