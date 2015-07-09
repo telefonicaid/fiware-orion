@@ -323,6 +323,44 @@ static void prepareDatabaseWithServicePaths(void) {
 
 /* ****************************************************************************
 *
+* prepareDatabaseDifferentNativeTypes -
+*
+*/
+static void prepareDatabaseDifferentNativeTypes(void) {
+
+  /* Set database */
+  setupDatabase();
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* We create the following entities:
+   *
+   * - E1:
+   *     A1: string
+   *     A2: number
+   *     A2: bool
+   *     A3: vector
+   *     A5: object
+   *
+   */
+
+  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
+                     "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A4" << "A5") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "T" << "value" << "s") <<
+                        "A2" << BSON("type" << "T" << "value" << 42) <<
+                        "A3" << BSON("type" << "T" << "value" << false) <<
+                        "A4" << BSON("type" << "T" << "value" << BSON("x" << "a" << "y" << "b")) <<
+                        "A5" << BSON("type" << "T" << "value" << BSON_ARRAY("x1" << "x2"))
+                        )
+                    );
+
+  connection->insert(ENTITIES_COLL, en1);
+
+}
+
+/* ****************************************************************************
+*
 * findAttr -
 *
 */
@@ -9310,6 +9348,109 @@ TEST(mongoUpdateContextRequest, updateNativeTypes)
     /* Release connection */
     setMongoConnectionForUnitTest(NULL);
 
+
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* preservingNativeTypes -
+*
+* Changing only one attribute (the string one), other weeks the same
+*/
+TEST(mongoUpdateContextRequest, preservingNativeTypes)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Prepare database */
+    prepareDatabaseDifferentNativeTypes();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E1", "T1", "false");
+    ContextAttribute ca("A1", "T", "new_s");
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("UPDATE");
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ(0, res.errorCode.details.size());
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientBase* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E1" << "_id.type" << "T1"));
+    EXPECT_STREQ("E1", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T1", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(5, attrs.nFields());
+    ASSERT_EQ(5, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    BSONObj a3 = attrs.getField("A3").embeddedObject();
+    BSONObj a4 = attrs.getField("A4").embeddedObject();
+    BSONObj a5 = attrs.getField("A5").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_TRUE(findAttr(attrNames, "A3"));
+    EXPECT_TRUE(findAttr(attrNames, "A4"));
+    EXPECT_TRUE(findAttr(attrNames, "A5"));
+    EXPECT_STREQ("T", C_STR_FIELD(a1, "type"));
+    EXPECT_STREQ("new_s", C_STR_FIELD(a1, "value"));
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_STREQ("T", C_STR_FIELD(a2, "type"));
+    EXPECT_EQ(42, a2.getField("value").Number());;
+    EXPECT_FALSE(a2.hasField("modDate"));
+    EXPECT_STREQ("T", C_STR_FIELD(a3, "type"));
+    EXPECT_FALSE(a3.getBoolField("value"));
+    EXPECT_FALSE(a3.hasField("modDate"));
+    EXPECT_STREQ("T", C_STR_FIELD(a4, "type"));
+    EXPECT_EQ("a", a4.getField("value").embeddedObject().getField("x").str());
+    EXPECT_EQ("b", a4.getField("value").embeddedObject().getField("y").str());
+    EXPECT_FALSE(a4.hasField("modDate"));
+    EXPECT_STREQ("T", C_STR_FIELD(a5, "type"));
+    EXPECT_EQ("x1", a5.getField("value").Array()[0].str());
+    EXPECT_EQ("x2", a5.getField("value").Array()[1].str());
+    EXPECT_FALSE(a5.hasField("modDate"));
+
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
 
     utExit();
 }
