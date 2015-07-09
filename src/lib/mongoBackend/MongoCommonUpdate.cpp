@@ -136,7 +136,7 @@ void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
   switch(caP->valueType)
   {
     case ValueTypeString:
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->value);
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->stringValue);
       break;
     case ValueTypeNumber:
       bsonAttr.append(ENT_ATTRS_VALUE, caP->numberValue);
@@ -315,7 +315,7 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 bool emptyAttributeValue(ContextAttribute* caP)
 {
   /* Note that ValueTypeNumber and ValueTypeBoolean are always not-empty */
-  return (caP->valueType == ValueTypeString) && (caP->value == "") && (caP->compoundValueP == NULL);
+  return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
 }
 
 
@@ -337,7 +337,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
     case Bool:
       return caP->boolValue != attr.getBoolField(ENT_ATTRS_VALUE);
     case String:
-      return caP->value != STR_FIELD(attr, ENT_ATTRS_VALUE);
+      return caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
     default:
       LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
       return false;
@@ -793,9 +793,9 @@ static bool processLocation
             return false;
           }
 
-          if (!string2coords(caP->value, coordLat, coordLong))
+          if (!string2coords(caP->stringValue, coordLat, coordLong))
           {
-            *errDetail = "coordinate format error [see Orion user manual]: " + caP->value;
+            *errDetail = "coordinate format error [see Orion user manual]: " + caP->stringValue;
             return false;
           }
 
@@ -1378,13 +1378,13 @@ static bool processContextAttributeVector
 
       if (locAttr == targetAttr->name)
       {
-        if (!string2coords(targetAttr->value, coordLat, coordLong))
+        if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
         {
           cerP->statusCode.fill(SccInvalidParameter,
                                 std::string("action: UPDATE") +
                                 " - entity: [" + eP->toString() + "]" +
                                 " - offending attribute: " + targetAttr->toString() +
-                                " - error parsing location attribute, value: <" + targetAttr->value + ">");
+                                " - error parsing location attribute, value: <" + targetAttr->stringValue + ">");
 
           LM_W(("Bad Input (error parsing location attribute)"));
           return false;
@@ -1428,13 +1428,13 @@ static bool processContextAttributeVector
             return false;
           }
 
-          if (!string2coords(targetAttr->value, coordLat, coordLong))
+          if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
           {
             cerP->statusCode.fill(SccInvalidParameter,
                                   std::string("action: APPEND") +
                                   " - entity: [" + eP->toString() + "]" +
                                   " - offending attribute: " + targetAttr->toString() +
-                                  " - error parsing location attribute, value: [" + targetAttr->value + "]");
+                                  " - error parsing location attribute, value: [" + targetAttr->stringValue + "]");
             LM_W(("Bad Input (error parsing location attribute)"));
             return false;
           }

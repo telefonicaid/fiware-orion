@@ -188,7 +188,7 @@ static std::string attributeValue(const std::string& path, const std::string& va
 {
   LM_T(LmtParse, ("Got an attribute value: '%s'", value.c_str()));
   parseDataP->lastContextAttribute = parseDataP->ncr.attributeP;
-  parseDataP->ncr.attributeP->value = value;
+  parseDataP->ncr.attributeP->stringValue = value;
   return "OK";
 }
 

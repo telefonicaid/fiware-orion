@@ -171,8 +171,8 @@ static std::string attributeValue(const std::string& path, const std::string& va
   parseDataP->lastContextAttribute = parseDataP->upcr.attributeP;
   LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute to: %p", parseDataP->lastContextAttribute));
 
-  parseDataP->upcr.attributeP->value = value;
-  LM_T(LmtParse, ("Set value to '%s' for a contextElement attribute", parseDataP->upcr.attributeP->value.c_str()));
+  parseDataP->upcr.attributeP->stringValue = value;
+  LM_T(LmtParse, ("Set value to '%s' for a contextElement attribute", parseDataP->upcr.attributeP->stringValue.c_str()));
 
   return "OK";
 }

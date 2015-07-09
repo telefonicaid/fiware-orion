@@ -99,7 +99,7 @@ static std::string contextAttributeValue(const std::string& path, const std::str
 {
   reqData->lastContextAttribute = reqData->ucer.attributeP;
   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
-  reqData->ucer.attributeP->value = value;
+  reqData->ucer.attributeP->stringValue = value;
   return "OK";
 }
 

@@ -1316,12 +1316,12 @@ bool entitiesQuery
 
         if (queryAttr.getField(ENT_ATTRS_VALUE).type() == String)
         {
-          ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
-          if (!includeEmpty && ca.value.length() == 0)
+          ca.stringValue = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
+          if (!includeEmpty && ca.stringValue.length() == 0)
           {
             continue;
           }
-          caP = new ContextAttribute(ca.name, ca.type, ca.value);
+          caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
         }
         else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object)
         {

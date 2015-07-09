@@ -58,7 +58,7 @@ ContextAttribute::ContextAttribute()
   LM_T(LmtClone, ("Creating a ContextAttribute 1"));
   name                  = "";
   type                  = "";
-  value                 = "";
+  stringValue                 = "";
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   found                 = false;
@@ -77,7 +77,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
   name                  = caP->name;
   type                  = caP->type;
-  value                 = caP->value;
+  stringValue                 = caP->stringValue;
   compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
   found                 = caP->found;
   typeFromXmlAttribute  = "";
@@ -118,7 +118,7 @@ ContextAttribute::ContextAttribute
 
   name                  = _name;
   type                  = _type;
-  value                 = std::string(_value);
+  stringValue                 = std::string(_value);
   valueType             = ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
@@ -146,7 +146,7 @@ ContextAttribute::ContextAttribute
 
   name                  = _name;
   type                  = _type;
-  value                 = _value;
+  stringValue                 = _value;
   valueType             = ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
@@ -302,7 +302,7 @@ std::string ContextAttribute::renderAsJsonObject
     if (omitValue == false)
     {
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                      (request != RtUpdateContextResponse)? value : "",
+                      (request != RtUpdateContextResponse)? stringValue : "",
                       ciP->outFormat, commaAfterContextValue);
     }
   }
@@ -402,7 +402,7 @@ std::string ContextAttribute::render
       if ((valueType == ValueTypeString) || (ciP->apiVersion != "v2"))
       {
         out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                        (request != RtUpdateContextResponse)? value : "",
+                        (request != RtUpdateContextResponse)? stringValue : "",
                         ciP->outFormat, commaAfterContextValue);
       }
 #if 0
@@ -479,17 +479,17 @@ std::string ContextAttribute::toJson(bool isLastElement)
   {
     if (isNumber == true)
     {
-      out = JSON_VALUE_NUMBER(name, value);
+      out = JSON_VALUE_NUMBER(name, stringValue);
     }
     else if (isString == true)
     {
-      out = JSON_VALUE(name, value);
+      out = JSON_VALUE(name, stringValue);
     }
     else
     {
       if (compoundValueP == NULL)
       {
-        out = JSON_VALUE(name, value);
+        out = JSON_VALUE(name, stringValue);
       }
       else
       {
@@ -514,13 +514,13 @@ std::string ContextAttribute::toJson(bool isLastElement)
 
     if (isNumber == true)
     {
-      out += JSON_VALUE_NUMBER("value", value);
+      out += JSON_VALUE_NUMBER("value", stringValue);
     }
     else
     {
       if (compoundValueP == NULL)
       {
-        out += JSON_VALUE("value", value);
+        out += JSON_VALUE("value", stringValue);
       }
       else
       {
@@ -606,7 +606,7 @@ void ContextAttribute::present(const std::string& indent, int ix)
   {
     if (valueType == ValueTypeString)
     {
-      LM_F(("%s  String Value:      %s", indent.c_str(), value.c_str()));
+      LM_F(("%s  String Value:      %s", indent.c_str(), stringValue.c_str()));
     }
     else if (valueType == ValueTypeNumber)
     {
@@ -669,7 +669,7 @@ std::string ContextAttribute::toStringValue(void)
   switch(valueType)
   {
     case ValueTypeString:
-      return value;
+      return stringValue;
     case ValueTypeNumber:
     return "<double>";
       //FIXME P10: return std::string(numberValue);

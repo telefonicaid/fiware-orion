@@ -342,13 +342,13 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_ok)
     ca2 = *cer0.contextElement.contextAttributeVector.get(2);    
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
-    EXPECT_EQ("X", ca0.value);
+    EXPECT_EQ("X", ca0.stringValue);
     EXPECT_EQ("A2", ca1.name);
     EXPECT_EQ("TA2", ca1.type);
-    EXPECT_EQ("Z", ca1.value);
+    EXPECT_EQ("Z", ca1.stringValue);
     EXPECT_EQ("A3", ca2.name);
     EXPECT_EQ("TA3", ca2.type);
-    EXPECT_EQ("W", ca2.value);
+    EXPECT_EQ("W", ca2.stringValue);
 
     /* Context Element Response #2 */
     EXPECT_EQ(SccOk, cer1.statusCode.code);
@@ -362,10 +362,10 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_ok)
     ca1 = *cer1.contextElement.contextAttributeVector.get(1);
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
-    EXPECT_EQ("S", ca0.value);
+    EXPECT_EQ("S", ca0.stringValue);
     EXPECT_EQ("A4", ca1.name);
     EXPECT_EQ("TA4", ca1.type);
-    EXPECT_EQ("T", ca1.value);
+    EXPECT_EQ("T", ca1.stringValue);
 
     EXPECT_EQ(0, err.length());
 }
@@ -416,13 +416,13 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_pattern)
     ca2 = *cer0.contextElement.contextAttributeVector.get(2);    
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
-    EXPECT_EQ("X", ca0.value);
+    EXPECT_EQ("X", ca0.stringValue);
     EXPECT_EQ("A2", ca1.name);
     EXPECT_EQ("TA2", ca1.type);
-    EXPECT_EQ("Z", ca1.value);
+    EXPECT_EQ("Z", ca1.stringValue);
     EXPECT_EQ("A3", ca2.name);
     EXPECT_EQ("TA3", ca2.type);
-    EXPECT_EQ("W", ca2.value);
+    EXPECT_EQ("W", ca2.stringValue);
 
     /* Context Element Response #2 */
     EXPECT_EQ(SccOk, cer1.statusCode.code);
@@ -436,10 +436,10 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_pattern)
     ca1 = *cer1.contextElement.contextAttributeVector.get(1);
     EXPECT_EQ("A1", ca0.name);
     EXPECT_EQ("TA1", ca0.type);
-    EXPECT_EQ("S", ca0.value);
+    EXPECT_EQ("S", ca0.stringValue);
     EXPECT_EQ("A4", ca1.name);
     EXPECT_EQ("TA4", ca1.type);
-    EXPECT_EQ("T", ca1.value);
+    EXPECT_EQ("T", ca1.stringValue);
 
     EXPECT_EQ(0, err.length());
 }

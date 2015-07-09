@@ -245,7 +245,7 @@ static int contextAttributeContextValue(xml_node<>* node, ParseData* parseDataP)
   parseDataP->lastContextAttribute = parseDataP->ncr.attributeP;
   parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
 
-  parseDataP->ncr.attributeP->value = node->value();
+  parseDataP->ncr.attributeP->stringValue = node->value();
 
   return 0;
 }

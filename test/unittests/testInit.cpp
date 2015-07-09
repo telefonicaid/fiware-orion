@@ -112,18 +112,22 @@ static bool equalContextAttribute(ContextAttribute* caExpected, ContextAttribute
     LM_M(("caArg '%s', '%s', '%s'",
           caArg->name.c_str(),
           caArg->type.c_str(),
-          caArg->value.c_str()
+          caArg->toStringValue().c_str()
           ));
     LM_M(("caExpected '%s', '%s', '%s'",
           caExpected->name.c_str(),
           caExpected->type.c_str(),
-          caExpected->value.c_str()
+          caExpected->toStringValue().c_str()
           ));
 
-    if (caArg->name == caExpected->name && caArg->type == caExpected->type && caArg->value == caExpected->value) {
+    if (caArg->name == caExpected->name &&
+        caArg->type == caExpected->type &&
+        caArg->stringValue == caExpected->stringValue) // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
+    {
         return true;
     }
-    else {
+    else
+    {
         return false;
     }
 }
