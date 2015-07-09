@@ -254,12 +254,12 @@ Please have a look to the [Quick Start guide](doc/manuals/quick_start_guide.md) 
 ## API Walkthrough
 
 * [FIWARE NGSI v1](doc/manuals/user/walkthrough_apiv1.md) (Markdown)
-* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/cookbook) (Apiary) - *ongoing*
+* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/cookbook) (Apiary) - *ongoing, not yet suitable for production*
 
 ## API Reference Documentation
 
 * [FIWARE NGSI v1](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_NGSI:_publicly_available_documents) (XSD and PDF)
-* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/) (Apiary) - *ongoing*
+* [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/) (Apiary) - *ongoing, not yet suitable for production*
 
 ## Testing
 
