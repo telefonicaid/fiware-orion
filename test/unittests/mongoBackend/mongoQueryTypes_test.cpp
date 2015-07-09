@@ -181,7 +181,7 @@ ContextAttribute* getAttr(ContextAttributeVector& caV, std::string name, std::st
   }
   /* Usually (i.e. in no-test code) we should return NULL. However, it helps to debug to use
    * a ContextAttribute value with crazy values */
-  ContextAttribute* ca = new ContextAttribute("error", "error_T");
+  ContextAttribute* ca = new ContextAttribute("error", "error_T", "error_V");
   return ca;
 }
 

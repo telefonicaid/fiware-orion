@@ -536,7 +536,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1");
+    ContextAttribute ca("A1", "TA1", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -751,7 +751,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_noType)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1");
+    ContextAttribute ca("A1", "TA1", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -948,7 +948,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T", "false");
-    ContextAttribute ca("A1", "TA1");
+    ContextAttribute ca("A1", "TA1", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -1143,7 +1143,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
-    ContextAttribute ca("A1", "TA1");
+    ContextAttribute ca("A1", "TA1", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -1339,7 +1339,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatchDisjoint)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "TA2");
+    ContextAttribute ca("A2", "TA2", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -1505,7 +1505,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteNoMatch)
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A3", "TA3");
+    ContextAttribute ca("A3", "TA3", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -1759,8 +1759,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMixMatchNoMatch)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A3", "TA3");   // no match
-    ContextAttribute caa2("A2", "TA2");    // match
+    ContextAttribute caa1("A3", "TA3", "");    // no match
+    ContextAttribute caa2("A2", "TA2", "");    // match
     ce.contextAttributeVector.push_back(&caa1);
     ce.contextAttributeVector.push_back(&caa2);
     req.contextElementVector.push_back(&ce);
@@ -1960,7 +1960,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_delete2Matches1Notifica
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute caa1("A1", "TA1");
+    ContextAttribute caa1("A1", "TA1", "");
     ce.contextAttributeVector.push_back(&caa1);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -2160,7 +2160,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatch)
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A1", "TA1");
+    ContextAttribute ca("A1", "TA1", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -2357,7 +2357,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMatchDisjoint)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A2", "TA2");
+    ContextAttribute ca("A2", "TA2", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -2521,7 +2521,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteNoMatch)
     /* Forge the request (from "inside" to "outside") */    
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca("A3", "TA3");
+    ContextAttribute ca("A3", "TA3", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -2775,8 +2775,8 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_deleteMixMatchNoMatch)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A3", "TA3");   // no match
-    ContextAttribute caa2("A2", "TA2");   // match
+    ContextAttribute caa1("A3", "TA3", "");   // no match
+    ContextAttribute caa2("A2", "TA2", "");   // match
     ce.contextAttributeVector.push_back(&caa1);
     ce.contextAttributeVector.push_back(&caa2);
     req.contextElementVector.push_back(&ce);
@@ -2976,7 +2976,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, CondN_delete2Matches1Notifica
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E2", "T2", "false");
-    ContextAttribute caa1("A1", "TA1");
+    ContextAttribute caa1("A1", "TA1", "");
     ce.contextAttributeVector.push_back(&caa1);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");

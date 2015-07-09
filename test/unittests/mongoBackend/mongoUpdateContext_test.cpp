@@ -125,6 +125,7 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 * - createNativeTypes
 * - updateNativeTypes
+* - preservingNativeTypes
 *
 * Simulating fails in MongoDB connection:
 *
@@ -2984,7 +2985,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1Attr)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "TA2");
+    ContextAttribute ca("A2", "TA2", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -3135,7 +3136,7 @@ TEST(mongoUpdateContextRequest, delete1Ent1AttrNoType)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A2", "");
+    ContextAttribute ca("A2", "", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -3403,7 +3404,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1Attr)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "", "false");
-    ContextAttribute ca("A2", "TA2");
+    ContextAttribute ca("A2", "TA2", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -3576,7 +3577,7 @@ TEST(mongoUpdateContextRequest, delete1EntNoType1AttrNoType)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "", "false");
-    ContextAttribute ca("A2", "");
+    ContextAttribute ca("A2", "", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -3749,9 +3750,9 @@ TEST(mongoUpdateContextRequest, deleteNEnt1Attr)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce1, ce2;
     ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A2", "TA2");
+    ContextAttribute ca1("A2", "TA2", "");
     ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca2("A4", "TA4");
+    ContextAttribute ca2("A4", "TA4", "");
     ce1.contextAttributeVector.push_back(&ca1);
     ce2.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce1);
@@ -3913,8 +3914,8 @@ TEST(mongoUpdateContextRequest, delete1EntNAttr)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1");
-    ContextAttribute ca2("A2", "TA2");
+    ContextAttribute ca1("A1", "TA1", "");
+    ContextAttribute ca2("A2", "TA2", "");
     ce.contextAttributeVector.push_back(&ca1);
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
@@ -4066,11 +4067,11 @@ TEST(mongoUpdateContextRequest, deleteNEntNAttr)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce1, ce2;
     ce1.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca1("A1", "TA1");
-    ContextAttribute ca2("A2", "TA2");
+    ContextAttribute ca1("A1", "TA1", "");
+    ContextAttribute ca2("A2", "TA2", "");
     ce2.entityId.fill("E2", "T2", "false");
-    ContextAttribute ca3("A3", "TA3");
-    ContextAttribute ca4("A4", "TA4");
+    ContextAttribute ca3("A3", "TA3", "");
+    ContextAttribute ca4("A4", "TA4", "");
     ce1.contextAttributeVector.push_back(&ca1);
     ce1.contextAttributeVector.push_back(&ca2);
     ce2.contextAttributeVector.push_back(&ca3);
@@ -5105,7 +5106,7 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A1", "TA1");
+    ContextAttribute ca("A1", "TA1", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("UPDATE");
@@ -5262,7 +5263,7 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A8", "TA8");
+    ContextAttribute ca("A8", "TA8", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("APPEND");
@@ -5581,7 +5582,7 @@ TEST(mongoUpdateContextRequest, deleteAttrNotFoundFail)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E1", "T1", "false");
-    ContextAttribute ca("A8", "TA8");
+    ContextAttribute ca("A8", "TA8", "");
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
@@ -7215,7 +7216,7 @@ TEST(mongoUpdateContextRequest, deleteAttrWithId)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca("A1", "TA1");
+    ContextAttribute ca("A1", "TA1", "");
     Metadata md("ID", "string", "ID1");
     ca.metadataVector.push_back(&md);
     ce.contextAttributeVector.push_back(&ca);
@@ -7395,11 +7396,11 @@ TEST(mongoUpdateContextRequest, deleteAttrWithAndWithoutId)
     /* Forge the request (from "inside" to "outside") */
     ContextElement ce;
     ce.entityId.fill("E10", "T10", "false");
-    ContextAttribute ca1("A1", "TA1");
+    ContextAttribute ca1("A1", "TA1", "");
     Metadata md("ID", "string", "ID1");
     ca1.metadataVector.push_back(&md);
     ce.contextAttributeVector.push_back(&ca1);
-    ContextAttribute ca2("A2", "TA2");
+    ContextAttribute ca2("A2", "TA2", "");
     ce.contextAttributeVector.push_back(&ca2);
     req.contextElementVector.push_back(&ce);
     req.updateActionType.set("DELETE");
