@@ -145,7 +145,7 @@ void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
       bsonAttr.append(ENT_ATTRS_VALUE, caP->boolValue);
       break;
     default:
-      LM_E(("Runtime Error (uknown attribute type)"));
+      LM_E(("Runtime Error (unknown attribute type)"));
   }
 }
 
@@ -325,10 +325,13 @@ bool emptyAttributeValue(ContextAttribute* caP)
 */
 bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 {
-  /* Note that compoundValueP is not evaluated, the place from which this function is called
-   * already have checked that */
   switch (attr.getField(ENT_ATTRS_VALUE).type())
   {
+    case Object:
+    case Array:
+      /* As the compoundValueP has been checked is NULL before invoking this function, finding
+       * a compound value in DB means that there is a change */
+      return true;
     case NumberDouble:
       return caP->numberValue != attr.getField(ENT_ATTRS_VALUE).Number();
     case Bool:
@@ -336,7 +339,7 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
     case String:
       return caP->value != STR_FIELD(attr, ENT_ATTRS_VALUE);
     default:
-      LM_E(("Runtime Error (uknown attribute type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
+      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
       return false;
   }
 }
@@ -363,20 +366,6 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   else
   {
     /* Slightly different treatment, depending on attribute value type in DB (string, number, boolean, vector or object) */
-#if 0
-    if (attr.getField(ENT_ATTRS_VALUE).type() == Object)
-    {
-      ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
-    }
-    else if (attr.getField(ENT_ATTRS_VALUE).type() == Array)
-    {
-      ab.appendArray(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
-    }
-    else
-    {
-      ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
-    }
-#endif
     switch (attr.getField(ENT_ATTRS_VALUE).type())
     {
       case Object:
@@ -395,7 +384,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
         ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
         break;
       default:
-        LM_E(("Runtime Error (uknown attribute type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
     }
 
   }
