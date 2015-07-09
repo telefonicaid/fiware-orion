@@ -18,7 +18,7 @@ Orion is a C++ implementation of the NGSI9/10 REST API binding developed as a pa
 
 Orion Context Broker allows you to manage all the whole lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSI9/10 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to register context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. an interval of time has passed or the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this document.
 
-If this is your first approach with Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/manuals/quick_start_guide.md).
+If this is your first contact with the Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/manuals/quick_start_guide.md).
 
 ## Build and Install
 
@@ -30,7 +30,7 @@ building from sources, check [this document](doc/manuals/admin/build_source.md).
 * System resources: see [these recommendations](doc/manuals/admin/resources.md#resources-recommendations)
 * Operating system: CentOS/RedHat. The reference operating system is CentOS 6.3  
 but it should work also in any later CentOS/RedHat 6.x version.
-* Database: MongoDB is required running either in the same system where Orion Context Broker is going to be installed or in a different host accessible through the network. The recommended MongoDB version is 2.6.9 (although it should work with later MongoDB 2.6.x and 3.0.x versions). It is not recommended using MongoDB 2.4.x., as some [geolocated queries](doc/manuals/user/geolocation.md) may not work.
+* Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB version is 2.6.9 (although it should work with later MongoDB 2.6.x and 3.0.x versions). It is not recommended using MongoDB 2.4.x., as some [geolocated queries](doc/manuals/user/geolocation.md) may not work.
     * Note that the officially supported MongoDB version is 2.6. In the case of using MongoDB 3.0 with its new authentication mechanism
       (SCRAM_SHA1) you may need to compile from sources using special switches for the MongoDB driver. See [this issue](https://github.com/telefonicaid/fiware-orion/issues/1061) for details.
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):
@@ -249,7 +249,7 @@ In order to update one of the entity atributes (temperature):
     }
     EOF
 
-Please have a look to the [Quick Start guide](doc/manuals/quick_start_guide.md) if you want to test these operations in an actual public instance of Oriion Context Broker. In addition, have a look to the API Walkthrough and API Reference sections below in order to know more details about the API (subscriptions, registrations, etc.).
+Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) if you want to test these operations in an actual public instance of Orion Context Broker. In addition, have a look to the API Walkthrough and API Reference sections below in order to know more details about the API (subscriptions, registrations, etc.).
 
 ## API Walkthrough
 

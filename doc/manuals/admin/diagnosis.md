@@ -23,7 +23,7 @@ tests and user validation.
 -   Run the following command
 
 ```
-curl localhost:1026/version
+curl localhost:1026/version
 ```
 
 -   Check that you get the version number as output (along with uptime
@@ -45,8 +45,8 @@ curl localhost:1026/version
 A process named "contextBroker" should be up and running, e.g.:
 
 ```
-$ ps ax | grep contextBroker
- 8517 ?        Ssl    8:58 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbhost localhost -db orion
+$ ps ax | grep contextBroker
+ 8517 ?        Ssl    8:58 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbhost localhost -db orion
 ```
 
 ### Network interfaces Up & Open
@@ -64,7 +64,7 @@ runs using authentication, i.e. with `--auth`.
 You can check that the database is working using the mongo console:
 
 ```
-mongo <dbhost>/<db>
+mongo <dbhost>/<db>
 ```
 
 You can check the different collections used by the broker using the
@@ -76,10 +76,10 @@ exists. Use `show collections` to get the actual collections list in any
 given moment.
 
 ```
-> db.registrations.count()
-> db.entities.count()
-> db.csubs.count()
-> db.casubs.count()
+> db.registrations.count()
+> db.entities.count()
+> db.csubs.count()
+> db.casubs.count()
 ```
 
 ## Diagnose database connection problems
@@ -89,7 +89,7 @@ The symptoms of a database connection problem are the following ones:
 -   At start time. The broker doesn't start and the following message
     appears in the log file:
 
-` X@08:04:45 main[313]: MongoDB error`
+` X@08:04:45 main[313]: MongoDB error`
 
 -   During broker operation. Error message like the following ones
     appear in the responses sent by the broker.
@@ -132,7 +132,7 @@ In both cases, check that the connection to MonogDB is correctly
 configured (in particular, the BROKER\_DATABASE\_HOST if you are running
 Orion Context Broker [as a service](../../../README.md#as-system-service) or
 the "-dbhost" option if you are running it [from the command
-line](cli.md)) and that the mongod or mongos
+line](cli.md)) and that the mongod/mongos
 process (depending if you are using sharding or not) is up and running.
 
 If the problem is that MongoDB is down, note that Orion Context Broker
@@ -172,14 +172,14 @@ The solution fo this problems is:
         following content (just one line)
 
 ```
--b /usr/bin/contextBroker
+-b /usr/bin/contextBroker
 ```
 
 -   Re-install the contextBroker package, typically running (as root or
     using sudo):
 
 ```
-yum remove contextBroker
-yum install contextBroker
+yum remove contextBroker
+yum install contextBroker
 ```
 

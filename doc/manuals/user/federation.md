@@ -149,8 +149,8 @@ attribute values) in C. You can check it by doing a queryContext to C:
 In the current context broker version, the semantics of
 nofityContextRequest are the same that [updateContext
 APPEND  or, if the context element already
-exist, the semantics of updateContext UPDATE](walkthrough_apiv1.md#update-context-elements).
-Thus, federation doesn't provide exact mirroring: a updateContext DELETE to 
+exists, the semantics of updateContext UPDATE](walkthrough_apiv1.md#update-context-elements).
+Thus, federation doesn't provide exact mirroring: an updateContext DELETE to
 one context broker will not produce the same effect in the federated context broker.
 
 This mechanism works similarly with registerContext and

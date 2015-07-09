@@ -13,7 +13,7 @@ database. It is strongly recommended that you stop the broker before
 doing a backup.
 
 ```
-mongodump --host <dbhost> --db <db>
+mongodump --host <dbhost> --db <db>
 ```
 
 This will create the backup in the dump/ directory.
@@ -35,7 +35,7 @@ Let's assume that the backup is in the dump/<db> directory. To restore
 it:
 
 ```
-mongorestore --host <dbhost> --db <db> dump/<db>
+mongorestore --host <dbhost> --db <db> dump/<db>
 ```
 
 Note that if you are using
@@ -94,8 +94,8 @@ each particular service/tenant database.
 This operation is done using the MongoDB shell:
 
 ```
-mongo <host>/<db>
-> db.dropDatabase()
+mongo <host>/<db>
+> db.dropDatabase()
 ```
 
 ## Setting indexes
@@ -132,7 +132,7 @@ indexes could be recommended:
 The only index that Orion Context Broker actually ensures is the
 "2dsphere" one in the location.coords field in the entities collection,
 due to functional needs [geo-location functionality](../user/geolocation.md)to work. The index is ensured at Orion startup or when entities are
-created for first time.
+created for the first time.
 
 ### Analysis
 
@@ -148,7 +148,7 @@ particular set up, but the results in your particular environment may
 differ depending on hardware profile, the particular entities being used
 for the test, set up situation, etc. In this particular case, the
 resources of the system under test (a VMware-based VM) are: 2 vCPU (on a
-physical host based on Intel Xeon E5620@ 2.40GHz) and 4GB RAM. Both Orion
+physical host based on Intel Xeon E5620@2.40GHz) and 4GB RAM. Both Orion
 and MongoDB run in the same VM. The tool to generate load is JMeter
 using the configuration that can be found at [the following
 location](https://github.com/telefonicaid/fiware-orion/tree/develop/test/LoadTest)
@@ -213,7 +213,7 @@ In order to use them, you need to install the pymongo driver (version
 2.5 or above) as a requirement to run it, typically using (run it as
 root or using the sudo command):
 
-` pip-python install pymongo`
+` pip-python install pymongo`
 
 ### Deleting expired documents
 
@@ -234,9 +234,9 @@ csubs and casubs collection, "marking" them with the following field:
 
 ```
 {
-  ...,
-  "expired": 1,
-  ...
+  ...,
+  "expired": 1,
+  ...
 }
 ```
 
@@ -244,17 +244,17 @@ The garbage-collector.py program takes as arguments the collection to be
 analyzed, e.g. to analyze csubs and casubs, run:
 
 ```
-garbage-collector.py csubs casubs
+garbage-collector.py csubs casubs
 ```
 
 After running garbage-collector.py you can easily remove the expired
 documents using the following commands in the mongo console:
 
 ```
-mongo <host>/<db>
-> db.registrations.remove({expired: 1})
-> db.csubs.remove({expired: 1})
-> db.casubs.remove({expired: 1})
+mongo <host>/<db>
+> db.registrations.remove({expired: 1})
+> db.csubs.remove({expired: 1})
+> db.casubs.remove({expired: 1})
 ```
 
 ### Latest updated document

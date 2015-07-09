@@ -2,7 +2,7 @@
 
 ## Authentication and Authorization 
 
-Orion doesn't provide "native" authentication or authorization mechanisms to enforce access control. However, they can be achieved [the access control framework provided by FIWARE GEs](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FIWARE.ArchitectureDescription.Security.Access_Control_Generic_Enabler).
+Orion doesn't provide "native" authentication nor any authorization mechanisms to enforce access control. However, authentication/authorization can be achieved [the access control framework provided by FIWARE GEs](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FIWARE.ArchitectureDescription.Security.Access_Control_Generic_Enabler).
 
 More specifically, Orion is integrated in this framework using the [FIWARE PEP Proxy
 GE](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FIWARE.OpenSpecification.Security.PEP_Proxy_Generic_Enabler).
