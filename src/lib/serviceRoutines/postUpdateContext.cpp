@@ -540,7 +540,7 @@ std::string postUpdateContext
       }
       else
       {
-        ceP->contextAttributeVector[aIx]->value = aP->value;
+        ceP->contextAttributeVector[aIx]->stringValue = aP->stringValue; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
         ceP->contextAttributeVector[aIx]->type  = aP->type;
       }
     }

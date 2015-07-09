@@ -60,7 +60,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     {
       if (type == "String")
       {
-        caP->value        = iter->value.GetString();
+        caP->stringValue        = iter->value.GetString();
         caP->valueType    = ValueTypeString;
       }
       else if (type == "Number")
@@ -80,12 +80,12 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       }
       else if (type == "Vector")
       {
-        caP->value        = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
+        caP->stringValue        = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
         caP->valueType    = ValueTypeCompoundVector;
       }
       else if (type == "Object")
       {
-        caP->value        = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
+        caP->stringValue        = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
         caP->valueType    = ValueTypeCompoundObject;
       }
     }
@@ -123,7 +123,7 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
   if (type == "String")
   {
     caP->type        = "";
-    caP->value       = iter->value.GetString();
+    caP->stringValue       = iter->value.GetString();
     caP->valueType   = ValueTypeString;
   }
   else if (type == "Number")
@@ -169,7 +169,7 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
     }
     else
     {
-      caP->value              = iter->value.GetString();
+      caP->stringValue              = iter->value.GetString();
       caP->valueType          = ValueTypeCompoundObject;
     }
   }

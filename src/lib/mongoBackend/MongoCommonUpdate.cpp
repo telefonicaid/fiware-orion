@@ -136,7 +136,7 @@ void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
   switch(caP->valueType)
   {
     case ValueTypeString:
-      bsonAttr.append(ENT_ATTRS_VALUE, caP->value);
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->stringValue);
       break;
     case ValueTypeNumber:
       bsonAttr.append(ENT_ATTRS_VALUE, caP->numberValue);
@@ -145,7 +145,7 @@ void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
       bsonAttr.append(ENT_ATTRS_VALUE, caP->boolValue);
       break;
     default:
-      LM_E(("Runtime Error (uknown attribute type)"));
+      LM_E(("Runtime Error (unknown attribute type)"));
   }
 }
 
@@ -315,7 +315,7 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 bool emptyAttributeValue(ContextAttribute* caP)
 {
   /* Note that ValueTypeNumber and ValueTypeBoolean are always not-empty */
-  return (caP->valueType == ValueTypeString) && (caP->value == "") && (caP->compoundValueP == NULL);
+  return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
 }
 
 
@@ -325,18 +325,21 @@ bool emptyAttributeValue(ContextAttribute* caP)
 */
 bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 {
-  /* Note that compoundValueP is not evaluated, the place from which this function is called
-   * already have checked that */
   switch (attr.getField(ENT_ATTRS_VALUE).type())
   {
+    case Object:
+    case Array:
+      /* As the compoundValueP has been checked is NULL before invoking this function, finding
+       * a compound value in DB means that there is a change */
+      return true;
     case NumberDouble:
       return caP->numberValue != attr.getField(ENT_ATTRS_VALUE).Number();
     case Bool:
       return caP->boolValue != attr.getBoolField(ENT_ATTRS_VALUE);
     case String:
-      return caP->value != STR_FIELD(attr, ENT_ATTRS_VALUE);
+      return caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
     default:
-      LM_E(("Runtime Error (uknown attribute type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
+      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
       return false;
   }
 }
@@ -363,20 +366,6 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   else
   {
     /* Slightly different treatment, depending on attribute value type in DB (string, number, boolean, vector or object) */
-#if 0
-    if (attr.getField(ENT_ATTRS_VALUE).type() == Object)
-    {
-      ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
-    }
-    else if (attr.getField(ENT_ATTRS_VALUE).type() == Array)
-    {
-      ab.appendArray(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
-    }
-    else
-    {
-      ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
-    }
-#endif
     switch (attr.getField(ENT_ATTRS_VALUE).type())
     {
       case Object:
@@ -395,7 +384,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
         ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
         break;
       default:
-        LM_E(("Runtime Error (uknown attribute type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
     }
 
   }
@@ -804,9 +793,9 @@ static bool processLocation
             return false;
           }
 
-          if (!string2coords(caP->value, coordLat, coordLong))
+          if (!string2coords(caP->stringValue, coordLat, coordLong))
           {
-            *errDetail = "coordinate format error [see Orion user manual]: " + caP->value;
+            *errDetail = "coordinate format error [see Orion user manual]: " + caP->stringValue;
             return false;
           }
 
@@ -1389,13 +1378,13 @@ static bool processContextAttributeVector
 
       if (locAttr == targetAttr->name)
       {
-        if (!string2coords(targetAttr->value, coordLat, coordLong))
+        if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
         {
           cerP->statusCode.fill(SccInvalidParameter,
                                 std::string("action: UPDATE") +
                                 " - entity: [" + eP->toString() + "]" +
                                 " - offending attribute: " + targetAttr->toString() +
-                                " - error parsing location attribute, value: <" + targetAttr->value + ">");
+                                " - error parsing location attribute, value: <" + targetAttr->stringValue + ">");
 
           LM_W(("Bad Input (error parsing location attribute)"));
           return false;
@@ -1439,13 +1428,13 @@ static bool processContextAttributeVector
             return false;
           }
 
-          if (!string2coords(targetAttr->value, coordLat, coordLong))
+          if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
           {
             cerP->statusCode.fill(SccInvalidParameter,
                                   std::string("action: APPEND") +
                                   " - entity: [" + eP->toString() + "]" +
                                   " - offending attribute: " + targetAttr->toString() +
-                                  " - error parsing location attribute, value: [" + targetAttr->value + "]");
+                                  " - error parsing location attribute, value: [" + targetAttr->stringValue + "]");
             LM_W(("Bad Input (error parsing location attribute)"));
             return false;
           }

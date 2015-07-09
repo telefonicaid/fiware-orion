@@ -165,7 +165,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityLocAttribute)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
@@ -296,7 +296,7 @@ TEST(mongoUpdateContextGeoRequest, appendLocAttribute)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
@@ -413,7 +413,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocAttribute)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -519,7 +519,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocAttribute)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -625,14 +625,14 @@ TEST(mongoUpdateContextGeoRequest, newEntityTwoLocAttributesFail)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("WGS84", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
@@ -743,7 +743,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityWrongCoordinatesFormatFail)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
@@ -854,7 +854,7 @@ TEST(mongoUpdateContextGeoRequest, newEntityNotSupportedLocationFail)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
@@ -966,7 +966,7 @@ TEST(mongoUpdateContextGeoRequest, appendAdditionalLocAttributeFail)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
@@ -1077,7 +1077,7 @@ TEST(mongoUpdateContextGeoRequest, appendWrongCoordinatesFormatFail)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
@@ -1188,7 +1188,7 @@ TEST(mongoUpdateContextGeoRequest, appendNotSupportedLocationFail)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
@@ -1297,7 +1297,7 @@ TEST(mongoUpdateContextGeoRequest, updateWrongCoordinatesFormatFail)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
     EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
@@ -1405,7 +1405,7 @@ TEST(mongoUpdateContextGeoRequest, updateLocationMetadataFail)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
@@ -1517,7 +1517,7 @@ TEST(mongoUpdateContextGeoRequest, deleteLocationMetadataFail)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("location", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);

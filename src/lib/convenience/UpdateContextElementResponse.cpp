@@ -148,7 +148,7 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
     //
     for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
-      cerP->contextElement.contextAttributeVector[aIx]->value = "";
+      cerP->contextElement.contextAttributeVector[aIx]->stringValue = "";  // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
     }
 
     contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);

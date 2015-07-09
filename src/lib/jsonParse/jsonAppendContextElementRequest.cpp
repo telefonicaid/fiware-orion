@@ -100,7 +100,7 @@ static std::string contextAttributeValue(const std::string& path, const std::str
 {
   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
   parseDataP->lastContextAttribute = parseDataP->acer.attributeP;
-  parseDataP->acer.attributeP->value = value;
+  parseDataP->acer.attributeP->stringValue = value;
   return "OK";
 }
 

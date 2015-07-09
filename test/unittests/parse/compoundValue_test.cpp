@@ -51,14 +51,14 @@ TEST(compoundValue, updateNoCompoundValue)
   result = xmlTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
   EXPECT_STREQ("OK", result.c_str());
   caP = reqData.upcr.res.contextElementVector.get(0)->contextAttributeVector.get(0);
-  EXPECT_EQ("1", caP->value);
+  EXPECT_EQ("1", caP->stringValue);
 
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), inFileJson)) << "Error getting test data from '" << inFileJson << "'";
   ci.inFormat = JSON;
   result = jsonTreat(testBuf, &ci, &reqData, UpdateContext, "updateContextRequest", NULL);
   EXPECT_STREQ("OK", result.c_str());
   caP = reqData.upcr.res.contextElementVector.get(0)->contextAttributeVector.get(0);
-  EXPECT_EQ("1", caP->value);
+  EXPECT_EQ("1", caP->stringValue);
   
 
   utExit();

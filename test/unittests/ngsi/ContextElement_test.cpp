@@ -49,7 +49,7 @@ TEST(ContextElement, Check)
 
   ContextAttribute a;
   a.name  = "";
-  a.value = "V";
+  a.stringValue = "V";
   ce.contextAttributeVector.push_back(&a);
   EXPECT_EQ(ce.check(UpdateContext, XML, "", "", 0), "missing attribute name");
   a.name = "name";

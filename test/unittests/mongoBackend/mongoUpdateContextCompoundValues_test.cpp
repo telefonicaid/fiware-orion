@@ -257,7 +257,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -340,7 +340,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -423,11 +423,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -518,11 +518,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -610,7 +610,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -700,7 +700,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -790,11 +790,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -892,11 +892,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -990,7 +990,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1070,7 +1070,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1149,7 +1149,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1229,7 +1229,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1309,7 +1309,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1391,7 +1391,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1470,7 +1470,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1552,7 +1552,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);

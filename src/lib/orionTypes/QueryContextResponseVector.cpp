@@ -96,7 +96,7 @@ void QueryContextResponseVector::present(void)
       for (unsigned int aIx = 0; aIx < ceP->contextAttributeVector.size(); ++aIx)
       {
         ContextAttribute* aP = ceP->contextAttributeVector[aIx];
-        LM_F(("  attribute %02d: %s: %s", aIx, aP->name.c_str(), aP->value.c_str()));
+        LM_F(("  attribute %02d: %s: %s", aIx, aP->name.c_str(), aP->toStringValue().c_str()));
       }
     }
 

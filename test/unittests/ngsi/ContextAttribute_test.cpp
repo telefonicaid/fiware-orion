@@ -48,12 +48,12 @@ TEST(ContextAttribute, checkOne)
   EXPECT_TRUE(res == "missing attribute name");
 
   ca.name  = "Algo, lo que sea!";
-  ca.value = "";
+  ca.stringValue = ""; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
   res     = ca.check(RegisterContext, XML, "", "", 0);
   EXPECT_TRUE(res == "OK");
   
-  ca.value = "Algun valor cualquiera";
+  ca.stringValue = "Algun valor cualquiera"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
   res     = ca.check(RegisterContext, XML, "", "", 0);
   EXPECT_TRUE(res == "OK");
 
@@ -75,10 +75,10 @@ TEST(ContextAttribute, checkVector)
 
   utInit();
 
-  ca0.name  = "Algo, lo que sea!";
-  ca0.value = "Algo, lo que sea!";
-  ca1.name  = "Algo, lo que sea!";
-  ca1.value = "Algo, lo que sea!";
+  ca0.name        = "Algo, lo que sea!";
+  ca0.stringValue = "Algo, lo que sea!"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
+  ca1.name        = "Algo, lo que sea!";
+  ca1.stringValue = "Algo, lo que sea!"; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
 
   caVector.push_back(&ca0);
   caVector.push_back(&ca1);

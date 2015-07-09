@@ -60,12 +60,13 @@ typedef struct ContextAttribute
 {
   std::string     name;                    // Mandatory
   std::string     type;                    // Optional
-  std::string     value;                   // Optional (FI-WARE changes - MANDATORY in OMA spec)
-                                           //          Especially for the new convops, value is NOT mandatory
-                                           //          E.g. /v1/contextTypes
   MetadataVector  metadataVector;          // Optional
 
+  // Value - Optional (FI-WARE changes - MANDATORY in OMA spec)
+  //            Especially for the new convops, value is NOT mandatory
+  //            E.g. /v1/contextTypes
   ContextAttributeValueType  valueType;    // Type of value: from json parse
+  std::string                stringValue;  // "value" as a String
   double                     numberValue;  // "value" as a Number
   bool                       boolValue;    // "value" as a Boolean
 
