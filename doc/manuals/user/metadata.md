@@ -6,8 +6,7 @@ Apart from metadata elements to which Orion pays special attention (e.g.
 ID, location, etc.), users can attach their own metadata to entity
 attributes. These metadata elements are processed by Orion in a
 transparent way: it simply stores them in the database at updateContext
-(and notifyContext time in [federeated
-scenarios](#Context_Broker_Federation "wikilink")) and retrieve it in
+(and notifyContext time in [federeated scenarios](federation.md#context-broker-federation)) and retrieve it in
 queryContext or notifyContext.
 
 For example, to create an entity Room1 with attribute "temperature", and
@@ -140,20 +139,20 @@ We can check that temperature includes both attributes
 
       
 Note that, from the point of view of [ONCHANGE
-subscription](#ONCHANGE "wikilink"), changing the metadata of a given
+subscription](walkthrough_apiv1.md#onchange), changing the metadata of a given
 attribute or adding a new metadata element is considered a change even
 if attribute value itself hasn't changed. Metadata elements cannot be
 deleted once introduced: in order to delete metadata elements you have
 to remove the entity attribute (using [updateContext
-DELETE](#Adding_and_removing_attributes_with_APPEND_and_DELETE_in_updateContext "wikilink")),
+DELETE](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)),
 then re-create it ([using updateContext
-APPEND](#Adding_and_removing_attributes_with_APPEND_and_DELETE_in_updateContext "wikilink")).
+APPEND](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)).
 
 You can use any name for your custom metadata except for the ones used
 for some metadata names that are interpreted by Orion:
 
 -   [ID](#Metadata_ID_for_attributes "wikilink")
--   [location](#Defining_location_attribute "wikilink")
+-   [location](geolocation.md#Defining_location_attribute )
 -   creData (reserved for future use)
 -   modDate (reserved for future use)
 
@@ -309,8 +308,8 @@ attributes using ID metadata:
     an specific attribute identified by ID
 -   PUT /v1/contextEntities/Room1/attributes/temperature/ground (using
     as payload updateContextElementRequest, as [described in a previous
-    section](#Convenience_Update_Context "wikilink")).
+    section](walkthrough_apiv1.md#convenience-update-context)).
 -   DELETE /v1/contextEntities/Room1/attributes/temperature/ground: to
     remove an specific attribute identified by ID (see DELETE attribute
     semantics [described in a previous
-    section](#Adding_and_removing_attributes_with_APPEND_and_DELETE_in_updateContext "wikilink")).
+    section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)).

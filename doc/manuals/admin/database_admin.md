@@ -13,13 +13,13 @@ database. It is strongly recommended that you stop the broker before
 doing a backup.
 
 ```
-mongodump --host <dbhost> --db <db>
+mongodump --host <dbhost> --db <db>
 ```
 
 This will create the backup in the dump/ directory.
 
 Note that if you are using
-[multitenant/multiservice](../user/multitenancy.md)
+[multitenant/multiservice](#multitenant/multiservice-database-separation)
 you need to apply the procedures to each per-tenant/service database
 
 ## Restore
@@ -35,18 +35,18 @@ Let's assume that the backup is in the dump/<db> directory. To restore
 it:
 
 ```
-mongorestore --host <dbhost> --db <db> dump/<db>
+mongorestore --host <dbhost> --db <db> dump/<db>
 ```
 
 Note that if you are using
-[multitenant/multiservice](../user/multitenancy.md)
+[multitenant/multiservice](#multitenant/multiservice-database-separation)
 you need to apply the procedures to each per-tenant/service database
 
 ## Database authorization
 
 MongoDB authorization is configured with the `-db`, `-dbuser` and `-dbpwd`
 options ([see section on command line
-options](#Command_line_options "wikilink")). There are different cases
+options](cli.md)). There are different cases
 to take into account:
 
 -   If your MongoDB instance/cluster doesn't use authorization at all,
@@ -68,8 +68,7 @@ to take into account:
 
 Normally, Orion Context Broker uses just one database at MongoDB level
 (the one specified with the `-db` command line option, typically "orion").
-However, when [multitenant/multiservice is
-used](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Multi_service_tenancy "wikilink")
+However, when [multitenant/multiservice](#multitenant/multiservice-database-separation) is used
 the behaviour is different and the following databases are used (let
 `<db>` be the value of the `-db` command line option):
 
@@ -95,8 +94,8 @@ each particular service/tenant database.
 This operation is done using the MongoDB shell:
 
 ```
-mongo <host>/<db>
-> db.dropDatabase()
+mongo <host>/<db>
+> db.dropDatabase()
 ```
 
 ## Setting indexes
@@ -113,7 +112,7 @@ to decide what to priorize.
 However, in order to help administrator in that task, the following
 indexes could be recommended:
 
--   Collection [entities](#entities_collection "wikilink")
+-   Collection [entities](database_model.md#entities-collection)
     -   \_id.id (used by queryContext and related
         convenience operations)
     -   \_id.type (used by queryContext and related
@@ -122,7 +121,7 @@ indexes could be recommended:
         convenience operations)
     -   creDate (used to provided ordered results in queryContext and
         related convenience operations)
--   Collection [registrations](#registrations_collection "wikilink")
+-   Collection [registrations](database_model.md#registrations-collection)
     -   \_id (used to provided ordered results in
         discoverContextAvailability and related convenience operations).
         We include this index here for the sake of completeness, but the
@@ -132,10 +131,8 @@ indexes could be recommended:
 
 The only index that Orion Context Broker actually ensures is the
 "2dsphere" one in the location.coords field in the entities collection,
-due to functional needs (in order [geo-location
-functionality](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Geolocation_capabilities "wikilink")
-to work). The index is ensured at Orion startup or when entities are
-created for first time.
+due to functional needs [geo-location functionality](../user/geolocation.md)to work. The index is ensured at Orion startup or when entities are
+created for the first time.
 
 ### Analysis
 
@@ -216,7 +213,7 @@ In order to use them, you need to install the pymongo driver (version
 2.5 or above) as a requirement to run it, typically using (run it as
 root or using the sudo command):
 
-` pip-python install pymongo`
+` pip-python install pymongo`
 
 ### Deleting expired documents
 
@@ -237,9 +234,9 @@ csubs and casubs collection, "marking" them with the following field:
 
 ```
 {
-  ...,
-  "expired": 1,
-  ...
+  ...,
+  "expired": 1,
+  ...
 }
 ```
 
@@ -247,17 +244,17 @@ The garbage-collector.py program takes as arguments the collection to be
 analyzed, e.g. to analyze csubs and casubs, run:
 
 ```
-garbage-collector.py csubs casubs
+garbage-collector.py csubs casubs
 ```
 
 After running garbage-collector.py you can easily remove the expired
 documents using the following commands in the mongo console:
 
 ```
-mongo <host>/<db>
-> db.registrations.remove({expired: 1})
-> db.csubs.remove({expired: 1})
-> db.casubs.remove({expired: 1})
+mongo <host>/<db>
+> db.registrations.remove({expired: 1})
+> db.csubs.remove({expired: 1})
+> db.casubs.remove({expired: 1})
 ```
 
 ### Latest updated document

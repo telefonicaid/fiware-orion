@@ -2,9 +2,9 @@
 
 Orion Context Broker supports hierarchical scopes, so entities can be
 assigned to a scope at creation time with
-[updateContext](#Update_context_elements "wikilink") (or [related
-convenience operation](#Convenience_Update_Context "wikilink")). Then,
-[queryContext](#Query_Context_operation "wikilink") and [subscribeContext](#Context_subscriptions "wikilink") (and related
+[updateContext](walkthrough_apiv1.md#update-context-elements) (or [related
+convenience operation](walkthrough_apiv1.md#convenience-update-context)). Then,
+[queryContext](walkthrough_apiv1.md#query-context-operation) and [subscribeContext](walkthrough_apiv1.md#context-subscriptions) (and related
 convenience operations) can be also scoped to locate entities in the corresponding scopes.
 
 For example, consider an Orion-based application using the following
@@ -84,7 +84,7 @@ Some additional remarks:
 
 -   The scopes entities can be combined orthogonally with the
     [multi-service/multi-tenant
-    functionality](#Multi_service_tenancy "wikilink"). In that case,
+    functionality](multitenancy.md#multi-service-tenancy). In that case,
     each “scope tree” lives in a different service/tenant and they can
     use even the same names with complete database-based isolation. See
     figure below.

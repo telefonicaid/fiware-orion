@@ -1,7 +1,7 @@
 # Watchdog
 
 Although Orion Context Broker is highly stable, it may fail (see the
-section on [diagnosis procedures](#Diagnosis_Procedures "wikilink") for
+section on [diagnosis procedures](diagnosis.md) for
 more information about detecting problems with the broker). Thus, it is
 recommendable to use a watchdog process to detect if the broker process
 has stopped running, so it can be re-started automatically and/or you

@@ -4,7 +4,7 @@ Orion Context Broker has several capabilities related to geolocation
 that are described in this section. It is strictly required to use
 MongoDB 2.4 or higher in order to use geolocation features (see
 [requirements section in the installation
-manual](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Requirements "wikilink")).
+manual](../../../README.md#requirements)).
 
 ## Defining location attribute
 
@@ -50,7 +50,7 @@ Additional comments:
     be defined as location. If you want to redefine the attribute of an
     entity used for location, first you have to DELETE it, then APPEND
     the new one (check the section about [adding and removing attributes
-    dynamically](#Adding_and_removing_attributes_with_APPEND_and_DELETE_in_updateContext "wikilink")).
+    dynamically](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)).
 -   The value of the location metadata is the coordinates system used.
     Current version only support
     [WGS84](http://en.wikipedia.org/wiki/World_Geodetic_System) (which
@@ -65,8 +65,8 @@ Additional comments:
 ## Geo-located queries
 
 Entities location can be used in
-[queryContext](#Query_Context_operation "wikilink") (or [equivalent
-convenience operations](#Convenience_Query_Context "wikilink")). To do
+[queryContext](walkthrough_apiv1.md#query-context-operation) or  equivalent
+[convenience operations](walkthrough_apiv1.md#convenience-query-context). To do
 so, we use the scope element, using "FIWARE::Location" as scopeType and
 an area specification as scopeValue. The query result includes only the
 entities located in that area, i.e. context elements belonging to
@@ -88,12 +88,12 @@ the following scenario: three entities (A, B and C, of type "Point")
 have been created in Orion Context Broker, each one in the coordinates
 shown in the following picture.
 
-![](orion-geo-points.png "orion-geo-points.png")
+![](Orion-geo-points.png "Orion-geo-points.png")
 
 Let's consider a query whose scope is the internal area to the square
 defined by coordinates (0, 0), (0, 6), (6, 6) and (6, 0).
 
-![](orion-geo-square.png "orion-geo-square.png")
+![](Orion-geo-square.png "Orion-geo-square.png")
 
 To define a polygon, we use the polygon element which, in sequence,
 include a vertexList. A vertexList is composed by a list of vertex
@@ -145,7 +145,7 @@ query would be A and B.
 Let's consider a query whose scope is the internal area to the rectangle
 defined by coordinates (3, 3), (3, 8), (11, 8) and (11, 3).
 
-![](orion-geo-rectangle.png "orion-geo-rectangle.png")
+![](Orion-geo-rectangle.png "Orion-geo-rectangle.png")
 
 The result of the query would be B and C.
 
@@ -241,7 +241,7 @@ to "true".
 Let's consider a query whose scope is the internal area to the triangle
 defined by coordinates (0, 0), (0, 6) and (6, 0).
 
-![](orion-geo-triangle.png "orion-geo-triangle.png")
+![](Orion-geo-triangle.png "Orion-geo-triangle.png")
 
 The result of the query would be A.
 
@@ -341,7 +341,7 @@ km](http://boulter.com/gps/distance/?from=N+40.418889+W+3.691944++&to=N+40.31666
 Let's consider a query whose scope is inside a radius of 13.5 km (13500
 meters) centred in Madrid.
 
-![](orion-geo-circle-14-in.png "orion-geo-circle-14-in.png")
+![](Orion-geo-circle-14-in.png "Orion-geo-circle-14-in.png")
 
 To define a circle, we use the circle element which, in sequence,
 include a three elements: centerLatitude (the latitude of the circle
@@ -377,7 +377,7 @@ center), centerLongitude (the longitude of the circle center) and radius
 Let's consider a query whose scope is inside a radius of 15 km (15000
 meters) centred in Madrid.
 
-![](orion-geo-circle-15-in.png "orion-geo-circle-15-in.png")
+![](Orion-geo-circle-15-in.png "Orion-geo-circle-15-in.png")
 
 The result of the query would be Madrid, Leganes and Alcobendas.
 
@@ -409,7 +409,7 @@ The result of the query would be Madrid, Leganes and Alcobendas.
 Let's consider a query whose scope is outside a radius of 13.5 km (13500
 meters) centred in Madrid.
 
-![](orion-geo-circle-14-out.png "orion-geo-circle-14-out.png")
+![](Orion-geo-circle-14-out.png "Orion-geo-circle-14-out.png")
 
 We use the inverted element set to "true". The result of the query would
 be Alcobendas.
