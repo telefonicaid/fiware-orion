@@ -110,7 +110,6 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     }
   }
 
-  LM_M(("KZ: Really sending response - ciP->httpStatusCode == %d, payload == '%s'", ciP->httpStatusCode, answer.c_str()));
   MHD_queue_response(ciP->connection, ciP->httpStatusCode, response);
   MHD_destroy_response(response);
 }
