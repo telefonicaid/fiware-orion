@@ -44,6 +44,7 @@
 *
 * MetadataValueType - 
 */
+// FIXME P10: we should use the same Enum (in a separate .h) file for Metadata, ContextAttribute, and CompoundValueNode
 typedef enum MetadataValueType
 {
   MetadataValueTypeString,

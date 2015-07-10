@@ -76,18 +76,23 @@ namespace orion
 class CompoundValueNode
 {
  public:
+  // FIXME P10: we should use the same Enum (in a separate .h) file for Metadata, ContextAttribute, and CompoundValueNode
   enum Type
   {
     Unknown,
     String,
+    Number,
+    Bool,
     Object,
     Vector
   };
 
   // Tree fields
   std::string                        name;
-  Type                               type;
-  std::string                        value;
+  Type                               type;    // FIXME p10: to be changed to valueType? (to be the same than in ContextAttribute)
+  std::string                        value;   // FIXME P10: to be changed to stringValue
+  double                             numberValue;
+  bool                               boolValue;
   std::vector<CompoundValueNode*>    childV;
 
 
