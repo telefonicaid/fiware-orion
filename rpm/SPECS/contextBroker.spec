@@ -32,7 +32,7 @@ License:   AGPLv3
 Group:     Applications/Engineering
 Vendor:     Telefónica I+D
 Packager:   Fermín Galán <fermin@tid.es>
-URL:        http://catalogue.fi-ware.eu/enablers/publishsubscribe-context-broker-orion-context-broker
+URL:        http://catalogue.fiware.org/enablers/publishsubscribe-context-broker-orion-context-broker
 Source:     %{name}-%{broker_version}.tar.gz
 BuildRoot: /var/tmp/%{name}-buildroot
 Requires:  libstdc++, boost-thread, boost-filesystem, libmicrohttpd, libcurl, logrotate
@@ -163,20 +163,20 @@ fi
 
 %changelog
 * Fri Jul 10 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.23.0-1
-Add: Reuse curl context for outgoing notifications, so now connections are persistent if the HTTP server doesn't close them
-Add: CLI paramter -cprForwardLimit to cap the number of forwarding request for a single client request. (Issue #1016).
-Fix: Fixed a bug about pagination problem due to missing ErrorCode with details in the case of queries with forwarding to context providers.  (Issue #945)
-Fix: taking into account the pagination limit before adding "potential" entities to be queried in CPrs. (Issue #945)
-Fix: Add multiservice flag for the default configuration in the RPM. (Issue #964)
-Fix: ONCHANGE subscription sends notification when value under condition it is not updated with updateContext-APPEND in some cases (Issue #943)
-Fix: updating attribute metadata without updating attribute value at the same time is now supported (Issue #766)
-Fix: remove unconditional tracing on xmlTreat()/jsonTreat() which was impacting on performance (specially in high-load scenarios)
-Fix: use NOSIGNAL as libcurl option to avoid crashes in that library. (Issue #1016)
-Add: New operation "GET /v2/entities" (Issue #947)
-Add: New operation "GET /v2" (Issue #956)
-Add: New operation "GET /v2/entities/{id}" (Issue #950)
-Add: New operation "GET /v2/entities/{entityId}" (Issue #950)
-Add: New operation "GET /v2/entities/{entityId}/attrs/{attrName}" (Issue #989)
+- Add: Reuse curl context for outgoing notifications, so now connections are persistent if the HTTP server doesn't close them
+- Add: CLI paramter -cprForwardLimit to cap the number of forwarding request for a single client request. (Issue #1016).
+- Fix: Fixed a bug about pagination problem due to missing ErrorCode with details in the case of queries with forwarding to context providers.  (Issue #945)
+- Fix: taking into account the pagination limit before adding "potential" entities to be queried in CPrs. (Issue #945)
+- Fix: Add multiservice flag for the default configuration in the RPM. (Issue #964)
+- Fix: ONCHANGE subscription sends notification when value under condition it is not updated with updateContext-APPEND in some cases (Issue #943)
+- Fix: updating attribute metadata without updating attribute value at the same time is now supported (Issue #766)
+- Fix: remove unconditional tracing on xmlTreat()/jsonTreat() which was impacting on performance (specially in high-load scenarios)
+- Fix: use NOSIGNAL as libcurl option to avoid crashes in that library. (Issue #1016)
+- Add: New operation "GET /v2/entities" (Issue #947)
+- Add: New operation "GET /v2" (Issue #956)
+- Add: New operation "GET /v2/entities/{id}" (Issue #950)
+- Add: New operation "GET /v2/entities/{entityId}" (Issue #950)
+- Add: New operation "GET /v2/entities/{entityId}/attrs/{attrName}" (Issue #989)
 
 * Mon May 25 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.22.0-1
 - Add: CORS support for GET requests, configuring allowed origin with -corsOrigin CLI parameter (Issue #501)
