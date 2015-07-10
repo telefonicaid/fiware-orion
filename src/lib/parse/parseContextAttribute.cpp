@@ -35,6 +35,72 @@ using namespace rapidjson;
 
 
 
+std::string parseCompound(const Value& node, ContextAttribute* caP, orion::CompoundValueNode* parent)
+{
+  std::string type   = jsonParseTypeNames[node.GetType()];
+
+  if (caP->compoundValueP == NULL)
+  {
+    if (type == "Object")
+    {
+      caP->compoundValueP            = new orion::CompoundValueNode();
+      caP->compoundValueP->type      = orion::CompoundValueNode::Object;
+      caP->compoundValueP->container = caP->compoundValueP;
+      caP->compoundValueP->name      = "TOP";
+    }
+    else if (type == "Vector")
+    {
+      caP->compoundValueP            = new orion::CompoundValueNode();
+      caP->compoundValueP->type      = orion::CompoundValueNode::Vector;
+      caP->compoundValueP->container = caP->compoundValueP;
+      caP->compoundValueP->name      = "TOP";
+    }
+
+    for (Value::ConstMemberIterator iter = node.MemberBegin(); iter != node.MemberEnd(); ++iter)
+    {
+      parseCompound(iter->value, caP, caP->compoundValueP);
+    }
+
+    return "OK";
+  }
+
+  for (Value::ConstMemberIterator iter = node.MemberBegin(); iter != node.MemberEnd(); ++iter)
+  {
+    if (type == "String")
+    {
+      orion::CompoundValueNode* cvnP = new orion::CompoundValueNode();
+      cvnP->name = iter->name.GetString();
+      cvnP->type = orion::CompoundValueNode::String;
+      
+      parent->childV.push_back(cvnP);
+    }
+    else if (type == "Object")
+    {
+      orion::CompoundValueNode* cvnP = new orion::CompoundValueNode();
+      cvnP->type = orion::CompoundValueNode::Object;
+
+      for (Value::ConstMemberIterator iter = node.MemberBegin(); iter != node.MemberEnd(); ++iter)
+      {
+        parseCompound(iter->value, caP, cvnP);
+      }
+    }
+    else if (type == "Vector")
+    {
+      orion::CompoundValueNode* cvnP = new orion::CompoundValueNode();
+      cvnP->type = orion::CompoundValueNode::Vector;
+
+      for (Value::ConstMemberIterator iter = node.MemberBegin(); iter != node.MemberEnd(); ++iter)
+      {
+        parseCompound(iter->value, caP, cvnP);
+      }
+    }
+  }
+
+  return "OK";
+}
+
+
+
 /* ****************************************************************************
 *
 * parseContextAttributeObject - 
@@ -115,15 +181,19 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 */
 std::string parseContextAttribute(const Value::ConstMemberIterator& iter, ContextAttribute* caP)
 {
+  LM_M(("KZ: In parseContextAttribute"));
+
   std::string name   = iter->name.GetString();
   std::string type   = jsonParseTypeNames[iter->value.GetType()];
   
   caP->name = name;
 
+  LM_M(("KZ: name: %s", caP->name.c_str()));
+
   if (type == "String")
   {
     caP->type        = "";
-    caP->stringValue       = iter->value.GetString();
+    caP->stringValue = iter->value.GetString();
     caP->valueType   = ValueTypeString;
   }
   else if (type == "Number")
@@ -153,6 +223,7 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
   {
     std::string r;
 
+    LM_M(("KZ: Object"));
     //
     // Either Compound or '{ "type": "xxx", "value": "yyy" }'
     //
@@ -160,6 +231,9 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
     //
     if (iter->value.HasMember("value"))
     {
+      LM_M(("KZ: Normal object"));
+      LM_M(("KZ: Normal object (has 'value'): '%s'", iter->value.GetString()));
+
       r = parseContextAttributeObject(iter->value, caP);
       if (r != "OK")
       {
@@ -169,8 +243,9 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
     }
     else
     {
-      caP->stringValue              = iter->value.GetString();
-      caP->valueType          = ValueTypeCompoundObject;
+      LM_M(("KZ: Compound object"));
+      parseCompound(iter->value, caP, NULL);
+      caP->valueType    = ValueTypeCompoundObject;
     }
   }
   else

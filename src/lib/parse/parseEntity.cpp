@@ -130,6 +130,6 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
   ciP->httpHeader.push_back("Location");
   ciP->httpHeaderValue.push_back(location);
   ciP->httpStatusCode = SccCreated;
-  LM_M(("KZ: All OK: ciP->httpStatusCode == %d", ciP->httpStatusCode));
+
   return "OK";
 }
