@@ -108,6 +108,10 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - queryIdMetadataPattern
 * - queryCustomMetadataPattern
 *
+* Native types
+*
+* - queryNativeTypes
+*
 * Simulating fails in MongoDB connection:
 *
 * - mongoDbQueryFail
@@ -479,6 +483,44 @@ static void prepareDatabaseForPagination(void)
   connection->insert(ENTITIES_COLL, e04);
   connection->insert(ENTITIES_COLL, e05);
   connection->insert(ENTITIES_COLL, e06);
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseDifferentNativeTypes -
+*
+*/
+static void prepareDatabaseDifferentNativeTypes(void) {
+
+  /* Set database */
+  setupDatabase();
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* We create the following entities:
+   *
+   * - E1:
+   *     A1: string
+   *     A2: number
+   *     A2: bool
+   *     A3: vector
+   *     A5: object
+   *
+   */
+
+  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
+                     "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A4" << "A5") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "T" << "value" << "s") <<
+                        "A2" << BSON("type" << "T" << "value" << 42.0) <<
+                        "A3" << BSON("type" << "T" << "value" << false) <<
+                        "A4" << BSON("type" << "T" << "value" << BSON("x" << "a" << "y" << "b")) <<
+                        "A5" << BSON("type" << "T" << "value" << BSON_ARRAY("x1" << "x2"))
+                        )
+                    );
+
+  connection->insert(ENTITIES_COLL, en1);
+
 }
 
 /* ****************************************************************************
@@ -3614,6 +3656,92 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     /* Release connection */
     setMongoConnectionForUnitTest(NULL);
 
+}
+
+/* ****************************************************************************
+*
+* queryNativeTypes -
+*
+* Query:     E1 - no attrs
+* Result:    E1 - (A1 string, A2 number, A3 bool, A4 vector, A5 object)
+*
+*/
+TEST(mongoQueryContextRequest, queryNativeTypes)
+{
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabaseDifferentNativeTypes();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E1", "T1", "false");
+    req.entityIdVector.push_back(&en);
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccNone, res.errorCode.code);
+    EXPECT_EQ("", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(5, RES_CER(0).contextAttributeVector.size());
+
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("s", RES_CER_ATTR(0, 0)->stringValue);
+    EXPECT_EQ(ValueTypeString, RES_CER_ATTR(0, 0)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ(42, RES_CER_ATTR(0, 1)->numberValue);
+    EXPECT_EQ(ValueTypeNumber, RES_CER_ATTR(0, 1)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
+
+    EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 2)->type);
+    EXPECT_FALSE(RES_CER_ATTR(0, 2)->boolValue);
+    EXPECT_EQ(ValueTypeBoolean, RES_CER_ATTR(0, 2)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 2)->metadataVector.size());
+
+    EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 3)->type);
+    EXPECT_EQ(orion::CompoundValueNode::Object, RES_CER_ATTR(0, 3)->compoundValueP->type);
+    EXPECT_EQ("x", RES_CER_ATTR(0, 3)->compoundValueP->childV[0]->name);
+    EXPECT_EQ("a", RES_CER_ATTR(0, 3)->compoundValueP->childV[0]->value);
+    EXPECT_EQ("y", RES_CER_ATTR(0, 3)->compoundValueP->childV[1]->name);
+    EXPECT_EQ("b", RES_CER_ATTR(0, 3)->compoundValueP->childV[1]->value);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 3)->metadataVector.size());
+
+    EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 4)->type);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 4)->compoundValueP->type);
+    EXPECT_EQ(orion::CompoundValueNode::String, RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->type);
+    EXPECT_EQ("x1", RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->value);
+    EXPECT_EQ(orion::CompoundValueNode::String, RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->type);
+    EXPECT_EQ("x2", RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->value);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 4)->metadataVector.size());
+
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+
+    /* Release dynamic memory used by response (mongoBackend allocates it) */
+    res.contextElementResponseVector.release();
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************

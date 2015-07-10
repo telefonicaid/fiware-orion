@@ -46,8 +46,8 @@ typedef enum ContextAttributeValueType
   ValueTypeString,
   ValueTypeNumber,
   ValueTypeBoolean,
-  ValueTypeCompoundVector,
-  ValueTypeCompoundObject
+  ValueTypeCompoundVector,   // FIXME P10: is this actually needed as we are using compoundValueP at the end?
+  ValueTypeCompoundObject    // FIXME P10: is this actually needed as we are using compoundValueP at the end?
 } ContextAttributeValueType;
 
 
