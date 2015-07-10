@@ -140,6 +140,8 @@ const char* CompoundValueNode::typeName(const Type _type)
   switch (_type)
   {
   case String:       return "String";
+  case Number:       return "Number";
+  case Bool:         return "Bool";
   case Object:       return "Object";
   case Vector:       return "Vector";
   case Unknown:      return "Unknown";
