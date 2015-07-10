@@ -465,49 +465,36 @@ std::string ContextAttribute::render
 std::string ContextAttribute::toJson(bool isLastElement)
 {
   std::string  out;
-  bool         isNumber = false;
-  bool         isString = false;
 
-  if (type == "number")
+  if ((type == "") && (metadataVector.size() == 0))
   {
-    isNumber = true;
-  }
-
-  if (type == "string")
-  {
-    isString = true;
-  }
-
-  if (((type == "") || (isNumber == true || isString == true)) && (metadataVector.size() == 0))
-  {
-    if (isNumber == true)
+    if (valueType == ValueTypeNumber)
     {
-      out = JSON_VALUE_NUMBER(name, stringValue);
+      char num[32];
+
+      snprintf(num, sizeof(num), "%f", numberValue);
+      out = JSON_VALUE_NUMBER(name, num);
+      LM_M(("KZ: Number:out == %s", out.c_str()));
     }
-    else if (isString == true)
+    else if (valueType == ValueTypeString)
     {
       out = JSON_VALUE(name, stringValue);
+      LM_M(("KZ: String:out == %s", out.c_str()));
     }
-    else
+    else if (valueType == ValueTypeBoolean)
     {
-      if (compoundValueP == NULL)
+      out = JSON_VALUE_BOOL(name, boolValue);
+      LM_M(("KZ: String:out == %s", out.c_str()));
+    }
+    else if (compoundValueP != NULL)
+    {
+      if (compoundValueP->isObject())
       {
-        out = JSON_VALUE(name, stringValue);
+        out = JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
       }
-      else
+      else if (compoundValueP->isVector())
       {
-        if (compoundValueP->isObject())
-        {
-          out = JSON_STR(name) + ":{" + compoundValueP->toJson(true) + "}";
-        }
-        else if (compoundValueP->isVector())
-        {
-          out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
-        }
-        else
-        {
-          out = JSON_STR(name) + ":" + "\"" + compoundValueP->toJson(true) + "\"";  // Can toplevel be a String?
-        }
+        out = JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
       }
     }
   }
@@ -515,9 +502,26 @@ std::string ContextAttribute::toJson(bool isLastElement)
   {
     out = JSON_STR(name) + ":{";
 
-    if (isNumber == true)
+    if (type != "")
     {
-      out += JSON_VALUE_NUMBER("value", stringValue);
+      out += JSON_VALUE("type", type) + ",";
+    }
+
+    if (valueType == ValueTypeNumber)
+    {
+      char num[32];
+
+      snprintf(num, sizeof(num), "%f", numberValue);
+
+      out += JSON_VALUE_NUMBER("value", num);
+    }
+    else if (valueType == ValueTypeString)
+    {
+      out += JSON_VALUE("value", stringValue);
+    }
+    else if (valueType == ValueTypeBoolean)
+    {
+      out += JSON_VALUE_BOOL("value", boolValue);
     }
     else
     {
@@ -529,22 +533,13 @@ std::string ContextAttribute::toJson(bool isLastElement)
       {
         if (compoundValueP->isObject())
         {
-          out = JSON_STR(name) + ":{" + compoundValueP->toJson(true) + "}";
+          out = JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
         }
         else if (compoundValueP->isVector())
         {
-          out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
-        }
-        else
-        {
-          out = JSON_STR(name) + ":\"" + compoundValueP->toJson(true) + "\"";  // Can toplevel be a String?
+          out = JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
         }
       }
-    }
-
-    if ((type != "") && (isNumber == false))
-    {
-      out += "," + JSON_VALUE("type", type);
     }
 
     if (metadataVector.size() > 0)
@@ -669,17 +664,24 @@ std::string ContextAttribute::toString(void)
 */
 std::string ContextAttribute::toStringValue(void)
 {
-  switch(valueType)
+  switch (valueType)
   {
-    case ValueTypeString:
-      return stringValue;
-    case ValueTypeNumber:
+  case ValueTypeString:
+    return stringValue;
+    break;
+
+  case ValueTypeNumber:
     return "<double>";
-      //FIXME P10: return std::string(numberValue);
-    case ValueTypeBoolean:
-      return boolValue ? "true" : "false";
-    default:
-      return "<unkown type>";
+    // FIXME P10: return std::string(numberValue);
+    break;
+
+  case ValueTypeBoolean:
+    return boolValue ? "true" : "false";
+    break;
+
+  default:
+    return "<unkown type>";
+    break;
   }
 }
 

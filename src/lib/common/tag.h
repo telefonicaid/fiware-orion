@@ -40,6 +40,7 @@
 #define JSON_NUMBER(value)             std::string(value)
 #define JSON_VALUE(name, value)        std::string(JSON_PROP(name) + JSON_STR(value))
 #define JSON_VALUE_NUMBER(name, value) std::string(JSON_PROP(name) + JSON_NUMBER(value))
+#define JSON_VALUE_BOOL(name, value)   std::string(JSON_PROP(name) + ((value == true)? "true" : "false"))
 
 
 
