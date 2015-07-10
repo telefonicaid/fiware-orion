@@ -49,3 +49,4 @@ test/acceptance/properties.json
 cmake_install.cmake
 CMakeFiles
 Makefile
+CTestTestfile.cmake
