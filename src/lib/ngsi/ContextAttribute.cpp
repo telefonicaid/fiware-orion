@@ -77,7 +77,10 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
 {
   name                  = caP->name;
   type                  = caP->type;
-  stringValue                 = caP->stringValue;
+  valueType             = caP->valueType;
+  stringValue           = caP->stringValue;
+  numberValue           = caP->numberValue;
+  boolValue             = caP->boolValue;
   compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
   found                 = caP->found;
   typeFromXmlAttribute  = "";

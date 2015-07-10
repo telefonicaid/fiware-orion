@@ -1314,6 +1314,40 @@ bool entitiesQuery
       {
         ContextAttribute* caP;
 
+        switch(queryAttr.getField(ENT_ATTRS_VALUE).type())
+        {
+        case String:
+          ca.stringValue = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
+          if (!includeEmpty && ca.stringValue.length() == 0)
+          {
+            continue;
+          }
+          caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
+          break;
+        case NumberDouble:
+          ca.numberValue = queryAttr.getField(ENT_ATTRS_VALUE).Number();
+          caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
+          break;
+        case Bool:
+          ca.boolValue = queryAttr.getBoolField(ENT_ATTRS_VALUE);
+          caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
+          break;
+        case Object:
+          caP = new ContextAttribute(ca.name, ca.type, "");
+          caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
+          compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+          break;
+        case Array:
+          caP = new ContextAttribute(ca.name, ca.type, "");
+          caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
+          compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
+          break;
+        default:
+          LM_E(("Runtime Error (unknown attribute value type in DB: %d)", queryAttr.getField(ENT_ATTRS_VALUE).type()));
+          continue;
+        }
+
+#if 0
         if (queryAttr.getField(ENT_ATTRS_VALUE).type() == String)
         {
           ca.stringValue = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
@@ -1340,6 +1374,7 @@ bool entitiesQuery
           LM_T(LmtSoftError, ("unknown BSON type"));
           continue;
         }
+#endif
 
         /* Setting ID (if found) */
         if (mdId != "")
