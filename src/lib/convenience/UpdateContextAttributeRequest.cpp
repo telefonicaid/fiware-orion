@@ -53,7 +53,7 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(Format format, std::string indent)
+std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format format, std::string indent)
 {
   std::string tag = "updateContextAttributeRequest";
   std::string out = "";
@@ -77,7 +77,7 @@ std::string UpdateContextAttributeRequest::render(Format format, std::string ind
     }
 
     out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
-    out += compoundValueP->render(format, indent + "    ");
+    out += compoundValueP->render(ciP, format, indent + "    ");
     out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
   }
 

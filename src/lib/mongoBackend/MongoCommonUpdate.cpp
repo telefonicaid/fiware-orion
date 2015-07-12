@@ -69,6 +69,14 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
     {
       b.append(child->value);
     }
+    else if (child->type == orion::CompoundValueNode::Number)
+    {
+      b.append(child->numberValue);
+    }
+    else if (child->type == orion::CompoundValueNode::Bool)
+    {
+      b.append(child->boolValue);
+    }
     else if (child->type == orion::CompoundValueNode::Vector)
     {
       BSONArrayBuilder ba;
@@ -104,6 +112,14 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
     if (child->type == orion::CompoundValueNode::String)
     {
       b.append(child->name, child->value);
+    }
+    else if (child->type == orion::CompoundValueNode::Number)
+    {
+      b.append(child->name, child->numberValue);
+    }
+    else if (child->type == orion::CompoundValueNode::Bool)
+    {
+      b.append(child->name, child->boolValue);
     }
     else if (child->type == orion::CompoundValueNode::Vector)
     {

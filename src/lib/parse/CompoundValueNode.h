@@ -30,6 +30,8 @@
 
 #include "common/Format.h"
 
+struct ConnectionInfo;
+
 
 namespace orion
 {
@@ -89,7 +91,7 @@ class CompoundValueNode
 
   // Tree fields
   std::string                        name;
-  Type                               type;    // FIXME p10: to be changed to valueType? (to be the same than in ContextAttribute)
+  Type                               type;    // FIXME P10: to be changed to valueType? (to be the same as in ContextAttribute)
   std::string                        value;   // FIXME P10: to be changed to stringValue
   double                             numberValue;
   bool                               boolValue;
@@ -130,7 +132,7 @@ class CompoundValueNode
   CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _value = "");
   void                check(void);
   std::string         finish(void);
-  std::string         render(Format format, const std::string& indent);
+  std::string         render(ConnectionInfo* ciP, Format format, const std::string& indent);
   std::string         toJson(bool isLastElement);
 
   static const char*  typeName(const Type _type);

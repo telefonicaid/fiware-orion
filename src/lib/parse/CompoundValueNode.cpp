@@ -30,6 +30,7 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/tag.h"
+#include "rest/ConnectionInfo.h"
 #include "parse/CompoundValueNode.h"
 
 
@@ -163,7 +164,9 @@ std::string CompoundValueNode::finish(void)
   LM_T(LmtCompoundValue, ("Finishing a compound"));
 
   if (lmTraceIsSet(LmtCompoundValueShow))
+  {
     show("");
+  }
 
   check();  // sets 'error' for toplevel node
 
@@ -251,9 +254,20 @@ void CompoundValueNode::shortShow(const std::string& indent)
   {
     LM_F(("%s%s (object)", indent.c_str(), name.c_str()));
   }
-  else
+  else if (type == String)
   {
     LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), value.c_str()));
+    return;
+  }
+  else if (type == Bool)
+  {
+    LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), (boolValue == true)? "true" : "false"));
+    return;
+  }
+  else if (type == Number)
+  {
+    LM_F(("%s%s (%f)", indent.c_str(), name.c_str(), numberValue));
+    return;
   }
 
   for (uint64_t ix = 0; ix < childV.size(); ++ix)
@@ -275,11 +289,6 @@ void CompoundValueNode::show(const std::string& indent)
     LM_F(("%sname:      %s", indent.c_str(), name.c_str()));
   }
 
-  if (value != "")
-  {
-    LM_F(("%svalue:     %s", indent.c_str(), value.c_str()));
-  }
-
   LM_F(("%scontainer: %s", indent.c_str(), container->name.c_str()));
   LM_F(("%slevel:     %d", indent.c_str(), level));
   LM_F(("%ssibling:   %d", indent.c_str(), siblingNo));
@@ -287,7 +296,19 @@ void CompoundValueNode::show(const std::string& indent)
   LM_F(("%spath:      %s", indent.c_str(), path.c_str()));
   LM_F(("%srootP:     %s", indent.c_str(), rootP->name.c_str()));
 
-  if (childV.size() != 0)
+  if (type == String)
+  {
+    LM_F(("%sString Value:     %s", indent.c_str(), value.c_str()));
+  }
+  else if (type == Bool)
+  {
+    LM_F(("%sBool Value:     %s", indent.c_str(), (boolValue == false)? "false" : "true"));
+  }
+  else if (type == Number)
+  {
+    LM_F(("%sNumber Value:     %f", indent.c_str(), numberValue));
+  }
+  else if (childV.size() != 0)
   {
     std::string childrenString;
 
@@ -383,12 +404,20 @@ void CompoundValueNode::check(void)
 *
 * render -
 */
-std::string CompoundValueNode::render(Format format, const std::string& indent)
+std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const std::string& indent)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  tagName   = (container->type == Vector)? "item" : name;
 
+  LM_M(("In render"));
+  if (ciP->apiVersion == "v2")
+  {
+    LM_M(("V2 so toJson instead of render"));
+    return toJson(true); // FIXME P8: The info on comma-after-or-not is not available here ...
+  }
+
+  LM_M(("Still in render (ciP->apiVersion == %s)", ciP->apiVersion.c_str()));
   if (type == String)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
@@ -400,7 +429,7 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
     out += startTag(indent, tagName, tagName, format, true, container->type == Object, true);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(format, indent + "  ");
+      out += childV[ix]->render(ciP, format, indent + "  ");
     }
 
     out += endTag(indent, tagName, format, jsonComma, true, true);
@@ -410,7 +439,7 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(format, indent);
+      out += childV[ix]->render(ciP, format, indent);
     }
   }
   else if ((type == Object) && (container->type == Vector))
@@ -419,7 +448,7 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
     out += startTag(indent, "item", "", format, false, false);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(format, indent + "  ");
+      out += childV[ix]->render(ciP, format, indent + "  ");
     }
 
     out += endTag(indent, "item", format, jsonComma, false, true);
@@ -433,7 +462,7 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(format, indent + "  ");
+        out += childV[ix]->render(ciP, format, indent + "  ");
       }
 
       out += endTag(indent, tagName, format, jsonComma, false, true);
@@ -443,7 +472,7 @@ std::string CompoundValueNode::render(Format format, const std::string& indent)
       LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(format, indent);
+        out += childV[ix]->render(ciP, format, indent);
       }
     }
   }
@@ -463,18 +492,63 @@ std::string CompoundValueNode::toJson(bool isLastElement)
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  tagName   = (container->type == Vector)? "item" : name;
 
+  // No "comma after" if toplevel
+  if (container == this)
+  {
+    jsonComma = false;
+  }
+
+  LM_M(("In CompoundValueNode::toJson (%s, type %s, jsonComma: %s, siblings: %d)",
+        name.c_str(), typeName(type), jsonComma? "true" : "false", container->childV.size()));
+
   if (type == String)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    out = valueTag("", tagName, value, JSON, jsonComma, false, container->type == Vector);
+    if (container->type == Vector)
+    {
+      out = JSON_STR(value);
+    }
+    else
+    {
+      out = JSON_STR(tagName) + ":" + JSON_STR(value);
+    }
+  }
+  else if (type == Number)
+  {
+    char  num[32];
+
+    LM_T(LmtCompoundValueRender, ("I am a Number (%s)", name.c_str()));
+    snprintf(num, sizeof(num), "%f", numberValue);
+
+    if (container->type == Vector)
+    {
+      out = JSON_NUMBER(num);
+    }
+    else
+    {
+      out = JSON_STR(tagName) + ":" + JSON_NUMBER(num);
+    }
+  }
+  else if (type == Bool)
+  {
+    LM_T(LmtCompoundValueRender, ("I am a Bool (%s)", name.c_str()));
+
+    if (container->type == Vector)
+    {
+      out = JSON_BOOL(boolValue);
+    }
+    else
+    {
+      out = JSON_STR(tagName) + ":" + JSON_BOOL(boolValue);
+    }
   }
   else if ((type == Vector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += "[";
+    out += JSON_STR(name) + ":[";
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(JSON, "");
+      out += childV[ix]->toJson(false);
     }
 
     out += "]";
@@ -482,10 +556,12 @@ std::string CompoundValueNode::toJson(bool isLastElement)
   else if ((type == Vector) && (container == this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
+    out += "[";
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(JSON, "");
+      out += childV[ix]->toJson(ix == childV.size() - 1);
     }
+    out += "]";
   }
   else if ((type == Object) && (container->type == Vector))
   {
@@ -493,7 +569,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     out += "{";
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
-      out += childV[ix]->render(JSON, "");
+      out += childV[ix]->toJson(ix == childV.size() - 1);
     }
 
     out += "}";
@@ -503,25 +579,29 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     if (rootP != this)
     {
       LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is NOT a Vector", name.c_str()));
-      out += "{";
+      out += JSON_STR(name) + ":{";
 
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(JSON, "");
+        out += childV[ix]->toJson(ix == childV.size() - 1);
       }
 
       out += "}";
     }
     else
     {
-      LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s)", name.c_str()));
+      LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s: %d children)", name.c_str(), childV.size()));
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        out += childV[ix]->render(JSON, "");
+        LM_M(("Calling toJson for child %d: %s", ix, childV[ix]->name.c_str()));
+        out += childV[ix]->toJson(true);
+        LM_M(("out: %s", out.c_str()));
       }
     }
   }
 
+  out += jsonComma? "," : "";
+  LM_M(("out[%s]: %s", name.c_str(), out.c_str()));
   return out;
 }
 

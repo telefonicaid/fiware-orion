@@ -850,7 +850,7 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 */
 static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 {
-  if ((e.type() != String) && (e.type() != Object) && (e.type() != Array))
+  if ((e.type() != String) && (e.type() != Bool) && (e.type() != NumberDouble) && (e.type() != Object) && (e.type() != Array))
   {
     LM_T(LmtSoftError, ("unknown BSON type"));
     return;
@@ -864,6 +864,16 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
   case String:
     child->type  = orion::CompoundValueNode::String;
     child->value = e.String();
+    break;
+
+  case Bool:
+    child->type  = orion::CompoundValueNode::Bool;
+    child->boolValue = e.Bool();
+    break;
+
+  case NumberDouble:
+    child->type  = orion::CompoundValueNode::Number;
+    child->numberValue = e.Number();
     break;
 
   case Object:

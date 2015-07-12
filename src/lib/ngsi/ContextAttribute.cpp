@@ -81,7 +81,8 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   stringValue           = caP->stringValue;
   numberValue           = caP->numberValue;
   boolValue             = caP->boolValue;
-  compoundValueP        = (caP->compoundValueP)? caP->compoundValueP->clone() : NULL;
+  compoundValueP        = caP->compoundValueP;
+  caP->compoundValueP   = NULL;
   found                 = caP->found;
   typeFromXmlAttribute  = "";
 
@@ -319,7 +320,7 @@ std::string ContextAttribute::renderAsJsonObject
     }
 
     out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
-    out += compoundValueP->render(ciP->outFormat, indent + "    ");
+    out += compoundValueP->render(ciP, ciP->outFormat, indent + "    ");
     out += endTag(indent + "  ", "contextValue", ciP->outFormat, commaAfterContextValue, isCompoundVector);
   }
 
@@ -442,7 +443,7 @@ std::string ContextAttribute::render
     }
 
     out += startTag(indent + "  ", "contextValue", "value", ciP->outFormat, isCompoundVector, true, isCompoundVector);
-    out += compoundValueP->render(ciP->outFormat, indent + "    ");
+    out += compoundValueP->render(ciP, ciP->outFormat, indent + "    ");
     out += endTag(indent + "  ", "contextValue", ciP->outFormat, commaAfterContextValue, isCompoundVector);
   }
 
@@ -468,34 +469,32 @@ std::string ContextAttribute::toJson(bool isLastElement)
 
   if ((type == "") && (metadataVector.size() == 0))
   {
-    if (valueType == ValueTypeNumber)
+    if (compoundValueP != NULL)
+    {
+      LM_M(("compoundValueP != NULL"));
+      if (compoundValueP->isObject())
+      {
+        out = JSON_STR(name) + ":{" + compoundValueP->toJson(true) + "}";
+      }
+      else if (compoundValueP->isVector())
+      {
+        out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
+      }
+    }
+    else if (valueType == ValueTypeNumber)
     {
       char num[32];
 
       snprintf(num, sizeof(num), "%f", numberValue);
       out = JSON_VALUE_NUMBER(name, num);
-      LM_M(("KZ: Number:out == %s", out.c_str()));
     }
     else if (valueType == ValueTypeString)
     {
       out = JSON_VALUE(name, stringValue);
-      LM_M(("KZ: String:out == %s", out.c_str()));
     }
     else if (valueType == ValueTypeBoolean)
     {
       out = JSON_VALUE_BOOL(name, boolValue);
-      LM_M(("KZ: String:out == %s", out.c_str()));
-    }
-    else if (compoundValueP != NULL)
-    {
-      if (compoundValueP->isObject())
-      {
-        out = JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
-      }
-      else if (compoundValueP->isVector())
-      {
-        out = JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
-      }
     }
   }
   else
@@ -507,7 +506,21 @@ std::string ContextAttribute::toJson(bool isLastElement)
       out += JSON_VALUE("type", type) + ",";
     }
 
-    if (valueType == ValueTypeNumber)
+    if (compoundValueP != NULL)
+    {
+      if (compoundValueP->isObject())
+      {
+        LM_M(("compoundValueP != NULL 2"));
+        out += JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
+        LM_M(("out: %s", out.c_str()));
+      }
+      else if (compoundValueP->isVector())
+      {
+        LM_M(("compoundValueP != NULL 3"));
+        out += JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
+      }
+    }
+    else if (valueType == ValueTypeNumber)
     {
       char num[32];
 
@@ -525,21 +538,7 @@ std::string ContextAttribute::toJson(bool isLastElement)
     }
     else
     {
-      if (compoundValueP == NULL)
-      {
-        out += JSON_VALUE("value", stringValue);
-      }
-      else
-      {
-        if (compoundValueP->isObject())
-        {
-          out = JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
-        }
-        else if (compoundValueP->isVector())
-        {
-          out = JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
-        }
-      }
+      out += JSON_VALUE("value", stringValue);
     }
 
     if (metadataVector.size() > 0)
@@ -597,8 +596,8 @@ std::string ContextAttribute::check
 void ContextAttribute::present(const std::string& indent, int ix)
 {
   LM_F(("%sAttribute %d:",    indent.c_str(), ix));
-  LM_F(("%s  Name:       %s", indent.c_str(), name.c_str()));
-  LM_F(("%s  Type:       %s", indent.c_str(), type.c_str()));
+  LM_F(("%s  Name:      %s", indent.c_str(), name.c_str()));
+  LM_F(("%s  Type:      %s", indent.c_str(), type.c_str()));
 
   if (compoundValueP == NULL)
   {

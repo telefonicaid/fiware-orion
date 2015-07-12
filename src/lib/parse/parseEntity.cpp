@@ -48,7 +48,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
   if (document.HasParseError())
   {
     LM_W(("Bad Input (JSON parse error)"));
-    eP->errorCode.fill("JSON Parse Error", "");
+    eP->errorCode.fill("JSON Parse Error I", "");
     return eP->render(ciP, EntitiesRequest);
   }
 
@@ -56,7 +56,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
   if (!document.IsObject())
   {
     LM_E(("Bad Input (JSON Parse Error)"));
-    eP->errorCode.fill("JSON Parse Error", "");
+    eP->errorCode.fill("JSON Parse Error II", "");
     return eP->render(ciP, EntitiesRequest);
   }
 
@@ -64,7 +64,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
   if (document.HasMember("id") && document.HasMember("idPattern"))
   {
     LM_W(("Bad Input (both 'id' and 'idPattern' specified"));
-    eP->errorCode.fill("JSON Parse Error", "both 'id'and 'idPattern'specified");
+    eP->errorCode.fill("JSON Parse Error III", "both 'id'and 'idPattern'specified");
     return eP->render(ciP, EntitiesRequest);
   }
 
@@ -81,7 +81,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
       if (type != "String")
       {
         LM_W(("Bad Input (bad type for EntityId::id"));
-        eP->errorCode.fill("JSON Parse Error", "bad type for EntityId::id");
+        eP->errorCode.fill("JSON Parse Error IV", "bad type for EntityId::id");
         return eP->render(ciP, EntitiesRequest);
       }
 
@@ -92,7 +92,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
       if (type != "String")
       {
         LM_W(("Bad Input (bad type for EntityId::type"));
-        eP->errorCode.fill("JSON Parse Error", "bad type for EntityId::type");
+        eP->errorCode.fill("JSON Parse Error V", "bad type for EntityId::type");
         return eP->render(ciP, EntitiesRequest);
       }
 
@@ -103,7 +103,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
       if (type != "String")
       {
         LM_W(("Bad Input (bad type for EntityId::isPattern)"));
-        eP->errorCode.fill("JSON Parse Error", "bad type for EntityId::isPattern");
+        eP->errorCode.fill("JSON Parse Error VI", "bad type for EntityId::isPattern");
         return eP->render(ciP, EntitiesRequest);
       }
 
@@ -119,7 +119,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
       if (r != "OK")
       {
         LM_W(("Bad Input (parse error in EntityId::ContextAttribute)"));
-        eP->errorCode.fill("JSON Parse Error", r);
+        eP->errorCode.fill("JSON Parse Error VII", r);
         return eP->render(ciP, EntitiesRequest);
       }
     }
@@ -131,5 +131,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
   ciP->httpHeaderValue.push_back(location);
   ciP->httpStatusCode = SccCreated;
 
+  LM_M(("Done parsing Entity"));
+  eP->present("");
   return "OK";
 }
