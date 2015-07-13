@@ -40,10 +40,10 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
                    -->  *.py             files with steps associated to previous scenarios
     logs/:                               folder to log (it is created if does not exist)
     results/:                            folder to save junit reports (it is created if does not exist)
-    settings/:                           folder to store different configurations (this place is configurable in configuration.py) (optional)
+    settings/:                           folder to store different configurations (this place is configurable in configuration.json) (optional)
     tools/:                              internal libraries
     behave.ini:                          configuration files for behave are called either ”.behaverc” or “behave.ini”
-    configurations.json:                 initial configuration, before of execution
+    configuration.json:                  initial configuration, before of execution
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
     README.md:                           this file, a brief explication about this framework to test
     requirement.txt:                     external library, necessary install before to execute test (see Test execution section)
@@ -53,11 +53,11 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 - Change to the test/acceptance/behave folder of the project if not already on it.
 - We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to referenced by `properties.json` files.
   The settings folder path could be changed in the `configuration.json`.
-  This file initially will overwrite properties.py in each feature.
+  This file initially will overwrite properties.json in each feature.
 - modify in `configuration.json`:
        * JENKINS: determine whether you are in jenkins or not.
        * PATH_TO_SETTING_FOLDER: folder where are the different configurations
-- `properties.py` will be update automatically from settings folder (see configuration.json)
+- `properties.json` will be update automatically from settings folder (see configuration.json)
 - Run behave (see available params with the -h option).
 ```
     Some examples:
@@ -100,7 +100,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 ### BackgroundFeature
 
 In certain cases, could be useful define a background by feature instead of `Background` that is by scenario.
-Recommend append `BackgroundFeature` in Feature description and define the steps with `Environment Setup:` prefix.
+Recommend append `BackgroundFeature` in Feature description and define the steps with `Setup:` or `Check:` prefix.
 Example:
 ```
 Feature: feature name...
@@ -109,9 +109,9 @@ Feature: feature name...
   So ....
 
   BackgroundFeature:
-    Environment Setup: update config file
-    Environment Setup: restart service
-    Environment Setup: verify if the service is installed successfully
+    Setup: update config file
+    Setup: restart service
+    Check: verify if the service is installed successfully
 ```
 
 ### Tests Suites Coverage:

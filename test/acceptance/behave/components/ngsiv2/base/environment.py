@@ -37,15 +37,17 @@ def before_feature(context, feature):
     :param context:
     :param feature:
     """
+
     __logger__.info("\n\n\n\n")
     __logger__.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     __logger__.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     __logger__.info("BEFORE FEATURE: %s" % feature)
     __logger__.info("BEFORE FEATURE: %s" % feature.description)
-    # ---- backgroundFeature ----
+    # ---- BackgroundFeature ----
+    keywords = ["Setup:", "Check:"]
     for description in feature.description:
-        if description.split(" ")[0] in ("Environment Setup:"):
-            description = description.replace("Environment Setup:", "Given")
+        if description.split(" ")[0] in keywords:
+            description = description.replace(description.split(" ")[0], "Given")
             __logger__.info("steps in Background Feature: %s" % description)
             context.execute_steps(description)
 

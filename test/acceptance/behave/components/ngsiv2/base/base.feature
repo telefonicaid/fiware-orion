@@ -29,10 +29,10 @@ Feature: NGSI v2 base requests
   So that I can manage and use them in my scripts
 
   BackgroundFeature:
-    Environment Setup: update properties.py from "epg_contextBroker.txt" and sudo local "false"
-    Environment Setup: update contextBroker config file and restart service
-    Environment Setup: verify contextBroker is installed successfully
-    Environment Setup: verify mongo is installed successfully
+    Setup: update properties.py from "epg_contextBroker.txt" and sudo local "false"
+    Setup: update contextBroker config file and restart service
+    Check: verify contextBroker is installed successfully
+    Check: verify mongo is installed successfully
 
   @base
   Scenario: verify NGSI v2 base request
