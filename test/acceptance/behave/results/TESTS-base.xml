@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<testsuite errors="0" failures="0" name="base.NGSI v2 base requests" skipped="0" tests="2" time="10.237046"><testcase classname="base.NGSI v2 base requests" name="verify NGSI v2 base request" status="passed" time="5.09478"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @base
+  Scenario: verify NGSI v2 base request
+    When send a base request ... passed in 5.077s
+    Then verify that receive an "OK" http code ... passed in 0.006s
+    And verify main paths ... passed in 0.012s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase><testcase classname="base.NGSI v2 base requests" name="verify NGSI v2 base request" status="passed" time="5.142266"><system-out>
+<![CDATA[
+@scenario.begin
+
+  @base_2
+  Scenario: verify NGSI v2 base request
+    When send a base request ... passed in 5.130s
+    Then verify that receive an "OK" http code ... passed in 0.012s
+    And verify main paths ... passed in 0.000s
+
+@scenario.end
+--------------------------------------------------------------------------------
+]]>
+</system-out></testcase></testsuite>
