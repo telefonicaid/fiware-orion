@@ -45,8 +45,11 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 {
   for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
+    LM_M(("1"));
     std::string name   = iter->name.GetString();
+    LM_M(("2"));
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
+    LM_M(("3"));
 
     if (name == "type")
     {
@@ -93,7 +96,9 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     }
     else  // Metadata
     {
+      LM_M(("Metadata"));
       Metadata*   mP = new Metadata();
+      mP->name       = iter->name.GetString();
       std::string r  = parseMetadata(iter->value, mP);
 
       caP->metadataVector.push_back(mP);
@@ -103,9 +108,11 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         LM_W(("Bad Input (error parsing Metadata)"));
         return "Parse Error";
       }
+      LM_M(("Metadata OK"));
     }
   }
 
+  LM_M(("Done"));
   return "OK";
 }
 
@@ -170,6 +177,7 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
     {
       LM_M(("KZ: Normal object"));
       r = parseContextAttributeObject(iter->value, caP);
+      LM_M(("KZ: Normal object parsed"));
       if (r != "OK")
       {
         LM_W(("Bad Input (json error in EntityId::ContextAttribute::Object"));

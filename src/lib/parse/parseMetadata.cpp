@@ -108,10 +108,7 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
 */
 std::string parseMetadata(const Value& val, Metadata* mP)
 {
-  std::string name   = val.GetString();
   std::string type   = jsonParseTypeNames[val.GetType()];
-  
-  mP->name = name;
 
   if (type == "Object")
   {
@@ -139,10 +136,6 @@ std::string parseMetadata(const Value& val, Metadata* mP)
   {
     mP->valueType    = MetadataValueTypeBoolean;
     mP->boolValue    = false;
-  }
-  else if (type == "Vector")
-  {
-    return "Parse Error";
   }
   else
   {

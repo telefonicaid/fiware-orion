@@ -100,7 +100,8 @@ std::string parseContextAttributeCompoundValue
   std::string type   = jsonParseTypeNames[node->value.GetType()];
   std::string name   = node->name.GetString();
 
-  // Create this node
+  LM_M(("Got: %s (%s)", name.c_str(), type.c_str()));
+
   if (caP->compoundValueP == NULL)
   {
     LM_M(("KZ-Comp: Got a TOPLEVEL %s", type.c_str()));
@@ -124,13 +125,18 @@ std::string parseContextAttributeCompoundValue
   {
     int counter  = 0;
 
-    for (Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
+    LM_M(("1"));
+    // Value::ConstMemberIterator memberIterator = node->value.MemberBegin();
+    LM_M(("2"));
+    for (Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter) // , ++memberIterator)
     {
+      LM_M(("3"));
       char                       buffer[256];
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
       char                       itemNo[4];
 
+      LM_M(("3"));
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
       cvnP->type       = stringToCompoundType(nodeType);
@@ -153,9 +159,31 @@ std::string parseContextAttributeCompoundValue
       {
         cvnP->boolValue   = (nodeType == "True")? true : false;
       }
+      else if (nodeType == "Object")
+      {
+        cvnP->path += "/";
+        cvnP->type = orion::CompoundValueNode::Object;
+      }
+      else if (nodeType == "Array")
+      {
+        cvnP->path += "/";
+        cvnP->type = orion::CompoundValueNode::Vector;
+      }
 
       parent->childV.push_back(cvnP);
       LM_M(("KZ: pushed Array-member %d: %s: %s (%s)", counter, nodeType.c_str(), cvnP->path.c_str(), stringValue(cvnP, buffer)));
+
+      //
+      // Recursive call if Object or Array
+      //
+      if ((nodeType == "Object") || (nodeType == "Array"))
+      {
+        LM_M(("Object/Array inside Array - not implemnented!"));
+        // Value::ConstMemberIterator node = iter->MemberBegin();
+        // LM_M(("Calling parseContextAttributeCompoundValue"));
+        // parseContextAttributeCompoundValue(node, caP, cvnP);
+      }
+
       ++counter;
     }
   }
@@ -208,6 +236,7 @@ std::string parseContextAttributeCompoundValue
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
+        LM_M(("Recursive call as Object or Array"));
         parseContextAttributeCompoundValue(iter, caP, cvnP);
       }
 
