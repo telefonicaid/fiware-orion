@@ -122,7 +122,7 @@ ContextAttribute::ContextAttribute
 
   name                  = _name;
   type                  = _type;
-  stringValue                 = std::string(_value);
+  stringValue           = std::string(_value);
   valueType             = ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
@@ -150,7 +150,7 @@ ContextAttribute::ContextAttribute
 
   name                  = _name;
   type                  = _type;
-  stringValue                 = _value;
+  stringValue           = _value;
   valueType             = ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
@@ -680,7 +680,7 @@ std::string ContextAttribute::toStringValue(void)
     break;
 
   default:
-    return "<unkown type>";
+    return "<unknown type>";
     break;
   }
 }

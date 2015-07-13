@@ -76,13 +76,17 @@ typedef struct Metadata
 
   Metadata();
   Metadata(Metadata* mP);
-  Metadata(const std::string& _name, const std::string& _type, const std::string& _value = "");
+  Metadata(const std::string& _name, const std::string& _type, const char* _value);
+  Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
+  Metadata(const std::string& _name, const std::string& _type, double _value);
+  Metadata(const std::string& _name, const std::string& _type, bool _value);
 
   std::string  render(Format format, const std::string& indent, bool comma = false);
   std::string  toJson(bool isLastElement);
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
   void         fill(const struct Metadata& md);
+  std::string  toStringValue(void);
 
   std::string  check(RequestType         requestType,
                      Format              format,

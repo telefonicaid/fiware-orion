@@ -51,19 +51,31 @@ Metadata::Metadata()
 *
 * Metadata::Metadata -
 *
-* FIXME P9: Copy also the Association!
-*
 */
 Metadata::Metadata(Metadata* mP)
 {
   LM_T(LmtClone, ("'cloning' a Metadata"));
 
-  name  = mP->name;
-  type  = mP->type;
-  value = mP->value;
+  name        = mP->name;
+  type        = mP->type;
+  valueType   = mP->valueType;
+  value       = mP->value;
+  numberValue = mP->numberValue;
+  boolValue   = mP->boolValue;
+
 }
 
-
+/* ****************************************************************************
+*
+* Metadata::Metadata -
+*/
+Metadata::Metadata(const std::string& _name, const std::string& _type, const char* _value)
+{
+  name      = _name;
+  type      = _type;
+  valueType = MetadataValueTypeString;
+  value     = std::string(_value);
+}
 
 /* ****************************************************************************
 *
@@ -71,11 +83,35 @@ Metadata::Metadata(Metadata* mP)
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, const std::string& _value)
 {
-  name  = _name;
-  type  = _type;
-  value = _value;
+  name      = _name;
+  type      = _type;
+  valueType = MetadataValueTypeString;
+  value     = _value;
 }
 
+/* ****************************************************************************
+*
+* Metadata::Metadata -
+*/
+Metadata::Metadata(const std::string& _name, const std::string& _type, double _value)
+{
+  name         = _name;
+  type         = _type;
+  valueType    = MetadataValueTypeNumber;
+  numberValue  = _value;
+}
+
+/* ****************************************************************************
+*
+* Metadata::Metadata -
+*/
+Metadata::Metadata(const std::string& _name, const std::string& _type, bool _value)
+{
+  name      = _name;
+  type      = _type;
+  valueType = MetadataValueTypeBoolean;
+  boolValue = _value;
+}
 
 
 /* ****************************************************************************
@@ -175,7 +211,32 @@ void Metadata::fill(const struct Metadata& md)
   association = md.association;
 }
 
+/* ****************************************************************************
+*
+* toStringValue -
+*/
+std::string Metadata::toStringValue(void)
+{
+  switch (valueType)
+  {
+  case MetadataValueTypeString:
+    return value;
+    break;
 
+  case MetadataValueTypeNumber:
+    return "<double>";
+    // FIXME P10: return std::string(numberValue);
+    break;
+
+  case MetadataValueTypeBoolean:
+    return boolValue ? "true" : "false";
+    break;
+
+  default:
+    return "<unknown type>";
+    break;
+  }
+}
 
 /* ****************************************************************************
 *

@@ -362,6 +362,68 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
 
 /* ****************************************************************************
 *
+* appendMetadata -
+*/
+void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
+{
+  if (mdP->type != "")
+  {
+    switch (mdP->valueType)
+    {
+    case MetadataValueTypeString:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->value));
+      return;
+    case MetadataValueTypeNumber:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      return;
+    case MetadataValueTypeBoolean:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      return;
+    default:
+      LM_E(("Runtime Error (unknown attribute type)"));
+    }
+  }
+  else
+  {
+    switch (mdP->valueType)
+    {
+    case MetadataValueTypeString:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->value));
+      return;
+    case MetadataValueTypeNumber:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      return;
+    case MetadataValueTypeBoolean:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      return;
+    default:
+      LM_E(("Runtime Error (unknown attribute type)"));
+    }
+  }
+}
+
+/* ****************************************************************************
+*
+* BSONtoMetadata -
+*/
+void BSONtoMetadata (BSONObj& mdB, Metadata* md)
+{
+  std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
+  switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
+  {
+  case MetadataValueTypeString:
+    *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getStringField(ENT_ATTRS_MD_VALUE));
+  case MetadataValueTypeNumber:
+    *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getField(ENT_ATTRS_MD_VALUE).Number());
+  case MetadataValueTypeBoolean:
+    *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getBoolField(ENT_ATTRS_MD_VALUE));
+  default:
+    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", mdB.getField(ENT_ATTRS_MD_VALUE).type()));
+  }
+}
+
+/* ****************************************************************************
+*
 * mergeAttrInfo -
 *
 * Takes as input the information of a given attribute, both in database (attr) and
@@ -424,23 +486,14 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   /* First add the metadata elements coming in the request */
   for (unsigned int ix = 0; ix < caP->metadataVector.size() ; ++ix)
   {
-    Metadata* md = caP->metadataVector.get(ix);
+    Metadata* mdP = caP->metadataVector.get(ix);
 
     /* Skip not custom metadata */
-    if (isNotCustomMetadata(md->name))
+    if (isNotCustomMetadata(mdP->name))
     {
       continue;
     }
-    if (md->type == "")
-    {
-      mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_VALUE << md->value));
-    }
-    else
-    {
-      mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name <<
-                             ENT_ATTRS_MD_TYPE << md->type <<
-                             ENT_ATTRS_MD_VALUE << md->value));
-    }
+    appendMetadata(&mdVBuilder, mdP);
   }
 
   /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
@@ -453,22 +506,14 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
-      BSONObj md = i.next().embeddedObject();
+      BSONObj mdB = i.next().embeddedObject();
+      Metadata md;
+      BSONtoMetadata(mdB, &md);
 
       mdVSize++;
-      if (!hasMetadata(md.getStringField(ENT_ATTRS_MD_NAME), md.getStringField(ENT_ATTRS_MD_TYPE), caP))
+      if (!hasMetadata(md.name, md.type, caP))
       {
-        if (md.hasField(ENT_ATTRS_MD_TYPE))
-        {
-          mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME  << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                 ENT_ATTRS_MD_TYPE  << md.getStringField(ENT_ATTRS_MD_TYPE) <<
-                                 ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-        }
-        else
-        {
-          mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME  << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                 ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-        }
+        appendMetadata(&mdVBuilder, &md);
       }
     }
   }
@@ -595,9 +640,9 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 
     if (!isNotCustomMetadata(md->name))
     {
-      mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
+      appendMetadata(&mdToAdd, md);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
-                      md->name.c_str(), md->type.c_str(), md->value.c_str()));
+                      md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
     }
   }
 
@@ -1279,7 +1324,7 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 
     if (!isNotCustomMetadata(mdReq->name))
     {
-      md = new Metadata(mdReq->name, mdReq->type, mdReq->value);
+      md = new Metadata(mdReq);
       caRes->metadataVector.push_back(md);
     }
   }
