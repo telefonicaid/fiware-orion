@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST Entities V2
+POST Entities V2 with compound attribute as vector
 
 --SHELL-INIT--
 dbInit CB
@@ -39,11 +39,7 @@ echo "===================="
 payload='{
   "id": "E1",
   "type": "T1",
-  "attr01": "1",
-  "attr02": 2,
-  "attr03": 3.3,
-  "attr04": true,
-  "attr05": false
+  "cvec": [ 1, 2, 3 ]
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -70,16 +66,16 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 101
+Content-Length: 59
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr01": "1", 
-    "attr02": 2.0, 
-    "attr03": 3.2999999999999998, 
-    "attr04": true, 
-    "attr05": false, 
+    "cvec": [
+        1.0, 
+        2.0, 
+        3.0
+    ], 
     "id": "E1", 
     "type": "T1"
 }

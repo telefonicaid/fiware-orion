@@ -478,6 +478,7 @@ std::string ContextAttribute::toJson(bool isLastElement)
       }
       else if (compoundValueP->isVector())
       {
+        LM_M(("KZ: compoundValue is a vector"));
         out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
       }
     }
@@ -517,7 +518,7 @@ std::string ContextAttribute::toJson(bool isLastElement)
       else if (compoundValueP->isVector())
       {
         LM_M(("compoundValueP != NULL 3"));
-        out += JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
+        out += JSON_STR("value") + ":[4," + compoundValueP->toJson(true) + ",4]";
       }
     }
     else if (valueType == ValueTypeNumber)

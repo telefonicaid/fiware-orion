@@ -555,13 +555,14 @@ std::string CompoundValueNode::toJson(bool isLastElement)
   }
   else if ((type == Vector) && (container == this))
   {
+    //
+    // NOTE: Here, the '[]' are already added in the calling function
+    //
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
-    out += "[";
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
       out += childV[ix]->toJson(ix == childV.size() - 1);
     }
-    out += "]";
   }
   else if ((type == Object) && (container->type == Vector))
   {

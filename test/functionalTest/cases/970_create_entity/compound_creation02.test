@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST Entities V2 with compound values
+POST Entities V2 with complicated compound values
 
 --SHELL-INIT--
 dbInit CB

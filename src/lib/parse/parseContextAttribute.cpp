@@ -28,209 +28,12 @@
 
 #include "ngsi/ContextAttribute.h"
 #include "parse/jsonParseTypeNames.h"
+#include "parse/CompoundValueNode.h"
 #include "parse/parseContextAttribute.h"
 #include "parse/parseMetadata.h"
+#include "parse/parseContextAttributeCompoundValue.h"
 
 using namespace rapidjson;
-
-
-
-/* ****************************************************************************
-*
-* stringValue - 
-*/
-static char* stringValue(orion::CompoundValueNode* cvnP, char* buffer)
-{
-  if (cvnP->type == orion::CompoundValueNode::String)
-  {
-    return (char*) cvnP->value.c_str();
-  }
-  else if (cvnP->type == orion::CompoundValueNode::Number)
-  {
-    sprintf(buffer, "%f", cvnP->numberValue);
-    return buffer;
-  }
-  else if (cvnP->type == orion::CompoundValueNode::Bool)
-  {
-    return (char*) "Boolean";
-  }
-  else if (cvnP->type == orion::CompoundValueNode::Object)
-  {
-    return (char*) "Object";
-  }
-  else if (cvnP->type == orion::CompoundValueNode::Vector)
-  {
-    return (char*) "Array";
-  }
-
-  return (char*) "unknown type";
-}
-
-
-
-/* ****************************************************************************
-*
-* stringToCompoundType - 
-*/
-static orion::CompoundValueNode::Type stringToCompoundType(std::string nodeType)
-{
-  if (nodeType == "String")
-  {
-    return orion::CompoundValueNode::String;
-  }
-  else if (nodeType == "Number")
-  {
-    return orion::CompoundValueNode::Number;
-  }
-  else if ((nodeType == "True") || (nodeType == "False"))
-  {
-    return orion::CompoundValueNode::Bool;
-  }
-  else if (nodeType == "Object")
-  {
-    return orion::CompoundValueNode::Object;
-  }
-  else if (nodeType == "Array")
-  {
-    return orion::CompoundValueNode::Vector;
-  }
-
-  return orion::CompoundValueNode::String;
-}
-
-
-
-/* ****************************************************************************
-*
-* parseCompound - 
-*/
-std::string parseCompound(const Value::ConstMemberIterator& node, ContextAttribute* caP, orion::CompoundValueNode* parent)
-{
-  std::string type   = jsonParseTypeNames[node->value.GetType()];
-  std::string name   = node->name.GetString();
-
-  // Create this node
-  if (caP->compoundValueP == NULL)
-  {
-    LM_M(("KZ-Comp: Got a TOPLEVEL %s", type.c_str()));
-    caP->compoundValueP            = new orion::CompoundValueNode();
-    caP->compoundValueP->name      = "TOP";
-    caP->compoundValueP->container = caP->compoundValueP;
-    caP->compoundValueP->type      = stringToCompoundType(type);
-    caP->compoundValueP->path      = "/";
-    caP->compoundValueP->rootP     = caP->compoundValueP;
-    caP->compoundValueP->level     = 0;
-    caP->compoundValueP->siblingNo = 0;
-
-    parent = caP->compoundValueP;
-
-//    if (caP->type == "")
-//    {
-//      caP->type = (type == "Object")? "Compound Object" : "Compound Vector";
-//    }
-  }
-
-
-  //
-  // Children of the node
-  //
-  if (type == "Array")
-  {
-    int counter  = 0;
-
-    for (Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
-    {
-      char                       buffer[256];
-      std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
-      orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
-      char                       itemNo[4];
-
-      snprintf(itemNo, sizeof(itemNo), "%03d", counter);
-
-      cvnP->type       = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + "[" + itemNo + "]";
-
-
-      if (nodeType == "String")
-      {
-        cvnP->value       = iter->GetString();
-      }
-      else if (nodeType == "Number")
-      {
-        cvnP->numberValue = iter->GetDouble();
-      }
-      else if ((nodeType == "True") || (nodeType == "False"))
-      {
-        cvnP->boolValue   = (nodeType == "True")? true : false;
-      }
-
-      parent->childV.push_back(cvnP);
-      LM_M(("KZ: pushed Array-member %d: %s: %s (%s)", counter, nodeType.c_str(), cvnP->path.c_str(), stringValue(cvnP, buffer)));
-      ++counter;
-    }
-  }
-  else if (type == "Object")
-  {
-    int counter  = 0;
-
-    for (Value::ConstMemberIterator iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
-    {
-      char                       buffer[256];
-      std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
-      orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
-
-      cvnP->name       = iter->name.GetString();
-      cvnP->type       = stringToCompoundType(nodeType);
-      cvnP->container  = parent;
-      cvnP->rootP      = parent->rootP;
-      cvnP->level      = parent->level + 1;
-      cvnP->siblingNo  = counter;
-      cvnP->path       = parent->path + cvnP->name;
-
-      if (nodeType == "String")
-      {
-        cvnP->value       = iter->value.GetString();
-      }
-      else if (nodeType == "Number")
-      {
-        cvnP->numberValue = iter->value.GetDouble();
-      }
-      else if ((nodeType == "True") || (nodeType == "False"))
-      {
-        cvnP->boolValue   = (nodeType == "True")? true : false;
-      }
-      else if (nodeType == "Object")
-      {
-        cvnP->path += "/";
-        cvnP->type = orion::CompoundValueNode::Object;
-      }
-      else if (nodeType == "Array")
-      {
-        cvnP->path += "/";
-        cvnP->type = orion::CompoundValueNode::Vector;
-      }
-
-      parent->childV.push_back(cvnP);
-      LM_M(("KZ: pushed %s: %s (%s)", nodeType.c_str(), cvnP->path.c_str(), stringValue(cvnP, buffer)));
-        
-      //
-      // Recursive call if Object or Array
-      //
-      if ((nodeType == "Object") || (nodeType == "Array"))
-      {
-        parseCompound(iter, caP, cvnP);
-      }
-
-      ++counter;
-    }
-  }
-
-  return "OK";
-}
 
 
 
@@ -259,7 +62,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     {
       if (type == "String")
       {
-        caP->stringValue        = iter->value.GetString();
+        caP->stringValue  = iter->value.GetString();
         caP->valueType    = ValueTypeString;
       }
       else if (type == "Number")
@@ -279,12 +82,12 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       }
       else if (type == "Array")
       {
-        caP->stringValue        = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
+        caP->stringValue  = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
         caP->valueType    = ValueTypeCompoundVector;
       }
       else if (type == "Object")
       {
-        caP->stringValue        = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
+        caP->stringValue  = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
         caP->valueType    = ValueTypeCompoundObject;
       }
     }
@@ -349,9 +152,10 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
   }
   else if (type == "Array")
   {
-    caP->valueType  = ValueTypeCompoundVector;
-    // caP->valueValue.compound = "";
-  }
+    LM_M(("KZ: Compound array"));
+    parseContextAttributeCompoundValue(iter, caP, NULL);
+    caP->valueType    = ValueTypeCompoundObject;
+   }
   else if (type == "Object")
   {
     std::string r;
@@ -365,8 +169,6 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
     if (iter->value.HasMember("value"))
     {
       LM_M(("KZ: Normal object"));
-      LM_M(("KZ: Normal object (has 'value'): '%s'", iter->value.GetString()));
-
       r = parseContextAttributeObject(iter->value, caP);
       if (r != "OK")
       {
@@ -377,7 +179,7 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
     else
     {
       LM_M(("KZ: Compound object"));
-      parseCompound(iter, caP, NULL);
+      parseContextAttributeCompoundValue(iter, caP, NULL);
       caP->valueType    = ValueTypeCompoundObject;
     }
   }
