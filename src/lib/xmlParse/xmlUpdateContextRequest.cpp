@@ -213,7 +213,7 @@ static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", node->value()));
-  reqData->upcr.contextMetadataP->value = node->value();
+  reqData->upcr.contextMetadataP->stringValue = node->value();
   return 0;
 }
 
@@ -266,7 +266,7 @@ static int domainMetadataType(xml_node<>* node, ParseData* reqData)
 static int domainMetadataValue(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", node->value()));
-  reqData->upcr.domainMetadataP->value = node->value();
+  reqData->upcr.domainMetadataP->stringValue = node->value();
   return 0;
 }
 

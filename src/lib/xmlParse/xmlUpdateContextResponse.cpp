@@ -200,7 +200,7 @@ static int contextMetadataType(xml_node<>* node, ParseData* parseDataP)
 static int contextMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
-  parseDataP->upcrs.metadataP->value = node->value();
+  parseDataP->upcrs.metadataP->stringValue = node->value();
   return 0;
 }
 

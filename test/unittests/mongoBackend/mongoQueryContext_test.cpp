@@ -3018,14 +3018,14 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 1)->type);
     EXPECT_EQ("B", RES_CER_ATTR(0, 1)->stringValue);
     ASSERT_EQ(1, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3076,10 +3076,10 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
     ASSERT_EQ(2, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("TMD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
-    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);
+    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3131,7 +3131,7 @@ TEST(mongoQueryContextRequest, queryCustomMetadataNative)
     ASSERT_EQ(3, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("TMD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ(MetadataValueTypeString, RES_CER_ATTR(0, 0)->metadataVector.get(0)->valueType);
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
@@ -3653,7 +3653,7 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
 
     EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 1)->type);
@@ -3661,7 +3661,7 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     ASSERT_EQ(1, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->stringValue);
 
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -3678,7 +3678,7 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     ASSERT_EQ(1, RES_CER_ATTR(1, 0)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(1, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(1, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->stringValue);
 
     EXPECT_EQ("A1", RES_CER_ATTR(1, 1)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 1)->type);
@@ -3686,7 +3686,7 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     ASSERT_EQ(1, RES_CER_ATTR(1, 1)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(1, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(1, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID2", RES_CER_ATTR(1, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID2", RES_CER_ATTR(1, 1)->metadataVector.get(0)->stringValue);
 
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -3738,10 +3738,10 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     ASSERT_EQ(2, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("TMD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
-    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);           
+    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->stringValue);           
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3757,10 +3757,10 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     ASSERT_EQ(2, RES_CER_ATTR(1, 0)->metadataVector.size());
     EXPECT_EQ("MD1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("TMD1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("7", RES_CER_ATTR(1, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("7", RES_CER_ATTR(1, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("MD2", RES_CER_ATTR(1, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(1, 0)->metadataVector.get(1)->type);
-    EXPECT_EQ("8", RES_CER_ATTR(1, 0)->metadataVector.get(1)->value);
+    EXPECT_EQ("8", RES_CER_ATTR(1, 0)->metadataVector.get(1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);

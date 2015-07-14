@@ -57,7 +57,7 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
     {
       if (type == "String")
       {
-        mP->value               = iter->value.GetString();
+        mP->stringValue               = iter->value.GetString();
         mP->valueType           = MetadataValueTypeString;
       }
       else if (type == "Number")
@@ -119,7 +119,7 @@ std::string parseMetadata(const Value& val, Metadata* mP)
 
   if (type == "String")
   {
-    mP->value        = val.GetString();
+    mP->stringValue        = val.GetString();
     mP->valueType    = MetadataValueTypeString;
   }
   else if (type == "Number")

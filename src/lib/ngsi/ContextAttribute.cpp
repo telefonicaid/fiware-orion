@@ -264,7 +264,7 @@ std::string ContextAttribute::getId(void)
   {
     if (metadataVector.get(ix)->name == NGSI_MD_ID)
     {
-      return metadataVector.get(ix)->value;
+      return metadataVector.get(ix)->stringValue;
     }
   }
 
@@ -283,7 +283,7 @@ std::string ContextAttribute::getLocation()
   {
     if (metadataVector.get(ix)->name == NGSI_MD_LOCATION)
     {
-      return metadataVector.get(ix)->value;
+      return metadataVector.get(ix)->stringValue;
     }
   }
 

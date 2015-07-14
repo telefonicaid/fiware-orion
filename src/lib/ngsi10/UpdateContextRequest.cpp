@@ -309,7 +309,7 @@ void UpdateContextRequest::fill
       mP = new Metadata("ID", "", metaID);
       caP->metadataVector.push_back(mP);
     }
-    else if (mP->value != metaID)
+    else if (mP->stringValue != metaID)
     {
       LM_W(("Bad Input (metaID differs in URI and payload"));
     }

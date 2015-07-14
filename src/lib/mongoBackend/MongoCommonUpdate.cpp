@@ -371,7 +371,7 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
     switch (mdP->valueType)
     {
     case MetadataValueTypeString:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->value));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
     case MetadataValueTypeNumber:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
@@ -388,7 +388,7 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
     switch (mdP->valueType)
     {
     case MetadataValueTypeString:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->value));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
     case MetadataValueTypeNumber:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->numberValue));
@@ -827,9 +827,9 @@ static bool processLocation
         }
         else
         {
-          if ((mdP->value != LOCATION_WGS84) && (mdP->value != LOCATION_WGS84_LEGACY))
+          if ((mdP->stringValue != LOCATION_WGS84) && (mdP->stringValue != LOCATION_WGS84_LEGACY))
           {
-            *errDetail = "only WGS84 are supported, found: " + mdP->value;
+            *errDetail = "only WGS84 are supported, found: " + mdP->stringValue;
             return false;
           }
 
