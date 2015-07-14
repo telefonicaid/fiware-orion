@@ -92,6 +92,7 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - queryNoType
 * - queryIdMetadata
 * - queryCustomMetadata
+* - queryCustomMetadataNative
 *
 * (N=2 without loss of generality)
 * (WA = Without Attributes)
@@ -354,6 +355,56 @@ static void prepareDatabaseWithCustomMetadata(void) {
                            "A2" << BSON("type" << "TA2" << "value" << "F" <<
                                 "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "11") <<
                                                    BSON("name" << "MD2" << "type" << "TMD2" << "value" << "12")
+                                                  )
+                                )
+                          )
+                      );
+
+    connection->insert(ENTITIES_COLL, en1);
+    connection->insert(ENTITIES_COLL, en2);
+}
+
+/* ****************************************************************************
+*
+* prepareDatabaseWithAttributeCustomMetadataNative -
+*
+*/
+static void prepareDatabaseWithCustomMetadataNative(void) {
+
+    /* Start with the base entities */
+    prepareDatabase();
+
+    /* Add some entities with metadata ID */
+
+    DBClientBase* connection = getMongoConnection();
+    BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "A" <<
+                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "val1") <<
+                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << 2.1) <<
+                                                  BSON("name" << "MD3" << "type" << "TMD3" << "value" << false)
+                                                 )
+                               ) <<
+                          "A2" << BSON("type" << "TA2" << "value" << "C" <<
+                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << false) <<
+                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << 6.5)
+                                                 )
+                               )
+                          )
+                      );
+
+    BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                           "A1" << BSON("type" << "TA1" << "value" << "D" <<
+                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "x") <<
+                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << 8.7)
+                                                  )
+                                ) <<
+                           "A2" << BSON("type" << "TA2" << "value" << "F" <<
+                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << true) <<
+                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "val2")
                                                   )
                                 )
                           )
@@ -3029,6 +3080,67 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
     EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
+
+}
+
+
+/* ****************************************************************************
+*
+* queryCustomMetadataNatibve -
+*
+*/
+TEST(mongoQueryContextRequest, queryCustomMetadataNative)
+{
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabaseWithCustomMetadataNative();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E10", "T", "false");
+    req.entityIdVector.push_back(&en);
+    req.attributeList.push_back("A1");
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccNone, res.errorCode.code);
+    EXPECT_EQ("", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E10", RES_CER(0).entityId.id);
+    EXPECT_EQ("T", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->stringValue);
+    ASSERT_EQ(3, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("TMD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ(MetadataValueTypeString, RES_CER_ATTR(0, 0)->metadataVector.get(0)->valueType);
+    EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
+    EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
+    EXPECT_EQ(2.1, RES_CER_ATTR(0, 0)->metadataVector.get(1)->numberValue);
+    EXPECT_EQ(MetadataValueTypeNumber, RES_CER_ATTR(0, 0)->metadataVector.get(1)->valueType);
+    EXPECT_EQ("MD3", RES_CER_ATTR(0, 0)->metadataVector.get(2)->name);
+    EXPECT_EQ("TMD3", RES_CER_ATTR(0, 0)->metadataVector.get(2)->type);
+    EXPECT_FALSE(RES_CER_ATTR(0, 0)->metadataVector.get(2)->boolValue);
+    EXPECT_EQ(MetadataValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector.get(2)->valueType);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);

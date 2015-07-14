@@ -406,7 +406,7 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
 *
 * BSONtoMetadata -
 */
-void BSONtoMetadata (BSONObj& mdB, Metadata* md)
+static void BSONtoMetadata (BSONObj& mdB, Metadata* md)
 {
   std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
   switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
