@@ -203,11 +203,11 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
 
       if (xmlAttribute == "vector")
       {
-        containerP = containerP->add(orion::CompoundValueNode::Vector, name);
+        containerP = containerP->add(orion::CompoundValueNode::Vector, name, "");
       }
       else if (xmlAttribute == "")
       {
-        containerP = containerP->add(orion::CompoundValueNode::Object, name);
+        containerP = containerP->add(orion::CompoundValueNode::Object, name, "");
       }
       else
       {

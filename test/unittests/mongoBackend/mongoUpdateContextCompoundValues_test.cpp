@@ -697,7 +697,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1Native)
     EXPECT_EQ(22.0, a1.getField("value").Array()[0].Number());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
-    EXPECT_EQ(3.0, a1.getField("value").Array()[1].embeddedObject().getField("y").Number);
+    EXPECT_EQ(3.0, a1.getField("value").Array()[1].embeddedObject().getField("y").Number());
     EXPECT_EQ("z1", a1.getField("value").Array()[2].Array()[0].str());
     EXPECT_FALSE(a1.getField("value").Array()[2].Array()[1].Bool());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -723,7 +723,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2Native)
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
-    CREATE_COMPOUND2(cv)
+    CREATE_COMPOUND2_NATIVE(cv)
     ContextAttribute ca("A1", "TA1", cv);
     ce.contextAttributeVector.push_back(&ca);
     req.contextElementVector.push_back(&ce);
@@ -778,7 +778,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2Native)
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
-    EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -804,7 +804,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
-    CREATE_COMPOUND1(cv)
+    CREATE_COMPOUND1_NATIVE(cv)
     ContextAttribute ca1("A1", "TA1", cv);
     ContextAttribute ca2("A2", "TA2", "simple2");
     ce.contextAttributeVector.push_back(&ca1);
@@ -866,12 +866,12 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     EXPECT_TRUE(findAttr(attrNames, "A1"));
     EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
-    EXPECT_EQ("22", a1.getField("value").Array()[0].str());
+    EXPECT_EQ(22.0, a1.getField("value").Array()[0].Number());
     EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
     EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
-    EXPECT_EQ("3", a1.getField("value").Array()[1].embeddedObject().getField("y").str());
+    EXPECT_EQ(3.0, a1.getField("value").Array()[1].embeddedObject().getField("y").Number());
     EXPECT_EQ("z1", a1.getField("value").Array()[2].Array()[0].str());
-    EXPECT_EQ("z2", a1.getField("value").Array()[2].Array()[1].str());
+    EXPECT_FALSE(a1.getField("value").Array()[2].Array()[1].Bool());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
     EXPECT_EQ(1360232700, a1.getIntField("creDate"));
     EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
@@ -899,7 +899,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     ContextElement ce;
     ce.entityId.fill("E3", "T3", "false");
     orion::CompoundValueNode* cv;
-    CREATE_COMPOUND2(cv)
+    CREATE_COMPOUND2_NATIVE(cv)
     ContextAttribute ca1("A1", "TA1", cv);
     ContextAttribute ca2("A2", "TA2", "simple2");
     ce.contextAttributeVector.push_back(&ca1);
@@ -962,7 +962,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     EXPECT_TRUE(findAttr(attrNames, "A2"));
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
-    EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));

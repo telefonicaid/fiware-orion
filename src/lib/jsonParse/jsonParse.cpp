@@ -260,13 +260,13 @@ void eatCompound
     else if ((nodeName != "") && (nodeValue == ""))  // Named Container
     {
       LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
-      containerP = containerP->add(orion::CompoundValueNode::Object, nodeName);
+      containerP = containerP->add(orion::CompoundValueNode::Object, nodeName, "");
     }
     else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
     {
       LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
       containerP->valueType = orion::CompoundValueNode::Vector;
-      containerP = containerP->add(orion::CompoundValueNode::Object, "item");
+      containerP = containerP->add(orion::CompoundValueNode::Object, "item", "");
     }
     else if ((nodeName == "") && (nodeValue != ""))  // Name-Less String + its container is a vector
     {

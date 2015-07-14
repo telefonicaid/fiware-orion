@@ -119,7 +119,7 @@ void compoundValueMiddle
   {
     // If we enter a vector or an object, the container must change (so that we add to this container from now on).
     // ciP->compoundValueP points to the current compound container
-    ciP->compoundValueP = ciP->compoundValueP->add(type, name);
+    ciP->compoundValueP = ciP->compoundValueP->add(type, name, "");
 
     LM_T(LmtCompoundValueContainer, ("Set current container to '%s' (%s)",
                                      ciP->compoundValueP->path.c_str(),

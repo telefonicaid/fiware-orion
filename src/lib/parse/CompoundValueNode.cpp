@@ -77,7 +77,7 @@ CompoundValueNode::CompoundValueNode(Type _type)
 
 /* ****************************************************************************
 *
-* CompoundValueNode - constructor for all nodes except toplevel
+* CompoundValueNode - constructor for all nodes except toplevel (string)
 */
 CompoundValueNode::CompoundValueNode
 (
@@ -94,6 +94,102 @@ CompoundValueNode::CompoundValueNode
   rootP     = container->rootP;
   name      = _name;
   stringValue     = _value;
+  path      = _path;
+  level     = container->level + 1;
+  siblingNo = _siblingNo;
+  valueType      = _type;
+
+  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
+                          name.c_str(),
+                          level,
+                          siblingNo,
+                          typeName(valueType),
+                          this));
+}
+
+/* ****************************************************************************
+*
+* CompoundValueNode - constructor for all nodes except toplevel (char*)
+*/
+CompoundValueNode::CompoundValueNode
+(
+  CompoundValueNode*  _container,
+  const std::string&  _path,
+  const std::string&  _name,
+  const char*         _value,
+  int                 _siblingNo,
+  Type                _type,
+  int                 _level
+)
+{
+  container = _container;
+  rootP     = container->rootP;
+  name      = _name;
+  stringValue     = std::string(_value);
+  path      = _path;
+  level     = container->level + 1;
+  siblingNo = _siblingNo;
+  valueType      = _type;
+
+  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
+                          name.c_str(),
+                          level,
+                          siblingNo,
+                          typeName(valueType),
+                          this));
+}
+
+/* ****************************************************************************
+*
+* CompoundValueNode - constructor for all nodes except toplevel (string)
+*/
+CompoundValueNode::CompoundValueNode
+(
+  CompoundValueNode*  _container,
+  const std::string&  _path,
+  const std::string&  _name,
+  double              _value,
+  int                 _siblingNo,
+  Type                _type,
+  int                 _level
+)
+{
+  container = _container;
+  rootP     = container->rootP;
+  name      = _name;
+  numberValue     = _value;
+  path      = _path;
+  level     = container->level + 1;
+  siblingNo = _siblingNo;
+  valueType      = _type;
+
+  LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
+                          name.c_str(),
+                          level,
+                          siblingNo,
+                          typeName(valueType),
+                          this));
+}
+
+/* ****************************************************************************
+*
+* CompoundValueNode - constructor for all nodes except toplevel (string)
+*/
+CompoundValueNode::CompoundValueNode
+(
+  CompoundValueNode*  _container,
+  const std::string&  _path,
+  const std::string&  _name,
+  bool                _value,
+  int                 _siblingNo,
+  Type                _type,
+  int                 _level
+)
+{
+  container = _container;
+  rootP     = container->rootP;
+  name      = _name;
+  boolValue     = _value;
   path      = _path;
   level     = container->level + 1;
   siblingNo = _siblingNo;
@@ -205,13 +301,94 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
 
 /* ****************************************************************************
 *
-* add -
+* add - (string)
 */
 CompoundValueNode* CompoundValueNode::add
 (
   const Type          _type,
   const std::string&  _name,
   const std::string&  _value
+)
+{
+  std::string newPath = path;
+
+  if (newPath == "/")
+  {
+    newPath += _name;
+  }
+  else
+  {
+    newPath += "/" + _name;
+  }
+
+  CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
+
+  return add(node);
+}
+
+/* ****************************************************************************
+*
+* add - (char*)
+*/
+CompoundValueNode* CompoundValueNode::add
+(
+  const Type          _type,
+  const std::string&  _name,
+  const char*         _value
+)
+{
+  std::string newPath = path;
+
+  if (newPath == "/")
+  {
+    newPath += _name;
+  }
+  else
+  {
+    newPath += "/" + _name;
+  }
+
+  CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
+
+  return add(node);
+}
+
+/* ****************************************************************************
+*
+* add - (double)
+*/
+CompoundValueNode* CompoundValueNode::add
+(
+  const Type          _type,
+  const std::string&  _name,
+  double              _value
+)
+{
+  std::string newPath = path;
+
+  if (newPath == "/")
+  {
+    newPath += _name;
+  }
+  else
+  {
+    newPath += "/" + _name;
+  }
+
+  CompoundValueNode* node = new CompoundValueNode(this, newPath, _name, _value, childV.size(), _type, level + 1);
+
+  return add(node);
+}
+
+/* ****************************************************************************
+*
+* add - (bool)
+*/
+CompoundValueNode* CompoundValueNode::add
+(
+  const Type          _type,
+  const std::string&  _name,
+  bool                _value
 )
 {
   std::string newPath = path;
