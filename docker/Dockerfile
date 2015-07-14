@@ -6,7 +6,7 @@ RUN echo -e "[testbed-fiware]\n\
 name=Fiware Repository\n\
 baseurl=http://repositories.testbed.fiware.org/repo/rpm/x86_64/\n\
 gpgcheck=0\n\
-enabled=1\n" > /etc/yum.repos.d/testbed-fi-ware.repo
+enabled=1\n" > /etc/yum.repos.d/testbed-fiware.repo
 
 # Install Orion
 RUN yum -y install contextBroker
