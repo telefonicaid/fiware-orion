@@ -481,28 +481,6 @@ std::string ContextAttribute::toJson(bool isLastElement)
 
   LM_M(("KZ2: valueType: %d, type: '%s'", valueType, type.c_str()));
 
-  //
-  // 1. If obvious type, then wipe the type out so it isn't rendered
-  //
-  if ((valueType == ValueTypeString) && ((type == "string") || (type == "String")))
-  {
-    type = "";
-  }
-
-  if ((valueType == ValueTypeNumber) && ((type == "number") || (type == "Number")))
-  {
-    type = "";
-  }
-
-  if ((valueType == ValueTypeBoolean) && ((type == "bool") || (type == "Bool")))
-  {
-    type = "";
-  }
-
-
-  //
-  // 2. Now render ...
-  //
   if ((type == "") && (metadataVector.size() == 0))
   {
     if (compoundValueP != NULL)
@@ -554,7 +532,7 @@ std::string ContextAttribute::toJson(bool isLastElement)
       else if (compoundValueP->isVector())
       {
         LM_M(("compoundValueP != NULL 3"));
-        out += JSON_STR("value") + ":[4," + compoundValueP->toJson(true) + ",4]";
+        out += JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
       }
     }
     else if (valueType == ValueTypeNumber)
