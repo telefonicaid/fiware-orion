@@ -179,9 +179,9 @@ std::string parseContextAttributeCompoundValue
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
         LM_M(("Object/Array inside Array - not implemnented!"));
-        Value::ConstMemberIterator node2 = node->FindMember(iter);
+        // Value::ConstMemberIterator node2 = node->FindMember(iter);
         // LM_M(("Calling parseContextAttributeCompoundValue"));
-        parseContextAttributeCompoundValue(node2, caP, cvnP);
+        // parseContextAttributeCompoundValue(node2, caP, cvnP);
       }
 
       ++counter;
