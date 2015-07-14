@@ -1,4 +1,4 @@
-FROM centos:centos6
+FROM centos:6.6
 MAINTAINER FIWARE Orion Context Broker Team. Telefónica I+D
 
 # Setup FIWARE repo
