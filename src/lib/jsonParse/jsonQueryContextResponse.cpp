@@ -217,7 +217,7 @@ static std::string attributeMetadataType(const std::string& path, const std::str
 static std::string attributeMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadata value: '%s'", value.c_str()));
-  parseDataP->qcrs.metadataP->value = value;
+  parseDataP->qcrs.metadataP->stringValue = value;
   return "OK";
 }
 
@@ -270,7 +270,7 @@ static std::string domainMetadataType(const std::string& path, const std::string
 static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a domainMetadata value: '%s'", value.c_str()));
-  parseDataP->qcrs.domainMetadataP->value = value;
+  parseDataP->qcrs.domainMetadataP->stringValue = value;
   return "OK";
 }
 

@@ -40,9 +40,10 @@
 */
 Metadata::Metadata()
 {
-  name  = "";
-  type  = "";
-  value = "";
+  name      = "";
+  type      = "";
+  stringValue     = "";
+  valueType = MetadataValueTypeString;
 }
 
 
@@ -59,7 +60,7 @@ Metadata::Metadata(Metadata* mP)
   name        = mP->name;
   type        = mP->type;
   valueType   = mP->valueType;
-  value       = mP->value;
+  stringValue       = mP->stringValue;
   numberValue = mP->numberValue;
   boolValue   = mP->boolValue;
 
@@ -74,7 +75,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
   name      = _name;
   type      = _type;
   valueType = MetadataValueTypeString;
-  value     = std::string(_value);
+  stringValue     = std::string(_value);
 }
 
 /* ****************************************************************************
@@ -86,7 +87,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
   name      = _name;
   type      = _type;
   valueType = MetadataValueTypeString;
-  value     = _value;
+  stringValue     = _value;
 }
 
 /* ****************************************************************************
@@ -122,7 +123,7 @@ std::string Metadata::render(Format format, const std::string& indent, bool comm
 {
   std::string out     = "";
   std::string tag     = "contextMetadata";
-  std::string xValue  = value;
+  std::string xValue  = stringValue;
 
   out += startTag(indent, tag, tag, format, false, false);
   out += valueTag(indent + "  ", "name", name, format, true);
@@ -159,7 +160,7 @@ std::string Metadata::check
     return "missing metadata name";
   }
 
-  if ((value == "") && (type != "Association"))
+  if ((stringValue == "") && (type != "Association"))
   {
     return "missing metadata value";
   }
@@ -183,7 +184,7 @@ void Metadata::present(const std::string& metadataType, int ix, const std::strin
   LM_F(("%s%s Metadata %d:",   indent.c_str(), metadataType.c_str(), ix));
   LM_F(("%s  Name:     %s", indent.c_str(), name.c_str()));
   LM_F(("%s  Type:     %s", indent.c_str(), type.c_str()));
-  LM_F(("%s  Value:    %s", indent.c_str(), value.c_str()));
+  LM_F(("%s  Value:    %s", indent.c_str(), stringValue.c_str()));
 }
 
 
@@ -207,7 +208,7 @@ void Metadata::fill(const struct Metadata& md)
 {
   name        = md.name;
   type        = md.type;
-  value       = md.value;
+  stringValue       = md.stringValue;
   association = md.association;
 }
 
@@ -220,7 +221,7 @@ std::string Metadata::toStringValue(void)
   switch (valueType)
   {
   case MetadataValueTypeString:
-    return value;
+    return stringValue;
     break;
 
   case MetadataValueTypeNumber:
@@ -256,17 +257,17 @@ std::string Metadata::toJson(bool isLastElement)
   {
     if (isNumber == true)
     {
-      out = JSON_VALUE_NUMBER(name, value);
+      out = JSON_VALUE_NUMBER(name, stringValue);
     }
     else
     {
-      out = JSON_VALUE(name, value);
+      out = JSON_VALUE(name, stringValue);
     }
   }
   else
   {
     out = JSON_STR(name) + ":{";
-    out += JSON_VALUE("value", value);
+    out += JSON_VALUE("value", stringValue);
     out += "," + JSON_VALUE("type", type);
     out += "}";
   }

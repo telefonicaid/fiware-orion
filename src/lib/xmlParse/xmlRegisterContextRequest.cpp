@@ -208,7 +208,7 @@ static int craMetadataType(xml_node<>* node, ParseData* parseDataP)
 static int craMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", node->value()));
-  parseDataP->rcr.attributeMetadataP->value = node->value();
+  parseDataP->rcr.attributeMetadataP->stringValue = node->value();
 
   return 0;
 }
@@ -266,7 +266,7 @@ static int regMetadataType(xml_node<>* node, ParseData* parseDataP)
 static int regMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata value: '%s'", node->value()));
-  parseDataP->rcr.registrationMetadataP->value = node->value();
+  parseDataP->rcr.registrationMetadataP->stringValue = node->value();
 
   return 0;
 }

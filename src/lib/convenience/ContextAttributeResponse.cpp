@@ -201,7 +201,7 @@ void ContextAttributeResponse::fill
       ContextAttribute* caP  = qcrP->contextElementResponseVector[0]->contextElement.contextAttributeVector[aIx];
       Metadata*         mP   = caP->metadataVector.lookupByName("ID");
 
-      if ((mP == NULL) || (mP->value != metaID))
+      if ((mP == NULL) || (mP->stringValue != metaID))
       {
         continue;
       }

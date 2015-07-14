@@ -371,7 +371,7 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
     switch (mdP->valueType)
     {
     case MetadataValueTypeString:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->value));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
     case MetadataValueTypeNumber:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
@@ -388,7 +388,7 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
     switch (mdP->valueType)
     {
     case MetadataValueTypeString:
-      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->value));
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
     case MetadataValueTypeNumber:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->numberValue));
@@ -399,26 +399,6 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
     default:
       LM_E(("Runtime Error (unknown attribute type)"));
     }
-  }
-}
-
-/* ****************************************************************************
-*
-* BSONtoMetadata -
-*/
-void BSONtoMetadata (BSONObj& mdB, Metadata* md)
-{
-  std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
-  switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
-  {
-  case MetadataValueTypeString:
-    *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getStringField(ENT_ATTRS_MD_VALUE));
-  case MetadataValueTypeNumber:
-    *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getField(ENT_ATTRS_MD_VALUE).Number());
-  case MetadataValueTypeBoolean:
-    *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getBoolField(ENT_ATTRS_MD_VALUE));
-  default:
-    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", mdB.getField(ENT_ATTRS_MD_VALUE).type()));
   }
 }
 
@@ -507,14 +487,13 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
       BSONObj mdB = i.next().embeddedObject();
-      Metadata md;
-      BSONtoMetadata(mdB, &md);
-
+      Metadata* md = BSONtoMetadata(mdB);
       mdVSize++;
-      if (!hasMetadata(md.name, md.type, caP))
+      if (!hasMetadata(md->name, md->type, caP))
       {
-        appendMetadata(&mdVBuilder, &md);
+        appendMetadata(&mdVBuilder, md);
       }
+      delete md;
     }
   }
 
@@ -848,9 +827,9 @@ static bool processLocation
         }
         else
         {
-          if ((mdP->value != LOCATION_WGS84) && (mdP->value != LOCATION_WGS84_LEGACY))
+          if ((mdP->stringValue != LOCATION_WGS84) && (mdP->stringValue != LOCATION_WGS84_LEGACY))
           {
-            *errDetail = "only WGS84 are supported, found: " + mdP->value;
+            *errDetail = "only WGS84 are supported, found: " + mdP->stringValue;
             return false;
           }
 

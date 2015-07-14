@@ -152,7 +152,7 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
-  reqData->ucer.metadataP->value = value;
+  reqData->ucer.metadataP->stringValue = value;
   return "OK";
 }
 

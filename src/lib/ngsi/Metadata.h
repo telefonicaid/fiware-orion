@@ -66,11 +66,12 @@ typedef enum MetadataValueType
 typedef struct Metadata
 {
   std::string  name;         // Mandatory
-  std::string  type;         // Optional
-  std::string  value;        // Mandatory
+  std::string  type;         // Optional  
   Association  association;  // Optional (used if type == 'Association')
 
+  // Mandatory
   MetadataValueType  valueType;    // Type of value: from json parse
+  std::string  stringValue;        // "value" as a String
   double             numberValue;  // "value" as a Number
   bool               boolValue;    // "value" as a Boolean
 

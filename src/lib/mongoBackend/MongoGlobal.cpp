@@ -1038,6 +1038,29 @@ static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
   }
 }
 
+/* ****************************************************************************
+*
+* BSONtoMetadata -
+*/
+Metadata* BSONtoMetadata(BSONObj& mdB)
+{
+  std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
+  switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
+  {
+  case String:
+    return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getStringField(ENT_ATTRS_MD_VALUE));
+    break;
+  case NumberDouble:
+    return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getField(ENT_ATTRS_MD_VALUE).Number());
+    break;
+  case Bool:
+    return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getBoolField(ENT_ATTRS_MD_VALUE));
+    break;
+  default:
+    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", mdB.getField(ENT_ATTRS_MD_VALUE).type()));
+    return NULL;
+  }
+}
 
 /* ****************************************************************************
 *
@@ -1357,35 +1380,6 @@ bool entitiesQuery
           continue;
         }
 
-#if 0
-        if (queryAttr.getField(ENT_ATTRS_VALUE).type() == String)
-        {
-          ca.stringValue = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
-          if (!includeEmpty && ca.stringValue.length() == 0)
-          {
-            continue;
-          }
-          caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
-        }
-        else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object)
-        {
-          caP = new ContextAttribute(ca.name, ca.type, "");
-          caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
-          compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
-        }
-        else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array)
-        {
-          caP = new ContextAttribute(ca.name, ca.type, "");
-          caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
-          compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
-        }
-        else
-        {
-          LM_T(LmtSoftError, ("unknown BSON type"));
-          continue;
-        }
-#endif
-
         /* Setting ID (if found) */
         if (mdId != "")
         {
@@ -1409,21 +1403,7 @@ bool entitiesQuery
           for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
           {
             BSONObj    metadata = metadataV[ix].embeddedObject();
-            Metadata*  md;
-
-            if (metadata.hasField(ENT_ATTRS_MD_TYPE))
-            {
-              md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME),
-                                STR_FIELD(metadata, ENT_ATTRS_MD_TYPE),
-                                STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
-            }
-            else
-            {
-              md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME),
-                                "",
-                                STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
-            }
-
+            Metadata*  md = BSONtoMetadata(metadata);
             caP->metadataVector.push_back(md);
           }
         }
