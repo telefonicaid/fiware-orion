@@ -1038,12 +1038,11 @@ static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
   }
 }
 
-#if 1
 /* ****************************************************************************
 *
 * BSONtoMetadata -
 */
-static Metadata* BSONtoMetadata (BSONObj& mdB)
+Metadata* BSONtoMetadata(BSONObj& mdB)
 {
   std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
   switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
@@ -1062,8 +1061,6 @@ static Metadata* BSONtoMetadata (BSONObj& mdB)
     return NULL;
   }
 }
-#endif
-
 
 /* ****************************************************************************
 *
@@ -1406,26 +1403,7 @@ bool entitiesQuery
           for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
           {
             BSONObj    metadata = metadataV[ix].embeddedObject();
-#if 1
-            //Metadata*  md = new Metadata();
             Metadata*  md = BSONtoMetadata(metadata);
-
-#else
-            Metadata*  md = new Metadata();
-            if (metadata.hasField(ENT_ATTRS_MD_TYPE))
-            {
-              md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME),
-                                STR_FIELD(metadata, ENT_ATTRS_MD_TYPE),
-                                STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
-            }
-            else
-            {
-              md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME),
-                                "",
-                                STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
-            }
-#endif
-
             caP->metadataVector.push_back(md);
           }
         }

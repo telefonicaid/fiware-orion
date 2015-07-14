@@ -404,29 +404,6 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
 
 /* ****************************************************************************
 *
-* BSONtoMetadata -
-*/
-static void BSONtoMetadata (BSONObj& mdB, Metadata* md)
-{
-  std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
-  switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
-  {
-  case String:
-    *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getStringField(ENT_ATTRS_MD_VALUE));
-    break;
-  case NumberDouble:
-    *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getField(ENT_ATTRS_MD_VALUE).Number());
-    break;
-  case Bool:
-    *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getBoolField(ENT_ATTRS_MD_VALUE));
-    break;
-  default:
-    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", mdB.getField(ENT_ATTRS_MD_VALUE).type()));
-  }
-}
-
-/* ****************************************************************************
-*
 * mergeAttrInfo -
 *
 * Takes as input the information of a given attribute, both in database (attr) and
@@ -510,14 +487,13 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
       BSONObj mdB = i.next().embeddedObject();
-      Metadata md;
-      BSONtoMetadata(mdB, &md);
-
+      Metadata* md = BSONtoMetadata(mdB);
       mdVSize++;
-      if (!hasMetadata(md.name, md.type, caP))
+      if (!hasMetadata(md->name, md->type, caP))
       {
-        appendMetadata(&mdVBuilder, &md);
+        appendMetadata(&mdVBuilder, md);
       }
+      delete md;
     }
   }
 
