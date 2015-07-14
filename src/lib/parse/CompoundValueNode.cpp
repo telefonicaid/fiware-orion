@@ -792,9 +792,30 @@ std::string CompoundValueNode::toJson(bool isLastElement)
 CompoundValueNode* CompoundValueNode::clone(void)
 {
   LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
-
-  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(valueType) :
-    new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
+  CompoundValueNode* me;
+  if (rootP == this)
+  {
+    me = new CompoundValueNode(valueType);
+  }
+  else
+  {
+    switch (valueType)
+    {
+    case String:
+    case Object:
+    case Vector:
+      me = new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
+      break;
+    case Number:
+      me = new CompoundValueNode(container, path, name, numberValue, siblingNo, valueType, level);
+      break;
+    case Bool:
+      me = new CompoundValueNode(container, path, name, boolValue, siblingNo, valueType, level);
+      break;
+    default:
+      LM_E(("Runtime Error (unknown compound node value type: %d)", valueType));
+    }
+  }
 
   for (unsigned int ix = 0; ix < childV.size(); ++ix)
   {

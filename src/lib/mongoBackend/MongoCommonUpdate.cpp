@@ -196,6 +196,16 @@ static void valueBson(ContextAttribute* caP, BSONObjBuilder& bsonAttr)
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->stringValue);
     }
+    else if (caP->compoundValueP->valueType == orion::CompoundValueNode::Number)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->numberValue);
+    }
+    else if (caP->compoundValueP->valueType == orion::CompoundValueNode::Bool)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->boolValue);
+    }
     else
     {
       LM_T(LmtMongo, ("Unknown type in compound value"));
