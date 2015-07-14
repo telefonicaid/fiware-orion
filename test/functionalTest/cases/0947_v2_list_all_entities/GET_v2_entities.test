@@ -277,13 +277,16 @@ Date: REGEX(.*)
 03. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 288
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "A0": 255, 
+        "A0": {
+            "type": "number", 
+            "value": "255"
+        }, 
         "A1": "E1/T1/A1", 
         "A2": {
             "type": "AT2", 
@@ -300,7 +303,10 @@ Date: REGEX(.*)
                 "type": "tm2", 
                 "value": "M2"
             }, 
-            "m3": 3, 
+            "m3": {
+                "type": "number", 
+                "value": "3"
+            }, 
             "type": "a4", 
             "value": "E1/T1/A4/M1-3"
         }, 
@@ -313,14 +319,17 @@ Date: REGEX(.*)
 04. GET /v2/entities?count=true
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 288
 Content-Type: application/json
 X-Total-Count: 1
 Date: REGEX(.*)
 
 [
     {
-        "A0": 255, 
+        "A0": {
+            "type": "number", 
+            "value": "255"
+        }, 
         "A1": "E1/T1/A1", 
         "A2": {
             "type": "AT2", 
@@ -337,7 +346,10 @@ Date: REGEX(.*)
                 "type": "tm2", 
                 "value": "M2"
             }, 
-            "m3": 3, 
+            "m3": {
+                "type": "number", 
+                "value": "3"
+            }, 
             "type": "a4", 
             "value": "E1/T1/A4/M1-3"
         }, 
@@ -381,13 +393,16 @@ Date: REGEX(.*)
 06. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 287
+Content-Length: 337
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "A0": 255, 
+        "A0": {
+            "type": "number", 
+            "value": "255"
+        }, 
         "A1": "E1/T1/A1", 
         "A2": {
             "type": "AT2", 
@@ -404,7 +419,10 @@ Date: REGEX(.*)
                 "type": "tm2", 
                 "value": "M2"
             }, 
-            "m3": 3, 
+            "m3": {
+                "type": "number", 
+                "value": "3"
+            }, 
             "type": "a4", 
             "value": "E1/T1/A4/M1-3"
         }, 

@@ -57,8 +57,8 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
     {
       if (type == "String")
       {
-        mP->stringValue               = iter->value.GetString();
-        mP->valueType           = MetadataValueTypeString;
+        mP->stringValue   = iter->value.GetString();
+        mP->valueType     = MetadataValueTypeString;
       }
       else if (type == "Number")
       {
@@ -85,6 +85,8 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
         LM_E(("Bad Input (ContextAttribute::Metadata::type cannot be an Object)"));
         return "Parse Error";
       }
+
+      LM_M(("Parsed a Metadata Object '%s': valueType: %d", mP->name.c_str(), mP->valueType));
     }
     else
     {
@@ -119,7 +121,7 @@ std::string parseMetadata(const Value& val, Metadata* mP)
 
   if (type == "String")
   {
-    mP->stringValue        = val.GetString();
+    mP->stringValue  = val.GetString();
     mP->valueType    = MetadataValueTypeString;
   }
   else if (type == "Number")
@@ -143,5 +145,6 @@ std::string parseMetadata(const Value& val, Metadata* mP)
     return "Parse Error";
   }
 
+  LM_M(("Parsed a Metadata '%s': valueType: %d", mP->name.c_str(), mP->valueType));
   return "OK";
 }

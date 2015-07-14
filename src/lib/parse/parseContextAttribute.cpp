@@ -45,11 +45,10 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 {
   for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
-    LM_M(("1"));
     std::string name   = iter->name.GetString();
-    LM_M(("2"));
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
-    LM_M(("3"));
+
+    LM_M(("parseContextAttributeObject: %s/%s", name.c_str(), type.c_str()));
 
     if (name == "type")
     {
@@ -85,13 +84,13 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       }
       else if (type == "Array")
       {
-        caP->stringValue  = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
         caP->valueType    = ValueTypeCompoundVector;
+        parseContextAttributeCompoundValue(iter, caP, NULL);
       }
       else if (type == "Object")
       {
-        caP->stringValue  = iter->value.GetString();  // FIXME P9: Can't imagine this works ...
         caP->valueType    = ValueTypeCompoundObject;
+        parseContextAttributeCompoundValue(iter, caP, NULL);
       }
     }
     else  // Metadata

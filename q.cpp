@@ -42,9 +42,10 @@ static char* trim(char* s)
 */
 int qStringToBson(char* in)
 {
-  char* str = strdup(in);
-  char* s;
+  char* str         = strdup(in);
+  char* toFree      = str;
   int   statementNo = 0;
+  char* s;
 
   while ((s = strtok(str, ";")) != NULL)
   {
@@ -224,7 +225,7 @@ int qStringToBson(char* in)
     str = NULL;  // So that strtok continues eating the initial string
   }
 
-  free(str);
+  free(toFree);
   return 0;
 }
 

@@ -239,6 +239,8 @@ std::string Metadata::toStringValue(void)
   }
 }
 
+
+
 /* ****************************************************************************
 *
 * toJson - 
@@ -246,29 +248,58 @@ std::string Metadata::toStringValue(void)
 std::string Metadata::toJson(bool isLastElement)
 {
   std::string  out;
-  bool         isNumber = false;
 
-  if (type == "number")
-  {
-    isNumber = true;
-  }
+  LM_M(("Metadata '%s' to JSON (type: '%s', valueType: %d)", name.c_str(), type.c_str(), valueType));
 
-  if ((type == "") || (isNumber == true))
+  if (type == "")
   {
-    if (isNumber == true)
+    if (valueType == MetadataValueTypeNumber)
     {
-      out = JSON_VALUE_NUMBER(name, stringValue);
+      char num[32];
+    
+      snprintf(num, sizeof(num), "%f", numberValue);
+      out = JSON_VALUE_NUMBER(name, num);
+    }
+    else if (valueType == MetadataValueTypeBoolean)
+    {
+      out = JSON_VALUE_BOOL(name, boolValue);
+    }
+    else if (valueType == MetadataValueTypeString)
+    {
+      out = JSON_VALUE(name, stringValue);
     }
     else
     {
+      LM_E(("Bad value type for metadata %s", name.c_str()));
       out = JSON_VALUE(name, stringValue);
     }
   }
   else
   {
     out = JSON_STR(name) + ":{";
-    out += JSON_VALUE("value", stringValue);
-    out += "," + JSON_VALUE("type", type);
+    out += JSON_VALUE("type", type) + ",";
+
+    if (valueType == MetadataValueTypeString)
+    {
+      out += JSON_VALUE("value", stringValue);
+    }
+    else if (valueType == MetadataValueTypeNumber)
+    {
+      char num[32];
+
+      snprintf(num, sizeof(num), "%f", numberValue);
+      out += JSON_VALUE_NUMBER("value", num);
+    }
+    else if (valueType == MetadataValueTypeBoolean)
+    {
+      out += JSON_VALUE_BOOL("value", boolValue);
+    }
+    else
+    {
+      LM_E(("Bad value type for metadata %s", name.c_str()));
+      out += JSON_VALUE("value", stringValue);
+    }
+
     out += "}";
   }
 

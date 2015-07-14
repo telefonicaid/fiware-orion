@@ -1045,21 +1045,27 @@ static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
 Metadata* BSONtoMetadata(BSONObj& mdB)
 {
   std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
+
   switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
   {
   case String:
     return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getStringField(ENT_ATTRS_MD_VALUE));
     break;
+
   case NumberDouble:
     return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getField(ENT_ATTRS_MD_VALUE).Number());
     break;
+
   case Bool:
     return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getBoolField(ENT_ATTRS_MD_VALUE));
     break;
-  default:
-    LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", mdB.getField(ENT_ATTRS_MD_VALUE).type()));
-    return NULL;
+
+  default:  // Just to avoid compilation error about missing constants ...
+    break;
   }
+
+  LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", mdB.getField(ENT_ATTRS_MD_VALUE).type()));
+  return NULL;  
 }
 
 /* ****************************************************************************
