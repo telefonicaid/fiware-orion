@@ -58,7 +58,8 @@ ContextAttribute::ContextAttribute()
   LM_T(LmtClone, ("Creating a ContextAttribute 1"));
   name                  = "";
   type                  = "";
-  stringValue                 = "";
+  stringValue           = "";
+  valueType             = ValueTypeString;
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   found                 = false;
@@ -103,6 +104,8 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   }
 }
 
+
+
 /* ****************************************************************************
 *
 * ContextAttribute::ContextAttribute -
@@ -130,6 +133,8 @@ ContextAttribute::ContextAttribute
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -159,6 +164,8 @@ ContextAttribute::ContextAttribute
   providingApplication.setFormat(NOFORMAT);
 }
 
+
+
 /* ****************************************************************************
 *
 * ContextAttribute::ContextAttribute -
@@ -186,6 +193,8 @@ ContextAttribute::ContextAttribute
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -216,6 +225,8 @@ ContextAttribute::ContextAttribute
 }
 
 
+
+
 /* ****************************************************************************
 *
 * ContextAttribute::ContextAttribute -
@@ -227,13 +238,14 @@ ContextAttribute::ContextAttribute
   orion::CompoundValueNode*  _compoundValueP
 )
 {
-  LM_T(LmtClone, ("Creating a ContextAttribute, maintaing a pointer to compound value (at %p)", _compoundValueP));
+  LM_T(LmtClone, ("Creating a ContextAttribute, maintaining a pointer to compound value (at %p)", _compoundValueP));
 
   name                  = _name;
   type                  = _type;
   compoundValueP        = _compoundValueP->clone();
   typeFromXmlAttribute  = "";
   found                 = false;
+  valueType             = ValueTypeCompoundObject;  // FIXME P6: Couls be ValueTypeCompoundVector ...
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -467,6 +479,30 @@ std::string ContextAttribute::toJson(bool isLastElement)
 {
   std::string  out;
 
+  LM_M(("KZ2: valueType: %d, type: '%s'", valueType, type.c_str()));
+
+  //
+  // 1. If obvious type, then wipe the type out so it isn't rendered
+  //
+  if ((valueType == ValueTypeString) && ((type == "string") || (type == "String")))
+  {
+    type = "";
+  }
+
+  if ((valueType == ValueTypeNumber) && ((type == "number") || (type == "Number")))
+  {
+    type = "";
+  }
+
+  if ((valueType == ValueTypeBoolean) && ((type == "bool") || (type == "Bool")))
+  {
+    type = "";
+  }
+
+
+  //
+  // 2. Now render ...
+  //
   if ((type == "") && (metadataVector.size() == 0))
   {
     if (compoundValueP != NULL)
