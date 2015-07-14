@@ -4,11 +4,10 @@ In order to help clients organize query and discovery requests with a
 large number of responses (for example, think of how costly could be
 returning a query matching 1,000,000 results in a single HTTP response
 to a queryContext request),
-[queryContext](#Query_Context_operation "wikilink") (and [related
-convenience operations](#Convenience_Query_Context "wikilink")) and
-[discoverContextAvailability](#Discover_Context_Availability_operation "wikilink")
-(and [related convenience
-operations](#Convenience_Discover_Context_Availability "wikilink"))
+[queryContext](walkthrough_apiv1.md#query-context-operation) (and [related
+convenience operations](walkthrough_apiv1.md#Convenience_Query_Context)) and
+[discoverContextAvailability](walkthrough_apiv1.md#discover-context-availability-operation)
+(and [related convenience operations](walkthrough_apiv1.md#convenience-discover-context-availability))
 allow pagination. The mechanism is based on three URI parameters:
 
 -   **limit**, in order to specify the maximum number of entities or

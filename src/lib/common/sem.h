@@ -131,7 +131,7 @@ extern int get_curl_context(const std::string& key, struct curl_context *pcc);
 *
 * release_curl_context -
 */
-extern int release_curl_context(struct curl_context *pcc);
+extern int release_curl_context(struct curl_context *pcc, bool final = false);
 
 
 

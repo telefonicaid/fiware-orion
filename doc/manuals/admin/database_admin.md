@@ -13,13 +13,13 @@ database. It is strongly recommended that you stop the broker before
 doing a backup.
 
 ```
-mongodump --host <dbhost> --db <db>
+mongodump --host <dbhost> --db <db>
 ```
 
 This will create the backup in the dump/ directory.
 
 Note that if you are using
-[multitenant/multiservice](../user/multitenancy.md)
+[multitenant/multiservice](#multitenant/multiservice-database-separation)
 you need to apply the procedures to each per-tenant/service database
 
 ## Restore
@@ -35,18 +35,18 @@ Let's assume that the backup is in the dump/<db> directory. To restore
 it:
 
 ```
-mongorestore --host <dbhost> --db <db> dump/<db>
+mongorestore --host <dbhost> --db <db> dump/<db>
 ```
 
 Note that if you are using
-[multitenant/multiservice](../user/multitenancy.md)
+[multitenant/multiservice](#multitenant/multiservice-database-separation)
 you need to apply the procedures to each per-tenant/service database
 
 ## Database authorization
 
 MongoDB authorization is configured with the `-db`, `-dbuser` and `-dbpwd`
 options ([see section on command line
-options](#Command_line_options "wikilink")). There are different cases
+options](cli.md)). There are different cases
 to take into account:
 
 -   If your MongoDB instance/cluster doesn't use authorization at all,
@@ -68,8 +68,7 @@ to take into account:
 
 Normally, Orion Context Broker uses just one database at MongoDB level
 (the one specified with the `-db` command line option, typically "orion").
-However, when [multitenant/multiservice is
-used](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Multi_service_tenancy "wikilink")
+However, when [multitenant/multiservice](#multitenant/multiservice-database-separation) is used
 the behaviour is different and the following databases are used (let
 `<db>` be the value of the `-db` command line option):
 
@@ -83,7 +82,7 @@ request involving tenant data is processed by Orion. Note that there is
 a limitation in MongoDB current versions of 24,000 namespaces (each
 collection or index in a database consumes a namespace). Orion currently
 uses 5 collections per database, thus taking into account each
-collection involves also at least the \_id index, that will end in a
+collection involves also at least the `_id` index, that will end in a
 2,400 services/tenants limit (less if you have more indexes in place).
 
 Finally, in the case of per-service/tenant databases, all collections
@@ -95,8 +94,8 @@ each particular service/tenant database.
 This operation is done using the MongoDB shell:
 
 ```
-mongo <host>/<db>
-> db.dropDatabase()
+mongo <host>/<db>
+> db.dropDatabase()
 ```
 
 ## Setting indexes
@@ -113,29 +112,27 @@ to decide what to priorize.
 However, in order to help administrator in that task, the following
 indexes could be recommended:
 
--   Collection [entities](#entities_collection "wikilink")
-    -   \_id.id (used by queryContext and related
+-   Collection [entities](database_model.md#entities-collection)
+    -   `_id.id` (used by queryContext and related
         convenience operations)
-    -   \_id.type (used by queryContext and related
+    -   `_id.type` (used by queryContext and related
         convenience operations)
-    -   \_id.servicePath (used by queryContext and related
+    -   `_id.servicePath` (used by queryContext and related
         convenience operations)
-    -   creDate (used to provided ordered results in queryContext and
+    -   `creDate` (used to provided ordered results in queryContext and
         related convenience operations)
--   Collection [registrations](#registrations_collection "wikilink")
-    -   \_id (used to provided ordered results in
+-   Collection [registrations](database_model.md#registrations-collection)
+    -   `_id` (used to provided ordered results in
         discoverContextAvailability and related convenience operations).
         We include this index here for the sake of completeness, but the
         administrator doesn’t need to explicitly ensure it, given that
-        MongoDB automatically provides a mandatory index for \_id in
+        MongoDB automatically provides a mandatory index for `_id` in
         every collection.
 
 The only index that Orion Context Broker actually ensures is the
 "2dsphere" one in the location.coords field in the entities collection,
-due to functional needs (in order [geo-location
-functionality](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide#Geolocation_capabilities "wikilink")
-to work). The index is ensured at Orion startup or when entities are
-created for first time.
+due to functional needs [geo-location functionality](../user/geolocation.md)to work. The index is ensured at Orion startup or when entities are
+created for the first time.
 
 ### Analysis
 
@@ -161,47 +158,52 @@ orionPerformanceAppendsAndUpdates\_v2.0.jmx) and running in a separated
 VM (but in the same subnet, i.e. L2 connectivity with the system under
 test.
 
-```
-  Test                                Indexes   10,000 entities   100,000 entities   1,000,000 entities
-  ----------------------------------- --------- ----------------- ------------------ --------------------
-  Entity query                        None      115.3             12.2               2
-  \_id.id                             2271.2    2225.7            2187.7
-  \_id.type                           40        4.6               1.8
-  separated \_id.id and \_id.type     2214.7    2179.3            2197.1
-  compound (\_id.id, \_id.type)       2155.5    2174.4            2084.4
-  Entity creation                     None      64.5              17.8               2.4
-  \_id.id                             748.2     672.9             698.3
-  \_id.type                           33.5      4.9               2.1
-  separated \_id.id and \_id.type     774.4     703.9             691.9
-  compound (\_id.id, \_id.type)       784.6     721.1             639.2
-  Mixing entity creation and update   None      102.1             15.5               3.3
-  \_id.id                             1118.1    798.1             705.5
-  \_id.type                           32.6      4.8               1.8
-  separated \_id.id and \_id.type     1145.3    746.4             706.5
-  compound (\_id.id, \_id.type)       1074.7    760.7             636.1
+Test cases are entity query, entity creation and mixing creation and update.
 
-  Case                              Indexes     Index size (MB)   Index size / DB file size
-  --------------------------------- ----------- ----------------- ---------------------------
-  10,000 entities                   None        0.88 (\*)         0.004
-  \_id.id                           1.17        0.006
-  \_id.type                         1.11        0.005
-  separated \_id.id and \_id.type   1.40        0.007
-  compound (\_id.id, \_id.type)     1.23        0.006
-  100,000 entities                  None (\*)   8                 0.041
-  \_id.id                           11          0.057
-  \_id.type                         10          0.052
-  separated \_id.id and \_id.type   13          0.067
-  compound (\_id.id, \_id.type)     12          0.062
-  1,000,000 entities                None (\*)   124               0.077
-  \_id.id                           154         0.076
-  \_id.type                         145         0.073
-  separated \_id.id and \_id.type   175         0.088
-  compound (\_id.id, \_id.type)     161         0.079
+Throughput:
+
+
+| Case - Indexes                                           |  10,000 entities  | 100,000 entities   | 1,000,000 entities |
+|:---------------------------------------------------------|:----------------- |:------------------ |:------------------ |
+| Query - none                                             | 115.3             | 12.2               | 2                  |
+| Query - `_id.id`                                         | 2271.2            | 2225.7             | 2187.7             |
+| Query - `_id.type`                                       | 40                | 4.6                | 1.8                |
+| Query - separated `_id.id` and `_id.type`                | 2214.7            | 2179.3             | 2197.1             |
+| Query - compound `{_id.id,_id.type}`                     | 2155.5            | 2174.4             | 2084.4             |
+| Creation - none                                          | 64.5              | 17.8               | 2.4                |
+| Creation - `_id.id`                                      | 748.2             | 672.9              | 698.3              |
+| Creation - `_id.type`                                    | 33.5              | 4.9                | 2.1                |
+| Creation - separated `_id.id` and `_id.type`             | 774.4             | 703.9              | 691.9              |
+| Creation - compound `{_id.id,_id.type}`                  | 784.6             | 721.1              | 639.2              |
+| Creation and update - none                               | 102.1             | 15.5               | 3.3                |
+| Creation and update - `_id.id`                           | 1118.1            | 798.1              | 705.5              |
+| Creation and update - `_id.type`                         | 32.6              | 4.8                | 1.8                |
+| Creation and update - separated `_id.id` and `_id.type`  | 1145.3            | 746.4              | 706.5              |
+| Creation and update - compound `{_id.id,_id.type}`       | 1074.7            | 760.7              | 636.1              |
+
+Storage:
+
+| Case - Indexes                                         | Index size (MB) |  Index size / DB file size   |
+|:-------------------------------------------------------|:--------------- |:---------------------------- |
+| 10,000 entities - none (\*)                            | 0.88            | 0.004                        |
+| 10,000 entities - `_id.id`                             | 1.17            | 0.006                        |
+| 10,000 entities - `_id.type`                           | 1.11            | 0.005                        |
+| 10,000 entities - separated `_id.id` and `_id.type`    | 1.40            | 0.007                        |
+| 10,000 entities - compound `{_id.id`,`_id.type}`       | 1.23            | 0.006                        |
+| 100,000 entities - none (\*)                           | 8               | 0.041                        |
+| 100,000 entities -  `_id.id`                           | 11              | 0.057                        |
+| 100,000 entities -  `_id.type`                         | 10              | 0.052                        |
+| 100,000 entities -  separated `_id.id` and `_id.type`  | 13              | 0.067                        |
+| 100,000 entities -  compound `{_id.id`,`_id.type}`     | 12              | 0.062                        |
+| 1,000,000 entities - none (\*)                         | 124             | 0.077                        |
+| 1,000,000 entities - `_id.id`                          | 154             | 0.076                        |
+| 1,000,000 entities - `_id.type`                        | 145             | 0.073                        |
+| 1,000,000 entities - separated `_id.id` and `_id.type` | 175             | 0.088                        |
+| 1,000,000 entities - compound (`_id.id`,`_id.type}`    | 161             | 0.079                        |
 
 (\*) Althought we don't set any index, note that the MongoDB always set
-up an index in \_id. Thus, some ammount of space is always allocated to
+up an index in `_id`. Thus, some ammount of space is always allocated to
 indexes.
-```
 
 **Hint:** considering the above information, it is hihgly recommended to
 set up an index on `_id.id` in the entities collection.
@@ -216,7 +218,7 @@ In order to use them, you need to install the pymongo driver (version
 2.5 or above) as a requirement to run it, typically using (run it as
 root or using the sudo command):
 
-` pip-python install pymongo`
+` pip-python install pymongo`
 
 ### Deleting expired documents
 
@@ -237,9 +239,9 @@ csubs and casubs collection, "marking" them with the following field:
 
 ```
 {
-  ...,
-  "expired": 1,
-  ...
+  ...,
+  "expired": 1,
+  ...
 }
 ```
 
@@ -247,17 +249,17 @@ The garbage-collector.py program takes as arguments the collection to be
 analyzed, e.g. to analyze csubs and casubs, run:
 
 ```
-garbage-collector.py csubs casubs
+garbage-collector.py csubs casubs
 ```
 
 After running garbage-collector.py you can easily remove the expired
 documents using the following commands in the mongo console:
 
 ```
-mongo <host>/<db>
-> db.registrations.remove({expired: 1})
-> db.csubs.remove({expired: 1})
-> db.casubs.remove({expired: 1})
+mongo <host>/<db>
+> db.registrations.remove({expired: 1})
+> db.csubs.remove({expired: 1})
+> db.casubs.remove({expired: 1})
 ```
 
 ### Latest updated document
