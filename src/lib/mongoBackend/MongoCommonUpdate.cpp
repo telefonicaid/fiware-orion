@@ -411,12 +411,15 @@ void BSONtoMetadata (BSONObj& mdB, Metadata* md)
   std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
   switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
   {
-  case MetadataValueTypeString:
+  case String:
     *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getStringField(ENT_ATTRS_MD_VALUE));
-  case MetadataValueTypeNumber:
+    break;
+  case NumberDouble:
     *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getField(ENT_ATTRS_MD_VALUE).Number());
-  case MetadataValueTypeBoolean:
+    break;
+  case Bool:
     *md = Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getBoolField(ENT_ATTRS_MD_VALUE));
+    break;
   default:
     LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", mdB.getField(ENT_ATTRS_MD_VALUE).type()));
   }
