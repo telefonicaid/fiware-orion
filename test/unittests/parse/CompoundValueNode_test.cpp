@@ -110,7 +110,9 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
 
   utInit();
 
-  ConnectionInfo* ciP = NULL;
+  ConnectionInfo ci;
+
+  ci.apiVersion = "v1";
 
   tree->add(vec);
   vec->add(item1);
@@ -126,11 +128,11 @@ TEST(CompoundValueNode, vectorInvalidAndOk)
   std::string rendered;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
-  rendered = tree->render(ciP, XML, "");
+  rendered = tree->render(&ci, XML, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rendered = tree->render(ciP, JSON, "");
+  rendered = tree->render(&ci, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   tree->shortShow("");
@@ -162,7 +164,8 @@ TEST(CompoundValueNode, structInvalidAndOk)
 
   utInit();
 
-  ConnectionInfo* ciP = NULL;
+  ConnectionInfo ci;
+  ci.apiVersion = "v1";
 
   tree->add(str);
   str->add(item1);
@@ -178,11 +181,11 @@ TEST(CompoundValueNode, structInvalidAndOk)
   std::string rendered;
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile1)) << "Error getting test data from '" << outFile1 << "'";
-  rendered = tree->render(ciP, XML, "");
+  rendered = tree->render(&ci, XML, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
   
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outFile2)) << "Error getting test data from '" << outFile2 << "'";
-  rendered = tree->render(ciP, JSON, "");
+  rendered = tree->render(&ci, JSON, "");
   EXPECT_STREQ(expectedBuf, rendered.c_str());
 
   tree->shortShow("");

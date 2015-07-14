@@ -44,7 +44,7 @@ payload='{
       "attributes" : [
         {
           "name" : "speed",
-          "type": "number",
+          "type": "Number",
           "value" : 150
         },
         {
@@ -158,4 +158,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB
