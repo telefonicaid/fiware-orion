@@ -242,7 +242,7 @@ Date: REGEX(.*)
 03. GET /v2/entities/E1 (ok)
 ============================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 286
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -253,7 +253,7 @@ Date: REGEX(.*)
     }, 
     "A1": "E1/T1/A1", 
     "A2": {
-        "type": "AT2",
+        "type": "AT2", 
         "value": "E1/T1/A2"
     }, 
     "A3": {
@@ -267,7 +267,10 @@ Date: REGEX(.*)
             "type": "tm2", 
             "value": "M2"
         }, 
-        "m3": 3, 
+        "m3": {
+            "type": "number", 
+            "value": "3"
+        }, 
         "type": "a4", 
         "value": "E1/T1/A4/M1-3"
     }, 
