@@ -4,7 +4,7 @@ orion:
     - mongo
   ports:
     - "1026:1026"
-  command: -fg -t 0-255 -dbhost mongo
+  command: -dbhost mongo
 
 mongo:
   image: mongo:latest

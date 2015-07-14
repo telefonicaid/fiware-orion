@@ -12,4 +12,4 @@ enabled=1\n" > /etc/yum.repos.d/testbed-fi-ware.repo
 RUN yum -y install contextBroker
 
 EXPOSE 1026
-ENTRYPOINT ["/usr/bin/contextBroker"]
+ENTRYPOINT ["/usr/bin/contextBroker", "-fg", "-t 0-255"]
