@@ -3829,20 +3829,20 @@ TEST(mongoQueryContextRequest, queryNativeTypes)
 
     EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 3)->type);
-    EXPECT_EQ(orion::CompoundValueNode::Object, RES_CER_ATTR(0, 3)->compoundValueP->type);
+    EXPECT_EQ(orion::CompoundValueNode::Object, RES_CER_ATTR(0, 3)->compoundValueP->valueType);
     EXPECT_EQ("x", RES_CER_ATTR(0, 3)->compoundValueP->childV[0]->name);
-    EXPECT_EQ("a", RES_CER_ATTR(0, 3)->compoundValueP->childV[0]->value);
+    EXPECT_EQ("a", RES_CER_ATTR(0, 3)->compoundValueP->childV[0]->stringValue);
     EXPECT_EQ("y", RES_CER_ATTR(0, 3)->compoundValueP->childV[1]->name);
-    EXPECT_EQ("b", RES_CER_ATTR(0, 3)->compoundValueP->childV[1]->value);
+    EXPECT_EQ("b", RES_CER_ATTR(0, 3)->compoundValueP->childV[1]->stringValue);
     EXPECT_EQ(0, RES_CER_ATTR(0, 3)->metadataVector.size());
 
     EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 4)->type);
-    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 4)->compoundValueP->type);
-    EXPECT_EQ(orion::CompoundValueNode::String, RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->type);
-    EXPECT_EQ("x1", RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->value);
-    EXPECT_EQ(orion::CompoundValueNode::String, RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->type);
-    EXPECT_EQ("x2", RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->value);
+    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 4)->compoundValueP->valueType);
+    EXPECT_EQ(orion::CompoundValueNode::String, RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->valueType);
+    EXPECT_EQ("x1", RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->stringValue);
+    EXPECT_EQ(orion::CompoundValueNode::String, RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->valueType);
+    EXPECT_EQ("x2", RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->stringValue);
     EXPECT_EQ(0, RES_CER_ATTR(0, 4)->metadataVector.size());
 
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);

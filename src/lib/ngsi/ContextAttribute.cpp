@@ -326,7 +326,7 @@ std::string ContextAttribute::renderAsJsonObject
   {
     bool isCompoundVector = false;
 
-    if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::CompoundValueNode::Vector))
     {
       isCompoundVector = true;
     }
@@ -449,7 +449,7 @@ std::string ContextAttribute::render
   {
     bool isCompoundVector = false;
 
-    if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::CompoundValueNode::Vector))
     {
       isCompoundVector = true;
     }

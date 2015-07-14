@@ -91,8 +91,8 @@ class CompoundValueNode
 
   // Tree fields
   std::string                        name;
-  Type                               type;    // FIXME P10: to be changed to valueType? (to be the same as in ContextAttribute)
-  std::string                        value;   // FIXME P10: to be changed to stringValue
+  Type                               valueType;
+  std::string                        stringValue;
   double                             numberValue;
   bool                               boolValue;
   std::vector<CompoundValueNode*>    childV;

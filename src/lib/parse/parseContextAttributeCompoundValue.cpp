@@ -59,23 +59,23 @@ static orion::CompoundValueNode::Type stringToCompoundType(std::string nodeType)
 */
 static char* stringValue(orion::CompoundValueNode* cvnP, char* buffer)
 {
-  if (cvnP->type == orion::CompoundValueNode::String)
+  if (cvnP->valueType == orion::CompoundValueNode::String)
   {
-    return (char*) cvnP->value.c_str();
+    return (char*) cvnP->stringValue.c_str();
   }
-  else if (cvnP->type == orion::CompoundValueNode::Bool)
+  else if (cvnP->valueType == orion::CompoundValueNode::Bool)
   {
     return (char*) "Boolean";
   }
-  else if (cvnP->type == orion::CompoundValueNode::Object)
+  else if (cvnP->valueType == orion::CompoundValueNode::Object)
   {
     return (char*) "Object";
   }
-  else if (cvnP->type == orion::CompoundValueNode::Vector)
+  else if (cvnP->valueType == orion::CompoundValueNode::Vector)
   {
     return (char*) "Array";
   }
-  else if (cvnP->type == orion::CompoundValueNode::Number)
+  else if (cvnP->valueType == orion::CompoundValueNode::Number)
   {
     sprintf(buffer, "%f", cvnP->numberValue);
     return buffer;
@@ -108,7 +108,7 @@ std::string parseContextAttributeCompoundValue
     caP->compoundValueP            = new orion::CompoundValueNode();
     caP->compoundValueP->name      = "TOP";
     caP->compoundValueP->container = caP->compoundValueP;
-    caP->compoundValueP->type      = stringToCompoundType(type);
+    caP->compoundValueP->valueType      = stringToCompoundType(type);
     caP->compoundValueP->path      = "/";
     caP->compoundValueP->rootP     = caP->compoundValueP;
     caP->compoundValueP->level     = 0;
@@ -139,7 +139,7 @@ std::string parseContextAttributeCompoundValue
       LM_M(("3"));
       snprintf(itemNo, sizeof(itemNo), "%03d", counter);
 
-      cvnP->type       = stringToCompoundType(nodeType);
+      cvnP->valueType       = stringToCompoundType(nodeType);
       cvnP->container  = parent;
       cvnP->rootP      = parent->rootP;
       cvnP->level      = parent->level + 1;
@@ -149,7 +149,7 @@ std::string parseContextAttributeCompoundValue
 
       if (nodeType == "String")
       {
-        cvnP->value       = iter->GetString();
+        cvnP->stringValue       = iter->GetString();
       }
       else if (nodeType == "Number")
       {
@@ -162,12 +162,12 @@ std::string parseContextAttributeCompoundValue
       else if (nodeType == "Object")
       {
         cvnP->path += "/";
-        cvnP->type = orion::CompoundValueNode::Object;
+        cvnP->valueType = orion::CompoundValueNode::Object;
       }
       else if (nodeType == "Array")
       {
         cvnP->path += "/";
-        cvnP->type = orion::CompoundValueNode::Vector;
+        cvnP->valueType = orion::CompoundValueNode::Vector;
       }
 
       parent->childV.push_back(cvnP);
@@ -198,7 +198,7 @@ std::string parseContextAttributeCompoundValue
       orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
 
       cvnP->name       = iter->name.GetString();
-      cvnP->type       = stringToCompoundType(nodeType);
+      cvnP->valueType       = stringToCompoundType(nodeType);
       cvnP->container  = parent;
       cvnP->rootP      = parent->rootP;
       cvnP->level      = parent->level + 1;
@@ -207,7 +207,7 @@ std::string parseContextAttributeCompoundValue
 
       if (nodeType == "String")
       {
-        cvnP->value       = iter->value.GetString();
+        cvnP->stringValue       = iter->value.GetString();
       }
       else if (nodeType == "Number")
       {
@@ -220,12 +220,12 @@ std::string parseContextAttributeCompoundValue
       else if (nodeType == "Object")
       {
         cvnP->path += "/";
-        cvnP->type = orion::CompoundValueNode::Object;
+        cvnP->valueType = orion::CompoundValueNode::Object;
       }
       else if (nodeType == "Array")
       {
         cvnP->path += "/";
-        cvnP->type = orion::CompoundValueNode::Vector;
+        cvnP->valueType = orion::CompoundValueNode::Vector;
       }
 
       parent->childV.push_back(cvnP);

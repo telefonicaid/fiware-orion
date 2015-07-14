@@ -44,7 +44,7 @@ namespace orion
 CompoundValueNode::CompoundValueNode()
 {
   rootP      = NULL;
-  type       = Unknown;
+  valueType       = Unknown;
   container  = NULL;
   level      = 0;
   name       = "Unset";
@@ -63,14 +63,14 @@ CompoundValueNode::CompoundValueNode()
 CompoundValueNode::CompoundValueNode(Type _type)
 {
   rootP      = this;
-  type       = _type;
+  valueType       = _type;
   container  = this;
   level      = 0;
   name       = "toplevel";
   path       = "/";
   siblingNo  = 0;
 
-  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s) at %p", (type == Vector)? "Vector" : "Object", this));
+  LM_T(LmtCompoundValue, ("Created TOPLEVEL compound node (a %s) at %p", (valueType == Vector)? "Vector" : "Object", this));
 }
 
 
@@ -93,17 +93,17 @@ CompoundValueNode::CompoundValueNode
   container = _container;
   rootP     = container->rootP;
   name      = _name;
-  value     = _value;
+  stringValue     = _value;
   path      = _path;
   level     = container->level + 1;
   siblingNo = _siblingNo;
-  type      = _type;
+  valueType      = _type;
 
   LM_T(LmtCompoundValue, ("Created compound node '%s' at level %d, sibling number %d, type %s at %p",
                           name.c_str(),
                           level,
                           siblingNo,
-                          typeName(type),
+                          typeName(valueType),
                           this));
 }
 
@@ -186,14 +186,14 @@ CompoundValueNode* CompoundValueNode::add(CompoundValueNode* node)
   node->siblingNo = childV.size();
   node->rootP     = rootP;
 
-  if (node->type == String)
+  if (node->valueType == String)
     LM_T(LmtCompoundValueAdd, ("Adding String '%s', with value '%s' under '%s' (%s)",
                                node->name.c_str(),
-                               node->value.c_str(),
+                               node->stringValue.c_str(),
                                node->container->path.c_str(),
                                node->container->name.c_str()));
   else
-    LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->type), node->name.c_str(),
+    LM_T(LmtCompoundValueAdd, ("Adding %s '%s' under '%s' (%s)", typeName(node->valueType), node->name.c_str(),
                                node->container->path.c_str(),
                                node->container->name.c_str()));
 
@@ -238,7 +238,7 @@ CompoundValueNode* CompoundValueNode::add
 */
 void CompoundValueNode::shortShow(const std::string& indent)
 {
-  if ((rootP == this) && (type == Vector))
+  if ((rootP == this) && (valueType == Vector))
   {
     LM_F(("%s%s (toplevel vector)", indent.c_str(), name.c_str()));
   }
@@ -246,25 +246,25 @@ void CompoundValueNode::shortShow(const std::string& indent)
   {
     LM_F(("%s%s (toplevel object)", indent.c_str(), name.c_str()));
   }
-  else if (type == Vector)
+  else if (valueType == Vector)
   {
     LM_F(("%s%s (vector)", indent.c_str(), name.c_str()));
   }
-  else if (type == Object)
+  else if (valueType == Object)
   {
     LM_F(("%s%s (object)", indent.c_str(), name.c_str()));
   }
-  else if (type == String)
+  else if (valueType == String)
   {
-    LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), value.c_str()));
+    LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), stringValue.c_str()));
     return;
   }
-  else if (type == Bool)
+  else if (valueType == Bool)
   {
     LM_F(("%s%s (%s)", indent.c_str(), name.c_str(), (boolValue == true)? "true" : "false"));
     return;
   }
-  else if (type == Number)
+  else if (valueType == Number)
   {
     LM_F(("%s%s (%f)", indent.c_str(), name.c_str(), numberValue));
     return;
@@ -292,19 +292,19 @@ void CompoundValueNode::show(const std::string& indent)
   LM_F(("%scontainer: %s", indent.c_str(), container->name.c_str()));
   LM_F(("%slevel:     %d", indent.c_str(), level));
   LM_F(("%ssibling:   %d", indent.c_str(), siblingNo));
-  LM_F(("%stype:      %s", indent.c_str(), typeName(type)));
+  LM_F(("%stype:      %s", indent.c_str(), typeName(valueType)));
   LM_F(("%spath:      %s", indent.c_str(), path.c_str()));
   LM_F(("%srootP:     %s", indent.c_str(), rootP->name.c_str()));
 
-  if (type == String)
+  if (valueType == String)
   {
-    LM_F(("%sString Value:     %s", indent.c_str(), value.c_str()));
+    LM_F(("%sString Value:     %s", indent.c_str(), stringValue.c_str()));
   }
-  else if (type == Bool)
+  else if (valueType == Bool)
   {
     LM_F(("%sBool Value:     %s", indent.c_str(), (boolValue == false)? "false" : "true"));
   }
-  else if (type == Number)
+  else if (valueType == Number)
   {
     LM_F(("%sNumber Value:     %f", indent.c_str(), numberValue));
   }
@@ -345,7 +345,7 @@ void CompoundValueNode::show(const std::string& indent)
 */
 void CompoundValueNode::check(void)
 {
-  if (type == Vector)
+  if (valueType == Vector)
   {
     if (childV.size() == 0)
     {
@@ -364,7 +364,7 @@ void CompoundValueNode::check(void)
       }
     }
   }
-  else if (type == Object)
+  else if (valueType == Object)
   {
     if (childV.size() == 0)
     {
@@ -408,7 +408,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
-  std::string  tagName   = (container->type == Vector)? "item" : name;
+  std::string  tagName   = (container->valueType == Vector)? "item" : name;
 
   LM_M(("In render"));
   if (ciP->apiVersion == "v2")
@@ -418,15 +418,15 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
   }
 
   LM_M(("Still in render (ciP->apiVersion == %s)", ciP->apiVersion.c_str()));
-  if (type == String)
+  if (valueType == String)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    out = valueTag(indent, tagName, value, format, jsonComma, false, container->type == Vector);
+    out = valueTag(indent, tagName, stringValue, format, jsonComma, false, container->valueType == Vector);
   }
-  else if ((type == Vector) && (container != this))
+  else if ((valueType == Vector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += startTag(indent, tagName, tagName, format, true, container->type == Object, true);
+    out += startTag(indent, tagName, tagName, format, true, container->valueType == Object, true);
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
     {
       out += childV[ix]->render(ciP, format, indent + "  ");
@@ -434,7 +434,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
 
     out += endTag(indent, tagName, format, jsonComma, true, true);
   }
-  else if ((type == Vector) && (container == this))
+  else if ((valueType == Vector) && (container == this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s) and my container is TOPLEVEL", name.c_str()));
     for (uint64_t ix = 0; ix < childV.size(); ++ix)
@@ -442,7 +442,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
       out += childV[ix]->render(ciP, format, indent);
     }
   }
-  else if ((type == Object) && (container->type == Vector))
+  else if ((valueType == Object) && (container->valueType == Vector))
   {
     LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
     out += startTag(indent, "item", "", format, false, false);
@@ -453,7 +453,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
 
     out += endTag(indent, "item", format, jsonComma, false, true);
   }
-  else if (type == Object)
+  else if (valueType == Object)
   {
     if (rootP != this)
     {
@@ -490,7 +490,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
 {
   std::string  out       = "";
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
-  std::string  tagName   = (container->type == Vector)? "item" : name;
+  std::string  tagName   = (container->valueType == Vector)? "item" : name;
 
   // No "comma after" if toplevel
   if (container == this)
@@ -499,28 +499,28 @@ std::string CompoundValueNode::toJson(bool isLastElement)
   }
 
   LM_M(("In CompoundValueNode::toJson (%s, type %s, jsonComma: %s, siblings: %d)",
-        name.c_str(), typeName(type), jsonComma? "true" : "false", container->childV.size()));
+        name.c_str(), typeName(valueType), jsonComma? "true" : "false", container->childV.size()));
 
-  if (type == String)
+  if (valueType == String)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    if (container->type == Vector)
+    if (container->valueType == Vector)
     {
-      out = JSON_STR(value);
+      out = JSON_STR(stringValue);
     }
     else
     {
-      out = JSON_STR(tagName) + ":" + JSON_STR(value);
+      out = JSON_STR(tagName) + ":" + JSON_STR(stringValue);
     }
   }
-  else if (type == Number)
+  else if (valueType == Number)
   {
     char  num[32];
 
     LM_T(LmtCompoundValueRender, ("I am a Number (%s)", name.c_str()));
     snprintf(num, sizeof(num), "%f", numberValue);
 
-    if (container->type == Vector)
+    if (container->valueType == Vector)
     {
       out = JSON_NUMBER(num);
     }
@@ -529,11 +529,11 @@ std::string CompoundValueNode::toJson(bool isLastElement)
       out = JSON_STR(tagName) + ":" + JSON_NUMBER(num);
     }
   }
-  else if (type == Bool)
+  else if (valueType == Bool)
   {
     LM_T(LmtCompoundValueRender, ("I am a Bool (%s)", name.c_str()));
 
-    if (container->type == Vector)
+    if (container->valueType == Vector)
     {
       out = JSON_BOOL(boolValue);
     }
@@ -542,7 +542,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
       out = JSON_STR(tagName) + ":" + JSON_BOOL(boolValue);
     }
   }
-  else if ((type == Vector) && (container != this))
+  else if ((valueType == Vector) && (container != this))
   {
     LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
     out += JSON_STR(name) + ":[";
@@ -553,7 +553,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
 
     out += "]";
   }
-  else if ((type == Vector) && (container == this))
+  else if ((valueType == Vector) && (container == this))
   {
     //
     // NOTE: Here, the '[]' are already added in the calling function
@@ -564,7 +564,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
       out += childV[ix]->toJson(ix == childV.size() - 1);
     }
   }
-  else if ((type == Object) && (container->type == Vector))
+  else if ((valueType == Object) && (container->valueType == Vector))
   {
     LM_T(LmtCompoundValueRender, ("I am an Object (%s) and my container is a Vector", name.c_str()));
     out += "{";
@@ -575,7 +575,7 @@ std::string CompoundValueNode::toJson(bool isLastElement)
 
     out += "}";
   }
-  else if (type == Object)
+  else if (valueType == Object)
   {
     if (rootP != this)
     {
@@ -616,8 +616,8 @@ CompoundValueNode* CompoundValueNode::clone(void)
 {
   LM_T(LmtCompoundValue, ("cloning '%s'", name.c_str()));
 
-  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(type) :
-    new CompoundValueNode(container, path, name, value, siblingNo, type, level);
+  CompoundValueNode* me = (rootP == this)? new CompoundValueNode(valueType) :
+    new CompoundValueNode(container, path, name, stringValue, siblingNo, valueType, level);
 
   for (unsigned int ix = 0; ix < childV.size(); ++ix)
   {
@@ -636,7 +636,7 @@ CompoundValueNode* CompoundValueNode::clone(void)
 */
 bool CompoundValueNode::isVector(void)
 {
-  return (type == Vector);
+  return (valueType == Vector);
 }
 
 
@@ -647,7 +647,7 @@ bool CompoundValueNode::isVector(void)
 */
 bool CompoundValueNode::isObject(void)
 {
-  return (type == Object);
+  return (valueType == Object);
 }
 
 
@@ -658,7 +658,7 @@ bool CompoundValueNode::isObject(void)
 */
 bool CompoundValueNode::isString(void)
 {
-  return (type == String);
+  return (valueType == String);
 }
 
 
@@ -680,7 +680,7 @@ const char* CompoundValueNode::cname(void)
 */
 const char* CompoundValueNode::cvalue(void)
 {
-  return value.c_str();
+  return stringValue.c_str();
 }
 
 

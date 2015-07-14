@@ -862,17 +862,17 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
   switch (e.type())
   {
   case String:
-    child->type  = orion::CompoundValueNode::String;
-    child->value = e.String();
+    child->valueType  = orion::CompoundValueNode::String;
+    child->stringValue = e.String();
     break;
 
   case Bool:
-    child->type  = orion::CompoundValueNode::Bool;
+    child->valueType  = orion::CompoundValueNode::Bool;
     child->boolValue = e.Bool();
     break;
 
   case NumberDouble:
-    child->type  = orion::CompoundValueNode::Number;
+    child->valueType  = orion::CompoundValueNode::Number;
     child->numberValue = e.Number();
     break;
 
@@ -904,7 +904,7 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 {
   BSONObj obj = be.embeddedObject();
 
-  cvP->type = orion::CompoundValueNode::Object;
+  cvP->valueType = orion::CompoundValueNode::Object;
   for (BSONObj::iterator i = obj.begin(); i.more();)
   {
     BSONElement e = i.next();
@@ -921,7 +921,7 @@ static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElem
 {
   std::vector<BSONElement> vec = be.Array();
 
-  cvP->type = orion::CompoundValueNode::Vector;
+  cvP->valueType = orion::CompoundValueNode::Vector;
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     BSONElement e = vec[ix];

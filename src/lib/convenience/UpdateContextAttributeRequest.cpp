@@ -71,7 +71,7 @@ std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format fo
   {
     bool isCompoundVector = false;
 
-    if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::CompoundValueNode::Vector))
     {
       isCompoundVector = true;
     }
