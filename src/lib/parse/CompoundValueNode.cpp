@@ -813,6 +813,7 @@ CompoundValueNode* CompoundValueNode::clone(void)
       me = new CompoundValueNode(container, path, name, boolValue, siblingNo, valueType, level);
       break;
     default:
+      me = NULL;
       LM_E(("Runtime Error (unknown compound node value type: %d)", valueType));
     }
   }
