@@ -54,7 +54,7 @@ status_codes = {'OK': 200,
                 'Unsupported Media Type': 415,
                 'Internal Server Error': 500}
 
-__logger__ = logging.getLogger("context broker class")
+__logger__ = logging.getLogger("utils")
 
 class CB:
     """

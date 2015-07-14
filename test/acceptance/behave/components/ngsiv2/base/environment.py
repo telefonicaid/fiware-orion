@@ -25,10 +25,15 @@ __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 from components.common_steps.initial_steps import *
 
-FORMAT = "%(asctime)s %(name)s %(message)s"
-logging.basicConfig(format=FORMAT,filename="logs/qa.log", level=logging.DEBUG)
-__logger__ = logging.getLogger("env")
+__logger__ = logging.getLogger("environment")
 
+
+def before_all(context):
+    """
+    actions before all
+    :param context:
+    """
+    context.config.setup_logging(configfile="logging.ini")
 
 def before_feature(context, feature):
     """
@@ -48,7 +53,7 @@ def before_feature(context, feature):
     for description in feature.description:
         if description.split(" ")[0] in keywords:
             description = description.replace(description.split(" ")[0], "Given")
-            __logger__.info("steps in Background Feature: %s" % description)
+            __logger__.debug("steps in Background Feature: %s" % description)
             context.execute_steps(description)
 
 def after_feature(context, feature):

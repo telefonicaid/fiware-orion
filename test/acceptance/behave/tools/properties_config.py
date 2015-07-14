@@ -28,7 +28,7 @@ import json
 
 from tools import general_utils
 
-__logger__ = logging.getLogger("properties_config class")
+__logger__ = logging.getLogger("utils")
 
 class Properties:
     """

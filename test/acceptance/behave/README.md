@@ -43,6 +43,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
     settings/:                           folder to store different configurations (this place is configurable in configuration.json) (optional)
     tools/:                              internal libraries
     behave.ini:                          configuration files for behave are called either ”.behaverc” or “behave.ini”
+    logging.ini                          log configuration with several loggers (environment, steps and utils)
     configuration.json:                  initial configuration, before of execution
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
     README.md:                           this file, a brief explication about this framework to test
@@ -63,7 +64,8 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
     Some examples:
        behave .../example.feature                      -- run only one feature
        behave .../example.feature -t test              -- run scenarios tagged with "test" in a feature
-       behave .../example.feature -t=-test             -- run all scenarios except tagged with "skip" in a feature
+       behave .../example.feature -t=-skip             -- run all scenarios except tagged with "skip" in a feature
+       behave .../example.feature -t ~@skip            -- run all scenarios except tagged with "skip" in a feature
 ```
 
 ### Properties.json

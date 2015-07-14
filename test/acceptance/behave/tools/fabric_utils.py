@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
-#
-# Copyright 2015 Telefonica Investigación y Desarrollo, S.A.U
-#
-# This file is part of Short Term Historic (FI-WARE project).
-#
-# fiware-cygnus is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
-# Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-# fiware-cygnus is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-# warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along with fiware-cygnus. If not, see
-# http://www.gnu.org/licenses/.
-#
-# For those usages not covered by the GNU Affero General Public License please contact:
-# iot_support at tid.es
-#
+"""
+ Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 
-__author__ = 'Iván Arias León (ivan.ariasleon at telefonica dot com)'
+ This file is part of Orion Context Broker.
+
+ Orion Context Broker is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+
+ Orion Context Broker is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+ General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+
+ For those usages not covered by this license please contact with
+ iot_support at tid dot es
+"""
+__author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 import logging
 
@@ -46,7 +48,7 @@ MODE              = u'mode'
 COMMAND           = u'command'
 HIDE              = u'hide'
 
-__logger__ = logging.getLogger("fabric utils class")
+__logger__ = logging.getLogger("utils")
 
 class FabricSupport:
     """
@@ -111,7 +113,6 @@ class FabricSupport:
         :param sudo: with superuser privileges (True | False)
         :param hide: show message or not (True or False)
         """
-        __logger__.info("-- command: %s" % command)
         path     = kwargs.get(PATH, env.cwd)
         sudo_run = kwargs.get(SUDO, self.sudo)
         hide_msg = kwargs.get(HIDE, self.hide)

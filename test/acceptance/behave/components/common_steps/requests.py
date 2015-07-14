@@ -30,7 +30,7 @@ from tools.properties_config import Properties
 from tools.CB import CB
 
 behave.use_step_matcher("re")
-__logger__ = logging.getLogger("initial_steps")
+__logger__ = logging.getLogger("steps")
 
 @step (u'send a base request')
 def send_a_base_request(context):
@@ -39,12 +39,12 @@ def send_a_base_request(context):
     :param context:
     """
     global cb
-    __logger__.info(" >> sending a base request: /v2")
+    __logger__.debug(" >> sending a base request: /v2")
     properties_class = Properties()
     props = properties_class.read_properties()["context_broker_env"]
     cb = CB(protocol=props["CB_PROTOCOL"], host=props["CB_HOST"], port=props["CB_PORT"], version=props["CB_VERSION"], verify_version=props["CB_VERIFY_VERSION"])
     cb.send_base_request()
-    __logger__.debug(" >> sent a base request: /v2 correctly")
+    __logger__.info(" >> sent a base request: /v2 correctly")
 
 #  ------------------------------------- validations ----------------------------------------------
 @step (u'verify that receive an "([^"]*)" http code')
@@ -55,9 +55,9 @@ def verify_that_receive_an_http_code(context, http_code):
     :param http_code:
     """
     global cb
-    __logger__.info(" >> verifying that return an http code")
+    __logger__.debug(" >> verifying that return an http code")
     cb.verify_http_code(http_code)
-    __logger__.debug(" >> verified that http code returned is %s" % http_code)
+    __logger__.info(" >> verified that http code returned is %s" % http_code)
 
 @step (u'verify main paths')
 def verify_main_paths(context):
@@ -66,6 +66,6 @@ def verify_main_paths(context):
     :param context:
     """
     global cb
-    __logger__.info(" >> verifying main paths")
+    __logger__.debug(" >> verifying main paths")
     cb.verify_main_paths()
-    __logger__.debug(" >> verified that main paths are correct")
+    __logger__.info(" >> verified that main paths are correct")
