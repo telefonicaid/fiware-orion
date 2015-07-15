@@ -280,7 +280,7 @@ std::string Metadata::toJson(bool isLastElement)
     }
     else
     {
-      LM_E(("Bad value type for metadata %s", name.c_str()));
+      LM_E(("Runtime Error (invalid type for metadata %s)", name.c_str()));
       out = JSON_VALUE(name, stringValue);
     }
   }
@@ -306,7 +306,7 @@ std::string Metadata::toJson(bool isLastElement)
     }
     else
     {
-      LM_E(("Bad value type for metadata %s", name.c_str()));
+      LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
       out += JSON_VALUE("value", stringValue);
     }
 
