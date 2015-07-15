@@ -250,7 +250,7 @@ std::string parseContextAttributeCompoundValue
     caP->compoundValueP            = new orion::CompoundValueNode();
     caP->compoundValueP->name      = "TOP";
     caP->compoundValueP->container = caP->compoundValueP;
-    caP->compoundValueP->valueType      = stringToCompoundType(type);
+    caP->compoundValueP->valueType = stringToCompoundType(type);
     caP->compoundValueP->path      = "/";
     caP->compoundValueP->rootP     = caP->compoundValueP;
     caP->compoundValueP->level     = 0;
