@@ -332,7 +332,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
 
   if (s != 0)
   {
-    LM_E(("pthread_mutex_lock failure"));
+    LM_E(("Runtime Error (pthread_mutex_lock failure)"));
     return s;
   }
 
@@ -352,7 +352,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       {
         pthread_mutex_unlock(&contexts_mutex);
         LM_M(("KZ: released contexts_mutex"));
-        LM_E(("malloc"));
+        LM_E(("Runtime Error (malloc)"));
         return -1;
       }
 
@@ -361,7 +361,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       {
         pthread_mutex_unlock(&contexts_mutex);
         LM_M(("KZ: released contexts_mutex"));
-        LM_E(("pthread_mutex_init"));
+        LM_E(("Runtime Error (pthread_mutex_init)"));
         free(pm);
         return s;
       }
@@ -381,7 +381,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
   s = pthread_mutex_unlock(&contexts_mutex);
   if (s != 0)
   {
-    LM_E(("pthread_mutex_unlock"));
+    LM_E(("Runtime Error (pthread_mutex_unlock)"));
     return s;
   }
   LM_M(("KZ: released contexts_mutex"));
@@ -403,7 +403,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
     s = pthread_mutex_lock(pcc->pmutex);
     if (s != 0)
     {
-      LM_E(("pthread_mutex_lock"));
+      LM_E(("Runtime Error (pthread_mutex_lock)"));
       return s;
     }
     LM_M(("KZ: got pmutex"));
@@ -416,7 +416,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       int s = pthread_mutex_lock(&contexts_mutex);
       if (s != 0)
       {
-        LM_E(("pthread_mutex_lock"));
+        LM_E(("Runtime Error (pthread_mutex_lock)"));
         return s;
       }
 
@@ -424,7 +424,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       s = pthread_mutex_unlock(&contexts_mutex);
       if (s != 0)
       {
-        LM_E(("pthread_mutex_unlock"));
+        LM_E(("Runtime Error (pthread_mutex_unlock)"));
         return s;
       }
     }
@@ -461,7 +461,7 @@ int release_curl_context(struct curl_context *pcc, bool final)
 
     if (s != 0)
     {
-      LM_E(("KZ: pthread_mutex_unlock"));
+      LM_E(("Runtime Error (pthread_mutex_unlock)"));
       return s;
     }
 
