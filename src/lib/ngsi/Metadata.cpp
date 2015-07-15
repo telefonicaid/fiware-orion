@@ -40,10 +40,10 @@
 */
 Metadata::Metadata()
 {
-  name      = "";
-  type      = "";
-  stringValue     = "";
-  valueType = MetadataValueTypeString;
+  name         = "";
+  type         = "";
+  stringValue  = "";
+  valueType    = MetadataValueTypeString;
 }
 
 
