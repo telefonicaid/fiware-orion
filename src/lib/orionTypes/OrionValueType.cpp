@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_PARSE_COMPOUNDVALUE_H_
-#define SRC_LIB_PARSE_COMPOUNDVALUE_H_
-
 /*
 *
-* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,53 +22,31 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-
-#include "rest/ConnectionInfo.h"
 #include "orionTypes/OrionValueType.h"
-#include "ngsi/ParseData.h"
-
 
 
 namespace orion
 {
-/* ****************************************************************************
-*
-* compoundValueStart - 
-*/
-extern void compoundValueStart
-(
-  ConnectionInfo*     ciP,
-  const std::string&  path,
-  const std::string&  name,
-  const std::string&  value,
-  const std::string&  rest,
-  orion::ValueType    type,
-  bool                fatherIsVector
-);
 
 
 
 /* ****************************************************************************
 *
-* compoundValueMiddle - 
+* valueTypeName - 
 */
-extern void compoundValueMiddle
-(
-  ConnectionInfo*     ciP,
-  const std::string&  relPath,
-  const std::string&  name,
-  const std::string&  value,
-  orion::ValueType    type
-);
+const char* valueTypeName(const orion::ValueType _type)
+{
+  switch (_type)
+  {
+  case ValueTypeString:       return "String";
+  case ValueTypeNumber:       return "Number";
+  case ValueTypeBoolean:      return "Boolean";
+  case ValueTypeObject:       return "Object";
+  case ValueTypeVector:       return "Vector";
+  case ValueTypeUnknown:      return "Unknown";
+  }
 
-
-
-/* ****************************************************************************
-*
-* compoundValueEnd - 
-*/
-extern void compoundValueEnd(ConnectionInfo* ciP, ParseData* parseDataP);
+  return "Invalid";
 }
 
-#endif  // SRC_LIB_PARSE_COMPOUNDVALUE_H_
+}

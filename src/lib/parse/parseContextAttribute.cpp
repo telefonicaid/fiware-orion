@@ -65,38 +65,38 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       if (type == "String")
       {
         caP->stringValue  = iter->value.GetString();
-        caP->valueType    = ValueTypeString;
+        caP->valueType    = orion::ValueTypeString;
       }
       else if (type == "Number")
       {
         caP->numberValue  = iter->value.GetDouble();
-        caP->valueType    = ValueTypeNumber;
+        caP->valueType    = orion::ValueTypeNumber;
       }
       else if (type == "True")
       {
         caP->boolValue    = true;
-        caP->valueType    = ValueTypeBoolean;
+        caP->valueType    = orion::ValueTypeBoolean;
       }
       else if (type == "False")
       {
         caP->boolValue    = false;
-        caP->valueType    = ValueTypeBoolean;
+        caP->valueType    = orion::ValueTypeBoolean;
       }
       else if (type == "Array")
       {
-        caP->valueType    = ValueTypeCompoundVector;
+        caP->valueType    = orion::ValueTypeVector;
         parseContextAttributeCompoundValue(iter, caP, NULL);
       }
       else if (type == "Object")
       {
-        caP->valueType    = ValueTypeCompoundObject;
+        caP->valueType    = orion::ValueTypeObject;
         parseContextAttributeCompoundValue(iter, caP, NULL);
       }
     }
     else  // Metadata
     {
-      LM_M(("Metadata"));
       Metadata*   mP = new Metadata();
+
       mP->name       = iter->name.GetString();
       std::string r  = parseMetadata(iter->value, mP);
 
@@ -136,31 +136,31 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
   {
     caP->type        = "";
     caP->stringValue = iter->value.GetString();
-    caP->valueType   = ValueTypeString;
+    caP->valueType   = orion::ValueTypeString;
   }
   else if (type == "Number")
   {
     caP->type        = "";
-    caP->valueType   = ValueTypeNumber;
+    caP->valueType   = orion::ValueTypeNumber;
     caP->numberValue = iter->value.GetDouble();
   }
   else if (type == "True")
   {
     caP->type        = "";
-    caP->valueType   = ValueTypeBoolean;
+    caP->valueType   = orion::ValueTypeBoolean;
     caP->boolValue   = true;
   }
   else if (type == "False")
   {
     caP->type        = "";
-    caP->valueType   = ValueTypeBoolean;
+    caP->valueType   = orion::ValueTypeBoolean;
     caP->boolValue   = false;
   }
   else if (type == "Array")
   {
     LM_M(("KZ: Compound array"));
     parseContextAttributeCompoundValue(iter, caP, NULL);
-    caP->valueType    = ValueTypeCompoundObject;
+    caP->valueType    = orion::ValueTypeObject;
    }
   else if (type == "Object")
   {
@@ -187,7 +187,7 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
     {
       LM_M(("KZ: Compound object"));
       parseContextAttributeCompoundValue(iter, caP, NULL);
-      caP->valueType    = ValueTypeCompoundObject;
+      caP->valueType    = orion::ValueTypeObject;
     }
   }
   else

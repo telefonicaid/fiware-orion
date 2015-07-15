@@ -29,28 +29,22 @@
 #include <vector>
 
 #include "common/Format.h"
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
 #include "ngsi/Association.h"
-
-/* Metadata interpreted by Orion Context Broker, i.e. not custom metadata */
-#define NGSI_MD_ID       "ID"
-#define NGSI_MD_LOCATION "location"
-#define NGSI_MD_CREDATE  "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
-#define NGSI_MD_MODDATE  "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
 
 
 
 /* ****************************************************************************
 *
-* MetadataValueType - 
+* Defines -
+*
+* Metadata interpreted by Orion Context Broker, i.e. not custom metadata
 */
-// FIXME P10: we should use the same Enum (in a separate .h) file for Metadata, ContextAttribute, and CompoundValueNode
-typedef enum MetadataValueType
-{
-  MetadataValueTypeString,
-  MetadataValueTypeNumber,
-  MetadataValueTypeBoolean
-} MetadataValueType;
+#define NGSI_MD_ID       "ID"
+#define NGSI_MD_LOCATION "location"
+#define NGSI_MD_CREDATE  "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
+#define NGSI_MD_MODDATE  "modDate"    // FIXME P5: to be used for modDate (currenly only in DB)
 
 
 
@@ -70,7 +64,7 @@ typedef struct Metadata
   Association  association;  // Optional (used if type == 'Association')
 
   // Mandatory
-  MetadataValueType  valueType;    // Type of value: from json parse
+  orion::ValueType   valueType;    // Type of value: taken from JSON parse
   std::string        stringValue;  // "value" as a String
   double             numberValue;  // "value" as a Number
   bool               boolValue;    // "value" as a Boolean

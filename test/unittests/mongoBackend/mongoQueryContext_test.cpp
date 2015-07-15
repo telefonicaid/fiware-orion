@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
@@ -3132,15 +3133,15 @@ TEST(mongoQueryContextRequest, queryCustomMetadataNative)
     EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("TMD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
     EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
-    EXPECT_EQ(MetadataValueTypeString, RES_CER_ATTR(0, 0)->metadataVector.get(0)->valueType);
+    EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->metadataVector.get(0)->valueType);
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
     EXPECT_EQ(2.1, RES_CER_ATTR(0, 0)->metadataVector.get(1)->numberValue);
-    EXPECT_EQ(MetadataValueTypeNumber, RES_CER_ATTR(0, 0)->metadataVector.get(1)->valueType);
+    EXPECT_EQ(orion::ValueTypeNumber, RES_CER_ATTR(0, 0)->metadataVector.get(1)->valueType);
     EXPECT_EQ("MD3", RES_CER_ATTR(0, 0)->metadataVector.get(2)->name);
     EXPECT_EQ("TMD3", RES_CER_ATTR(0, 0)->metadataVector.get(2)->type);
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->metadataVector.get(2)->boolValue);
-    EXPECT_EQ(MetadataValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector.get(2)->valueType);
+    EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector.get(2)->valueType);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3829,7 +3830,7 @@ TEST(mongoQueryContextRequest, queryNativeTypes)
 
     EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 3)->type);
-    EXPECT_EQ(orion::CompoundValueNode::Object, RES_CER_ATTR(0, 3)->compoundValueP->valueType);
+    EXPECT_EQ(orion::ValueTypeObject, RES_CER_ATTR(0, 3)->compoundValueP->valueType);
     EXPECT_EQ("x", RES_CER_ATTR(0, 3)->compoundValueP->childV[0]->name);
     EXPECT_EQ("a", RES_CER_ATTR(0, 3)->compoundValueP->childV[0]->stringValue);
     EXPECT_EQ("y", RES_CER_ATTR(0, 3)->compoundValueP->childV[1]->name);
@@ -3838,10 +3839,10 @@ TEST(mongoQueryContextRequest, queryNativeTypes)
 
     EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 4)->type);
-    EXPECT_EQ(orion::CompoundValueNode::Vector, RES_CER_ATTR(0, 4)->compoundValueP->valueType);
-    EXPECT_EQ(orion::CompoundValueNode::String, RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->valueType);
+    EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 4)->compoundValueP->valueType);
+    EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->valueType);
     EXPECT_EQ("x1", RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->stringValue);
-    EXPECT_EQ(orion::CompoundValueNode::String, RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->valueType);
+    EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->valueType);
     EXPECT_EQ("x2", RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->stringValue);
     EXPECT_EQ(0, RES_CER_ATTR(0, 4)->metadataVector.size());
 

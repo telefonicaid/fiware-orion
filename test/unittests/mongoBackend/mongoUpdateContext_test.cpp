@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "mongoBackend/mongoQueryContext.h"
@@ -9547,15 +9548,15 @@ TEST(mongoUpdateContextRequest, createMdNativeTypes)
     ASSERT_EQ(3, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ(MetadataValueTypeString, RES_CER_ATTR(0, 0)->metadataVector.get(0)->valueType);
+    EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->metadataVector.get(0)->valueType);
     EXPECT_EQ("s", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
-    EXPECT_EQ(MetadataValueTypeNumber, RES_CER_ATTR(0, 0)->metadataVector.get(1)->valueType);
+    EXPECT_EQ(orion::ValueTypeNumber, RES_CER_ATTR(0, 0)->metadataVector.get(1)->valueType);
     EXPECT_EQ(55.5, RES_CER_ATTR(0, 0)->metadataVector.get(1)->numberValue);
     EXPECT_EQ("MD3", RES_CER_ATTR(0, 0)->metadataVector.get(2)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->metadataVector.get(2)->type);
-    EXPECT_EQ(MetadataValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector.get(2)->valueType);
+    EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector.get(2)->valueType);
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->metadataVector.get(2)->boolValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -9748,15 +9749,15 @@ TEST(mongoUpdateContextRequest, updateMdNativeTypes)
     ASSERT_EQ(3, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ(MetadataValueTypeString, RES_CER_ATTR(0, 0)->metadataVector.get(0)->valueType);
+    EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->metadataVector.get(0)->valueType);
     EXPECT_EQ("ss", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
-    EXPECT_EQ(MetadataValueTypeNumber, RES_CER_ATTR(0, 0)->metadataVector.get(1)->valueType);
+    EXPECT_EQ(orion::ValueTypeNumber, RES_CER_ATTR(0, 0)->metadataVector.get(1)->valueType);
     EXPECT_EQ(44.4, RES_CER_ATTR(0, 0)->metadataVector.get(1)->numberValue);
     EXPECT_EQ("MD3", RES_CER_ATTR(0, 0)->metadataVector.get(2)->name);
     EXPECT_EQ("T", RES_CER_ATTR(0, 0)->metadataVector.get(2)->type);
-    EXPECT_EQ(MetadataValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector.get(2)->valueType);
+    EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector.get(2)->valueType);
     EXPECT_TRUE(RES_CER_ATTR(0, 0)->metadataVector.get(2)->boolValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);

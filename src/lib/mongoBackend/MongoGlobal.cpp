@@ -40,6 +40,8 @@
 #include "common/sem.h"
 #include "common/string.h"
 
+#include "orionTypes/OrionValueType.h"
+
 #include "mongoBackend/mongoOntimeintervalOperations.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -856,23 +858,23 @@ static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
     return;
   }
 
-  orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
+  orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::ValueTypeObject);
   child->name = e.fieldName();
 
   switch (e.type())
   {
   case String:
-    child->valueType  = orion::CompoundValueNode::String;
+    child->valueType  = orion::ValueTypeString;
     child->stringValue = e.String();
     break;
 
   case Bool:
-    child->valueType  = orion::CompoundValueNode::Bool;
+    child->valueType  = orion::ValueTypeBoolean;
     child->boolValue = e.Bool();
     break;
 
   case NumberDouble:
-    child->valueType  = orion::CompoundValueNode::Number;
+    child->valueType  = orion::ValueTypeNumber;
     child->numberValue = e.Number();
     break;
 
@@ -904,7 +906,7 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 {
   BSONObj obj = be.embeddedObject();
 
-  cvP->valueType = orion::CompoundValueNode::Object;
+  cvP->valueType = orion::ValueTypeObject;
   for (BSONObj::iterator i = obj.begin(); i.more();)
   {
     BSONElement e = i.next();
@@ -921,7 +923,7 @@ static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElem
 {
   std::vector<BSONElement> vec = be.Array();
 
-  cvP->valueType = orion::CompoundValueNode::Vector;
+  cvP->valueType = orion::ValueTypeVector;
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     BSONElement e = vec[ix];
@@ -1373,12 +1375,12 @@ bool entitiesQuery
           break;
         case Object:
           caP = new ContextAttribute(ca.name, ca.type, "");
-          caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
+          caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
           compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
           break;
         case Array:
           caP = new ContextAttribute(ca.name, ca.type, "");
-          caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
+          caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
           compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
           break;
         default:

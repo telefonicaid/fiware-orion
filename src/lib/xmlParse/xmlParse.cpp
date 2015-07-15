@@ -172,11 +172,11 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
 
     if (xmlAttribute == "vector")
     {
-      containerP = new CompoundValueNode(orion::CompoundValueNode::Vector);
+      containerP = new CompoundValueNode(orion::ValueTypeVector);
     }
     else if (xmlAttribute =="")
     {
-      containerP = new CompoundValueNode(orion::CompoundValueNode::Object);
+      containerP = new CompoundValueNode(orion::ValueTypeObject);
     }
     else
     {
@@ -203,11 +203,11 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
 
       if (xmlAttribute == "vector")
       {
-        containerP = containerP->add(orion::CompoundValueNode::Vector, name, "");
+        containerP = containerP->add(orion::ValueTypeVector, name, "");
       }
       else if (xmlAttribute == "")
       {
-        containerP = containerP->add(orion::CompoundValueNode::Object, name, "");
+        containerP = containerP->add(orion::ValueTypeObject, name, "");
       }
       else
       {
@@ -228,7 +228,7 @@ void eatCompound(ConnectionInfo* ciP, orion::CompoundValueNode* containerP, xml_
         return;
       }
 
-      containerP->add(orion::CompoundValueNode::String, name, value);
+      containerP->add(orion::ValueTypeString, name, value);
     }
   }
 

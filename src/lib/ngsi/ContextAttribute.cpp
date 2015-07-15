@@ -30,6 +30,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -59,7 +60,7 @@ ContextAttribute::ContextAttribute()
   name                  = "";
   type                  = "";
   stringValue           = "";
-  valueType             = ValueTypeString;
+  valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   found                 = false;
@@ -126,7 +127,7 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   stringValue           = std::string(_value);
-  valueType             = ValueTypeString;
+  valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
 
@@ -156,7 +157,7 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   stringValue           = _value;
-  valueType             = ValueTypeString;
+  valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
 
@@ -186,7 +187,7 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   numberValue           = _value;
-  valueType             = ValueTypeNumber;
+  valueType             = orion::ValueTypeNumber;
   compoundValueP        = NULL;
   found                 = _found;
 
@@ -216,7 +217,7 @@ ContextAttribute::ContextAttribute
   name                  = _name;
   type                  = _type;
   boolValue             = _value;
-  valueType             = ValueTypeBoolean;
+  valueType             = orion::ValueTypeBoolean;
   compoundValueP        = NULL;
   found                 = _found;
 
@@ -245,11 +246,10 @@ ContextAttribute::ContextAttribute
   compoundValueP        = _compoundValueP->clone();
   typeFromXmlAttribute  = "";
   found                 = false;
-  valueType             = ValueTypeCompoundObject;  // FIXME P6: Couls be ValueTypeCompoundVector ...
+  valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
-
 }
 
 
@@ -326,7 +326,7 @@ std::string ContextAttribute::renderAsJsonObject
   {
     bool isCompoundVector = false;
 
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::CompoundValueNode::Vector))
+    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
     {
       isCompoundVector = true;
     }
@@ -415,7 +415,7 @@ std::string ContextAttribute::render
   {
     if (omitValue == false)
     {
-      if ((valueType == ValueTypeString) || (ciP->apiVersion != "v2"))
+      if ((valueType == orion::ValueTypeString) || (ciP->apiVersion != "v2"))
       {
         out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
                         (request != RtUpdateContextResponse)? stringValue : "",
@@ -432,7 +432,7 @@ std::string ContextAttribute::render
   {
     bool isCompoundVector = false;
 
-    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::CompoundValueNode::Vector))
+    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
     {
       isCompoundVector = true;
     }
@@ -479,18 +479,18 @@ std::string ContextAttribute::toJson(bool isLastElement)
         out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
       }
     }
-    else if (valueType == ValueTypeNumber)
+    else if (valueType == orion::ValueTypeNumber)
     {
       char num[32];
 
       snprintf(num, sizeof(num), "%f", numberValue);
       out = JSON_VALUE_NUMBER(name, num);
     }
-    else if (valueType == ValueTypeString)
+    else if (valueType == orion::ValueTypeString)
     {
       out = JSON_VALUE(name, stringValue);
     }
-    else if (valueType == ValueTypeBoolean)
+    else if (valueType == orion::ValueTypeBoolean)
     {
       out = JSON_VALUE_BOOL(name, boolValue);
     }
@@ -518,7 +518,7 @@ std::string ContextAttribute::toJson(bool isLastElement)
         out += JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
       }
     }
-    else if (valueType == ValueTypeNumber)
+    else if (valueType == orion::ValueTypeNumber)
     {
       char num[32];
 
@@ -526,11 +526,11 @@ std::string ContextAttribute::toJson(bool isLastElement)
 
       out += JSON_VALUE_NUMBER("value", num);
     }
-    else if (valueType == ValueTypeString)
+    else if (valueType == orion::ValueTypeString)
     {
       out += JSON_VALUE("value", stringValue);
     }
-    else if (valueType == ValueTypeBoolean)
+    else if (valueType == orion::ValueTypeBoolean)
     {
       out += JSON_VALUE_BOOL("value", boolValue);
     }
@@ -599,15 +599,15 @@ void ContextAttribute::present(const std::string& indent, int ix)
 
   if (compoundValueP == NULL)
   {
-    if (valueType == ValueTypeString)
+    if (valueType == orion::ValueTypeString)
     {
       LM_F(("%s  String Value:      %s", indent.c_str(), stringValue.c_str()));
     }
-    else if (valueType == ValueTypeNumber)
+    else if (valueType == orion::ValueTypeNumber)
     {
       LM_F(("%s  Number Value:      %f", indent.c_str(), numberValue));
     }
-    else if (valueType == ValueTypeBoolean)
+    else if (valueType == orion::ValueTypeBoolean)
     {
       LM_F(("%s  Boolean Value:      %s", indent.c_str(), (boolValue == false)? "false" : "true"));
     }
@@ -665,16 +665,16 @@ std::string ContextAttribute::toStringValue(void)
 
   switch (valueType)
   {
-  case ValueTypeString:
+  case orion::ValueTypeString:
     return stringValue;
     break;
 
-  case ValueTypeNumber:
+  case orion::ValueTypeNumber:
     snprintf(buffer, sizeof(buffer), "%f", numberValue);
     return std::string(buffer);
     break;
 
-  case ValueTypeBoolean:
+  case orion::ValueTypeBoolean:
     return boolValue ? "true" : "false";
     break;
 

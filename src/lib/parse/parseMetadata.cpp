@@ -26,6 +26,7 @@
 
 #include "logMsg/logMsg.h"
 
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/Metadata.h"
 #include "parse/jsonParseTypeNames.h"
 #include "parse/parseMetadata.h"
@@ -58,21 +59,21 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
       if (type == "String")
       {
         mP->stringValue   = iter->value.GetString();
-        mP->valueType     = MetadataValueTypeString;
+        mP->valueType     = orion::ValueTypeString;
       }
       else if (type == "Number")
       {
-        mP->valueType     = MetadataValueTypeNumber;
+        mP->valueType     = orion::ValueTypeNumber;
         mP->numberValue   = iter->value.GetDouble();
       }
       else if (type == "True")
       {
-        mP->valueType     = MetadataValueTypeBoolean;
+        mP->valueType     = orion::ValueTypeBoolean;
         mP->boolValue     = true;
       }
       else if (type == "False")
       {
-        mP->valueType     = MetadataValueTypeBoolean;
+        mP->valueType     = orion::ValueTypeBoolean;
         mP->boolValue     = false;
       }
       else if (type == "Vector")
@@ -122,21 +123,21 @@ std::string parseMetadata(const Value& val, Metadata* mP)
   if (type == "String")
   {
     mP->stringValue  = val.GetString();
-    mP->valueType    = MetadataValueTypeString;
+    mP->valueType    = orion::ValueTypeString;
   }
   else if (type == "Number")
   {
-    mP->valueType    = MetadataValueTypeNumber;
+    mP->valueType    = orion::ValueTypeNumber;
     mP->numberValue  = val.GetDouble();
   }
   else if (type == "True")
   {
-    mP->valueType    = MetadataValueTypeBoolean;
+    mP->valueType    = orion::ValueTypeBoolean;
     mP->boolValue    = true;
   }
   else if (type == "False")
   {
-    mP->valueType    = MetadataValueTypeBoolean;
+    mP->valueType    = orion::ValueTypeBoolean;
     mP->boolValue    = false;
   }
   else

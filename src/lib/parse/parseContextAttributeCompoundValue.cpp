@@ -39,16 +39,16 @@
 *
 * stringToCompoundType - 
 */
-static orion::CompoundValueNode::Type stringToCompoundType(std::string nodeType)
+static orion::ValueType stringToCompoundType(std::string nodeType)
 {
-  if      (nodeType == "String")  return orion::CompoundValueNode::String;
-  else if (nodeType == "Number")  return orion::CompoundValueNode::Number;
-  else if (nodeType == "True")    return orion::CompoundValueNode::Bool;
-  else if (nodeType == "False")   return orion::CompoundValueNode::Bool;
-  else if (nodeType == "Object")  return orion::CompoundValueNode::Object;
-  else if (nodeType == "Array")   return orion::CompoundValueNode::Vector;
+  if      (nodeType == "String")  return orion::ValueTypeString;
+  else if (nodeType == "Number")  return orion::ValueTypeNumber;
+  else if (nodeType == "True")    return orion::ValueTypeBoolean;
+  else if (nodeType == "False")   return orion::ValueTypeBoolean;
+  else if (nodeType == "Object")  return orion::ValueTypeObject;
+  else if (nodeType == "Array")   return orion::ValueTypeVector;
 
-  return orion::CompoundValueNode::String;
+  return orion::ValueTypeString;
 }
 
 
@@ -59,23 +59,23 @@ static orion::CompoundValueNode::Type stringToCompoundType(std::string nodeType)
 */
 static char* stringValue(orion::CompoundValueNode* cvnP, char* buffer)
 {
-  if (cvnP->valueType == orion::CompoundValueNode::String)
+  if (cvnP->valueType == orion::ValueTypeString)
   {
     return (char*) cvnP->stringValue.c_str();
   }
-  else if (cvnP->valueType == orion::CompoundValueNode::Bool)
+  else if (cvnP->valueType == orion::ValueTypeBoolean)
   {
     return (char*) "Boolean";
   }
-  else if (cvnP->valueType == orion::CompoundValueNode::Object)
+  else if (cvnP->valueType == orion::ValueTypeObject)
   {
     return (char*) "Object";
   }
-  else if (cvnP->valueType == orion::CompoundValueNode::Vector)
+  else if (cvnP->valueType == orion::ValueTypeVector)
   {
     return (char*) "Array";
   }
-  else if (cvnP->valueType == orion::CompoundValueNode::Number)
+  else if (cvnP->valueType == orion::ValueTypeNumber)
   {
     sprintf(buffer, "%f", cvnP->numberValue);
     return buffer;
@@ -139,12 +139,12 @@ std::string parseContextAttributeCompoundValue
       else if (nodeType == "Object")
       {
         cvnP->path += "/";
-        cvnP->valueType = orion::CompoundValueNode::Object;
+        cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
         cvnP->path += "/";
-        cvnP->valueType = orion::CompoundValueNode::Vector;
+        cvnP->valueType = orion::ValueTypeVector;
       }
 
       parent->childV.push_back(cvnP);
@@ -199,12 +199,12 @@ std::string parseContextAttributeCompoundValue
       else if (nodeType == "Object")
       {
         cvnP->path += "/";
-        cvnP->valueType = orion::CompoundValueNode::Object;
+        cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
         cvnP->path += "/";
-        cvnP->valueType = orion::CompoundValueNode::Vector;
+        cvnP->valueType = orion::ValueTypeVector;
       }
 
       parent->childV.push_back(cvnP);
@@ -299,12 +299,12 @@ std::string parseContextAttributeCompoundValue
       else if (nodeType == "Object")
       {
         cvnP->path += "/";
-        cvnP->valueType = orion::CompoundValueNode::Object;
+        cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
         cvnP->path += "/";
-        cvnP->valueType = orion::CompoundValueNode::Vector;
+        cvnP->valueType = orion::ValueTypeVector;
       }
 
       parent->childV.push_back(cvnP);
@@ -355,12 +355,12 @@ std::string parseContextAttributeCompoundValue
       else if (nodeType == "Object")
       {
         cvnP->path += "/";
-        cvnP->valueType = orion::CompoundValueNode::Object;
+        cvnP->valueType = orion::ValueTypeObject;
       }
       else if (nodeType == "Array")
       {
         cvnP->path += "/";
-        cvnP->valueType = orion::CompoundValueNode::Vector;
+        cvnP->valueType = orion::ValueTypeVector;
       }
 
       parent->childV.push_back(cvnP);

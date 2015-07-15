@@ -29,6 +29,7 @@
 #include <vector>
 
 #include "common/Format.h"
+#include "orionTypes/OrionValueType.h"
 
 struct ConnectionInfo;
 
@@ -81,20 +82,9 @@ namespace orion
 class CompoundValueNode
 {
  public:
-  // FIXME P10: we should use the same Enum (in a separate .h) file for Metadata, ContextAttribute, and CompoundValueNode
-  enum Type
-  {
-    Unknown,
-    String,
-    Number,
-    Bool,
-    Object,
-    Vector
-  };
-
   // Tree fields
   std::string                        name;
-  Type                               valueType;
+  orion::ValueType                   valueType;
   std::string                        stringValue;
   double                             numberValue;
   bool                               boolValue;
@@ -116,7 +106,7 @@ class CompoundValueNode
 
   // Constructors/Destructors
   CompoundValueNode();
-  explicit CompoundValueNode(Type _type);
+  explicit CompoundValueNode(orion::ValueType _type);
 
   CompoundValueNode
   (
@@ -125,7 +115,7 @@ class CompoundValueNode
     const std::string&  _name,
     const std::string&  _value,
     int                 _siblingNo,
-    Type                _type,
+    orion::ValueType    _type,
     int                 _level = -1
   );
 
@@ -136,7 +126,7 @@ class CompoundValueNode
     const std::string&  _name,
     const char*         _value,
     int                 _siblingNo,
-    Type                _type,
+    orion::ValueType    _type,
     int                 _level = -1
   );
 
@@ -147,7 +137,7 @@ class CompoundValueNode
     const std::string&  _name,
     double              _value,
     int                 _siblingNo,
-    Type                _type,
+    orion::ValueType    _type,
     int                 _level = -1
   );
 
@@ -158,7 +148,7 @@ class CompoundValueNode
     const std::string&  _name,
     bool                 _value,
     int                 _siblingNo,
-    Type                _type,
+    orion::ValueType    _type,
     int                 _level = -1
   );
 
@@ -166,16 +156,15 @@ class CompoundValueNode
 
   CompoundValueNode*  clone(void);
   CompoundValueNode*  add(CompoundValueNode* node);
-  CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _value);
-  CompoundValueNode*  add(const Type _type, const std::string& _name, const char* _value);
-  CompoundValueNode*  add(const Type _type, const std::string& _name, double _value);
-  CompoundValueNode*  add(const Type _type, const std::string& _name, bool _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, const std::string& _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, const char* _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, double _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
   void                check(void);
   std::string         finish(void);
   std::string         render(ConnectionInfo* ciP, Format format, const std::string& indent);
   std::string         toJson(bool isLastElement);
 
-  static const char*  typeName(const Type _type);
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);
 

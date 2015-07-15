@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/EntityId.h"
@@ -77,100 +78,100 @@
 
 
 // Compound1: [ 22, { x: [x1, x2], y: 3 }, [ z1, z2 ] ]
-#define CREATE_COMPOUND1(cv)                                                       \
-    orion::CompoundValueNode*  str;                                                \
-    orion::CompoundValueNode*  vec;                                                \
-    orion::CompoundValueNode*  x;                                                  \
-    orion::CompoundValueNode*  leaf;                                               \
-                                                                                   \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);           \
-                                                                                   \
-    leaf = cv->add(orion::CompoundValueNode::String,  "",  "22");                  \
-    str  = cv->add(orion::CompoundValueNode::Object,  "",  "");                    \
-    vec  = cv->add(orion::CompoundValueNode::Vector,  "",  "");                    \
-                                                                                   \
-    x    = str->add(orion::CompoundValueNode::Vector, "x", "");                    \
-    leaf = str->add(orion::CompoundValueNode::String, "y", "3");                   \
-                                                                                   \
-    leaf = x->add(orion::CompoundValueNode::String,   "",  "x1");                  \
-    leaf = x->add(orion::CompoundValueNode::String,   "",  "x2");                  \
-                                                                                   \
-    leaf = vec->add(orion::CompoundValueNode::String, "",  "z1");                  \
-    leaf = vec->add(orion::CompoundValueNode::String, "",  "z2");                  \
-                                                                                   \
-    leaf->check();                                                                 \
-    cv->shortShow("shortShow1: ");                                                 \
+#define CREATE_COMPOUND1(cv)                                             \
+    orion::CompoundValueNode*  str;                                      \
+    orion::CompoundValueNode*  vec;                                      \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  leaf;                                     \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeVector);           \
+                                                                         \
+    leaf = cv->add(orion::ValueTypeString,  "",  "22");                  \
+    str  = cv->add(orion::ValueTypeObject,  "",  "");                    \
+    vec  = cv->add(orion::ValueTypeVector,  "",  "");                    \
+                                                                         \
+    x    = str->add(orion::ValueTypeVector, "x", "");                    \
+    leaf = str->add(orion::ValueTypeString, "y", "3");                   \
+                                                                         \
+    leaf = x->add(orion::ValueTypeString,   "",  "x1");                  \
+    leaf = x->add(orion::ValueTypeString,   "",  "x2");                  \
+                                                                         \
+    leaf = vec->add(orion::ValueTypeString, "",  "z1");                  \
+    leaf = vec->add(orion::ValueTypeString, "",  "z2");                  \
+                                                                         \
+    leaf->check();                                                       \
+    cv->shortShow("shortShow1: ");                                       \
     cv->show("show1: ");
     
 
 // Compound2: { x: { x1: a, x2: b }, y: [ y1, y2 ] }
-#define CREATE_COMPOUND2(cv)                                                       \
-    orion::CompoundValueNode*  x;                                                  \
-    orion::CompoundValueNode*  y;                                                  \
-    orion::CompoundValueNode*  leaf;                                               \
-                                                                                   \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Object);           \
-                                                                                   \
-    x    = cv->add(orion::CompoundValueNode::Object, "x",  "");                    \
-    y    = cv->add(orion::CompoundValueNode::Vector, "y",  "");                    \
-                                                                                   \
-    leaf = x->add(orion::CompoundValueNode::String,  "x1", "a");                   \
-    leaf = x->add(orion::CompoundValueNode::String,  "x2", "b");                   \
-                                                                                   \
-    leaf = y->add(orion::CompoundValueNode::String,  "",   "y1");                  \
-    leaf = y->add(orion::CompoundValueNode::String,  "",   "y2");                  \
-                                                                                   \
-    leaf->check();                                                                 \
-    cv->shortShow("shortShow2: ");                                                 \
+#define CREATE_COMPOUND2(cv)                                             \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  y;                                        \
+    orion::CompoundValueNode*  leaf;                                     \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeObject);           \
+                                                                         \
+    x    = cv->add(orion::ValueTypeObject, "x",  "");                    \
+    y    = cv->add(orion::ValueTypeVector, "y",  "");                    \
+                                                                         \
+    leaf = x->add(orion::ValueTypeString,  "x1", "a");                   \
+    leaf = x->add(orion::ValueTypeString,  "x2", "b");                   \
+                                                                         \
+    leaf = y->add(orion::ValueTypeString,  "",   "y1");                  \
+    leaf = y->add(orion::ValueTypeString,  "",   "y2");                  \
+                                                                         \
+    leaf->check();                                                       \
+    cv->shortShow("shortShow2: ");                                       \
     cv->show("show2: ");
 
 
 // Compound1 native: [ 22.0, { x: [x1, x2], y: 3.0 }, [ z1, false ] ]
-#define CREATE_COMPOUND1_NATIVE(cv)                                                \
-    orion::CompoundValueNode*  str;                                                \
-    orion::CompoundValueNode*  vec;                                                \
-    orion::CompoundValueNode*  x;                                                  \
-    orion::CompoundValueNode*  leaf;                                               \
-                                                                                   \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);           \
-                                                                                   \
-    leaf = cv->add(orion::CompoundValueNode::Number,  "",  22.0);                  \
-    str  = cv->add(orion::CompoundValueNode::Object,  "",  "");                    \
-    vec  = cv->add(orion::CompoundValueNode::Vector,  "",  "");                    \
-                                                                                   \
-    x    = str->add(orion::CompoundValueNode::Vector, "x", "");                    \
-    leaf = str->add(orion::CompoundValueNode::Number, "y", 3.0);                   \
-                                                                                   \
-    leaf = x->add(orion::CompoundValueNode::String,   "",  "x1");                  \
-    leaf = x->add(orion::CompoundValueNode::String,   "",  "x2");                  \
-                                                                                   \
-    leaf = vec->add(orion::CompoundValueNode::String, "",  "z1");                  \
-    leaf = vec->add(orion::CompoundValueNode::Bool, "",  false);                   \
-                                                                                   \
-    leaf->check();                                                                 \
-    cv->shortShow("shortShow1: ");                                                 \
+#define CREATE_COMPOUND1_NATIVE(cv)                                      \
+    orion::CompoundValueNode*  str;                                      \
+    orion::CompoundValueNode*  vec;                                      \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  leaf;                                     \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeVector);           \
+                                                                         \
+    leaf = cv->add(orion::ValueTypeNumber,  "",  22.0);                  \
+    str  = cv->add(orion::ValueTypeObject,  "",  "");                    \
+    vec  = cv->add(orion::ValueTypeVector,  "",  "");                    \
+                                                                         \
+    x    = str->add(orion::ValueTypeVector, "x", "");                    \
+    leaf = str->add(orion::ValueTypeNumber, "y", 3.0);                   \
+                                                                         \
+    leaf = x->add(orion::ValueTypeString,   "",  "x1");                  \
+    leaf = x->add(orion::ValueTypeString,   "",  "x2");                  \
+                                                                         \
+    leaf = vec->add(orion::ValueTypeString, "",  "z1");                  \
+    leaf = vec->add(orion::ValueTypeBoolean, "",  false);                \
+                                                                         \
+    leaf->check();                                                       \
+    cv->shortShow("shortShow1: ");                                       \
     cv->show("show1: ");
 
 
 // Compound2 native: { x: { x1: a, x2: true }, y: [ y1, y2 ] }
-#define CREATE_COMPOUND2_NATIVE(cv)                                                \
-    orion::CompoundValueNode*  x;                                                  \
-    orion::CompoundValueNode*  y;                                                  \
-    orion::CompoundValueNode*  leaf;                                               \
-                                                                                   \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Object);           \
-                                                                                   \
-    x    = cv->add(orion::CompoundValueNode::Object, "x",  "");                    \
-    y    = cv->add(orion::CompoundValueNode::Vector, "y",  "");                    \
-                                                                                   \
-    leaf = x->add(orion::CompoundValueNode::String,  "x1", "a");                   \
-    leaf = x->add(orion::CompoundValueNode::Bool,  "x2", true);                    \
-                                                                                   \
-    leaf = y->add(orion::CompoundValueNode::String,  "",   "y1");                  \
-    leaf = y->add(orion::CompoundValueNode::String,  "",   "y2");                  \
-                                                                                   \
-    leaf->check();                                                                 \
-    cv->shortShow("shortShow2: ");                                                 \
+#define CREATE_COMPOUND2_NATIVE(cv)                                      \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  y;                                        \
+    orion::CompoundValueNode*  leaf;                                     \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeObject);           \
+                                                                         \
+    x    = cv->add(orion::ValueTypeObject, "x",  "");                    \
+    y    = cv->add(orion::ValueTypeVector, "y",  "");                    \
+                                                                         \
+    leaf = x->add(orion::ValueTypeString,  "x1", "a");                   \
+    leaf = x->add(orion::ValueTypeBoolean,  "x2", true);                 \
+                                                                         \
+    leaf = y->add(orion::ValueTypeString,  "",   "y1");                  \
+    leaf = y->add(orion::ValueTypeString,  "",   "y2");                  \
+                                                                         \
+    leaf->check();                                                       \
+    cv->shortShow("shortShow2: ");                                       \
     cv->show("show2: ");
 
 

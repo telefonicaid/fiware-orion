@@ -37,6 +37,7 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
+#include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
@@ -65,26 +66,26 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
   {
     orion::CompoundValueNode* child = children[ix];
 
-    if (child->valueType == orion::CompoundValueNode::String)
+    if (child->valueType == orion::ValueTypeString)
     {
       b.append(child->stringValue);
     }
-    else if (child->valueType == orion::CompoundValueNode::Number)
+    else if (child->valueType == orion::ValueTypeNumber)
     {
       b.append(child->numberValue);
     }
-    else if (child->valueType == orion::CompoundValueNode::Bool)
+    else if (child->valueType == orion::ValueTypeBoolean)
     {
       b.append(child->boolValue);
     }
-    else if (child->valueType == orion::CompoundValueNode::Vector)
+    else if (child->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder ba;
 
       compoundValueBson(child->childV, ba);
       b.append(ba.arr());
     }
-    else if (child->valueType == orion::CompoundValueNode::Object)
+    else if (child->valueType == orion::ValueTypeObject)
     {
       BSONObjBuilder bo;
 
@@ -109,26 +110,26 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
   {
     orion::CompoundValueNode* child = children[ix];
 
-    if (child->valueType == orion::CompoundValueNode::String)
+    if (child->valueType == orion::ValueTypeString)
     {
       b.append(child->name, child->stringValue);
     }
-    else if (child->valueType == orion::CompoundValueNode::Number)
+    else if (child->valueType == orion::ValueTypeNumber)
     {
       b.append(child->name, child->numberValue);
     }
-    else if (child->valueType == orion::CompoundValueNode::Bool)
+    else if (child->valueType == orion::ValueTypeBoolean)
     {
       b.append(child->name, child->boolValue);
     }
-    else if (child->valueType == orion::CompoundValueNode::Vector)
+    else if (child->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder ba;
 
       compoundValueBson(child->childV, ba);
       b.append(child->name, ba.arr());
     }
-    else if (child->valueType == orion::CompoundValueNode::Object)
+    else if (child->valueType == orion::ValueTypeObject)
     {
       BSONObjBuilder bo;
 
@@ -154,12 +155,15 @@ void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
     case ValueTypeString:
       bsonAttr.append(ENT_ATTRS_VALUE, caP->stringValue);
       break;
+
     case ValueTypeNumber:
       bsonAttr.append(ENT_ATTRS_VALUE, caP->numberValue);
       break;
+
     case ValueTypeBoolean:
       bsonAttr.append(ENT_ATTRS_VALUE, caP->boolValue);
       break;
+
     default:
       LM_E(("Runtime Error (unknown attribute type)"));
   }
@@ -178,30 +182,30 @@ static void valueBson(ContextAttribute* caP, BSONObjBuilder& bsonAttr)
   }
   else
   {
-    if (caP->compoundValueP->valueType == orion::CompoundValueNode::Vector)
+    if (caP->compoundValueP->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder b;
       compoundValueBson(caP->compoundValueP->childV, b);
       bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
     }
-    else if (caP->compoundValueP->valueType == orion::CompoundValueNode::Object)
+    else if (caP->compoundValueP->valueType == orion::ValueTypeObject)
     {
       BSONObjBuilder b;
 
       compoundValueBson(caP->compoundValueP->childV, b);
       bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
     }
-    else if (caP->compoundValueP->valueType == orion::CompoundValueNode::String)
+    else if (caP->compoundValueP->valueType == orion::ValueTypeString)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->stringValue);
     }
-    else if (caP->compoundValueP->valueType == orion::CompoundValueNode::Number)
+    else if (caP->compoundValueP->valueType == orion::ValueTypeNumber)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->numberValue);
     }
-    else if (caP->compoundValueP->valueType == orion::CompoundValueNode::Bool)
+    else if (caP->compoundValueP->valueType == orion::ValueTypeBoolean)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
       bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->boolValue);
@@ -358,12 +362,16 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
       /* As the compoundValueP has been checked is NULL before invoking this function, finding
        * a compound value in DB means that there is a change */
       return true;
+
     case NumberDouble:
       return caP->numberValue != attr.getField(ENT_ATTRS_VALUE).Number();
+
     case Bool:
       return caP->boolValue != attr.getBoolField(ENT_ATTRS_VALUE);
+
     case String:
       return caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
+
     default:
       LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
       return false;
@@ -380,15 +388,18 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
   {
     switch (mdP->valueType)
     {
-    case MetadataValueTypeString:
+    case orion::ValueTypeString:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
-    case MetadataValueTypeNumber:
+
+    case orion::ValueTypeNumber:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
       return;
-    case MetadataValueTypeBoolean:
+
+    case orion::ValueTypeBoolean:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
+
     default:
       LM_E(("Runtime Error (unknown attribute type)"));
     }
@@ -397,15 +408,18 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
   {
     switch (mdP->valueType)
     {
-    case MetadataValueTypeString:
+    case orion::ValueTypeString:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->stringValue));
       return;
-    case MetadataValueTypeNumber:
+
+    case orion::ValueTypeNumber:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->numberValue));
       return;
-    case MetadataValueTypeBoolean:
+
+    case orion::ValueTypeBoolean:
       mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->boolValue));
       return;
+
     default:
       LM_E(("Runtime Error (unknown attribute type)"));
     }
@@ -439,22 +453,26 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
       case Object:
         ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
         break;
+
       case Array:
         ab.appendArray(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
         break;
+
       case NumberDouble:
         ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).Number());
         break;
+
       case Bool:
         ab.append(ENT_ATTRS_VALUE, attr.getBoolField(ENT_ATTRS_VALUE));
         break;
+
       case String:
         ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
         break;
+
       default:
         LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
     }
-
   }
 
   /* 2. Add type, if present in request. If not, just use the one that is already present in the database. */
@@ -496,9 +514,11 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
-      BSONObj mdB = i.next().embeddedObject();
-      Metadata* md = BSONtoMetadata(mdB);
+      BSONObj    mdB = i.next().embeddedObject();
+      Metadata*  md  = BSONtoMetadata(mdB);
+
       mdVSize++;
+
       if (!hasMetadata(md->name, md->type, caP))
       {
         appendMetadata(&mdVBuilder, md);

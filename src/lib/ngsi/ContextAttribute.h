@@ -30,26 +30,11 @@
 
 #include "ngsi/MetadataVector.h"
 #include "common/Format.h"
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
 #include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
 #include "rest/ConnectionInfo.h"
-
-
-
-/* ****************************************************************************
-*
-* ContextAttributeValueType - 
-*/
-// FIXME P10: we should use the same Enum (in a separate .h) file for Metadata, ContextAttribute, and CompoundValueNode
-typedef enum ContextAttributeValueType
-{
-  ValueTypeString,
-  ValueTypeNumber,
-  ValueTypeBoolean,
-  ValueTypeCompoundVector,
-  ValueTypeCompoundObject
-} ContextAttributeValueType;
 
 
 
@@ -63,10 +48,12 @@ typedef struct ContextAttribute
   std::string     type;                    // Optional
   MetadataVector  metadataVector;          // Optional
 
+  //
   // Value - Optional (FI-WARE changes - MANDATORY in OMA spec)
   //            Especially for the new convops, value is NOT mandatory
   //            E.g. /v1/contextTypes
-  ContextAttributeValueType  valueType;    // Type of value: from json parse
+  //
+  orion::ValueType           valueType;    // Type of value: taken from JSON parse
   std::string                stringValue;  // "value" as a String
   double                     numberValue;  // "value" as a Number
   bool                       boolValue;    // "value" as a Boolean

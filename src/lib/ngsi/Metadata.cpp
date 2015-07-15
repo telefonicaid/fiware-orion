@@ -30,6 +30,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/Metadata.h"
 
 
@@ -43,7 +44,7 @@ Metadata::Metadata()
   name         = "";
   type         = "";
   stringValue  = "";
-  valueType    = MetadataValueTypeString;
+  valueType    = orion::ValueTypeString;
 }
 
 
@@ -75,7 +76,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
 {
   name         = _name;
   type         = _type;
-  valueType    = MetadataValueTypeString;
+  valueType    = orion::ValueTypeString;
   stringValue  = std::string(_value);
 }
 
@@ -89,7 +90,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
 {
   name         = _name;
   type         = _type;
-  valueType    = MetadataValueTypeString;
+  valueType    = orion::ValueTypeString;
   stringValue  = _value;
 }
 
@@ -103,7 +104,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
 {
   name         = _name;
   type         = _type;
-  valueType    = MetadataValueTypeNumber;
+  valueType    = orion::ValueTypeNumber;
   numberValue  = _value;
 }
 
@@ -117,7 +118,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, bool _val
 {
   name       = _name;
   type       = _type;
-  valueType  = MetadataValueTypeBoolean;
+  valueType  = orion::ValueTypeBoolean;
   boolValue  = _value;
 }
 
@@ -230,16 +231,16 @@ std::string Metadata::toStringValue(void)
 
   switch (valueType)
   {
-  case MetadataValueTypeString:
+  case orion::ValueTypeString:
     return stringValue;
     break;
 
-  case MetadataValueTypeNumber:
+  case orion::ValueTypeNumber:
     snprintf(buffer, sizeof(buffer), "%f", numberValue);
     return std::string(buffer);
     break;
 
-  case MetadataValueTypeBoolean:
+  case orion::ValueTypeBoolean:
     return boolValue ? "true" : "false";
     break;
 
@@ -263,18 +264,18 @@ std::string Metadata::toJson(bool isLastElement)
 
   if (type == "")
   {
-    if (valueType == MetadataValueTypeNumber)
+    if (valueType == orion::ValueTypeNumber)
     {
       char num[32];
     
       snprintf(num, sizeof(num), "%f", numberValue);
       out = JSON_VALUE_NUMBER(name, num);
     }
-    else if (valueType == MetadataValueTypeBoolean)
+    else if (valueType == orion::ValueTypeBoolean)
     {
       out = JSON_VALUE_BOOL(name, boolValue);
     }
-    else if (valueType == MetadataValueTypeString)
+    else if (valueType == orion::ValueTypeString)
     {
       out = JSON_VALUE(name, stringValue);
     }
@@ -289,18 +290,18 @@ std::string Metadata::toJson(bool isLastElement)
     out = JSON_STR(name) + ":{";
     out += JSON_VALUE("type", type) + ",";
 
-    if (valueType == MetadataValueTypeString)
+    if (valueType == orion::ValueTypeString)
     {
       out += JSON_VALUE("value", stringValue);
     }
-    else if (valueType == MetadataValueTypeNumber)
+    else if (valueType == orion::ValueTypeNumber)
     {
       char num[32];
 
       snprintf(num, sizeof(num), "%f", numberValue);
       out += JSON_VALUE_NUMBER("value", num);
     }
-    else if (valueType == MetadataValueTypeBoolean)
+    else if (valueType == orion::ValueTypeBoolean)
     {
       out += JSON_VALUE_BOOL("value", boolValue);
     }
