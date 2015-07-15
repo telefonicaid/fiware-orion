@@ -57,14 +57,15 @@ Metadata::Metadata(Metadata* mP)
 {
   LM_T(LmtClone, ("'cloning' a Metadata"));
 
-  name        = mP->name;
-  type        = mP->type;
-  valueType   = mP->valueType;
-  stringValue       = mP->stringValue;
-  numberValue = mP->numberValue;
-  boolValue   = mP->boolValue;
-
+  name         = mP->name;
+  type         = mP->type;
+  valueType    = mP->valueType;
+  stringValue  = mP->stringValue;
+  numberValue  = mP->numberValue;
+  boolValue    = mP->boolValue;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -72,11 +73,13 @@ Metadata::Metadata(Metadata* mP)
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, const char* _value)
 {
-  name      = _name;
-  type      = _type;
-  valueType = MetadataValueTypeString;
-  stringValue     = std::string(_value);
+  name         = _name;
+  type         = _type;
+  valueType    = MetadataValueTypeString;
+  stringValue  = std::string(_value);
 }
+
+
 
 /* ****************************************************************************
 *
@@ -84,11 +87,13 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, const std::string& _value)
 {
-  name      = _name;
-  type      = _type;
-  valueType = MetadataValueTypeString;
-  stringValue     = _value;
+  name         = _name;
+  type         = _type;
+  valueType    = MetadataValueTypeString;
+  stringValue  = _value;
 }
+
+
 
 /* ****************************************************************************
 *
@@ -102,17 +107,20 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
   numberValue  = _value;
 }
 
+
+
 /* ****************************************************************************
 *
 * Metadata::Metadata -
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, bool _value)
 {
-  name      = _name;
-  type      = _type;
-  valueType = MetadataValueTypeBoolean;
-  boolValue = _value;
+  name       = _name;
+  type       = _type;
+  valueType  = MetadataValueTypeBoolean;
+  boolValue  = _value;
 }
+
 
 
 /* ****************************************************************************
