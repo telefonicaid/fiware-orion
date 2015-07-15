@@ -421,23 +421,6 @@ std::string ContextAttribute::render
                         (request != RtUpdateContextResponse)? stringValue : "",
                         ciP->outFormat, commaAfterContextValue);
       }
-#if 0
-//
-// FIXME P10: The render function must change because of the new typed values of attributes
-//
-      else if (valueType == ValueTypeNumber)
-      {
-        out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                        numberValue.,
-                        ciP->outFormat, commaAfterContextValue);
-      }
-      else if (valueType == ValueTypeBoolean)
-      {
-        out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                        booleanValue,
-                        ciP->outFormat, commaAfterContextValue);
-      }
-#endif
     }
     else if (request == RtUpdateContextResponse)
     {
