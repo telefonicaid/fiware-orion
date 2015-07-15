@@ -214,10 +214,10 @@ void Metadata::release(void)
 */
 void Metadata::fill(const struct Metadata& md)
 {
-  name        = md.name;
-  type        = md.type;
-  stringValue       = md.stringValue;
-  association = md.association;
+  name         = md.name;
+  type         = md.type;
+  stringValue  = md.stringValue;
+  association  = md.association;
 }
 
 /* ****************************************************************************
