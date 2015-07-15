@@ -25,15 +25,13 @@
 #include <semaphore.h>
 #include <errno.h>
 #include <time.h>
+#include <map>  // for curl contexts
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
 #include "common/clockFunctions.h"
-
-// includes for curl contexts
-#include <map>
 
 
 
@@ -467,7 +465,6 @@ int release_curl_context(struct curl_context *pcc, bool final)
       return s;
     }
 
-    // free(pcc->pmutex);
     pcc->pmutex = NULL; // It will remain in global map
   }
   else

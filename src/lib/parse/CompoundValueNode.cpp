@@ -719,17 +719,6 @@ std::string CompoundValueNode::toJson(bool isLastElement)
       out = JSON_STR(tagName) + ":" + JSON_BOOL(boolValue);
     }
   }
-  else if ((valueType == Vector) && (container != this))
-  {
-    LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
-    out += JSON_STR(name) + ":[";
-    for (uint64_t ix = 0; ix < childV.size(); ++ix)
-    {
-      out += childV[ix]->toJson(false);
-    }
-
-    out += "]";
-  }
   else if ((valueType == Vector) && (container == this))
   {
     //
@@ -740,6 +729,28 @@ std::string CompoundValueNode::toJson(bool isLastElement)
     {
       out += childV[ix]->toJson(ix == childV.size() - 1);
     }
+  }
+  else if ((valueType == Vector) && (container->valueType == Vector))
+  {
+    out += "[";
+
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
+      out += childV[ix]->toJson(false);
+    }
+
+    out += "]";
+  }
+  else if (valueType == Vector)
+  {
+    LM_T(LmtCompoundValueRender, ("I am a Vector (%s)", name.c_str()));
+    out += JSON_STR(name) + ":[";
+    for (uint64_t ix = 0; ix < childV.size(); ++ix)
+    {
+      out += childV[ix]->toJson(false);
+    }
+
+    out += "]";
   }
   else if ((valueType == Object) && (container->valueType == Vector))
   {

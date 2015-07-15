@@ -40,10 +40,25 @@ payload='{
   "id": "E1",
   "type": "T1",
   "attr01": {
-    "ovec": [
-      { "a":1, "b":2, "c":3 },
-      [ "1", "2", "3" ]
+    "objAndVecInVec": [
+      { "a":1, "b": "2", "c": true },
+      [ 1,2,3,4,5 ]
     ]
+  },
+  "attr2": {
+    "objAndVecInObj" : {
+      "nestedObj": {
+        "noa": 1,
+        "nob": "2",
+        "noc": true,
+        "nod": false
+      },
+      "nestedVec": [
+        "nva",
+        "nvb",
+        "nvc"
+      ]
+    }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -71,17 +86,41 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 167
+Content-Length: 255
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr01": {
-        "m1": "m1", 
-        "m2": 2.0, 
-        "m3": false, 
-        "type": "AT", 
-        "value": "06"
+        "objAndVecInVec": [
+            {
+                "a": 1.0, 
+                "b": "2", 
+                "c": true
+            }, 
+            [
+                1.0, 
+                2.0, 
+                3.0, 
+                4.0, 
+                5.0
+            ]
+        ]
+    }, 
+    "attr2": {
+        "objAndVecInObj": {
+            "nestedObj": {
+                "noa": 1.0, 
+                "nob": "2", 
+                "noc": true, 
+                "nod": false
+            }, 
+            "nestedVec": [
+                "nva", 
+                "nvb", 
+                "nvc"
+            ]
+        }
     }, 
     "id": "E1", 
     "type": "T1"
