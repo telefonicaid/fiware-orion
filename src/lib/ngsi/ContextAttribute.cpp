@@ -678,6 +678,8 @@ std::string ContextAttribute::toString(void)
 */
 std::string ContextAttribute::toStringValue(void)
 {
+  char buffer[64];
+
   switch (valueType)
   {
   case ValueTypeString:
@@ -685,8 +687,8 @@ std::string ContextAttribute::toStringValue(void)
     break;
 
   case ValueTypeNumber:
-    return "<double>";
-    // FIXME P10: return std::string(numberValue);
+    snprintf(buffer, sizeof(buffer), "%f", numberValue);
+    return std::string(buffer);
     break;
 
   case ValueTypeBoolean:
