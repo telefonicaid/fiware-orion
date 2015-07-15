@@ -344,7 +344,7 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 */
 bool emptyAttributeValue(ContextAttribute* caP)
 {
-  /* Note that ValueTypeNumber and ValueTypeBoolean are always not-empty */
+  /* Note that ValueTypeNumber and ValueTypeBoolean are always non-empty */
   return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
 }
 
