@@ -218,6 +218,8 @@ void Metadata::fill(const struct Metadata& md)
 */
 std::string Metadata::toStringValue(void)
 {
+  char buffer[64];
+
   switch (valueType)
   {
   case MetadataValueTypeString:
@@ -225,8 +227,8 @@ std::string Metadata::toStringValue(void)
     break;
 
   case MetadataValueTypeNumber:
-    return "<double>";
-    // FIXME P10: return std::string(numberValue);
+    snprintf(buffer, sizeof(buffer), "%f", numberValue);
+    return std::string(buffer);
     break;
 
   case MetadataValueTypeBoolean:
