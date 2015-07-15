@@ -21,6 +21,29 @@ This specification is licensed under the
 [FIWARE Open Specification License]
 (http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_%28essential_patents_license%29).
 
+## Introduction to FIWARE NGSI concepts
+
+The FIWARE NGSI (Next Generation Service Interface) API defines 
+
+* a **data model** for context information, based on the notion of *context entities*.
+* a **context data interface** for exchanging information by means of query, subscription, and update operations.
+* a **context availability interface** for exchanging information on how to obtain context information.
+
+### Context Entities
+
+Context entities, or simply called entities, are the center of gravity in the FIWARE NGSI data model. An entity represents a real-world object like e.g. a sensor, a person, or a room. Each entity is uniquely identified by its **entity id**. Furthermore, the type system of FIWARE NGSI enables entities to have an **entity type**.
+
+### Context Elements
+
+While context entities are the central conceptual concept of the NGSI data model, context elements are the central kind of data object. A context element is a JSON object which contains information about a specific context entity. Consequently, a context element has a mandatory property 'id', an optional property 'type', and, optionally, further properties which describe more information about the entity.
+
+It is important to understand that the relationship of entity and context element is a one-to-many relationship. This means that 
+* each context element refers to exactly one entity
+* there can be several context elements referring to the same entity. The context elements can for example contain different pieces of information about the entity.
+
+*old stuff*
+the main data container in FIWARE NGSI. An entity is a data object which is typically used for representing a real-world object like e.g. a sensor, a person, or a room. The minimum data that has to be contained by an entity object is an identifier, the *entity id*. This identifier uniquely determines the real-world object the entity object refers to. This means that two entity objects having the same entity id refer to the same real-world object.
+
 
 ## JSON entity representation
 
