@@ -43,7 +43,6 @@ SET (HEADERS
 # Include directories
 # -----------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
-include_directories("/opt/rapidjson/rapidjson-1.0.2/include")
 
 # Library declaration
 # -----------------------------------------------------------------
