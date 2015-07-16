@@ -134,7 +134,7 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
       {
         LM_W(("Bad Input (parse error in EntityId::ContextAttribute)"));
         eP->errorCode.fill("JSON Parse Error", r);
-        ciP->httpStatusCode = SccBadRequest;;
+        ciP->httpStatusCode = SccBadRequest;
         return eP->render(ciP, EntitiesRequest);
       }
     }

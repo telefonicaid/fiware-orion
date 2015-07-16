@@ -86,12 +86,24 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       else if (type == "Array")
       {
         caP->valueType    = orion::ValueTypeVector;
-        parseContextAttributeCompoundValue(iter, caP, NULL);
+
+        std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+        if (r != "OK")
+        {
+          LM_W(("Bad Input (json error in EntityId::ContextAttributeObject::Vector"));
+          return "json error in EntityId::ContextAttributeObject::Vector";
+        }
       }
       else if (type == "Object")
       {
         caP->valueType    = orion::ValueTypeObject;
-        parseContextAttributeCompoundValue(iter, caP, NULL);
+
+        std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+        if (r != "OK")
+        {
+          LM_W(("Bad Input (json error in EntityId::ContextAttributeObject::Object"));
+          return "json error in EntityId::ContextAttributeObject::Object";
+        }
       }
     }
     else  // Metadata
@@ -106,7 +118,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       if (r != "OK")
       {
         LM_W(("Bad Input (error parsing Metadata)"));
-        return "Parse Error";
+        return "json error in EntityId::ContextAttributeObject::Metadata";
       }
       LM_M(("Metadata OK"));
     }
@@ -160,9 +172,15 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   else if (type == "Array")
   {
     LM_M(("KZ: Compound array"));
-    parseContextAttributeCompoundValue(iter, caP, NULL);
-    caP->valueType    = orion::ValueTypeObject;
-   }
+    caP->valueType = orion::ValueTypeObject;
+    std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+    if (r != "OK")
+    {
+      LM_W(("Bad Input (json error in EntityId::ContextAttribute::Vector"));
+      ciP->httpStatusCode = SccBadRequest;
+      return "json error in EntityId::ContextAttribute::Vector";
+    }
+  }
   else if (type == "Object")
   {
     std::string r;
@@ -181,33 +199,35 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
       if (r != "OK")
       {
         LM_W(("Bad Input (json error in EntityId::ContextAttribute::Object"));
-        return "json error in EntityId::ContextAttribute::Object";
+        ciP->httpStatusCode = SccBadRequest;
+        return "r";
       }
     }
     else
     {
       LM_M(("KZ: Compound object"));
       parseContextAttributeCompoundValue(iter, caP, NULL);
-      caP->valueType    = orion::ValueTypeObject;
+      caP->valueType = orion::ValueTypeObject;
     }
   }
   else
   {
     LM_W(("Bad Input (bad type for EntityId::ContextAttribute)"));
+    ciP->httpStatusCode = SccBadRequest;
     return "invalid JSON type for EntityId::ContextAttribute";
   }
 
   if (caP->name == "")
   {
     LM_W(("Bad Input (no 'name' for ContextAttribute"));
-    ciP->httpStatusCode = SccBadRequest;;
+    ciP->httpStatusCode = SccBadRequest;
     return "no 'name' for ContextAttribute";
   }
 
   if ((caP->valueType == orion::ValueTypeString) && (caP->stringValue == ""))
   {
     LM_W(("Bad Input (no 'value' for ContextAttribute"));
-    ciP->httpStatusCode = SccBadRequest;;
+    ciP->httpStatusCode = SccBadRequest;
     return "no 'value' for ContextAttribute";
   }
 
