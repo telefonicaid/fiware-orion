@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_PARSE_PARSEENTITY_H_
-#define SRC_LIB_PARSE_PARSEENTITY_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSEENTITY_H_
+#define SRC_LIB_JSONPARSEV2_PARSEENTITY_H_
 
 /*
 *
@@ -37,4 +37,4 @@
 */
 extern std::string parseEntity(ConnectionInfo* ciP, Entity* eP);
 
-#endif  // SRC_LIB_PARSE_PARSEENTITY_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSEENTITY_H_

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_PARSE_PARSECONTEXTATTRIBUTECOMPOUNDVALUE_H_
-#define SRC_LIB_PARSE_PARSECONTEXTATTRIBUTECOMPOUNDVALUE_H_
+#ifndef SRC_LIB_JSONPARSEV2_JSONPARSETYPENAMES_H_
+#define SRC_LIB_JSONPARSEV2_JSONPARSETYPENAMES_H_
 
 /*
 *
@@ -25,25 +25,13 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-
-#include "rapidjson/document.h"
-
-#include "ngsi/ContextAttribute.h"
-
-using namespace rapidjson;
 
 
 
 /* ****************************************************************************
 *
-* parseContextAttribute - 
+* jsonParseTypeNames - 
 */
-extern std::string parseContextAttributeCompoundValue
-(
-  const Value::ConstMemberIterator&  node,
-  ContextAttribute*                  caP,
-  orion::CompoundValueNode*          parent
-);
+extern const char* jsonParseTypeNames[7];
 
-#endif  // SRC_LIB_PARSE_PARSECONTEXTATTRIBUTECOMPOUNDVALUE_H_
+#endif  // SRC_LIB_JSONPARSEV2_JSONPARSETYPENAMES_H_

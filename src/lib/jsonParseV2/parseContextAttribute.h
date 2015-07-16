@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_PARSE_JSONREQUESTTREAT_H_
-#define SRC_LIB_PARSE_JSONREQUESTTREAT_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTE_H_
+#define SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTE_H_
 
 /*
 *
@@ -25,19 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
+#include "rapidjson/document.h"
 
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
+using namespace rapidjson;
 
 
 
 /* ****************************************************************************
 *
-* jsonRequestTreat - 
+* parseContextAttribute - 
 */
-extern std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType);
+extern std::string parseContextAttribute(const Value::ConstMemberIterator& iter, ContextAttribute* caP);
 
-#endif  // SRC_LIB_PARSE_JSONREQUESTTREAT_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTE_H_

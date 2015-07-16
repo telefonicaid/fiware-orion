@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_JSONPARSEV2_JSONREQUESTTREAT_H_
+#define SRC_LIB_JSONPARSEV2_JSONREQUESTTREAT_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,21 +25,18 @@
 *
 * Author: Ken Zangelin
 */
-#include "parse/jsonParseTypeNames.h"
+#include <string>
+
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+#include "ngsi/Request.h"
 
 
 
 /* ****************************************************************************
 *
-* jsonParseTypeNames - 
+* jsonRequestTreat - 
 */
-const char* jsonParseTypeNames[7] =
-{
-  "Null",
-  "False",
-  "True",
-  "Object",
-  "Array",
-  "String",
-  "Number"
-};
+extern std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType);
+
+#endif  // SRC_LIB_JSONPARSEV2_JSONREQUESTTREAT_H_

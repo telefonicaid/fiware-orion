@@ -34,7 +34,7 @@
 #include "common/statistics.h"
 #include "common/string.h"
 #include "ngsi/ParseData.h"
-#include "parse/jsonRequestTreat.h"
+#include "jsonParseV2/jsonRequestTreat.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/RestService.h"

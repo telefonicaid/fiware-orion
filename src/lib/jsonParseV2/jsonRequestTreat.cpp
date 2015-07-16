@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_PARSE_JSONPARSETYPENAMES_H_
-#define SRC_LIB_PARSE_JSONPARSETYPENAMES_H_
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,13 +22,36 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+#include <vector>
+
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+#include "ngsi/Request.h"
+#include "jsonParseV2/jsonRequestTreat.h"
+#include "jsonParseV2/parseEntity.h"
 
 
 
 /* ****************************************************************************
 *
-* jsonParseTypeNames - 
+* jsonRequestTreat - 
 */
-extern const char* jsonParseTypeNames[7];
+std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
+{
+  std::string answer;
 
-#endif  // SRC_LIB_PARSE_JSONPARSETYPENAMES_H_
+  LM_M(("KZ: requestType: %d", requestType));
+  switch (requestType)
+  {
+  case EntitiesRequest:
+    answer = parseEntity(ciP, &parseDataP->ent.res);
+    break;
+
+  default:
+    answer = "Request Treat function not implemented";
+    break;
+  }
+  
+  return answer;
+}

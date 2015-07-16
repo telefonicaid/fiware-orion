@@ -28,8 +28,8 @@
 
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/Metadata.h"
-#include "parse/jsonParseTypeNames.h"
-#include "parse/parseMetadata.h"
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseMetadata.h"
 
 
 

@@ -27,9 +27,9 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "parse/jsonParseTypeNames.h"
-#include "parse/parseEntity.h"
-#include "parse/parseContextAttribute.h"
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseEntity.h"
+#include "jsonParseV2/parseContextAttribute.h"
 
 using namespace rapidjson;
 

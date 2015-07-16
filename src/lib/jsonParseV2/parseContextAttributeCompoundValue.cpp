@@ -28,10 +28,9 @@
 
 #include "logMsg/logMsg.h"
 #include "ngsi/ContextAttribute.h"
-#include "parse/jsonParseTypeNames.h"
 #include "parse/CompoundValueNode.h"
-
-#include "parse/parseContextAttributeCompoundValue.h"
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseContextAttributeCompoundValue.h"
 
 
 

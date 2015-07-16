@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_PARSE_PARSECONTEXTATTRIBUTE_H_
-#define SRC_LIB_PARSE_PARSECONTEXTATTRIBUTE_H_
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,16 +22,21 @@
 *
 * Author: Ken Zangelin
 */
-#include "rapidjson/document.h"
-
-using namespace rapidjson;
+#include "jsonParseV2/jsonParseTypeNames.h"
 
 
 
 /* ****************************************************************************
 *
-* parseContextAttribute - 
+* jsonParseTypeNames - 
 */
-extern std::string parseContextAttribute(const Value::ConstMemberIterator& iter, ContextAttribute* caP);
-
-#endif  // SRC_LIB_PARSE_PARSECONTEXTATTRIBUTE_H_
+const char* jsonParseTypeNames[7] =
+{
+  "Null",
+  "False",
+  "True",
+  "Object",
+  "Array",
+  "String",
+  "Number"
+};
