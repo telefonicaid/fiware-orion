@@ -107,29 +107,42 @@ static bool equalEntity(EntityId enExpected, EntityId enArg) {
 *
 * equalContextAttribute -
 */
-static bool equalContextAttribute(ContextAttribute* caExpected, ContextAttribute* caArg) {
+static bool equalContextAttribute(ContextAttribute* caExpected, ContextAttribute* caArg)
+{
+  if (caArg->name != caExpected->name)
+  {
+    return false;
+  }
 
-    LM_M(("caArg '%s', '%s', '%s'",
-          caArg->name.c_str(),
-          caArg->type.c_str(),
-          caArg->toStringValue().c_str()
-          ));
-    LM_M(("caExpected '%s', '%s', '%s'",
-          caExpected->name.c_str(),
-          caExpected->type.c_str(),
-          caExpected->toStringValue().c_str()
-          ));
+  if (caArg->type != caExpected->type)
+  {
+    return false;
+  }
 
-    if (caArg->name == caExpected->name &&
-        caArg->type == caExpected->type &&
-        caArg->stringValue == caExpected->stringValue) // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+  if (caArg->valueType != caExpected->valueType)
+  {
+    return false;
+  }
+
+  if ((caArg->valueType == orion::ValueTypeString) && (caArg->stringValue != caExpected->stringValue))
+  {
+    return false;
+  }
+
+  if ((caArg->valueType == orion::ValueTypeNumber) && (caArg->numberValue != caExpected->numberValue))
+  {
+    return false;
+  }
+
+  if ((caArg->valueType == orion::ValueTypeBoolean) && (caArg->boolValue != caExpected->boolValue))
+  {
+    return false;
+  }
+
+  LM_M(("caArg '%s', '%s', '%s'", caArg->name.c_str(), caArg->type.c_str(), caArg->toStringValue().c_str()));
+  LM_M(("caExpected '%s', '%s', '%s'", caExpected->name.c_str(), caExpected->type.c_str(), caExpected->toStringValue().c_str()));
+
+  return true;
 }
 
 /* ****************************************************************************
