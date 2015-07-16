@@ -515,7 +515,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
       BSONObj    mdB = i.next().embeddedObject();
-      Metadata*  md  = BSONtoMetadata(mdB);
+      Metadata*  md  = bsonToMetadata(mdB);
 
       mdVSize++;
 

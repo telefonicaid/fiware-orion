@@ -1042,9 +1042,9 @@ static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
 
 /* ****************************************************************************
 *
-* BSONtoMetadata -
+* bsonToMetadata -
 */
-Metadata* BSONtoMetadata(BSONObj& mdB)
+Metadata* bsonToMetadata(BSONObj& mdB)
 {
   std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
 
@@ -1411,7 +1411,7 @@ bool entitiesQuery
           for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
           {
             BSONObj    metadata = metadataV[ix].embeddedObject();
-            Metadata*  md = BSONtoMetadata(metadata);
+            Metadata*  md = bsonToMetadata(metadata);
             caP->metadataVector.push_back(md);
           }
         }
