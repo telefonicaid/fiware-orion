@@ -27,6 +27,8 @@
 */
 #include "rapidjson/document.h"
 
+#include "rest/ConnectionInfo.h"
+
 using namespace rapidjson;
 
 
@@ -35,6 +37,6 @@ using namespace rapidjson;
 *
 * parseContextAttribute - 
 */
-extern std::string parseContextAttribute(const Value::ConstMemberIterator& iter, ContextAttribute* caP);
+extern std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP);
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTE_H_

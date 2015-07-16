@@ -47,7 +47,8 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
   if (document.HasParseError())
   {
     LM_W(("Bad Input (JSON parse error)"));
-    eP->errorCode.fill("JSON Parse Error I", "");
+    eP->errorCode.fill("JSON Parse Error", "Errors found in incoming JSON buffer");
+    ciP->httpStatusCode = SccBadRequest;;
     return eP->render(ciP, EntitiesRequest);
   }
 
@@ -55,7 +56,8 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
   if (!document.IsObject())
   {
     LM_E(("Bad Input (JSON Parse Error)"));
-    eP->errorCode.fill("JSON Parse Error II", "");
+    eP->errorCode.fill("JSON Parse Error", "Error a<t parsing incoming JSON buffer");
+    ciP->httpStatusCode = SccBadRequest;;
     return eP->render(ciP, EntitiesRequest);
   }
 
@@ -63,7 +65,17 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
   if (document.HasMember("id") && document.HasMember("idPattern"))
   {
     LM_W(("Bad Input (both 'id' and 'idPattern' specified"));
-    eP->errorCode.fill("JSON Parse Error III", "both 'id'and 'idPattern'specified");
+    eP->errorCode.fill("JSON Parse Error", "both 'id' and 'idPattern' specified");
+    ciP->httpStatusCode = SccBadRequest;;
+    return eP->render(ciP, EntitiesRequest);
+  }
+
+
+  if (!document.HasMember("id") && !document.HasMember("idPattern"))
+  {
+    LM_W(("Bad Input (No 'id' nor 'idPattern' specified"));
+    eP->errorCode.fill("JSON Parse Error", "no  'id' nor 'idPattern' specified");
+    ciP->httpStatusCode = SccBadRequest;;
     return eP->render(ciP, EntitiesRequest);
   }
 
@@ -79,8 +91,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
     {
       if (type != "String")
       {
-        LM_W(("Bad Input (bad type for EntityId::id"));
-        eP->errorCode.fill("JSON Parse Error IV", "bad type for EntityId::id");
+        LM_W(("Bad Input (invalid JSON type for EntityId::id"));
+        eP->errorCode.fill("JSON Parse Error", "invalid JSON type for EntityId::id");
+        ciP->httpStatusCode = SccBadRequest;;
         return eP->render(ciP, EntitiesRequest);
       }
 
@@ -90,8 +103,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
     {
       if (type != "String")
       {
-        LM_W(("Bad Input (bad type for EntityId::type"));
-        eP->errorCode.fill("JSON Parse Error V", "bad type for EntityId::type");
+        LM_W(("Bad Input (invalid JSON type for EntityId::type"));
+        eP->errorCode.fill("JSON Parse Error", "invalid JSON type for EntityId::type");
+        ciP->httpStatusCode = SccBadRequest;;
         return eP->render(ciP, EntitiesRequest);
       }
 
@@ -101,8 +115,9 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
     {
       if (type != "String")
       {
-        LM_W(("Bad Input (bad type for EntityId::isPattern)"));
-        eP->errorCode.fill("JSON Parse Error VI", "bad type for EntityId::isPattern");
+        LM_W(("Bad Input (invalid JSON type for EntityId::isPattern)"));
+        eP->errorCode.fill("JSON Parse Error", "invalid JSON type for EntityId::isPattern");
+        ciP->httpStatusCode = SccBadRequest;;
         return eP->render(ciP, EntitiesRequest);
       }
 
@@ -114,14 +129,23 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
       ContextAttribute* caP = new ContextAttribute();
       eP->attributeVector.push_back(caP);
 
-      std::string r = parseContextAttribute(iter, caP);
+      std::string r = parseContextAttribute(ciP, iter, caP);
       if (r != "OK")
       {
         LM_W(("Bad Input (parse error in EntityId::ContextAttribute)"));
-        eP->errorCode.fill("JSON Parse Error VII", r);
+        eP->errorCode.fill("JSON Parse Error", r);
+        ciP->httpStatusCode = SccBadRequest;;
         return eP->render(ciP, EntitiesRequest);
       }
     }
+  }
+
+  if (eP->id == "")
+  {
+    LM_W(("Bad Input (empty 'id/idPattern' for Entity"));
+    eP->errorCode.fill("JSON Parse Error", "empty 'id/idPattern' for Entity");
+    ciP->httpStatusCode = SccBadRequest;;
+    return eP->render(ciP, EntitiesRequest);
   }
 
   std::string location = "/v2/entities/" + eP->id;

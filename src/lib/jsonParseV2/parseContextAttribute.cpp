@@ -32,6 +32,7 @@
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseMetadata.h"
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
+#include "rest/ConnectionInfo.h"
 
 using namespace rapidjson;
 
@@ -121,7 +122,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 *
 * parseContextAttribute - 
 */
-std::string parseContextAttribute(const Value::ConstMemberIterator& iter, ContextAttribute* caP)
+std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP)
 {
   LM_M(("KZ: In parseContextAttribute"));
 
@@ -180,7 +181,7 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
       if (r != "OK")
       {
         LM_W(("Bad Input (json error in EntityId::ContextAttribute::Object"));
-        return "Parse Error";
+        return "json error in EntityId::ContextAttribute::Object";
       }
     }
     else
@@ -193,7 +194,21 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
   else
   {
     LM_W(("Bad Input (bad type for EntityId::ContextAttribute)"));
-    return "Parse Error";
+    return "invalid JSON type for EntityId::ContextAttribute";
+  }
+
+  if (caP->name == "")
+  {
+    LM_W(("Bad Input (no 'name' for ContextAttribute"));
+    ciP->httpStatusCode = SccBadRequest;;
+    return "no 'name' for ContextAttribute";
+  }
+
+  if ((caP->valueType == orion::ValueTypeString) && (caP->stringValue == ""))
+  {
+    LM_W(("Bad Input (no 'value' for ContextAttribute"));
+    ciP->httpStatusCode = SccBadRequest;;
+    return "no 'value' for ContextAttribute";
   }
 
   return "OK";
