@@ -44,7 +44,7 @@ public:
   std::string             type;             // Optional
   std::string             isPattern;        // Optional
   ContextAttributeVector  attributeVector;  // Optional
-  ErrorCode   errorCode;                    // Optional - mandatory if not 200-OK
+  ErrorCode               errorCode;        // Optional - mandatory if not 200-OK
 
   std::string             servicePath;      // Not part of payload, just an internal field
 

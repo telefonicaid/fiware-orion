@@ -68,9 +68,11 @@ initial entity or attribute creation with APPEND).
 The value of the attribute is stored internally by Orion Context Broker
 in a format-independent representation. 
 
-Note that in order to align JSON representations, the final "leaf"
+Note that (for API version 1) in order to align JSON representations, the final "leaf"
 elements of the structured attribute values after traversing all vectors
-and key-maps are always considered as strings.Thus, take into account that
-although you can use for instance a JSON integer as a field value in updates
-(such as {"x": 3 }),you will retrieve a string in queries and notifications 
-(i.e. { "x": "3"}).
+and key-maps are always considered as strings. Thus, take into account that
+although you can use for instance a JSON number as a field value in updates
+(such as `{"x": 3.2 }`), you will retrieve a string in queries and notifications 
+(i.e. `{ "x": "3.2"}`).
+
+In API version 2, the final "leaf" elements of the structured attribute values after traversing all vectors and key-maps uses the right native JSON type (number, boolean, etc.). Thus, take if you use for instance a JSON number as a field value in updates (such as `{"x": 3.2 }`), you will retrieve also a number in queries and notifications (i.e. `{ "x": 3.2}`).

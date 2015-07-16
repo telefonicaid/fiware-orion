@@ -337,6 +337,12 @@ extern bool includedAttribute(ContextAttribute attr, AttributeList* attrsV);
 
 /* ****************************************************************************
 *
+* bsonToMetadata -
+*/
+extern Metadata* bsonToMetadata(BSONObj& mdB);
+
+/* ****************************************************************************
+*
 * entitiesQuery -
 *
 */

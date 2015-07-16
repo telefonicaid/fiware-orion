@@ -167,7 +167,7 @@ static bool associationsQuery
     std::string  srcEnType  = STR_FIELD(r.getField(ASSOC_SOURCE_ENT).embeddedObject(), ASSOC_ENT_TYPE);
     std::string  tgtEnId    = STR_FIELD(r.getField(ASSOC_TARGET_ENT).embeddedObject(), ASSOC_ENT_ID);
     std::string  tgtEnType  = STR_FIELD(r.getField(ASSOC_TARGET_ENT).embeddedObject(), ASSOC_ENT_TYPE);
-    Metadata*    md         = new Metadata(name, "Association");
+    Metadata*    md         = new Metadata(name, "Association", "");
 
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
 

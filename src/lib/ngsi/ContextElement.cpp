@@ -62,6 +62,17 @@ ContextElement::ContextElement(EntityId* eP)
 
 /* ****************************************************************************
 *
+* ContextElement::ContextElement - 
+*/
+ContextElement::ContextElement(const std::string& id, const std::string& type, const std::string& isPattern)
+{
+  entityId.fill(id, type, isPattern);
+}
+
+
+
+/* ****************************************************************************
+*
 * ContextElement::render - 
 */
 std::string ContextElement::render(ConnectionInfo* ciP, RequestType requestType, const std::string& indent, bool comma, bool omitAttributeValues)

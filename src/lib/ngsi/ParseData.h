@@ -54,6 +54,7 @@
 #include "convenience/UpdateContextElementRequest.h"
 #include "convenience/AppendContextElementRequest.h"
 #include "convenience/UpdateContextAttributeRequest.h"
+#include "apiTypesV2/Entity.h"
 
 
 
@@ -333,6 +334,17 @@ typedef struct UpdateContextAttributeData
 
 /* ****************************************************************************
 *
+* EntityData - 
+*/
+typedef struct EntityData
+{
+  Entity  res;
+} EntityData;
+
+
+
+/* ****************************************************************************
+*
 * ParseData -
 */
 typedef struct ParseData
@@ -367,6 +379,8 @@ typedef struct ParseData
   DiscoverContextAvailabilityResponseData     dcars;
   QueryContextResponseData                    qcrs;
   UpdateContextResponseData                   upcrs;
+
+  EntityData                                  ent;
 } ParseData;
 
 #endif  // SRC_LIB_NGSI_PARSEDATA_H_

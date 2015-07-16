@@ -110,6 +110,7 @@ typedef enum RequestType
   EntityResponse,
   EntityAttributeRequest,
   EntityAttributeResponse,
+  PostEntity,
 
   InvalidRequest = 100
 } RequestType;

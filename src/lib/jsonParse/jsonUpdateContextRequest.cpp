@@ -125,7 +125,7 @@ static std::string attribute(const std::string& path, const std::string& value, 
 {
   LM_T(LmtParse, ("%s: %s", path.c_str(), value.c_str()));
 
-  reqDataP->upcr.attributeP = new ContextAttribute("", "");
+  reqDataP->upcr.attributeP = new ContextAttribute("", "", "");
 
   reqDataP->upcr.ceP->contextAttributeVector.push_back(reqDataP->upcr.attributeP);
 
@@ -171,8 +171,8 @@ static std::string attributeValue(const std::string& path, const std::string& va
   parseDataP->lastContextAttribute = parseDataP->upcr.attributeP;
   LM_T(LmtCompoundValue, ("Set parseDataP->lastContextAttribute to: %p", parseDataP->lastContextAttribute));
 
-  parseDataP->upcr.attributeP->value = value;
-  LM_T(LmtParse, ("Set value to '%s' for a contextElement attribute", parseDataP->upcr.attributeP->value.c_str()));
+  parseDataP->upcr.attributeP->stringValue = value;
+  LM_T(LmtParse, ("Set value to '%s' for a contextElement attribute", parseDataP->upcr.attributeP->stringValue.c_str()));
 
   return "OK";
 }
@@ -191,7 +191,7 @@ static std::string metadata(const std::string& path, const std::string& value, P
 
   reqDataP->upcr.contextMetadataP->type  = "";
   reqDataP->upcr.contextMetadataP->name  = "";
-  reqDataP->upcr.contextMetadataP->value = "";
+  reqDataP->upcr.contextMetadataP->stringValue = "";
 
   reqDataP->upcr.attributeP->metadataVector.push_back(reqDataP->upcr.contextMetadataP);
 
@@ -235,7 +235,7 @@ static std::string metadataType(const std::string& path, const std::string& valu
 static std::string metadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
-  reqDataP->upcr.contextMetadataP->value = value;
+  reqDataP->upcr.contextMetadataP->stringValue = value;
 
   return "OK";
 }
@@ -253,7 +253,7 @@ static std::string domainMetadata(const std::string& path, const std::string& va
   reqDataP->upcr.domainMetadataP = new Metadata();
   reqDataP->upcr.domainMetadataP->type  = "";
   reqDataP->upcr.domainMetadataP->name  = "";
-  reqDataP->upcr.domainMetadataP->value = "";
+  reqDataP->upcr.domainMetadataP->stringValue = "";
   reqDataP->upcr.ceP->domainMetadataVector.push_back(reqDataP->upcr.domainMetadataP);
 
   return "OK";
@@ -296,7 +296,7 @@ static std::string domainMetadataType(const std::string& path, const std::string
 static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
-  reqDataP->upcr.domainMetadataP->value = value;
+  reqDataP->upcr.domainMetadataP->stringValue = value;
 
   return "OK";
 }

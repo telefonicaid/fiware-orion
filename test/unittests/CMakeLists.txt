@@ -246,13 +246,16 @@ SET (STATIC_LIBS
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
     mongoBackend
+    rest
     ngsiNotify
     jsonParse
+    jsonParseV2
     xmlParse
-    parse
+    apiTypesV2
     convenience
     serviceRoutines
     rest
+    parse
     ngsi9
     ngsi10
     ngsi

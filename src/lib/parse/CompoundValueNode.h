@@ -29,13 +29,16 @@
 #include <vector>
 
 #include "common/Format.h"
+#include "orionTypes/OrionValueType.h"
+
+struct ConnectionInfo;
 
 
 namespace orion
 {
 /* ****************************************************************************
 *
-* CompoundValueNode - 
+* CompoundValueNode -
 *
 * The class fields:
 * -------------------------------------------------------------------------------
@@ -46,11 +49,14 @@ namespace orion
 *                Also, when creating the tree from mongo BSON, there will often
 *                be no 'name', just like the case of JSON payload parsing.
 *
-* o type         There are only three types of nodes: Vectors, Objects and Strings.
+* o valueType    There are the following types of nodes: Vectors, Objects, Strings, Numbers and Bools
 *                The root node is somehow special, but is always either Vector or Object.
 *
-* o value        The value of a String in the tree. Always stored as a string, as the
-*                payload always comes in as a string.
+* o stringValue  The value of a String in the tree.
+*
+* o numberValue  The value of a Number in the tree.
+*
+* o boolValue    The value of a Bool in the tree.
 *
 * o childV       A vector of the children of a Vector or Object.
 *                Contains pointers to CompoundValueNode.
@@ -76,18 +82,12 @@ namespace orion
 class CompoundValueNode
 {
  public:
-  enum Type
-  {
-    Unknown,
-    String,
-    Object,
-    Vector
-  };
-
   // Tree fields
   std::string                        name;
-  Type                               type;
-  std::string                        value;
+  orion::ValueType                   valueType;
+  std::string                        stringValue;
+  double                             numberValue;
+  bool                               boolValue;
   std::vector<CompoundValueNode*>    childV;
 
 
@@ -106,7 +106,7 @@ class CompoundValueNode
 
   // Constructors/Destructors
   CompoundValueNode();
-  explicit CompoundValueNode(Type _type);
+  explicit CompoundValueNode(orion::ValueType _type);
 
   CompoundValueNode
   (
@@ -115,20 +115,56 @@ class CompoundValueNode
     const std::string&  _name,
     const std::string&  _value,
     int                 _siblingNo,
-    Type                _type,
-    int                 _level = -1);
+    orion::ValueType    _type,
+    int                 _level = -1
+  );
+
+  CompoundValueNode
+  (
+    CompoundValueNode*  _container,
+    const std::string&  _path,
+    const std::string&  _name,
+    const char*         _value,
+    int                 _siblingNo,
+    orion::ValueType    _type,
+    int                 _level = -1
+  );
+
+  CompoundValueNode
+  (
+    CompoundValueNode*  _container,
+    const std::string&  _path,
+    const std::string&  _name,
+    double              _value,
+    int                 _siblingNo,
+    orion::ValueType    _type,
+    int                 _level = -1
+  );
+
+  CompoundValueNode
+  (
+    CompoundValueNode*  _container,
+    const std::string&  _path,
+    const std::string&  _name,
+    bool                 _value,
+    int                 _siblingNo,
+    orion::ValueType    _type,
+    int                 _level = -1
+  );
 
   ~CompoundValueNode();
 
   CompoundValueNode*  clone(void);
   CompoundValueNode*  add(CompoundValueNode* node);
-  CompoundValueNode*  add(const Type _type, const std::string& _name, const std::string& _value = "");
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, const std::string& _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, const char* _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, double _value);
+  CompoundValueNode*  add(const orion::ValueType _type, const std::string& _name, bool _value);
   void                check(void);
   std::string         finish(void);
-  std::string         render(Format format, const std::string& indent);
+  std::string         render(ConnectionInfo* ciP, Format format, const std::string& indent);
   std::string         toJson(bool isLastElement);
 
-  static const char*  typeName(const Type _type);
   void                shortShow(const std::string& indent);
   void                show(const std::string& indent);
 

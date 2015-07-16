@@ -181,27 +181,27 @@ static std::string getArrayElementName(const std::string& arrayName)
 *
 * nodeType -
 */
-std::string nodeType(const std::string& nodeName, const std::string& value, orion::CompoundValueNode::Type* typeP)
+std::string nodeType(const std::string& nodeName, const std::string& value, orion::ValueType* typeP)
 {
-  bool        isObject         = (nodeName == "") && (value == "");
-  bool        isString           = (nodeName != "") && (value != "");
-  bool        isVector         = (nodeName != "") && (value == "");
+  bool  isObject  = (nodeName == "") && (value == "");
+  bool  isString  = (nodeName != "") && (value != "");
+  bool  isVector  = (nodeName != "") && (value == "");
 
   if (isObject)
   {
-    *typeP = orion::CompoundValueNode::Object;
+    *typeP = orion::ValueTypeObject;
     return "Object";
   }
 
   if (isString)
   {
-    *typeP = orion::CompoundValueNode::String;
+    *typeP = orion::ValueTypeString;
     return "String";
   }
 
   if (isVector)
   {
-     *typeP = orion::CompoundValueNode::Vector;
+     *typeP = orion::ValueTypeVector;
      return "Vector";
   }
 
@@ -231,7 +231,7 @@ void eatCompound
   if (containerP == NULL)
   {
     LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
-    containerP = new CompoundValueNode(orion::CompoundValueNode::Object);
+    containerP = new CompoundValueNode(orion::ValueTypeObject);
     ciP->compoundValueRoot = containerP;
   }
   else
@@ -246,7 +246,7 @@ void eatCompound
         return;
       }
 
-      containerP->add(orion::CompoundValueNode::String, nodeName, nodeValue);
+      containerP->add(orion::ValueTypeString, nodeName, nodeValue);
       LM_T(LmtCompoundValue, ("Added string '%s' (value: '%s') under '%s'",
                               nodeName.c_str(),
                               nodeValue.c_str(),
@@ -255,24 +255,24 @@ void eatCompound
     else if ((nodeName == "") && (nodeValue == "") && (noOfChildren == 0))  // Unnamed String with EMPTY VALUE
     {
       LM_T(LmtCompoundValue, ("'Bad' input - looks like a container but it is an EMPTY STRING - no name, no value"));
-      containerP->add(orion::CompoundValueNode::String, "item", "");
+      containerP->add(orion::ValueTypeString, "item", "");
     }
     else if ((nodeName != "") && (nodeValue == ""))  // Named Container
     {
       LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
-      containerP = containerP->add(orion::CompoundValueNode::Object, nodeName);
+      containerP = containerP->add(orion::ValueTypeObject, nodeName, "");
     }
     else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
     {
       LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
-      containerP->type = orion::CompoundValueNode::Vector;
-      containerP = containerP->add(orion::CompoundValueNode::Object, "item");
+      containerP->valueType = orion::ValueTypeVector;
+      containerP = containerP->add(orion::ValueTypeObject, "item", "");
     }
     else if ((nodeName == "") && (nodeValue != ""))  // Name-Less String + its container is a vector
     {
-      containerP->type = orion::CompoundValueNode::Vector;
+      containerP->valueType = orion::ValueTypeVector;
       LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
-      containerP->add(orion::CompoundValueNode::String, "item", nodeValue);
+      containerP->add(orion::ValueTypeString, "item", nodeValue);
       LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s') under '%s'",
                               nodeValue.c_str(), containerP->cpath()));
     }

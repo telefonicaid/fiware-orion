@@ -99,7 +99,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
   LM_T(LmtParse, ("Got an attribute value: %s", node->value()));
   parseDataP->lastContextAttribute = parseDataP->acer.attributeP;
   parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
-  parseDataP->acer.attributeP->value = node->value();
+  parseDataP->acer.attributeP->stringValue = node->value();
   return 0;
 }
 
@@ -152,7 +152,7 @@ static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
-  reqData->acer.metadataP->value = node->value();
+  reqData->acer.metadataP->stringValue = node->value();
   return 0;
 }
 
@@ -205,7 +205,7 @@ static int domainMetadataType(xml_node<>* node, ParseData* reqData)
 static int domainMetadataValue(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
-  reqData->acer.domainMetadataP->value = node->value();
+  reqData->acer.domainMetadataP->stringValue = node->value();
   return 0;
 }
 

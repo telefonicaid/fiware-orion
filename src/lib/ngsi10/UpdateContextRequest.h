@@ -32,6 +32,8 @@
 #include "ngsi/ContextElementVector.h"
 #include "ngsi/UpdateActionType.h"
 #include "rest/ConnectionInfo.h"
+#include "apiTypesV2/Entity.h"
+
 
 
 /* ****************************************************************************
@@ -90,6 +92,9 @@ typedef struct UpdateContextRequest
                     const std::string&                   attributeName,
                     const std::string&                   metaID,
                     const std::string&                   _updateActionType);
+
+  void         fill(const Entity* entP, const std::string& _updateActionType);
+
 } UpdateContextRequest;
 
 #endif

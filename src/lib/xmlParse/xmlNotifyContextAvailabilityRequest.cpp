@@ -279,7 +279,7 @@ static int attributeMetadataType(xml_node<>* node, ParseData* parseDataP)
 static int attributeMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadataValue: '%s'", node->value()));
-  parseDataP->ncar.attributeMetadataP->value = node->value();
+  parseDataP->ncar.attributeMetadataP->stringValue = node->value();
 
   return 0;
 }
@@ -336,7 +336,7 @@ static int registrationMetadataType(xml_node<>* node, ParseData* parseDataP)
 static int registrationMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registrationMetadataValue: '%s'", node->value()));
-  parseDataP->ncar.regMetadataP->value = node->value();
+  parseDataP->ncar.regMetadataP->stringValue = node->value();
 
   return 0;
 }

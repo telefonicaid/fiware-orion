@@ -73,6 +73,14 @@ extern std::string restService(ConnectionInfo* ciP, RestService* serviceV);
 *
 * payloadParse - 
 */
-extern std::string payloadParse(ConnectionInfo* ciP, ParseData* parseDataP, RestService* service, XmlRequest** reqPP, JsonRequest** jsonPP);
+extern std::string payloadParse
+(
+  ConnectionInfo*            ciP,
+  ParseData*                 parseDataP,
+  RestService*               service,
+  XmlRequest**               reqPP,
+  JsonRequest**              jsonPP,
+  std::vector<std::string>&  compV
+);
 
 #endif

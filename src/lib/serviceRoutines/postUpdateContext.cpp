@@ -497,7 +497,12 @@ std::string postUpdateContext
   //
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
-  ciP->httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
+  HttpStatusCode httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, "postUpdateContext");
+  if (ciP->httpStatusCode != SccCreated)
+  {
+    ciP->httpStatusCode = httpStatusCode;
+  }
+
   foundAndNotFoundAttributeSeparation(upcrsP, upcrP, ciP);
 
 
@@ -535,7 +540,7 @@ std::string postUpdateContext
       }
       else
       {
-        ceP->contextAttributeVector[aIx]->value = aP->value;
+        ceP->contextAttributeVector[aIx]->stringValue = aP->stringValue; // FIXME P10: automacit value -> stringValue change, please review to check if it is safe
         ceP->contextAttributeVector[aIx]->type  = aP->type;
       }
     }

@@ -29,6 +29,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContext.h"
 #include "ngsi/EntityId.h"
@@ -48,6 +49,12 @@
 * - createEntityCompoundValue2
 * - createEntityCompoundValue1PlusSimpleValue
 * - createEntityCompoundValue2PlusSimpleValue
+*
+* - createEntityCompoundValue1Native
+* - createEntityCompoundValue2Native
+* - createEntityCompoundValue1PlusSimpleValueNative
+* - createEntityCompoundValue2PlusSimpleValueNative
+*
 * - appendCompoundValue1
 * - appendCompoundValue2
 * - appendCompoundValue1PlusSimpleValue
@@ -71,52 +78,102 @@
 
 
 // Compound1: [ 22, { x: [x1, x2], y: 3 }, [ z1, z2 ] ]
-#define CREATE_COMPOUND1(cv)                                                       \
-    orion::CompoundValueNode*  str;                                                \
-    orion::CompoundValueNode*  vec;                                                \
-    orion::CompoundValueNode*  x;                                                  \
-    orion::CompoundValueNode*  leaf;                                               \
-                                                                                   \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);           \
-                                                                                   \
-    leaf = cv->add(orion::CompoundValueNode::String,  "",  "22");                  \
-    str  = cv->add(orion::CompoundValueNode::Object,  "",  "");                    \
-    vec  = cv->add(orion::CompoundValueNode::Vector,  "",  "");                    \
-                                                                                   \
-    x    = str->add(orion::CompoundValueNode::Vector, "x", "");                    \
-    leaf = str->add(orion::CompoundValueNode::String, "y", "3");                   \
-                                                                                   \
-    leaf = x->add(orion::CompoundValueNode::String,   "",  "x1");                  \
-    leaf = x->add(orion::CompoundValueNode::String,   "",  "x2");                  \
-                                                                                   \
-    leaf = vec->add(orion::CompoundValueNode::String, "",  "z1");                  \
-    leaf = vec->add(orion::CompoundValueNode::String, "",  "z2");                  \
-                                                                                   \
-    leaf->check();                                                                 \
-    cv->shortShow("shortShow1: ");                                                 \
+#define CREATE_COMPOUND1(cv)                                             \
+    orion::CompoundValueNode*  str;                                      \
+    orion::CompoundValueNode*  vec;                                      \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  leaf;                                     \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeVector);           \
+                                                                         \
+    leaf = cv->add(orion::ValueTypeString,  "",  "22");                  \
+    str  = cv->add(orion::ValueTypeObject,  "",  "");                    \
+    vec  = cv->add(orion::ValueTypeVector,  "",  "");                    \
+                                                                         \
+    x    = str->add(orion::ValueTypeVector, "x", "");                    \
+    leaf = str->add(orion::ValueTypeString, "y", "3");                   \
+                                                                         \
+    leaf = x->add(orion::ValueTypeString,   "",  "x1");                  \
+    leaf = x->add(orion::ValueTypeString,   "",  "x2");                  \
+                                                                         \
+    leaf = vec->add(orion::ValueTypeString, "",  "z1");                  \
+    leaf = vec->add(orion::ValueTypeString, "",  "z2");                  \
+                                                                         \
+    leaf->check();                                                       \
+    cv->shortShow("shortShow1: ");                                       \
     cv->show("show1: ");
     
 
 // Compound2: { x: { x1: a, x2: b }, y: [ y1, y2 ] }
-#define CREATE_COMPOUND2(cv)                                                       \
-    orion::CompoundValueNode*  x;                                                  \
-    orion::CompoundValueNode*  y;                                                  \
-    orion::CompoundValueNode*  leaf;                                               \
-                                                                                   \
-    cv = new orion::CompoundValueNode(orion::CompoundValueNode::Object); \
-                                                                                   \
-    x    = cv->add(orion::CompoundValueNode::Object, "x",  "");                    \
-    y    = cv->add(orion::CompoundValueNode::Vector, "y",  "");                    \
-                                                                                   \
-    leaf = x->add(orion::CompoundValueNode::String,  "x1", "a");                   \
-    leaf = x->add(orion::CompoundValueNode::String,  "x2", "b");                   \
-                                                                                   \
-    leaf = y->add(orion::CompoundValueNode::String,  "",   "y1");                  \
-    leaf = y->add(orion::CompoundValueNode::String,  "",   "y2");                  \
-                                                                                   \
-    leaf->check();                                                                 \
-    cv->shortShow("shortShow2: ");                                                 \
+#define CREATE_COMPOUND2(cv)                                             \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  y;                                        \
+    orion::CompoundValueNode*  leaf;                                     \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeObject);           \
+                                                                         \
+    x    = cv->add(orion::ValueTypeObject, "x",  "");                    \
+    y    = cv->add(orion::ValueTypeVector, "y",  "");                    \
+                                                                         \
+    leaf = x->add(orion::ValueTypeString,  "x1", "a");                   \
+    leaf = x->add(orion::ValueTypeString,  "x2", "b");                   \
+                                                                         \
+    leaf = y->add(orion::ValueTypeString,  "",   "y1");                  \
+    leaf = y->add(orion::ValueTypeString,  "",   "y2");                  \
+                                                                         \
+    leaf->check();                                                       \
+    cv->shortShow("shortShow2: ");                                       \
     cv->show("show2: ");
+
+
+// Compound1 native: [ 22.0, { x: [x1, x2], y: 3.0 }, [ z1, false ] ]
+#define CREATE_COMPOUND1_NATIVE(cv)                                      \
+    orion::CompoundValueNode*  str;                                      \
+    orion::CompoundValueNode*  vec;                                      \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  leaf;                                     \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeVector);           \
+                                                                         \
+    leaf = cv->add(orion::ValueTypeNumber,  "",  22.0);                  \
+    str  = cv->add(orion::ValueTypeObject,  "",  "");                    \
+    vec  = cv->add(orion::ValueTypeVector,  "",  "");                    \
+                                                                         \
+    x    = str->add(orion::ValueTypeVector, "x", "");                    \
+    leaf = str->add(orion::ValueTypeNumber, "y", 3.0);                   \
+                                                                         \
+    leaf = x->add(orion::ValueTypeString,   "",  "x1");                  \
+    leaf = x->add(orion::ValueTypeString,   "",  "x2");                  \
+                                                                         \
+    leaf = vec->add(orion::ValueTypeString, "",  "z1");                  \
+    leaf = vec->add(orion::ValueTypeBoolean, "",  false);                \
+                                                                         \
+    leaf->check();                                                       \
+    cv->shortShow("shortShow1: ");                                       \
+    cv->show("show1: ");
+
+
+// Compound2 native: { x: { x1: a, x2: true }, y: [ y1, y2 ] }
+#define CREATE_COMPOUND2_NATIVE(cv)                                      \
+    orion::CompoundValueNode*  x;                                        \
+    orion::CompoundValueNode*  y;                                        \
+    orion::CompoundValueNode*  leaf;                                     \
+                                                                         \
+    cv = new orion::CompoundValueNode(orion::ValueTypeObject);           \
+                                                                         \
+    x    = cv->add(orion::ValueTypeObject, "x",  "");                    \
+    y    = cv->add(orion::ValueTypeVector, "y",  "");                    \
+                                                                         \
+    leaf = x->add(orion::ValueTypeString,  "x1", "a");                   \
+    leaf = x->add(orion::ValueTypeBoolean,  "x2", true);                 \
+                                                                         \
+    leaf = y->add(orion::ValueTypeString,  "",   "y1");                  \
+    leaf = y->add(orion::ValueTypeString,  "",   "y2");                  \
+                                                                         \
+    leaf->check();                                                       \
+    cv->shortShow("shortShow2: ");                                       \
+    cv->show("show2: ");
+
 
 /* ****************************************************************************
 *
@@ -257,7 +314,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -340,7 +397,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -423,11 +480,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValu
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -518,11 +575,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -555,6 +612,358 @@ TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValu
     EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
     EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
     EXPECT_EQ("b", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").str());
+    EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
+    EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_EQ(1360232700, a2.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a2.getIntField("creDate"));
+
+    /* Release mock */
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* createCompoundValue1Native -
+*/
+TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1Native)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E3", "T3", "false");
+    orion::CompoundValueNode* cv;
+    CREATE_COMPOUND1_NATIVE(cv)
+    ContextAttribute ca("A1", "TA1", cv);
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).entityId.id);
+    EXPECT_EQ("T3", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientBase* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
+    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_EQ(22.0, a1.getField("value").Array()[0].Number());
+    EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
+    EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
+    EXPECT_EQ(3.0, a1.getField("value").Array()[1].embeddedObject().getField("y").Number());
+    EXPECT_EQ("z1", a1.getField("value").Array()[2].Array()[0].str());
+    EXPECT_FALSE(a1.getField("value").Array()[2].Array()[1].Bool());
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+
+    /* Release mock */
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* createCompoundValue2Native -
+*/
+TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2Native)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E3", "T3", "false");
+    orion::CompoundValueNode* cv;
+    CREATE_COMPOUND2_NATIVE(cv)
+    ContextAttribute ca("A1", "TA1", cv);
+    ce.contextAttributeVector.push_back(&ca);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).entityId.id);
+    EXPECT_EQ("T3", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientBase* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
+    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(1, attrs.nFields());
+    ASSERT_EQ(1, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
+    EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
+    EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+
+    /* Release mock */
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* createCompoundValue1PlusSimpleValueNative -
+*/
+TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue1PlusSimpleValueNative)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E3", "T3", "false");
+    orion::CompoundValueNode* cv;
+    CREATE_COMPOUND1_NATIVE(cv)
+    ContextAttribute ca1("A1", "TA1", cv);
+    ContextAttribute ca2("A2", "TA2", "simple2");
+    ce.contextAttributeVector.push_back(&ca1);
+    ce.contextAttributeVector.push_back(&ca2);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).entityId.id);
+    EXPECT_EQ("T3", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientBase* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
+    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_EQ(22.0, a1.getField("value").Array()[0].Number());
+    EXPECT_EQ("x1", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[0].str());
+    EXPECT_EQ("x2", a1.getField("value").Array()[1].embeddedObject().getField("x").Array()[1].str());
+    EXPECT_EQ(3.0, a1.getField("value").Array()[1].embeddedObject().getField("y").Number());
+    EXPECT_EQ("z1", a1.getField("value").Array()[2].Array()[0].str());
+    EXPECT_FALSE(a1.getField("value").Array()[2].Array()[1].Bool());
+    EXPECT_EQ(1360232700, a1.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a1.getIntField("creDate"));
+    EXPECT_STREQ("TA2",C_STR_FIELD(a2, "type"));
+    EXPECT_STREQ("simple2",C_STR_FIELD(a2, "value"));
+    EXPECT_EQ(1360232700, a2.getIntField("modDate"));
+    EXPECT_EQ(1360232700, a2.getIntField("creDate"));
+
+    /* Release mock */
+    utExit();
+}
+
+/* ****************************************************************************
+*
+* createCompoundValue2PlusSimpleValueNative -
+*/
+TEST(mongoUpdateContextCompoundValuesRequest, createCompoundValue2PlusSimpleValueNative)
+{
+    HttpStatusCode         ms;
+    UpdateContextRequest   req;
+    UpdateContextResponse  res;
+
+    utInit();
+
+    /* Forge the request (from "inside" to "outside") */
+    ContextElement ce;
+    ce.entityId.fill("E3", "T3", "false");
+    orion::CompoundValueNode* cv;
+    CREATE_COMPOUND2_NATIVE(cv)
+    ContextAttribute ca1("A1", "TA1", cv);
+    ContextAttribute ca2("A2", "TA2", "simple2");
+    ce.contextAttributeVector.push_back(&ca1);
+    ce.contextAttributeVector.push_back(&ca2);
+    req.contextElementVector.push_back(&ce);
+    req.updateActionType.set("APPEND");
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccOk, res.errorCode.code);
+    EXPECT_EQ("OK", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E3", RES_CER(0).entityId.id);
+    EXPECT_EQ("T3", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Check that every involved collection at MongoDB is as expected */
+    /* Note we are using EXPECT_STREQ() for some cases, as Mongo Driver returns const char*, not string
+     * objects (see http://code.google.com/p/googletest/wiki/Primer#String_Comparison) */
+
+    DBClientBase* connection = getMongoConnection();
+
+    /* entities collection */
+    BSONObj ent, attrs;
+    std::vector<BSONElement> attrNames;
+    ASSERT_EQ(1, connection->count(ENTITIES_COLL, BSONObj()));
+
+    ent = connection->findOne(ENTITIES_COLL, BSON("_id.id" << "E3" << "_id.type" << "T3"));
+    EXPECT_STREQ("E3", C_STR_FIELD(ent.getObjectField("_id"), "id"));
+    EXPECT_STREQ("T3", C_STR_FIELD(ent.getObjectField("_id"), "type"));
+    EXPECT_EQ(1360232700, ent.getIntField("modDate"));
+    EXPECT_EQ(1360232700, ent.getIntField("creDate"));
+    attrs = ent.getField("attrs").embeddedObject();
+    attrNames = ent.getField("attrNames").Array();
+    ASSERT_EQ(2, attrs.nFields());
+    ASSERT_EQ(2, attrNames.size());
+    BSONObj a1 = attrs.getField("A1").embeddedObject();
+    BSONObj a2 = attrs.getField("A2").embeddedObject();
+    EXPECT_TRUE(findAttr(attrNames, "A1"));
+    EXPECT_TRUE(findAttr(attrNames, "A2"));
+    EXPECT_STREQ("TA1",C_STR_FIELD(a1, "type"));
+    EXPECT_EQ("a", a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x1").str());
+    EXPECT_TRUE(a1.getField("value").embeddedObject().getField("x").embeddedObject().getField("x2").Bool());
     EXPECT_EQ("y1", a1.getField("value").embeddedObject().getField("y").Array()[0].str());
     EXPECT_EQ("y2", a1.getField("value").embeddedObject().getField("y").Array()[1].str());
     EXPECT_EQ(1360232700, a1.getIntField("modDate"));
@@ -610,7 +1019,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -700,7 +1109,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -790,11 +1199,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue1PlusSimpleValu
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -892,11 +1301,11 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendCompoundValue2PlusSimpleValu
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -990,7 +1399,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundObject)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1070,7 +1479,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundObjectToSimple)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1149,7 +1558,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundObje
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1229,7 +1638,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundObjectToSimp
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1309,7 +1718,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateSimpleToCompoundVector)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1391,7 +1800,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, updateCompoundVectorToSimple)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1470,7 +1879,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateSimpleToCompoundVect
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -1552,7 +1961,7 @@ TEST(mongoUpdateContextCompoundValuesRequest, appendAsUpdateCompoundVectorToSimp
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("AX", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TAX", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);

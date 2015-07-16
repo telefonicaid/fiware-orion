@@ -207,7 +207,7 @@ static std::string craMetadata(const std::string& path, const std::string& value
 
   reqDataP->rcr.attributeMetadataP->type  = "";
   reqDataP->rcr.attributeMetadataP->name  = "";
-  reqDataP->rcr.attributeMetadataP->value = "";
+  reqDataP->rcr.attributeMetadataP->stringValue = "";
 
   reqDataP->rcr.attributeP->metadataVector.push_back(reqDataP->rcr.attributeMetadataP);
 
@@ -251,7 +251,7 @@ static std::string craMetadataType(const std::string& path, const std::string& v
 static std::string craMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", value.c_str()));
-  reqDataP->rcr.attributeMetadataP->value = value;
+  reqDataP->rcr.attributeMetadataP->stringValue = value;
 
   return "OK";
 }
@@ -269,7 +269,7 @@ static std::string regMetadata(const std::string& path, const std::string& value
   reqDataP->rcr.registrationMetadataP = new Metadata();
   reqDataP->rcr.registrationMetadataP->type  = "";
   reqDataP->rcr.registrationMetadataP->name  = "";
-  reqDataP->rcr.registrationMetadataP->value = "";
+  reqDataP->rcr.registrationMetadataP->stringValue = "";
   reqDataP->rcr.crP->registrationMetadataVector.push_back(reqDataP->rcr.registrationMetadataP);
 
   return "OK";
@@ -312,7 +312,7 @@ static std::string regMetadataType(const std::string& path, const std::string& v
 static std::string regMetadataValue(const std::string& path, const std::string& value, ParseData* reqDataP)
 {
   LM_T(LmtParse, ("Got a reg metadata value: '%s'", value.c_str()));
-  reqDataP->rcr.registrationMetadataP->value = value;
+  reqDataP->rcr.registrationMetadataP->stringValue = value;
 
   return "OK";
 }

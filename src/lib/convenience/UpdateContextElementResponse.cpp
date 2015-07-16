@@ -148,7 +148,17 @@ void UpdateContextElementResponse::fill(UpdateContextResponse* ucrsP)
     //
     for (unsigned int aIx = 0; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
     {
-      cerP->contextElement.contextAttributeVector[aIx]->value = "";
+      //
+      // NOTE
+      //   Only stringValue is cleared here (not numberValue nor boolValue, which are new for v2).
+      //   This is OK for /v1, where all fields are strings.
+      //   For /v2, we would need to reset the valueType to STRING as well, but since this function is used only
+      //   in v1, this is not strictly necessary.
+      //   However, it doesn't hurt, so that modification is included as well: 
+      //     cerP->contextElement.contextAttributeVector[aIx]->valueType = orion::ValueTypeString
+      //
+      cerP->contextElement.contextAttributeVector[aIx]->stringValue = "";
+      cerP->contextElement.contextAttributeVector[aIx]->valueType   = orion::ValueTypeString;
     }
 
     contextAttributeResponseVector.fill(&cerP->contextElement.contextAttributeVector, cerP->statusCode);
