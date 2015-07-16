@@ -323,11 +323,9 @@ void curl_context_cleanup(void)
 */
 int get_curl_context(const std::string& key, struct curl_context* pcc)
 {
-  LM_M(("KZ: In get_curl_context"));
   pcc->curl   = NULL;
   pcc->pmutex = NULL;
 
-  LM_M(("KZ: waiting for contexts_mutex"));
   int s = pthread_mutex_lock(&contexts_mutex);
 
   if (s != 0)
@@ -335,8 +333,6 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
     LM_E(("Runtime Error (pthread_mutex_lock failure)"));
     return s;
   }
-
-  LM_M(("KZ: got contexts_mutex"));
 
   std::map<std::string, struct curl_context>::iterator it;
   it = contexts.find(key);
@@ -351,7 +347,6 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       if (pm == NULL)
       {
         pthread_mutex_unlock(&contexts_mutex);
-        LM_M(("KZ: released contexts_mutex"));
         LM_E(("Runtime Error (malloc)"));
         return -1;
       }
@@ -360,7 +355,6 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       if (s != 0)
       {
         pthread_mutex_unlock(&contexts_mutex);
-        LM_M(("KZ: released contexts_mutex"));
         LM_E(("Runtime Error (pthread_mutex_init)"));
         free(pm);
         return s;
@@ -384,7 +378,6 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
     LM_E(("Runtime Error (pthread_mutex_unlock)"));
     return s;
   }
-  LM_M(("KZ: released contexts_mutex"));
 
   // lock the mutex, if everything was right
   // and cc is not {NULL, NULl}
@@ -399,14 +392,12 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       clock_gettime(CLOCK_REALTIME, &startTime);
     }
 
-    LM_M(("KZ: waiting for pmutex"));
     s = pthread_mutex_lock(pcc->pmutex);
     if (s != 0)
     {
       LM_E(("Runtime Error (pthread_mutex_lock)"));
       return s;
     }
-    LM_M(("KZ: got pmutex"));
 
     if (semTimeStatistics)
     {
@@ -441,8 +432,6 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
 */
 int release_curl_context(struct curl_context *pcc, bool final)
 {
-  LM_M(("KZ: In release_curl_context"));
-
   // Reset context if not an empty context
   if (pcc->curl != NULL)
   {
@@ -467,8 +456,7 @@ int release_curl_context(struct curl_context *pcc, bool final)
 
     pcc->pmutex = NULL; // It will remain in global map
   }
-  else
-    LM_M(("KZ: NOT unlocked pmutex"));
+
 
   return 0;
 }
