@@ -317,6 +317,11 @@ std::string ContextAttribute::renderAsJsonObject
   {
     if (omitValue == false)
     {
+      //
+      // NOTE
+      // renderAsJsonObject is used in v1 only.
+      // => we only need to care about stringValue (not boolValue nor numberValue)
+      //
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
                       (request != RtUpdateContextResponse)? stringValue : "",
                       ciP->outFormat, commaAfterContextValue);
