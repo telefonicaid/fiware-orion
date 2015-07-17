@@ -28,6 +28,8 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
 #include "ngsi/Restriction.h"
 #include "ngsi/Reference.h"
 #include "ngsi/NotifyConditionVector.h"
@@ -37,6 +39,29 @@
 
 namespace orion
 {
+
+/* ****************************************************************************
+*
+* match - 
+*/
+bool EntityInfo::match(const std::string& idPattern, const std::string& type)
+{
+  if ((type != "") && (entityType != type))
+  {
+    return false;
+  }
+
+  // REGEX comparison this->entityIdPattern VS idPattern
+  if (regcomp(&entityIdPattern, idPattern.c_str(), 0) != 0)
+  {
+    LM_W(("Bad Input (error compiling regex: '%s')", idPattern.c_str()));
+    return false;
+  }
+
+  return regexec(&entityIdPattern, idPattern.c_str(), 0, NULL, 0) == 0;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -114,6 +139,177 @@ Subscription::Subscription
 void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
 {
   entityIdInfos.push_back(entityIdInfoP);
+}
+
+
+
+/* ****************************************************************************
+*
+* match - 
+*/
+bool Subscription::match(const std::string& id, const std::string& type, const std::string& attributeName)
+{
+  if (!hasAttribute(attributeName))
+  {
+    return false;
+  }
+
+  unsigned int ix;
+
+  for (ix = 0; ix < entityIdInfos.size(); ++ix)
+  {
+    if (entityIdInfos[ix]->match(id, type))
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* hasAttribute - 
+*/
+bool Subscription::hasAttribute(const std::string& attributeName)
+{
+  unsigned int ix;
+
+  for (ix = 0; ix < attributes.size(); ++ix)
+  {
+    if (attributes[ix] == attributeName)
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::SubscriptionCache - 
+*/
+SubscriptionCache::SubscriptionCache()
+{
+  sem_init(&mutex, 0, 1); // Shared between threads, not taken initially
+}
+
+
+
+/* ****************************************************************************
+*
+* lookup - 
+*/
+Subscription* SubscriptionCache::lookup(const std::string& id, const std::string& type, const std::string& attributeName)
+{
+  unsigned int ix;
+
+  for (ix = 0; ix < subs.size(); ++ix)
+  {
+    if (subs[ix]->match(id, type, attributeName))
+    {
+      return subs[ix];
+    }
+  }
+
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* lookupById - 
+*/
+Subscription* SubscriptionCache::lookupById(const std::string& subId)
+{
+  unsigned int ix;
+
+  for (ix = 0; ix < subs.size(); ++ix)
+  {
+    if (subs[ix]->subscriptionId == subId)
+    {
+      return subs[ix];
+    }
+  }
+
+  return NULL;
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::insert - 
+*/
+void SubscriptionCache::insert(Subscription* subP)
+{
+  sem_wait(&mutex);
+  subs.push_back(subP);
+  sem_post(&mutex);
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::remove - 
+*/
+int SubscriptionCache::remove(Subscription* subP)
+{
+  unsigned int ix;
+
+  for (ix = 0; ix < subs.size(); ++ix)
+  {
+    if (subs[ix] == subP)
+    {
+      sem_wait(&mutex);
+
+      free(subP);
+      subs.erase(subs.begin() + ix);
+      
+      sem_post(&mutex);
+
+      return 0;
+    }
+  }
+
+  return -1;
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::remove - 
+*/
+int SubscriptionCache::remove(const std::string& subId)
+{
+  Subscription* subP = lookupById(subId);
+
+  if (subP == NULL)
+  {
+    return -1;
+  }
+
+  return remove(subP);
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::refresh - 
+*/
+int SubscriptionCache::refresh(void)
+{
+  LM_W(("NOT IMPLEMENMTED"));
+  return 0;
 }
 
 }

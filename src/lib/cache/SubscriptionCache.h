@@ -56,6 +56,8 @@ typedef struct EntityInfo
 {
   regex_t       entityIdPattern;
   std::string   entityType;
+
+  bool          match(const std::string& idPattern, const std::string& type);
 } EntityInfo;
 
 
@@ -100,6 +102,8 @@ class Subscription
                const std::string&               _reference);
 
   void entityIdInfoAdd(EntityInfo* entityIdInfoP);
+  bool match(const std::string& idPattern, const std::string& type, const std::string& attributeName);
+  bool hasAttribute(const std::string&attributeName);
 };
 
 
@@ -130,12 +134,12 @@ class SubscriptionCache
  public:
   SubscriptionCache();
 
-  int            init(void);
-  void           insert(const Subscription& sub);
-  int            remove(std::string subId);
+  void           insert(Subscription* sub);
+  int            remove(Subscription* sub);
+  int            remove(const std::string& subId);
   int            refresh(void);
-  Subscription*  lookup(const EntityId& entity, const ContextAttribute& attribute);
-  Subscription*  lookupById(std::string subId);
+  Subscription*  lookup(const std::string& id, const std::string& type, const std::string& attributeName);
+  Subscription*  lookupById(const std::string& subId);
 };
 
 }  // namespace orion
