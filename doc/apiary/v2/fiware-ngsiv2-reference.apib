@@ -43,10 +43,16 @@ A context element is a JSON object  which contains information about a specific 
 
 It is important to understand that the relationship of entity and context element is one-to-many. This means that 
 * each context element refers to exactly one entity
-* there can be several context elements referring to the same entity. The context elements can for example contain different pieces of information about the entity.
+* there can be several context elements  referring to the same entity. The context elements can for example contain different pieces of information about the entity.
 
-*old stuff*
-the main data container in FIWARE NGSI. An entity is a data object which is typically used for representing a real-world object like e.g. a sensor, a person, or a room. The minimum data that has to be contained by an entity object is an identifier, the *entity id*. This identifier uniquely determines the real-world object the entity object refers to. This means that two entity objects having the same entity id refer to the same real-world object.
+### <contextattributes> Context Attributes 
+
+Context attributes are properties of context entities. For example, the current speed of a car could be modeled as attribute *current_speed* of entity *car-104*. 
+
+In the NGSI data model, attributes have an *attribute name*, and *attribute type*, an *attribute value* and *metadata*. 
+ * the attribute name describes which kind of property of the entity the attribute value represents, for example *current_speed*.
+  * the attribute type represents the NGSI value type of the attribute value. Note that FIWARE NGSI has an own type system for attribute values, so NGSI value types are not the same as JSON types.
+  * the attribute value finally contains the actual data.
 
 
 ## JSON entity representation
