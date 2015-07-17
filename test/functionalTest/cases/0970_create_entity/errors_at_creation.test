@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST Entities V2
+POST Entities V2 error handling
 
 --SHELL-INIT--
 dbInit CB
@@ -30,32 +30,16 @@ brokerStart CB 0
 --SHELL--
 
 #
-# 00. POST /v2/entities with Entity::id AND Entity::idPattern
 # 01. POST /v2/entities without Entity::id
 # 02. POST /v2/entities with empty Entity::id
-# 03. POST /v2/entities with empty Entity::idPattern
-# 04. POST /v2/entities with boolean Entity::id
-# 05. POST /v2/entities with integer Entity::id
-# 06. POST /v2/entities with boolean Entity::type
-# 07. POST /v2/entities with integer Entity::type
-# 08. POST /v2/entities without Attribute::name
-# 09. POST /v2/entities with integer Attribute::name
-# 10. POST /v2/entities with boolean Attribute::name
-# 11. POST /v2/entities with empty Attribute::value
+# 03. POST /v2/entities with boolean Entity::id
+# 04. POST /v2/entities with Entity::id as a number
+# 05. POST /v2/entities with boolean Entity::type
+# 06. POST /v2/entities with Entity::type as a number
+# 07. POST /v2/entities without Attribute::name
+# 08. POST /v2/entities with Attribute::name as a number
+# 09. POST /v2/entities with boolean Attribute::name
 #
-
-echo "00. POST /v2/entities with Entity::id AND Entity::idPattern"
-echo "==========================================================="
-payload='{
-  "id": "id",
-  "idPattern": "pattern",
-  "type": "T1",
-  "attr01": "1"
-}'
-orionCurl --url /v2/entities --payload "$payload" --json
-echo
-echo
-
 
 echo "01. POST /v2/entities without Entity::id"
 echo "========================================"
@@ -79,18 +63,7 @@ echo
 echo
 
 
-echo "03. POST /v2/entities with empty Entity::idPattern"
-echo "=================================================="
-payload='{
-  "idPattern": "",
-  "attr01": "1"
-}'
-orionCurl --url /v2/entities --payload "$payload" --json
-echo
-echo
-
-
-echo "04. POST /v2/entities with boolean Entity::id"
+echo "03. POST /v2/entities with boolean Entity::id"
 echo "============================================="
 payload='{
   "id": true,
@@ -102,8 +75,8 @@ echo
 echo
 
 
-echo "05. POST /v2/entities with integer Entity::id"
-echo "============================================="
+echo "04. POST /v2/entities with Entity::id as a number"
+echo "================================================="
 payload='{
   "id": 12,
   "type": "T1",
@@ -114,7 +87,7 @@ echo
 echo
 
 
-echo "06. POST /v2/entities with boolean Entity::type"
+echo "05. POST /v2/entities with boolean Entity::type"
 echo "==============================================="
 payload='{
   "id": "ID",
@@ -126,8 +99,8 @@ echo
 echo
 
 
-echo "07. POST /v2/entities with integer Entity::type"
-echo "==============================================="
+echo "06. POST /v2/entities with Entity::type as a number"
+echo "==================================================="
 payload='{
   "id": "ID",
   "type": 19,
@@ -138,7 +111,7 @@ echo
 echo
 
 
-echo "08. POST /v2/entities without Attribute::name"
+echo "07. POST /v2/entities without Attribute::name"
 echo "============================================="
 payload='{
   "id": "ID",
@@ -150,8 +123,8 @@ echo
 echo
 
 
-echo "09. POST /v2/entities with integer Attribute::name"
-echo "=================================================="
+echo "08. POST /v2/entities with Attribute::name as a number"
+echo "======================================================"
 payload='{
   "id": "ID",
   "type": "WT",
@@ -162,7 +135,7 @@ echo
 echo
 
 
-echo "10. POST /v2/entities with boolean Attribute::name"
+echo "09. POST /v2/entities with boolean Attribute::name"
 echo "=================================================="
 payload='{
   "id": "ID",
@@ -174,178 +147,124 @@ echo
 echo
 
 
-echo "11. POST /v2/entities with empty Attribute::value"
-echo "================================================="
-payload='{
-  "id": "ID",
-  "type": "WT",
-  "a1": {
-    "value": ""
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload" --json
-echo
-echo
-
-
 --REGEXPECT--
-00. POST /v2/entities with Entity::id AND Entity::idPattern
-===========================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 80
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "both 'id' and 'idPattern' specified", 
-    "error": "JSON Parse Error"
-}
-
-
 01. POST /v2/entities without Entity::id
 ========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
+Content-Length: 61
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "no 'id' nor 'idPattern' specified", 
-    "error": "JSON Parse Error"
+    "description": "no entity id specified", 
+    "error": "ParseError"
 }
 
 
 02. POST /v2/entities with empty Entity::id
 ===========================================
 HTTP/1.1 400 Bad Request
-Content-Length: 76
+Content-Length: 54
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "empty 'id/idPattern' for Entity", 
-    "error": "JSON Parse Error"
+    "description": "empty entity id", 
+    "error": "ParseError"
 }
 
 
-03. POST /v2/entities with empty Entity::idPattern
-==================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "empty 'id/idPattern' for Entity", 
-    "error": "JSON Parse Error"
-}
-
-
-04. POST /v2/entities with boolean Entity::id
+03. POST /v2/entities with boolean Entity::id
 =============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
+Content-Length: 70
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for EntityId::id", 
-    "error": "JSON Parse Error"
+    "description": "invalid JSON type for entity id", 
+    "error": "ParseError"
 }
 
 
-05. POST /v2/entities with integer Entity::id
-=============================================
+04. POST /v2/entities with Entity::id as a number
+=================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 79
+Content-Length: 70
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for EntityId::id", 
-    "error": "JSON Parse Error"
+    "description": "invalid JSON type for entity id", 
+    "error": "ParseError"
 }
 
 
-06. POST /v2/entities with boolean Entity::type
+05. POST /v2/entities with boolean Entity::type
 ===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 81
+Content-Length: 72
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for EntityId::type", 
-    "error": "JSON Parse Error"
+    "description": "invalid JSON type for entity type", 
+    "error": "ParseError"
 }
 
 
-07. POST /v2/entities with integer Entity::type
-===============================================
+06. POST /v2/entities with Entity::type as a number
+===================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 81
+Content-Length: 72
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for EntityId::type", 
-    "error": "JSON Parse Error"
+    "description": "invalid JSON type for entity type", 
+    "error": "ParseError"
 }
 
 
-08. POST /v2/entities without Attribute::name
+07. POST /v2/entities without Attribute::name
 =============================================
+HTTP/1.1 400 Bad Request
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "no 'name' for ContextAttribute", 
+    "error": "ParseError"
+}
+
+
+08. POST /v2/entities with Attribute::name as a number
+======================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 75
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "no 'name' for ContextAttribute", 
-    "error": "JSON Parse Error"
+    "description": "Errors found in incoming JSON buffer", 
+    "error": "ParseError"
 }
 
 
-09. POST /v2/entities with integer Attribute::name
+09. POST /v2/entities with boolean Attribute::name
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 81
+Content-Length: 75
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "description": "Errors found in incoming JSON buffer", 
-    "error": "JSON Parse Error"
-}
-
-
-10. POST /v2/entities with boolean Attribute::name
-==================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 81
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "Errors found in incoming JSON buffer", 
-    "error": "JSON Parse Error"
-}
-
-
-11. POST /v2/entities with empty Attribute::value
-=================================================
-HTTP/1.1 400 Bad Request
-Content-Length: 76
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "no 'value' for ContextAttribute", 
-    "error": "JSON Parse Error"
+    "error": "ParseError"
 }
 
 
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-

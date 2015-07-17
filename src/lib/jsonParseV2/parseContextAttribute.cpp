@@ -55,7 +55,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     {
       if (type != "String")
       {
-        LM_E(("Bad Input (ContextAttribute::Object::type must be a String"));
+        LM_E(("Bad Input (ContextAttributeObject::type must be a String"));
         return "Parse Error";
       }
 
@@ -90,8 +90,8 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
         if (r != "OK")
         {
-          LM_W(("Bad Input (json error in EntityId::ContextAttributeObject::Vector"));
-          return "json error in EntityId::ContextAttributeObject::Vector";
+          LM_W(("Bad Input (json error in ContextAttributeObject::Vector"));
+          return "json error in ContextAttributeObject::Vector";
         }
       }
       else if (type == "Object")
@@ -101,8 +101,8 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
         if (r != "OK")
         {
-          LM_W(("Bad Input (json error in EntityId::ContextAttributeObject::Object"));
-          return "json error in EntityId::ContextAttributeObject::Object";
+          LM_W(("Bad Input (json error in ContextAttributeObject::Object"));
+          return "json error in ContextAttributeObject::Object";
         }
       }
     }
@@ -118,7 +118,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       if (r != "OK")
       {
         LM_W(("Bad Input (error parsing Metadata)"));
-        return "json error in EntityId::ContextAttributeObject::Metadata";
+        return "json error in ContextAttributeObject::Metadata";
       }
       LM_M(("Metadata OK"));
     }
@@ -176,9 +176,9 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
     if (r != "OK")
     {
-      LM_W(("Bad Input (json error in EntityId::ContextAttribute::Vector"));
+      LM_W(("Bad Input (json error in ContextAttribute::Vector"));
       ciP->httpStatusCode = SccBadRequest;
-      return "json error in EntityId::ContextAttribute::Vector";
+      return "json error in ContextAttribute::Vector";
     }
   }
   else if (type == "Object")
@@ -198,7 +198,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
       LM_M(("KZ: Normal object parsed"));
       if (r != "OK")
       {
-        LM_W(("Bad Input (json error in EntityId::ContextAttribute::Object"));
+        LM_W(("Bad Input (json error in ContextAttribute::Object"));
         ciP->httpStatusCode = SccBadRequest;
         return "r";
       }
@@ -212,9 +212,9 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   }
   else
   {
-    LM_W(("Bad Input (bad type for EntityId::ContextAttribute)"));
+    LM_W(("Bad Input (bad type for ContextAttribute)"));
     ciP->httpStatusCode = SccBadRequest;
-    return "invalid JSON type for EntityId::ContextAttribute";
+    return "invalid JSON type for ContextAttribute";
   }
 
   if (caP->name == "")
@@ -222,13 +222,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     LM_W(("Bad Input (no 'name' for ContextAttribute"));
     ciP->httpStatusCode = SccBadRequest;
     return "no 'name' for ContextAttribute";
-  }
-
-  if ((caP->valueType == orion::ValueTypeString) && (caP->stringValue == ""))
-  {
-    LM_W(("Bad Input (no 'value' for ContextAttribute"));
-    ciP->httpStatusCode = SccBadRequest;
-    return "no 'value' for ContextAttribute";
   }
 
   return "OK";
