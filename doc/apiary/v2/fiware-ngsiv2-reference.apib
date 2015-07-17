@@ -44,25 +44,25 @@ A context element is a JSON object  which contains information about a specific 
 
 It is important to understand that the relationship of entity and context element is one-to-many. This means that 
 * each context element refers to exactly one entity
-* there can be several context elements  referring to the same entity. The context elements can for example contain different pieces of information about the entity.
+* there can be several context elements  referring to the same entity. The context elements can for example contain different pieces of information about the entity
 
 ### Context Attributes 
 
 Context attributes are properties of context entities. For example, the current speed of a car could be modeled as attribute *current_speed* of entity *car-104*.
 
 In the NGSI data model, attributes have an *attribute name*, and *attribute type*, an *attribute value* and *metadata*. 
- * the attribute name describes which kind of property of the entity the attribute value represents, for example *current_speed*.
- * the attribute type represents the NGSI value type of the attribute value. Note that FIWARE NGSI has an own type system for attribute values, so NGSI value types are not the same as JSON types.
- * the attribute value finally contains
-  * the actual data.
-  * optional **metadata** describing properties of the attribute value like e.g. accuracy, provider, or a timestamp.
+ * The attribute name describes which kind of property of the entity the attribute value represents, for example *current_speed*.
+ * The attribute type represents the NGSI value type of the attribute value. Note that FIWARE NGSI has an own type system for attribute values, so NGSI value types are not the same as JSON types.
+ * The attribute value finally contains
+  * the actual data
+  * optional **metadata** describing properties of the attribute value like e.g. accuracy, provider, or a timestamp
   
 ### Context Metadata
 
 Context metadata is used in FIWARE NGSI at several places, one of them being an optional part of the attribute value as described above. Similarly to attributes, each piece of metadata has 
- * **a metadata name**, describing the role of the metadata at the place where it occurs. For example, the metadata name *accuracy* indicates that the metadata value describes how accurate a given attribute value is.
- * a **metadata type**, describing the NGSI value type of the metadata value.
- * a **metadata value** containing the actual metadata. It is not forseen that metadata values can themselves have metadata.
+ * **a metadata name**, describing the role of the metadata at the place where it occurs; for example, the metadata name *accuracy* indicates that the metadata value describes how accurate a given attribute value is
+ * a **metadata type**, describing the NGSI value type of the metadata value
+ * a **metadata value** containing the actual metadata, where it is not forseen that metadata values can themselves have metadata
 
 ## JSON entity representation
 
