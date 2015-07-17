@@ -46,6 +46,7 @@ typedef struct NotifyConditionVector
   unsigned int      size(void);
   NotifyCondition*  get(int ix);
   void              release(void);
+  void              fill(const NotifyConditionVector& nv);
 
   std::string       check(RequestType         requestType,
                           Format              format,

@@ -89,15 +89,15 @@ class Subscription
   Reference                 reference;
 
   Subscription();
-  Subscription(std::string _subscriptionId);
-  Subscription(std::string                _subscriptionId,
-               std::vector<EntityInfo*>&  _entityIdInfos,
-               std::vector<std::string>&  _attributes,
-               int64_t                    _throttling,
-               int64_t                    _expirationTime,
-               Restriction&               _restriction,
-               NotifyConditionVector&     _notifyConditionVector,
-               Reference&                 _reference);
+  Subscription(const std::string& _subscriptionId);
+  Subscription(const std::string&               _subscriptionId,
+               const std::vector<EntityInfo*>&  _entityIdInfos,
+               const std::vector<std::string>&  _attributes,
+               int64_t                          _throttling,
+               int64_t                          _expirationTime,
+               const Restriction&               _restriction,
+               const NotifyConditionVector&     _notifyConditionVector,
+               const std::string&               _reference);
 
   void entityIdInfoAdd(EntityInfo* entityIdInfoP);
 };
@@ -129,18 +129,10 @@ class SubscriptionCache
 
  public:
   SubscriptionCache();
-  SubscriptionCache(std::string                subscriptionId,
-                    std::vector<EntityInfo*>&  entityIdInfos,
-                    std::vector<std::string>&  attributes,
-                    int64_t                    throttling,
-                    int64_t                    expirationTime,
-                    Restriction&               restriction,
-                    NotifyConditionVector&     notifyConditionVector,
-                    Reference&                 reference);
 
   int            init(void);
   void           insert(const Subscription& sub);
-  int            delete(std::string subId);
+  int            remove(std::string subId);
   int            refresh(void);
   Subscription*  lookup(const EntityId& entity, const ContextAttribute& attribute);
   Subscription*  lookupById(std::string subId);

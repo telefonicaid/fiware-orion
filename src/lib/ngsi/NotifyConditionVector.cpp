@@ -151,3 +151,13 @@ void NotifyConditionVector::release(void)
 
   vec.clear();
 }
+
+
+
+/* ****************************************************************************
+*
+* NotifyConditionVector::fill - 
+*/
+void NotifyConditionVector::fill(const NotifyConditionVector& nv)
+{
+}

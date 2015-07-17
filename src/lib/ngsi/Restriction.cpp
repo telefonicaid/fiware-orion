@@ -123,3 +123,13 @@ void Restriction::release(void)
   attributeExpression.release();
   scopeVector.release();
 }
+
+
+
+/* ****************************************************************************
+*
+* Restriction::fill - 
+*/
+void Restriction::fill(const Restriction& rP)
+{
+}

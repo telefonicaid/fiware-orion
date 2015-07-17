@@ -46,6 +46,7 @@ typedef struct Restriction
   std::string   render(Format format, const std::string& indent, int restrictions = 1, bool comma = false);
   void          present(const std::string& indent);
   void          release();
+  void          fill(const Restriction& rP);
 
   std::string   check(RequestType         requestType,
                       Format              format,

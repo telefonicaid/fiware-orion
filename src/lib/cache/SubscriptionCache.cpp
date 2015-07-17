@@ -44,6 +44,9 @@ namespace orion
 */
 Subscription::Subscription()
 {
+  subscriptionId = "";
+  throttling     = 0;
+  expirationTime = 0;
 }
 
 
@@ -52,9 +55,11 @@ Subscription::Subscription()
 *
 * Subscription::Subscription - 
 */
-Subscription::Subscription(std::string _subscriptionId)
+Subscription::Subscription(const std::string& _subscriptionId)
 {
   subscriptionId = _subscriptionId;
+  throttling     = 0;
+  expirationTime = 0;
 }
 
 
@@ -65,14 +70,14 @@ Subscription::Subscription(std::string _subscriptionId)
 */
 Subscription::Subscription
 (
-  std::string                _subscriptionId,
-  std::vector<EntityInfo*>*  _entityIdInfos,
-  std::vector<std::string>&  _attributes,
-  int64_t                    _throttling.
-  int64_t                    _expirationTime,
-  Restriction&               _restriction,
-  NotifyConditionVector&     _notifyConditionVector,
-  Reference&                 _reference
+  const std::string&               _subscriptionId,
+  const std::vector<EntityInfo*>&  _entityIdInfos,
+  const std::vector<std::string>&  _attributes,
+  int64_t                          _throttling,
+  int64_t                          _expirationTime,
+  const Restriction&               _restriction,
+  const NotifyConditionVector&     _notifyConditionVector,
+  const std::string&               _reference
 )
 {
   unsigned int ix;
@@ -92,7 +97,23 @@ Subscription::Subscription
   throttling     = _throttling;
   expirationTime = _expirationTime;
 
+  restriction.fill(_restriction);
+  notifyConditionVector.fill(_notifyConditionVector);
   reference.set(_reference);
+}
+
+
+
+/* ****************************************************************************
+*
+* Subscription::entityIdInfoAdd - 
+*
+* FIXME P10: need to decide whether this function copies the EntityInfo or
+*            just uses the pointer. For now, just using the pointer.
+*/
+void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
+{
+  entityIdInfos.push_back(entityIdInfoP);
 }
 
 }
