@@ -56,7 +56,12 @@ In the NGSI data model, attributes have an *attribute name*, and *attribute type
   * the actual data.
   * optional **metadata** describing properties of the attribute value like e.g. accuracy, provider, or a timestamp.
   
+### Context Metadata
 
+Context metadata is used in FIWARE NGSI at several places, one of them being an optional part of the attribute value as described above. Similarly to attributes, each piece of metadata has 
+ * **a metadata name**, describing the role of the metadata at the place where it occurs. For example, the metadata name *accuracy* indicates that the metadata value describes how accurate a given attribute value is.
+ * a **metadata type**, describing the NGSI value type of the metadata value.
+ * a **metadata value** containing the actual metadata. It is not forseen that metadata values can themselves have metadata.
 
 ## JSON entity representation
 
