@@ -27,6 +27,7 @@
 */
 #include <semaphore.h>
 #include <regex.h>
+#include <stdint.h>
 #include <string>
 #include <vector>
 
@@ -51,11 +52,11 @@ namespace orion
 * o entityType           string containing the type of the EntityId
 *
 */
-struct EntityInfo
+typedef struct EntityInfo
 {
   regex_t       entityIdPattern;
   std::string   entityType;
-};
+} EntityInfo;
 
 
 
@@ -77,14 +78,28 @@ struct EntityInfo
 */
 class Subscription
 {
+ public:
   std::string               subscriptionId;
   std::vector<EntityInfo*>  entityIdInfos;
   std::vector<std::string>  attributes;
-  int64                     throttling;
-  int64                     expirationTime;
+  int64_t                   throttling;
+  int64_t                   expirationTime;
   Restriction               restriction;
   NotifyConditionVector     notifyConditionVector;
   Reference                 reference;
+
+  Subscription();
+  Subscription(std::string _subscriptionId);
+  Subscription(std::string                _subscriptionId,
+               std::vector<EntityInfo*>&  _entityIdInfos,
+               std::vector<std::string>&  _attributes,
+               int64_t                    _throttling,
+               int64_t                    _expirationTime,
+               Restriction&               _restriction,
+               NotifyConditionVector&     _notifyConditionVector,
+               Reference&                 _reference);
+
+  void entityIdInfoAdd(EntityInfo* entityIdInfoP);
 };
 
 
@@ -114,6 +129,14 @@ class SubscriptionCache
 
  public:
   SubscriptionCache();
+  SubscriptionCache(std::string                subscriptionId,
+                    std::vector<EntityInfo*>&  entityIdInfos,
+                    std::vector<std::string>&  attributes,
+                    int64_t                    throttling,
+                    int64_t                    expirationTime,
+                    Restriction&               restriction,
+                    NotifyConditionVector&     notifyConditionVector,
+                    Reference&                 reference);
 
   int            init(void);
   void           insert(const Subscription& sub);

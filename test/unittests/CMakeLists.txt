@@ -246,6 +246,7 @@ SET (STATIC_LIBS
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
     mongoBackend
+    cache
     rest
     ngsiNotify
     jsonParse
