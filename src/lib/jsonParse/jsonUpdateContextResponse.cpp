@@ -164,7 +164,7 @@ static std::string attributeValue(const std::string& path, const std::string& va
 {
   LM_T(LmtParse, ("Got an attribute value: '%s'", value.c_str()));
   parseDataP->lastContextAttribute = parseDataP->upcrs.attributeP;
-  parseDataP->upcrs.attributeP->value = value;
+  parseDataP->upcrs.attributeP->stringValue = value;
   return "OK";
 }
 
@@ -217,7 +217,7 @@ static std::string attributeMetadataType(const std::string& path, const std::str
 static std::string attributeMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadata value: '%s'", value.c_str()));
-  parseDataP->upcrs.metadataP->value = value;
+  parseDataP->upcrs.metadataP->stringValue = value;
   return "OK";
 }
 
@@ -270,7 +270,7 @@ static std::string domainMetadataType(const std::string& path, const std::string
 static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a domainMetadata value: '%s'", value.c_str()));
-  parseDataP->upcrs.domainMetadataP->value = value;
+  parseDataP->upcrs.domainMetadataP->stringValue = value;
   return "OK";
 }
 

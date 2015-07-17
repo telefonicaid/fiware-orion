@@ -188,7 +188,7 @@ HttpStatusCode mongoEntityTypes
         {
           continue;
         }        
-        ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), "");
+        ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), "", "");
         type->contextAttributeVector.push_back(ca);
       }
     }
@@ -351,7 +351,7 @@ HttpStatusCode mongoAttributesForEntityType
       continue;
     }
 
-    ContextAttribute*  ca = new ContextAttribute(idField.str(), "");
+    ContextAttribute*  ca = new ContextAttribute(idField.str(), "", "");
     responseP->entityType.contextAttributeVector.push_back(ca);
   }
 

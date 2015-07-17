@@ -68,16 +68,16 @@ HttpStatusCode mongoUpdateContext
     else
     {
         /* Process each ContextElement */
-        for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix) {
-
-            processContextElement(requestP->contextElementVector.get(ix),
-                                  responseP,
-                                  requestP->updateActionType.get(),
-                                  tenant,
-                                  servicePathV,
-                                  uriParams,
-                                  xauthToken,
-                                  caller);
+        for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix)
+        {
+          processContextElement(requestP->contextElementVector.get(ix),
+                                responseP,
+                                requestP->updateActionType.get(),
+                                tenant,
+                                servicePathV,
+                                uriParams,
+                                xauthToken,
+                                caller);
         }
 
         /* Note that although individual processContextElements() invocations return ConnectionError, this

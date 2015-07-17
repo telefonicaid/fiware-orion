@@ -136,21 +136,27 @@ Date: REGEX(.*)
 02. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 155
+Content-Length: 209
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "brand": "Mercedes Benz",
-        "id": "8787GHY",
-        "madeInCountry": "DE",
+        "brand": {
+            "type": "string", 
+            "value": "Mercedes Benz"
+        }, 
+        "id": "8787GHY", 
+        "madeInCountry": "DE", 
         "model": {
-            "type": "myString",
+            "type": "myString", 
             "value": "Klasse C"
-        },
-        "plateCountry": "ES",
-        "speed": 150,
+        }, 
+        "plateCountry": "ES", 
+        "speed": {
+            "type": "number", 
+            "value": "150"
+        }, 
         "type": "Car"
     }
 ]

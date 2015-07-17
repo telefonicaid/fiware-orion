@@ -80,9 +80,9 @@ std::string putAttributeValueInstance
   // 01. Check validity of path components VS payload
   Metadata* mP = parseDataP->upcar.res.metadataVector.lookupByName("ID");
 
-  if ((mP != NULL) && (mP->value != metaID))
+  if ((mP != NULL) && (mP->stringValue != metaID))
   {
-    std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->value + "/";
+    std::string details = "unmatching metadata ID value URI/payload: /" + metaID + "/ vs /" + mP->stringValue + "/";
     
     response.fill(SccBadRequest, details);
     answer = response.render(ciP->outFormat, "", false, false);

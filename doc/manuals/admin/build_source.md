@@ -24,6 +24,7 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * libmicrohttpd: 0.9.22 (the one that comes in EPEL6 repository)
 * libcurl: 7.19.7
 * Mongo Driver: legacy-1.0.2 (from source)
+* rapidjson: 1.0.2
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
 * cantcoap (for proxyCoap)
@@ -49,6 +50,12 @@ commands that require root privilege):
         cd mongo-cxx-driver-legacy-1.0.2
         scons                                         # The build/linux2/normal/libmongoclient.a library is generated as outcome
         sudo scons install --prefix=/usr/local        # This puts .h files in /usr/local/include/mongo and libmongoclient.a in /usr/local/lib
+
+* Install rapidjson from sources:
+
+        wget https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz
+        tar xfvz v1.0.2.tar.gz
+        sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 
 * Install Google Test/Mock from sources (there are RPM pacakges for this, but they don't seem to be working with the current CMakeLists.txt configuration)
 

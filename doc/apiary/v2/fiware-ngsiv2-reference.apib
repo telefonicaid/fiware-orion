@@ -114,6 +114,7 @@ In the case of being present, the error payload is JSON object including the fol
 
 Error list (HTTP response code in paranthesis):
 
+* ParseError (400). The incoming JSON payload is incorrect.
 * NotFound (404). The context element referred in the request has not been found.
 * TooManyResults (409). There are several results that match with the resource identification used
   in the request. This typically the case of requesting an entity with not enough information and the
@@ -1347,7 +1348,7 @@ Response:
 
 ## OMA-NGSI Operations [/v2/queryContext]
 
-For the sake of completness here is an enumeration of the OMA-NGSI (9 & 10) operations. Those
+For the sake of completeness here is an enumeration of the OMA-NGSI (9 & 10) operations. These
 operations will be supported under the 'v2' resource as well.
 
 ### queryContext [POST /v2/queryContext]

@@ -30,6 +30,7 @@
 
 #include "ngsi/MetadataVector.h"
 #include "common/Format.h"
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
 #include "ngsi/ProvidingApplication.h"
 #include "parse/CompoundValueNode.h"
@@ -45,14 +46,22 @@ typedef struct ContextAttribute
 {
   std::string     name;                    // Mandatory
   std::string     type;                    // Optional
-  std::string     value;                   // Optional (FI-WARE changes - MANDATORY in OMA spec)
-                                           //          Especially for the new convops, value is NOT mandatory
-                                           //          E.g. /v1/contextTypes
   MetadataVector  metadataVector;          // Optional
 
-  ProvidingApplication     providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
-  bool                     found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
-                                                    // It means attribute found either locally or remotely in providing application
+  //
+  // Value - Optional (FI-WARE changes - MANDATORY in OMA spec)
+  //            Especially for the new convops, value is NOT mandatory
+  //            E.g. /v1/contextTypes
+  //
+  orion::ValueType           valueType;    // Type of value: taken from JSON parse
+  std::string                stringValue;  // "value" as a String
+  double                     numberValue;  // "value" as a Number
+  bool                       boolValue;    // "value" as a Boolean
+
+
+  ProvidingApplication       providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
+  bool                       found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
+                                                      // It means attribute found either locally or remotely in providing application
 
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
@@ -60,7 +69,10 @@ typedef struct ContextAttribute
   ~ContextAttribute();
   ContextAttribute();
   ContextAttribute(ContextAttribute* caP);
-  ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value = "", bool _found = true);
+  ContextAttribute(const std::string& _name, const std::string& _type, const char* _value, bool _found = true);
+  ContextAttribute(const std::string& _name, const std::string& _type, const std::string& _value, bool _found = true);
+  ContextAttribute(const std::string& _name, const std::string& _type, double _value, bool _found = true);
+  ContextAttribute(const std::string& _name, const std::string& _type, bool _value, bool _found = true);
   ContextAttribute(const std::string& _name, const std::string& _type, orion::CompoundValueNode* _compoundValueP);
 
   /* Grabbers for metadata to which CB gives a special semantic */
@@ -74,6 +86,9 @@ typedef struct ContextAttribute
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(void);
+
+  /* Helper method to be use in some places wher '%s' is needed. Maybe could be merged with toString? FIXME P2 */
+  std::string  toStringValue(void);
 
   std::string  check(RequestType         requestType,
                      Format              format,

@@ -23,7 +23,7 @@ at least one entity document.
 
 -   Apply the fix\_location\_gjson.py to your DBs, using the following
     (where 'db' is the database name). Note that if you are using
-    [multitenant/multiservice](../user/multitenancy.md)
+    [multitenant/multiservice](database_admin.md#multiservice/multitenant-database-separation)
     you need to apply the procedure to each per-tenant/service database.
     The script can take a while, an interactive progress counter
     is shown.
@@ -39,7 +39,7 @@ at least one entity document.
 -   Apply the attrsvector2attrsobject.py to your DBs, using the
     following (where 'db' is the database name). Note that if you are
     using
-    [multitenant/multiservice](../user/multitenancy.md)
+    [multitenant/multiservice](database_admin.md#multiservice/multitenant-database-separation)
     you need to apply the procedure to each per-tenant/service database.
     The script can take a while, an interactive progress counter
     is shown.

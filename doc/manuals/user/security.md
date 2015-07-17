@@ -2,7 +2,7 @@
 
 ## Authentication and Authorization 
 
-Orion doesn't provide "native" authentication or authorization mechanisms to enforce access control. However, they can be achieved [the access control framework provided by FIWARE GEs](FIWARE.ArchitectureDescription.Security.Access_Control_Generic_Enabler "wikilink").
+Orion doesn't provide "native" authentication nor any authorization mechanisms to enforce access control. However, authentication/authorization can be achieved [the access control framework provided by FIWARE GEs](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FIWARE.ArchitectureDescription.Security.Access_Control_Generic_Enabler).
 
 More specifically, Orion is integrated in this framework using the [FIWARE PEP Proxy
 GE](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FIWARE.OpenSpecification.Security.PEP_Proxy_Generic_Enabler).
@@ -22,7 +22,7 @@ Orion Context Broker supports HTTPS, using the `-https` options (which in additi
 -key and -cert options, to especify the files containing the private key
 and certificates for the server, respectively). Check the [command line
 options section in the administration manual for
-details](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Command_line_options "wikilink").
+details](../admin/cli.md#command-line-options).
 Note that current Orion version cannot run in both HTTP and HTTPS at the
 same time, i.e. using -https disables HTTP.
 
@@ -43,5 +43,5 @@ notifications. In order to do so:
 
 -   You have to use Rush as relayer (as the HTTPS encoding is
     implemented in Rush). See [how to run Orion using
-    Rush](Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide#Using_Rush_relayer "wikilink")
+    Rush](../admin/rush.md)
     for additional information on this topic.

@@ -30,6 +30,7 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/Metadata.h"
 
 
@@ -40,9 +41,10 @@
 */
 Metadata::Metadata()
 {
-  name  = "";
-  type  = "";
-  value = "";
+  name         = "";
+  type         = "";
+  stringValue  = "";
+  valueType    = orion::ValueTypeString;
 }
 
 
@@ -51,16 +53,31 @@ Metadata::Metadata()
 *
 * Metadata::Metadata -
 *
-* FIXME P9: Copy also the Association!
-*
 */
 Metadata::Metadata(Metadata* mP)
 {
   LM_T(LmtClone, ("'cloning' a Metadata"));
 
-  name  = mP->name;
-  type  = mP->type;
-  value = mP->value;
+  name         = mP->name;
+  type         = mP->type;
+  valueType    = mP->valueType;
+  stringValue  = mP->stringValue;
+  numberValue  = mP->numberValue;
+  boolValue    = mP->boolValue;
+}
+
+
+
+/* ****************************************************************************
+*
+* Metadata::Metadata -
+*/
+Metadata::Metadata(const std::string& _name, const std::string& _type, const char* _value)
+{
+  name         = _name;
+  type         = _type;
+  valueType    = orion::ValueTypeString;
+  stringValue  = std::string(_value);
 }
 
 
@@ -71,9 +88,38 @@ Metadata::Metadata(Metadata* mP)
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, const std::string& _value)
 {
-  name  = _name;
-  type  = _type;
-  value = _value;
+  name         = _name;
+  type         = _type;
+  valueType    = orion::ValueTypeString;
+  stringValue  = _value;
+}
+
+
+
+/* ****************************************************************************
+*
+* Metadata::Metadata -
+*/
+Metadata::Metadata(const std::string& _name, const std::string& _type, double _value)
+{
+  name         = _name;
+  type         = _type;
+  valueType    = orion::ValueTypeNumber;
+  numberValue  = _value;
+}
+
+
+
+/* ****************************************************************************
+*
+* Metadata::Metadata -
+*/
+Metadata::Metadata(const std::string& _name, const std::string& _type, bool _value)
+{
+  name       = _name;
+  type       = _type;
+  valueType  = orion::ValueTypeBoolean;
+  boolValue  = _value;
 }
 
 
@@ -86,7 +132,7 @@ std::string Metadata::render(Format format, const std::string& indent, bool comm
 {
   std::string out     = "";
   std::string tag     = "contextMetadata";
-  std::string xValue  = value;
+  std::string xValue  = stringValue;
 
   out += startTag(indent, tag, tag, format, false, false);
   out += valueTag(indent + "  ", "name", name, format, true);
@@ -123,7 +169,7 @@ std::string Metadata::check
     return "missing metadata name";
   }
 
-  if ((value == "") && (type != "Association"))
+  if ((stringValue == "") && (type != "Association"))
   {
     return "missing metadata value";
   }
@@ -147,7 +193,7 @@ void Metadata::present(const std::string& metadataType, int ix, const std::strin
   LM_F(("%s%s Metadata %d:",   indent.c_str(), metadataType.c_str(), ix));
   LM_F(("%s  Name:     %s", indent.c_str(), name.c_str()));
   LM_F(("%s  Type:     %s", indent.c_str(), type.c_str()));
-  LM_F(("%s  Value:    %s", indent.c_str(), value.c_str()));
+  LM_F(("%s  Value:    %s", indent.c_str(), stringValue.c_str()));
 }
 
 
@@ -169,10 +215,39 @@ void Metadata::release(void)
 */
 void Metadata::fill(const struct Metadata& md)
 {
-  name        = md.name;
-  type        = md.type;
-  value       = md.value;
-  association = md.association;
+  name         = md.name;
+  type         = md.type;
+  stringValue  = md.stringValue;
+  association  = md.association;
+}
+
+/* ****************************************************************************
+*
+* toStringValue -
+*/
+std::string Metadata::toStringValue(void)
+{
+  char buffer[64];
+
+  switch (valueType)
+  {
+  case orion::ValueTypeString:
+    return stringValue;
+    break;
+
+  case orion::ValueTypeNumber:
+    snprintf(buffer, sizeof(buffer), "%f", numberValue);
+    return std::string(buffer);
+    break;
+
+  case orion::ValueTypeBoolean:
+    return boolValue ? "true" : "false";
+    break;
+
+  default:
+    return "<unknown type>";
+    break;
+  }
 }
 
 
@@ -184,29 +259,58 @@ void Metadata::fill(const struct Metadata& md)
 std::string Metadata::toJson(bool isLastElement)
 {
   std::string  out;
-  bool         isNumber = false;
 
-  if (type == "number")
-  {
-    isNumber = true;
-  }
+  LM_M(("Metadata '%s' to JSON (type: '%s', valueType: %d)", name.c_str(), type.c_str(), valueType));
 
-  if ((type == "") || (isNumber == true))
+  if (type == "")
   {
-    if (isNumber == true)
+    if (valueType == orion::ValueTypeNumber)
     {
-      out = JSON_VALUE_NUMBER(name, value);
+      char num[32];
+    
+      snprintf(num, sizeof(num), "%f", numberValue);
+      out = JSON_VALUE_NUMBER(name, num);
+    }
+    else if (valueType == orion::ValueTypeBoolean)
+    {
+      out = JSON_VALUE_BOOL(name, boolValue);
+    }
+    else if (valueType == orion::ValueTypeString)
+    {
+      out = JSON_VALUE(name, stringValue);
     }
     else
     {
-      out = JSON_VALUE(name, value);
+      LM_E(("Runtime Error (invalid type for metadata %s)", name.c_str()));
+      out = JSON_VALUE(name, stringValue);
     }
   }
   else
   {
     out = JSON_STR(name) + ":{";
-    out += JSON_VALUE("value", value);
-    out += "," + JSON_VALUE("type", type);
+    out += JSON_VALUE("type", type) + ",";
+
+    if (valueType == orion::ValueTypeString)
+    {
+      out += JSON_VALUE("value", stringValue);
+    }
+    else if (valueType == orion::ValueTypeNumber)
+    {
+      char num[32];
+
+      snprintf(num, sizeof(num), "%f", numberValue);
+      out += JSON_VALUE_NUMBER("value", num);
+    }
+    else if (valueType == orion::ValueTypeBoolean)
+    {
+      out += JSON_VALUE_BOOL("value", boolValue);
+    }
+    else
+    {
+      LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
+      out += JSON_VALUE("value", stringValue);
+    }
+
     out += "}";
   }
 

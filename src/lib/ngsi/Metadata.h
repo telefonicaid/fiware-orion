@@ -29,10 +29,18 @@
 #include <vector>
 
 #include "common/Format.h"
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
 #include "ngsi/Association.h"
 
-/* Metadata interpreted by Orion Context Broker, i.e. not custom metadata */
+
+
+/* ****************************************************************************
+*
+* Defines -
+*
+* Metadata interpreted by Orion Context Broker, i.e. not custom metadata
+*/
 #define NGSI_MD_ID       "ID"
 #define NGSI_MD_LOCATION "location"
 #define NGSI_MD_CREDATE  "creDate"    // FIXME P5: to be used for creDate (currenly only in DB)
@@ -52,19 +60,28 @@
 typedef struct Metadata
 {
   std::string  name;         // Mandatory
-  std::string  type;         // Optional
-  std::string  value;        // Mandatory
+  std::string  type;         // Optional  
   Association  association;  // Optional (used if type == 'Association')
+
+  // Mandatory
+  orion::ValueType   valueType;    // Type of value: taken from JSON parse
+  std::string        stringValue;  // "value" as a String
+  double             numberValue;  // "value" as a Number
+  bool               boolValue;    // "value" as a Boolean
 
   Metadata();
   Metadata(Metadata* mP);
-  Metadata(const std::string& _name, const std::string& _type, const std::string& _value = "");
+  Metadata(const std::string& _name, const std::string& _type, const char* _value);
+  Metadata(const std::string& _name, const std::string& _type, const std::string& _value);
+  Metadata(const std::string& _name, const std::string& _type, double _value);
+  Metadata(const std::string& _name, const std::string& _type, bool _value);
 
   std::string  render(Format format, const std::string& indent, bool comma = false);
   std::string  toJson(bool isLastElement);
   void         present(const std::string& metadataType, int ix, const std::string& indent);
   void         release(void);
   void         fill(const struct Metadata& md);
+  std::string  toStringValue(void);
 
   std::string  check(RequestType         requestType,
                      Format              format,

@@ -28,6 +28,7 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryContext.h"
 #include "ngsi/EntityId.h"
@@ -92,6 +93,7 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - queryNoType
 * - queryIdMetadata
 * - queryCustomMetadata
+* - queryCustomMetadataNative
 *
 * (N=2 without loss of generality)
 * (WA = Without Attributes)
@@ -107,6 +109,10 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * - queryNoTypePattern
 * - queryIdMetadataPattern
 * - queryCustomMetadataPattern
+*
+* Native types
+*
+* - queryNativeTypes
 *
 * Simulating fails in MongoDB connection:
 *
@@ -361,6 +367,56 @@ static void prepareDatabaseWithCustomMetadata(void) {
 
 /* ****************************************************************************
 *
+* prepareDatabaseWithAttributeCustomMetadataNative -
+*
+*/
+static void prepareDatabaseWithCustomMetadataNative(void) {
+
+    /* Start with the base entities */
+    prepareDatabase();
+
+    /* Add some entities with metadata ID */
+
+    DBClientBase* connection = getMongoConnection();
+    BSONObj en1 = BSON("_id" << BSON("id" << "E10" << "type" << "T") <<
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                          "A1" << BSON("type" << "TA1" << "value" << "A" <<
+                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "val1") <<
+                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << 2.1) <<
+                                                  BSON("name" << "MD3" << "type" << "TMD3" << "value" << false)
+                                                 )
+                               ) <<
+                          "A2" << BSON("type" << "TA2" << "value" << "C" <<
+                               "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << false) <<
+                                                  BSON("name" << "MD2" << "type" << "TMD2" << "value" << 6.5)
+                                                 )
+                               )
+                          )
+                      );
+
+    BSONObj en2 = BSON("_id" << BSON("id" << "E11" << "type" << "T") <<
+                       "attrNames" << BSON_ARRAY("A1" << "A2") <<
+                       "attrs" << BSON(
+                           "A1" << BSON("type" << "TA1" << "value" << "D" <<
+                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << "x") <<
+                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << 8.7)
+                                                  )
+                                ) <<
+                           "A2" << BSON("type" << "TA2" << "value" << "F" <<
+                                "md" << BSON_ARRAY(BSON("name" << "MD1" << "type" << "TMD1" << "value" << true) <<
+                                                   BSON("name" << "MD2" << "type" << "TMD2" << "value" << "val2")
+                                                  )
+                                )
+                          )
+                      );
+
+    connection->insert(ENTITIES_COLL, en1);
+    connection->insert(ENTITIES_COLL, en2);
+}
+
+/* ****************************************************************************
+*
 * prepareDatabaseWithServicePath -
 *
 */
@@ -483,6 +539,44 @@ static void prepareDatabaseForPagination(void)
 
 /* ****************************************************************************
 *
+* prepareDatabaseDifferentNativeTypes -
+*
+*/
+static void prepareDatabaseDifferentNativeTypes(void) {
+
+  /* Set database */
+  setupDatabase();
+
+  DBClientBase* connection = getMongoConnection();
+
+  /* We create the following entities:
+   *
+   * - E1:
+   *     A1: string
+   *     A2: number
+   *     A2: bool
+   *     A3: vector
+   *     A5: object
+   *
+   */
+
+  BSONObj en1 = BSON("_id" << BSON("id" << "E1" << "type" << "T1") <<
+                     "attrNames" << BSON_ARRAY("A1" << "A2" << "A3" << "A4" << "A5") <<
+                     "attrs" << BSON(
+                        "A1" << BSON("type" << "T" << "value" << "s") <<
+                        "A2" << BSON("type" << "T" << "value" << 42.0) <<
+                        "A3" << BSON("type" << "T" << "value" << false) <<
+                        "A4" << BSON("type" << "T" << "value" << BSON("x" << "a" << "y" << "b")) <<
+                        "A5" << BSON("type" << "T" << "value" << BSON_ARRAY("x1" << "x2"))
+                        )
+                    );
+
+  connection->insert(ENTITIES_COLL, en1);
+
+}
+
+/* ****************************************************************************
+*
 * paginationDetails -
 *
 */
@@ -521,7 +615,7 @@ TEST(mongoQueryContextRequest, paginationDetails)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -533,7 +627,7 @@ TEST(mongoQueryContextRequest, paginationDetails)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("a2", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("a2", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -545,7 +639,7 @@ TEST(mongoQueryContextRequest, paginationDetails)
     ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-    EXPECT_EQ("a3", RES_CER_ATTR(2, 0)->value);
+    EXPECT_EQ("a3", RES_CER_ATTR(2, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
     EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -557,7 +651,7 @@ TEST(mongoQueryContextRequest, paginationDetails)
     ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
-    EXPECT_EQ("a4", RES_CER_ATTR(3, 0)->value);
+    EXPECT_EQ("a4", RES_CER_ATTR(3, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
     EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
@@ -569,7 +663,7 @@ TEST(mongoQueryContextRequest, paginationDetails)
     ASSERT_EQ(1, RES_CER(4).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(4, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(4, 0)->type);
-    EXPECT_EQ("a5", RES_CER_ATTR(4, 0)->value);
+    EXPECT_EQ("a5", RES_CER_ATTR(4, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(4).code);
     EXPECT_EQ("OK", RES_CER_STATUS(4).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(4).details.size());
@@ -581,7 +675,7 @@ TEST(mongoQueryContextRequest, paginationDetails)
     ASSERT_EQ(1, RES_CER(5).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(5, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(5, 0)->type);
-    EXPECT_EQ("a6", RES_CER_ATTR(5, 0)->value);
+    EXPECT_EQ("a6", RES_CER_ATTR(5, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(5).code);
     EXPECT_EQ("OK", RES_CER_STATUS(5).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(5).details.size());
@@ -631,7 +725,7 @@ TEST(mongoQueryContextRequest, paginationAll)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -643,7 +737,7 @@ TEST(mongoQueryContextRequest, paginationAll)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("a2", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("a2", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -655,7 +749,7 @@ TEST(mongoQueryContextRequest, paginationAll)
     ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-    EXPECT_EQ("a3", RES_CER_ATTR(2, 0)->value);
+    EXPECT_EQ("a3", RES_CER_ATTR(2, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
     EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -667,7 +761,7 @@ TEST(mongoQueryContextRequest, paginationAll)
     ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
-    EXPECT_EQ("a4", RES_CER_ATTR(3, 0)->value);
+    EXPECT_EQ("a4", RES_CER_ATTR(3, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
     EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
@@ -679,7 +773,7 @@ TEST(mongoQueryContextRequest, paginationAll)
     ASSERT_EQ(1, RES_CER(4).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(4, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(4, 0)->type);
-    EXPECT_EQ("a5", RES_CER_ATTR(4, 0)->value);
+    EXPECT_EQ("a5", RES_CER_ATTR(4, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(4).code);
     EXPECT_EQ("OK", RES_CER_STATUS(4).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(4).details.size());
@@ -691,7 +785,7 @@ TEST(mongoQueryContextRequest, paginationAll)
     ASSERT_EQ(1, RES_CER(5).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(5, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(5, 0)->type);
-    EXPECT_EQ("a6", RES_CER_ATTR(5, 0)->value);
+    EXPECT_EQ("a6", RES_CER_ATTR(5, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(5).code);
     EXPECT_EQ("OK", RES_CER_STATUS(5).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(5).details.size());
@@ -742,7 +836,7 @@ TEST(mongoQueryContextRequest, paginationOnlyFirst)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -794,7 +888,7 @@ TEST(mongoQueryContextRequest, paginationOnlySecond)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("a2", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("a2", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -846,7 +940,7 @@ TEST(mongoQueryContextRequest, paginationRange)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("a3", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("a3", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -858,7 +952,7 @@ TEST(mongoQueryContextRequest, paginationRange)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("a4", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("a4", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -870,7 +964,7 @@ TEST(mongoQueryContextRequest, paginationRange)
     ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-    EXPECT_EQ("a5", RES_CER_ATTR(2, 0)->value);
+    EXPECT_EQ("a5", RES_CER_ATTR(2, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
     EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -963,7 +1057,7 @@ TEST(mongoQueryContextRequest, paginationNonExistingOverlap)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("a6", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("a6", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1056,7 +1150,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_2levels)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a2", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a2", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1068,7 +1162,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_2levels)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("a4", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("a4", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -1080,7 +1174,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_2levels)
   ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ("a5", RES_CER_ATTR(2, 0)->value);
+  EXPECT_EQ("a5", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -1131,7 +1225,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1143,7 +1237,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("a2", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("a2", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -1155,7 +1249,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ("a3", RES_CER_ATTR(2, 0)->value);
+  EXPECT_EQ("a3", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -1167,7 +1261,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
-  EXPECT_EQ("a4", RES_CER_ATTR(3, 0)->value);
+  EXPECT_EQ("a4", RES_CER_ATTR(3, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
@@ -1179,7 +1273,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   ASSERT_EQ(1, RES_CER(4).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(4, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(4, 0)->type);
-  EXPECT_EQ("a5", RES_CER_ATTR(4, 0)->value);
+  EXPECT_EQ("a5", RES_CER_ATTR(4, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(4).code);
   EXPECT_EQ("OK", RES_CER_STATUS(4).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(4).details.size());
@@ -1191,7 +1285,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1level)
   ASSERT_EQ(1, RES_CER(5).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(5, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(5, 0)->type);
-  EXPECT_EQ("a6", RES_CER_ATTR(5, 0)->value);
+  EXPECT_EQ("a6", RES_CER_ATTR(5, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(5).code);
   EXPECT_EQ("OK", RES_CER_STATUS(5).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(5).details.size());
@@ -1243,7 +1337,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a10", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a10", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1255,7 +1349,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("a11", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("a11", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -1267,7 +1361,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ("a12", RES_CER_ATTR(2, 0)->value);
+  EXPECT_EQ("a12", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -1279,7 +1373,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_0levels)
   ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
-  EXPECT_EQ("a13", RES_CER_ATTR(3, 0)->value);
+  EXPECT_EQ("a13", RES_CER_ATTR(3, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
@@ -1330,7 +1424,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1levelbis)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a7", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a7", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1342,7 +1436,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternType_1levelbis)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("a8", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("a8", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -1393,7 +1487,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("ie_01", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("ie_01", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1404,7 +1498,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("ie_02", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("ie_02", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -1415,7 +1509,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ("ie_03", RES_CER_ATTR(2, 0)->value);
+  EXPECT_EQ("ie_03", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -1466,7 +1560,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("ie_01", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("ie_01", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1517,7 +1611,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("ie_02", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("ie_02", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1569,7 +1663,7 @@ TEST(mongoQueryContextRequest, queryWithIdenticalEntitiesButDifferentServicePath
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("ie_03", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("ie_03", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1620,7 +1714,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a2", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a2", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1632,7 +1726,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("a4", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("a4", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -1644,7 +1738,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ("a5", RES_CER_ATTR(2, 0)->value);
+  EXPECT_EQ("a5", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -1656,7 +1750,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_2levels)
   ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
-  EXPECT_EQ("ae_1", RES_CER_ATTR(3, 0)->value);
+  EXPECT_EQ("ae_1", RES_CER_ATTR(3, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
@@ -1707,7 +1801,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a1", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1719,7 +1813,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("a2", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("a2", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -1731,7 +1825,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ("a3", RES_CER_ATTR(2, 0)->value);
+  EXPECT_EQ("a3", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -1743,7 +1837,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
-  EXPECT_EQ("a4", RES_CER_ATTR(3, 0)->value);
+  EXPECT_EQ("a4", RES_CER_ATTR(3, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
@@ -1755,7 +1849,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   ASSERT_EQ(1, RES_CER(4).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(4, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(4, 0)->type);
-  EXPECT_EQ("a5", RES_CER_ATTR(4, 0)->value);
+  EXPECT_EQ("a5", RES_CER_ATTR(4, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(4).code);
   EXPECT_EQ("OK", RES_CER_STATUS(4).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(4).details.size());
@@ -1767,7 +1861,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   ASSERT_EQ(1, RES_CER(5).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(5, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(5, 0)->type);
-  EXPECT_EQ("a6", RES_CER_ATTR(5, 0)->value);
+  EXPECT_EQ("a6", RES_CER_ATTR(5, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(5).code);
   EXPECT_EQ("OK", RES_CER_STATUS(5).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(5).details.size());
@@ -1779,7 +1873,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1level)
   ASSERT_EQ(1, RES_CER(6).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(6, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(6, 0)->type);
-  EXPECT_EQ("ae_1", RES_CER_ATTR(6, 0)->value);
+  EXPECT_EQ("ae_1", RES_CER_ATTR(6, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(6).code);
   EXPECT_EQ("OK", RES_CER_STATUS(6).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(6).details.size());
@@ -1831,7 +1925,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a10", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a10", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1843,7 +1937,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("a11", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("a11", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -1855,7 +1949,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ("a12", RES_CER_ATTR(2, 0)->value);
+  EXPECT_EQ("a12", RES_CER_ATTR(2, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
   EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -1867,7 +1961,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_0levels)
   ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(3, 0)->type);
-  EXPECT_EQ("a13", RES_CER_ATTR(3, 0)->value);
+  EXPECT_EQ("a13", RES_CER_ATTR(3, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
   EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
@@ -1918,7 +2012,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1levelbis)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a7", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a7", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -1930,7 +2024,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntPatternNoType_1levelbis)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("a8", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("a8", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -2020,7 +2114,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternTypeOk)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a3", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a3", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2072,7 +2166,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a3", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a3", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2084,7 +2178,7 @@ TEST(mongoQueryContextRequest, queryWithServicePathEntNoPatternNoType)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("ae_2", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("ae_2", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -2138,7 +2232,7 @@ TEST(mongoQueryContextRequest, queryWithSeveralServicePaths)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("a4", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("a4", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2150,7 +2244,7 @@ TEST(mongoQueryContextRequest, queryWithSeveralServicePaths)
   ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ("a12", RES_CER_ATTR(1, 0)->value);
+  EXPECT_EQ("a12", RES_CER_ATTR(1, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
   EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -2204,10 +2298,10 @@ TEST(mongoQueryContextRequest, query1Ent0Attr)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2257,7 +2351,7 @@ TEST(mongoQueryContextRequest, query1Ent1Attr)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2308,10 +2402,10 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2323,10 +2417,10 @@ TEST(mongoQueryContextRequest, queryNEnt0Attr)
     ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("val3", RES_CER_ATTR(1, 1)->value);
+    EXPECT_EQ("val3", RES_CER_ATTR(1, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -2378,7 +2472,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrSingle)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2432,7 +2526,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val2", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2444,7 +2538,7 @@ TEST(mongoQueryContextRequest, queryNEnt1AttrMulti)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -2500,7 +2594,7 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2512,7 +2606,7 @@ TEST(mongoQueryContextRequest, queryNEntNAttr)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val3", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val3", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -2731,10 +2825,10 @@ TEST(mongoQueryContextRequest, queryNEntWA0Attr)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2796,7 +2890,7 @@ TEST(mongoQueryContextRequest, queryNEntWA1Attr)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2851,7 +2945,7 @@ TEST(mongoQueryContextRequest, queryNoType)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2863,7 +2957,7 @@ TEST(mongoQueryContextRequest, queryNoType)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val1bis", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val1bis", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -2875,7 +2969,7 @@ TEST(mongoQueryContextRequest, queryNoType)
     ASSERT_EQ(1, RES_CER(2).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(2, 0)->type);
-    EXPECT_EQ("val1bis1", RES_CER_ATTR(2, 0)->value);
+    EXPECT_EQ("val1bis1", RES_CER_ATTR(2, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
     EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -2921,18 +3015,18 @@ TEST(mongoQueryContextRequest, queryIdMetadata)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->stringValue);
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("B", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("B", RES_CER_ATTR(0, 1)->stringValue);
     ASSERT_EQ(1, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -2979,14 +3073,75 @@ TEST(mongoQueryContextRequest, queryCustomMetadata)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->stringValue);
     ASSERT_EQ(2, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("TMD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
-    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);
+    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->stringValue);
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
+
+}
+
+
+/* ****************************************************************************
+*
+* queryCustomMetadataNatibve -
+*
+*/
+TEST(mongoQueryContextRequest, queryCustomMetadataNative)
+{
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabaseWithCustomMetadataNative();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E10", "T", "false");
+    req.entityIdVector.push_back(&en);
+    req.attributeList.push_back("A1");
+
+    /* Invoke the function in mongoBackend library */
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccNone, res.errorCode.code);
+    EXPECT_EQ("", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E10", RES_CER(0).entityId.id);
+    EXPECT_EQ("T", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->stringValue);
+    ASSERT_EQ(3, RES_CER_ATTR(0, 0)->metadataVector.size());
+    EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
+    EXPECT_EQ("TMD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
+    EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 0)->metadataVector.get(0)->valueType);
+    EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
+    EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
+    EXPECT_EQ(2.1, RES_CER_ATTR(0, 0)->metadataVector.get(1)->numberValue);
+    EXPECT_EQ(orion::ValueTypeNumber, RES_CER_ATTR(0, 0)->metadataVector.get(1)->valueType);
+    EXPECT_EQ("MD3", RES_CER_ATTR(0, 0)->metadataVector.get(2)->name);
+    EXPECT_EQ("TMD3", RES_CER_ATTR(0, 0)->metadataVector.get(2)->type);
+    EXPECT_FALSE(RES_CER_ATTR(0, 0)->metadataVector.get(2)->boolValue);
+    EXPECT_EQ(orion::ValueTypeBoolean, RES_CER_ATTR(0, 0)->metadataVector.get(2)->valueType);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3040,10 +3195,10 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3055,10 +3210,10 @@ TEST(mongoQueryContextRequest, queryPattern0Attr)
     ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("val3", RES_CER_ATTR(1, 1)->value);
+    EXPECT_EQ("val3", RES_CER_ATTR(1, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -3106,7 +3261,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrSingle)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3156,7 +3311,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val2", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3168,7 +3323,7 @@ TEST(mongoQueryContextRequest, queryPattern1AttrMulti)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -3218,10 +3373,10 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3233,7 +3388,7 @@ TEST(mongoQueryContextRequest, queryPatternNAttr)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -3317,10 +3472,10 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3332,10 +3487,10 @@ TEST(mongoQueryContextRequest, queryMixPatternAndNotPattern)
     ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("val3", RES_CER_ATTR(1, 1)->value);
+    EXPECT_EQ("val3", RES_CER_ATTR(1, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -3401,10 +3556,10 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("val2", RES_CER_ATTR(0, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3416,10 +3571,10 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
     ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val2bis", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
     EXPECT_EQ("TA3", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("val3", RES_CER_ATTR(1, 1)->value);
+    EXPECT_EQ("val3", RES_CER_ATTR(1, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -3431,10 +3586,10 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
     ASSERT_EQ(2, RES_CER(2).contextAttributeVector.size());
     EXPECT_EQ("A4", RES_CER_ATTR(2, 0)->name);
     EXPECT_EQ("TA4", RES_CER_ATTR(2, 0)->type);
-    EXPECT_EQ("val4", RES_CER_ATTR(2, 0)->value);
+    EXPECT_EQ("val4", RES_CER_ATTR(2, 0)->stringValue);
     EXPECT_EQ("A5", RES_CER_ATTR(2, 1)->name);
     EXPECT_EQ("TA5", RES_CER_ATTR(2, 1)->type);
-    EXPECT_EQ("val5", RES_CER_ATTR(2, 1)->value);
+    EXPECT_EQ("val5", RES_CER_ATTR(2, 1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(2).code);
     EXPECT_EQ("OK", RES_CER_STATUS(2).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(2).details.size());
@@ -3446,7 +3601,7 @@ TEST(mongoQueryContextRequest, queryNoTypePattern)
     ASSERT_EQ(1, RES_CER(3).contextAttributeVector.size());
     EXPECT_EQ("A2", RES_CER_ATTR(3, 0)->name);
     EXPECT_EQ("TA2", RES_CER_ATTR(3, 0)->type);
-    EXPECT_EQ("val2bis1", RES_CER_ATTR(3, 0)->value);
+    EXPECT_EQ("val2bis1", RES_CER_ATTR(3, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(3).code);
     EXPECT_EQ("OK", RES_CER_STATUS(3).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(3).details.size());
@@ -3495,19 +3650,19 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     ASSERT_EQ(2, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->stringValue);
     ASSERT_EQ(1, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
 
     EXPECT_EQ("A1", RES_CER_ATTR(0, 1)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 1)->type);
-    EXPECT_EQ("B", RES_CER_ATTR(0, 1)->value);
+    EXPECT_EQ("B", RES_CER_ATTR(0, 1)->stringValue);
     ASSERT_EQ(1, RES_CER_ATTR(0, 1)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(0, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(0, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID2", RES_CER_ATTR(0, 1)->metadataVector.get(0)->stringValue);
 
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -3520,19 +3675,19 @@ TEST(mongoQueryContextRequest, queryIdMetadataPattern)
     ASSERT_EQ(2, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("E", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("E", RES_CER_ATTR(1, 0)->stringValue);
     ASSERT_EQ(1, RES_CER_ATTR(1, 0)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(1, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(1, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->stringValue);
 
     EXPECT_EQ("A1", RES_CER_ATTR(1, 1)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 1)->type);
-    EXPECT_EQ("F", RES_CER_ATTR(1, 1)->value);
+    EXPECT_EQ("F", RES_CER_ATTR(1, 1)->stringValue);
     ASSERT_EQ(1, RES_CER_ATTR(1, 1)->metadataVector.size());
     EXPECT_EQ("ID", RES_CER_ATTR(1, 1)->metadataVector.get(0)->name);
     EXPECT_EQ("string", RES_CER_ATTR(1, 1)->metadataVector.get(0)->type);
-    EXPECT_EQ("ID2", RES_CER_ATTR(1, 1)->metadataVector.get(0)->value);
+    EXPECT_EQ("ID2", RES_CER_ATTR(1, 1)->metadataVector.get(0)->stringValue);
 
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
@@ -3580,14 +3735,14 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("A", RES_CER_ATTR(0, 0)->stringValue);
     ASSERT_EQ(2, RES_CER_ATTR(0, 0)->metadataVector.size());
     EXPECT_EQ("MD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("TMD1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("1", RES_CER_ATTR(0, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("MD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->type);
-    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->value);           
+    EXPECT_EQ("2", RES_CER_ATTR(0, 0)->metadataVector.get(1)->stringValue);           
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3599,14 +3754,14 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("D", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("D", RES_CER_ATTR(1, 0)->stringValue);
     ASSERT_EQ(2, RES_CER_ATTR(1, 0)->metadataVector.size());
     EXPECT_EQ("MD1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->name);
     EXPECT_EQ("TMD1", RES_CER_ATTR(1, 0)->metadataVector.get(0)->type);
-    EXPECT_EQ("7", RES_CER_ATTR(1, 0)->metadataVector.get(0)->value);
+    EXPECT_EQ("7", RES_CER_ATTR(1, 0)->metadataVector.get(0)->stringValue);
     EXPECT_EQ("MD2", RES_CER_ATTR(1, 0)->metadataVector.get(1)->name);
     EXPECT_EQ("TMD2", RES_CER_ATTR(1, 0)->metadataVector.get(1)->type);
-    EXPECT_EQ("8", RES_CER_ATTR(1, 0)->metadataVector.get(1)->value);
+    EXPECT_EQ("8", RES_CER_ATTR(1, 0)->metadataVector.get(1)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -3614,6 +3769,92 @@ TEST(mongoQueryContextRequest, queryCustomMetadataPattern)
     /* Release connection */
     setMongoConnectionForUnitTest(NULL);
 
+}
+
+/* ****************************************************************************
+*
+* queryNativeTypes -
+*
+* Query:     E1 - no attrs
+* Result:    E1 - (A1 string, A2 number, A3 bool, A4 vector, A5 object)
+*
+*/
+TEST(mongoQueryContextRequest, queryNativeTypes)
+{
+    HttpStatusCode         ms;
+    QueryContextRequest   req;
+    QueryContextResponse  res;
+
+    /* Prepare database */
+    prepareDatabaseDifferentNativeTypes();
+
+    /* Forge the request (from "inside" to "outside") */
+    EntityId en("E1", "T1", "false");
+    req.entityIdVector.push_back(&en);
+
+    /* Invoke the function in mongoBackend library */
+    servicePathVector.clear();
+    ms = mongoQueryContext(&req, &res, "", servicePathVector, uriParams);
+
+    /* Check response is as expected */
+    EXPECT_EQ(SccOk, ms);
+
+    EXPECT_EQ(SccNone, res.errorCode.code);
+    EXPECT_EQ("", res.errorCode.reasonPhrase);
+    EXPECT_EQ("", res.errorCode.details);
+
+    ASSERT_EQ(1, res.contextElementResponseVector.size());
+    /* Context Element response # 1 */
+    EXPECT_EQ("E1", RES_CER(0).entityId.id);
+    EXPECT_EQ("T1", RES_CER(0).entityId.type);
+    EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
+    ASSERT_EQ(5, RES_CER(0).contextAttributeVector.size());
+
+    EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
+    EXPECT_EQ("s", RES_CER_ATTR(0, 0)->stringValue);
+    EXPECT_EQ(ValueTypeString, RES_CER_ATTR(0, 0)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
+
+    EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
+    EXPECT_EQ(42, RES_CER_ATTR(0, 1)->numberValue);
+    EXPECT_EQ(ValueTypeNumber, RES_CER_ATTR(0, 1)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 1)->metadataVector.size());
+
+    EXPECT_EQ("A3", RES_CER_ATTR(0, 2)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 2)->type);
+    EXPECT_FALSE(RES_CER_ATTR(0, 2)->boolValue);
+    EXPECT_EQ(ValueTypeBoolean, RES_CER_ATTR(0, 2)->valueType);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 2)->metadataVector.size());
+
+    EXPECT_EQ("A4", RES_CER_ATTR(0, 3)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 3)->type);
+    EXPECT_EQ(orion::ValueTypeObject, RES_CER_ATTR(0, 3)->compoundValueP->valueType);
+    EXPECT_EQ("x", RES_CER_ATTR(0, 3)->compoundValueP->childV[0]->name);
+    EXPECT_EQ("a", RES_CER_ATTR(0, 3)->compoundValueP->childV[0]->stringValue);
+    EXPECT_EQ("y", RES_CER_ATTR(0, 3)->compoundValueP->childV[1]->name);
+    EXPECT_EQ("b", RES_CER_ATTR(0, 3)->compoundValueP->childV[1]->stringValue);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 3)->metadataVector.size());
+
+    EXPECT_EQ("A5", RES_CER_ATTR(0, 4)->name);
+    EXPECT_EQ("T", RES_CER_ATTR(0, 4)->type);
+    EXPECT_EQ(orion::ValueTypeVector, RES_CER_ATTR(0, 4)->compoundValueP->valueType);
+    EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->valueType);
+    EXPECT_EQ("x1", RES_CER_ATTR(0, 4)->compoundValueP->childV[0]->stringValue);
+    EXPECT_EQ(orion::ValueTypeString, RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->valueType);
+    EXPECT_EQ("x2", RES_CER_ATTR(0, 4)->compoundValueP->childV[1]->stringValue);
+    EXPECT_EQ(0, RES_CER_ATTR(0, 4)->metadataVector.size());
+
+    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
+    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ("", RES_CER_STATUS(0).details);
+
+
+    /* Release dynamic memory used by response (mongoBackend allocates it) */
+    res.contextElementResponseVector.release();
+    /* Release connection */
+    setMongoConnectionForUnitTest(NULL);
 }
 
 /* ****************************************************************************

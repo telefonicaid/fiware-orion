@@ -131,7 +131,7 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
     ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+    EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
     EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -143,7 +143,7 @@ TEST(mongoQueryContextExistEntity, entityTypeWithoutFilter)
     ASSERT_EQ(1, RES_CER(1).contextAttributeVector.size());
     EXPECT_EQ("A1", RES_CER_ATTR(1, 0)->name);
     EXPECT_EQ("TA1", RES_CER_ATTR(1, 0)->type);
-    EXPECT_EQ("val1b", RES_CER_ATTR(1, 0)->value);
+    EXPECT_EQ("val1b", RES_CER_ATTR(1, 0)->stringValue);
     EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
     EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
     EXPECT_EQ(0, RES_CER_STATUS(1).details.size());
@@ -198,7 +198,7 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterExist)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("val1", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
@@ -254,7 +254,7 @@ TEST(mongoQueryContextExistEntity, entityTypeFilterNotExist)
   ASSERT_EQ(1, RES_CER(0).contextAttributeVector.size());
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ("val1b", RES_CER_ATTR(0, 0)->value);
+  EXPECT_EQ("val1b", RES_CER_ATTR(0, 0)->stringValue);
   EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
   EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);

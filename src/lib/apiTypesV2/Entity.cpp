@@ -57,37 +57,37 @@ Entity::~Entity()
 */
 std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool comma)
 {
-
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
-      std::string out = "{";
+    std::string out = "{";
 
-      out += JSON_VALUE("id", id);
+    out += JSON_VALUE("id", id);
 
-      if (type != "")
-      {
-        out += ",";
-        out += JSON_VALUE("type", type);
-      }
+    if (type != "")
+    {
+      out += ",";
+      out += JSON_VALUE("type", type);
+    }
 
-      if (attributeVector.size() != 0)
-      {
-        out += ",";
-        out += attributeVector.toJson(true);
-      }
+    if (attributeVector.size() != 0)
+    {
+      out += ",";
+      out += attributeVector.toJson(true);
+      LM_M(("out == %s", out.c_str()));
+    }
 
-      out += "}";
+    out += "}";
 
-      if (comma)
-      {
-        out += ",";
-      }
+    if (comma)
+    {
+      LM_M(("Adding a comma"));
+      out += ",";
+    }
 
-      return out;
+    return out;
   }
 
   return errorCode.toJson(true);
-
 }
 
 

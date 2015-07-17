@@ -155,10 +155,14 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
                           parseDataP->lastContextAttribute));
 
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
-  parseDataP->upcr.attributeP->value = node->value();
+  parseDataP->upcr.attributeP->stringValue = node->value();
+  parseDataP->upcr.attributeP->valueType   = ValueTypeString;
 
-  if (parseDataP->upcr.attributeP->value == " ")
-    parseDataP->upcr.attributeP->value = "";
+  LM_M(("KZ1: stringValue: '%s'", parseDataP->upcr.attributeP->stringValue.c_str()));
+  if (parseDataP->upcr.attributeP->stringValue == " ")
+  {
+    parseDataP->upcr.attributeP->stringValue = "";
+  }
 
   return 0;
 }
@@ -212,7 +216,7 @@ static int contextMetadataType(xml_node<>* node, ParseData* reqData)
 static int contextMetadataValue(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", node->value()));
-  reqData->upcr.contextMetadataP->value = node->value();
+  reqData->upcr.contextMetadataP->stringValue = node->value();
   return 0;
 }
 
@@ -265,7 +269,7 @@ static int domainMetadataType(xml_node<>* node, ParseData* reqData)
 static int domainMetadataValue(xml_node<>* node, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value: '%s'", node->value()));
-  reqData->upcr.domainMetadataP->value = node->value();
+  reqData->upcr.domainMetadataP->stringValue = node->value();
   return 0;
 }
 

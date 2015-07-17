@@ -35,6 +35,7 @@ SET (STATIC_LIBS
     mongoBackend
     rest
     jsonParse
+    jsonParseV2
     xmlParse
     apiTypesV2
     convenience

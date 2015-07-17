@@ -28,6 +28,7 @@
 #include <string>
 
 #include "rest/ConnectionInfo.h"
+#include "orionTypes/OrionValueType.h"
 #include "ngsi/ParseData.h"
 
 
@@ -40,13 +41,13 @@ namespace orion
 */
 extern void compoundValueStart
 (
-  ConnectionInfo*          ciP,
-  const std::string&       path,
-  const std::string&       name,
-  const std::string&       value,
-  const std::string&       rest,
-  CompoundValueNode::Type  type,
-  bool                     fatherIsVector
+  ConnectionInfo*     ciP,
+  const std::string&  path,
+  const std::string&  name,
+  const std::string&  value,
+  const std::string&  rest,
+  orion::ValueType    type,
+  bool                fatherIsVector
 );
 
 
@@ -57,11 +58,11 @@ extern void compoundValueStart
 */
 extern void compoundValueMiddle
 (
-  ConnectionInfo*          ciP,
-  const std::string&       relPath,
-  const std::string&       name,
-  const std::string&       value,
-  CompoundValueNode::Type  type
+  ConnectionInfo*     ciP,
+  const std::string&  relPath,
+  const std::string&  name,
+  const std::string&  value,
+  orion::ValueType    type
 );
 
 

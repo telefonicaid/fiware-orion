@@ -231,7 +231,7 @@ static std::string attributeMetadataType(const std::string& path, const std::str
 static std::string attributeMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got an attributeMetadataValue: '%s'", value.c_str()));
-  parseDataP->ncar.attributeMetadataP->value = value;
+  parseDataP->ncar.attributeMetadataP->stringValue = value;
   return "OK";
 }
 
@@ -285,7 +285,7 @@ static std::string registrationMetadataType(const std::string& path, const std::
 static std::string registrationMetadataValue(const std::string& path, const std::string& value, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a registrationMetadataValue: '%s'", value.c_str()));
-  parseDataP->ncar.regMetadataP->value = value;
+  parseDataP->ncar.regMetadataP->stringValue = value;
   return "OK";
 }
 
