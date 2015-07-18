@@ -43,21 +43,27 @@ namespace orion
 *
 * match - 
 */
-bool EntityInfo::match(const std::string& idPattern, const std::string& type)
+bool EntityInfo::match(const std::string& id, const std::string& type)
 {
+  LM_M(("KZ: matching against idPattern '%s' / type '%s'", id.c_str(), type.c_str()));
+
+  //
+  // If type non-empty - perfect match is mandatory
+  // If type is empty - always matches
+  //
   if ((type != "") && (entityType != type))
   {
     return false;
   }
 
-  // REGEX comparison this->entityIdPattern VS idPattern
-  if (regcomp(&entityIdPattern, idPattern.c_str(), 0) != 0)
-  {
-    LM_W(("Bad Input (error compiling regex: '%s')", idPattern.c_str()));
-    return false;
-  }
+  // REGEX comparison this->entityIdPattern VS id
+//  if (regcomp(&entityIdPattern, id.c_str(), 0) != 0)
+//  {
+//    LM_W(("Bad Input (error compiling regex: '%s')", id.c_str()));
+//    return false;
+//  }
 
-  return regexec(&entityIdPattern, idPattern.c_str(), 0, NULL, 0) == 0;
+  return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
 }
 
 
@@ -148,21 +154,30 @@ void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
 */
 bool Subscription::match(const std::string& id, const std::string& type, const std::string& attributeName)
 {
+  LM_M(("KZ: matching against id '%s' / type '%s' / attr '%s'", id.c_str(), type.c_str(), attributeName.c_str()));
+
   if (!hasAttribute(attributeName))
   {
+    LM_M(("KZ: not even attribute name was ok ..."));
     return false;
   }
 
+  LM_M(("KZ: attribute OK"));
   unsigned int ix;
+
+  LM_M(("KZ: searching an entity in vector of %d entity patterns", entityIdInfos.size()));
 
   for (ix = 0; ix < entityIdInfos.size(); ++ix)
   {
+    LM_M(("KZ: calling match method for an entityIdInfo"));
     if (entityIdInfos[ix]->match(id, type))
     {
+      LM_M(("KZ: match!"));
       return true;
     }
   }
 
+  LM_M(("KZ: no match ..."));
   return false;
 }
 
@@ -176,14 +191,19 @@ bool Subscription::hasAttribute(const std::string& attributeName)
 {
   unsigned int ix;
 
+  LM_M(("KZ: looking for attribute '%s' in a vector of %d attributes", attributeName.c_str(), attributes.size()));
+
   for (ix = 0; ix < attributes.size(); ++ix)
   {
+    LM_M(("KZ: Comparing '%s' to attribute %d: '%s'", attributeName.c_str(), ix, attributes[ix].c_str()));
     if (attributes[ix] == attributeName)
     {
+      LM_M(("KZ: got a match in attribute name"));
       return true;
     }
   }
 
+  LM_M(("KZ: no match in attribute name"));
   return false;
 }
 
@@ -204,19 +224,21 @@ SubscriptionCache::SubscriptionCache()
 *
 * lookup - 
 */
-Subscription* SubscriptionCache::lookup(const std::string& id, const std::string& type, const std::string& attributeName)
+void SubscriptionCache::lookup
+(
+  const std::string&           id,
+  const std::string&           type,
+  const std::string&           attributeName,
+  std::vector<Subscription*>*  subV
+)
 {
-  unsigned int ix;
-
-  for (ix = 0; ix < subs.size(); ++ix)
+  for (unsigned int ix = 0; ix < subs.size(); ++ix)
   {
     if (subs[ix]->match(id, type, attributeName))
     {
-      return subs[ix];
+      subV->push_back(subs[ix]);
     }
   }
-
-  return NULL;
 }
 
 

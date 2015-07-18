@@ -125,19 +125,22 @@ class Subscription
 */
 class SubscriptionCache
 {
- private:
+private:
   std::vector<Subscription*>  subs;
   sem_t                       mutex;
 
- public:
+public:
   SubscriptionCache();
 
   void           insert(Subscription* sub);
   int            remove(Subscription* sub);
   int            remove(const std::string& subId);
   int            refresh(void);
-  Subscription*  lookup(const std::string& id, const std::string& type, const std::string& attributeName);
   Subscription*  lookupById(const std::string& subId);
+  void           lookup(const std::string&           id,
+                        const std::string&           type,
+                        const std::string&           attributeName,
+                        std::vector<Subscription*>*  subV);
 };
 
 }  // namespace orion
