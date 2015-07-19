@@ -36,7 +36,7 @@
 #include "ngsi/NotifyConditionVector.h"
 
 struct SubscribeContextRequest;
-
+struct UpdateContextSubscriptionRequest;
 
 namespace orion
 {
@@ -57,6 +57,7 @@ typedef struct EntityInfo
   regex_t       entityIdPattern;
   std::string   entityType;
 
+  EntityInfo() {}
   EntityInfo(const std::string& idPattern, const std::string& _entityType);
   bool          match(const std::string& idPattern, const std::string& type);
 } EntityInfo;
@@ -106,6 +107,7 @@ class Subscription
   void entityIdInfoAdd(EntityInfo* entityIdInfoP);
   bool match(const std::string& idPattern, const std::string& type, const std::string& attributeName);
   bool hasAttribute(const std::string&attributeName);
+  void update(UpdateContextSubscriptionRequest* ucsrP);
 };
 
 

@@ -36,6 +36,7 @@
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityId.h"
 #include "ngsi10/SubscribeContextRequest.h"
+#include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "cache/SubscriptionCache.h"
 
 namespace orion
@@ -298,6 +299,31 @@ bool Subscription::hasAttribute(const std::string& attributeName)
 
   LM_M(("KZ: no match in attribute name"));
   return false;
+}
+
+
+
+/* ****************************************************************************
+*
+* update - 
+*/
+void Subscription::update(UpdateContextSubscriptionRequest* ucsrP)
+{
+  // 1. Update expirationTime if 'duration' is set in UpdateContextSubscriptionRequest
+  if (ucsrP->duration.get() != "")
+  {
+    int64_t _expirationTime = getCurrentTime() + ucsrP->duration.parse();
+    expirationTime  = _expirationTime;
+  }
+
+  // 2. Update throttling if 'throttling' is set in UpdateContextSubscriptionRequest
+  if (ucsrP->throttling.get() != "")
+  {
+    throttling = ucsrP->throttling.get();
+  }
+
+  // 3. restriction
+  // 4. notifyConditionVector
 }
 
 
