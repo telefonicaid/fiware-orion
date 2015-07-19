@@ -30,14 +30,49 @@
 
 #include "logMsg/logMsg.h"
 
+#include "common/statistics.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/Reference.h"
 #include "ngsi/NotifyConditionVector.h"
 #include "ngsi/EntityId.h"
+#include "ngsi10/SubscribeContextRequest.h"
 #include "cache/SubscriptionCache.h"
 
 namespace orion
 {
+
+
+/* ****************************************************************************
+*
+* subCache - global singleton for the subscription cache
+*/
+SubscriptionCache* subCache = NULL;
+
+
+
+/* ****************************************************************************
+*
+* subscriptionCacheInit - 
+*/
+void subscriptionCacheInit(void)
+{
+  LM_M(("KZ: creating Subscription Cache"));
+  subCache = new SubscriptionCache();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityInfo::EntityInfo - 
+*/
+EntityInfo::EntityInfo(const std::string& idPattern, const std::string& _entityType)
+{
+  regcomp(&entityIdPattern, idPattern.c_str(), 0);
+  entityType = _entityType;
+}
+
+
 
 /* ****************************************************************************
 *
@@ -57,12 +92,6 @@ bool EntityInfo::match(const std::string& id, const std::string& type)
   }
 
   // REGEX comparison this->entityIdPattern VS id
-//  if (regcomp(&entityIdPattern, id.c_str(), 0) != 0)
-//  {
-//    LM_W(("Bad Input (error compiling regex: '%s')", id.c_str()));
-//    return false;
-//  }
-
   return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
 }
 
@@ -75,7 +104,7 @@ bool EntityInfo::match(const std::string& id, const std::string& type)
 Subscription::Subscription()
 {
   subscriptionId = "";
-  throttling     = 0;
+  throttling     = "";
   expirationTime = 0;
 }
 
@@ -88,8 +117,72 @@ Subscription::Subscription()
 Subscription::Subscription(const std::string& _subscriptionId)
 {
   subscriptionId = _subscriptionId;
-  throttling     = 0;
+  throttling     = "";
   expirationTime = 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* Subscription::Subscription - 
+*/
+Subscription::Subscription(SubscribeContextRequest* scrP, std::string _subscriptionId, int64_t _expiration)
+{
+  unsigned int ix;
+
+  //
+  // 1. Get Subscription Id
+  //
+  subscriptionId = _subscriptionId;
+
+
+  //
+  // 2. Convert all patterned EntityId to EntityInfo
+  //
+  for (ix = 0; ix < scrP->entityIdVector.vec.size(); ++ix)
+  {
+    EntityId* eIdP;
+
+    eIdP = scrP->entityIdVector.vec[ix];
+
+    if (eIdP->isPattern == "false")
+    {
+      continue;
+    }
+
+    EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type);
+    
+    entityIdInfoAdd(eP);
+  }
+
+
+  //
+  // 3. Insert all attributes 
+  //
+  for (ix = 0; ix < scrP->attributeList.attributeV.size(); ++ix)
+  {
+    attributes.push_back(scrP->attributeList.attributeV[ix]);
+  }
+
+
+  //
+  // 4. throttling
+  //
+  throttling = scrP->throttling.get().c_str();
+
+
+  //
+  // 5. expirationTime
+  //
+  expirationTime = _expiration;
+
+
+  //
+  // 6. restriction
+  // 7. notifyConditionVector
+  // 8. reference
+  //
 }
 
 
@@ -103,7 +196,7 @@ Subscription::Subscription
   const std::string&               _subscriptionId,
   const std::vector<EntityInfo*>&  _entityIdInfos,
   const std::vector<std::string>&  _attributes,
-  int64_t                          _throttling,
+  const std::string&               _throttling,
   int64_t                          _expirationTime,
   const Restriction&               _restriction,
   const NotifyConditionVector&     _notifyConditionVector,
@@ -239,6 +332,8 @@ void SubscriptionCache::lookup
       subV->push_back(subs[ix]);
     }
   }
+
+  ++noOfSubCacheLookups;
 }
 
 
@@ -270,9 +365,19 @@ Subscription* SubscriptionCache::lookupById(const std::string& subId)
 */
 void SubscriptionCache::insert(Subscription* subP)
 {
+  LM_M(("KZ: Inserting subscription in cache"));
+
+  if (subP->entityIdInfos.size() == 0)
+  {
+    LM_M(("KZ: no entity id patterns - no insert performed"));
+    return;
+  }
+
   sem_wait(&mutex);
   subs.push_back(subP);
   sem_post(&mutex);
+  LM_M(("KZ: Subscription cache size: %d", subs.size()));
+  ++noOfSubCacheEntries;
 }
 
 
@@ -296,10 +401,12 @@ int SubscriptionCache::remove(Subscription* subP)
       
       sem_post(&mutex);
 
+      ++noOfSubCacheRemovals;
       return 0;
     }
   }
 
+  ++noOfSubCacheRemovalFailures;
   return -1;
 }
 

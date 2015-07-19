@@ -35,9 +35,11 @@
 #include "ngsi/Reference.h"
 #include "ngsi/NotifyConditionVector.h"
 
+struct SubscribeContextRequest;
+
+
 namespace orion
 {
-
 
 
 /* ****************************************************************************
@@ -55,6 +57,7 @@ typedef struct EntityInfo
   regex_t       entityIdPattern;
   std::string   entityType;
 
+  EntityInfo(const std::string& idPattern, const std::string& _entityType);
   bool          match(const std::string& idPattern, const std::string& type);
 } EntityInfo;
 
@@ -62,7 +65,7 @@ typedef struct EntityInfo
 
 /* ****************************************************************************
 *
-* SubscriptionCache -
+* Subscription -
 *
 * The class fields:
 * -------------------------------------------------------------------------------
@@ -82,7 +85,7 @@ class Subscription
   std::string               subscriptionId;
   std::vector<EntityInfo*>  entityIdInfos;
   std::vector<std::string>  attributes;
-  int64_t                   throttling;
+  std::string               throttling;
   int64_t                   expirationTime;
   Restriction               restriction;
   NotifyConditionVector     notifyConditionVector;
@@ -90,10 +93,11 @@ class Subscription
 
   Subscription();
   Subscription(const std::string& _subscriptionId);
+  Subscription(SubscribeContextRequest* scrP, std::string _subscriptionId, int64_t _expiration);
   Subscription(const std::string&               _subscriptionId,
                const std::vector<EntityInfo*>&  _entityIdInfos,
                const std::vector<std::string>&  _attributes,
-               int64_t                          _throttling,
+               const std::string&               _throttling,
                int64_t                          _expirationTime,
                const Restriction&               _restriction,
                const NotifyConditionVector&     _notifyConditionVector,
@@ -142,6 +146,22 @@ public:
                         const std::string&           attributeName,
                         std::vector<Subscription*>*  subV);
 };
+
+
+
+/* ****************************************************************************
+*
+* subCache - 
+*/
+extern SubscriptionCache* subCache;
+
+
+
+/* ****************************************************************************
+*
+* subscriptionCacheInit - 
+*/
+extern void subscriptionCacheInit(void);
 
 }  // namespace orion
 

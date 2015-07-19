@@ -183,6 +183,8 @@
 
 #include "common/string.h"
 
+#include "cache/SubscriptionCache.h"
+
 
 
 /* ****************************************************************************
@@ -1183,6 +1185,9 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
 {
   /* Set notifier object (singleton) */
   setNotifier(new Notifier());
+
+  /* Create the subscription cache object */
+  subscriptionCacheInit();
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
   if (!ngsi9Only)

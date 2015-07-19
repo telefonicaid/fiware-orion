@@ -44,7 +44,7 @@ typedef struct Throttling
 
   Throttling();
   void         set(const std::string& value);
-  std::string  get(void);
+  const std::string  get(void);
   bool         isEmpty(void);
   std::string  render(Format format, const std::string& indent, bool comma);
 
