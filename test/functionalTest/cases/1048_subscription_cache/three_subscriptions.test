@@ -25,7 +25,7 @@ notifyFormat_ngsi10
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 0 IPv4 -mutexTimeStat
 accumulatorStart
 
 --SHELL--
@@ -228,17 +228,22 @@ Date: REGEX(.*)
 04. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: 203
+Content-Length: 459
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orion": {
+        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
+        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
         "jsonRequests": "4", 
         "measuring_interval_in_secs": "REGEX(\d)", 
+        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "statisticsRequests": "1", 
         "subCacheEntries": "2", 
+        "subCacheMutexWaitingTime": "REGEX(\d+.\d+)", 
         "subscriptions": "3", 
+        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "uptime_in_secs": "REGEX(\d)"
     }
 }
@@ -263,17 +268,22 @@ Date: REGEX(.*)
 06. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: 232
+Content-Length: 488
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orion": {
+        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
+        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
         "jsonRequests": "6", 
         "measuring_interval_in_secs": "REGEX(\d)", 
+        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "statisticsRequests": "2", 
         "subCacheEntries": "2", 
+        "subCacheMutexWaitingTime": "REGEX(\d+.\d+)", 
         "subscriptions": "3", 
+        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "1", 
         "uptime_in_secs": "REGEX(\d)"
     }
@@ -299,18 +309,23 @@ Date: REGEX(.*)
 08. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: 262
+Content-Length: 518
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orion": {
+        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
+        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
         "jsonRequests": "8", 
         "measuring_interval_in_secs": "REGEX(\d)", 
+        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "statisticsRequests": "3", 
         "subCacheEntries": "1", 
+        "subCacheMutexWaitingTime": "REGEX(\d+.\d+)", 
         "subCacheRemovals": "1", 
         "subscriptions": "3", 
+        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "2", 
         "uptime_in_secs": "REGEX(\d)"
     }

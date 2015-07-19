@@ -27,10 +27,13 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <time.h>
 
 #include "logMsg/logMsg.h"
 
 #include "common/statistics.h"
+#include "common/clockFunctions.h"
+
 #include "ngsi/Restriction.h"
 #include "ngsi/Reference.h"
 #include "ngsi/NotifyConditionVector.h"
@@ -53,12 +56,38 @@ SubscriptionCache* subCache = NULL;
 
 /* ****************************************************************************
 *
+* subCacheMutexTime - 
+*/
+static struct timespec subCacheMutexTime = { 0, 0 };
+
+
+
+/* ****************************************************************************
+*
 * subscriptionCacheInit - 
 */
 void subscriptionCacheInit(void)
 {
   LM_M(("KZ: creating Subscription Cache"));
   subCache = new SubscriptionCache();
+}
+
+
+
+/* ****************************************************************************
+*
+* subCacheMutexWaitingTimeGet - 
+*/
+void subCacheMutexWaitingTimeGet(char* buf, int bufLen)
+{
+  if (semTimeStatistics)
+  {
+    snprintf(buf, bufLen, "%lu.%09d", subCacheMutexTime.tv_sec, (int) subCacheMutexTime.tv_nsec);
+  }
+  else
+  {
+    snprintf(buf, bufLen, "Disabled");
+  }
 }
 
 
@@ -334,7 +363,55 @@ void Subscription::update(UpdateContextSubscriptionRequest* ucsrP)
 */
 SubscriptionCache::SubscriptionCache()
 {
+  semInit();
+}
+
+
+
+/* ****************************************************************************
+*
+* semInit - 
+*/
+void SubscriptionCache::semInit(void)
+{
   sem_init(&mutex, 0, 1); // Shared between threads, not taken initially
+}
+
+
+
+/* ****************************************************************************
+*
+* semTake - 
+*/
+void SubscriptionCache::semTake(void)
+{
+  struct timespec  startTime;
+  struct timespec  endTime;
+  struct timespec  diffTime;
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &startTime);
+  }
+
+  sem_wait(&mutex);
+
+  if (semTimeStatistics)
+  {
+    clock_gettime(CLOCK_REALTIME, &endTime);
+    clock_difftime(&endTime, &startTime, &diffTime);
+    clock_addtime(&subCacheMutexTime, &diffTime);
+  }
+}
+
+
+/* ****************************************************************************
+*
+* semGive - 
+*/
+void SubscriptionCache::semGive(void)
+{
+  sem_post(&mutex);
 }
 
 
@@ -399,9 +476,9 @@ void SubscriptionCache::insert(Subscription* subP)
     return;
   }
 
-  sem_wait(&mutex);
+  semTake();
   subs.push_back(subP);
-  sem_post(&mutex);
+  semGive();
   LM_M(("KZ: Subscription cache size: %d", subs.size()));
   ++noOfSubCacheEntries;
 }
@@ -421,12 +498,12 @@ int SubscriptionCache::remove(Subscription* subP)
     if (subs[ix] == subP)
     {
       LM_M(("KZ: Really removing subscription '%s' from cache (cache size: %d)", subP->subscriptionId.c_str(), subs.size()));
-      sem_wait(&mutex);
+      semTake();
 
       free(subP);
       subs.erase(subs.begin() + ix);
       
-      sem_post(&mutex);
+      semGive();
 
       ++noOfSubCacheRemovals;
       LM_M(("KZ: Really removed subscription '%s' from cache (cache size: %d)", subP->subscriptionId.c_str(), subs.size()));
