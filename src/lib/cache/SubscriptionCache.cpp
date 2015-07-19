@@ -365,7 +365,7 @@ Subscription* SubscriptionCache::lookupById(const std::string& subId)
 */
 void SubscriptionCache::insert(Subscription* subP)
 {
-  LM_M(("KZ: Inserting subscription in cache"));
+  LM_M(("KZ: Inserting subscription '%s' in cache", subP->subscriptionId.c_str()));
 
   if (subP->entityIdInfos.size() == 0)
   {
@@ -394,6 +394,7 @@ int SubscriptionCache::remove(Subscription* subP)
   {
     if (subs[ix] == subP)
     {
+      LM_M(("KZ: Really removing subscription '%s' from cache (cache size: %d)", subP->subscriptionId.c_str(), subs.size()));
       sem_wait(&mutex);
 
       free(subP);
@@ -402,6 +403,8 @@ int SubscriptionCache::remove(Subscription* subP)
       sem_post(&mutex);
 
       ++noOfSubCacheRemovals;
+      LM_M(("KZ: Really removed subscription '%s' from cache (cache size: %d)", subP->subscriptionId.c_str(), subs.size()));
+      --noOfSubCacheEntries;
       return 0;
     }
   }
@@ -420,8 +423,11 @@ int SubscriptionCache::remove(const std::string& subId)
 {
   Subscription* subP = lookupById(subId);
 
+  LM_M(("KZ: Removing subscription '%s' from cache", subId.c_str()));
+
   if (subP == NULL)
   {
+    LM_M(("KZ: subscription '%s' not found", subId.c_str()));
     return -1;
   }
 

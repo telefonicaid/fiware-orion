@@ -35,6 +35,10 @@ accumulatorStart
 # 02. Subscribe to E2.*/A1
 # 03. Subscribe to E3.*/A1
 # 04. Statistics
+# 05. Remove first subscription (uncached SUB1)
+# 06. Statistics
+# 07. Remove second subscription (cached SUB2)
+# 08. Statistics
 #
 
 echo "01. Subscribe to E1/A1 (no pattern)"
@@ -62,6 +66,7 @@ payload='{
   ]
 }'
 orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB1=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
 
@@ -92,6 +97,7 @@ payload='{
   ]
 }'
 orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB2=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
 
@@ -122,6 +128,7 @@ payload='{
   ]
 }'
 orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB3=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
 echo
 echo
 
@@ -132,6 +139,41 @@ orionCurl --url /statistics --json
 echo
 echo
 
+
+echo "05. Remove first subscription (uncached SUB1)"
+echo "============================================="
+payload='
+{
+  "subscriptionId": "'$SUB1'"
+}'
+orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Statistics"
+echo "=============="
+orionCurl --url /statistics --json
+echo
+echo
+
+
+echo "07. Remove second subscription (cached SUB2)"
+echo "============================================"
+payload='
+{
+  "subscriptionId": "'$SUB2'"
+}'
+orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Statistics"
+echo "=============="
+orionCurl --url /statistics --json
+echo
+echo
 
 
 --REGEXPECT--
@@ -197,6 +239,79 @@ Date: REGEX(.*)
         "statisticsRequests": "1", 
         "subCacheEntries": "2", 
         "subscriptions": "3", 
+        "uptime_in_secs": "REGEX(\d)"
+    }
+}
+
+
+05. Remove first subscription (uncached SUB1)
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }, 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+06. Statistics
+==============
+HTTP/1.1 200 OK
+Content-Length: 232
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "jsonRequests": "6", 
+        "measuring_interval_in_secs": "REGEX(\d)", 
+        "statisticsRequests": "2", 
+        "subCacheEntries": "2", 
+        "subscriptions": "3", 
+        "unsubscriptions": "1", 
+        "uptime_in_secs": "REGEX(\d)"
+    }
+}
+
+
+07. Remove second subscription (cached SUB2)
+============================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }, 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+08. Statistics
+==============
+HTTP/1.1 200 OK
+Content-Length: 262
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "jsonRequests": "8", 
+        "measuring_interval_in_secs": "REGEX(\d)", 
+        "statisticsRequests": "3", 
+        "subCacheEntries": "1", 
+        "subCacheRemovals": "1", 
+        "subscriptions": "3", 
+        "unsubscriptions": "2", 
         "uptime_in_secs": "REGEX(\d)"
     }
 }
