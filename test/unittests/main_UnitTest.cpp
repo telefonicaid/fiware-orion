@@ -109,8 +109,8 @@ int main(int argC, char** argV)
 
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false);
-  subscriptionCacheInit();
   setupDatabase();
+  subscriptionCacheInit("unittest");
 
   LM_M(("Run all tests"));
   ::testing::InitGoogleMock(&argC, argV);

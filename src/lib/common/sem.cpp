@@ -68,6 +68,8 @@ static struct timespec accTransSemTime = { 0, 0 };
 */
 int semInit(SemRequestType _reqPolicy, bool semTimeStat, int shared, int takenInitially)
 {
+  LM_M(("KZ: semInit params:  shared: %d, takenInitially: %d", shared, takenInitially));
+
   if (sem_init(&reqSem, shared, takenInitially) == -1)
   {
     LM_E(("Runtime Error (error initializing 'req' semaphore: %s)", strerror(errno)));

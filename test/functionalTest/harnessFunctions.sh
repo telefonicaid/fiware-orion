@@ -341,12 +341,26 @@ function brokerStart()
 #
 function brokerStop
 {
+  if [ "$1" == "-v" ]
+  then
+    _verbose=1
+    shift
+  fi
+
   role=$1
+  if [ "$role" == "" ]
+  then
+    role=CB
+  fi
+ 
+  vMsg "Stopping broker $1"
 
   if [ "$role" == "CB" ]
   then
     pidFile=$CB_PID_FILE
     port=$CB_PORT
+    vMsg pidFile: $pidFile
+    vMsg port: $port
   elif [ "$role" == "CM" ]
   then
     pidFile=$CM_PID_FILE
@@ -374,7 +388,9 @@ function brokerStop
   fi
 
   if [ "$VALGRIND" == "" ]; then
+    vMsg "killing with PID from pidFile"
     kill $(cat $pidFile 2> /dev/null) 2> /dev/null
+    vMsg "should be dead"
     if [ -f /tmp/orion_${port}.pid ]
     then
       rm -f /tmp/orion_${port}.pid 2> /dev/null

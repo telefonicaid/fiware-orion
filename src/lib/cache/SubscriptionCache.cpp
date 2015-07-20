@@ -40,7 +40,10 @@
 #include "ngsi/EntityId.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
+#include "mongoBackend/MongoGlobal.h"
 #include "cache/SubscriptionCache.h"
+
+
 
 namespace orion
 {
@@ -66,10 +69,10 @@ static struct timespec subCacheMutexTime = { 0, 0 };
 *
 * subscriptionCacheInit - 
 */
-void subscriptionCacheInit(void)
+void subscriptionCacheInit(std::string dbName)
 {
-  LM_M(("KZ: creating Subscription Cache"));
-  subCache = new SubscriptionCache();
+  subCache = new SubscriptionCache(dbName);
+  subCache->init();
 }
 
 
@@ -110,8 +113,6 @@ EntityInfo::EntityInfo(const std::string& idPattern, const std::string& _entityT
 */
 bool EntityInfo::match(const std::string& id, const std::string& type)
 {
-  LM_M(("KZ: matching against idPattern '%s' / type '%s'", id.c_str(), type.c_str()));
-
   //
   // If type non-empty - perfect match is mandatory
   // If type is empty - always matches
@@ -133,8 +134,10 @@ bool EntityInfo::match(const std::string& id, const std::string& type)
 */
 Subscription::Subscription()
 {
+  tenant         = "";
+  servicePath    = "";
   subscriptionId = "";
-  throttling     = "";
+  throttling     = 0;
   expirationTime = 0;
 }
 
@@ -144,10 +147,17 @@ Subscription::Subscription()
 *
 * Subscription::Subscription - 
 */
-Subscription::Subscription(const std::string& _subscriptionId)
+Subscription::Subscription
+(
+  const std::string& _tenant,
+  const std::string& _servicePath,
+  const std::string& _subscriptionId
+)
 {
+  tenant         = _tenant;
+  servicePath    = _servicePath;
   subscriptionId = _subscriptionId;
-  throttling     = "";
+  throttling     = 0;
   expirationTime = 0;
 }
 
@@ -157,7 +167,14 @@ Subscription::Subscription(const std::string& _subscriptionId)
 *
 * Subscription::Subscription - 
 */
-Subscription::Subscription(SubscribeContextRequest* scrP, std::string _subscriptionId, int64_t _expiration)
+Subscription::Subscription
+(
+  const std::string&        _tenant,
+  const std::string&        _servicePath,
+  SubscribeContextRequest*  scrP,
+  std::string               _subscriptionId,
+  int64_t                   _expiration
+)
 {
   unsigned int ix;
 
@@ -199,7 +216,7 @@ Subscription::Subscription(SubscribeContextRequest* scrP, std::string _subscript
   //
   // 4. throttling
   //
-  throttling = scrP->throttling.get().c_str();
+  throttling = scrP->throttling.parse();
 
 
   //
@@ -223,10 +240,12 @@ Subscription::Subscription(SubscribeContextRequest* scrP, std::string _subscript
 */
 Subscription::Subscription
 (
+  const std::string&               _tenant,
+  const std::string&               _servicePath,
   const std::string&               _subscriptionId,
   const std::vector<EntityInfo*>&  _entityIdInfos,
   const std::vector<std::string>&  _attributes,
-  const std::string&               _throttling,
+  int64_t                          _throttling,
   int64_t                          _expirationTime,
   const Restriction&               _restriction,
   const NotifyConditionVector&     _notifyConditionVector,
@@ -235,6 +254,8 @@ Subscription::Subscription
 {
   unsigned int ix;
 
+  tenant         = _tenant;
+  servicePath    = _servicePath;
   subscriptionId = _subscriptionId;
 
   for (ix = 0; ix < _entityIdInfos.size(); ++ix)
@@ -277,30 +298,21 @@ void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
 */
 bool Subscription::match(const std::string& id, const std::string& type, const std::string& attributeName)
 {
-  LM_M(("KZ: matching against id '%s' / type '%s' / attr '%s'", id.c_str(), type.c_str(), attributeName.c_str()));
-
   if (!hasAttribute(attributeName))
   {
-    LM_M(("KZ: not even attribute name was ok ..."));
     return false;
   }
 
-  LM_M(("KZ: attribute OK"));
   unsigned int ix;
-
-  LM_M(("KZ: searching an entity in vector of %d entity patterns", entityIdInfos.size()));
 
   for (ix = 0; ix < entityIdInfos.size(); ++ix)
   {
-    LM_M(("KZ: calling match method for an entityIdInfo"));
     if (entityIdInfos[ix]->match(id, type))
     {
-      LM_M(("KZ: match!"));
       return true;
     }
   }
 
-  LM_M(("KZ: no match ..."));
   return false;
 }
 
@@ -314,19 +326,14 @@ bool Subscription::hasAttribute(const std::string& attributeName)
 {
   unsigned int ix;
 
-  LM_M(("KZ: looking for attribute '%s' in a vector of %d attributes", attributeName.c_str(), attributes.size()));
-
   for (ix = 0; ix < attributes.size(); ++ix)
   {
-    LM_M(("KZ: Comparing '%s' to attribute %d: '%s'", attributeName.c_str(), ix, attributes[ix].c_str()));
     if (attributes[ix] == attributeName)
     {
-      LM_M(("KZ: got a match in attribute name"));
       return true;
     }
   }
 
-  LM_M(("KZ: no match in attribute name"));
   return false;
 }
 
@@ -348,7 +355,7 @@ void Subscription::update(UpdateContextSubscriptionRequest* ucsrP)
   // 2. Update throttling if 'throttling' is set in UpdateContextSubscriptionRequest
   if (ucsrP->throttling.get() != "")
   {
-    throttling = ucsrP->throttling.get();
+    throttling = ucsrP->throttling.parse();
   }
 
   // 3. restriction
@@ -363,7 +370,18 @@ void Subscription::update(UpdateContextSubscriptionRequest* ucsrP)
 */
 SubscriptionCache::SubscriptionCache()
 {
-  semInit();
+  dbName = "";
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::SubscriptionCache - 
+*/
+SubscriptionCache::SubscriptionCache(std::string _dbName)
+{
+  dbName = _dbName;
 }
 
 
@@ -464,22 +482,176 @@ Subscription* SubscriptionCache::lookupById(const std::string& subId)
 
 /* ****************************************************************************
 *
+* subTreat - 
+*/
+static void subTreat(std::string tenant, BSONObj& bobj)
+{
+  BSONElement  idField = bobj.getField("_id");
+
+  if (idField.eoo() == true)
+  {
+    LM_E(("Database Error (error retrieving _id field in doc: '%s')", bobj.toString().c_str()));
+    return;
+  }
+
+
+
+  //
+  // 01. Extract values from database object 'bobj'
+  //
+
+  std::string               subId       = idField.OID().toString();
+  int64_t                   expiration  = bobj.getField("expiration").Long();
+  std::string               reference   = bobj.getField("reference").String();
+  int64_t                   throttling  = bobj.getField("throttling").Long();
+  std::vector<BSONElement>  eVec        = bobj.getField("entities").Array();
+  std::vector<BSONElement>  attrVec     = bobj.getField("attrs").Array();
+  std::vector<BSONElement>  condVec     = bobj.getField("conditions").Array();
+  std::string               format      = bobj.getField("format").String();
+  std::string               servicePath = bobj.getField("servicePath").String();
+
+  std::vector<EntityInfo*> eiV;
+  std::vector<std::string> attrV;
+  Restriction              restriction;
+  NotifyConditionVector    notifyConditionVector;
+
+
+  //
+  // 02. Pushing Entity-data names to EntityInfo Vector (eiV)
+  //
+  for (unsigned int ix = 0; ix < eVec.size(); ++ix)
+  {
+    BSONObj entity = eVec[ix].embeddedObject();
+
+    if (!entity.hasField("id"))
+    {
+      LM_W(("Runtime Error (got a subscription without id)"));
+      continue;
+    }
+
+    std::string id = entity.getStringField("id");
+    
+    if (!entity.hasField("isPattern"))
+    {
+      continue;
+    }
+
+    std::string isPattern = entity.getStringField("isPattern");
+    if (isPattern != "true")
+    {
+      continue;
+    }
+
+    std::string  type = "";
+    if (entity.hasField("type"))
+    {
+      type = entity.getStringField("type");
+    }
+
+    EntityInfo* eiP = new EntityInfo(id, type);
+    eiV.push_back(eiP);
+  }
+
+  if (eiV.size() == 0)
+  {
+    return;
+  }
+
+
+  //
+  // 03. Pushing attribute names to Attribute Vector (attrV)
+  //
+  for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
+  {
+    std::string attributeName = attrVec[ix].String();
+
+    attrV.push_back(attributeName);
+  }
+
+
+  //
+  // 04. FIXME P4: Restriction not implemented
+  //
+  
+  
+
+  //
+  // 05. Fill in notifyConditionVector from condVec
+  //
+  for (unsigned int ix = 0; ix < condVec.size(); ++ix)
+  {
+    BSONObj                   condition = condVec[ix].embeddedObject();
+    std::string               condType;
+    std::vector<BSONElement>  valueVec;
+
+    condType = condition.getStringField("type");
+    if (condType != "ONCHANGE")
+    {
+      continue;
+    }
+
+    NotifyCondition* ncP = new NotifyCondition();
+    ncP->type = condType;
+
+    valueVec = condition.getField("value").Array();
+    for (unsigned int vIx = 0; vIx < valueVec.size(); ++vIx)
+    {
+      std::string condValue;
+
+      condValue = valueVec[vIx].String();
+      ncP->condValueList.push_back(condValue);
+    }
+
+    notifyConditionVector.push_back(ncP);
+  }
+
+
+
+  //
+  // 06. Create Subscription and add it to the subscription-cache
+  //
+  Subscription* subP = new Subscription(tenant, servicePath, subId, eiV, attrV, throttling, expiration, restriction, notifyConditionVector, reference);
+  subCache->insert(subP);
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::init - 
+*/
+void SubscriptionCache::init(void)
+{
+  semInit();
+
+  // FIXME P10: Get a list of all tenants and call subscriptionsTreat() for each of them
+  std::vector<std::string> tenantV;
+
+  tenantV.push_back(dbName);
+
+  for (unsigned int ix = 0; ix < tenantV.size(); ++ix)
+  {
+    subscriptionsTreat(tenantV[ix], subTreat);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * SubscriptionCache::insert - 
 */
 void SubscriptionCache::insert(Subscription* subP)
 {
-  LM_M(("KZ: Inserting subscription '%s' in cache", subP->subscriptionId.c_str()));
-
   if (subP->entityIdInfos.size() == 0)
   {
-    LM_M(("KZ: no entity id patterns - no insert performed"));
     return;
   }
 
   semTake();
   subs.push_back(subP);
   semGive();
-  LM_M(("KZ: Subscription cache size: %d", subs.size()));
+
   ++noOfSubCacheEntries;
 }
 
@@ -497,7 +669,6 @@ int SubscriptionCache::remove(Subscription* subP)
   {
     if (subs[ix] == subP)
     {
-      LM_M(("KZ: Really removing subscription '%s' from cache (cache size: %d)", subP->subscriptionId.c_str(), subs.size()));
       semTake();
 
       free(subP);
@@ -506,7 +677,6 @@ int SubscriptionCache::remove(Subscription* subP)
       semGive();
 
       ++noOfSubCacheRemovals;
-      LM_M(("KZ: Really removed subscription '%s' from cache (cache size: %d)", subP->subscriptionId.c_str(), subs.size()));
       --noOfSubCacheEntries;
       return 0;
     }
@@ -526,11 +696,8 @@ int SubscriptionCache::remove(const std::string& subId)
 {
   Subscription* subP = lookupById(subId);
 
-  LM_M(("KZ: Removing subscription '%s' from cache", subId.c_str()));
-
   if (subP == NULL)
   {
-    LM_M(("KZ: subscription '%s' not found", subId.c_str()));
     return -1;
   }
 

@@ -83,22 +83,32 @@ typedef struct EntityInfo
 class Subscription
 {
  public:
+  std::string               tenant;
+  std::string               servicePath;
   std::string               subscriptionId;
   std::vector<EntityInfo*>  entityIdInfos;
   std::vector<std::string>  attributes;
-  std::string               throttling;
+  int64_t                   throttling;
   int64_t                   expirationTime;
   Restriction               restriction;
   NotifyConditionVector     notifyConditionVector;
   Reference                 reference;
 
   Subscription();
-  Subscription(const std::string& _subscriptionId);
-  Subscription(SubscribeContextRequest* scrP, std::string _subscriptionId, int64_t _expiration);
-  Subscription(const std::string&               _subscriptionId,
+  Subscription(const std::string& _tenant, const std::string& _servicePath, const std::string& _subscriptionId);
+
+  Subscription(const std::string&        _tenant,
+               const std::string&        _servicePath,
+               SubscribeContextRequest*  scrP,
+               std::string               _subscriptionId,
+               int64_t                   _expiration);
+
+  Subscription(const std::string&               _tenant,
+               const std::string&               _servicePath,
+               const std::string&               _subscriptionId,
                const std::vector<EntityInfo*>&  _entityIdInfos,
                const std::vector<std::string>&  _attributes,
-               const std::string&               _throttling,
+               int64_t                          _throttling,
                int64_t                          _expirationTime,
                const Restriction&               _restriction,
                const NotifyConditionVector&     _notifyConditionVector,
@@ -133,11 +143,14 @@ class SubscriptionCache
 {
 private:
   std::vector<Subscription*>  subs;
+  std::string                 dbName;
   sem_t                       mutex;
 
 public:
   SubscriptionCache();
+  SubscriptionCache(std::string _dbName);
 
+  void           init();
   void           insert(Subscription* sub);
   int            remove(Subscription* sub);
   int            remove(const std::string& subId);
@@ -167,7 +180,7 @@ extern SubscriptionCache* subCache;
 *
 * subscriptionCacheInit - 
 */
-extern void subscriptionCacheInit(void);
+extern void subscriptionCacheInit(std::string dbName);
 
 
 

@@ -43,19 +43,20 @@ typedef struct Throttling
   int64_t       seconds;
 
   Throttling();
-  void         set(const std::string& value);
+
+  void               set(const std::string& value);
   const std::string  get(void);
-  bool         isEmpty(void);
-  std::string  render(Format format, const std::string& indent, bool comma);
+  bool               isEmpty(void);
+  std::string        render(Format format, const std::string& indent, bool comma);
 
-  std::string  check(RequestType requestType,
-                     Format format,
-                     const std::string& indent,
-                     const std::string& predetectedError,
-                     int counter);
+  std::string        check(RequestType requestType,
+                           Format format,
+                           const std::string& indent,
+                           const std::string& predetectedError,
+                           int counter);
 
-  int64_t      parse(void);
-  void         present(const std::string& indent);
+  int64_t            parse(void);
+  void               present(const std::string& indent);
 } Throttling;
 
 #endif  // SRC_LIB_NGSI_THROTTLING_H_

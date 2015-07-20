@@ -1187,7 +1187,7 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
   setNotifier(new Notifier());
 
   /* Create the subscription cache object */
-  subscriptionCacheInit();
+  subscriptionCacheInit(dbName);
 
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
   if (!ngsi9Only)

@@ -60,13 +60,6 @@ using std::auto_ptr;
 
 /* ****************************************************************************
 *
-* OtisTreatFunction - callback signature for treatOntimeintervalSubscriptions
-*/
-typedef void (*OtisTreatFunction)(std::string tenant, BSONObj& bobjP);
-
-
-/* ****************************************************************************
-*
 * Globals
 */
 static std::string          dbPrefix;
@@ -192,6 +185,7 @@ bool mongoConnect(DBClientConnection* c)
 void setMongoConnectionForUnitTest(DBClientBase* _connection)
 {
   connection = _connection;
+  LM_M(("In setMongoConnectionForUnitTest: %p", connection));
 }
 
 
@@ -560,6 +554,8 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   for (unsigned int ix = 0; ix < condV.size(); ++ix)
   {
     BSONObj condition = condV[ix].embeddedObject();
+
+    LM_M(("KZ: got a subscription of type '%s'", STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str()));
 
     if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
     {
@@ -2479,4 +2475,58 @@ std::string dbDotDecode(std::string s)
 {
   std::replace(s.begin(), s.end(), ESCAPE_1_ENCODED, ESCAPE_1_DECODED);
   return s;
+}
+
+
+
+/* ****************************************************************************
+*
+* subscriptionsTreat -
+*
+* Lookup all subscriptions in the database and call a treat function for each
+*/
+void subscriptionsTreat(std::string tenant, OtisTreatFunction treatFunction)
+{
+  BSONObj                   query;
+  DBClientBase*             connection = getMongoConnection();
+  auto_ptr<DBClientCursor>  cursor;
+
+  try
+  {
+    LM_M(("connection at %p", connection));
+    cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
+
+    /*
+     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+     * exception ourselves
+     */
+    if (cursor.get() == NULL)
+    {
+      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+    }
+    releaseMongoConnection(connection);
+
+    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
+  }
+  catch (const DBException &e)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error (DBException: %s)", e.what()));
+    return;
+  }
+  catch (...)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error (generic exception)"));
+    return;
+  }
+
+  // Call the treat function for each subscription
+  while (cursor->more())
+  {
+    BSONObj sub = cursor->next();
+
+    treatFunction(tenant, sub);
+  }
 }
