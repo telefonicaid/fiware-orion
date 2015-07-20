@@ -38,9 +38,7 @@ Furthermore, the type system of FIWARE NGSI enables entities to have an **entity
 
 ### Context Elements
 
-While context entities are the central concept of the FIWARE NGSI information model, context elements are the corresponding type of data object in the NGSI *data model*. 
-
-A context element is a JSON object  which contains information about a specific context entity. Consequently, a context element has a mandatory property 'id', an optional property 'type', and, optionally, further properties which describe more information about the entity (see the **context attributes** section below). Details of the JSON representation of context elements can be found below.
+A context element is a data object (e.g. JSON object; see the section on JSON representation below) which contains information about a specific context entity. Consequently, a context element has a mandatory property `id` in order to identify the context entity it refers to. It furthermore can contain an optional property `type` to describe the type of the entity. Further properties can be used to represent more information about the entity (see the **context attributes** section below).
 
 It is important to understand that the relationship of entity and context element is one-to-many. This means that 
 * each context element refers to exactly one entity
