@@ -54,6 +54,7 @@ TEST(badNgsi10Request, ok)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  ci.apiVersion = "v1";
   out = restService(&ci, rs);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
