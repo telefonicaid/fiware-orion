@@ -32,13 +32,27 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
 
 ### Context Entities
 
-Context entities, or simply called entities, are the center of gravity in the FIWARE NGSI information model. An entity represents a real-world object like e.g. a sensor, a person, or a room. Each entity is uniquely identified by its **entity id**. 
+Context entities, or simply called entities, are the center of gravity
+in the FIWARE NGSI information model. An entity represents a
+real-world object like e.g. a sensor, a person, or a room. Each entity
+is uniquely identified by its **entity id**. 
 
-Furthermore, the type system of FIWARE NGSI enables entities to have an **entity type**. Entity types are semantic types; they are intended to describe the type of real-world object represented by the entity. For example, a context entity with id *sensor-365* could have the type *temperatureSensor*.
+Furthermore, the type system of FIWARE NGSI enables entities to have 
+an **entity type**. Entity types are semantic types; they are intended
+to describe the type of real-world object represented by the entity.
+For example, a context entity with id *sensor-365* could have the
+type *temperatureSensor*.
 
 ### Context Elements
 
-A context element is a data object (e.g. JSON object; see the section on JSON representation below) which contains information about a specific context entity. Consequently, a context element has a mandatory property `id` in order to identify the context entity it refers to. It furthermore can contain an optional property `type` to describe the type of the entity. Further properties can be used to represent more information about the entity (see the **context attributes** section below).
+A context element is a data object (e.g. JSON object; see the section
+on JSON representation below) which contains information about a
+specific context entity. Consequently, a context element has a
+mandatory property `id` in order to identify the context entity it
+refers to. It furthermore can contain an optional property `type`
+to describe the type of the entity. Further properties can be used
+to represent more information about the entity (see the **context
+attributes** section below).
 
 It is important to understand that the relationship of entity and context element is one-to-many. This means that 
 * each context element refers to exactly one entity
@@ -46,9 +60,12 @@ It is important to understand that the relationship of entity and context elemen
 
 ### Context Attributes 
 
-Context attributes are properties of context entities. For example, the current speed of a car could be modeled as attribute *current_speed* of entity *car-104*.
+Context attributes are properties of context entities.
+For example, the current speed of a car could be modeled as
+attribute *current_speed* of entity *car-104*.
 
-In the NGSI data model, attributes have an *attribute name*, an *attribute type*, an *attribute value* and *metadata*. 
+In the NGSI data model, attributes have an *attribute name*,
+an *attribute type*, an *attribute value* and *metadata*. 
  * The attribute name describes which kind of property of the entity the attribute value represents, for example *current_speed*.
  * The attribute type represents the NGSI value type of the attribute value. Note that FIWARE NGSI has its own type system for attribute values, so NGSI value types are not the same as JSON types.
  * The attribute value finally contains
@@ -57,12 +74,18 @@ In the NGSI data model, attributes have an *attribute name*, an *attribute type*
   
 ### Context Metadata
 
-Context metadata is used in FIWARE NGSI at several places, one of them being an optional part of the attribute value as described above. Similarly to attributes, each piece of metadata has 
- * **a metadata name**, describing the role of the metadata at the place where it occurs; for example, the metadata name *accuracy* indicates that the metadata value describes how accurate a given attribute value is
+Context metadata is used in FIWARE NGSI at several places, one of
+them being an optional part of the attribute value as described
+above. Similarly to attributes, each piece of metadata has 
+ * **a metadata name**, describing the role of the metadata at the
+ place where it occurs; for example, the metadata name *accuracy* 
+ indicates that the metadata value describes how accurate a given 
+ attribute value is
  * a **metadata type**, describing the NGSI value type of the metadata value
  * a **metadata value** containing the actual metadata
 
-Note that in NGSI it is not forseen that metadata values can themselves have metadata.
+Note that in NGSI it is not forseen that metadata values can
+themselves have metadata.
 
 ## JSON entity representation
 
