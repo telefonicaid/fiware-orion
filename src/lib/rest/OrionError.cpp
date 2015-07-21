@@ -73,6 +73,22 @@ OrionError::OrionError(StatusCode& sc)
 
 /* ****************************************************************************
 *
+* OrionError::errorStringForV2 - 
+*/
+std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
+{
+  if (_reasonPhrase == "Bad Request")
+  {
+    return "BadRequest";
+  }
+
+  return _reasonPhrase;
+}
+
+
+
+/* ****************************************************************************
+*
 * OrionError::render - 
 */
 std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
@@ -82,6 +98,7 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
   //
   if (ciP->apiVersion == "v2")
   {
+    reasonPhrase = errorStringForV2(reasonPhrase);
     return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
   }
 
