@@ -1,0 +1,10 @@
+orion:
+  build: .
+  links:
+    - mongo
+  ports:
+    - "1026:1026"
+  command: -dbhost mongo
+
+mongo:
+  image: mongo:2.6

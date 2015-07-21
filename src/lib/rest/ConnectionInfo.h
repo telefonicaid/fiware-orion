@@ -68,6 +68,7 @@ public:
     servicePath            = "";
     ip                     = "";
     port                   = 0;
+    apiVersion             = "v1";
 
     memset(payloadWord, 0, sizeof(payloadWord));
   }
@@ -90,6 +91,7 @@ public:
     servicePath            = "";
     ip                     = "";
     port                   = 0;
+    apiVersion             = "v1";
 
     memset(payloadWord, 0, sizeof(payloadWord));
   }
@@ -109,6 +111,7 @@ public:
     parseDataP             = NULL;
     tenant                 = "";
     servicePath            = "";
+    apiVersion             = "v1";
 
     memset(payloadWord, 0, sizeof(payloadWord));
 

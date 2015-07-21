@@ -126,12 +126,6 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
     return eP->render(ciP, EntitiesRequest);
   }
 
-  std::string location = "/v2/entities/" + eP->id;
-
-  ciP->httpHeader.push_back("Location");
-  ciP->httpHeaderValue.push_back(location);
-  ciP->httpStatusCode = SccCreated;
-
   LM_M(("Done parsing Entity"));
   eP->present("");
   return "OK";

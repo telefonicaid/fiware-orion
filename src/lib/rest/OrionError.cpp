@@ -27,6 +27,7 @@
 
 #include "common/tag.h"
 #include "common/Format.h"
+#include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 
 
@@ -72,14 +73,52 @@ OrionError::OrionError(StatusCode& sc)
 
 /* ****************************************************************************
 *
+* OrionError::errorStringForV2 - 
+*/
+std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
+{
+  if (_reasonPhrase == "Bad Request")
+  {
+    return "BadRequest";
+  }
+
+  return _reasonPhrase;
+}
+
+
+
+/* ****************************************************************************
+*
 * OrionError::render - 
 */
-std::string OrionError::render(Format format, const std::string& _indent)
+std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
 {
-  std::string out           = "";
-  std::string tag           = "orionError";
-  std::string initialIndent = _indent;
-  std::string indent        = _indent;
+  //
+  // For API version 2 this is pretty easy ...
+  //
+  if (ciP->apiVersion == "v2")
+  {
+    reasonPhrase = errorStringForV2(reasonPhrase);
+    return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
+  }
+
+
+  //
+  // A little more hairy for API version 1
+  //
+
+  std::string  out           = "";
+  std::string  tag           = "orionError";
+  std::string  initialIndent = _indent;
+  std::string  indent        = _indent;
+  Format       format        = ciP->outFormat;
+
+  if (format == NOFORMAT)
+  {
+    // Default format is XML for "v1"
+    format = XML;
+  }
+
 
   //
   // OrionError is NEVER part of any other payload, so the JSON start/end braces must be added here
@@ -96,12 +135,16 @@ std::string OrionError::render(Format format, const std::string& _indent)
   out += valueTag(indent + "  ", "reasonPhrase",  reasonPhrase, format, details != "");
 
   if (details != "")
+  {
     out += valueTag(indent + "  ", "details",       details,      format);
+  }
 
   out += endTag(indent, tag, format);
 
   if (format == JSON)
+  {
     out += initialIndent + "}\n";
+  }
 
   return out;
 }

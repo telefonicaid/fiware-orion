@@ -252,7 +252,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
 
       LM_T(LmtRest, ("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
       
-      reply = orionError.render(format, indent);
+      reply = orionError.render(ciP, indent);
    }
 
    return reply;
