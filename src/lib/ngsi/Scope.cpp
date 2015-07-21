@@ -52,11 +52,11 @@ Scope::Scope()
 *
 * Scope::Scope -
 */
-Scope::Scope(const std::string& _type, const std::string& _value)
+Scope::Scope(const std::string& _type, const std::string& _value, const std::string& _oper)
 {
   type  = _type;
   value = _value;
-  oper  = "";
+  oper  = _oper;
 }
 
 

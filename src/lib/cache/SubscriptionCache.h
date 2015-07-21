@@ -31,6 +31,7 @@
 #include <string>
 #include <vector>
 
+#include "common/Format.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/Reference.h"
 #include "ngsi/NotifyConditionVector.h"
@@ -94,6 +95,9 @@ class Subscription
   NotifyConditionVector     notifyConditionVector;
   Reference                 reference;
 
+  int                       lastNotificationTime;
+  Format                    format;
+
   Subscription();
   Subscription(const std::string& _tenant, const std::string& _servicePath, const std::string& _subscriptionId);
 
@@ -115,7 +119,11 @@ class Subscription
                const std::string&               _reference);
 
   void entityIdInfoAdd(EntityInfo* entityIdInfoP);
-  bool match(const std::string& idPattern, const std::string& type, const std::string& attributeName);
+  bool match(const std::string&  _tenant,
+             const std::string&  _servicePath,
+             const std::string&  idPattern,
+             const std::string&  type,
+             const std::string&  attributeName);
   bool hasAttribute(const std::string&attributeName);
   void update(UpdateContextSubscriptionRequest* ucsrP);
 };
@@ -153,10 +161,18 @@ public:
   void           init();
   void           insert(Subscription* sub);
   int            remove(Subscription* sub);
-  int            remove(const std::string& subId);
+  int            remove(const std::string&  tenant,
+                        const std::string&  servicePath,
+                        const std::string&  subId);
   int            refresh(void);
-  Subscription*  lookupById(const std::string& subId);
-  void           lookup(const std::string&           id,
+
+  Subscription*  lookupById(const std::string&       tenant,
+                            const std::string&       servicePath,
+                            const std::string&       subId);
+
+  void           lookup(const std::string&           tenant,
+                        const std::string&           servicePath,
+                        const std::string&           id,
                         const std::string&           type,
                         const std::string&           attributeName,
                         std::vector<Subscription*>*  subV);

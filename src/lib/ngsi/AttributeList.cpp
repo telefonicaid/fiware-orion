@@ -37,6 +37,20 @@
 
 /* ****************************************************************************
 *
+* AttributeList::fill - 
+*/
+void AttributeList::fill(std::vector<std::string> aVec)
+{
+  for (unsigned int ix = 0; ix < aVec.size(); ++ix)
+  {
+    attributeV.push_back(aVec[ix]);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
 * render - 
 */
 std::string AttributeList::render(Format format, const std::string& indent, bool comma)

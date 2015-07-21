@@ -111,7 +111,11 @@ EntityInfo::EntityInfo(const std::string& idPattern, const std::string& _entityT
 *
 * match - 
 */
-bool EntityInfo::match(const std::string& id, const std::string& type)
+bool EntityInfo::match
+(
+  const std::string&  id,
+  const std::string&  type
+)
 {
   //
   // If type non-empty - perfect match is mandatory
@@ -122,7 +126,7 @@ bool EntityInfo::match(const std::string& id, const std::string& type)
     return false;
   }
 
-  // REGEX comparison this->entityIdPattern VS id
+  // REGEX-comparison this->entityIdPattern VS id
   return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
 }
 
@@ -134,11 +138,13 @@ bool EntityInfo::match(const std::string& id, const std::string& type)
 */
 Subscription::Subscription()
 {
-  tenant         = "";
-  servicePath    = "";
-  subscriptionId = "";
-  throttling     = 0;
-  expirationTime = 0;
+  tenant                = "";
+  servicePath           = "";
+  subscriptionId        = "";
+  throttling            = 0;
+  expirationTime        = 0;
+  lastNotificationTime  = -1;
+  format                = XML;
 }
 
 
@@ -154,11 +160,13 @@ Subscription::Subscription
   const std::string& _subscriptionId
 )
 {
-  tenant         = _tenant;
-  servicePath    = _servicePath;
-  subscriptionId = _subscriptionId;
-  throttling     = 0;
-  expirationTime = 0;
+  tenant                = _tenant;
+  servicePath           = _servicePath;
+  subscriptionId        = _subscriptionId;
+  throttling            = 0;
+  expirationTime        = 0;
+  lastNotificationTime  = -1;
+  format                = XML;
 }
 
 
@@ -179,8 +187,18 @@ Subscription::Subscription
   unsigned int ix;
 
   //
-  // 1. Get Subscription Id
+  // 0. Fill in 'constant initial values'
   //
+  lastNotificationTime  = -1;
+  format                = XML;
+
+
+
+  //
+  // 1. Get Tenant, ServicePath and Subscription Id
+  //
+  tenant         = _tenant;
+  servicePath    = _servicePath;
   subscriptionId = _subscriptionId;
 
 
@@ -227,9 +245,20 @@ Subscription::Subscription
 
   //
   // 6. restriction
+  //
+  restriction.fill(&scrP->restriction);
+
+
+  //
   // 7. notifyConditionVector
+  //
+  notifyConditionVector.fill(scrP->notifyConditionVector);
+
+
+  //
   // 8. reference
   //
+  reference.set(scrP->reference.get());
 }
 
 
@@ -257,6 +286,7 @@ Subscription::Subscription
   tenant         = _tenant;
   servicePath    = _servicePath;
   subscriptionId = _subscriptionId;
+  format         = XML;
 
   for (ix = 0; ix < _entityIdInfos.size(); ++ix)
   {
@@ -271,7 +301,7 @@ Subscription::Subscription
   throttling     = _throttling;
   expirationTime = _expirationTime;
 
-  restriction.fill(_restriction);
+  restriction.fill((Restriction*) &_restriction);
   notifyConditionVector.fill(_notifyConditionVector);
   reference.set(_reference);
 }
@@ -296,16 +326,26 @@ void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
 *
 * match - 
 */
-bool Subscription::match(const std::string& id, const std::string& type, const std::string& attributeName)
+bool Subscription::match
+(
+  const std::string&  _tenant,
+  const std::string&  _servicePath,
+  const std::string&  id,
+  const std::string&  type,
+  const std::string&  attributeName
+)
 {
+  if ((_tenant != tenant) || (_servicePath != servicePath))
+  {
+    return false;
+  }
+
   if (!hasAttribute(attributeName))
   {
     return false;
   }
 
-  unsigned int ix;
-
-  for (ix = 0; ix < entityIdInfos.size(); ++ix)
+  for (unsigned int ix = 0; ix < entityIdInfos.size(); ++ix)
   {
     if (entityIdInfos[ix]->match(id, type))
     {
@@ -440,6 +480,8 @@ void SubscriptionCache::semGive(void)
 */
 void SubscriptionCache::lookup
 (
+  const std::string&           tenant,
+  const std::string&           servicePath,
   const std::string&           id,
   const std::string&           type,
   const std::string&           attributeName,
@@ -448,7 +490,7 @@ void SubscriptionCache::lookup
 {
   for (unsigned int ix = 0; ix < subs.size(); ++ix)
   {
-    if (subs[ix]->match(id, type, attributeName))
+    if (subs[ix]->match(tenant, servicePath, id, type, attributeName))
     {
       subV->push_back(subs[ix]);
     }
@@ -463,16 +505,33 @@ void SubscriptionCache::lookup
 *
 * lookupById - 
 */
-Subscription* SubscriptionCache::lookupById(const std::string& subId)
+Subscription* SubscriptionCache::lookupById
+(
+  const std::string&  tenant,
+  const std::string&  servicePath,
+  const std::string&  subId
+)
 {
   unsigned int ix;
 
   for (ix = 0; ix < subs.size(); ++ix)
   {
-    if (subs[ix]->subscriptionId == subId)
+    if (subs[ix]->tenant != tenant)
     {
-      return subs[ix];
+      continue;
     }
+
+    if ((servicePath != "") && (subs[ix]->servicePath != servicePath))
+    {
+      continue;
+    }
+
+    if (subs[ix]->subscriptionId != subId)
+    {
+      continue;
+    }
+
+    return subs[ix];
   }
 
   return NULL;
@@ -692,9 +751,14 @@ int SubscriptionCache::remove(Subscription* subP)
 *
 * SubscriptionCache::remove - 
 */
-int SubscriptionCache::remove(const std::string& subId)
+int SubscriptionCache::remove
+(
+  const std::string& tenant,
+  const std::string& servicePath,
+  const std::string& subId
+)
 {
-  Subscription* subP = lookupById(subId);
+  Subscription* subP = lookupById(tenant, servicePath, subId);
 
   if (subP == NULL)
   {

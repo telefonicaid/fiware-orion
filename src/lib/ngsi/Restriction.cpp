@@ -130,6 +130,13 @@ void Restriction::release(void)
 *
 * Restriction::fill - 
 */
-void Restriction::fill(const Restriction& rP)
+void Restriction::fill(Restriction* rP)
 {
+  const std::string ae = rP->attributeExpression.get();
+  attributeExpression.set(ae);
+
+  for (unsigned int ix = 0; ix < rP->scopeVector.size(); ++ix)
+  {
+    scopeVector.push_back(new Scope(rP->scopeVector[ix]->type, rP->scopeVector[ix]->value, rP->scopeVector[ix]->oper));
+  }
 }

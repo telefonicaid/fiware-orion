@@ -272,7 +272,7 @@ HttpStatusCode mongoUpdateContextSubscription
   //
   // Update the entry in the cache of subscriptions, if applicable
   //
-  Subscription* subP = subCache->lookupById(requestP->subscriptionId.get());
+  Subscription* subP = subCache->lookupById(tenant, servicePathV[0], requestP->subscriptionId.get());
 
   if (subP != NULL)
   {

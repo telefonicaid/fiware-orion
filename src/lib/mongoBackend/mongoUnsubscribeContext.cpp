@@ -173,7 +173,7 @@ HttpStatusCode mongoUnsubscribeContext(UnsubscribeContextRequest* requestP, Unsu
     //
     // Removing subscription from cache
     //
-    subCache->remove(requestP->subscriptionId.get());
+    subCache->remove(tenant, "", requestP->subscriptionId.get());
 
     return SccOk;
 }

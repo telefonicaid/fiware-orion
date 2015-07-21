@@ -71,42 +71,42 @@ TEST(cache, SubscriptionCache)
 
   subCache->insert(subP);
 
-  subP = subCache->lookupById("012345678901234567890123");
+  subP = subCache->lookupById("unittest", "/spath", "012345678901234567890123");
   EXPECT_TRUE(subP != NULL);
   EXPECT_EQ("012345678901234567890123", subP->subscriptionId);
 
   std::vector<Subscription*> subV;
-  subCache->lookup("E10", "", "attr1", &subV);
+  subCache->lookup("unittest", "/spath", "E10", "", "attr1", &subV);
   ASSERT_EQ(1, subV.size());
   EXPECT_EQ("012345678901234567890123", subV[0]->subscriptionId);
   subV.clear();
 
-  subCache->lookup("E20", "", "attr1", &subV);
+  subCache->lookup("unittest", "/spath", "E20", "", "attr1", &subV);
   ASSERT_EQ(1, subV.size());
   EXPECT_EQ("012345678901234567890123", subV[0]->subscriptionId);
   subV.clear();
 
-  subCache->lookup("E30", "", "attr1", &subV);
+  subCache->lookup("unittest", "/spath", "E30", "", "attr1", &subV);
   EXPECT_EQ(0, subV.size());
   subV.clear();
 
-  subCache->lookup("E30", "", "attr4", &subV);
+  subCache->lookup("unittest", "/spath", "E30", "", "attr4", &subV);
   EXPECT_EQ(0, subV.size());
   subV.clear();
 
-  subCache->lookup("E10", "at1", "attr3", &subV);
+  subCache->lookup("unittest", "/spath", "E10", "at1", "attr3", &subV);
   ASSERT_EQ(1, subV.size());
   EXPECT_EQ("012345678901234567890123", subV[0]->subscriptionId);
   subV.clear();
 
-  subCache->lookup("E10", "at3", "attr4", &subV);
+  subCache->lookup("unittest", "/spath", "E10", "at3", "attr4", &subV);
   ASSERT_EQ(0, subV.size());
   subV.clear();
 
   subP = new Subscription("unittest", "/spath", "012345678901234567890124", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE");
   subCache->insert(subP);
 
-  subCache->lookup("E10", "", "attr3", &subV);
+  subCache->lookup("unittest", "/spath", "E10", "", "attr3", &subV);
   ASSERT_EQ(2, subV.size());
   EXPECT_EQ("012345678901234567890123", subV[0]->subscriptionId);
   EXPECT_EQ("012345678901234567890124", subV[1]->subscriptionId);

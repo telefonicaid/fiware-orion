@@ -37,6 +37,7 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
+#include "cache/SubscriptionCache.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -1065,17 +1066,8 @@ static bool addTriggeredSubscriptions
          "}";
   LM_T(LmtMongo, ("JS function: %s", function.c_str()));
 
-  BSONObjBuilder  queryPattern;
-
-  queryPattern.append(entPatternQ, "true");
-  queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
-  queryPattern.append(condValueQ, attr);
-  queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  queryPattern.append(CSUB_SERVICE_PATH, spBson);
-  queryPattern.appendCode("$where", function);
-
   // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
-  BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
+  BSONObj query = queryNoPattern;
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
                   getSubscribeContextCollectionName(tenant).c_str(),
@@ -1159,6 +1151,46 @@ static bool addTriggeredSubscriptions
     }
   }
 
+
+  //
+  // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
+  //
+  std::vector<Subscription*> subVec;
+  subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
+
+  int now = getCurrentTime();
+  for (unsigned int ix = 0; ix < subVec.size(); ++ix)
+  {
+    Subscription* sP = subVec[ix];
+
+    // Outdated subscriptions are skipped
+    if (sP->expirationTime < now)
+    {
+      continue;
+    }
+
+    AttributeList aList;
+
+    aList.fill(sP->attributes);
+
+    // Throttling
+    if ((sP->throttling != -1) && (sP->lastNotificationTime != -1))
+    {
+      if ((now - sP->lastNotificationTime) < sP->throttling)
+      {
+        continue;
+      }
+
+      TriggeredSubscription* sub = new TriggeredSubscription((long long) sP->throttling,
+                                                             (long long) sP->lastNotificationTime,
+                                                             sP->format,
+                                                             sP->reference.get(),
+                                                             aList);
+      subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
+      sP->lastNotificationTime = now;
+    }
+  }
+
   return true;
 }
 
@@ -1180,7 +1212,7 @@ static bool processSubscriptions
 {
   DBClientBase* connection = NULL;
 
-  /* For each one of the subscriptions in the map, send notification */
+  /* For each subscription in the map, send notification */
   bool ret = true;
   err = "";
 
