@@ -117,8 +117,10 @@ rm $RPM_BUILD_ROOT/usr/share/contextBroker/tests/cases/CMakeLists.txt
 cp LICENSE $RPM_BUILD_ROOT/usr/share/doc/contextBroker
 cp scripts/testEnv.sh test/functionalTest/testHarness.sh test/functionalTest/testDiff.py test/functionalTest/harnessFunctions.sh $RPM_BUILD_ROOT/usr/share/contextBroker/tests
 cp scripts/accumulator-server.py $RPM_BUILD_ROOT/usr/share/contextBroker/tests 
+cp scripts/httpsPrepare.sh $RPM_BUILD_ROOT/usr/share/contextBroker/tests
 cp scripts/managedb/garbage-collector.py $RPM_BUILD_ROOT/usr/share/contextBroker
 cp scripts/managedb/latest-updates.py $RPM_BUILD_ROOT/usr/share/contextBroker
+cp scripts/monit_log_processing.py $RPM_BUILD_ROOT/usr/share/contextBroker
 cp etc/init.d/contextBroker.centos $RPM_BUILD_ROOT/etc/init.d/%{name}
 chmod 755 $RPM_BUILD_ROOT/etc/init.d/%{name}
 mkdir -p $RPM_BUILD_ROOT/etc/sysconfig
