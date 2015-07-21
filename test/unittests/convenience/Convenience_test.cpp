@@ -92,18 +92,22 @@ TEST(Convenience, shortPath)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
+  ci1.apiVersion = "v1";
   out = restService(&ci1, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
+  ci2.apiVersion = "v1";
   out = restService(&ci2, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
+  ci3.apiVersion = "v1";
   out = restService(&ci3, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
+  ci4.apiVersion = "v1";
   out = restService(&ci4, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -126,6 +130,7 @@ TEST(Convenience, badPathNgsi9)
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
+  ci.apiVersion = "v1";
   out = restService(&ci, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
@@ -147,6 +152,7 @@ TEST(Convenience, badPathNgsi10)
   utInit();
 
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
+  ci.apiVersion = "v1";
   out = restService(&ci, restServiceV);
   EXPECT_STREQ(expectedBuf, out.c_str());
 

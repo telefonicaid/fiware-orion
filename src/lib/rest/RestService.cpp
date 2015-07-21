@@ -327,7 +327,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
     OrionError  error(SccBadRequest, "The Orion Context Broker is a REST service, not a 'web page'");
-    std::string response = error.render(ciP->outFormat, "");
+    std::string response = error.render(ciP, "");
 
     LM_W(("Bad Input (The Orion Context Broker is a REST service, not a 'web page')"));
     restReply(ciP, response);
@@ -417,9 +417,15 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
                         "tenant name not accepted - a tenant string must not be longer than " MAX_TENANT_NAME_LEN_STRING " characters"
                         " and may only contain underscores and alphanumeric characters");
 
-      std::string  response = error.render(ciP->outFormat, "");
+      std::string  response = error.render(ciP, "");
 
       LM_W(("Bad Input (%s)", error.details.c_str()));
+
+      if (ciP->apiVersion != "v1")
+      {
+        ciP->httpStatusCode = SccBadRequest;  // FIXME P9:  OK for all versions?
+      }
+
       restReply(ciP, response);
 
       if (reqP != NULL)

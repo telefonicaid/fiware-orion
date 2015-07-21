@@ -48,7 +48,8 @@
 *
 * 01. Fill in UpdateContextRequest
 * 02. Call standard op postUpdateContext
-* 03. Cleanup and return result
+* 03. Prepare HTTP headers
+* 04. Cleanup and return result
 */
 std::string postEntities
 (
@@ -60,24 +61,24 @@ std::string postEntities
 {
   Entity*  eP = &parseDataP->ent.res;
 
-
-  // 00. Temp debug
-  // LM_M(("Presenting"));
-  // eP->present("");
-
   // 01. Fill in UpdateContextRequest
-  LM_M(("Fill in UpdateContextRequest"));
   parseDataP->upcr.res.fill(eP, "APPEND");
   
 
   // 02. Call standard op postUpdateContext
-  LM_M(("Call standard op postUpdateContext"));
   postUpdateContext(ciP, components, compV, parseDataP);
 
 
-  // 03. Cleanup and return result
-  LM_M(("Cleanup"));
+  // 03. Prepare HTTP headers
+  std::string location = "/v2/entities/" + eP->id;
+
+  ciP->httpHeader.push_back("Location");
+  ciP->httpHeaderValue.push_back(location);
+  ciP->httpStatusCode = SccCreated;
+
+
+  // 04. Cleanup and return result
   eP->release();
-  LM_M(("return result"));
+
   return "";
 }
