@@ -115,6 +115,7 @@ In the case of being present, the error payload is JSON object including the fol
 Error list (HTTP response code in paranthesis):
 
 * ParseError (400). The incoming JSON payload is incorrect.
+* BadRequest (400). The incoming request is somehow invalid.
 * NotFound (404). The context element referred in the request has not been found.
 * TooManyResults (409). There are several results that match with the resource identification used
   in the request. This typically the case of requesting an entity with not enough information and the
