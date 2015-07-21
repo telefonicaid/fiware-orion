@@ -52,6 +52,8 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 ### Tests execution:
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
+- You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
+- You should add "--upgrade" (if you have a previous installed version of this library)
 - We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to referenced by `properties.json` files.
   The settings folder path could be changed in the `configuration.json`.
   This file initially will overwrite properties.json in each feature.
@@ -118,7 +120,11 @@ Feature: feature name...
 
 ### Tests Suites Coverage:
 
-- base.
+ - entities
+    * base
+    * create_entities
+    * list_entities (pending)
+
 
 ### Tags
 

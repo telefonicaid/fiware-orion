@@ -38,6 +38,12 @@ from components.common_steps.requests import *
 # ---- requests.py -------------------------------------------------------------------
 """
 @step (u'send a base request')
+@step (u'a definition of headers')
+@step (u'create "([^"]*)" entities with "([^"]*)" attributes')
+@step (u'delete database in mongo')
 @step (u'verify that receive an "([^"]*)" http code')
+@step (u'verify that receive several "([^"]*)" http code')
 @step (u'verify main paths')
+@step (u'verify that entities are stored in mongo')
+@step (u'verify that entities are not stored in mongo')
 """

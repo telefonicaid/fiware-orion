@@ -22,8 +22,8 @@
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
-
 from components.common_steps.initial_steps import *
+from components.common_steps.requests import *
 
 __logger__ = logging.getLogger("environment")
 
@@ -35,6 +35,7 @@ def before_all(context):
     """
     context.config.setup_logging(configfile="logging.ini")
 
+
 def before_feature(context, feature):
     """
     actions before each feature
@@ -42,7 +43,6 @@ def before_feature(context, feature):
     :param context:
     :param feature:
     """
-
     __logger__.info("\n\n\n\n")
     __logger__.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     __logger__.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -66,6 +66,7 @@ def after_feature(context, feature):
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
+
 def before_scenario(context, scenario):
     """
     actions executed before each scenario
@@ -75,14 +76,18 @@ def before_scenario(context, scenario):
     __logger__.info("==>>")
     __logger__.info("BEFORE SCENARIO: %s " % scenario)
 
+
 def after_scenario(context, scenario):
     """
     actions executed after each scenario
+       - database used is deleted
     :param context:
     :param scenario:
     """
     __logger__.info("AFTER SCENARIO")
+    context.execute_steps(u'Given delete database in mongo')
     __logger__.info("<<==")
+
 
 def before_step(context, step):
     """
@@ -91,6 +96,7 @@ def before_step(context, step):
     :param step:
     """
     __logger__.info("BEFORE STEP: %s" % step)
+
 
 def after_step(context, step):
     """

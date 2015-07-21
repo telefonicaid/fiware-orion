@@ -23,12 +23,11 @@
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 import subprocess
-import logging
-import json
 
-from tools import general_utils
+from iotqautils.helpers_utils import *
 
 __logger__ = logging.getLogger("utils")
+
 
 class Properties:
     """
@@ -46,27 +45,31 @@ class Properties:
         :param file_name: script file associated to a feature
         :param sudo_run:  with superuser privileges (True | False)
         """
-        if sudo_run.lower() == "true": sudo_run = "sudo"
-        else: sudo_run = ""
-        configuration = general_utils.read_file_to_json("configuration.json")
+        if sudo_run.lower() == "true":
+            sudo_run = "sudo"
+        else:
+            sudo_run = ""
+        configuration = read_file_to_json("configuration.json")
         __logger__.info("configuration.json: %s" % str(configuration))
         if configuration["JENKINS"].lower() == "false":
-           with open("%s/%s" % (configuration["PATH_TO_SETTINGS_FOLDER"], file_name)) as config_file:
-               for line in config_file.readlines():
-                   __logger__.info("-- properties.json lines: %s %s" % (sudo_run, str(line)))
-                   p = subprocess.Popen("%s %s"% (sudo_run, str(line)), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                   STDOUT = p.stdout.readlines()
-                   assert STDOUT == [], "ERROR - modifying config files from %s/%s in setting folder. \n %s" % (configuration.PATH_TO_SETTING_FOLDER, file_name, STDOUT)
+            with open("%s/%s" % (configuration["PATH_TO_SETTINGS_FOLDER"], file_name)) as config_file:
+                for line in config_file.readlines():
+                    __logger__.info("-- properties.json lines: %s %s" % (sudo_run, str(line)))
+                    p = subprocess.Popen("%s %s" % (sudo_run, str(line)), shell=True, stdout=subprocess.PIPE,
+                                         stderr=subprocess.STDOUT)
+                    stdout = p.stdout.readlines()
+                    assert stdout == [], "ERROR - modifying config files from %s/%s in setting folder. \n " \
+                                         "        %s" % (configuration.PATH_TO_SETTING_FOLDER, file_name, stdout)
 
     def read_properties(self):
         """
         Parse the properties used in project located in the acceptance folder
         :return: properties dict
         """
-        self.config = general_utils.read_file_to_json("properties.json")
+        self.config = read_file_to_json("properties.json")
         return self.config
 
-    def update_contextBroker_file(self, fabric):
+    def update_context_broker_file(self, fabric):
         """
         updating /etc/sysconfig/contextBroker
         note: if values have "/" chars are replaced by "\/". Ex: BROKER_LOG_DIR variable
@@ -77,4 +80,3 @@ class Properties:
         fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_DATABASE_HOST", "BROKER_DATABASE_HOST", self.config["mongo_env"]["MONGO_HOST"]), sudo=True)
         fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_DATABASE_NAME", "BROKER_DATABASE_NAME", self.config["mongo_env"]["MONGO_DATABASE"]), sudo=True)
         fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_EXTRA_OPS", "BROKER_EXTRA_OPS", self.config["context_broker_env"]["CB_EXTRA_OPS"]), sudo=True)
-

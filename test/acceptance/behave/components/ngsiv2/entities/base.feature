@@ -29,10 +29,22 @@ Feature: NGSI v2 base requests
   So that I can manage and use them in my scripts
 
   BackgroundFeature:
-    Setup: update properties.py from "epg_contextBroker.txt" and sudo local "false"
+    Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
     Setup: update contextBroker config file and restart service
     Check: verify contextBroker is installed successfully
     Check: verify mongo is installed successfully
+
+  @version
+  Scenario: verify NGSI v2 version request
+    When send a version request
+    Then verify that receive an "OK" http code
+    And verify if version is the expected
+
+  @statistics
+  Scenario: verify NGSI v2 statistics request
+    When send a statistics request
+    Then verify that receive an "OK" http code
+    And verify statistics
 
   @base
   Scenario: verify NGSI v2 base request
@@ -40,12 +52,6 @@ Feature: NGSI v2 base requests
     Then verify that receive an "OK" http code
     And verify main paths
 
-
-  @base_2
-  Scenario: verify NGSI v2 base request
-    When send a base request
-    Then verify that receive an "OK" http code
-    And verify main paths
 
 
 

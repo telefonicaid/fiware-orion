@@ -13,7 +13,7 @@
         "CB_LOG_FILE": "/var/log/contextBroker",
         "CB_LOG_OWNER": "orion",
         "CB_LOG_MOD": "777",
-        "CB_EXTRA_OPS": "-multiservice"
+        "CB_EXTRA_OPS": "\"-multiservice\""
     },
 
    "mongo_env": {
