@@ -98,6 +98,11 @@ std::string OrionError::render(ConnectionInfo* ciP, const std::string& _indent)
   //
   if (ciP->apiVersion == "v2")
   {
+    if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
+    {
+      ciP->httpStatusCode = SccBadRequest;
+    }
+
     reasonPhrase = errorStringForV2(reasonPhrase);
     return "{" + JSON_STR("error") + ":" + JSON_STR(reasonPhrase) + "," + JSON_STR("description") + ":" + JSON_STR(details) + "}";
   }
