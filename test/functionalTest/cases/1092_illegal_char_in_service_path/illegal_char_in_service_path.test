@@ -30,12 +30,11 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/entities with invalid tenant
-# 02. POST /v2/entities with invalid service-path
+# 01. POST /v2/entities with invalid service-path
 #
 
-echo "01. POST /v2/entities with invalid tenant"
-echo "========================================="
+echo "01. POST /v2/entities with invalid service-path"
+echo "==============================================="
 payload='{
   "type": "room",
   "id": "room_0",
@@ -55,21 +54,21 @@ payload='{
     }
   }
 }'
-orionCurl --url /v2/entities --payload "$payload" --servicePath "/test" --tenant "a.b" --json
+orionCurl --url /v2/entities --payload "$payload" --servicePath "/test.2" --json
 echo
 echo
 
 
 --REGEXPECT--
-01. POST /v2/entities with invalid tenant
-=========================================
+01. POST /v2/entities with invalid service-path
+===============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 180
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters", 
+    "description": "a component of ServicePath contains an illegal character", 
     "error": "BadRequest"
 }
 

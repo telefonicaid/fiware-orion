@@ -466,7 +466,9 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
 
 
   if (ciP->httpHeaders.servicePathReceived == false)
+  {
     return 0;
+  }
 
   if (servicePath[0] != '/')
   {
@@ -497,7 +499,7 @@ int servicePathCheck(ConnectionInfo* ciP, const char* servicePath)
     // /Madrid/Gardens/North# is not allowed
     if ((ix == components - 1) && (compV[ix] == "#"))
     {
-        continue;
+      continue;
     }
 
     const char* comp = compV[ix].c_str();      
@@ -588,7 +590,9 @@ int servicePathSplit(ConnectionInfo* ciP)
     int s;
 
     if ((s = servicePathCheck(ciP, ciP->servicePathV[ix].c_str())) != 0)
+    {
       return s;
+    }
   }
 
   return 0;
@@ -884,6 +888,8 @@ static int connectionTreat
       ciP->httpHeaders.servicePath = defaultServicePath(url, method);
     }
 
+    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
+
     char tenant[128];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
@@ -904,8 +910,6 @@ static int connectionTreat
       LM_W(("Bad Input (error in ServicePath http-header)"));
       restReply(ciP, ciP->answer);
     }
-
-    ciP->apiVersion = apiVersionGet(ciP->url.c_str());
 
     if (contentTypeCheck(ciP) != 0)
     {
