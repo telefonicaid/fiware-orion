@@ -235,7 +235,7 @@ function localBrokerStart()
   then
     mkdir -p $CM_LOG_DIR
     port=$CM_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CM_PORT  -pidpath $CM_PID_FILE -dbhost $dbHost:$dbport  -db $CM_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CM_LOG_DIR -fwdPort $CB_PORT -ngsi9 $extraParams"
+    CB_START_CMD="contextBroker -harakiri -port $CM_PORT  -pidpath $CM_PID_FILE -dbhost $dbHost:$dbPort  -db $CM_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CM_LOG_DIR -fwdPort $CB_PORT -ngsi9 $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
