@@ -1049,27 +1049,33 @@ A subscription is represented by a JSON object with the following fields:
 
 A `subject` contains the following subfields:
 
-* `id` : Id of the affected entities (optional). It cannot be use at the same time than `idPattern`.
-* `idPattern` : Id pattern of the affected entities (optional). It cannot be use at the same time than `id`.
-* `type` : Type of the affected entities (optional)
-* `condition`: Condition that will trigger the notification. It can have two optional properties, `attributes` (an array of
-attribute names) and `expression` (an expression composed of `q`, `geometry` and `coords`, see "List entities" operation above
+* `id` or `idPattern` : Id or pattern of the affected entities (optional). Both cannot be used at the same time.
+* `type` : Type of the affected entities (optional).
+* `condition`: Condition that will trigger the notification. It can have two optional properties:
+ * `attributes`: array of attribute names
+ * `expression`: an expression composed of `q`, `geometry` and `coords` (see "List entities" operation above
 about this field):
- * If `attributes` and `expression` are used, a notification is sent whenever one of the attributes in the `attributes` list changes and
-   at the same time `expression` matches.
- * If `attributes` is used and `expression` is not used, a notification is sent whenever one of the attributes in the `attributes` list changes-
- * If `attributes` is not used and `expression` is used, a notification is sent whenever any of the attributes of the entity changes and
-   at the same time `expression` matches.
- * If neither `attributes` or `expression` are used, a notification is sent whenever any of the attributes of the entity changes.
 
 `id`/`idPattern` or `type` must be present.
 
 A `notification` object contains the following subfields:
 
-* `attributes`: List of attributes to be included in the notification message. If not specified they will be all entity attributes.
-* `callback` : URL that will point to the service which will be invoked when a notification is generated. A NGSIv2 compliant server must
-   support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
-* `throttling`: A period of time (in ISO8601 format) which must ellapse between two consecutive notifications. It is optional.
+* `attributes`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
+  in the notification
+* `callback` : URL that will point to the service which will be invoked when a notification is generated. A NGSIv2
+  compliant server must support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
+* `throttling`: A period of time (in ISO8601 format) which must ellapse between two consecutive notifications. It
+  is optional.
+
+Notification rules are as follow:
+
+* If `attributes` and `expression` are used, a notification is sent whenever one of the attributes in the `attributes` list changes and
+  at the same time `expression` matches.
+* If `attributes` is used and `expression` is not used, a notification is sent whenever one of the attributes in the `attributes` list changes-
+* If `attributes` is not used and `expression` is used, a notification is sent whenever any of the attributes of the entity changes and
+  at the same time `expression` matches.
+* If neither `attributes` or `expression` are used, a notification is sent whenever any of the attributes of the entity changes.
+
 
 ### List subscriptions [GET /v2/subscriptions]
 
@@ -1091,7 +1097,7 @@ Response:
                     "condition": {
                        "attrs:" [ "temperature " ],
                        "expression:" {
-                          "q": "tempature>40"
+                          "q": "temperature>40"
                        }
                     }
                 },
@@ -1122,7 +1128,7 @@ Response:
                 "condition": {
                     "attributes:" [ "temperature " ],
                     "expression:" {
-                       "q": "tempature>40"
+                       "q": "temperature>40"
                     }
                  }
             },
@@ -1140,7 +1146,7 @@ Response:
 
             Location: /v2/subscriptions/abcde98765
 
-### Get subscription [GET /v2/subscription/{subId}]
+### Get subscription [GET /v2/subscriptions/{subscriptionId}]
 
 The response is the subscription represented by a JSON object as described at the beginning of this section.
 
@@ -1150,7 +1156,7 @@ Response:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
-    + subId: abcdef (required, string) - subscription Id.
+    + subscriptionId: abcdef (required, string) - subscription Id.
 
 + Response 200 (application/json)
 
@@ -1161,7 +1167,7 @@ Response:
                 "condition": {
                     "attributes:" [ "temperature " ],
                     "expression:" {
-                       "q": "tempature>40"
+                       "q": "temperature>40"
                     }
                  }
             },
@@ -1173,7 +1179,7 @@ Response:
             "duration": "PT1M"
         }
 
-### Update subscription [PATCH /v2/subscription/{subId}]
+### Update subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 Only the fields included in the request are updated in the subscription.
 
@@ -1183,7 +1189,7 @@ Response:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
-    + subId: abcdef (required, string) - subscription Id.
+    + subscriptionId: abcdef (required, string) - subscription Id.
 
 + Request (application/json)
 
@@ -1193,7 +1199,7 @@ Response:
 
 + Response 204
 
-### Delete subscription [DELETE /v2/subscription/{subId}]
+### Delete subscription [DELETE /v2/subscriptions/{subscriptionId}]
 
 Cancels subscription.
 
@@ -1203,7 +1209,7 @@ Response:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
-    + subId: abcdef (required, string) - subscription Id.
+    + subscriptionId: abcdef (required, string) - subscription Id.
 
 + Response 204
 
@@ -1222,8 +1228,7 @@ corresponds to the URL of the provider service.
 
 A `subject` contains the following subfields:
 
-* `id` : Id of the affected entities (optional). It cannot be use at the same time than `idPattern`.
-* `idPattern` : Id pattern of the affected entities (optional). It cannot be use at the same time than `id`.
+* `id` or `idPattern` : Id or pattern of the affected entities (optional). Both cannot be used at the same time.
 * `entity` : Id or pattern id which identifies the affected entities (optional).
 * `type` : Type of the affected entities (optional).
 * `attributes`: List of attributes to be provided (if not specified it would mean all).
@@ -1286,7 +1291,7 @@ Response:
 
             Location: /v2/registrations/abcde98765
 
-### Get context provider registration [GET /v2/registrations/{regId}]
+### Get context provider registration [GET /v2/registrations/{registrationId}]
 
 The response is the registration represented by a JSON object as described at the beginning of this section.
 
@@ -1296,7 +1301,7 @@ Response:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
-    + regId: abcdef (required, string) - registration Id.
+    + registrationId: abcdef (required, string) - registration Id.
 
 + Response 200 (application/json)
 
@@ -1312,7 +1317,7 @@ Response:
             "duration": "PT1M"
         }
 
-### Update context provider registration [PATCH /v2/registrations/{regId}]
+### Update context provider registration [PATCH /v2/registrations/{registrationId}]
 
 Only the fields included in the request are updated in the registration.
 
@@ -1332,7 +1337,7 @@ Response:
 
 + Response 204
 
-### Delete context provider registration [DELETE /v2/registrations/{regId}]
+### Delete context provider registration [DELETE /v2/registrations/{registrationId}]
 
 Cancels registration.
 
@@ -1459,10 +1464,12 @@ Response code:
 
 ### updateContext [POST /v2/updateContext]
 
-The payload is an object which two properties:
+The payload is an object with two properties:
 
-* `action`, to specify the kind of updateContext action to do (see OMA NGSI specification for the semantics), either UPDATE, APPEND or DELETE
-* `entities`, an array of entities, each one specified using the the JSON entity representation format (described in a section above).
+* `action`, to specify the kind of updateContext action to do (see OMA NGSI specification for the semantics),
+   either UPDATE, APPEND or DELETE
+* `entities`, an array of entities, each one specified using the the JSON entity representation format
+  (described in a section above).
 
 Response:
 
