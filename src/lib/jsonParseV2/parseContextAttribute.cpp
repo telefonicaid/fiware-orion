@@ -32,6 +32,7 @@
 #include "jsonParseV2/parseContextAttribute.h"
 #include "jsonParseV2/parseMetadata.h"
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
+#include "rest/ConnectionInfo.h"
 
 using namespace rapidjson;
 
@@ -54,7 +55,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     {
       if (type != "String")
       {
-        LM_E(("Bad Input (ContextAttribute::Object::type must be a String"));
+        LM_E(("Bad Input (ContextAttributeObject::type must be a String"));
         return "Parse Error";
       }
 
@@ -85,12 +86,24 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       else if (type == "Array")
       {
         caP->valueType    = orion::ValueTypeVector;
-        parseContextAttributeCompoundValue(iter, caP, NULL);
+
+        std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+        if (r != "OK")
+        {
+          LM_W(("Bad Input (json error in ContextAttributeObject::Vector"));
+          return "json error in ContextAttributeObject::Vector";
+        }
       }
       else if (type == "Object")
       {
         caP->valueType    = orion::ValueTypeObject;
-        parseContextAttributeCompoundValue(iter, caP, NULL);
+
+        std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+        if (r != "OK")
+        {
+          LM_W(("Bad Input (json error in ContextAttributeObject::Object"));
+          return "json error in ContextAttributeObject::Object";
+        }
       }
     }
     else  // Metadata
@@ -105,7 +118,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       if (r != "OK")
       {
         LM_W(("Bad Input (error parsing Metadata)"));
-        return "Parse Error";
+        return "json error in ContextAttributeObject::Metadata";
       }
       LM_M(("Metadata OK"));
     }
@@ -121,7 +134,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 *
 * parseContextAttribute - 
 */
-std::string parseContextAttribute(const Value::ConstMemberIterator& iter, ContextAttribute* caP)
+std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP)
 {
   LM_M(("KZ: In parseContextAttribute"));
 
@@ -159,9 +172,15 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
   else if (type == "Array")
   {
     LM_M(("KZ: Compound array"));
-    parseContextAttributeCompoundValue(iter, caP, NULL);
-    caP->valueType    = orion::ValueTypeObject;
-   }
+    caP->valueType = orion::ValueTypeObject;
+    std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
+    if (r != "OK")
+    {
+      LM_W(("Bad Input (json error in ContextAttribute::Vector"));
+      ciP->httpStatusCode = SccBadRequest;
+      return "json error in ContextAttribute::Vector";
+    }
+  }
   else if (type == "Object")
   {
     std::string r;
@@ -179,21 +198,30 @@ std::string parseContextAttribute(const Value::ConstMemberIterator& iter, Contex
       LM_M(("KZ: Normal object parsed"));
       if (r != "OK")
       {
-        LM_W(("Bad Input (json error in EntityId::ContextAttribute::Object"));
-        return "Parse Error";
+        LM_W(("Bad Input (json error in ContextAttribute::Object"));
+        ciP->httpStatusCode = SccBadRequest;
+        return "r";
       }
     }
     else
     {
       LM_M(("KZ: Compound object"));
       parseContextAttributeCompoundValue(iter, caP, NULL);
-      caP->valueType    = orion::ValueTypeObject;
+      caP->valueType = orion::ValueTypeObject;
     }
   }
   else
   {
-    LM_W(("Bad Input (bad type for EntityId::ContextAttribute)"));
-    return "Parse Error";
+    LM_W(("Bad Input (bad type for ContextAttribute)"));
+    ciP->httpStatusCode = SccBadRequest;
+    return "invalid JSON type for ContextAttribute";
+  }
+
+  if (caP->name == "")
+  {
+    LM_W(("Bad Input (no 'name' for ContextAttribute"));
+    ciP->httpStatusCode = SccBadRequest;
+    return "no 'name' for ContextAttribute";
   }
 
   return "OK";

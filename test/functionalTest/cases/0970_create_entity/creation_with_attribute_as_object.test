@@ -90,7 +90,7 @@ Date: REGEX(.*)
 {
     "attr01": "1", 
     "attr02": 2.0, 
-    "attr03": 3.2999999999999998, 
+    "attr03": 3.3, 
     "attr04": true, 
     "attr05": false, 
     "attr06": "06", 

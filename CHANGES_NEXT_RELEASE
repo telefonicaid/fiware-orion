@@ -1,3 +1,6 @@
 Add:  POST /v2/entities - entity creation under version 2 (Issue #970)
 Add:  API version 2 only supports JSON so we can now distinguish between STRINGS, NUMBERS (all treated as floats for now),
       and BOOLEANS (true, false), for the VALUE for ContextAttribute and Metadata (No Issue)
+Add: monit_log_processing.py script to contextBroker RPM (Issue #1083) 
+Add: httpsPrepare.sh script to contextBroker-tests RPM (Issue #2)
+Fix:  Fixed a bug about error handling for API version 2 (Issue #1087)

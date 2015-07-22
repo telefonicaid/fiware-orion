@@ -21,6 +21,75 @@ This specification is licensed under the
 [FIWARE Open Specification License]
 (http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_%28essential_patents_license%29).
 
+## FIWARE NGSI information and data model introduction
+
+The FIWARE NGSI (Next Generation Service Interface) API defines 
+
+* a **data model** for context information, based on a simple information model using the notion of *context entities*
+* a **context data interface** for exchanging information by means of query, subscription, and update operations
+* a **context availability interface** for exchanging information on how to obtain context information
+(whether to separate the two interfaces is currently under discussion).
+
+### Context Entities
+
+Context entities, or simply called entities, are the center of gravity
+in the FIWARE NGSI information model. An entity represents a
+real-world object like e.g. a sensor, a person, or a room. Each entity
+is uniquely identified by its **entity id**. 
+
+Furthermore, the type system of FIWARE NGSI enables entities to have 
+an **entity type**. Entity types are semantic types; they are intended
+to describe the type of real-world object represented by the entity.
+For example, a context entity with id *sensor-365* could have the
+type *temperatureSensor*.
+
+### Context Elements
+
+*(Note: the distinction between context entities and context elements 
+is still under discussion; therefore the notion of context elements
+currently only appears in this section.)*
+
+A context element is a data object (e.g. JSON object; see the section
+on JSON representation below) which contains information about a
+specific context entity. Consequently, a context element has a
+mandatory property `id` in order to identify the context entity it
+refers to. It furthermore can contain an optional property `type`
+to describe the type of the entity. Further properties can be used
+to represent more information about the entity (see the **context
+attributes** section below).
+
+It is important to understand that the relationship of entity and context element is one-to-many. This means that 
+* each context element refers to exactly one entity
+* there can be several context elements  referring to the same entity. The context elements can for example contain different pieces of information about the entity
+
+### Context Attributes 
+
+Context attributes are properties of context entities.
+For example, the current speed of a car could be modeled as
+attribute *current_speed* of entity *car-104*.
+
+In the NGSI data model, attributes have an *attribute name*,
+an *attribute type*, an *attribute value* and *metadata*. 
+ * The attribute name describes which kind of property of the entity the attribute value represents, for example *current_speed*.
+ * The attribute type represents the NGSI value type of the attribute value. Note that FIWARE NGSI has its own type system for attribute values, so NGSI value types are not the same as JSON types.
+ * The attribute value finally contains
+  * the actual data
+  * optional **metadata** describing properties of the attribute value like e.g. accuracy, provider, or a timestamp
+  
+### Context Metadata
+
+Context metadata is used in FIWARE NGSI at several places, one of
+them being an optional part of the attribute value as described
+above. Similarly to attributes, each piece of metadata has 
+ * **a metadata name**, describing the role of the metadata at the
+ place where it occurs; for example, the metadata name *accuracy* 
+ indicates that the metadata value describes how accurate a given 
+ attribute value is
+ * a **metadata type**, describing the NGSI value type of the metadata value
+ * a **metadata value** containing the actual metadata
+
+Note that in NGSI it is not forseen that metadata values can
+themselves have metadata.
 
 ## JSON entity representation
 
@@ -114,6 +183,8 @@ In the case of being present, the error payload is JSON object including the fol
 
 Error list (HTTP response code in paranthesis):
 
+* ParseError (400). The incoming JSON payload is incorrect.
+* BadRequest (400). The incoming request is somehow invalid.
 * NotFound (404). The context element referred in the request has not been found.
 * TooManyResults (409). There are several results that match with the resource identification used
   in the request. This typically the case of requesting an entity with not enough information and the
@@ -285,8 +356,8 @@ on the shape. In particular, the following geometries can be defined so far:</p>
 This operation supports two options:
 
 <ul>
-  <li><code>count</code>: when used, the total entities number is returned as a HTTP in the response name <code>X-Total-Count</code>.</li>
-  <li><code>cannonical</code>: when used, the response payload used the "cannonical form". See JSON entity representation format section
+  <li><code>count</code>: when used, the total number of entities is returned in the response as a HTTP header named <code>X-Total-Count</code>.</li>
+  <li><code>canonical</code>: when used, the response payload uses the "canonical form". See JSON entity representation format section
   for details.</li>
 </td></tr>
 </table>
@@ -297,7 +368,7 @@ the JSON entity representation format (described in a section above).
 Response code:
 
 * Successful operation uses 200 OK
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + limit: 20 (optional, number)
@@ -343,7 +414,7 @@ Response:
 
 * Successful operation uses 201 Created. Reponse includes a `Location` header with the URL of the
   created entity.
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Request (application/json)
 
@@ -392,7 +463,7 @@ the list of conflicting entities, i.e. all the entities with such an ID.
 Response:
 
 * Successful operation uses 200 OK
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity Id.
@@ -440,7 +511,7 @@ whether `append` option is used or not.
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -468,7 +539,7 @@ attributes in the payload doesn't exist in the entity, an error if returned.
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 
 + Parameters
@@ -495,7 +566,7 @@ request.
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -516,7 +587,7 @@ Delete the entity.
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
@@ -551,7 +622,7 @@ URL that could be used to get the list of conflicting entities, i.e. all the ent
 Response:
 
 * Successful operation uses 20O OK
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
@@ -600,7 +671,7 @@ whether `append` option is used:
 Response:
 
 * Successful operation uses 204 No Content.
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -629,7 +700,7 @@ attributes in the payload doesn't exist in the entity, an error if returned.
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -656,7 +727,7 @@ request.
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -678,7 +749,7 @@ Delete the entity.
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
@@ -698,7 +769,7 @@ Returns a JSON object with the attribute data of the attribute. The object follo
 Response:
 
 * Successful operation uses 20O OK.
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -719,7 +790,7 @@ is replaced by the one in the request. The object follows the JSON representatio
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -742,7 +813,7 @@ Removes an entity attribute.
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -762,7 +833,7 @@ Returns a JSON object with the attribute data of the attribute. The object follo
 Response:
 
 * Successful operation uses 20O OK.
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -784,7 +855,7 @@ by the one in the request. The object follows the JSON representation for attrib
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -808,7 +879,7 @@ Removes the attribute from the entity.
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -839,7 +910,7 @@ indicates that the attribute value must be provided as plain text (text/plain).
 Response:
 
 * Successful operation uses 20O OK.
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -859,7 +930,7 @@ with a `value` property, or as plain text (text/plain).
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -895,7 +966,7 @@ If the `text` option is not used, returns a JSON object which the `value` of the
 Response:
 
 * Successful operation uses 20O OK.
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -916,7 +987,7 @@ with a `value` property, or as plain text (text/plain).
 Response:
 
 * Successful operation uses 204 No Content
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -963,7 +1034,7 @@ If `values` option is used, the operation returns a JSON array with the list of 
 Response code:
 
 * Successful operation uses 200 OK
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + limit: 20 (optional, number)
@@ -994,7 +1065,7 @@ Response code:
               "pressure": {
                 "type": null
               },
-              "hummidity": {
+              "humidity": {
                 "type": "percentage"
               },
               "temperature": {
@@ -1015,7 +1086,7 @@ the entities of such type) and `count` (the number of entities belonging to that
 Response code:
 
 * Successful operation uses 200 OK
-* Error use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
 
 + Parameters
     + entityType: Room (required, string) - Entity Type
@@ -1027,7 +1098,7 @@ Response code:
               "pressure": {
                 "type": null
               },
-              "hummidity": {
+              "humidity": {
                 "type": "percentage"
               },
               "temperature": {
@@ -1203,10 +1274,114 @@ The registration is represented by a JSON object as described at the beginning o
 
 ## OMA-NGSI Operations [/v2/queryContext]
 
-For the sake of completness here is an enumeration of the OMA-NGSI (9 & 10) operations. Those
+For the sake of completeness here is an enumeration of the OMA-NGSI (9 & 10) operations. These
 operations will be supported under the 'v2' resource as well.
 
 ### queryContext [POST /v2/queryContext]
+
+<table style="width: 100%; margin: 12px 0 0 0;">
+<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
+<tr><td colspan="2">none</td></tr>
+<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">limit</td><td>Limit the number of entities to be retrieved</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">offset</td><td>Skip a number of records</td></tr>
+<tr><td style="padding-right: 40px; width: 140px;">options</td><td>
+This operation supports two options:
+
+<ul>
+  <li><code>count</code>: when used, the total number of entities is returned in the response as a HTTP header named <code>X-Total-Count</code>.</li>
+  <li><code>canonical</code>: when used, the response payload uses the "canonical form". See JSON entity representation format section
+  for details.</li>
+</td></tr>
+</table>
+
+The response payload is an Array which contains one object per matching entity. Each entity follows
+the JSON entity representation format (described in a section above).
+
+The payload may contain the following elements (all of them optional):
+
+* `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
+  elements:
+   * `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
+     or pattern (in the case of `idPattern`) of the entities to search for. If omitted, it means "any entity
+     ID".
+   * `type`: specifies the type of the entities to search for. If omitted, it means "any entity type".
+* `attributes`: a list of attributes names to search for. If omitted, it means "any attribute".
+* `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
+   object with a `type` (a JSON string) and `value` (whose type depends on the `type` property). The
+   different available scopes are described elsewhere.
+
+Response code:
+
+* Successful operation uses 200 OK
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+
++ Parameters
+    + limit: 20 (optional, number)
+    + offset: 20 (optional, number)
+
++ Request (application/json)
+
+        {
+            "entities": [
+                {
+                    "idPattern": ".*",
+                    "type": "myFooType"
+                },
+                {
+                    "id": "myBar",
+                    "type": "myBarType"
+                }
+            ],
+            "attributes": [
+                "temperature",
+                "humidity"
+            ],
+            "scopes": [
+                {
+                    "type": "FIWARE::Filter::qString",
+                    "value": "temperature>40;colour=black,red;+status"
+                },
+                {
+                    "type": "FIWARE::Filter::Location",
+                    "value": {
+                        "circle": {
+                            "centerLatitude": "40.418889",
+                            "centerLongitude": "-3.691944",
+                            "radius": "13500"
+                        }
+                    }
+                }
+            ]
+        }
+
++ Response 200 (application/json)
+
+        [
+         {
+            "type": "Room",
+            "id": "DC_S1-D41",
+            "temperature": 35.6
+         },
+         {
+            "type": "Room",
+            "id": "Boe-Idearium",
+            "temperature": 22.5
+         },
+         {
+            "type": "Car",
+            "id": "P-9873-K",
+            "speed": {
+                "value": 100,
+                "type": "number",
+                "accuracy": 2,
+                "timestamp": {
+                    "value": "2015-06-04T07:20:27.378Z",
+                    "type": "date"
+                }
+            }
+         }
+        ]
 
 ### updateContext [POST /v2/updateContext]
 
