@@ -187,7 +187,8 @@ HttpStatusCode mongoSubscribeContext
     {
       if (requestP->entityIdVector[ix]->isPattern == "true")
       {
-        subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oid.toString(), expiration));
+        LM_M(("KZ: inserting sub in cache"));
+        subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oid.toString(), expiration, notifyFormat));
         break;
       }
     }

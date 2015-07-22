@@ -67,7 +67,7 @@ TEST(cache, SubscriptionCache)
   entityIdInfos.push_back(ei1);
   entityIdInfos.push_back(ei2);
 
-  subP = new Subscription("unittest", "/spath", "012345678901234567890123", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE");
+  subP = new Subscription("unittest", "/spath", "012345678901234567890123", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", JSON);
 
   subCache->insert(subP);
 
@@ -103,7 +103,7 @@ TEST(cache, SubscriptionCache)
   ASSERT_EQ(0, subV.size());
   subV.clear();
 
-  subP = new Subscription("unittest", "/spath", "012345678901234567890124", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE");
+  subP = new Subscription("unittest", "/spath", "012345678901234567890124", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", JSON);
   subCache->insert(subP);
 
   subCache->lookup("unittest", "/spath", "E10", "", "attr3", &subV);

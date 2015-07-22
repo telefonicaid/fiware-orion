@@ -99,13 +99,14 @@ class Subscription
   Format                    format;
 
   Subscription();
-  Subscription(const std::string& _tenant, const std::string& _servicePath, const std::string& _subscriptionId);
+  Subscription(const std::string& _tenant, const std::string& _servicePath, const std::string& _subscriptionId, Format _format);
 
   Subscription(const std::string&        _tenant,
                const std::string&        _servicePath,
                SubscribeContextRequest*  scrP,
                std::string               _subscriptionId,
-               int64_t                   _expiration);
+               int64_t                   _expiration,
+               Format                    _format);
 
   Subscription(const std::string&               _tenant,
                const std::string&               _servicePath,
@@ -115,8 +116,9 @@ class Subscription
                int64_t                          _throttling,
                int64_t                          _expirationTime,
                const Restriction&               _restriction,
-               const NotifyConditionVector&     _notifyConditionVector,
-               const std::string&               _reference);
+               NotifyConditionVector&           _notifyConditionVector,
+               const std::string&               _reference,
+               Format                           _format);
 
   void entityIdInfoAdd(EntityInfo* entityIdInfoP);
   bool match(const std::string&  _tenant,
@@ -124,6 +126,8 @@ class Subscription
              const std::string&  idPattern,
              const std::string&  type,
              const std::string&  attributeName);
+  bool servicePathMatch(const std::string&  _servicePath);
+  bool attributeMatch(const std::string& attributeName);
   bool hasAttribute(const std::string&attributeName);
   void update(UpdateContextSubscriptionRequest* ucsrP);
 };
