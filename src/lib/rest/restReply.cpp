@@ -79,14 +79,20 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
   }
 
   for (unsigned int hIx = 0; hIx < ciP->httpHeader.size(); ++hIx)
+  {
     MHD_add_response_header(response, ciP->httpHeader[hIx].c_str(), ciP->httpHeaderValue[hIx].c_str());
+  }
 
   if (answer != "")
   {
     if (ciP->outFormat == XML)
+    {
       MHD_add_response_header(response, "Content-Type", "application/xml");
+    }
     else if (ciP->outFormat == JSON)
+    {
       MHD_add_response_header(response, "Content-Type", "application/json");
+    }
 
     // At the present version, CORS is support only for GET requests
     if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))
@@ -246,7 +252,7 @@ std::string restErrorReplyGet(ConnectionInfo* ciP, Format format, const std::str
 
       LM_T(LmtRest, ("Unknown tag: '%s', request == '%s'", tag.c_str(), request.c_str()));
       
-      reply = orionError.render(format, indent);
+      reply = orionError.render(ciP, indent);
    }
 
    return reply;

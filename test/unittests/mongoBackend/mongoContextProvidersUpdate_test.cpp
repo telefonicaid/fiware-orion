@@ -551,7 +551,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneSingle)
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA4", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
@@ -617,7 +617,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrOneMulti)
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
@@ -681,7 +681,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
@@ -689,7 +689,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsSubset)
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("TA2", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 1)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
@@ -751,7 +751,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA5", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
@@ -885,7 +885,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
@@ -893,7 +893,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("TA4", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 1)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
@@ -901,7 +901,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiAttr)
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("TA5", RES_CER_ATTR(0, 2)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 2)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 2)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(0, 2)->found);
@@ -983,7 +983,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 
   EXPECT_EQ("A3", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA3", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
@@ -991,7 +991,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 
   EXPECT_EQ("A4", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("TA4", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
   EXPECT_EQ("http://cr2.com", RES_CER_ATTR(0, 1)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
@@ -999,7 +999,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 
   EXPECT_EQ("A5", RES_CER_ATTR(0, 2)->name);
   EXPECT_EQ("TA5", RES_CER_ATTR(0, 2)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 2)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 2)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 2)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 2)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(0, 2)->found);
@@ -1018,7 +1018,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("TA3", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
   EXPECT_EQ("http://cr1.com", RES_CER_ATTR(1, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(1, 0)->found);
@@ -1026,7 +1026,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 
   EXPECT_EQ("A4", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("TA4", RES_CER_ATTR(1, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(1, 1)->found);
@@ -1034,7 +1034,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntityAttrs)
 
   EXPECT_EQ("A5", RES_CER_ATTR(1, 2)->name);
   EXPECT_EQ("TA5", RES_CER_ATTR(1, 2)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 2)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 2)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(1, 2)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(1, 2)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(1, 2)->found);
@@ -1109,7 +1109,7 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoType)
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("http://cr5.com", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
@@ -1506,7 +1506,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
@@ -1514,7 +1514,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 1)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
@@ -1533,7 +1533,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
 
   EXPECT_EQ("A4", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
   EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(1, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(1, 0)->found);
@@ -1541,7 +1541,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(1, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(1, 1)->found);
@@ -1560,7 +1560,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
 
   EXPECT_EQ("A5", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(2, 0)->stringValue.size());
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(2, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(2, 0)->found);
@@ -1568,7 +1568,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
 
   EXPECT_EQ("A6", RES_CER_ATTR(2, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(2, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(2, 1)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(2, 1)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(2, 1)->found);
@@ -1587,7 +1587,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprs)
 
   EXPECT_EQ("A7", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(3, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(3, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(3, 0)->stringValue.size());
   EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(3, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(3, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(3, 0)->found);
@@ -1715,7 +1715,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(0, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 0)->found);
@@ -1723,7 +1723,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
 
   EXPECT_EQ("A2", RES_CER_ATTR(0, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(0, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 1)->stringValue.size());
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(0, 1)->providingApplication.get());
   EXPECT_EQ(JSON, RES_CER_ATTR(0, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(0, 1)->found);
@@ -1742,7 +1742,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
 
   EXPECT_EQ("A4", RES_CER_ATTR(1, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(1, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 0)->stringValue.size());
   EXPECT_EQ("http://cpr3.com", RES_CER_ATTR(1, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(1, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(1, 0)->found);
@@ -1750,7 +1750,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
 
   EXPECT_EQ("A3", RES_CER_ATTR(1, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(1, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(1, 1)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(1, 1)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(1, 1)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(1, 1)->found);
@@ -1769,7 +1769,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
 
   EXPECT_EQ("A5", RES_CER_ATTR(2, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(2, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(2, 0)->stringValue.size());
   EXPECT_EQ("http://cpr2.com", RES_CER_ATTR(2, 0)->providingApplication.get());
   EXPECT_EQ(JSON, RES_CER_ATTR(2, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(2, 0)->found);
@@ -1777,7 +1777,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
 
   EXPECT_EQ("A6", RES_CER_ATTR(2, 1)->name);
   EXPECT_EQ("T", RES_CER_ATTR(2, 1)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(2, 1)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(2, 1)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(2, 1)->providingApplication.get());
   EXPECT_EQ(NOFORMAT, RES_CER_ATTR(2, 1)->providingApplication.getFormat());
   EXPECT_FALSE(RES_CER_ATTR(2, 1)->found);
@@ -1796,7 +1796,7 @@ TEST(mongoContextProvidersUpdateRequest, severalCprsFormat)
 
   EXPECT_EQ("A7", RES_CER_ATTR(3, 0)->name);
   EXPECT_EQ("T", RES_CER_ATTR(3, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(3, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(3, 0)->stringValue.size());
   EXPECT_EQ("http://cpr1.com", RES_CER_ATTR(3, 0)->providingApplication.get());
   EXPECT_EQ(XML, RES_CER_ATTR(3, 0)->providingApplication.getFormat());
   EXPECT_TRUE(RES_CER_ATTR(3, 0)->found);
@@ -1895,7 +1895,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
@@ -1952,7 +1952,7 @@ TEST(mongoContextProvidersUpdateRequest, notFoundDelete)
 
   EXPECT_EQ("A1", RES_CER_ATTR(0, 0)->name);
   EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
-  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->value.size());
+  EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
   EXPECT_EQ("", RES_CER_ATTR(0, 0)->providingApplication.get());
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());

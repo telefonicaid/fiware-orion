@@ -167,8 +167,8 @@ void UpdateContextRequest::release(void)
 */
 void UpdateContextRequest::present(const std::string& indent)
 {
-  if (!lmTraceIsSet(LmtDump))
-    return;
+//  if (!lmTraceIsSet(LmtDump))
+//    return;
 
   contextElementVector.present(indent);
   updateActionType.present(indent);
@@ -309,13 +309,32 @@ void UpdateContextRequest::fill
       mP = new Metadata("ID", "", metaID);
       caP->metadataVector.push_back(mP);
     }
-    else if (mP->value != metaID)
+    else if (mP->stringValue != metaID)
     {
       LM_W(("Bad Input (metaID differs in URI and payload"));
     }
   }
 
   updateActionType.set(_updateActionType);
+}
+
+
+
+/* ****************************************************************************
+*
+* UpdateContextRequest::fill - 
+*/
+void UpdateContextRequest::fill(const Entity* entP, const std::string& _updateActionType)
+{
+  ContextElement*  ceP = new ContextElement(entP->id, entP->type, "false");
+
+  ceP->contextAttributeVector.fill((ContextAttributeVector*) &entP->attributeVector);
+
+  contextElementVector.push_back(ceP);
+  updateActionType.set(_updateActionType);
+
+  LM_M(("Presenting"));
+  present("Before mongo: ");
 }
 
 

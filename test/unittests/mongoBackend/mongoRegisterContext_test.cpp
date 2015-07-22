@@ -2773,7 +2773,7 @@ TEST(mongoRegisterContextRequest, AssociationsOk)
     aa1.target = "B1";
     aa2.source = "A2";
     aa2.target = "B2";
-    Metadata md("assoc1", "Association");;
+    Metadata md("assoc1", "Association", "");;
     md.association.entityAssociation.source = EntityId("E1", "T1", "false");
     md.association.entityAssociation.target = EntityId("E2", "T2", "false");
     md.association.attributeAssociationList.push_back(&aa1);
@@ -2849,7 +2849,7 @@ TEST(mongoRegisterContextRequest, AssociationsDbFail)
     aa1.target = "B1";
     aa2.source = "A2";
     aa2.target = "B2";
-    Metadata md("assoc1", "Association");;
+    Metadata md("assoc1", "Association", "");;
     md.association.entityAssociation.source = EntityId("E1", "T1", "false");
     md.association.entityAssociation.target = EntityId("E2", "T2", "false");
     md.association.attributeAssociationList.push_back(&aa1);

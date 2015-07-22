@@ -147,7 +147,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
   LM_T(LmtParse, ("Got an attribute value: %s", node->value()));
   parseDataP->lastContextAttribute = parseDataP->upcrs.attributeP;
   parseDataP->lastContextAttribute->typeFromXmlAttribute = xmlTypeAttributeGet(node);
-  parseDataP->upcrs.attributeP->value = node->value();
+  parseDataP->upcrs.attributeP->stringValue = node->value();
   return 0;
 }
 
@@ -200,7 +200,7 @@ static int contextMetadataType(xml_node<>* node, ParseData* parseDataP)
 static int contextMetadataValue(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", node->value()));
-  parseDataP->upcrs.metadataP->value = node->value();
+  parseDataP->upcrs.metadataP->stringValue = node->value();
   return 0;
 }
 

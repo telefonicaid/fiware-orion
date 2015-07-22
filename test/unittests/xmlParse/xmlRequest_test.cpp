@@ -59,32 +59,36 @@ TEST(xmlRequest, parseError)
   // Parse Error
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile1)) << "Error getting test data from '" << infile1 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
-  ci.inFormat  = XML;
-  ci.outFormat = XML;
+  ci.inFormat   = XML;
+  ci.outFormat  = XML;
+  ci.apiVersion = "v1";
   out  = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Request not found
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
-  ci2.inFormat  = XML;
-  ci2.outFormat = XML;
+  ci2.inFormat   = XML;
+  ci2.outFormat  = XML;
+  ci2.apiVersion = "v1";
   out  = xmlTreat(testBuf, &ci2, &parseData, (RequestType) (RegisterContext + 1000), "registerContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Error in first line '<?xml version="1.0" encoding="UTF-8"?>'
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile3)) << "Error getting test data from '" << infile3 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile3)) << "Error getting test data from '" << outfile3 << "'";
-  ci3.inFormat  = XML;
-  ci3.outFormat = XML;
+  ci3.inFormat   = XML;
+  ci3.outFormat  = XML;
+  ci3.apiVersion = "v1";
   out  = xmlTreat(testBuf, &ci3, &parseData, RegisterContext, "registerContextRequest", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   // Payload word differs
   EXPECT_EQ("OK", testDataFromFile(testBuf, sizeof(testBuf), infile2)) << "Error getting test data from '" << infile2 << "'";
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
-  ci.inFormat  = XML;
-  ci.outFormat = XML;
+  ci.inFormat   = XML;
+  ci.outFormat  = XML;
+  ci.apiVersion = "v1";
   out  = xmlTreat(testBuf, &ci, &parseData, RegisterContext, "discovery", NULL);
   EXPECT_STREQ(expectedBuf, out.c_str());
 

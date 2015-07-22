@@ -140,12 +140,12 @@ echo "new version:     $NEW_VERSION"
 #
 # Edit files that depend on the current version (which just changed)
 #
-sed "s/$currentVersion/$NEW_VERSION/" test/functionalTest/cases/000_version_operation/version_via_rest.test > /tmp/version_via_rest.test
-sed "s/$currentVersion/$NEW_VERSION/" test/functionalTest/cases/000_cli/version.test                        > /tmp/version.test
+sed "s/$currentVersion/$NEW_VERSION/" test/functionalTest/cases/0000_version_operation/version_via_rest.test > /tmp/version_via_rest.test
+sed "s/$currentVersion/$NEW_VERSION/" test/functionalTest/cases/0000_cli/version.test                        > /tmp/version.test
 sed "s/$currentVersion/$NEW_VERSION/" src/app/contextBroker/version.h        > /tmp/version.h
 
-mv /tmp/version_via_rest.test  test/functionalTest/cases/000_version_operation/version_via_rest.test
-mv /tmp/version.test           test/functionalTest/cases/000_cli/version.test
+mv /tmp/version_via_rest.test  test/functionalTest/cases/0000_version_operation/version_via_rest.test
+mv /tmp/version.test           test/functionalTest/cases/0000_cli/version.test
 mv /tmp/version.h              src/app/contextBroker/version.h
 
 
@@ -161,8 +161,8 @@ if [ "$CURRENT_BRANCH" == "develop" ]
 then
     git add rpm/SPECS/contextBroker.spec
     git add src/app/contextBroker/version.h
-    git add test/functionalTest/cases/000_cli/version.test
-    git add test/functionalTest/cases/000_version_operation/version_via_rest.test
+    git add test/functionalTest/cases/0000_cli/version.test
+    git add test/functionalTest/cases/0000_version_operation/version_via_rest.test
     git add CHANGES_NEXT_RELEASE
     git commit -m "Step: $currentVersion -> $NEW_VERSION"
     git push origin develop

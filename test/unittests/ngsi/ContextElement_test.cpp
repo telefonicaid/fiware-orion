@@ -49,14 +49,14 @@ TEST(ContextElement, Check)
 
   ContextAttribute a;
   a.name  = "";
-  a.value = "V";
+  a.stringValue = "V";
   ce.contextAttributeVector.push_back(&a);
   EXPECT_EQ(ce.check(UpdateContext, XML, "", "", 0), "missing attribute name");
   a.name = "name";
   
   Metadata m;
   m.name  = "";
-  m.value = "V";
+  m.stringValue = "V";
   ce.domainMetadataVector.push_back(&m);
   EXPECT_EQ(ce.check(UpdateContext, XML, "", "", 0), "missing metadata name");
   m.name = "NAME";

@@ -25,15 +25,13 @@
 #include <semaphore.h>
 #include <errno.h>
 #include <time.h>
+#include <map>  // for curl contexts
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
 #include "common/sem.h"
 #include "common/clockFunctions.h"
-
-// includes for curl contexts
-#include <map>
 
 
 
@@ -332,7 +330,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
 
   if (s != 0)
   {
-    LM_E(("pthread_mutex_lock failure"));
+    LM_E(("Runtime Error (pthread_mutex_lock failure)"));
     return s;
   }
 
@@ -348,14 +346,16 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
 
       if (pm == NULL)
       {
-        LM_E(("malloc"));
+        pthread_mutex_unlock(&contexts_mutex);
+        LM_E(("Runtime Error (malloc)"));
         return -1;
       }
 
       int s = pthread_mutex_init(pm, NULL);
       if (s != 0)
       {
-        LM_E(("pthread_mutex_init"));
+        pthread_mutex_unlock(&contexts_mutex);
+        LM_E(("Runtime Error (pthread_mutex_init)"));
         free(pm);
         return s;
       }
@@ -375,7 +375,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
   s = pthread_mutex_unlock(&contexts_mutex);
   if (s != 0)
   {
-    LM_E(("pthread_mutex_unlock"));
+    LM_E(("Runtime Error (pthread_mutex_unlock)"));
     return s;
   }
 
@@ -395,7 +395,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
     s = pthread_mutex_lock(pcc->pmutex);
     if (s != 0)
     {
-      LM_E(("pthread_mutex_lock"));
+      LM_E(("Runtime Error (pthread_mutex_lock)"));
       return s;
     }
 
@@ -407,7 +407,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       int s = pthread_mutex_lock(&contexts_mutex);
       if (s != 0)
       {
-        LM_E(("pthread_mutex_lock"));
+        LM_E(("Runtime Error (pthread_mutex_lock)"));
         return s;
       }
 
@@ -415,7 +415,7 @@ int get_curl_context(const std::string& key, struct curl_context* pcc)
       s = pthread_mutex_unlock(&contexts_mutex);
       if (s != 0)
       {
-        LM_E(("pthread_mutex_unlock"));
+        LM_E(("Runtime Error (pthread_mutex_unlock)"));
         return s;
       }
     }
@@ -443,7 +443,6 @@ int release_curl_context(struct curl_context *pcc, bool final)
   if (pcc->pmutex != NULL)
   {
     int s = pthread_mutex_unlock(pcc->pmutex);
-
     if (final)
     {
       free(pcc->pmutex);
@@ -451,12 +450,13 @@ int release_curl_context(struct curl_context *pcc, bool final)
 
     if (s != 0)
     {
-      LM_E(("pthread_mutex_unlock"));
+      LM_E(("Runtime Error (pthread_mutex_unlock)"));
       return s;
     }
 
     pcc->pmutex = NULL; // It will remain in global map
   }
+
 
   return 0;
 }

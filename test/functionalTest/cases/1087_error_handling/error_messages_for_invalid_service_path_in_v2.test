@@ -1,0 +1,79 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST /v2/entities with invalid service-path
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. POST /v2/entities with invalid tenant
+# 02. POST /v2/entities with invalid service-path
+#
+
+echo "01. POST /v2/entities with invalid tenant"
+echo "========================================="
+payload='{
+  "type": "room",
+  "id": "room_0",
+  "timestamp_0":
+  {
+    "type": "date",
+    "value": "017-06-17T07:21:24.238Z",
+    "very_hot_1": 
+    {
+      "type": "alarm",
+      "value": "Afe1BuMTcf"
+    },
+    "very_hot_0": 
+    {
+      "type": "alarm",
+      "value": "Afe1BuMTcf"
+    }
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --servicePath "/test" --tenant "a.b" --json
+echo
+echo
+
+
+--REGEXPECT--
+01. POST /v2/entities with invalid tenant
+=========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 180
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters", 
+    "error": "BadRequest"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

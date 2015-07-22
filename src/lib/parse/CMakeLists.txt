@@ -40,7 +40,6 @@ SET (HEADERS
 # -----------------------------------------------------------------
 include_directories("${PROJECT_SOURCE_DIR}/src/lib")
 
-
 # Library declaration
 # -----------------------------------------------------------------
 ADD_LIBRARY(parse STATIC ${SOURCES} ${HEADERS})

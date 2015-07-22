@@ -100,7 +100,7 @@ static std::string contextAttributeValue(const std::string& path, const std::str
 {
   LM_T(LmtParse, ("Got an attribute value: %s", value.c_str()));
   parseDataP->lastContextAttribute = parseDataP->acer.attributeP;
-  parseDataP->acer.attributeP->value = value;
+  parseDataP->acer.attributeP->stringValue = value;
   return "OK";
 }
 
@@ -153,7 +153,7 @@ static std::string contextMetadataType(const std::string& path, const std::strin
 static std::string contextMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
-  reqData->acer.metadataP->value = value;
+  reqData->acer.metadataP->stringValue = value;
   return "OK";
 }
 
@@ -206,7 +206,7 @@ static std::string domainMetadataType(const std::string& path, const std::string
 static std::string domainMetadataValue(const std::string& path, const std::string& value, ParseData* reqData)
 {
   LM_T(LmtParse, ("Got a metadata value '%s'", value.c_str()));
-  reqData->acer.domainMetadataP->value = value;
+  reqData->acer.domainMetadataP->stringValue = value;
   return "OK";
 }
 

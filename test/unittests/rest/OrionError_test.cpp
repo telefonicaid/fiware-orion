@@ -48,6 +48,9 @@ TEST(OrionError, all)
   const char*   outfile6 = "orion.orionError.all3.valid.json";
   const char*   outfile7 = "orion.orionError.all4.valid.xml";
   const char*   outfile8 = "orion.orionError.all4.valid.json";
+  ConnectionInfo ci;
+
+  ci.outFormat = XML;
 
   EXPECT_EQ(SccNone, e0.code);
   EXPECT_EQ("",      e0.reasonPhrase);
@@ -65,27 +68,30 @@ TEST(OrionError, all)
   EXPECT_EQ("OK",           e4.reasonPhrase);
   EXPECT_EQ("Good Request", e4.details);
 
-  out = e1.render(XML, "");
+  ci.apiVersion = "v1";
+  out = e1.render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile1)) << "Error getting test data from '" << outfile1 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e3.render(XML, "");
+  out = e3.render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e4.render(XML, "");
+  out = e4.render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile7)) << "Error getting test data from '" << outfile7 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e1.render(JSON, "");
+  ci.outFormat = JSON;
+
+  out = e1.render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile2)) << "Error getting test data from '" << outfile2 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e3.render(JSON, "");
+  out = e3.render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile6)) << "Error getting test data from '" << outfile6 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = e4.render(JSON, "");
+  out = e4.render(&ci, "");
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile8)) << "Error getting test data from '" << outfile8 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 }

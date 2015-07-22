@@ -37,6 +37,7 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
+#include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
@@ -65,18 +66,26 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
   {
     orion::CompoundValueNode* child = children[ix];
 
-    if (child->type == orion::CompoundValueNode::String)
+    if (child->valueType == orion::ValueTypeString)
     {
-      b.append(child->value);
+      b.append(child->stringValue);
     }
-    else if (child->type == orion::CompoundValueNode::Vector)
+    else if (child->valueType == orion::ValueTypeNumber)
+    {
+      b.append(child->numberValue);
+    }
+    else if (child->valueType == orion::ValueTypeBoolean)
+    {
+      b.append(child->boolValue);
+    }
+    else if (child->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder ba;
 
       compoundValueBson(child->childV, ba);
       b.append(ba.arr());
     }
-    else if (child->type == orion::CompoundValueNode::Object)
+    else if (child->valueType == orion::ValueTypeObject)
     {
       BSONObjBuilder bo;
 
@@ -101,18 +110,26 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
   {
     orion::CompoundValueNode* child = children[ix];
 
-    if (child->type == orion::CompoundValueNode::String)
+    if (child->valueType == orion::ValueTypeString)
     {
-      b.append(child->name, child->value);
+      b.append(child->name, child->stringValue);
     }
-    else if (child->type == orion::CompoundValueNode::Vector)
+    else if (child->valueType == orion::ValueTypeNumber)
+    {
+      b.append(child->name, child->numberValue);
+    }
+    else if (child->valueType == orion::ValueTypeBoolean)
+    {
+      b.append(child->name, child->boolValue);
+    }
+    else if (child->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder ba;
 
       compoundValueBson(child->childV, ba);
       b.append(child->name, ba.arr());
     }
-    else if (child->type == orion::CompoundValueNode::Object)
+    else if (child->valueType == orion::ValueTypeObject)
     {
       BSONObjBuilder bo;
 
@@ -126,36 +143,72 @@ static void compoundValueBson(std::vector<orion::CompoundValueNode*> children, B
   }
 }
 
+/* ****************************************************************************
+*
+* bsonAppendAttrValue -
+*
+*/
+void bsonAppendAttrValue(BSONObjBuilder& bsonAttr, ContextAttribute* caP)
+{
+  switch(caP->valueType)
+  {
+    case ValueTypeString:
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->stringValue);
+      break;
+
+    case ValueTypeNumber:
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->numberValue);
+      break;
+
+    case ValueTypeBoolean:
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->boolValue);
+      break;
+
+    default:
+      LM_E(("Runtime Error (unknown attribute type)"));
+  }
+}
+
 
 /* ****************************************************************************
 *
 * valueBson -
 */
-static void valueBson(ContextAttribute* ca, BSONObjBuilder& bsonAttr)
+static void valueBson(ContextAttribute* caP, BSONObjBuilder& bsonAttr)
 {
-  if (ca->compoundValueP == NULL)
+  if (caP->compoundValueP == NULL)
   {
-    bsonAttr.append(ENT_ATTRS_VALUE, ca->value);
+    bsonAppendAttrValue(bsonAttr, caP);
   }
   else
   {
-    if (ca->compoundValueP->type == orion::CompoundValueNode::Vector)
+    if (caP->compoundValueP->valueType == orion::ValueTypeVector)
     {
       BSONArrayBuilder b;
-      compoundValueBson(ca->compoundValueP->childV, b);
+      compoundValueBson(caP->compoundValueP->childV, b);
       bsonAttr.append(ENT_ATTRS_VALUE, b.arr());
     }
-    else if (ca->compoundValueP->type == orion::CompoundValueNode::Object)
+    else if (caP->compoundValueP->valueType == orion::ValueTypeObject)
     {
       BSONObjBuilder b;
 
-      compoundValueBson(ca->compoundValueP->childV, b);
+      compoundValueBson(caP->compoundValueP->childV, b);
       bsonAttr.append(ENT_ATTRS_VALUE, b.obj());
     }
-    else if (ca->compoundValueP->type == orion::CompoundValueNode::String)
+    else if (caP->compoundValueP->valueType == orion::ValueTypeString)
     {
       // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
-      bsonAttr.append(ENT_ATTRS_VALUE, ca->compoundValueP->value);
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->stringValue);
+    }
+    else if (caP->compoundValueP->valueType == orion::ValueTypeNumber)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->numberValue);
+    }
+    else if (caP->compoundValueP->valueType == orion::ValueTypeBoolean)
+    {
+      // FIXME P4: this is somehow redundant. See https://github.com/telefonicaid/fiware-orion/issues/271
+      bsonAttr.append(ENT_ATTRS_VALUE, caP->compoundValueP->boolValue);
     }
     else
     {
@@ -284,6 +337,97 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 
 /* ****************************************************************************
 *
+* emptyAttributeValue -
+*
+* Check that the attribute doesn't have any value, taking into account its multi-valuated
+* nature
+*/
+bool emptyAttributeValue(ContextAttribute* caP)
+{
+  /* Note that ValueTypeNumber and ValueTypeBoolean are always non-empty */
+  return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
+}
+
+
+/* ****************************************************************************
+*
+* changedAttr -
+*/
+bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
+{
+  switch (attr.getField(ENT_ATTRS_VALUE).type())
+  {
+    case Object:
+    case Array:
+      /* As the compoundValueP has been checked is NULL before invoking this function, finding
+       * a compound value in DB means that there is a change */
+      return true;
+
+    case NumberDouble:
+      return caP->numberValue != attr.getField(ENT_ATTRS_VALUE).Number();
+
+    case Bool:
+      return caP->boolValue != attr.getBoolField(ENT_ATTRS_VALUE);
+
+    case String:
+      return caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
+
+    default:
+      LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
+      return false;
+  }
+}
+
+/* ****************************************************************************
+*
+* appendMetadata -
+*/
+void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
+{
+  if (mdP->type != "")
+  {
+    switch (mdP->valueType)
+    {
+    case orion::ValueTypeString:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      return;
+
+    case orion::ValueTypeNumber:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      return;
+
+    case orion::ValueTypeBoolean:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_TYPE << mdP->type << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      return;
+
+    default:
+      LM_E(("Runtime Error (unknown attribute type)"));
+    }
+  }
+  else
+  {
+    switch (mdP->valueType)
+    {
+    case orion::ValueTypeString:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->stringValue));
+      return;
+
+    case orion::ValueTypeNumber:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->numberValue));
+      return;
+
+    case orion::ValueTypeBoolean:
+      mdVBuilder->append(BSON(ENT_ATTRS_MD_NAME << mdP->name << ENT_ATTRS_MD_VALUE << mdP->boolValue));
+      return;
+
+    default:
+      LM_E(("Runtime Error (unknown attribute type)"));
+    }
+  }
+}
+
+/* ****************************************************************************
+*
 * mergeAttrInfo -
 *
 * Takes as input the information of a given attribute, both in database (attr) and
@@ -297,24 +441,37 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
-  if (caP->value != "" || caP->compoundValueP != NULL)
+  if (!emptyAttributeValue(caP))
   {
     valueBson(caP, ab);
   }
   else
   {
-    /* Slightly different treatment, depending on whether the attribute value in DB is compound or not */
-    if (attr.getField(ENT_ATTRS_VALUE).type() == Object)
+    /* Slightly different treatment, depending on attribute value type in DB (string, number, boolean, vector or object) */
+    switch (attr.getField(ENT_ATTRS_VALUE).type())
     {
-      ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
-    }
-    else if (attr.getField(ENT_ATTRS_VALUE).type() == Array)
-    {
-      ab.appendArray(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
-    }
-    else
-    {
-      ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+      case Object:
+        ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
+        break;
+
+      case Array:
+        ab.appendArray(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).embeddedObject());
+        break;
+
+      case NumberDouble:
+        ab.append(ENT_ATTRS_VALUE, attr.getField(ENT_ATTRS_VALUE).Number());
+        break;
+
+      case Bool:
+        ab.append(ENT_ATTRS_VALUE, attr.getBoolField(ENT_ATTRS_VALUE));
+        break;
+
+      case String:
+        ab.append(ENT_ATTRS_VALUE, STR_FIELD(attr, ENT_ATTRS_VALUE));
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
     }
   }
 
@@ -337,23 +494,14 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   /* First add the metadata elements coming in the request */
   for (unsigned int ix = 0; ix < caP->metadataVector.size() ; ++ix)
   {
-    Metadata* md = caP->metadataVector.get(ix);
+    Metadata* mdP = caP->metadataVector.get(ix);
 
     /* Skip not custom metadata */
-    if (isNotCustomMetadata(md->name))
+    if (isNotCustomMetadata(mdP->name))
     {
       continue;
     }
-    if (md->type == "")
-    {
-      mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name << ENT_ATTRS_MD_VALUE << md->value));
-    }
-    else
-    {
-      mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME << md->name <<
-                             ENT_ATTRS_MD_TYPE << md->type <<
-                             ENT_ATTRS_MD_VALUE << md->value));
-    }
+    appendMetadata(&mdVBuilder, mdP);
   }
 
   /* Second, for each metadata previously in the metadata vector but *not included in the request*, add it as is */
@@ -366,23 +514,16 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
     for (BSONObj::iterator i = mdV.begin(); i.more();)
     {
-      BSONObj md = i.next().embeddedObject();
+      BSONObj    mdB = i.next().embeddedObject();
+      Metadata*  md  = bsonToMetadata(mdB);
 
       mdVSize++;
-      if (!hasMetadata(md.getStringField(ENT_ATTRS_MD_NAME), md.getStringField(ENT_ATTRS_MD_TYPE), caP))
+
+      if (!hasMetadata(md->name, md->type, caP))
       {
-        if (md.hasField(ENT_ATTRS_MD_TYPE))
-        {
-          mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME  << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                 ENT_ATTRS_MD_TYPE  << md.getStringField(ENT_ATTRS_MD_TYPE) <<
-                                 ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-        }
-        else
-        {
-          mdVBuilder.append(BSON(ENT_ATTRS_MD_NAME  << md.getStringField(ENT_ATTRS_MD_NAME) <<
-                                 ENT_ATTRS_MD_VALUE << md.getStringField(ENT_ATTRS_MD_VALUE)));
-        }
+        appendMetadata(&mdVBuilder, md);
       }
+      delete md;
     }
   }
 
@@ -415,7 +556,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
      *    different and, if they are of the same size, checking if the vectors are not equal)
      */
       actualUpdate = (!attr.hasField(ENT_ATTRS_VALUE) ||
-                      STR_FIELD(attr, ENT_ATTRS_VALUE) != caP->value ||
+                      attrValueChanges(attr, caP) ||
                       ((caP->type != "") && (!attr.hasField(ENT_ATTRS_TYPE) ||
                                              STR_FIELD(attr, ENT_ATTRS_TYPE) != caP->type) ) ||
                       mdVBuilder.arrSize() != mdVSize || !equalMetadataVectors(mdV, mdNewV));
@@ -508,9 +649,9 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 
     if (!isNotCustomMetadata(md->name))
     {
-      mdToAdd.append(BSON("name" << md->name << "type" << md->type << "value" << md->value));
+      appendMetadata(&mdToAdd, md);
       LM_T(LmtMongo, ("new custom metadata: {name: %s, type: %s, value: %s}",
-                      md->name.c_str(), md->type.c_str(), md->value.c_str()));
+                      md->name.c_str(), md->type.c_str(), md->toStringValue().c_str()));
     }
   }
 
@@ -716,15 +857,15 @@ static bool processLocation
         }
         else
         {
-          if ((mdP->value != LOCATION_WGS84) && (mdP->value != LOCATION_WGS84_LEGACY))
+          if ((mdP->stringValue != LOCATION_WGS84) && (mdP->stringValue != LOCATION_WGS84_LEGACY))
           {
-            *errDetail = "only WGS84 are supported, found: " + mdP->value;
+            *errDetail = "only WGS84 are supported, found: " + mdP->stringValue;
             return false;
           }
 
-          if (!string2coords(caP->value, coordLat, coordLong))
+          if (!string2coords(caP->stringValue, coordLat, coordLong))
           {
-            *errDetail = "coordinate format error [see Orion user manual]: " + caP->value;
+            *errDetail = "coordinate format error [see Orion user manual]: " + caP->stringValue;
             return false;
           }
 
@@ -1192,7 +1333,7 @@ static void setResponseMetadata(ContextAttribute* caReq, ContextAttribute* caRes
 
     if (!isNotCustomMetadata(mdReq->name))
     {
-      md = new Metadata(mdReq->name, mdReq->type, mdReq->value);
+      md = new Metadata(mdReq);
       caRes->metadataVector.push_back(md);
     }
   }
@@ -1261,7 +1402,7 @@ static bool processContextAttributeVector
     ContextAttribute*  targetAttr = ceP->contextAttributeVector.get(ix);
 
     /* No matter if success or fail, we have to include the attribute in the response */
-    ContextAttribute*  ca         = new ContextAttribute(targetAttr->name, targetAttr->type);
+    ContextAttribute*  ca         = new ContextAttribute(targetAttr->name, targetAttr->type, "");
 
     setResponseMetadata(targetAttr, ca);
     cerP->contextElement.contextAttributeVector.push_back(ca);
@@ -1307,13 +1448,13 @@ static bool processContextAttributeVector
 
       if (locAttr == targetAttr->name)
       {
-        if (!string2coords(targetAttr->value, coordLat, coordLong))
+        if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
         {
           cerP->statusCode.fill(SccInvalidParameter,
                                 std::string("action: UPDATE") +
                                 " - entity: [" + eP->toString() + "]" +
                                 " - offending attribute: " + targetAttr->toString() +
-                                " - error parsing location attribute, value: <" + targetAttr->value + ">");
+                                " - error parsing location attribute, value: <" + targetAttr->stringValue + ">");
 
           LM_W(("Bad Input (error parsing location attribute)"));
           return false;
@@ -1357,13 +1498,13 @@ static bool processContextAttributeVector
             return false;
           }
 
-          if (!string2coords(targetAttr->value, coordLat, coordLong))
+          if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
           {
             cerP->statusCode.fill(SccInvalidParameter,
                                   std::string("action: APPEND") +
                                   " - entity: [" + eP->toString() + "]" +
                                   " - offending attribute: " + targetAttr->toString() +
-                                  " - error parsing location attribute, value: [" + targetAttr->value + "]");
+                                  " - error parsing location attribute, value: [" + targetAttr->stringValue + "]");
             LM_W(("Bad Input (error parsing location attribute)"));
             return false;
           }
@@ -1565,7 +1706,7 @@ static bool createEntity
     LM_T(LmtMongo, ("new attribute: {name: %s, type: %s, value: %s}",
                     effectiveName.c_str(),
                     attrsV.get(ix)->type.c_str(),
-                    attrsV.get(ix)->value.c_str()));
+                    attrsV.get(ix)->toStringValue().c_str()));
 
     /* Custom metadata */
     BSONObj mdV;
@@ -1845,7 +1986,7 @@ void processContextElement
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
 
-      if ((aP->value.size() == 0) && (aP->compoundValueP == NULL) && (aP->metadataVector.size() == 0))
+      if (emptyAttributeValue(aP) && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 

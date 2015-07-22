@@ -46,13 +46,15 @@ TEST(UpdateContextAttributeRequest, render_xml)
 
   utInit();
 
+  ConnectionInfo* ciP = NULL;
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ucar.type         = "TYPE";
   ucar.contextValue = "Context Value";
 
   ucar.metadataVector.push_back(&mdata);
-  out = ucar.render(XML, "");
+  out = ucar.render(ciP, XML, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();
@@ -73,13 +75,15 @@ TEST(UpdateContextAttributeRequest, render_json)
 
   utInit();
 
+  ConnectionInfo* ciP = NULL;
+
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile)) << "Error getting test data from '" << outfile << "'";
 
   ucar.type         = "TYPE";
   ucar.contextValue = "Context Value";
 
   ucar.metadataVector.push_back(&mdata);
-  out = ucar.render(JSON, "");
+  out = ucar.render(ciP, JSON, "");
   EXPECT_STREQ(expectedBuf, out.c_str());
 
   utExit();

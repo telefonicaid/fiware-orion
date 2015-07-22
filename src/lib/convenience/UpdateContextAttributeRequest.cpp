@@ -53,7 +53,7 @@ UpdateContextAttributeRequest::UpdateContextAttributeRequest()
 *
 * render - 
 */
-std::string UpdateContextAttributeRequest::render(Format format, std::string indent)
+std::string UpdateContextAttributeRequest::render(ConnectionInfo* ciP, Format format, std::string indent)
 {
   std::string tag = "updateContextAttributeRequest";
   std::string out = "";
@@ -71,13 +71,13 @@ std::string UpdateContextAttributeRequest::render(Format format, std::string ind
   {
     bool isCompoundVector = false;
 
-    if ((compoundValueP != NULL) && (compoundValueP->type == orion::CompoundValueNode::Vector))
+    if ((compoundValueP != NULL) && (compoundValueP->valueType == orion::ValueTypeVector))
     {
       isCompoundVector = true;
     }
 
     out += startTag(indent + "  ", "contextValue", "value", format, isCompoundVector, true, isCompoundVector);
-    out += compoundValueP->render(format, indent + "    ");
+    out += compoundValueP->render(ciP, format, indent + "    ");
     out += endTag(indent + "  ", "contextValue", format, commaAfterContextValue, isCompoundVector);
   }
 

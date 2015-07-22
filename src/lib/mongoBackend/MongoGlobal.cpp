@@ -40,6 +40,8 @@
 #include "common/sem.h"
 #include "common/string.h"
 
+#include "orionTypes/OrionValueType.h"
+
 #include "mongoBackend/mongoOntimeintervalOperations.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
@@ -850,20 +852,30 @@ BSONObj fillQueryServicePath(const std::vector<std::string>& servicePath)
 */
 static void addCompoundNode(orion::CompoundValueNode* cvP, const BSONElement& e)
 {
-  if ((e.type() != String) && (e.type() != Object) && (e.type() != Array))
+  if ((e.type() != String) && (e.type() != Bool) && (e.type() != NumberDouble) && (e.type() != Object) && (e.type() != Array))
   {
     LM_T(LmtSoftError, ("unknown BSON type"));
     return;
   }
 
-  orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
+  orion::CompoundValueNode* child = new orion::CompoundValueNode(orion::ValueTypeObject);
   child->name = e.fieldName();
 
   switch (e.type())
   {
   case String:
-    child->type  = orion::CompoundValueNode::String;
-    child->value = e.String();
+    child->valueType  = orion::ValueTypeString;
+    child->stringValue = e.String();
+    break;
+
+  case Bool:
+    child->valueType  = orion::ValueTypeBoolean;
+    child->boolValue = e.Bool();
+    break;
+
+  case NumberDouble:
+    child->valueType  = orion::ValueTypeNumber;
+    child->numberValue = e.Number();
     break;
 
   case Object:
@@ -894,7 +906,7 @@ static void compoundObjectResponse(orion::CompoundValueNode* cvP, const BSONElem
 {
   BSONObj obj = be.embeddedObject();
 
-  cvP->type = orion::CompoundValueNode::Object;
+  cvP->valueType = orion::ValueTypeObject;
   for (BSONObj::iterator i = obj.begin(); i.more();)
   {
     BSONElement e = i.next();
@@ -911,7 +923,7 @@ static void compoundVectorResponse(orion::CompoundValueNode* cvP, const BSONElem
 {
   std::vector<BSONElement> vec = be.Array();
 
-  cvP->type = orion::CompoundValueNode::Vector;
+  cvP->valueType = orion::ValueTypeVector;
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     BSONElement e = vec[ix];
@@ -1028,6 +1040,35 @@ static void addFilterScope(Scope* scoP, std::vector<BSONObj> &filters)
   }
 }
 
+/* ****************************************************************************
+*
+* bsonToMetadata -
+*/
+Metadata* bsonToMetadata(BSONObj& mdB)
+{
+  std::string type = mdB.hasField(ENT_ATTRS_MD_TYPE) ? mdB.getStringField(ENT_ATTRS_MD_TYPE) : "";
+
+  switch (mdB.getField(ENT_ATTRS_MD_VALUE).type())
+  {
+  case String:
+    return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getStringField(ENT_ATTRS_MD_VALUE));
+    break;
+
+  case NumberDouble:
+    return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getField(ENT_ATTRS_MD_VALUE).Number());
+    break;
+
+  case Bool:
+    return new Metadata(mdB.getStringField(ENT_ATTRS_MD_NAME), type, mdB.getBoolField(ENT_ATTRS_MD_VALUE));
+    break;
+
+  default:  // Just to avoid compilation error about missing constants ...
+    break;
+  }
+
+  LM_E(("Runtime Error (unknown metadata value value type in DB: %d)", mdB.getField(ENT_ATTRS_MD_VALUE).type()));
+  return NULL;  
+}
 
 /* ****************************************************************************
 *
@@ -1314,30 +1355,36 @@ bool entitiesQuery
       {
         ContextAttribute* caP;
 
-        if (queryAttr.getField(ENT_ATTRS_VALUE).type() == String)
+        switch(queryAttr.getField(ENT_ATTRS_VALUE).type())
         {
-          ca.value = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
-          if (!includeEmpty && ca.value.length() == 0)
+        case String:
+          ca.stringValue = STR_FIELD(queryAttr, ENT_ATTRS_VALUE);
+          if (!includeEmpty && ca.stringValue.length() == 0)
           {
             continue;
           }
-          caP = new ContextAttribute(ca.name, ca.type, ca.value);
-        }
-        else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Object)
-        {
-          caP = new ContextAttribute(ca.name, ca.type);
-          caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Object);
+          caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
+          break;
+        case NumberDouble:
+          ca.numberValue = queryAttr.getField(ENT_ATTRS_VALUE).Number();
+          caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
+          break;
+        case Bool:
+          ca.boolValue = queryAttr.getBoolField(ENT_ATTRS_VALUE);
+          caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
+          break;
+        case Object:
+          caP = new ContextAttribute(ca.name, ca.type, "");
+          caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
           compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
-        }
-        else if (queryAttr.getField(ENT_ATTRS_VALUE).type() == Array)
-        {
-          caP = new ContextAttribute(ca.name, ca.type);
-          caP->compoundValueP = new orion::CompoundValueNode(orion::CompoundValueNode::Vector);
+          break;
+        case Array:
+          caP = new ContextAttribute(ca.name, ca.type, "");
+          caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
           compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
-        }
-        else
-        {
-          LM_T(LmtSoftError, ("unknown BSON type"));
+          break;
+        default:
+          LM_E(("Runtime Error (unknown attribute value type in DB: %d)", queryAttr.getField(ENT_ATTRS_VALUE).type()));
           continue;
         }
 
@@ -1364,21 +1411,7 @@ bool entitiesQuery
           for (unsigned int ix = 0; ix < metadataV.size(); ++ix)
           {
             BSONObj    metadata = metadataV[ix].embeddedObject();
-            Metadata*  md;
-
-            if (metadata.hasField(ENT_ATTRS_MD_TYPE))
-            {
-              md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME),
-                                STR_FIELD(metadata, ENT_ATTRS_MD_TYPE),
-                                STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
-            }
-            else
-            {
-              md = new Metadata(STR_FIELD(metadata, ENT_ATTRS_MD_NAME),
-                                "",
-                                STR_FIELD(metadata, ENT_ATTRS_MD_VALUE));
-            }
-
+            Metadata*  md = bsonToMetadata(metadata);
             caP->metadataVector.push_back(md);
           }
         }
