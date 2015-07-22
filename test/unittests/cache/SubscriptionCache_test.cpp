@@ -54,7 +54,8 @@ TEST(cache, SubscriptionCache)
   Subscription*             subP;
   EntityInfo*               ei1 = new EntityInfo();
   EntityInfo*               ei2 = new EntityInfo();
-
+  NotifyCondition*          ncP = new NotifyCondition();
+  
   attributeV.push_back("attr1");
   attributeV.push_back("attr2");
   attributeV.push_back("attr3");
@@ -66,6 +67,12 @@ TEST(cache, SubscriptionCache)
   ei2->entityType = "at2";
   entityIdInfos.push_back(ei1);
   entityIdInfos.push_back(ei2);
+
+  ncP->type = "ONCHANGE";
+  ncP->condValueList.push_back("attr1");
+  ncP->condValueList.push_back("attr2");
+  ncP->condValueList.push_back("attr3");
+  nv.push_back(ncP);
 
   subP = new Subscription("unittest", "/spath", "012345678901234567890123", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", JSON);
 
