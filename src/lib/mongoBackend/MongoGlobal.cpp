@@ -1975,10 +1975,13 @@ bool processOnChangeCondition
   Restriction                   res;
   ContextElementResponseVector  rawCerV;
 
+  LM_M(("KZ: In processOnChangeCondition"));
+
   if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, false, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
+    LM_M(("KZ: From processOnChangeCondition 1"));
     return false;
   }
 
@@ -2006,6 +2009,7 @@ bool processOnChangeCondition
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
+        LM_M(("KZ: From processOnChangeCondition 2"));
         return false;
       }
 
@@ -2020,6 +2024,7 @@ bool processOnChangeCondition
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
+        LM_M(("KZ: From processOnChangeCondition 3"));
         return true;
       }
 
@@ -2029,9 +2034,11 @@ bool processOnChangeCondition
     {
       getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
       ncr.contextElementResponseVector.release();
+      LM_M(("KZ: From processOnChangeCondition 4"));
       return true;
     }
   }
+  LM_M(("KZ: From processOnChangeCondition 5"));
 
   ncr.contextElementResponseVector.release();
   return false;
@@ -2071,6 +2078,7 @@ BSONArray processConditionVector
 
   *notificationDone = false;
 
+  LM_M(("KZ: In processConditionVector"));
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
   {
     NotifyCondition* nc = ncvP->get(ix);

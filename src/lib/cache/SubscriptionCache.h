@@ -96,6 +96,7 @@ class Subscription
   Reference                 reference;
 
   int                       lastNotificationTime;
+  int                       pendingNotifications;
   Format                    format;
 
   Subscription();

@@ -1145,7 +1145,7 @@ static bool addTriggeredSubscriptions
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
-          subToAttributeList(sub));
+          subToAttributeList(sub), NULL);
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
@@ -1165,7 +1165,8 @@ static bool addTriggeredSubscriptions
   {
     Subscription* sP = subVec[ix];
 
-    LM_M(("KZ: Got a subscription"));
+    sP->pendingNotifications += 1;
+    LM_M(("KZ: Got a subscription (%s) - pending notifications: %d", sP->subscriptionId.c_str(), sP->pendingNotifications));
     // Outdated subscriptions are skipped
     if (sP->expirationTime < now)
     {
@@ -1182,7 +1183,7 @@ static bool addTriggeredSubscriptions
     {
       if ((now - sP->lastNotificationTime) < sP->throttling)
       {
-        LM_M(("KZ: subscription is ignored due te throttling"));
+        LM_M(("KZ: subscription is ignored due to throttling"));
         continue;
       }
     }
@@ -1192,9 +1193,9 @@ static bool addTriggeredSubscriptions
                                                            (long long) sP->lastNotificationTime,
                                                            sP->format,
                                                            sP->reference.get(),
-                                                           aList);
+                                                           aList,
+                                                           sP);
     subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
-    sP->lastNotificationTime = now;
   }
 
   return true;
@@ -1222,6 +1223,7 @@ static bool processSubscriptions
   bool ret = true;
   err = "";
 
+  LM_M(("KZ: In processSubscriptions"));
   for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
     std::string             mapSubId  = it->first;
@@ -1261,6 +1263,22 @@ static bool processSubscriptions
       BSONObj query = BSON("_id" << OID(mapSubId));
       BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) <<
                             "$inc" << BSON(CSUB_COUNT << 1));
+
+      //
+      // Saving lastNotificationTime for cached subscription
+      //
+      if (trigs->cacheSubReference != NULL)
+      {
+        LM_M(("KZ: triggered sub from cache: pending notifications: %d", trigs->cacheSubReference->pendingNotifications));
+        trigs->cacheSubReference->pendingNotifications -= 1;
+#if 0
+        if (trigs->cacheSubReference->pendingNotifications == 0)
+        {
+          LM_M(("KZ: triggered sub from cache: pending notifications: %d - NOT OK to reset lastNotificationTime?", trigs->cacheSubReference->pendingNotifications));
+          // trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
+        }
+#endif
+      }
 
       try
       {
@@ -1303,6 +1321,8 @@ static bool processSubscriptions
     enV.release();
     delete it->second;
   }
+
+  LM_M(("KZ: From processSubscriptions"));
 
   subs.clear();
   return ret;
@@ -2010,6 +2030,7 @@ void processContextElement
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
 
+  LM_M(("In processContextElement"));
   /* Not supporting isPattern = true currently */
   if (isTrue(enP->isPattern))
   {

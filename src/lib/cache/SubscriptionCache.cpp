@@ -144,6 +144,7 @@ Subscription::Subscription()
   throttling            = 0;
   expirationTime        = 0;
   lastNotificationTime  = -1;
+  pendingNotifications  = 0;
   format                = XML;
 }
 
@@ -167,6 +168,7 @@ Subscription::Subscription
   throttling            = 0;
   expirationTime        = 0;
   lastNotificationTime  = -1;
+  pendingNotifications  = 0;
   format                = _format;
 }
 
@@ -194,6 +196,7 @@ Subscription::Subscription
   // 0. Fill in 'constant initial values'
   //
   lastNotificationTime  = -1;
+  pendingNotifications  = 0;
   format                = XML;
 
 
@@ -382,6 +385,7 @@ bool Subscription::match
     return false;
   }
 
+  LM_M(("KZ: Matching cache Service-Path '%s' to incoming Service-Path '%s'", servicePath.c_str(), _servicePath.c_str()));
   if (servicePathMatch(_servicePath) == false)
   {
     LM_M(("KZ: Subscription::match: servicePath not matching ('%s' vs '%s')", servicePath.c_str(), _servicePath.c_str()));
@@ -429,20 +433,49 @@ bool Subscription::servicePathMatch
   //
   if (spath[strlen(spath) - 1] != '#')
   {
+    LM_M(("KZ: No wildcard - exact match necessary"));
     return (_servicePath == servicePath);
   }
+
+  // Special case. "/#" matches EVERYTHING
+  if (servicePath == "/#")
+  {
+    LM_M(("KZ: Wildcard MATCH 1"));
+    return true;
+  }
+
 
   //
   // Wildcard - remove '#' and compare to the length of _servicePath.
   //            If equal upto the length of _servicePath, then it is a match
   //
-  int len = strlen(servicePath.c_str()) - 1;
+  // Actually, there is more than one way to match here:
+  // If we have a servicePath of the subscription as 
+  // "/a/b/#", then the following service-paths must match:
+  //   1. /a/b
+  //   2. /a/b/ AND /a/b/.+  (any path below /a/b/)
+  //
+  // What should NOT match is "/a/b2".
+  //
+  unsigned int len = strlen(spath) - 2;
 
-  if (strncmp(servicePath.c_str(), spath, len) == 0)
+  // 1. /a/b - (removing 2 chars from the cache-subscription removes "/#"
+
+  if ((spath[len] == '/') && (strlen(_servicePath.c_str()) == len) && (strncmp(spath, _servicePath.c_str(), len) == 0))
   {
+    LM_M(("KZ: Wildcard MATCH 2"));
     return true;
   }
 
+  // 2. /a/b/.+
+  len = strlen(spath) - 1;
+  if (strncmp(spath, _servicePath.c_str(), len) == 0)
+  {
+    LM_M(("KZ: Wildcard MATCH 3"));
+    return true;
+  }
+  
+  LM_M(("KZ: Wildcard NO MATCH"));
   return false;
 }
 
