@@ -1269,15 +1269,12 @@ static bool processSubscriptions
       //
       if (trigs->cacheSubReference != NULL)
       {
-        LM_M(("KZ: triggered sub from cache: pending notifications: %d", trigs->cacheSubReference->pendingNotifications));
         trigs->cacheSubReference->pendingNotifications -= 1;
-#if 0
+
         if (trigs->cacheSubReference->pendingNotifications == 0)
         {
-          LM_M(("KZ: triggered sub from cache: pending notifications: %d - NOT OK to reset lastNotificationTime?", trigs->cacheSubReference->pendingNotifications));
-          // trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
+          trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
         }
-#endif
       }
 
       try

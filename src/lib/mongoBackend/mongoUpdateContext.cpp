@@ -89,6 +89,6 @@ HttpStatusCode mongoUpdateContext
     }    
     reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
     
-    LM_M(("KZ: From mongoUpdateContext"));
+    LM_M(("KZ: Not even here I can decrement ..."));
     return SccOk;
 }

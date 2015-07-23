@@ -86,6 +86,7 @@ echo
 
 echo "03. Create entity E/T with Service Path /Spain/City/Barcelona"
 echo "============================================================="
+sleep 1.1 # Throttling is PT1S for the subscription
 payload='{
   "attributes" : [
     {
