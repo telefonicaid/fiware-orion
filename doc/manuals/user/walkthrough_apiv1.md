@@ -653,29 +653,26 @@ given moment wants to set the temperature and pressure of Room1 to 26.5
 
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
-	  "contextResponses": [
-	    {
-		  "contextElement": {
-		      "attributes": {
-			  "pressure": {
-			      "type": "integer",
-			      "value": "720"
-			  },
-			  "temperature": {
-			      "type": "float",
-			      "value": "23"
-			  }
+	  "contextElements": [
+	      {
+		  "type": "Room",
+		  "isPattern": "false",
+		  "id": "Room1",
+		  "attributes": [
+		      {
+			  "name": "temperature",
+			  "type": "float",
+			  "value": "26.5"
 		      },
-		      "id": "Room1",
-		      "isPattern": "false",
-		      "type": "Room"
-		    },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
+		      {
+			  "name": "pressure",
+			  "type": "integer",
+			  "value": "763"
+		      }
+		  ]
 	      }
-	  ]
+	    ],
+	    "updateAction": "UPDATE"
       }
       EOF                                                                                                                    
 
