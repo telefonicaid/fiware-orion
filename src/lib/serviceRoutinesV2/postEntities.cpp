@@ -70,11 +70,14 @@ std::string postEntities
 
 
   // 03. Prepare HTTP headers
-  std::string location = "/v2/entities/" + eP->id;
+  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
+  {
+    std::string location = "/v2/entities/" + eP->id;
 
-  ciP->httpHeader.push_back("Location");
-  ciP->httpHeaderValue.push_back(location);
-  ciP->httpStatusCode = SccCreated;
+    ciP->httpHeader.push_back("Location");
+    ciP->httpHeaderValue.push_back(location);
+    ciP->httpStatusCode = SccCreated;
+  }
 
 
   // 04. Cleanup and return result
