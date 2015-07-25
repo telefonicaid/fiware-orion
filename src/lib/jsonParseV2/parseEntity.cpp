@@ -76,8 +76,6 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
-    LM_M(("KZ: %s (type: %s)", name.c_str(), type.c_str()));
-
     if (name == "id")
     {
       if (type != "String")
@@ -126,7 +124,6 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
     return eP->render(ciP, EntitiesRequest);
   }
 
-  LM_M(("Done parsing Entity"));
   eP->present("");
   return "OK";
 }

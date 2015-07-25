@@ -1156,7 +1156,7 @@ static bool addTriggeredSubscriptions
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
   std::vector<Subscription*> subVec;
-  LM_M(("KZ3: lookup subs in ten='%s', spath='%s', entityId: '%s'/'%s', attr: '%s'",
+  LM_M(("KZ: lookup subs in ten='%s', spath='%s', entityId: '%s'/'%s', attr: '%s'",
         tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str()));
   subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
 
@@ -1223,7 +1223,6 @@ static bool processSubscriptions
   bool ret = true;
   err = "";
 
-  LM_M(("KZ: In processSubscriptions"));
   for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
   {
     std::string             mapSubId  = it->first;
@@ -1318,8 +1317,6 @@ static bool processSubscriptions
     enV.release();
     delete it->second;
   }
-
-  LM_M(("KZ: From processSubscriptions"));
 
   subs.clear();
   return ret;
@@ -2027,7 +2024,6 @@ void processContextElement
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
 
-  LM_M(("In processContextElement"));
   /* Not supporting isPattern = true currently */
   if (isTrue(enP->isPattern))
   {

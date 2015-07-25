@@ -333,6 +333,17 @@ void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
 
 /* ****************************************************************************
 *
+* EntityInfo::release - 
+*/
+void EntityInfo::release(void)
+{
+  regfree(&entityIdPattern);
+}
+
+
+
+/* ****************************************************************************
+*
 * Subscription::attributeMatch - 
 */
 bool Subscription::attributeMatch(const std::string& attributeName)
@@ -529,6 +540,26 @@ void Subscription::update(UpdateContextSubscriptionRequest* ucsrP)
 
 /* ****************************************************************************
 *
+* Subscription::release - 
+*/
+void Subscription::release(void)
+{
+  restriction.release();
+  notifyConditionVector.release();
+
+  for (unsigned int ix = 0; ix < entityIdInfos.size(); ++ix)
+  {
+    entityIdInfos[ix]->release();
+    delete(entityIdInfos[ix]);
+  }
+
+  entityIdInfos.clear();
+}
+
+
+
+/* ****************************************************************************
+*
 * SubscriptionCache::SubscriptionCache - 
 */
 SubscriptionCache::SubscriptionCache()
@@ -566,6 +597,11 @@ void SubscriptionCache::semInit(void)
 */
 void SubscriptionCache::semTake(void)
 {
+  if (pthread_self() == mutexOwner)
+  {
+    return;
+  }
+
   struct timespec  startTime;
   struct timespec  endTime;
   struct timespec  diffTime;
@@ -576,6 +612,7 @@ void SubscriptionCache::semTake(void)
   }
 
   sem_wait(&mutex);
+  mutexOwner = pthread_self();
 
   if (semTimeStatistics)
   {
@@ -593,6 +630,7 @@ void SubscriptionCache::semTake(void)
 void SubscriptionCache::semGive(void)
 {
   sem_post(&mutex);
+  mutexOwner = 0;
 }
 
 
@@ -795,7 +833,17 @@ static void subTreat(std::string tenant, BSONObj& bobj)
   //
   // 06. Create Subscription and add it to the subscription-cache
   //
-  Subscription* subP = new Subscription(tenant, servicePath, subId, eiV, attrV, throttling, expiration, restriction, notifyConditionVector, reference, format);
+  Subscription* subP = new Subscription(tenant,
+                                        servicePath,
+                                        subId,
+                                        eiV,
+                                        attrV,
+                                        throttling,
+                                        expiration,
+                                        restriction,
+                                        notifyConditionVector,
+                                        reference,
+                                        format);
   subCache->insert(subP);
 }
 
@@ -808,7 +856,17 @@ static void subTreat(std::string tenant, BSONObj& bobj)
 void SubscriptionCache::init(void)
 {
   semInit();
+  fillFromDb();
+}
 
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::fillFromDb - 
+*/
+void SubscriptionCache::fillFromDb(void)
+{
   // FIXME P10: Get a list of all tenants and call subscriptionsTreat() for each of them
   std::vector<std::string> tenantV;
 
@@ -828,33 +886,13 @@ void SubscriptionCache::init(void)
 */
 void SubscriptionCache::insert(Subscription* subP)
 {
+  LM_M(("KZ: Inserting item into sub.cache"));
+
   if (subP->entityIdInfos.size() == 0)
   {
     LM_E(("Runtime Error (no entity path for subscription - not inserted in subscription cache)"));
     return;
   }
-
-  LM_M(("KZ: Inserting a subscription in the cache"));
-  LM_M(("KZ: -------------------------------------"));
-  LM_M(("KZ: inserting a subscription in the cache: tenant      = '%s'", subP->tenant.c_str()));
-  LM_M(("KZ: inserting a subscription in the cache: servicePath = '%s'", subP->servicePath.c_str()));
-  LM_M(("KZ: inserting a subscription in the cache: entityIdInfos: %d",  subP->entityIdInfos.size()));
-
-  for (unsigned int eiIx = 0; eiIx < subP->entityIdInfos.size(); ++eiIx)
-  {
-    LM_M(("KZ: inserting a subscription in the cache: entityIdInfo[%d]->type: '%s'", eiIx, subP->entityIdInfos[eiIx]->entityType.c_str()));
-  }
-
-  for (unsigned int aIx = 0; aIx < subP->attributes.size(); ++aIx)
-  {
-    LM_M(("KZ: inserting a subscription in the cache: attributes[%d] = '%s'", aIx, subP->attributes[aIx].c_str()));
-  }
-  if (subP->attributes.size() == 0)
-  {
-    LM_M(("KZ: inserting a subscription in the cache: ALL attributes"));
-  }
-
-  LM_M(("KZ: -------------------------------------"));
 
   semTake();
   subs.push_back(subP);
@@ -921,11 +959,35 @@ int SubscriptionCache::remove
 
 /* ****************************************************************************
 *
+* SubscriptionCache::release - 
+*/
+void SubscriptionCache::release(void)
+{
+  for (unsigned int sIx = 0; sIx < subs.size(); ++sIx)
+  {
+    subs[sIx]->release();
+    delete(subs[sIx]);
+  }
+
+  subs.clear();
+}
+
+
+
+/* ****************************************************************************
+*
 * SubscriptionCache::refresh - 
 */
 int SubscriptionCache::refresh(void)
 {
-  LM_W(("NOT IMPLEMENMTED"));
+  semTake();
+  LM_M(("KZ: SubCache size before refresh: %d", size()));
+  release();
+  LM_M(("KZ: SubCache size after release: %d", size()));
+  fillFromDb();
+  LM_M(("KZ: SubCache size after fillFromDb: %d", size()));
+  semGive();
+
   return 0;
 }
 

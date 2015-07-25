@@ -260,8 +260,6 @@ std::string Metadata::toJson(bool isLastElement)
 {
   std::string  out;
 
-  LM_M(("Metadata '%s' to JSON (type: '%s', valueType: %d)", name.c_str(), type.c_str(), valueType));
-
   if (type == "")
   {
     if (valueType == orion::ValueTypeNumber)

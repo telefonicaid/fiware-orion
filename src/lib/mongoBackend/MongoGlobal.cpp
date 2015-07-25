@@ -185,7 +185,6 @@ bool mongoConnect(DBClientConnection* c)
 void setMongoConnectionForUnitTest(DBClientBase* _connection)
 {
   connection = _connection;
-  LM_M(("In setMongoConnectionForUnitTest: %p", connection));
 }
 
 
@@ -554,8 +553,6 @@ static void recoverOnTimeIntervalThread(std::string tenant, BSONObj& sub)
   for (unsigned int ix = 0; ix < condV.size(); ++ix)
   {
     BSONObj condition = condV[ix].embeddedObject();
-
-    LM_M(("KZ: got a subscription of type '%s'", STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str()));
 
     if (strcmp(STR_FIELD(condition, CSUB_CONDITIONS_TYPE).c_str(), ON_TIMEINTERVAL_CONDITION) == 0)
     {
@@ -1975,13 +1972,10 @@ bool processOnChangeCondition
   Restriction                   res;
   ContextElementResponseVector  rawCerV;
 
-  LM_M(("KZ: In processOnChangeCondition"));
-
   if (!entitiesQuery(enV, attrL, res, &rawCerV, &err, false, tenant, servicePathV))
   {
     ncr.contextElementResponseVector.release();
     rawCerV.release();
-    LM_M(("KZ: From processOnChangeCondition 1"));
     return false;
   }
 
@@ -2009,7 +2003,6 @@ bool processOnChangeCondition
       {
         rawCerV.release();
         ncr.contextElementResponseVector.release();
-        LM_M(("KZ: From processOnChangeCondition 2"));
         return false;
       }
 
@@ -2024,7 +2017,6 @@ bool processOnChangeCondition
         allCerV.release();
         ncr.contextElementResponseVector.release();
 
-        LM_M(("KZ: From processOnChangeCondition 3"));
         return true;
       }
 
@@ -2034,11 +2026,10 @@ bool processOnChangeCondition
     {
       getNotifier()->sendNotifyContextRequest(&ncr, notifyUrl, tenant, xauthToken, format);
       ncr.contextElementResponseVector.release();
-      LM_M(("KZ: From processOnChangeCondition 4"));
+
       return true;
     }
   }
-  LM_M(("KZ: From processOnChangeCondition 5"));
 
   ncr.contextElementResponseVector.release();
   return false;
@@ -2078,7 +2069,6 @@ BSONArray processConditionVector
 
   *notificationDone = false;
 
-  LM_M(("KZ: In processConditionVector"));
   for (unsigned int ix = 0; ix < ncvP->size(); ++ix)
   {
     NotifyCondition* nc = ncvP->get(ix);
@@ -2501,7 +2491,6 @@ void subscriptionsTreat(std::string tenant, OtisTreatFunction treatFunction)
 
   try
   {
-    LM_M(("connection at %p", connection));
     cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
 
     /*

@@ -61,6 +61,7 @@ typedef struct EntityInfo
   EntityInfo() {}
   EntityInfo(const std::string& idPattern, const std::string& _entityType);
   bool          match(const std::string& idPattern, const std::string& type);
+  void          release(void);
 } EntityInfo;
 
 
@@ -131,6 +132,7 @@ class Subscription
   bool attributeMatch(const std::string& attributeName);
   bool hasAttribute(const std::string&attributeName);
   void update(UpdateContextSubscriptionRequest* ucsrP);
+  void release(void);
 };
 
 
@@ -158,19 +160,22 @@ private:
   std::vector<Subscription*>  subs;
   std::string                 dbName;
   sem_t                       mutex;
+  pthread_t                   mutexOwner;
 
 public:
   SubscriptionCache();
   SubscriptionCache(std::string _dbName);
 
-  void           init();
+  void           init(void);
+  void           fillFromDb(void);
   void           insert(Subscription* sub);
   int            remove(Subscription* sub);
   int            remove(const std::string&  tenant,
                         const std::string&  servicePath,
                         const std::string&  subId);
+  void           release();
   int            refresh(void);
-
+  int            size(void) { return subs.size(); }
   Subscription*  lookupById(const std::string&       tenant,
                             const std::string&       servicePath,
                             const std::string&       subId);
