@@ -29,8 +29,11 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
 * a **context data interface** for exchanging information by means of query, subscription, and update operations
 * a **context availability interface** for exchanging information on how to obtain context information
 (whether to separate the two interfaces is currently under discussion).
+* a set of typical **roles** played by NGSI-compliant components
 
-### Context Entities
+### Context data modelling and exchange
+
+#### Context Entities
 
 Context entities, or simply called entities, are the center of gravity
 in the FIWARE NGSI information model. An entity represents a
@@ -43,7 +46,7 @@ to describe the type of real-world object represented by the entity.
 For example, a context entity with id *sensor-365* could have the
 type *temperatureSensor*.
 
-### Context Elements
+#### Context Elements
 
 *(Note: the distinction between context entities and context elements 
 is still under discussion; therefore the notion of context elements
@@ -62,7 +65,7 @@ It is important to understand that the relationship of entity and context elemen
 * each context element refers to exactly one entity
 * there can be several context elements  referring to the same entity. The context elements can for example contain different pieces of information about the entity
 
-### Context Attributes 
+#### Context Attributes 
 
 Context attributes are properties of context entities.
 For example, the current speed of a car could be modeled as
@@ -76,7 +79,7 @@ an *attribute type*, an *attribute value* and *metadata*.
   * the actual data
   * optional **metadata** describing properties of the attribute value like e.g. accuracy, provider, or a timestamp
   
-### Context Metadata
+#### Context Metadata
 
 Context metadata is used in FIWARE NGSI at several places, one of
 them being an optional part of the attribute value as described
@@ -90,6 +93,48 @@ above. Similarly to attributes, each piece of metadata has
 
 Note that in NGSI it is not forseen that metadata values can
 themselves have metadata.
+
+#### Restrictions and Operation Scopes
+
+(placeholder to describe restrictions and operation scopes)
+
+#### Context Queries
+
+(placeholder for describing what a context query is, and some hints on how this
+is typically done in the REST interface)
+
+#### Context Subscriptions
+
+(placeholder for describing the concept of context subscriptions)
+
+#### Context Updates
+
+(placeholder for describing updates)
+
+### Exchanging Context Availability Information
+
+(placeholder on some introduction of what context availability information is)
+
+#### Context Registrations
+
+(placeholder for describing what a context registration is and what it is used for)
+
+#### Context Discovery
+
+(placehoder for describing what discovery does)
+
+#### Context Availability Subscription
+
+(placeholder for describing context availability subscriptions)
+
+#### Registering Context Availability Information
+
+(placeholder for describing the operation of registering context)
+
+### Roles of FIWARE NGSI components
+
+(placeholder to describe roles like context provider, context producer,
+context broker, context registry, context consumer)
 
 ## JSON entity representation
 
