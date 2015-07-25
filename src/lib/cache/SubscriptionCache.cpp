@@ -688,12 +688,12 @@ static void subTreat(std::string tenant, BSONObj& bobj)
   std::string               subId         = idField.OID().toString();
   int64_t                   expiration    = bobj.getField("expiration").Long();
   std::string               reference     = bobj.getField("reference").String();
-  int64_t                   throttling    = bobj.getField("throttling").Long();
+  int64_t                   throttling    = bobj.hasField("throttling") ? bobj.getField("throttling").Long() : -1;
   std::vector<BSONElement>  eVec          = bobj.getField("entities").Array();
   std::vector<BSONElement>  attrVec       = bobj.getField("attrs").Array();
   std::vector<BSONElement>  condVec       = bobj.getField("conditions").Array();
-  std::string               formatString  = bobj.getField("format").String();
-  std::string               servicePath   = bobj.getField("servicePath").String();
+  std::string               formatString  = bobj.hasField("format") ? bobj.getField("format").String() : "XML";
+  std::string               servicePath   = bobj.hasField("servicePath") ? bobj.getField("servicePath").String() : "/";
   Format                    format        = stringToFormat(formatString);
 
   std::vector<EntityInfo*> eiV;
