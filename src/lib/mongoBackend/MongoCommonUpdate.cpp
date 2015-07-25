@@ -1033,8 +1033,10 @@ static bool addTriggeredSubscriptions
   std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
   BSONObj     spBson       = fromjson(inRegex);
 
-  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
-  BSONObj queryNoPattern = BSON(
+  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type. Only
+   * subscriptions for no pattern entities are queried, subscriptions for pattern entities are searched
+   * in the cache */
+  BSONObj query = BSON(
                 entIdQ << entityId <<
                 "$or" << BSON_ARRAY(
                     BSON(entTypeQ << entityType) <<
@@ -1044,30 +1046,6 @@ static bool addTriggeredSubscriptions
                 condValueQ << attr <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
                 CSUB_SERVICE_PATH << spBson);
-
-  /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
-   * way to do a "reverse regex" query in MongoDB (see
-   * http://stackoverflow.com/questions/15966991/mongodb-reverse-regex/15989520).
-   * Note that although we are using a isPattern=true in the MongoDB query besides $where, we
-   * also need to check that in the if statement in the JavaScript function given that a given
-   * sub document could include both isPattern=true and isPattern=false documents */
-  std::string function = std::string("function()") +
-         "{" +
-            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
-                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
-                    "return true; " +
-                "}" +
-            "}" +
-            "return false; " +
-         "}";
-  LM_T(LmtMongo, ("JS function: %s", function.c_str()));
-
-  // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
-  BSONObj query = queryNoPattern;
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
                   getSubscribeContextCollectionName(tenant).c_str(),
