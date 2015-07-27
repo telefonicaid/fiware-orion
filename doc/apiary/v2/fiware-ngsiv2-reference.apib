@@ -29,8 +29,11 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
 * a **context data interface** for exchanging information by means of query, subscription, and update operations
 * a **context availability interface** for exchanging information on how to obtain context information
 (whether to separate the two interfaces is currently under discussion).
+* a set of typical **roles** played by NGSI-compliant components
 
-### Context Entities
+### Context data modelling and exchange
+
+#### Context Entities
 
 Context entities, or simply called entities, are the center of gravity
 in the FIWARE NGSI information model. An entity represents a
@@ -43,7 +46,7 @@ to describe the type of real-world object represented by the entity.
 For example, a context entity with id *sensor-365* could have the
 type *temperatureSensor*.
 
-### Context Elements
+#### Context Elements
 
 *(Note: the distinction between context entities and context elements 
 is still under discussion; therefore the notion of context elements
@@ -62,7 +65,7 @@ It is important to understand that the relationship of entity and context elemen
 * each context element refers to exactly one entity
 * there can be several context elements  referring to the same entity. The context elements can for example contain different pieces of information about the entity
 
-### Context Attributes 
+#### Context Attributes 
 
 Context attributes are properties of context entities.
 For example, the current speed of a car could be modeled as
@@ -76,7 +79,7 @@ an *attribute type*, an *attribute value* and *metadata*.
   * the actual data
   * optional **metadata** describing properties of the attribute value like e.g. accuracy, provider, or a timestamp
   
-### Context Metadata
+#### Context Metadata
 
 Context metadata is used in FIWARE NGSI at several places, one of
 them being an optional part of the attribute value as described
@@ -90,6 +93,48 @@ above. Similarly to attributes, each piece of metadata has
 
 Note that in NGSI it is not forseen that metadata values can
 themselves have metadata.
+
+#### Restrictions and Operation Scopes
+
+(placeholder to describe restrictions and operation scopes)
+
+#### Context Queries
+
+(placeholder for describing what a context query is, and some hints on how this
+is typically done in the REST interface)
+
+#### Context Subscriptions
+
+(placeholder for describing the concept of context subscriptions)
+
+#### Context Updates
+
+(placeholder for describing updates)
+
+### Exchanging Context Availability Information
+
+(placeholder on some introduction of what context availability information is)
+
+#### Context Registrations
+
+(placeholder for describing what a context registration is and what it is used for)
+
+#### Context Discovery
+
+(placehoder for describing what discovery does)
+
+#### Context Availability Subscription
+
+(placeholder for describing context availability subscriptions)
+
+#### Registering Context Availability Information
+
+(placeholder for describing the operation of registering context)
+
+### Roles of FIWARE NGSI components
+
+(placeholder to describe roles like context provider, context producer,
+context broker, context registry, context consumer)
 
 ## JSON entity representation
 
@@ -368,7 +413,7 @@ the JSON entity representation format (described in a section above).
 Response code:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + limit: 20 (optional, number)
@@ -414,7 +459,7 @@ Response:
 
 * Successful operation uses 201 Created. Reponse includes a `Location` header with the URL of the
   created entity.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Request (application/json)
 
@@ -463,7 +508,7 @@ the list of conflicting entities, i.e. all the entities with such an ID.
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity Id.
@@ -511,7 +556,7 @@ whether `append` option is used or not.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -539,7 +584,7 @@ attributes in the payload doesn't exist in the entity, an error if returned.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 
 + Parameters
@@ -566,7 +611,7 @@ request.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -587,7 +632,7 @@ Delete the entity.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
@@ -622,7 +667,7 @@ URL that could be used to get the list of conflicting entities, i.e. all the ent
 Response:
 
 * Successful operation uses 20O OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
@@ -671,7 +716,7 @@ whether `append` option is used:
 Response:
 
 * Successful operation uses 204 No Content.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -700,7 +745,7 @@ attributes in the payload doesn't exist in the entity, an error if returned.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -727,7 +772,7 @@ request.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -749,7 +794,7 @@ Delete the entity.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Boe_Idearium (required, string) - Entity ID
@@ -769,7 +814,7 @@ Returns a JSON object with the attribute data of the attribute. The object follo
 Response:
 
 * Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -790,7 +835,7 @@ is replaced by the one in the request. The object follows the JSON representatio
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -813,7 +858,7 @@ Removes an entity attribute.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -833,7 +878,7 @@ Returns a JSON object with the attribute data of the attribute. The object follo
 Response:
 
 * Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -855,7 +900,7 @@ by the one in the request. The object follows the JSON representation for attrib
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -879,7 +924,7 @@ Removes the attribute from the entity.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -910,7 +955,7 @@ indicates that the attribute value must be provided as plain text (text/plain).
 Response:
 
 * Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -930,7 +975,7 @@ with a `value` property, or as plain text (text/plain).
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -966,7 +1011,7 @@ If the `text` option is not used, returns a JSON object which the `value` of the
 Response:
 
 * Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -987,7 +1032,7 @@ with a `value` property, or as plain text (text/plain).
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
@@ -1034,7 +1079,7 @@ If `values` option is used, the operation returns a JSON array with the list of 
 Response code:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + limit: 20 (optional, number)
@@ -1086,7 +1131,7 @@ the entities of such type) and `count` (the number of entities belonging to that
 Response code:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + entityType: Room (required, string) - Entity Type
@@ -1132,9 +1177,9 @@ A `notification` object contains the following subfields:
 
 * `attributes`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
   in the notification
-* `callback` : URL that will point to the service which will be invoked when a notification is generated. A NGSIv2
+* `callback` : URL pointing to the service which will be invoked when a notification is generated. A NGSIv2
   compliant server must support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
-* `throttling`: A period of time (in ISO8601 format) which must ellapse between two consecutive notifications. It
+* `throttling`: Minimal period of time (in ISO8601 format) which must elapse between two consecutive notifications. It
   is optional.
 
 Notification rules are as follow:
@@ -1154,7 +1199,7 @@ Returns a list of all the subscriptions present in the system
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Response 200
 
@@ -1188,7 +1233,7 @@ The subscription is represented by a JSON object as described at the beginning o
 Response:
 
 * Successful operation uses 201 Created
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Request (application/json)
 
@@ -1223,7 +1268,7 @@ The response is the subscription represented by a JSON object as described at th
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + subscriptionId: abcdef (required, string) - subscription Id.
@@ -1256,7 +1301,7 @@ Only the fields included in the request are updated in the subscription.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + subscriptionId: abcdef (required, string) - subscription Id.
@@ -1276,7 +1321,7 @@ Cancels subscription.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + subscriptionId: abcdef (required, string) - subscription Id.
@@ -1292,7 +1337,7 @@ A context registration is represented by a JSON object with the following fields
 
 * `id`: Unique identifier assigned to the registration. Automatically created at creation time.
 * `subject` : It s an object that describes the subject of the registration.
-* `callback` : URL of the service which is registered. In the case of a Context Provider
+* `callback` : URL pointing to the service which is registered. In the case of a Context Provider
 corresponds to the URL of the provider service.
 * `duration`: Duration of the registration in ISO8601 format. Default duration is infinite.
 
@@ -1312,7 +1357,7 @@ Lists all the registrations present in the system.
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Response 200
 
@@ -1340,7 +1385,7 @@ The registration is represented by a JSON object as described at the beginning o
 Response:
 
 * Successful operation uses 201 Created
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Request (application/json)
 
@@ -1368,7 +1413,7 @@ The response is the registration represented by a JSON object as described at th
 Response:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + registrationId: abcdef (required, string) - registration Id.
@@ -1394,7 +1439,7 @@ Only the fields included in the request are updated in the registration.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + redId: abcdef (required, string) - registration Id.
@@ -1414,7 +1459,7 @@ Cancels registration.
 Response:
 
 * Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + redId: abcdef (required, string) - registration Id.
@@ -1463,7 +1508,7 @@ The payload may contain the following elements (all of them optional):
 Response code:
 
 * Successful operation uses 200 OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
     + limit: 20 (optional, number)
@@ -1544,7 +1589,7 @@ The payload is an object with two properties:
 Response:
 
 * Successful operation uses 201 Created.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more detail.
+* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Request (application/json)
 
