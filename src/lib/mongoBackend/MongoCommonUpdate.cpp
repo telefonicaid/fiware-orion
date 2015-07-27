@@ -1134,8 +1134,6 @@ static bool addTriggeredSubscriptions
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
   std::vector<Subscription*> subVec;
-  LM_M(("KZ: lookup subs in ten='%s', spath='%s', entityId: '%s'/'%s', attr: '%s'",
-        tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str(), attr.c_str()));
   subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
 
   int now = getCurrentTime();
@@ -1144,11 +1142,9 @@ static bool addTriggeredSubscriptions
     Subscription* sP = subVec[ix];
 
     sP->pendingNotifications += 1;
-    LM_M(("KZ: Got a subscription (%s) - pending notifications: %d", sP->subscriptionId.c_str(), sP->pendingNotifications));
     // Outdated subscriptions are skipped
     if (sP->expirationTime < now)
     {
-      LM_M(("KZ: subscription is out-dated"));
       continue;
     }
 
@@ -1161,12 +1157,10 @@ static bool addTriggeredSubscriptions
     {
       if ((now - sP->lastNotificationTime) < sP->throttling)
       {
-        LM_M(("KZ: subscription is ignored due to throttling"));
         continue;
       }
     }
 
-    LM_M(("KZ: Creating a TriggeredSubscription"));
     TriggeredSubscription* sub = new TriggeredSubscription((long long) sP->throttling,
                                                            (long long) sP->lastNotificationTime,
                                                            sP->format,
@@ -1240,6 +1234,7 @@ static bool processSubscriptions
       BSONObj query = BSON("_id" << OID(mapSubId));
       BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) <<
                             "$inc" << BSON(CSUB_COUNT << 1));
+
 
       //
       // Saving lastNotificationTime for cached subscription

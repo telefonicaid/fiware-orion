@@ -1,4 +1,3 @@
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -292,8 +291,85 @@ static void prepareDatabase(void) {
 
   /* Given that preparation including csubs, we have to init cache */
   subscriptionCacheInit(DBPREFIX);
-
 }
+
+
+/* ****************************************************************************
+*
+* prepareSubsCache - 
+*
+* - Sub3:
+*     Entity: E[1-2]*
+*     Attribute: A1, A3, A4
+*     NotifyCond: ONCHANGE on [A1, A2, A4]
+* 
+*/
+void prepareSubsCache(int mode, std::string subscriptionId, std::string ref, Format fmt)
+{
+  std::vector<EntityInfo*>  eiV;
+  NotifyConditionVector     ncV;
+  NotifyCondition*          ncP = new NotifyCondition();
+  std::vector<std::string>  attrVec;
+  Subscription*             subP;
+  Restriction               restriction;
+  EntityInfo*               eiP;
+
+  ncP->type = "ONCHANGE";
+
+  if (mode == 1)
+  {
+    eiP = new EntityInfo("E[1-2]", "T");
+
+    ncP->condValueList.push_back("A1");
+    ncP->condValueList.push_back("A2");
+    ncP->condValueList.push_back("A3");
+    ncP->condValueList.push_back("A4");
+
+    attrVec.push_back("A1");
+    attrVec.push_back("A3");
+    attrVec.push_back("A4");
+  }
+  else if (mode == 2)
+  {
+    eiP = new EntityInfo("E3", "T3");
+
+    ncP->condValueList.push_back("A1");
+    ncP->condValueList.push_back("A3");
+
+    attrVec.push_back("A1");
+    attrVec.push_back("A3");
+  }
+  else if (mode == 3)
+  {
+    eiP = new EntityInfo("E3", "T3");
+
+    ncP->condValueList.push_back("A1");
+    ncP->condValueList.push_back("A3");
+    ncP->condValueList.push_back("A4");
+
+    attrVec.push_back("A1");
+    attrVec.push_back("A3");
+    attrVec.push_back("A4");
+  }
+  else if (mode == 4)
+  {
+    eiP = new EntityInfo("E3", "T3");
+
+    ncP->condValueList.push_back("A1");  // NOTE: Should be A3 ... is the test OK ?
+
+    attrVec.push_back("A3");
+  }
+
+  ncV.push_back(ncP);
+  eiV.push_back(eiP);
+  
+
+  subP = new Subscription("", "", subscriptionId, eiV, attrVec, 0, 1500000000, restriction, ncV, ref, fmt);
+  subP->lastNotificationTime = 20000000;
+
+  subCache->insert(subP);
+}
+
 
 /* ****************************************************************************
 *
@@ -809,7 +885,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -830,6 +906,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
 
     /* Prepare database */
     prepareDatabase();
+    prepareSubsCache(1, "51307b66f481db11bf860003", "http://notify3.me", JSON);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
@@ -876,7 +953,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -897,6 +974,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
 
     /* Prepare database */
     prepareDatabase();
+    prepareSubsCache(1, "51307b66f481db11bf860003", "http://notify3.me", JSON);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
@@ -938,7 +1016,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -959,6 +1037,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
 
     /* Prepare database */
     prepareDatabase();
+    prepareSubsCache(1, "51307b66f481db11bf860003", "http://notify3.me", JSON);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1003,7 +1082,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", XML))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", JSON))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1024,6 +1103,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
+    prepareSubsCache(2, "51307b66f481db11bf860005", "http://notify5.me", JSON);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
@@ -1091,6 +1171,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
+    prepareSubsCache(3, "51307b66f481db11bf860005", "http://notify5.me", XML);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
@@ -1154,6 +1235,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
+    prepareSubsCache(4, "51307b66f481db11bf860005", "http://notify5.me", XML);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    

@@ -56,6 +56,8 @@ TEST(cache, SubscriptionCache)
   EntityInfo*               ei2 = new EntityInfo();
   NotifyCondition*          ncP = new NotifyCondition();
   
+  subscriptionCacheInit("unittest");
+
   attributeV.push_back("attr1");
   attributeV.push_back("attr2");
   attributeV.push_back("attr3");

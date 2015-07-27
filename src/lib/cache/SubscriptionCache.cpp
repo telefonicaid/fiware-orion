@@ -390,11 +390,13 @@ bool Subscription::match
   const std::string&  attributeName
 )
 {
+  LM_M(("KZ: Matching cache Tenant '%s' to incoming Tenant '%s'", tenant.c_str(), _tenant.c_str()));
   if (_tenant != tenant)
   {
-    LM_M(("KZ: Subscription::match: tenant not matching"));
+    LM_M(("KZ: Subscription::match: tenant not matching ('%s' != '%s')", tenant.c_str(), _tenant.c_str()));
     return false;
   }
+  LM_M(("KZ: Tenant OK"));
 
   LM_M(("KZ: Matching cache Service-Path '%s' to incoming Service-Path '%s'", servicePath.c_str(), _servicePath.c_str()));
   if (servicePathMatch(_servicePath) == false)
@@ -402,16 +404,20 @@ bool Subscription::match
     LM_M(("KZ: Subscription::match: servicePath not matching ('%s' vs '%s')", servicePath.c_str(), _servicePath.c_str()));
     return false;
   }
+  LM_M(("KZ: Service-Path OK"));
+
 
   //
   // If ONCHANGE and one of the attribute names in the scope vector
   // of the subscription has the same name as the incoming attribute. there is a match.
   //
+  LM_M(("KZ: Matching Attributes (incoming: %s)", attributeName.c_str()));
   if (!attributeMatch(attributeName))
   {
     LM_M(("KZ: Subscription::match: attributes not matching (incoming: '%s')", attributeName.c_str()));
     return false;
   }
+  LM_M(("KZ: Attributes OK"));
 
   for (unsigned int ix = 0; ix < entityIdInfos.size(); ++ix)
   {

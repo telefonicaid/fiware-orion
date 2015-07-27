@@ -30,75 +30,91 @@ accumulatorStart
 
 --SHELL--
 
-url="/v1/updateContext"
+#
+# 01. Create OfficeRoom/Room/temperature
+# 02. Subscribe to OfficeRoom/Room ONTIMEINTERVAL
+# 03. Sleep 10 seconds and then dump the accumulator
+#
+
+
+echo "01. Create OfficeRoom/Room/temperature"
+echo "======================================"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-                  <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>27</contextValue>
-                </contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>degree</type>
+          <contextValue>27</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-echo "1: ++++++++++++++++++++"
 
-# to avoid a race condition in the order of notifications
+# To avoid a race condition in the order of notifications
 sleep 0.5s
 valgrindSleep 2
 
 
-#Subscribe for 5 seconds (7 if VALGRIND)
+# Subscribe for 5 seconds (7 if VALGRIND)
 sleepTime=PT5S
 if [ "$VALGRIND" == 1 ]
 then
   sleepTime=PT7S
 fi
 
+
 #INVALID_XML
-url="/v1/subscribeContext"
+echo "02. Subscribe to OfficeRoom/Room ONTIMEINTERVAL"
+echo "==============================================="
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>OfficeRoom</id>
-        </entityId>
+    <entityId type="Room" isPattern="false">
+      <id>OfficeRoom</id>
+    </entityId>
   </entityIdList>
   <attributeList>
-        <attribute>temperature</attribute>
+    <attribute>temperature</attribute>
   </attributeList>
   <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
   <duration>'${sleepTime}'</duration>
   <notifyConditions>
-        <notifyCondition>
-          <type>ONTIMEINTERVAL</type>
-          <condValueList>
-                <condValue>PT2S</condValue>
-          </condValueList>          
-        </notifyCondition>
+    <notifyCondition>
+      <type>ONTIMEINTERVAL</type>
+      <condValueList>
+        <condValue>PT2S</condValue>
+      </condValueList>          
+    </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+echo
+echo
 
-echo "2: ++++++++++++++++++++"
 
-#Sleep 10 seconds. Only 3 subscriptions arrive (at time 0, 2 and 4) as subscription expires at time=5s
+# Sleep 10 seconds. Only 3 subscriptions arrive (at time 0, 2 and 4) as subscription expires at time=5s
+echo "03. Sleep 10 seconds and then dump the accumulator"
+echo "=================================================="
 sleep 10s
 accumulatorDump
 
 
 --REGEXPECT--
+01. Create OfficeRoom/Room/temperature
+======================================
 HTTP/1.1 200 OK
 Content-Length: 640
 Content-Type: application/xml
@@ -127,7 +143,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-1: ++++++++++++++++++++
+
+
+02. Subscribe to OfficeRoom/Room ONTIMEINTERVAL
+===============================================
 HTTP/1.1 200 OK
 Content-Length: 192
 Content-Type: application/xml
@@ -140,7 +159,10 @@ Date: REGEX(.*)
     <duration>REGEX((PT5S|PT7S))</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-2: ++++++++++++++++++++
+
+
+03. Sleep 10 seconds and then dump the accumulator
+==================================================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 737
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
