@@ -36,6 +36,29 @@
 
 /* ****************************************************************************
 *
+* NotifyCondition::NotifyCondition - 
+*/
+NotifyCondition::NotifyCondition()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* NotifyCondition::NotifyCondition - 
+*/
+NotifyCondition::NotifyCondition(NotifyCondition* ncP)
+{
+  type = ncP->type;
+  condValueList.fill(ncP->condValueList);
+  restriction.set(ncP->restriction.get());
+}
+
+
+
+/* ****************************************************************************
+*
 * NotifyCondition::render -
 */
 std::string NotifyCondition::render(Format format, const std::string& indent, bool notLastInVector)

@@ -39,6 +39,7 @@
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsiNotify/Notifier.h"
+#include "cache/SubscriptionCache.h"
 
 #include "unittest.h"
 
@@ -109,6 +110,7 @@ int main(int argC, char** argV)
   LM_M(("Init tests"));
   orionInit(exitFunction, orionUnitTestVersion, SemReadWriteOp, false);
   setupDatabase();
+  //subscriptionCacheInit(DBPREFIX);
 
   LM_M(("Run all tests"));
   ::testing::InitGoogleMock(&argC, argV);

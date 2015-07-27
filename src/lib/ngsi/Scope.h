@@ -70,7 +70,7 @@ typedef struct Scope
   orion::Polygon      polygon;
 
   Scope();
-  Scope(const std::string& _type, const std::string& _value);
+  Scope(const std::string& _type, const std::string& _value, const std::string& _oper = "");
 
   std::string render(Format format, const std::string& indent, bool notLastInVector);
   void        present(const std::string& indent, int ix);

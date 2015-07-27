@@ -42,7 +42,6 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 {
   std::string answer;
 
-  LM_M(("KZ: requestType: %d", requestType));
   switch (requestType)
   {
   case EntitiesRequest:

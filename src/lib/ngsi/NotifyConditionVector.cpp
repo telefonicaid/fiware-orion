@@ -151,3 +151,18 @@ void NotifyConditionVector::release(void)
 
   vec.clear();
 }
+
+
+
+/* ****************************************************************************
+*
+* NotifyConditionVector::fill - 
+*/
+void NotifyConditionVector::fill(NotifyConditionVector& nv)
+{
+  for (unsigned int ncIx = 0; ncIx < nv.size(); ++ncIx)
+  {
+    NotifyCondition* ncP = new NotifyCondition(nv[ncIx]);
+    push_back(ncP);
+  }
+}

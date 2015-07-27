@@ -53,28 +53,28 @@ status_codes = {'OK': 200,
                 'Internal Server Error': 500}
 
 
-# ------------- base.feature -----------------------------------------
+# ------------- general_operations.feature -----------------------------------------
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
 
 
-@step(u'send a base request')
+@step(u'send a API entry point request')
 def send_a_base_request(context):
     """
-    send a base request
+    send a API entry point request
     :param context:
     """
     global cb, resp
-    __logger__.debug("Sending a base request: /v2 ...")
+    __logger__.debug("Sending a API entry point request: /v2 ...")
     properties_class = Properties()
     props = properties_class.read_properties()[CONTEXT_BROKER_ENV]
     cb = CB(protocol=props["CB_PROTOCOL"], host=props["CB_HOST"], port=props["CB_PORT"])
     resp = cb.get_base_request()
-    __logger__.info("...Sent a base request: /v2 correctly")
+    __logger__.info("...Sent a API entry point request: /v2 correctly")
 
 
 @step(u'send a version request')
-def send_a_base_request(context):
+def send_a_version_request(context):
     """
     send a version request
     :param context:
@@ -89,9 +89,9 @@ def send_a_base_request(context):
 
 
 @step(u'send a statistics request')
-def send_a_base_request(context):
+def send_a_statistics_request(context):
     """
-    send a version request
+    send a statistics request
     :param context:
     """
     global cb, resp, props_cb_env
@@ -171,30 +171,76 @@ def verify_that_receive_an_http_code(context, http_code):
     __logger__.info("...Verified that http code returned is %s" % http_code)
 
 
-@step(u'verify main paths')
-def verify_main_paths(context):
+@step(u'verify "([^"]*)" url with "([^"]*)" value in response')
+def verify_entry_point(context, url, value):
     """
-    verify main paths
+    verify API entry point response.
+         Ex:
+            {
+                "entities_url":"/v2/entities",
+                "types_url":"/v2/types",
+                "subscriptions_url":"/v2/subscriptions",
+                "registrations_url":"/v2/registrations"
+            }
     :param context:
+    :param url:
+    :param value:
     """
     global resp
-    __logger__.debug("Verifying main paths...")
-    ngsi = NGSI()
-    ngsi.verify_main_paths(resp)
-    __logger__.info("...Verified that main paths are correct")
+    __logger__.debug("Verifying url in API entry point response...")
+    resp_dict = convert_str_to_dict(resp.text, "JSON")
+    assert resp_dict[url] == value, " ERROR - in \"%s\" url with  \"$s\" value " % (url, value)
+    __logger__.info("...Verified url in API entry point response")
 
 
-@step(u'verify statistics')
-def verify_main_paths(context):
+@step(u'verify statistics "([^"]*)" field does exists')
+def verify_stat_fields(context, field):
     """
-    verify statistics
+    verify statistics fields in response.
+    Ex:
+            {
+              "orion" : {
+                    "xmlRequests" : "5",
+                    "versionRequests" : "1",
+                    "statisticsRequests" : "2",
+                    "uptime_in_secs" : "364",
+                    "measuring_interval_in_secs" : "364"
+              }
+            }
     :param context:
+    :param field: field to verify if it does exists
     """
     global resp
-    __logger__.debug("Verifying statistics fields...")
-    ngsi = NGSI()
-    ngsi.verify_statistics(resp)
-    __logger__.info("...Verified that statistics fields are correct")
+    __logger__.debug("Verifying statistics field: %s does exists..." % field)
+    resp_dict = convert_str_to_dict(resp.text, "JSON")
+    assert "orion" in resp_dict, "ERROR - orion field does no exist in statistics response"
+    assert field in resp_dict["orion"], "ERROR - %s field does no exist in statistics response" % field
+    __logger__.info("...Verified that statistics field %s is correct" % field)
+
+@step(u'verify version "([^"]*)" field does exists')
+def verify_version_fields(context, field):
+    """
+    verify version fields in response.
+    Ex:
+            {
+              "orion" : {
+                  "version" : "0.23.0_20150722131636",
+                  "uptime" : "0 d, 0 h, 4 m, 46 s",
+                  "git_hash" : "3c0767f91997a25925229b836dc48bba0f4801ba",
+                  "compile_time" : "Wed Jul 22 13:18:54 CEST 2015",
+                  "compiled_by" : "develenv",
+                  "compiled_in" : "ci-fiware-01"
+              }
+            }
+    :param context:
+    :param field: field to verify if it does exists
+    """
+    global resp
+    __logger__.debug("Verifying version field: %s does exists..." % field)
+    resp_dict = convert_str_to_dict(resp.text, "JSON")
+    assert "orion" in resp_dict, "ERROR - orion field does no exist in version response"
+    assert field in resp_dict["orion"], "ERROR - %s field does no exist in version response" % field
+    __logger__.info("...Verified that version field %s is correct" % field)
 
 
 @step(u'verify if version is the expected')
@@ -231,7 +277,6 @@ def verify_that_receive_several_http_codes(context, http_code):
                                                                     str(i), str(status_codes[http_code]),
                                                                     str(resp_list[i].status_code))
         __logger__.debug(" -- status code \"%s\" is the expected in position: %s" % (http_code, str(i)))
-
     __logger__.info("...Verified that http code returned in all entities are %s" % http_code)
 
 
@@ -273,6 +318,10 @@ def verify_error_message(context):
     verify error response
     :param context: parameters to evaluate
     """
-    global resp_list
+    global cb, resp_list
+    __logger__.debug("Verifying error message in several entities...")
+    entities_context = cb.get_entity_context()
     ngsi = NGSI()
-    ngsi.verify_error_response(context, resp_list)
+    for i in range(entities_context["entities_number"]):
+        ngsi.verify_error_response(context, resp_list[i])
+    __logger__.info("...Verified that error message in all entities ")

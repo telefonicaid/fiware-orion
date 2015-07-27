@@ -1,0 +1,338 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+notifyFormat_ngsi10
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 0 IPv4 -mutexTimeStat
+accumulatorStart
+
+--SHELL--
+
+#
+# 01. Subscribe to E1/A1 (no pattern)
+# 02. Subscribe to E2.*/A1
+# 03. Subscribe to E3.*/A1
+# 04. Statistics
+# 05. Remove first subscription (uncached SUB1)
+# 06. Statistics
+# 07. Remove second subscription (cached SUB2)
+# 08. Statistics
+#
+
+echo "01. Subscribe to E1/A1 (no pattern)"
+echo "==================================="
+payload='{
+  "entities": [
+    {
+        "id":   "E1",
+        "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ],
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "duration": "P1M",
+  "throttling": "PT1S",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A1"
+        ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB1=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
+echo
+echo
+
+
+echo "02. Subscribe to E2.*/A1"
+echo "========================"
+payload='{
+  "entities": [
+    {
+        "id":   "E2.*",
+        "isPattern": "true",
+        "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ],
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "duration": "P1M",
+  "throttling": "PT1S",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A1"
+        ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB2=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
+echo
+echo
+
+
+echo "03. Subscribe to E3.*/A1"
+echo "========================"
+payload='{
+  "entities": [
+    {
+        "id":   "E3.*",
+        "isPattern": "true",
+        "type": "T1"
+    }
+  ],
+  "attributes": [
+    "A1"
+  ],
+  "reference": "http://localhost:'${LISTENER_PORT}'/notify",
+  "duration": "P1M",
+  "throttling": "PT1S",
+  "notifyConditions": [
+    {
+        "type": "ONCHANGE",
+        "condValues": [
+            "A1"
+        ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json
+SUB3=$(echo "$_response" | grep subscriptionId | awk -F\" '{ print $4 }')
+echo
+echo
+
+
+echo "04. Statistics"
+echo "=============="
+orionCurl --url /statistics --json
+echo
+echo
+
+
+echo "05. Remove first subscription (uncached SUB1)"
+echo "============================================="
+payload='
+{
+  "subscriptionId": "'$SUB1'"
+}'
+orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Statistics"
+echo "=============="
+orionCurl --url /statistics --json
+echo
+echo
+
+
+echo "07. Remove second subscription (cached SUB2)"
+echo "============================================"
+payload='
+{
+  "subscriptionId": "'$SUB2'"
+}'
+orionCurl --url /v1/unsubscribeContext --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Statistics"
+echo "=============="
+orionCurl --url /statistics --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Subscribe to E1/A1 (no pattern)
+===================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M", 
+        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "throttling": "PT1S"
+    }
+}
+
+
+02. Subscribe to E2.*/A1
+========================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M", 
+        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "throttling": "PT1S"
+    }
+}
+
+
+03. Subscribe to E3.*/A1
+========================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M", 
+        "subscriptionId": "REGEX([0-9a-f]{24})", 
+        "throttling": "PT1S"
+    }
+}
+
+
+04. Statistics
+==============
+HTTP/1.1 200 OK
+Content-Length: 459
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
+        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
+        "jsonRequests": "4", 
+        "measuring_interval_in_secs": "REGEX(\d)", 
+        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
+        "statisticsRequests": "1", 
+        "subCacheEntries": "2", 
+        "subCacheMutexWaitingTime": "REGEX(\d+.\d+)", 
+        "subscriptions": "3", 
+        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
+        "uptime_in_secs": "REGEX(\d)"
+    }
+}
+
+
+05. Remove first subscription (uncached SUB1)
+=============================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }, 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+06. Statistics
+==============
+HTTP/1.1 200 OK
+Content-Length: 488
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
+        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
+        "jsonRequests": "6", 
+        "measuring_interval_in_secs": "REGEX(\d)", 
+        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
+        "statisticsRequests": "2", 
+        "subCacheEntries": "2", 
+        "subCacheMutexWaitingTime": "REGEX(\d+.\d+)", 
+        "subscriptions": "3", 
+        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
+        "unsubscriptions": "1", 
+        "uptime_in_secs": "REGEX(\d)"
+    }
+}
+
+
+07. Remove second subscription (cached SUB2)
+============================================
+HTTP/1.1 200 OK
+Content-Length: 122
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "statusCode": {
+        "code": "200", 
+        "reasonPhrase": "OK"
+    }, 
+    "subscriptionId": "REGEX([0-9a-f]{24})"
+}
+
+
+08. Statistics
+==============
+HTTP/1.1 200 OK
+Content-Length: 518
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
+        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
+        "jsonRequests": "8", 
+        "measuring_interval_in_secs": "REGEX(\d)", 
+        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
+        "statisticsRequests": "3", 
+        "subCacheEntries": "1", 
+        "subCacheMutexWaitingTime": "REGEX(\d+.\d+)", 
+        "subCacheRemovals": "1", 
+        "subscriptions": "3", 
+        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
+        "unsubscriptions": "2", 
+        "uptime_in_secs": "REGEX(\d)"
+    }
+}
+
+
+--TEARDOWN--
+brokerStop CB
+accumulatorStop
+dbDrop CB
