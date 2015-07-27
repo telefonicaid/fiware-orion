@@ -1955,7 +1955,7 @@ void searchContextProviders
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
 */
-void processContextElement
+int processContextElement
 (
   ContextElement*                      ceP,
   UpdateContextResponse*               responseP,
@@ -1976,11 +1976,11 @@ void processContextElement
   if (isTrue(enP->isPattern))
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
-    return;
+    return 0;  // Error already in responseP
   }
 
   /* Check that UPDATE or APPEND is not used with attributes with empty value */
-  if (strcasecmp(action.c_str(), "update") == 0 || strcasecmp(action.c_str(), "append") == 0)
+  if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "appendonly") == 0))
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -1996,7 +1996,7 @@ void processContextElement
                                   " - offending attribute: " + aP->toString() +
                                   " - empty attribute not allowed in APPEND or UPDATE");
         LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
-        return;
+        return 0;   // Erroralreadyin responseP
       }
     }
   }
@@ -2084,7 +2084,7 @@ void processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
-    return;
+    return 0;  // Error already in responseP
   }
   catch (...)
   {
@@ -2095,7 +2095,7 @@ void processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + "generic");
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
-    return;
+    return 0;  // Error already in responseP
   }
 
 
@@ -2110,6 +2110,17 @@ void processContextElement
 
   while (cursor->more())
   {
+    if (strcasecmp(action.c_str(), "appendonly") == 0)
+    {
+      //
+      // For the case of appendonly, no entity can be found.
+      // This directly indicates an error
+      //
+
+      LM_W(("KZ: Bad Input (entity already exists)"));
+      return 1;
+    }
+
     BSONObj r = cursor->next();
 
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -2356,6 +2367,7 @@ void processContextElement
   }
   LM_T(LmtServicePath, ("Docs found: %d", docs));
 
+
   /*
    * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()
    * before the query() to check this. However this would add a second interaction with MongoDB.
@@ -2374,7 +2386,7 @@ void processContextElement
     /* All the attributes existing in the request are added to the response with 'found' set to false
      * in the of UPDATE/DELETE and true in the case of APPEND
      */
-    bool foundValue = (strcasecmp(action.c_str(), "append") == 0);
+    bool foundValue = (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "appendonly") == 0);
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -2397,7 +2409,7 @@ void processContextElement
       cerP->statusCode.fill(SccContextElementNotFound);
       responseP->contextElementResponseVector.push_back(cerP);
     }
-    else   /* APPEND */
+    else   /* APPEND or APPENDONLY */
     {
       std::string errReason, errDetail;
 
@@ -2426,7 +2438,7 @@ void processContextElement
           {
             cerP->statusCode.fill(SccReceiverInternalError, err);
             responseP->contextElementResponseVector.push_back(cerP);
-            return;
+            return 0;  // Error already in responseP
           }
         }
 
@@ -2436,4 +2448,6 @@ void processContextElement
       responseP->contextElementResponseVector.push_back(cerP);
     }
   }
+
+  return 0;  // Response in responseP
 }

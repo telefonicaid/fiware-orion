@@ -36,13 +36,13 @@ using namespace mongo;
 * processContextElement -
 *
 */
-extern void processContextElement(ContextElement*                      ceP,
-                                  UpdateContextResponse*               responseP,
-                                  const std::string&                   action,
-                                  const std::string&                   tenant,
-                                  const std::vector<std::string>&      servicePath,
-                                  std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
-                                  const std::string&                   xauthToken,
-                                  const std::string&                   caller = "");
+extern int processContextElement(ContextElement*                      ceP,
+                                 UpdateContextResponse*               responseP,
+                                 const std::string&                   action,
+                                 const std::string&                   tenant,
+                                 const std::vector<std::string>&      servicePath,
+                                 std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
+                                 const std::string&                   xauthToken,
+                                 const std::string&                   caller = "");
 
 #endif

@@ -352,16 +352,15 @@ PaArgument paArgs[] =
 
 
 #define IENT                EntityRequest
+#define IENTA               PostAttributes
 #define IENT_COMPS_V2       3, { "v2", "entities", "*" }
 #define IENT_COMPS_WORD     ""
+
 
 #define IENTATTR                EntityAttributeRequest
 #define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
 #define IENTATTR_COMPS_WORD     ""
 
-#define IENTA                PostAttributes
-#define IENTA_COMPS_V2       3, { "v2", "entities", "*" }
-#define IENTA_COMPS_WORD     ""
 
 //
 // NGSI9
@@ -617,7 +616,7 @@ PaArgument paArgs[] =
   { "*",      ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       badVerbGetPostOnly         }, \
                                                                                                    \
   { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
-  { "POST",   IENTA,     IENTA_COMPS_V2,       IENTA_COMPS_WORD,     postAttributes             }, \
+  { "POST",   IENTA,     IENT_COMPS_V2,        IENT_COMPS_WORD,      postAttributes             }, \
   { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetOnly             }, \
                                                                                                    \
   { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
