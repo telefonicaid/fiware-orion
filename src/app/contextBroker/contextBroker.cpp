@@ -621,7 +621,7 @@ PaArgument paArgs[] =
                                                                                                    \
   { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
   { "POST",   IENTA,     IENT_COMPS_V2,        IENT_COMPS_WORD,      postAttributes             }, \
-  { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetOnly             }, \
+  { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetPostOnly         }, \
                                                                                                    \
   { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
   { "*",      IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  badVerbGetOnly             }

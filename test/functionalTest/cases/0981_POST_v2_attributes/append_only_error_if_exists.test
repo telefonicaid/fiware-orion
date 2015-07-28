@@ -36,6 +36,7 @@ brokerStart CB
 # 04. Make sure it didn't work
 # 05. Now update E1, using POST /v2/entities/E1
 # 06. Make sure it worked
+# 07. Try some other verb
 #
 
 echo "01. Create E1"
@@ -79,6 +80,13 @@ echo
 echo "06. Make sure it worked"
 echo "======================="
 orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "07. Try some other verb"
+echo "======================="
+orionCurl --url /v2/entities/E1 --json -X PUT --payload "123"
 echo
 echo
 
@@ -149,6 +157,15 @@ Date: REGEX(.*)
 }
 
 
+07. Try some other verb
+=======================
+HTTP/1.1 405 Method Not Allowed
+Content-Length: 0
+Allow: POST, GET
+Date: REGEX(.*)
+
+
+
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB
