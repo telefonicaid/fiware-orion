@@ -111,6 +111,7 @@ typedef enum RequestType
   EntityAttributeRequest,
   EntityAttributeResponse,
   PostEntity,
+  PostAttributes,
   DeleteEntity,
 
   InvalidRequest = 100
