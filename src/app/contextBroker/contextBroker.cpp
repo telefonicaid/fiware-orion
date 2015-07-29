@@ -86,16 +86,12 @@
 #include "common/compileInfo.h"
 
 #include "orionTypes/EntityTypesResponse.h"
-
-#include "serviceRoutines/logTraceTreat.h"
-
 #include "ngsi/ParseData.h"
 #include "ngsiNotify/onTimeIntervalThread.h"
-
+#include "serviceRoutines/logTraceTreat.h"
 #include "serviceRoutines/getEntityTypes.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
 #include "serviceRoutines/getAllContextEntities.h"
-
 #include "serviceRoutines/versionTreat.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "serviceRoutines/exitTreat.h"
@@ -113,7 +109,6 @@
 #include "serviceRoutines/postUnsubscribeContext.h"
 #include "serviceRoutines/postNotifyContext.h"
 #include "serviceRoutines/postNotifyContextAvailability.h"
-
 #include "serviceRoutines/postSubscribeContextConvOp.h"
 #include "serviceRoutines/postSubscribeContextAvailabilityConvOp.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
@@ -128,7 +123,6 @@
 #include "serviceRoutines/postContextEntityTypeAttribute.h"
 #include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
 #include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
-
 #include "serviceRoutines/getIndividualContextEntity.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 #include "serviceRoutines/badVerbPostOnly.h"
@@ -164,7 +158,6 @@
 #include "serviceRoutines/postContextEntitiesByEntityIdAndType.h"
 #include "serviceRoutines/getEntityByIdAttributeByNameWithTypeAndId.h"
 #include "serviceRoutines/postEntityByIdAttributeByNameWithTypeAndId.h"
-
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
 #include "serviceRoutines/badVerbGetOnly.h"
@@ -180,11 +173,10 @@
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutinesV2/postAttributes.h"
 #include "serviceRoutinesV2/putEntity.h"
+#include "serviceRoutinesV2/deleteEntity.h"
 
 #include "contextBroker/version.h"
-
 #include "common/string.h"
-
 #include "cache/SubscriptionCache.h"
 
 
@@ -357,7 +349,6 @@ PaArgument paArgs[] =
 
 
 #define IENT                EntityRequest
-#define IENTA               PostAttributes
 #define IENT_COMPS_V2       3, { "v2", "entities", "*" }
 #define IENT_COMPS_WORD     ""
 
@@ -623,6 +614,7 @@ PaArgument paArgs[] =
   { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
   { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postAttributes             }, \
   { "PUT",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      putEntity                  }, \
+  { "DELETE", IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      deleteEntity               }, \
   { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbAllFour             }, \
                                                                                                    \
   { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
