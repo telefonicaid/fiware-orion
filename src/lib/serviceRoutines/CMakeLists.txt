@@ -61,6 +61,7 @@ putAvailabilitySubscriptionConvOp.cpp
 deleteAvailabilitySubscriptionConvOp.cpp
 badVerbPostOnly.cpp
 badVerbAllFour.cpp
+badVerbAllFive.cpp
 badVerbGetPostOnly.cpp
 badVerbGetPostDeleteOnly.cpp
 badVerbGetOnly.cpp
@@ -134,6 +135,7 @@ deleteIndividualContextEntity.h
 getNgsi10ContextEntityTypes.h
 badVerbPostOnly.h
 badVerbAllFour.h
+badVerbAllFive.h
 badVerbGetPostOnly.h
 badVerbGetPostDeleteOnly.h
 badVerbGetOnly.h

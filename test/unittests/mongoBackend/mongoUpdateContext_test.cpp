@@ -4345,8 +4345,8 @@ TEST(mongoUpdateContextRequest, updateEntityFails)
     EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
-    EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-    EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+    EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */

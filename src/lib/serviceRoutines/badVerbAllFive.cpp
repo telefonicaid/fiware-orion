@@ -25,37 +25,33 @@
 #include <string>
 #include <vector>
 
-#include "rest/ConnectionInfo.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
-#include "jsonParseV2/jsonRequestTreat.h"
-#include "jsonParseV2/parseEntity.h"
-#include "jsonParseV2/parseAttributes.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/restReply.h"
+#include "serviceRoutines/badVerbAllFive.h"
 
 
 
 /* ****************************************************************************
 *
-* jsonRequestTreat - 
+* badVerbAllFive - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
+std::string badVerbAllFive
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
-  std::string answer;
+  ciP->httpHeader.push_back("Allow");
+  ciP->httpHeaderValue.push_back("POST, GET, PUT, DELETE, PATCH");
+  ciP->httpStatusCode = SccBadVerb;
 
-  switch (requestType)
-  {
-  case EntitiesRequest:
-    answer = parseEntity(ciP, &parseDataP->ent.res);
-    break;
+  LM_W(("Bad Input (bad verb for url '%s', method '%s')", ciP->url.c_str(), ciP->method.c_str()));
 
-  case EntityRequest:
-    answer = parseAttributes(ciP, &parseDataP->ent.res);
-    break;
-
-  default:
-    answer = "Request Treat function not implemented";
-    break;
-  }
-  
-  return answer;
+  return "";
 }

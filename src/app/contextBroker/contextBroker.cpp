@@ -179,6 +179,7 @@
 #include "serviceRoutinesV2/getEntityAttribute.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutinesV2/postAttributes.h"
+#include "serviceRoutinesV2/putEntity.h"
 
 #include "contextBroker/version.h"
 
@@ -620,8 +621,9 @@ PaArgument paArgs[] =
   { "*",      ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       badVerbGetPostOnly         }, \
                                                                                                    \
   { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
-  { "POST",   IENTA,     IENT_COMPS_V2,        IENT_COMPS_WORD,      postAttributes             }, \
-  { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetPostOnly         }, \
+  { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postAttributes             }, \
+  { "PUT",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      putEntity                  }, \
+  { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbAllFour             }, \
                                                                                                    \
   { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
   { "*",      IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  badVerbGetOnly             }

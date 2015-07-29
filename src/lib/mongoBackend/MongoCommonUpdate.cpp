@@ -1972,6 +1972,33 @@ void searchContextProviders
 }
 
 
+
+/* ****************************************************************************
+*
+* forwardsPending - 
+*/
+static bool forwardsPending(UpdateContextResponse* upcrsP)
+{
+  for (unsigned int cerIx = 0; cerIx < upcrsP->contextElementResponseVector.size(); ++cerIx)
+  {
+    ContextElementResponse* cerP  = upcrsP->contextElementResponseVector[cerIx];
+
+    for (unsigned int aIx = 0 ; aIx < cerP->contextElement.contextAttributeVector.size(); ++aIx)
+    {
+      ContextAttribute* aP  = cerP->contextElement.contextAttributeVector[aIx];
+      
+      if (aP->providingApplication.get() != "")
+      {
+        return true;
+      }      
+    }
+  }
+
+  return false;
+}
+
+
+
 /* ****************************************************************************
 *
 * processContextElement -
@@ -2428,6 +2455,14 @@ int processContextElement
       searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
       cerP->statusCode.fill(SccOk);
       responseP->contextElementResponseVector.push_back(cerP);
+
+      //
+      // If no context providers found, then the UPDATE was simply for a non-found entity and an error should be returned
+      //
+      if (forwardsPending(responseP) == false)
+      {
+        cerP->statusCode.fill(SccContextElementNotFound);
+      }
     }
     else if (strcasecmp(action.c_str(), "delete") == 0)
     {
