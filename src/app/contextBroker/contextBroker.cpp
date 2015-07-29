@@ -186,6 +186,8 @@
 
 #include "common/string.h"
 
+#include "cache/SubscriptionCache.h"
+
 
 
 /* ****************************************************************************
@@ -228,6 +230,7 @@ char            reqMutexPolicy[16];
 bool            mutexTimeStat;
 int             writeConcern;
 unsigned        cprForwardLimit;
+int             subCacheInterval;
 
 
 
@@ -268,12 +271,13 @@ unsigned        cprForwardLimit;
 #define MUTEX_TIMESTAT_DESC "measure total semaphore waiting time"
 #define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
+#define SUB_CACHE_IVAL_DESC "interval in seconds between calls to Subscription Cache refresh"
 
 
 
 /* ****************************************************************************
 *
-* parse arguments
+* Parse arguments
 */
 PaArgument paArgs[] =
 {
@@ -310,8 +314,8 @@ PaArgument paArgs[] =
   { "-writeConcern",  &writeConcern, "WRITE_CONCERN",  PaInt,    PaOpt, 1,          0,      1,     WRITE_CONCERN_DESC },
 
   { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
-
   { "-cprForwardLimit", &cprForwardLimit, "CPR_FORWARD_LIMIT", PaUInt, PaOpt, 1000, 0, UINT_MAX, CPR_FORWARD_LIMIT_DESC},
+  { "-subCacheIval",  &subCacheInterval, "SUBCACHE_IVAL", PaInt, PaOpt, 10,         0,     3600,  SUB_CACHE_IVAL_DESC },
 
 
   PA_END_OF_ARGS
@@ -357,13 +361,11 @@ PaArgument paArgs[] =
 #define IENT_COMPS_V2       3, { "v2", "entities", "*" }
 #define IENT_COMPS_WORD     ""
 
+
 #define IENTATTR                EntityAttributeRequest
 #define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
 #define IENTATTR_COMPS_WORD     ""
 
-#define IENTA                PostAttributes
-#define IENTA_COMPS_V2       3, { "v2", "entities", "*" }
-#define IENTA_COMPS_WORD     ""
 
 //
 // NGSI9
@@ -620,7 +622,7 @@ PaArgument paArgs[] =
                                                                                                    \
   { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
   { "DELETE", IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      deleteEntity               }, \
-  { "POST",   IENTA,     IENTA_COMPS_V2,       IENTA_COMPS_WORD,     postAttributes             }, \
+  { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postAttributes             }, \
   { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetPostDeleteOnly   }, \
                                                                                                    \
   { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
@@ -1191,6 +1193,9 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
   /* Set notifier object (singleton) */
   setNotifier(new Notifier());
 
+  /* Create the subscription cache object */
+  subscriptionCacheInit(dbName);
+
   /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
   if (!ngsi9Only)
   {
@@ -1561,6 +1566,14 @@ int main(int argC, char* argV[])
 
   while (1)
   {
-    sleep(10);
+    if (subCacheInterval != 0)
+    {
+      sleep(subCacheInterval);
+      // orion::subCache->refresh();
+    }
+    else
+    {
+      sleep(60);
+    }
   }
 }

@@ -138,3 +138,17 @@ std::string ConditionValueList::get(int ix)
 {
   return vec[ix];
 }
+
+
+
+/* ****************************************************************************
+*
+* ConditionValueList::fill - 
+*/
+void ConditionValueList::fill(ConditionValueList& list)
+{
+  for (unsigned int cvIx = 0; cvIx < list.size(); ++cvIx)
+  {
+    push_back(list[cvIx]);
+  }
+}

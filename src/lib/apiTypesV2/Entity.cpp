@@ -73,14 +73,12 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
     {
       out += ",";
       out += attributeVector.toJson(true);
-      LM_M(("out == %s", out.c_str()));
     }
 
     out += "}";
 
     if (comma)
     {
-      LM_M(("Adding a comma"));
       out += ",";
     }
 

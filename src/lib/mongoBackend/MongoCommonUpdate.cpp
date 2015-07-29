@@ -37,6 +37,7 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
+#include "cache/SubscriptionCache.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -1032,8 +1033,10 @@ static bool addTriggeredSubscriptions
   std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
   BSONObj     spBson       = fromjson(inRegex);
 
-  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
-  BSONObj queryNoPattern = BSON(
+  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type. Only
+   * subscriptions for no pattern entities are queried, subscriptions for pattern entities are searched
+   * in the cache */
+  BSONObj query = BSON(
                 entIdQ << entityId <<
                 "$or" << BSON_ARRAY(
                     BSON(entTypeQ << entityType) <<
@@ -1043,39 +1046,6 @@ static bool addTriggeredSubscriptions
                 condValueQ << attr <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
                 CSUB_SERVICE_PATH << spBson);
-
-  /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
-   * way to do a "reverse regex" query in MongoDB (see
-   * http://stackoverflow.com/questions/15966991/mongodb-reverse-regex/15989520).
-   * Note that although we are using a isPattern=true in the MongoDB query besides $where, we
-   * also need to check that in the if statement in the JavaScript function given that a given
-   * sub document could include both isPattern=true and isPattern=false documents */
-  std::string function = std::string("function()") +
-         "{" +
-            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
-                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
-                    "return true; " +
-                "}" +
-            "}" +
-            "return false; " +
-         "}";
-  LM_T(LmtMongo, ("JS function: %s", function.c_str()));
-
-  BSONObjBuilder  queryPattern;
-
-  queryPattern.append(entPatternQ, "true");
-  queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
-  queryPattern.append(condValueQ, attr);
-  queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  queryPattern.append(CSUB_SERVICE_PATH, spBson);
-  queryPattern.appendCode("$where", function);
-
-  // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
-  BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
                   getSubscribeContextCollectionName(tenant).c_str(),
@@ -1153,10 +1123,51 @@ static bool addTriggeredSubscriptions
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
-          subToAttributeList(sub));
+          subToAttributeList(sub), NULL);
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
+  }
+
+
+  //
+  // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
+  //
+  std::vector<Subscription*> subVec;
+  subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
+
+  int now = getCurrentTime();
+  for (unsigned int ix = 0; ix < subVec.size(); ++ix)
+  {
+    Subscription* sP = subVec[ix];
+
+    sP->pendingNotifications += 1;
+    // Outdated subscriptions are skipped
+    if (sP->expirationTime < now)
+    {
+      continue;
+    }
+
+    AttributeList aList;
+
+    aList.fill(sP->attributes);
+
+    // Throttling
+    if ((sP->throttling != -1) && (sP->lastNotificationTime != -1))
+    {
+      if ((now - sP->lastNotificationTime) < sP->throttling)
+      {
+        continue;
+      }
+    }
+
+    TriggeredSubscription* sub = new TriggeredSubscription((long long) sP->throttling,
+                                                           (long long) sP->lastNotificationTime,
+                                                           sP->format,
+                                                           sP->reference.get(),
+                                                           aList,
+                                                           sP);
+    subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
   }
 
   return true;
@@ -1180,7 +1191,7 @@ static bool processSubscriptions
 {
   DBClientBase* connection = NULL;
 
-  /* For each one of the subscriptions in the map, send notification */
+  /* For each subscription in the map, send notification */
   bool ret = true;
   err = "";
 
@@ -1223,6 +1234,20 @@ static bool processSubscriptions
       BSONObj query = BSON("_id" << OID(mapSubId));
       BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) <<
                             "$inc" << BSON(CSUB_COUNT << 1));
+
+
+      //
+      // Saving lastNotificationTime for cached subscription
+      //
+      if (trigs->cacheSubReference != NULL)
+      {
+        trigs->cacheSubReference->pendingNotifications -= 1;
+
+        if (trigs->cacheSubReference->pendingNotifications == 0)
+        {
+          trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
+        }
+      }
 
       try
       {
@@ -1955,7 +1980,7 @@ void searchContextProviders
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
 */
-void processContextElement
+int processContextElement
 (
   ContextElement*                      ceP,
   UpdateContextResponse*               responseP,
@@ -1976,11 +2001,11 @@ void processContextElement
   if (isTrue(enP->isPattern))
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
-    return;
+    return 0;  // Error already in responseP
   }
 
   /* Check that UPDATE or APPEND is not used with attributes with empty value */
-  if (strcasecmp(action.c_str(), "update") == 0 || strcasecmp(action.c_str(), "append") == 0)
+  if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "appendonly") == 0))
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -1996,7 +2021,7 @@ void processContextElement
                                   " - offending attribute: " + aP->toString() +
                                   " - empty attribute not allowed in APPEND or UPDATE");
         LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
-        return;
+        return 0;   // Erroralreadyin responseP
       }
     }
   }
@@ -2084,7 +2109,7 @@ void processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
-    return;
+    return 0;  // Error already in responseP
   }
   catch (...)
   {
@@ -2095,7 +2120,7 @@ void processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + "generic");
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
-    return;
+    return 0;  // Error already in responseP
   }
 
 
@@ -2110,6 +2135,17 @@ void processContextElement
 
   while (cursor->more())
   {
+    if (strcasecmp(action.c_str(), "appendonly") == 0)
+    {
+      //
+      // For the case of appendonly, no entity can be found.
+      // This directly indicates an error
+      //
+
+      LM_W(("KZ: Bad Input (entity already exists)"));
+      return 1;
+    }
+
     BSONObj r = cursor->next();
 
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -2356,6 +2392,7 @@ void processContextElement
   }
   LM_T(LmtServicePath, ("Docs found: %d", docs));
 
+
   /*
    * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()
    * before the query() to check this. However this would add a second interaction with MongoDB.
@@ -2374,7 +2411,7 @@ void processContextElement
     /* All the attributes existing in the request are added to the response with 'found' set to false
      * in the of UPDATE/DELETE and true in the case of APPEND
      */
-    bool foundValue = (strcasecmp(action.c_str(), "append") == 0);
+    bool foundValue = (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "appendonly") == 0);
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -2397,7 +2434,7 @@ void processContextElement
       cerP->statusCode.fill(SccContextElementNotFound);
       responseP->contextElementResponseVector.push_back(cerP);
     }
-    else   /* APPEND */
+    else   /* APPEND or APPENDONLY */
     {
       std::string errReason, errDetail;
 
@@ -2426,7 +2463,7 @@ void processContextElement
           {
             cerP->statusCode.fill(SccReceiverInternalError, err);
             responseP->contextElementResponseVector.push_back(cerP);
-            return;
+            return 0;  // Error already in responseP
           }
         }
 
@@ -2436,4 +2473,6 @@ void processContextElement
       responseP->contextElementResponseVector.push_back(cerP);
     }
   }
+
+  return 0;  // Response in responseP
 }
