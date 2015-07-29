@@ -121,9 +121,11 @@ Feature: feature name...
 ### Tests Suites Coverage:
 
  - entities
-    * base
-    * create_entities
+    * general_operations - 16
+    * create_entities - 555
     * list_entities (pending)
+
+ -  alarms (pending)
 
 
 ### Tags
