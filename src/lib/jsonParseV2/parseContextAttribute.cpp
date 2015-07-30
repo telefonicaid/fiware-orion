@@ -118,7 +118,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       if (r != "OK")
       {
         LM_W(("Bad Input (error parsing Metadata)"));
-        return "json error in ContextAttributeObject::Metadata";
+        return "JSON Parse Error in ContextAttributeObject::Metadata";
       }
       LM_M(("Metadata OK"));
     }
@@ -198,9 +198,9 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
       LM_M(("KZ: Normal object parsed"));
       if (r != "OK")
       {
-        LM_W(("Bad Input (json error in ContextAttribute::Object"));
+        LM_W(("Bad Input (JSON parse error in ContextAttribute::Object"));
         ciP->httpStatusCode = SccBadRequest;
-        return "r";
+        return r;
       }
     }
     else
