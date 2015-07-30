@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "common/tag.h"
+#include "parse/forbiddenChars.h"
 #include "apiTypesV2/Entity.h"
 #include "ngsi10/QueryContextResponse.h"
 
@@ -96,12 +97,12 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 */
 std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 {
-  if (id == "")
-  {
-    return "No Entity ID";
-  }
+  if (id == "")                           { return "No Entity ID";                           }
+  if (forbiddenChars(id.c_str()))         { return "Invalid characters in entity id";        }
+  if (forbiddenChars(type.c_str()))       { return "Invalid characters in entity type";      }
+  if (forbiddenChars(isPattern.c_str()))  { return "Invalid characters in entity isPattern"; }
 
-  return "OK";
+  return attributeVector.check(requestType, JSON, "", "", 0);
 }
 
 

@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "orionTypes/OrionValueType.h"
+#include "parse/forbiddenChars.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -580,6 +581,9 @@ std::string ContextAttribute::check
     return "missing attribute name";
   }
 
+  if (forbiddenChars(name.c_str()))  { return "Invalid characters in attribute name"; }
+  if (forbiddenChars(type.c_str()))  { return "Invalid characters in attribute type"; }
+
   if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
     // FIXME P9: Use CompoundValueNode::check here and stop calling it from where it is called right now.
@@ -587,7 +591,15 @@ std::string ContextAttribute::check
     return "OK";
   }
 
-  return "OK";
+  if (valueType == orion::ValueTypeString)
+  {
+    if (forbiddenChars(stringValue.c_str()))
+    {
+      return "Invalid characters in attribute value";
+    }
+  }
+
+  return metadataVector.check(requestType, format, indent + "  ", predetectedError, counter);
 }
 
 

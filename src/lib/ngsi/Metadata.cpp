@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "orionTypes/OrionValueType.h"
+#include "parse/forbiddenChars.h"
 #include "ngsi/Metadata.h"
 
 
@@ -169,10 +170,22 @@ std::string Metadata::check
     return "missing metadata name";
   }
 
-  if ((stringValue == "") && (type != "Association"))
+  if (forbiddenChars(name.c_str()))   { return "Invalid characters in metadata name";  }
+  if (forbiddenChars(type.c_str()))   { return "Invalid characters in metadata type";  }
+
+  if (valueType == orion::ValueTypeString)
   {
-    return "missing metadata value";
+    if (forbiddenChars(stringValue.c_str()))
+    {
+      return "Invalid characters in metadata value";
+    }
+
+    if ((stringValue == "") && (type != "Association"))
+    {
+      return "missing metadata value";
+    }
   }
+
 
   if (type == "Association")
   {
