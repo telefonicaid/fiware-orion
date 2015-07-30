@@ -97,7 +97,11 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 */
 std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 {
-  if (id == "")                           { return "No Entity ID";                           }
+  if ((requestType == EntitiesRequest) && (id == ""))
+  {
+    return "No Entity ID";
+  }
+
   if (forbiddenChars(id.c_str()))         { return "Invalid characters in entity id";        }
   if (forbiddenChars(type.c_str()))       { return "Invalid characters in entity type";      }
   if (forbiddenChars(isPattern.c_str()))  { return "Invalid characters in entity isPattern"; }
