@@ -333,7 +333,6 @@ void UpdateContextRequest::fill(const Entity* entP, const std::string& _updateAc
   contextElementVector.push_back(ceP);
   updateActionType.set(_updateActionType);
 
-  LM_M(("Presenting"));
   present("Before mongo: ");
 }
 

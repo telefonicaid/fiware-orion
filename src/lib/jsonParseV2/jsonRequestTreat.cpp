@@ -26,10 +26,12 @@
 #include <vector>
 
 #include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/parseEntity.h"
+#include "jsonParseV2/parseAttributes.h"
 
 
 
@@ -41,11 +43,34 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 {
   std::string answer;
 
-  LM_M(("KZ: requestType: %d", requestType));
   switch (requestType)
   {
   case EntitiesRequest:
     answer = parseEntity(ciP, &parseDataP->ent.res);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+
+    if ((answer = parseDataP->ent.res.check(ciP, EntitiesRequest)) != "OK")
+    {
+      OrionError error(SccBadRequest, "Parse Error (" + answer + ")");
+      return error.render(ciP, "");
+    }
+    break;
+
+  case EntityRequest:
+    answer = parseAttributes(ciP, &parseDataP->ent.res);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+
+    if ((answer = parseDataP->ent.res.check(ciP, EntityRequest)) != "OK")
+    {
+      OrionError error(SccBadRequest, "Parse Error (" + answer + ")");
+      return error.render(ciP, "");
+    }
     break;
 
   default:

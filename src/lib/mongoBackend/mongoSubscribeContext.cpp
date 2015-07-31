@@ -35,6 +35,9 @@
 #include "ngsi10/SubscribeContextResponse.h"
 #include "ngsi/StatusCode.h"
 #include "rest/uriParamNames.h"
+#include "cache/SubscriptionCache.h"
+
+
 
 /* ****************************************************************************
 *
@@ -174,6 +177,23 @@ HttpStatusCode mongoSubscribeContext
     }    
 
     reqSemGive(__FUNCTION__, "ngsi10 subscribe request", reqSemTaken);
+
+    
+    //
+    // Add the subscription to the subscription cache.
+    // But only if any of the entities in entityIdVector is pattern based.
+    //
+    for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
+    {
+      if (requestP->entityIdVector[ix]->isPattern == "true")
+      {
+        LM_M(("KZ: inserting sub in cache"));
+        subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oid.toString(), expiration, notifyFormat));
+        break;
+      }
+    }
+
+
 
     /* Fill the response element */
     responseP->subscribeResponse.duration = requestP->duration;

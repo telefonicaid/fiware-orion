@@ -118,7 +118,6 @@ static bool findAttr(std::vector<BSONElement> attrs, std::string name)
 */
 static void prepareDatabase(void)
 {
-
   /* Set database */
   setupDatabase();
 
@@ -216,9 +215,8 @@ static void prepareDatabase(void)
   connection->insert(REGISTRATIONS_COLL, reg2);
   connection->insert(REGISTRATIONS_COLL, reg3);
   connection->insert(REGISTRATIONS_COLL, reg4);
-
-
 }
+
 
 /* ****************************************************************************
 *
@@ -496,8 +494,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternAttrsAll)
   EXPECT_EQ("T3", RES_CER(0).entityId.type);
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);  
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
   EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
 
@@ -734,6 +732,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
+  res.present("TEST: ");
+
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
@@ -757,8 +757,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */
@@ -814,8 +814,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   EXPECT_EQ("T1", RES_CER(0).entityId.type);
   EXPECT_EQ("false", RES_CER(0).entityId.isPattern);
   EXPECT_EQ(0, RES_CER(0).providingApplicationList.size());
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
   EXPECT_EQ(0, RES_CER(0).contextAttributeVector.size());
 
@@ -823,8 +823,8 @@ TEST(mongoContextProvidersUpdateRequest, noPatternMultiEntity)
   EXPECT_EQ("T2", RES_CER(1).entityId.type);
   EXPECT_EQ("false", RES_CER(1).entityId.isPattern);
   EXPECT_EQ(0, RES_CER(1).providingApplicationList.size());
-  EXPECT_EQ(SccOk, RES_CER_STATUS(1).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(1).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(1).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(1).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(1).details);
   EXPECT_EQ(0, RES_CER(1).contextAttributeVector.size());
 
@@ -1900,8 +1900,8 @@ TEST(mongoContextProvidersUpdateRequest, notFoundUpdate)
   EXPECT_FALSE(RES_CER_ATTR(0, 0)->found);
   EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
 
-  EXPECT_EQ(SccOk, RES_CER_STATUS(0).code);
-  EXPECT_EQ("OK", RES_CER_STATUS(0).reasonPhrase);
+  EXPECT_EQ(SccContextElementNotFound, RES_CER_STATUS(0).code);
+  EXPECT_EQ("No context element found", RES_CER_STATUS(0).reasonPhrase);
   EXPECT_EQ("", RES_CER_STATUS(0).details);
 
   /* Release connection */

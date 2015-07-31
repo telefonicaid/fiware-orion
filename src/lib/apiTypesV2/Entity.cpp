@@ -26,6 +26,7 @@
 #include <vector>
 
 #include "common/tag.h"
+#include "parse/forbiddenChars.h"
 #include "apiTypesV2/Entity.h"
 #include "ngsi10/QueryContextResponse.h"
 
@@ -73,14 +74,12 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
     {
       out += ",";
       out += attributeVector.toJson(true);
-      LM_M(("out == %s", out.c_str()));
     }
 
     out += "}";
 
     if (comma)
     {
-      LM_M(("Adding a comma"));
       out += ",";
     }
 
@@ -98,12 +97,16 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
 */
 std::string Entity::check(ConnectionInfo* ciP, RequestType requestType)
 {
-  if (id == "")
+  if ((requestType == EntitiesRequest) && (id == ""))
   {
     return "No Entity ID";
   }
 
-  return "OK";
+  if (forbiddenChars(id.c_str()))         { return "Invalid characters in entity id";        }
+  if (forbiddenChars(type.c_str()))       { return "Invalid characters in entity type";      }
+  if (forbiddenChars(isPattern.c_str()))  { return "Invalid characters in entity isPattern"; }
+
+  return attributeVector.check(requestType, JSON, "", "", 0);
 }
 
 

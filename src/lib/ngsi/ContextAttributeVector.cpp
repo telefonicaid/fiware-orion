@@ -126,10 +126,8 @@ std::string ContextAttributeVector::toJson(bool isLastElement)
 
     ++renderedAttributes;
     out += vec[ix]->toJson(renderedAttributes == validAttributes);
-    LM_M(("*** out: %s", out.c_str()));
   }
 
-  LM_M(("*** out: %s", out.c_str()));
   return out;
 }
 

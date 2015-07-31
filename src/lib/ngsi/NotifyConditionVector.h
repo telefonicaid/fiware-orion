@@ -46,12 +46,23 @@ typedef struct NotifyConditionVector
   unsigned int      size(void);
   NotifyCondition*  get(int ix);
   void              release(void);
+  void              fill(NotifyConditionVector& nv);
 
   std::string       check(RequestType         requestType,
                           Format              format,
                           const std::string&  indent,
                           const std::string&  predetectedError,
                           int                 counter);
+
+  NotifyCondition* operator[](unsigned int ix)
+  {
+    if (ix < vec.size())
+    {
+      return vec[ix];
+    }
+
+    return NULL;
+  }
 } NotifyConditionVector;
 
 #endif  // SRC_LIB_NGSI_NOTIFYCONDITIONVECTOR_H_

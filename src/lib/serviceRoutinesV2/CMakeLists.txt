@@ -25,8 +25,11 @@ getEntities.cpp
 postEntities.cpp
 entryPointsTreat.cpp
 getEntity.cpp
+putEntity.cpp
 getEntityAttribute.cpp
 getEntityAttributeValue.cpp
+postAttributes.cpp
+deleteEntity.cpp
 )
 
 SET (HEADERS
@@ -34,8 +37,11 @@ getEntities.h
 postEntities.h
 entryPointsTreat.h
 getEntity.h
+putEntity.h
 getEntityAttribute.h
 getEntityAttributeValue.h
+postAttributes.h
+deleteEntity.h
 )
 
 

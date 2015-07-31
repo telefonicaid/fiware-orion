@@ -26,8 +26,9 @@
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
-#include "common/globals.h"
 
+#include "common/globals.h"
+#include "cache/SubscriptionCache.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
@@ -266,5 +267,17 @@ HttpStatusCode mongoUpdateContextSubscription
   responseP->subscribeResponse.subscriptionId = requestP->subscriptionId;
 
   reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
+
+
+  //
+  // Update the entry in the cache of subscriptions, if applicable
+  //
+  Subscription* subP = subCache->lookupById(tenant, servicePathV[0], requestP->subscriptionId.get());
+
+  if (subP != NULL)
+  {
+    subP->update(requestP);
+  }
+
   return SccOk;
 }
