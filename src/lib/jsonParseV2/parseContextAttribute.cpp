@@ -49,8 +49,6 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
-    LM_M(("parseContextAttributeObject: %s/%s", name.c_str(), type.c_str()));
-
     if (name == "type")
     {
       if (type != "String")
@@ -117,14 +115,12 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 
       if (r != "OK")
       {
-        LM_W(("Bad Input (error parsing Metadata)"));
-        return "JSON Parse Error in ContextAttributeObject::Metadata";
+        LM_W(("Bad Input (error parsing Metadata): %s", r.c_str()));
+        return r;
       }
-      LM_M(("Metadata OK"));
     }
   }
 
-  LM_M(("Done"));
   return "OK";
 }
 
@@ -136,14 +132,10 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 */
 std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP)
 {
-  LM_M(("KZ: In parseContextAttribute"));
-
   std::string name   = iter->name.GetString();
   std::string type   = jsonParseTypeNames[iter->value.GetType()];
   
   caP->name = name;
-
-  LM_M(("KZ: name: %s", caP->name.c_str()));
 
   if (type == "String")
   {

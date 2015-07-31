@@ -49,7 +49,7 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
       if (type != "String")
       {
         LM_E(("Bad Input (ContextAttribute::Metadata::type must be a String)"));
-        return "Parse Error";
+        return "invalid JSON type for attribute metadata type";
       }
 
       mP->type = iter->value.GetString();
@@ -76,20 +76,15 @@ static std::string parseMetadataObject(const Value& start, Metadata* mP)
         mP->valueType     = orion::ValueTypeBoolean;
         mP->boolValue     = false;
       }
-      else if (type == "Vector")
+      else
       {
-        LM_E(("Bad Input (ContextAttribute::Metadata::type cannot be a Vector)"));
-        return "Parse Error";
-      }
-      else if (type == "Object")
-      {
-        LM_E(("Bad Input (ContextAttribute::Metadata::type cannot be an Object)"));
-        return "Parse Error";
+        LM_E(("Bad Input (ContextAttribute::Metadata::type is '%s')", type.c_str()));
+        return "invalid JSON type for attribute metadata value";
       }
     }
     else
     {
-      return "Parse Error";
+      return "invalid JSON field for attribute metadata";
     }
   }
 
@@ -141,7 +136,7 @@ std::string parseMetadata(const Value& val, Metadata* mP)
   else
   {
     LM_W(("Bad Input (bad type for EntityId::ContextAttribute::Metadata)"));
-    return "Parse Error";
+    return "invalid JSON type for attribute metadata value";
   }
 
   return "OK";

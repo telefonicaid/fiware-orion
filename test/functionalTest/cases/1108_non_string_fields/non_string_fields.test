@@ -33,6 +33,9 @@ brokerStart CB
 # 01. POST /v2/entities with non-string in entity::id
 # 02. POST /v2/entities with non-string in entity::type
 # 03. POST /v2/entities with non-string in attribute::type
+# 04. POST /v2/entities with non-string in metadata::type
+# 05. POST /v2/entities with JSON object in metadata::value
+# 06. POST /v2/entities with invalid field in metadata
 #
 
 echo "01. POST /v2/entities with non-string in entity::id"
@@ -71,6 +74,42 @@ echo
 echo
 
 
+echo "04. POST /v2/entities with non-string in metadata::type"
+echo "======================================================="
+payload='{
+  "type": "room",
+  "id": "E1",
+  "temperature": { "type": "AT", "value": 25, "meta": { "type": false, "value": "STRING" } }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "05. POST /v2/entities with JSON object in metadata::value"
+echo "========================================================="
+payload='{
+  "type": "room",
+  "id": "E1",
+  "temperature": { "type": "AT", "value": 25, "meta": { "type": "md", "value": [ 1, 2, 3 ] } }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "06. POST /v2/entities with invalid field in metadata"
+echo "===================================================="
+payload='{
+  "type": "room",
+  "id": "E1",
+  "temperature": { "type": "AT", "value": 25, "meta": { "type": "md", "value": 3, "invalid": true } }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
 --REGEXPECT--
 01. POST /v2/entities with non-string in entity::id
 ===================================================
@@ -80,7 +119,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for entity id", 
+    "description": "invalid JSON type for entity id",
     "error": "ParseError"
 }
 
@@ -93,7 +132,7 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for entity type", 
+    "description": "invalid JSON type for entity type",
     "error": "ParseError"
 }
 
@@ -106,7 +145,46 @@ Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for attribute type", 
+    "description": "invalid JSON type for attribute type",
+    "error": "ParseError"
+}
+
+
+04. POST /v2/entities with non-string in metadata::type
+=======================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 84
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid JSON type for attribute metadata type",
+    "error": "ParseError"
+}
+
+
+05. POST /v2/entities with JSON object in metadata::value
+=========================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 85
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid JSON type for attribute metadata value",
+    "error": "ParseError"
+}
+
+
+06. POST /v2/entities with invalid field in metadata
+====================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 80
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid JSON field for attribute metadata",
     "error": "ParseError"
 }
 

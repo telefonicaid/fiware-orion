@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Compound Metadata Error Handling Test
+POST /v2/entities with invalid service-path
 
 --SHELL-INIT--
 dbInit CB
@@ -29,21 +29,16 @@ brokerStart CB
 
 --SHELL--
 
-echo "01. POST /v2/entities with Compound Metadata"
-echo "============================================"
+#
+# 05. POST /v2/entities with JSON object in metadata::value
+#
+
+echo "05. POST /v2/entities with JSON object in metadata::value"
+echo "========================================================="
 payload='{
   "type": "room",
-  "id": "room_0",
-  "attr":
-  {
-    "type": "date",
-    "value": 19,
-    "meta1":
-    {
-      "value": { "compound": "value" }
-    },
-    "meta2": [ 1, 2, 3 ]
-  }
+  "id": "E1",
+  "temperature": { "type": "AT", "value": 25, "meta": { "type": "md", "value": [ 1, 2, 3 ] } }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -51,15 +46,15 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities with Compound Metadata
-============================================
+05. POST /v2/entities with JSON object in metadata::value
+=========================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 85
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "invalid JSON type for attribute metadata value", 
+    "description": "invalid JSON type for attribute metadata value",
     "error": "ParseError"
 }
 
