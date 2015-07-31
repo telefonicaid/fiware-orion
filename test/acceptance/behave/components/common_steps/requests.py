@@ -58,6 +58,8 @@ status_codes = {'OK': 200,
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
 
+# --------------- general_operations ----------------------
+
 
 @step(u'send a API entry point request')
 def send_a_base_request(context):
@@ -103,6 +105,8 @@ def send_a_statistics_request(context):
     resp = cb.get_statistics_request()
     __logger__.info("..Sent a statistics request correctly")
 
+# ------------------ create_entities ------------------------------------------------
+
 
 @step(u'a definition of headers')
 def service_and_service_path(context):
@@ -146,8 +150,8 @@ def create_an_entity_and_attribute_with_special_values(context):
         Some cases are not parsed correctly to dict in python
     :param context: context variable (optional parameters)
     """
-    global cb, resp_list
-    resp_list = cb.create_entity_raw(context)
+    global cb, resp
+    resp = cb.create_entity_raw(context)
 
 
 @step(u'delete database in mongo')
@@ -174,8 +178,20 @@ def delete_database_in_mongo(context):
         m.disconnect()
         __logger__.debug("...Database \"%s\" is deleted" % database_name.lower())
 
+# ------------------------- list entities ----------------------------
 
-#  ------------------------------------- validations ----------------------------------------------
+
+@step(u'get all entities')
+def get_all_entities(context):
+    """
+    list all entities
+    """
+    global cb, resp
+    resp = cb.list_all_entities(context)
+
+# ------------------------------------- validations ----------------------------------------------
+
+
 @step(u'verify that receive an "([^"]*)" http code')
 def verify_that_receive_an_http_code(context, http_code):
     """
@@ -334,7 +350,20 @@ def entities_are_not_stored_in_mongo(context):
     __logger__.info(" >> verified entities are not stored in mongo")
 
 
-@step(u'verify error response')
+@step(u'verify an error response')
+def verify_error_message(context):
+    """
+    verify error response
+    :param context: parameters to evaluate
+    """
+    global cb, resp
+    __logger__.debug("Verifying error message ...")
+    ngsi = NGSI()
+    ngsi.verify_error_response(context, resp)
+    __logger__.info("...Verified that error message is the expected")
+
+
+@step(u'verify several error responses')
 def verify_error_message(context):
     """
     verify error response
@@ -344,7 +373,6 @@ def verify_error_message(context):
     __logger__.debug("Verifying error message in several entities...")
     entities_context = cb.get_entity_context()
     ngsi = NGSI()
-    __logger__.info("entities_context['entities_number'] after  : %s" % entities_context["entities_number"])
     for i in range(int(entities_context["entities_number"])):
         ngsi.verify_error_response(context, resp_list[i])
-    __logger__.info("...Verified that error message in all entities ")
+    __logger__.info("...Verified that error message is the expected in all entities ")

@@ -45,23 +45,23 @@ Feature: create entities requests (POST) in NGSI v2
   Check: verify mongo is installed successfully
 
   @happy_path
-  Scenario:  create a new entity in NGSI v2
+  Scenario:  create several entities in NGSI v2
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_happy_path  |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    When create "1" entities with "1" attributes
+    When create "3" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
       | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
+      | attributes_name  | random=5                |
       | attributes_value | 017-06-17T07:21:24.238Z |
       | attributes_type  | date                    |
       | metadatas_number | 2                       |
       | metadatas_name   | very_hot                |
       | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | metadatas_value  | hot                     |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
@@ -84,7 +84,7 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_type   | alarm     |
       | metadatas_value  | random=10 |
     Then verify that receive several "Request Entity Too Large" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                                              |
       | error       | Request Entity Too Large                           |
       | description | payload size: 1048647, max size supported: 1048576 |
@@ -103,7 +103,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     Then verify that receive several "Unsupported Media Type" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                                                                           |
       | error       | Unsupported Media Type                                                          |
       | description | Content-Type header not used, default application/octet-stream is not supported |
@@ -122,7 +122,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     Then verify that receive several "Unsupported Media Type" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                                      |
       | error       | Unsupported Media Type                     |
       | description | not supported content type: <content_type> |
@@ -192,7 +192,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                                                                                                                                         |
       | error       | BadRequest                                                                                                                                    |
       | description | tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters |
@@ -264,7 +264,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                                                    |
       | error       | BadRequest                                               |
       | description | a component of ServicePath contains an illegal character |
@@ -292,7 +292,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                                                                    |
       | error       | BadRequest                                                               |
       | description | Only /absolute/ Service Paths allowed [a service path must begin with /] |
@@ -316,7 +316,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                                  |
       | error       | BadRequest                             |
       | description | component-name too long in ServicePath |
@@ -340,7 +340,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                              |
       | error       | BadRequest                         |
       | description | too many components in ServicePath |
@@ -465,7 +465,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature     |
       | attributes_value | 34              |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -494,8 +494,8 @@ Feature: create entities requests (POST) in NGSI v2
       | entities_id      | "room2"       |
       | attributes_name  | "temperature" |
       | attributes_value | true          |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -524,8 +524,8 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | "temperature" |
       | attributes_value | true          |
       | attributes_type  | "nothing"     |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -600,7 +600,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature   |
       | attributes_value | 34            |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -629,8 +629,8 @@ Feature: create entities requests (POST) in NGSI v2
       | entities_id      | <entity_id>   |
       | attributes_name  | "temperature" |
       | attributes_value | true          |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -659,8 +659,8 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | "temperature" |
       | attributes_value | true          |
       | attributes_type  | "nothing"     |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -724,7 +724,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | <attributes_name> |
       | attributes_value | 34                |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -753,8 +753,8 @@ Feature: create entities requests (POST) in NGSI v2
       | entities_id      | <entity_id>       |
       | attributes_name  | <attributes_name> |
       | attributes_value | true              |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -797,7 +797,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  |        |
       | attributes_value | 34     |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                          |
       | error       | ParseError                     |
       | description | no 'name' for ContextAttribute |
@@ -854,7 +854,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature        |
       | attributes_value | <attributes_value> |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -883,7 +883,7 @@ Feature: create entities requests (POST) in NGSI v2
       | entities_id     | room2       |
       | attributes_name | temperature |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                                  |
       | error       | ParseError                             |
       | description | invalid JSON type for ContextAttribute |
@@ -902,7 +902,7 @@ Feature: create entities requests (POST) in NGSI v2
       | entities_id      | <entity_id>        |
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
-    Then verify that receive several "Created" http code
+    Then verify that receive an "Created" http code
     Examples:
       | entity_id | attributes_value                                                              |
       | "room1"   | true                                                                          |
@@ -937,7 +937,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
       | attributes_type  | "example"          |
-    Then verify that receive several "Created" http code
+    Then verify that receive an "Created" http code
     Examples:
       | entity_id | attributes_value                                                              |
       | "room1"   | true                                                                          |
@@ -974,7 +974,7 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | "very_hot"         |
       | metadatas_type   | "alarm"            |
       | metadatas_value  | "default"          |
-    Then verify that receive several "Created" http code
+    Then verify that receive an "Created" http code
     Examples:
       | entity_id | attributes_value                                                              |
       | "room1"   | true                                                                          |
@@ -1012,7 +1012,7 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | "very_hot"         |
       | metadatas_type   | "alarm"            |
       | metadatas_value  | "default"          |
-    Then verify that receive several "Created" http code
+    Then verify that receive an "Created" http code
     Examples:
       | entity_id | attributes_value                                                              |
       | "room1"   | true                                                                          |
@@ -1046,8 +1046,8 @@ Feature: create entities requests (POST) in NGSI v2
       | entities_id      | <entity_id>        |
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -1082,8 +1082,8 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature        |
       | attributes_value | <attributes_value> |
       | attributes_name  | example            |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -1121,8 +1121,8 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | very_hot           |
       | metadatas_type   | alarm              |
       | metadatas_value  | random=10          |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -1161,8 +1161,8 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | very_hot           |
       | metadatas_type   | alarm              |
       | metadatas_value  | random=10          |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -1251,7 +1251,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | 34                |
       | attributes_type  | <attributes_type> |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -1281,8 +1281,8 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | "temperature"     |
       | attributes_value | true              |
       | attributes_type  | <attributes_type> |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -1391,7 +1391,7 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | <metadata_name> |
       | metadatas_value  | random=5        |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -1425,7 +1425,7 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_value  | random=5        |
       | attributes_type  | random=6        |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -1456,8 +1456,8 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | true            |
       | metadatas_name   | <metadata_name> |
       | metadatas_value  | "default"       |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -1487,8 +1487,8 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | <metadata_name> |
       | metadatas_value  | "default"       |
       | attributes_type  | "nothing"       |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -1594,7 +1594,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | "34"             |
       | metadatas_name   | "alarm"          |
       | metadatas_value  | <metadata_value> |
-    Then verify that receive several "Created" http code
+    Then verify that receive an "Created" http code
     Examples:
       | entity_id | metadata_value             |
       | "room1"   | true                       |
@@ -1623,7 +1623,7 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | "alarm"          |
       | metadatas_value  | <metadata_value> |
       | metadatas_type   | "nothing"        |
-    Then verify that receive several "Created" http code
+    Then verify that receive an "Created" http code
     Examples:
       | entity_id | metadata_value             |
       | "room1"   | true                       |
@@ -1653,7 +1653,7 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | random=5         |
       | metadatas_value  | <metadata_value> |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -1687,7 +1687,7 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_value  | <metadata_value> |
       | metadatas_type   | random=6         |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -1718,8 +1718,8 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | "34"             |
       | metadatas_name   | "alarm"          |
       | metadatas_value  | <metadata_value> |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -1748,7 +1748,7 @@ Feature: create entities requests (POST) in NGSI v2
       | "room21"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
       | "room22"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
- @attributes_metadata_value_special_with_type_error @BUG_1110 @skip
+  @attributes_metadata_value_special_with_type_error @BUG_1110 @skip
   Scenario Outline:  try to create an entity NGSI v2 with several wrong special attributes metadata values with metadata type
     Given  a definition of headers
       | parameter          | value                             |
@@ -1764,8 +1764,8 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | "alarm"          |
       | metadatas_value  | <metadata_value> |
       | metadatas_type   | "nothing"        |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
@@ -1797,10 +1797,10 @@ Feature: create entities requests (POST) in NGSI v2
   @attributes_metadata_type
   Scenario Outline:  create entities in NGSI v2 with several attributes with metadata types
     Given  a definition of headers
-      | parameter          | value               |
-      | Fiware-Service     | test_metadata__type |
-      | Fiware-ServicePath | /test               |
-      | Content-Type       | application/json    |
+      | parameter          | value              |
+      | Fiware-Service     | test_metadata_type |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
     When create "1" entities with "1" attributes
       | parameter        | value           |
       | entities_type    | room            |
@@ -1851,7 +1851,7 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_value  | random=6        |
       | metadatas_type   | <metadata_type> |
     Then verify that receive several "Bad Request" http code
-    And verify error response
+    And verify several error responses
       | parameter   | value                        |
       | error       | ForbiddenCharacter           |
       | description | Illegal value for JSON field |
@@ -1883,8 +1883,8 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | "alarm"         |
       | metadatas_value  | "default"       |
       | metadatas_type   | <metadata_type> |
-    Then verify that receive several "Bad Request" http code
-    And verify error response
+    Then verify that receive an "Bad Request" http code
+    And verify an error response
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
