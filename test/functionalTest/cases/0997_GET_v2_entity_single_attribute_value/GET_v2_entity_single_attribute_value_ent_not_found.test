@@ -18,33 +18,42 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
-SET (SOURCES
-getEntities.cpp
-postEntities.cpp
-entryPointsTreat.cpp
-getEntity.cpp
-getEntityAttribute.cpp
-getEntityAttributeValue.cpp
-)
+--NAME--
+GET Entity Attribute V2 Entity not found
 
-SET (HEADERS
-getEntities.h
-postEntities.h
-entryPointsTreat.h
-getEntity.h
-getEntityAttribute.h
-getEntityAttributeValue.h
-)
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET /v2/entities/NONE/attrs/ANY/value
+#
+
+echo "02. GET /v2/entities/NONE/attrs/ANY/value"
+echo "========================================="
+orionCurl --url /v2/entities/NONE/attrs/ANY/value --json
+echo
+echo
+
+--REGEXPECT--
+02. GET /v2/entities/NONE/attrs/ANY/value
+=========================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
 
 
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
 
-# Include directories
-# -----------------------------------------------------------------
-include_directories("${PROJECT_SOURCE_DIR}/src/lib")
-
-
-# Library declaration
-# -----------------------------------------------------------------
-ADD_LIBRARY(serviceRoutinesV2 STATIC ${SOURCES} ${HEADERS})
