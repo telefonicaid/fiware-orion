@@ -22,6 +22,16 @@
 #
 # author: 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
+#
+#  Note: the "skip" tag is to skip the scenarios that still are not developed or failed
+#        -tg=-skip
+#
+
+# Missing Tests:
+#   - verification of Maximum Length Allowed in Fields
+#   - verification of Special Attribute Types
+#
+
 
 Feature: create entities requests (POST) in NGSI v2
   As a context broker user
