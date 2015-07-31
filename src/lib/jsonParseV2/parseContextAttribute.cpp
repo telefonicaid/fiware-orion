@@ -56,7 +56,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       if (type != "String")
       {
         LM_E(("Bad Input (ContextAttributeObject::type must be a String"));
-        return "Parse Error";
+        return "invalid JSON type for attribute type";
       }
 
       caP->type = iter->value.GetString();
