@@ -121,3 +121,4 @@ The list of available options is the following:
     Active-Active Orion configuration "none" is recommended.
 -   **-mutexTimeStat**. Include semaphore waiting time in the
     "/statistics" information. It may have performance impact.
+-   **-subCacheIval. interval in seconds between calls to Subscription Cache refresh.
