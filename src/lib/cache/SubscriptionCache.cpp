@@ -201,8 +201,6 @@ Subscription::Subscription
 {
   unsigned int ix;
 
-  LM_M(("KZ: Creating Subscription from SubscribeContextRequest"));
-
   //
   // 0. Fill in 'constant initial values'
   //
@@ -234,7 +232,6 @@ Subscription::Subscription
       continue;
     }
 
-    LM_M(("KZ: Subscription: adding EntityInfo with pattern '%s'", eIdP->id.c_str()));
     EntityInfo* eP = new EntityInfo(eIdP->id, eIdP->type);
     
     entityIdInfoAdd(eP);
@@ -272,7 +269,7 @@ Subscription::Subscription
   // 7. notifyConditionVector
   //
   notifyConditionVector.fill(scrP->notifyConditionVector);
-  LM_M(("Added %d notifyConditions", notifyConditionVector.size()));
+
 
   //
   // 8. reference
@@ -348,30 +345,24 @@ void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
 */
 bool Subscription::attributeMatch(const std::string& attributeName)
 {
-  LM_M(("KZ: attributeMatch: %d notifyConditions", notifyConditionVector.size()));
-
   for (unsigned int ncvIx = 0; ncvIx < notifyConditionVector.size(); ++ncvIx)
   {
     NotifyCondition* ncP = notifyConditionVector[ncvIx];
 
     if (strcasecmp(ncP->type.c_str(), "ONCHANGE") != 0)
     {
-      LM_M(("KZ: attributeMatch: not ONCHANGE"));
       continue;
     }
 
-    LM_M(("KZ: attributeMatch: %d condValues for notifyCondition %d", ncP->condValueList.size(), ncvIx));
     for (unsigned int cvIx = 0; cvIx < ncP->condValueList.size(); ++cvIx)
     {
       if (ncP->condValueList[cvIx] == attributeName)
       {
-        LM_M(("KZ: Found matching attribute: '%s'", ncP->condValueList[cvIx].c_str()));
         return true;
       }
     }
   }
 
-  LM_M(("KZ: No matching attribute for '%s'", attributeName.c_str()));
   return false;
 }
 
@@ -390,45 +381,34 @@ bool Subscription::match
   const std::string&  attributeName
 )
 {
-  LM_M(("KZ: Matching cache Tenant '%s' to incoming Tenant '%s'", tenant.c_str(), _tenant.c_str()));
   if (_tenant != tenant)
   {
-    LM_M(("KZ: Subscription::match: tenant not matching ('%s' != '%s')", tenant.c_str(), _tenant.c_str()));
     return false;
   }
-  LM_M(("KZ: Tenant OK"));
 
-  LM_M(("KZ: Matching cache Service-Path '%s' to incoming Service-Path '%s'", servicePath.c_str(), _servicePath.c_str()));
   if (servicePathMatch(_servicePath) == false)
   {
-    LM_M(("KZ: Subscription::match: servicePath not matching ('%s' vs '%s')", servicePath.c_str(), _servicePath.c_str()));
     return false;
   }
-  LM_M(("KZ: Service-Path OK"));
 
 
   //
   // If ONCHANGE and one of the attribute names in the scope vector
   // of the subscription has the same name as the incoming attribute. there is a match.
   //
-  LM_M(("KZ: Matching Attributes (incoming: %s)", attributeName.c_str()));
   if (!attributeMatch(attributeName))
   {
-    LM_M(("KZ: Subscription::match: attributes not matching (incoming: '%s')", attributeName.c_str()));
     return false;
   }
-  LM_M(("KZ: Attributes OK"));
 
   for (unsigned int ix = 0; ix < entityIdInfos.size(); ++ix)
   {
     if (entityIdInfos[ix]->match(id, type))
     {
-      LM_M(("KZ: Subscription::match: WE HAVE A MATCH !!!"));
       return true;
     }
   }
 
-  LM_M(("KZ: Subscription::match: entityId not matching"));
   return false;
 }
 
@@ -450,14 +430,12 @@ bool Subscription::servicePathMatch
   //
   if (spath[strlen(spath) - 1] != '#')
   {
-    LM_M(("KZ: No wildcard - exact match necessary"));
     return (_servicePath == servicePath);
   }
 
   // Special case. "/#" matches EVERYTHING
   if (servicePath == "/#")
   {
-    LM_M(("KZ: Wildcard MATCH 1"));
     return true;
   }
 
@@ -480,7 +458,6 @@ bool Subscription::servicePathMatch
 
   if ((spath[len] == '/') && (strlen(_servicePath.c_str()) == len) && (strncmp(spath, _servicePath.c_str(), len) == 0))
   {
-    LM_M(("KZ: Wildcard MATCH 2"));
     return true;
   }
 
@@ -488,11 +465,9 @@ bool Subscription::servicePathMatch
   len = strlen(spath) - 1;
   if (strncmp(spath, _servicePath.c_str(), len) == 0)
   {
-    LM_M(("KZ: Wildcard MATCH 3"));
     return true;
   }
   
-  LM_M(("KZ: Wildcard NO MATCH"));
   return false;
 }
 
@@ -655,8 +630,6 @@ void SubscriptionCache::lookup
   std::vector<Subscription*>*  subV
 )
 {
-  LM_M(("KZ: Looking up a sub in a cache of %d subs (tenant='%s',spath='%s')", subs.size(), tenant.c_str(), servicePath.c_str()));
-
   for (unsigned int ix = 0; ix < subs.size(); ++ix)
   {
     if (subs[ix]->match(tenant, servicePath, id, type, attributeName))
@@ -666,7 +639,6 @@ void SubscriptionCache::lookup
   }
 
   ++noOfSubCacheLookups;
-  LM_M(("KZ: returning a list of %d Subscriptions for the lookup", subV->size()));
 }
 
 
@@ -892,8 +864,6 @@ void SubscriptionCache::fillFromDb(void)
 */
 void SubscriptionCache::insert(Subscription* subP)
 {
-  LM_M(("KZ: Inserting item into sub.cache"));
-
   if (subP->entityIdInfos.size() == 0)
   {
     LM_E(("Runtime Error (no entity path for subscription - not inserted in subscription cache)"));
@@ -987,11 +957,8 @@ void SubscriptionCache::release(void)
 int SubscriptionCache::refresh(void)
 {
   semTake();
-  LM_M(("KZ: SubCache size before refresh: %d", size()));
   release();
-  LM_M(("KZ: SubCache size after release: %d", size()));
   fillFromDb();
-  LM_M(("KZ: SubCache size after fillFromDb: %d", size()));
   semGive();
 
   return 0;
