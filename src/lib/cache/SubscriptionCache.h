@@ -31,6 +31,8 @@
 #include <string>
 #include <vector>
 
+#include "mongo/client/dbclient.h"
+
 #include "common/Format.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/Reference.h"
@@ -38,6 +40,8 @@
 
 struct SubscribeContextRequest;
 struct UpdateContextSubscriptionRequest;
+
+using namespace mongo;
 
 namespace orion
 {
@@ -131,7 +135,7 @@ class Subscription
   bool servicePathMatch(const std::string&  _servicePath);
   bool attributeMatch(const std::string& attributeName);
   bool hasAttribute(const std::string&attributeName);
-  void update(UpdateContextSubscriptionRequest* ucsrP);
+  void update2(UpdateContextSubscriptionRequest* ucsrP);
   void release(void);
 };
 
@@ -169,6 +173,7 @@ public:
   void           init(void);
   void           fillFromDb(void);
   void           insert(Subscription* sub);
+  void           insert(const std::string& tenant, BSONObj bobj);
   int            remove(Subscription* sub);
   int            remove(const std::string&  tenant,
                         const std::string&  servicePath,

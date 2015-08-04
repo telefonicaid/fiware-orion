@@ -490,7 +490,7 @@ bool Subscription::hasAttribute(const std::string& attributeName)
 *
 * Subscription::update - 
 */
-void Subscription::update(UpdateContextSubscriptionRequest* ucsrP)
+void Subscription::update2(UpdateContextSubscriptionRequest* ucsrP)
 {
   // 1. Update expirationTime if 'duration' is set in UpdateContextSubscriptionRequest
   if (ucsrP->duration.get() != "")
@@ -679,6 +679,69 @@ Subscription* SubscriptionCache::lookupById
 */
 static void subToCache(std::string tenant, BSONObj& bobj)
 {
+  subCache->insert(tenant, bobj);
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::init - 
+*/
+void SubscriptionCache::init(void)
+{
+  semInit();
+  fillFromDb();
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::fillFromDb - 
+*/
+void SubscriptionCache::fillFromDb(void)
+{
+  std::vector<std::string> tenantV;
+
+  getOrionDatabases(tenantV);
+  tenantV.push_back(dbName);
+
+  for (unsigned int ix = 0; ix < tenantV.size(); ++ix)
+  {
+    subscriptionsTreat(tenantV[ix], subToCache);
+  }
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::insert - 
+*/
+void SubscriptionCache::insert(Subscription* subP)
+{
+  if (subP->entityIdInfos.size() == 0)
+  {
+    LM_E(("Runtime Error (no entity for subscription - not inserted in subscription cache)"));
+    return;
+  }
+
+  semTake();
+  subs.push_back(subP);
+  semGive();
+
+  ++noOfSubCacheEntries;
+}
+
+
+
+/* ****************************************************************************
+*
+* SubscriptionCache::insert - 
+*/
+void SubscriptionCache::insert(const std::string& tenant, BSONObj bobj)
+{
   BSONElement  idField = bobj.getField("_id");
 
   if (idField.eoo() == true)
@@ -798,7 +861,18 @@ static void subToCache(std::string tenant, BSONObj& bobj)
     notifyConditionVector.push_back(ncP);
   }
 
+  if (notifyConditionVector.size() == 0)
+  {
+    for (unsigned int ix = 0; ix < eiV.size(); ++ix)
+    {
+      delete(eiV[ix]);
+    }
+    eiV.clear();
 
+    restriction.release();
+
+    return;
+  }
 
   //
   // 06. Create Subscription and add it to the subscription-cache
@@ -815,58 +889,6 @@ static void subToCache(std::string tenant, BSONObj& bobj)
                                         reference,
                                         format);
   subCache->insert(subP);
-}
-
-
-
-/* ****************************************************************************
-*
-* SubscriptionCache::init - 
-*/
-void SubscriptionCache::init(void)
-{
-  semInit();
-  fillFromDb();
-}
-
-
-
-/* ****************************************************************************
-*
-* SubscriptionCache::fillFromDb - 
-*/
-void SubscriptionCache::fillFromDb(void)
-{
-  std::vector<std::string> tenantV;
-
-  getOrionDatabases(tenantV);
-  tenantV.push_back(dbName);
-
-  for (unsigned int ix = 0; ix < tenantV.size(); ++ix)
-  {
-    subscriptionsTreat(tenantV[ix], subToCache);
-  }
-}
-
-
-
-/* ****************************************************************************
-*
-* SubscriptionCache::insert - 
-*/
-void SubscriptionCache::insert(Subscription* subP)
-{
-  if (subP->entityIdInfos.size() == 0)
-  {
-    LM_E(("Runtime Error (no entity path for subscription - not inserted in subscription cache)"));
-    return;
-  }
-
-  semTake();
-  subs.push_back(subP);
-  semGive();
-
-  ++noOfSubCacheEntries;
 }
 
 
