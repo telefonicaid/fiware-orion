@@ -346,11 +346,6 @@ bool Subscription::attributeMatch(const std::string& attributeName)
   {
     NotifyCondition* ncP = notifyConditionVector[ncvIx];
 
-    if (strcasecmp(ncP->type.c_str(), "ONCHANGE") != 0)
-    {
-      continue;
-    }
-
     for (unsigned int cvIx = 0; cvIx < ncP->condValueList.size(); ++cvIx)
     {
       if (ncP->condValueList[cvIx] == attributeName)
