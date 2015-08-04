@@ -1236,19 +1236,6 @@ static bool processSubscriptions
                             "$inc" << BSON(CSUB_COUNT << 1));
 
 
-      //
-      // Saving lastNotificationTime for cached subscription
-      //
-      if (trigs->cacheSubReference != NULL)
-      {
-        trigs->cacheSubReference->pendingNotifications -= 1;
-
-        if (trigs->cacheSubReference->pendingNotifications == 0)
-        {
-          trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
-        }
-      }
-
       try
       {
         LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getSubscribeContextCollectionName(tenant).c_str(),
@@ -1262,6 +1249,19 @@ static bool processSubscriptions
         LM_I(("Database Operation Successful (update: %s, query: %s)",
               update.toString().c_str(),
               query.toString().c_str()));
+
+        //
+        // Saving lastNotificationTime for cached subscription
+        //
+        if (trigs->cacheSubReference != NULL)
+        {
+          trigs->cacheSubReference->pendingNotifications -= 1;
+
+          if (trigs->cacheSubReference->pendingNotifications == 0)
+          {
+            trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
+          }
+        }
       }
       catch (const DBException &e)
       {
