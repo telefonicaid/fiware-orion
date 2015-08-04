@@ -109,7 +109,7 @@ EntityInfo::EntityInfo(const std::string& idPattern, const std::string& _entityT
 
 /* ****************************************************************************
 *
-* match - 
+* EntityInfo::match - 
 */
 bool EntityInfo::match
 (
@@ -128,6 +128,17 @@ bool EntityInfo::match
 
   // REGEX-comparison this->entityIdPattern VS id
   return regexec(&entityIdPattern, id.c_str(), 0, NULL, 0) == 0;
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityInfo::release - 
+*/
+void EntityInfo::release(void)
+{
+  regfree(&entityIdPattern);
 }
 
 
@@ -333,17 +344,6 @@ void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
 
 /* ****************************************************************************
 *
-* EntityInfo::release - 
-*/
-void EntityInfo::release(void)
-{
-  regfree(&entityIdPattern);
-}
-
-
-
-/* ****************************************************************************
-*
 * Subscription::attributeMatch - 
 */
 bool Subscription::attributeMatch(const std::string& attributeName)
@@ -379,7 +379,7 @@ bool Subscription::attributeMatch(const std::string& attributeName)
 
 /* ****************************************************************************
 *
-* match - 
+* Subscription::match - 
 */
 bool Subscription::match
 (
@@ -436,7 +436,7 @@ bool Subscription::match
 
 /* ****************************************************************************
 *
-* match - 
+* Subscription::servicePathMatch - 
 */
 bool Subscription::servicePathMatch
 (
@@ -500,7 +500,7 @@ bool Subscription::servicePathMatch
 
 /* ****************************************************************************
 *
-* hasAttribute - 
+* Subscription::hasAttribute - 
 */
 bool Subscription::hasAttribute(const std::string& attributeName)
 {
@@ -521,7 +521,7 @@ bool Subscription::hasAttribute(const std::string& attributeName)
 
 /* ****************************************************************************
 *
-* update - 
+* Subscription::update - 
 */
 void Subscription::update(UpdateContextSubscriptionRequest* ucsrP)
 {
@@ -588,7 +588,7 @@ SubscriptionCache::SubscriptionCache(std::string _dbName)
 
 /* ****************************************************************************
 *
-* semInit - 
+* SubscriptionCache::semInit - 
 */
 void SubscriptionCache::semInit(void)
 {
@@ -599,7 +599,7 @@ void SubscriptionCache::semInit(void)
 
 /* ****************************************************************************
 *
-* semTake - 
+* SubscriptionCache::semTake - 
 */
 void SubscriptionCache::semTake(void)
 {
@@ -631,7 +631,7 @@ void SubscriptionCache::semTake(void)
 
 /* ****************************************************************************
 *
-* semGive - 
+* SubscriptionCache::semGive - 
 */
 void SubscriptionCache::semGive(void)
 {
@@ -643,7 +643,7 @@ void SubscriptionCache::semGive(void)
 
 /* ****************************************************************************
 *
-* lookup - 
+* SubscriptionCache::lookup - 
 */
 void SubscriptionCache::lookup
 (
@@ -673,7 +673,7 @@ void SubscriptionCache::lookup
 
 /* ****************************************************************************
 *
-* lookupById - 
+* SubscriptionCache::lookupById - 
 */
 Subscription* SubscriptionCache::lookupById
 (
@@ -711,7 +711,7 @@ Subscription* SubscriptionCache::lookupById
 
 /* ****************************************************************************
 *
-* subTreat - 
+* SubscriptionCache::subTreat - 
 */
 static void subTreat(std::string tenant, BSONObj& bobj)
 {
