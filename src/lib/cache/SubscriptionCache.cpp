@@ -694,14 +694,14 @@ static void subToCache(std::string tenant, BSONObj& bobj)
   //
 
   std::string               subId         = idField.OID().toString();
-  int64_t                   expiration    = bobj.getField("expiration").Long();
-  std::string               reference     = bobj.getField("reference").String();
-  int64_t                   throttling    = bobj.hasField("throttling") ? bobj.getField("throttling").Long() : -1;
-  std::vector<BSONElement>  eVec          = bobj.getField("entities").Array();
-  std::vector<BSONElement>  attrVec       = bobj.getField("attrs").Array();
-  std::vector<BSONElement>  condVec       = bobj.getField("conditions").Array();
-  std::string               formatString  = bobj.hasField("format") ? bobj.getField("format").String() : "XML";
-  std::string               servicePath   = bobj.hasField("servicePath") ? bobj.getField("servicePath").String() : "/";
+  int64_t                   expiration    = bobj.getField(CSUB_EXPIRATION).Long();
+  std::string               reference     = bobj.getField(CSUB_REFERENCE).String();
+  int64_t                   throttling    = bobj.hasField(CSUB_THROTTLING) ? bobj.getField(CSUB_THROTTLING).Long() : -1;
+  std::vector<BSONElement>  eVec          = bobj.getField(CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  attrVec       = bobj.getField(CSUB_ATTRS).Array();
+  std::vector<BSONElement>  condVec       = bobj.getField(CSUB_CONDITIONS).Array();
+  std::string               formatString  = bobj.hasField(CSUB_FORMAT) ? bobj.getField(CSUB_FORMAT).String() : "XML";
+  std::string               servicePath   = bobj.hasField(CSUB_SERVICE_PATH) ? bobj.getField(CSUB_SERVICE_PATH).String() : "/";
   Format                    format        = stringToFormat(formatString);
 
   std::vector<EntityInfo*> eiV;
@@ -716,29 +716,29 @@ static void subToCache(std::string tenant, BSONObj& bobj)
   {
     BSONObj entity = eVec[ix].embeddedObject();
 
-    if (!entity.hasField("id"))
+    if (!entity.hasField(CSUB_ENTITY_ID))
     {
       LM_W(("Runtime Error (got a subscription without id)"));
       continue;
     }
 
-    std::string id = entity.getStringField("id");
+    std::string id = entity.getStringField(ENT_ENTITY_ID);
     
-    if (!entity.hasField("isPattern"))
+    if (!entity.hasField(CSUB_ENTITY_ISPATTERN))
     {
       continue;
     }
 
-    std::string isPattern = entity.getStringField("isPattern");
+    std::string isPattern = entity.getStringField(CSUB_ENTITY_ISPATTERN);
     if (isPattern != "true")
     {
       continue;
     }
 
     std::string  type = "";
-    if (entity.hasField("type"))
+    if (entity.hasField(CSUB_ENTITY_TYPE))
     {
-      type = entity.getStringField("type");
+      type = entity.getStringField(CSUB_ENTITY_TYPE);
     }
 
     EntityInfo* eiP = new EntityInfo(id, type);
@@ -777,7 +777,7 @@ static void subToCache(std::string tenant, BSONObj& bobj)
     std::string               condType;
     std::vector<BSONElement>  valueVec;
 
-    condType = condition.getStringField("type");
+    condType = condition.getStringField(CSUB_CONDITIONS_TYPE);
     if (condType != "ONCHANGE")
     {
       continue;
@@ -786,7 +786,7 @@ static void subToCache(std::string tenant, BSONObj& bobj)
     NotifyCondition* ncP = new NotifyCondition();
     ncP->type = condType;
 
-    valueVec = condition.getField("value").Array();
+    valueVec = condition.getField(CSUB_CONDITIONS_VALUE).Array();
     for (unsigned int vIx = 0; vIx < valueVec.size(); ++vIx)
     {
       std::string condValue;
