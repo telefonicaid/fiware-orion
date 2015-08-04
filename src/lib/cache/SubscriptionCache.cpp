@@ -840,6 +840,7 @@ void SubscriptionCache::fillFromDb(void)
   std::vector<std::string> tenantV;
 
   getOrionDatabases(tenantV);
+  tenantV.push_back(dbName);
 
   for (unsigned int ix = 0; ix < tenantV.size(); ++ix)
   {

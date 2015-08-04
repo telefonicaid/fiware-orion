@@ -181,16 +181,36 @@ HttpStatusCode mongoSubscribeContext
     
     //
     // Add the subscription to the subscription cache.
-    // But only if any of the entities in entityIdVector is pattern based.
+    // But only if any of the entities in entityIdVector is pattern based -
+    // AND it is a subscription of type ONCHANGE
     //
+    bool patternBased = false;
+    bool onchange     = false;
+
+    // 1. Pattern-based?
     for (unsigned int ix = 0; ix < requestP->entityIdVector.size(); ++ix)
     {
       if (requestP->entityIdVector[ix]->isPattern == "true")
       {
-        LM_M(("KZ: inserting sub in cache"));
-        subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oid.toString(), expiration, notifyFormat));
+        patternBased = true;
         break;
       }
+    }
+
+    // 2. ONCHANGE?
+    for (unsigned int ix = 0; ix < requestP->notifyConditionVector.size(); ++ix)
+    {
+      if (strcasecmp(requestP->notifyConditionVector[ix]->type.c_str(), ON_CHANGE_CONDITION) == 0)
+      {
+        onchange = true;
+        break;
+      }
+    }
+
+    // 3. Create Subscription for the cache
+    if (patternBased && onchange)
+    {
+      subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oid.toString(), expiration, notifyFormat));
     }
 
 
