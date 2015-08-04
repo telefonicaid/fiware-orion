@@ -837,10 +837,9 @@ void SubscriptionCache::init(void)
 */
 void SubscriptionCache::fillFromDb(void)
 {
-  // FIXME P10: Get a list of all tenants and call subscriptionsTreat() for each of them
   std::vector<std::string> tenantV;
 
-  tenantV.push_back(dbName);
+  getOrionDatabases(tenantV);
 
   for (unsigned int ix = 0; ix < tenantV.size(); ++ix)
   {
