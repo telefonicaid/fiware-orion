@@ -328,9 +328,6 @@ Subscription::Subscription
 /* ****************************************************************************
 *
 * Subscription::entityIdInfoAdd - 
-*
-* FIXME P10: need to decide whether this function copies the EntityInfo or
-*            just uses the pointer. For now, just using the pointer.
 */
 void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
 {
