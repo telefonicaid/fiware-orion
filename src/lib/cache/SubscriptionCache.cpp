@@ -675,9 +675,9 @@ Subscription* SubscriptionCache::lookupById
 
 /* ****************************************************************************
 *
-* SubscriptionCache::subTreat - 
+* subToCache - 
 */
-static void subTreat(std::string tenant, BSONObj& bobj)
+static void subToCache(std::string tenant, BSONObj& bobj)
 {
   BSONElement  idField = bobj.getField("_id");
 
@@ -843,7 +843,7 @@ void SubscriptionCache::fillFromDb(void)
 
   for (unsigned int ix = 0; ix < tenantV.size(); ++ix)
   {
-    subscriptionsTreat(tenantV[ix], subTreat);
+    subscriptionsTreat(tenantV[ix], subToCache);
   }
 }
 
