@@ -31,6 +31,7 @@
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextAttribute.h"
 #include "cache/SubscriptionCache.h"
+#include "cache/subCache.h"
 
 #include "unittest.h"
 

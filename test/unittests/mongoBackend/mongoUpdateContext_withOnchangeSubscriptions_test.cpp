@@ -35,6 +35,7 @@
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
 #include "cache/SubscriptionCache.h"
+#include "cache/subCache.h"
 
 #include "mongo/client/dbclient.h"
 
