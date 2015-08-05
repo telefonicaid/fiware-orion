@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "common/string.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -61,16 +62,40 @@ std::string getEntities
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
+  using namespace std;
+
   Entities     entities;
+  typedef vector<string> vstr;
+  typedef vstr::size_type vstr_sz;
+
+  // optional parameter for list of IDs
+  string listIDs = ciP->uriParam["id"];
+  string pattern;
+
+  if (listIDs != "") {
+    vstr idsV;
+    stringSplit(listIDs, ',', idsV);
+    vstr_sz sz = idsV.size();
+    for(vstr_sz ix = 0; ix != sz; ++ix) {
+      if (ix != 0)
+      {
+          pattern += "|";
+      }
+      pattern += idsV[ix];
+    }
+  }
+  else
+  {
+    pattern = ".*";
+  }
 
 
   // 01. Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(".*", "", "true", EntityTypeEmptyOrNotEmpty, "");
+  parseDataP->qcr.res.fill(pattern, "", "true", EntityTypeEmptyOrNotEmpty, "");
   
 
   // 02. Call standard op postQueryContext
-  answer = postQueryContext(ciP, components, compV, parseDataP);
+  string answer = postQueryContext(ciP, components, compV, parseDataP);
 
 
   // 03. Render Entities response
