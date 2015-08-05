@@ -183,6 +183,7 @@
 
 #include "common/string.h"
 
+#include "cache/subCache.h"
 #include "cache/SubscriptionCache.h"
 
 

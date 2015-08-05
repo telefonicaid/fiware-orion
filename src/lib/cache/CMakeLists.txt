@@ -22,10 +22,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     SubscriptionCache.cpp
+    Subscription.cpp
+    EntityInfo.cpp
+    subCache.cpp
 )
 
 SET (HEADERS
     SubscriptionCache.h
+    Subscription.h
+    EntityInfo.h
+    subCache.h
 )
 
 

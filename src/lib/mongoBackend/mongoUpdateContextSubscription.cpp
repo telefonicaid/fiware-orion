@@ -28,7 +28,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "cache/subCache.h"
 #include "cache/SubscriptionCache.h"
+#include "cache/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"

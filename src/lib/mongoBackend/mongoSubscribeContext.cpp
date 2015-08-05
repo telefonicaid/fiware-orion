@@ -36,6 +36,7 @@
 #include "ngsi/StatusCode.h"
 #include "rest/uriParamNames.h"
 #include "cache/SubscriptionCache.h"
+#include "cache/subCache.h"
 
 
 
