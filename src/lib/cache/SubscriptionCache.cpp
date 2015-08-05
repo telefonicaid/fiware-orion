@@ -265,6 +265,8 @@ void SubscriptionCache::fillFromDb(void)
 */
 void SubscriptionCache::insert(Subscription* subP)
 {
+  LM_M(("KZ: Really Inserting subscription into subCache: '%s'", subP->subscriptionId.c_str()));
+
   if (subP->entityIdInfos.size() == 0)
   {
     LM_E(("Runtime Error (no entity for subscription - not inserted in subscription cache)"));
@@ -300,21 +302,24 @@ void SubscriptionCache::insert(const std::string& tenant, BSONObj bobj)
   // 01. Extract values from database object 'bobj'
   //
 
-  std::string               subId         = idField.OID().toString();
-  int64_t                   expiration    = bobj.getField(CSUB_EXPIRATION).Long();
-  std::string               reference     = bobj.getField(CSUB_REFERENCE).String();
-  int64_t                   throttling    = bobj.hasField(CSUB_THROTTLING) ? bobj.getField(CSUB_THROTTLING).Long() : -1;
-  std::vector<BSONElement>  eVec          = bobj.getField(CSUB_ENTITIES).Array();
-  std::vector<BSONElement>  attrVec       = bobj.getField(CSUB_ATTRS).Array();
-  std::vector<BSONElement>  condVec       = bobj.getField(CSUB_CONDITIONS).Array();
-  std::string               formatString  = bobj.hasField(CSUB_FORMAT) ? bobj.getField(CSUB_FORMAT).String() : "XML";
-  std::string               servicePath   = bobj.hasField(CSUB_SERVICE_PATH) ? bobj.getField(CSUB_SERVICE_PATH).String() : "/";
-  Format                    format        = stringToFormat(formatString);
+  std::string               subId             = idField.OID().toString();
+  int64_t                   expiration        = bobj.getField(CSUB_EXPIRATION).Long();
+  std::string               reference         = bobj.getField(CSUB_REFERENCE).String();
+  int64_t                   throttling        = bobj.hasField(CSUB_THROTTLING)? bobj.getField(CSUB_THROTTLING).Long() : -1;
+  std::vector<BSONElement>  eVec              = bobj.getField(CSUB_ENTITIES).Array();
+  std::vector<BSONElement>  attrVec           = bobj.getField(CSUB_ATTRS).Array();
+  std::vector<BSONElement>  condVec           = bobj.getField(CSUB_CONDITIONS).Array();
+  std::string               formatString      = bobj.hasField(CSUB_FORMAT)? bobj.getField(CSUB_FORMAT).String() : "XML";
+  std::string               servicePath       = bobj.hasField(CSUB_SERVICE_PATH)? bobj.getField(CSUB_SERVICE_PATH).String() : "/";
+  Format                    format            = stringToFormat(formatString);
+  int                       lastNotification  = bobj.hasField(CSUB_LASTNOTIFICATION)? bobj.getField(CSUB_LASTNOTIFICATION).Int() : 0;
 
   std::vector<EntityInfo*> eiV;
   std::vector<std::string> attrV;
   Restriction              restriction;
   NotifyConditionVector    notifyConditionVector;
+
+  LM_M(("KZ: Inserting subscription '%s' into subCache", subId.c_str()));
 
   //
   // 02. Pushing Entity-data names to EntityInfo Vector (eiV)
@@ -431,7 +436,9 @@ void SubscriptionCache::insert(const std::string& tenant, BSONObj bobj)
                                         restriction,
                                         notifyConditionVector,
                                         reference,
+                                        lastNotification,
                                         format);
+  
   subCache->insert(subP);
 }
 

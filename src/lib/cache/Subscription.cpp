@@ -187,6 +187,7 @@ Subscription::Subscription
   const Restriction&               _restriction,
   NotifyConditionVector&           _notifyConditionVector,
   const std::string&               _reference,
+  int                              _lastNotificationTime,
   Format                           _format
 )
 {
@@ -207,8 +208,9 @@ Subscription::Subscription
     attributes.push_back(_attributes[ix]);
   }
 
-  throttling     = _throttling;
-  expirationTime = _expirationTime;
+  throttling            = _throttling;
+  expirationTime        = _expirationTime;
+  lastNotificationTime  = _lastNotificationTime;
 
   restriction.fill((Restriction*) &_restriction);
   notifyConditionVector.fill(_notifyConditionVector);

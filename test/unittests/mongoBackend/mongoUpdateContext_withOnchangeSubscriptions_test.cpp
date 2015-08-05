@@ -292,9 +292,11 @@ static void prepareDatabase(void) {
 
   /* Given that preparation including csubs, we have to init cache */
   subscriptionCacheInit(DBPREFIX);
+  subCache->fillFromDb();
 }
 
 
+#if 0
 /* ****************************************************************************
 *
 * prepareSubsCache - 
@@ -370,6 +372,7 @@ void prepareSubsCache(int mode, std::string subscriptionId, std::string ref, For
 
   subCache->insert(subP);
 }
+#endif
 
 
 /* ****************************************************************************
@@ -907,7 +910,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
 
     /* Prepare database */
     prepareDatabase();
-    prepareSubsCache(1, "51307b66f481db11bf860003", "http://notify3.me", JSON);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
@@ -975,7 +977,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
 
     /* Prepare database */
     prepareDatabase();
-    prepareSubsCache(1, "51307b66f481db11bf860003", "http://notify3.me", JSON);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
@@ -1038,7 +1039,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
 
     /* Prepare database */
     prepareDatabase();
-    prepareSubsCache(1, "51307b66f481db11bf860003", "http://notify3.me", JSON);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();
@@ -1104,7 +1104,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
-    prepareSubsCache(2, "51307b66f481db11bf860005", "http://notify5.me", JSON);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
@@ -1172,7 +1171,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern_noT
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
-    prepareSubsCache(3, "51307b66f481db11bf860005", "http://notify5.me", XML);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
@@ -1236,7 +1234,6 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern_noT
 
     /* Prepare database */
     prepareDatabaseWithNoTypeSubscriptions();
-    prepareSubsCache(4, "51307b66f481db11bf860005", "http://notify5.me", XML);
 
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    

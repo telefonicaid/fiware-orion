@@ -77,7 +77,7 @@ TEST(cache, SubscriptionCache)
   ncP->condValueList.push_back("attr3");
   nv.push_back(ncP);
 
-  subP = new Subscription("unittest", "/spath", "012345678901234567890123", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", JSON);
+  subP = new Subscription("unittest", "/spath", "012345678901234567890123", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", 0, JSON);
 
   subCache->insert(subP);
 
@@ -113,7 +113,7 @@ TEST(cache, SubscriptionCache)
   ASSERT_EQ(0, subV.size());
   subV.clear();
 
-  subP = new Subscription("unittest", "/spath", "012345678901234567890124", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", JSON);
+  subP = new Subscription("unittest", "/spath", "012345678901234567890124", entityIdInfos, attributeV, 5, -1, restriction, nv, "REFERENCE", 0, JSON);
   subCache->insert(subP);
 
   subCache->lookup("unittest", "/spath", "E10", "", "attr3", &subV);

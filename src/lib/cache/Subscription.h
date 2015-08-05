@@ -102,6 +102,7 @@ class Subscription
                const Restriction&               _restriction,
                NotifyConditionVector&           _notifyConditionVector,
                const std::string&               _reference,
+               int                              _lastNotificationTime,
                Format                           _format);
 
   void entityIdInfoAdd(EntityInfo* entityIdInfoP);
