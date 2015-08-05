@@ -113,7 +113,6 @@ class Subscription
   bool servicePathMatch(const std::string&  _servicePath);
   bool attributeMatch(const std::string& attributeName);
   bool hasAttribute(const std::string&attributeName);
-  void update2(UpdateContextSubscriptionRequest* ucsrP);
   void release(void);
 };
 

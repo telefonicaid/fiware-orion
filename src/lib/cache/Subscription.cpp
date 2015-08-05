@@ -380,31 +380,6 @@ bool Subscription::hasAttribute(const std::string& attributeName)
 
 /* ****************************************************************************
 *
-* Subscription::update - 
-*/
-void Subscription::update2(UpdateContextSubscriptionRequest* ucsrP)
-{
-  // 1. Update expirationTime if 'duration' is set in UpdateContextSubscriptionRequest
-  if (ucsrP->duration.get() != "")
-  {
-    int64_t _expirationTime = getCurrentTime() + ucsrP->duration.parse();
-    expirationTime  = _expirationTime;
-  }
-
-  // 2. Update throttling if 'throttling' is set in UpdateContextSubscriptionRequest
-  if (ucsrP->throttling.get() != "")
-  {
-    throttling = ucsrP->throttling.parse();
-  }
-
-  // 3. restriction
-  // 4. notifyConditionVector
-}
-
-
-
-/* ****************************************************************************
-*
 * Subscription::release - 
 */
 void Subscription::release(void)
