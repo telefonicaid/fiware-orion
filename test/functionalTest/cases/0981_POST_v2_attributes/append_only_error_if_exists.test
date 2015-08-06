@@ -108,10 +108,15 @@ Date: REGEX(.*)
 
 03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append
 ===================================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "description": "one or more of the attributes in the request already exist: [ attr1 ]",
+    "error": "BadRequest"
+}
 
 
 04. Make sure it didn't work
