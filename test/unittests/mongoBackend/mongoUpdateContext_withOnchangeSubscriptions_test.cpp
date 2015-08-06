@@ -125,8 +125,6 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 */
 static void prepareDatabase(bool initializeCache = true) {
 
-  LM_M(("******************** IN prepareDatabase"));
-
   /* Set database */
   setupDatabase();
 
@@ -311,8 +309,6 @@ static void prepareDatabase(bool initializeCache = true) {
 *
 */
 static void prepareDatabaseWithNoTypeSubscriptions(void) {
-
-  LM_M(("******************** IN prepareDatabaseWithNoTypeSubscriptions"));
 
     prepareDatabase(false);
 
