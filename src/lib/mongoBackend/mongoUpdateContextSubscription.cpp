@@ -285,7 +285,10 @@ HttpStatusCode mongoUpdateContextSubscription
   //
 
   // 0. Lookup matching subscription in subscription-cache
-  Subscription* subP = subCache->lookupById(tenant, servicePathV[0], requestP->subscriptionId.get());
+  std::string servicePath;
+
+  servicePath = (servicePathV.size() == 0)? "" : servicePathV[0];
+  Subscription* subP = subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
 
   // 1. Remove 'sub' from sub-cache (if present)
   if (subP)

@@ -70,13 +70,13 @@ class SubscriptionCache
 {
 private:
   std::vector<Subscription*>  subs;
-  std::string                 dbName;
+  std::string                 dbPrefix;
   sem_t                       mutex;
   pthread_t                   mutexOwner;
 
 public:
   SubscriptionCache();
-  SubscriptionCache(std::string _dbName);
+  SubscriptionCache(std::string _dbPrefix);
 
   void           init(void);
   void           fillFromDb(void);
@@ -88,6 +88,7 @@ public:
                         const std::string&  subId);
   void           release();
   int            refresh(void);
+  void           present(const std::string& prefix);
   int            size(void) { return subs.size(); }
   Subscription*  lookupById(const std::string&       tenant,
                             const std::string&       servicePath,

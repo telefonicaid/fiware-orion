@@ -25,6 +25,8 @@
 #include <string>
 #include <semaphore.h>
 
+#include "logMsg/logMsg.h"
+
 #include "cache/EntityInfo.h"
 
 
@@ -59,7 +61,11 @@ bool EntityInfo::match
   // If type non-empty - perfect match is mandatory
   // If type is empty - always matches
   //
-  if ((type != "") && (entityType != type))
+
+  LM_M(("KZ: type: '%s'", type.c_str()));
+  LM_M(("KZ: entityType: '%s'", entityType.c_str()));
+
+  if ((type != "") && (entityType != type) && (entityType != ""))
   {
     return false;
   }
@@ -77,6 +83,18 @@ bool EntityInfo::match
 void EntityInfo::release(void)
 {
   regfree(&entityIdPattern);
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityInfo::present - 
+*/
+void EntityInfo::present(const std::string& prefix)
+{
+  LM_F(("%sid:    regex describing EntityId::id (the original string is not saved)", prefix.c_str()));
+  LM_F(("%stype:  %s", prefix.c_str(), entityType.c_str()));
 }
 
 }

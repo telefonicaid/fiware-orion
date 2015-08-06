@@ -167,7 +167,7 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 *
 * Empty vector of service paths, sent to mongoSubscribeContext during tests.
 */
-static std::vector<std::string> emptyServicePathV;
+std::vector<std::string> emptyServicePathV;
 
 /* ****************************************************************************
 *
@@ -624,7 +624,9 @@ TEST(mongoUpdateContextSubscription, updateDuration)
     prepareDatabase();
 
     /* Invoke the function in mongoBackend library */
-    ms = mongoUpdateContextSubscription(&req, &res, XML, "", "", emptyServicePathV);
+    std::string tenant      = "";
+    std::string servicePath = "";
+    ms = mongoUpdateContextSubscription(&req, &res, XML, tenant, servicePath, emptyServicePathV);
 
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);

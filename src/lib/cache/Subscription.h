@@ -114,6 +114,7 @@ class Subscription
   bool servicePathMatch(const std::string&  _servicePath);
   bool attributeMatch(const std::string& attributeName);
   bool hasAttribute(const std::string&attributeName);
+  void present(const std::string& prefix);
   void release(void);
 };
 

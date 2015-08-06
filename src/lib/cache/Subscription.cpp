@@ -25,11 +25,13 @@
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
 #include "common/globals.h"
 #include "ngsi10/SubscribeContextRequest.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
 #include "cache/Subscription.h"
-
+#include "mongoBackend/MongoGlobal.h"
 
 
 namespace orion
@@ -267,13 +269,18 @@ bool Subscription::match
   const std::string&  attributeName
 )
 {
-  if (_tenant != tenant)
+  if (composeDatabaseName(_tenant) != composeDatabaseName(tenant))
   {
+    LM_M(("KZ: no match due to tenant ('%s' vs '%s' (latter to match))", tenant.c_str(), _tenant.c_str()));
     return false;
   }
 
+  LM_M(("My service-path: '%s'", servicePath.c_str()));
+  LM_M(("Incoming service-path: '%s'", _servicePath.c_str()));
+
   if (servicePathMatch(_servicePath) == false)
   {
+    LM_M(("KZ: no match due to servicePath ('%s' vs '%s')", servicePath.c_str(), _servicePath.c_str()));
     return false;
   }
 
@@ -284,6 +291,7 @@ bool Subscription::match
   //
   if (!attributeMatch(attributeName))
   {
+    LM_M(("KZ: no match due to attributes (attributeName: %s)", attributeName.c_str()));
     return false;
   }
 
@@ -291,10 +299,12 @@ bool Subscription::match
   {
     if (entityIdInfos[ix]->match(id, type))
     {
+      LM_M(("KZ: MATCH"));
       return true;
     }
   }
 
+  LM_M(("KZ: no match due to entityIdInfos (id: '%s', type: '%s')", id.c_str(), type.c_str()));
   return false;
 }
 
@@ -306,10 +316,33 @@ bool Subscription::match
 */
 bool Subscription::servicePathMatch
 (
-  const std::string&  _servicePath
+  const std::string&  _servicePathIn
 )
 {
-  const char* spath = servicePath.c_str();
+  const char*  spath;
+  std::string  _servicePath = _servicePathIn;
+
+  //
+  // Empty service path?
+  //
+  LM_M(("Comparing service-paths"));
+  LM_M(("My service-path: '%s'", servicePath.c_str()));
+  LM_M(("comparing with service-path: '%s'", _servicePath.c_str()));
+
+  if ((_servicePath.length() == 0) && (servicePath.length() == 0))
+  {
+    return true;
+  }
+
+  //
+  // Default service path for a subscription is "/"
+  //
+  if (_servicePath.length() == 0)
+  {
+    _servicePath = "/";
+  }
+
+  spath = servicePath.c_str();
 
   //
   // No wildcard - exact match
@@ -396,6 +429,43 @@ void Subscription::release(void)
   }
 
   entityIdInfos.clear();
+}
+
+
+
+/* ****************************************************************************
+*
+* Subscription::present - 
+*/
+void Subscription::present(const std::string& prefix)
+{
+  LM_F(("%stenant:               %s", prefix.c_str(), tenant.c_str()));
+  LM_F(("%sservicePath:          %s", prefix.c_str(), servicePath.c_str()));
+  LM_F(("%ssubscriptionId:       %s", prefix.c_str(), subscriptionId.c_str()));
+
+  LM_F(("%s%d items of EntityInfo:", prefix.c_str(), entityIdInfos.size()));
+  for (unsigned int ix = 0; ix < entityIdInfos.size(); ++ix)
+  {
+    entityIdInfos[ix]->present(prefix + "  ");
+  }
+
+  LM_F(("%s%d attributes", prefix.c_str(), attributes.size()));
+  for (unsigned int ix = 0; ix < attributes.size(); ++ix)
+  {
+    LM_F(("%s  %s", prefix.c_str(), attributes[ix].c_str()));
+  }
+
+
+  LM_F(("%sthrottling:           %lu", prefix.c_str(), throttling));
+  LM_F(("%sexpirationTime:       %lu", prefix.c_str(), expirationTime));
+  
+  notifyConditionVector.present(prefix + "  ");
+  restriction.present(prefix + "  ");
+  LM_F(("%sreference:            %s",  prefix.c_str(), reference.get().c_str()));
+
+  LM_F(("%slastNotificationTime: %lu",  prefix.c_str(), lastNotificationTime));
+  LM_F(("%spendingNotifications: %lu",  prefix.c_str(), pendingNotifications));
+  LM_F(("%snotification format:  %s",   prefix.c_str(), (format == XML)? "XML" : "JSON"));
 }
 
 }

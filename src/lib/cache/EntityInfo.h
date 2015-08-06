@@ -51,6 +51,7 @@ typedef struct EntityInfo
   EntityInfo(const std::string& idPattern, const std::string& _entityType);
   bool          match(const std::string& idPattern, const std::string& type);
   void          release(void);
+  void          present(const std::string& prefix);
 } EntityInfo;
 
 }  // namespace orion

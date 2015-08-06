@@ -123,7 +123,9 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * This function is called before every test, to populate some information in the
 * entities and csbus collections.
 */
-static void prepareDatabase(void) {
+static void prepareDatabase(bool initializeCache = true) {
+
+  LM_M(("******************** IN prepareDatabase"));
 
   /* Set database */
   setupDatabase();
@@ -291,8 +293,11 @@ static void prepareDatabase(void) {
   connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
 
   /* Given that preparation including csubs, we have to init cache */
-  subscriptionCacheInit(DBPREFIX);
-  subCache->fillFromDb();
+  if (initializeCache == true)
+  {
+    subscriptionCacheInit("");
+    subCache->present("unittest: ");
+  }
 }
 
 
@@ -385,7 +390,9 @@ void prepareSubsCache(int mode, std::string subscriptionId, std::string ref, For
 */
 static void prepareDatabaseWithNoTypeSubscriptions(void) {
 
-    prepareDatabase();
+  LM_M(("******************** IN prepareDatabaseWithNoTypeSubscriptions"));
+
+    prepareDatabase(false);
 
     DBClientBase* connection = getMongoConnection();
 
@@ -422,7 +429,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
                       );
 
     BSONObj sub4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
-                        "expiration" << 1500000000 <<
+                        "expiration" << (long long) 1500000000 <<
                         "lastNotification" << 20000000 <<
                         "reference" << "http://notify4.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
@@ -434,7 +441,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
                         );
 
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
-                        "expiration" << 1500000000 <<
+                        "expiration" << (long long) 1500000000 <<
                         "lastNotification" << 20000000 <<
                         "reference" << "http://notify5.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E[2-3]" << "isPattern" << "true")) <<
@@ -450,6 +457,9 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
     connection->insert(SUBSCRIBECONTEXT_COLL, sub4);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub5);
 
+    /* Given that preparation including csubs, we have to init cache */
+    subscriptionCacheInit("");
+    subCache->present("unittest: ");
 }
 
 /* ****************************************************************************
@@ -889,7 +899,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "utest", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -911,10 +921,12 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     /* Prepare database */
     prepareDatabase();
 
+    subCache->present("testcase:");
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
-    ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
+    ms = mongoUpdateContext(&req, &res, "utest", servicePathVector, uriParams, "");
 
+    subCache->present("After mongoUpdateContext: ");
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
@@ -956,7 +968,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_appendMatch_pattern)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1018,7 +1030,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_deleteMatch_pattern)
     expectedNcr.subscriptionId.set("51307b66f481db11bf860003");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify3.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
@@ -1083,7 +1095,7 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern_noT
     expectedNcr.subscriptionId.set("51307b66f481db11bf860005");
 
     NotifierMock* notifierMock = new NotifierMock();
-    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", JSON))
+    EXPECT_CALL(*notifierMock, sendNotifyContextRequest(MatchNcr(&expectedNcr),"http://notify5.me", "", "", XML))
             .Times(1);
     EXPECT_CALL(*notifierMock, createIntervalThread(_,_,_))
             .Times(0);
