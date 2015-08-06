@@ -294,7 +294,6 @@ static void prepareDatabase(bool initializeCache = true) {
   if (initializeCache == true)
   {
     subscriptionCacheInit("");
-    subCache->present("unittest: ");
   }
 }
 
@@ -377,7 +376,6 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
 
     /* Given that preparation including csubs, we have to init cache */
     subscriptionCacheInit("");
-    subCache->present("unittest: ");
 }
 
 /* ****************************************************************************
@@ -839,12 +837,10 @@ TEST(mongoUpdateContext_withOnchangeSubscriptions, Cond1_updateMatch_pattern)
     /* Prepare database */
     prepareDatabase();
 
-    subCache->present("testcase:");
     /* Invoke the function in mongoBackend library */
     servicePathVector.clear();    
     ms = mongoUpdateContext(&req, &res, "utest", servicePathVector, uriParams, "");
 
-    subCache->present("After mongoUpdateContext: ");
     /* Check response is as expected */
     EXPECT_EQ(SccOk, ms);
 
