@@ -1431,6 +1431,11 @@ static bool processContextAttributeVector
   {
     ContextAttribute*  targetAttr = ceP->contextAttributeVector.get(ix);
 
+    if (targetAttr->skip == true)
+    {
+      continue;
+    }
+
     /* No matter if success or fail, we have to include the attribute in the response */
     ContextAttribute*  ca         = new ContextAttribute(targetAttr->name, targetAttr->type, "");
 
@@ -1987,7 +1992,7 @@ void searchContextProviders
 *
 * RETURN VALUE
 *   This function returns zero on success (or errors that are already handled by responseP),
-*    and 1 in the case of an intent to 'append-only' an entity that already exists.
+*   and 1 in the case of an intent to 'append-only' an entity that already exists.
 *   
 */
 int processContextElement
@@ -2002,7 +2007,8 @@ int processContextElement
   const std::string&                   caller
 )
 {
-  DBClientBase* connection = NULL;
+  DBClientBase* connection                  = NULL;
+  bool          attributeAlreadyExistsError = false;
 
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
@@ -2145,17 +2151,6 @@ int processContextElement
 
   while (cursor->more())
   {
-    if (strcasecmp(action.c_str(), "appendonly") == 0)
-    {
-      //
-      // For the case of appendonly, no entity can be found.
-      // This directly indicates an error
-      //
-
-      LM_W(("Bad Input (entity already exists)"));
-      return 1;
-    }
-
     BSONObj r = cursor->next();
 
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -2197,7 +2192,8 @@ int processContextElement
      * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
      * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
      * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
-    BSONObj           attrs = r.getField(ENT_ATTRS).embeddedObject();
+    BSONObj           attrs     = r.getField(ENT_ATTRS).embeddedObject();
+    BSONObj           attrNames = r.getField(ENT_ATTRNAMES).embeddedObject();
     BSONObjBuilder    toSet;
     BSONObjBuilder    toUnset;
     BSONArrayBuilder  toPush;
@@ -2227,6 +2223,28 @@ int processContextElement
       locAttr     = loc.getStringField(ENT_LOCATION_ATTRNAME);
       coordLong   = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[0].Double();
       coordLat    = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[1].Double();
+    }
+
+    //
+    // Before calling processContextAttributeVector and actually do the work, let's check if the
+    // request is of type 'append-only' and if we have any problem with attributes already existing.
+    //
+    if (strcasecmp(action.c_str(), "appendonly") == 0)
+    {
+      for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+      {
+        if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name) != 0)
+        {
+          LM_W(("Bad Input (attribute already exists)"));
+          attributeAlreadyExistsError = true;
+
+          //
+          // This attribute should now be removed from the 'query' ...
+          // processContextAttributeVector looks at the 'skip' field
+          //
+          ceP->contextAttributeVector[ix]->skip = true;
+        }
+      }
     }
 
     if (!processContextAttributeVector(ceP,
@@ -2269,7 +2287,7 @@ int processContextElement
       toUnset.append(ENT_LOCATION, 1);
     }
 
-    /* FIXME: I don't like the obj() step, but it could be the only possible way, let's wait for the answer to
+    /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
      * http://stackoverflow.com/questions/29668439/get-number-of-fields-in-bsonobjbuilder-object */
     BSONObjBuilder  updatedEntity;
     BSONObj         toSetObj    = toSet.obj();
@@ -2482,6 +2500,12 @@ int processContextElement
 
       responseP->contextElementResponseVector.push_back(cerP);
     }
+  }
+
+  if (attributeAlreadyExistsError == true)
+  {
+    buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, "one or more of the attributes in the request already exist");
+    responseP->present("attributeAlreadyExists: ");
   }
 
   return 0;  // Response in responseP
