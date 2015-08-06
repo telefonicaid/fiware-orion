@@ -56,7 +56,7 @@ echo
 echo "03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append"
 echo "==================================================================="
 payload='{  "attr1": 2 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json --noPayloadCheck
+orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
 echo
 echo
 
@@ -118,7 +118,6 @@ Date: REGEX(.*)
     "description": "one or more of the attributes in the request already exist: [ attr1 ]",
     "error": "BadRequest"
 }
-
 
 
 04. Make sure it didn't work
