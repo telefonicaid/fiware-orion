@@ -75,19 +75,14 @@ HttpStatusCode mongoUpdateContext
           // If this ContextElement is already existing in mongo, processContextElement
           // returns error 1
           //
-          int r = processContextElement(requestP->contextElementVector.get(ix),
-                                        responseP,
-                                        requestP->updateActionType.get(),
-                                        tenant,
-                                        servicePathV,
-                                        uriParams,
-                                        xauthToken,
-                                        caller);
-          if ((r == 1) && (strcasecmp(requestP->updateActionType.get().c_str(), "appendonly") == 0))
-          {
-            reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
-            return SccNoContent;
-          }
+          processContextElement(requestP->contextElementVector.get(ix),
+                                responseP,
+                                requestP->updateActionType.get(),
+                                tenant,
+                                servicePathV,
+                                uriParams,
+                                xauthToken,
+                                caller);
         }
 
         /* Note that although individual processContextElements() invocations return ConnectionError, this

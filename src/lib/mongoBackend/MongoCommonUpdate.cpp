@@ -1995,7 +1995,7 @@ void searchContextProviders
 *   and 1 in the case of an intent to 'append-only' an entity that already exists.
 *   
 */
-int processContextElement
+void processContextElement
 (
   ContextElement*                      ceP,
   UpdateContextResponse*               responseP,
@@ -2017,7 +2017,7 @@ int processContextElement
   if (isTrue(enP->isPattern))
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
-    return 0;  // Error already in responseP
+    return;  // Error already in responseP
   }
 
   /* Check that UPDATE or APPEND is not used with attributes with empty value */
@@ -2037,7 +2037,7 @@ int processContextElement
                                   " - offending attribute: " + aP->toString() +
                                   " - empty attribute not allowed in APPEND or UPDATE");
         LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
-        return 0;   // Error already in responseP
+        return;   // Error already in responseP
       }
     }
   }
@@ -2125,7 +2125,7 @@ int processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
-    return 0;  // Error already in responseP
+    return;  // Error already in responseP
   }
   catch (...)
   {
@@ -2136,7 +2136,7 @@ int processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + "generic");
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
-    return 0;  // Error already in responseP
+    return;  // Error already in responseP
   }
 
 
@@ -2193,7 +2193,6 @@ int processContextElement
      * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
      * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
     BSONObj           attrs     = r.getField(ENT_ATTRS).embeddedObject();
-    BSONObj           attrNames = r.getField(ENT_ATTRNAMES).embeddedObject();
     BSONObjBuilder    toSet;
     BSONObjBuilder    toUnset;
     BSONArrayBuilder  toPush;
@@ -2491,7 +2490,7 @@ int processContextElement
           {
             cerP->statusCode.fill(SccReceiverInternalError, err);
             responseP->contextElementResponseVector.push_back(cerP);
-            return 0;  // Error already in responseP
+            return;  // Error already in responseP
           }
         }
 
@@ -2505,8 +2504,7 @@ int processContextElement
   if (attributeAlreadyExistsError == true)
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, "one or more of the attributes in the request already exist");
-    responseP->present("attributeAlreadyExists: ");
   }
 
-  return 0;  // Response in responseP
+  // Response in responseP
 }
