@@ -24,6 +24,7 @@
 */
 #include <string.h>
 #include <string>
+#include <sstream>
 
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
@@ -70,6 +71,19 @@ Format stringToFormat(const std::string& s)
   return NOFORMAT;
 }
 
+/* ****************************************************************************
+*
+* isFloat -
+*/
+bool isFloat(const std::string& s)
+{
+  // Thanks to http://stackoverflow.com/questions/447206/c-isfloat-function
+  std::istringstream iss(s);
+  float f;
+  iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
+  // Check the entire string was consumed and if either failbit or badbit is set
+  return iss.eof() && !iss.fail();
+}
 
 
 /* ****************************************************************************
