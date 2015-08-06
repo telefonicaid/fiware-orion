@@ -2005,6 +2005,7 @@ void processContextElement
 {
   DBClientBase* connection                  = NULL;
   bool          attributeAlreadyExistsError = false;
+  std::string   attributeAlreadyExistsList  = "[ ";
 
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
@@ -2238,8 +2239,16 @@ void processContextElement
           // processContextAttributeVector looks at the 'skip' field
           //
           ceP->contextAttributeVector[ix]->skip = true;
+
+          // Add to the list of existing attributes - for the error response
+          if (attributeAlreadyExistsList != "[ ")
+          {
+            attributeAlreadyExistsList += ", ";
+          }
+          attributeAlreadyExistsList += ceP->contextAttributeVector[ix]->name;          
         }
       }
+      attributeAlreadyExistsList += " ]";
     }
 
     if (!processContextAttributeVector(ceP,
@@ -2499,7 +2508,9 @@ void processContextElement
 
   if (attributeAlreadyExistsError == true)
   {
-    buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, "one or more of the attributes in the request already exist");
+    std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
+
+    buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
   }
 
   // Response in responseP

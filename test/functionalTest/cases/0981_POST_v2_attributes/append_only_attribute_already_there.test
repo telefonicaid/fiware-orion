@@ -32,6 +32,8 @@ brokerStart CB
 #
 # 01. Create E1/attr1, with append-only
 # 02. Create E1/attr1, again - should fail
+# 03. Make sure E1 exists - and that attr1 == 1, not 2
+#
 
 echo "01. Create E1/attr1"
 echo "==================="
@@ -69,12 +71,12 @@ Date: REGEX(.*)
 02. Create E1/attr1 again - should fail
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 97
+Content-Length: 108
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "one or more of the attributes in the request already exist",
+    "description": "one or more of the attributes in the request already exist: [ attr1 ]",
     "error": "BadRequest"
 }
 
