@@ -47,6 +47,9 @@ typedef struct NotifyCondition
   ConditionValueList        condValueList;   // Optional
   RestrictionString         restriction;     // Optional
 
+  NotifyCondition();
+  NotifyCondition(NotifyCondition* ncP);
+
   std::string   render(Format format, const std::string& indent, bool notLastInVector);
   void          present(const std::string& indent, int ix);
   void          release(void);

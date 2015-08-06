@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_CACHE_SUBCACHE_H_
+#define SRC_LIB_CACHE_SUBCACHE_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,34 +26,36 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
-#include "jsonParseV2/jsonRequestTreat.h"
-#include "jsonParseV2/parseEntity.h"
+
+namespace orion
+{
+
+class SubscriptionCache;
+
+
+/* ****************************************************************************
+*
+* subCache - 
+*/
+extern SubscriptionCache* subCache;
 
 
 
 /* ****************************************************************************
 *
-* jsonRequestTreat - 
+* subscriptionCacheInit - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
-{
-  std::string answer;
+extern void subscriptionCacheInit(std::string dbName);
 
-  switch (requestType)
-  {
-  case EntitiesRequest:
-    answer = parseEntity(ciP, &parseDataP->ent.res);
-    break;
 
-  default:
-    answer = "Request Treat function not implemented";
-    break;
-  }
-  
-  return answer;
-}
+
+/* ****************************************************************************
+*
+* subCacheMutexWaitingTimeGet - 
+*/
+extern void subCacheMutexWaitingTimeGet(char* buf, int bufLen);
+
+}  // namespace orion
+
+#endif  // SRC_LIB_CACHE_SUBCACHE_H_

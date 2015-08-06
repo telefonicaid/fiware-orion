@@ -37,6 +37,9 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
+#include "cache/Subscription.h"
+#include "cache/SubscriptionCache.h"
+#include "cache/subCache.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -1032,8 +1035,10 @@ static bool addTriggeredSubscriptions
   std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
   BSONObj     spBson       = fromjson(inRegex);
 
-  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
-  BSONObj queryNoPattern = BSON(
+  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type. Only
+   * subscriptions for no pattern entities are queried, subscriptions for pattern entities are searched
+   * in the cache */
+  BSONObj query = BSON(
                 entIdQ << entityId <<
                 "$or" << BSON_ARRAY(
                     BSON(entTypeQ << entityType) <<
@@ -1043,39 +1048,6 @@ static bool addTriggeredSubscriptions
                 condValueQ << attr <<
                 CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
                 CSUB_SERVICE_PATH << spBson);
-
-  /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
-   * way to do a "reverse regex" query in MongoDB (see
-   * http://stackoverflow.com/questions/15966991/mongodb-reverse-regex/15989520).
-   * Note that although we are using a isPattern=true in the MongoDB query besides $where, we
-   * also need to check that in the if statement in the JavaScript function given that a given
-   * sub document could include both isPattern=true and isPattern=false documents */
-  std::string function = std::string("function()") +
-         "{" +
-            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
-                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
-                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
-                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
-                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
-                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
-                    "return true; " +
-                "}" +
-            "}" +
-            "return false; " +
-         "}";
-  LM_T(LmtMongo, ("JS function: %s", function.c_str()));
-
-  BSONObjBuilder  queryPattern;
-
-  queryPattern.append(entPatternQ, "true");
-  queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
-  queryPattern.append(condValueQ, attr);
-  queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
-  queryPattern.append(CSUB_SERVICE_PATH, spBson);
-  queryPattern.appendCode("$where", function);
-
-  // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
-  BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
 
   LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
                   getSubscribeContextCollectionName(tenant).c_str(),
@@ -1153,10 +1125,54 @@ static bool addTriggeredSubscriptions
           lastNotification,
           sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
           STR_FIELD(sub, CSUB_REFERENCE),
-          subToAttributeList(sub));
+          subToAttributeList(sub), NULL);
 
       subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
     }
+  }
+
+
+  //
+  // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
+  //
+  std::vector<Subscription*> subVec;
+  LM_M(("KZ: looking up subscriptions from subCache (tenant: %s, servicePath: %s, entityId: %s, entityType: %s)", tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str()));
+  subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
+  LM_M(("KZ: got %d subscriptions from subCache", subVec.size()));
+  int now = getCurrentTime();
+  for (unsigned int ix = 0; ix < subVec.size(); ++ix)
+  {
+    Subscription* sP = subVec[ix];
+
+    sP->pendingNotifications += 1;
+    // Outdated subscriptions are skipped
+    if (sP->expirationTime < now)
+    {
+      LM_M(("KZ: subscription %s is expired", sP->subscriptionId.c_str()));
+      continue;
+    }
+
+    AttributeList aList;
+
+    aList.fill(sP->attributes);
+
+    // Throttling
+    if ((sP->throttling != -1) && (sP->lastNotificationTime != -1))
+    {
+      if ((now - sP->lastNotificationTime) < sP->throttling)
+      {
+        LM_M(("KZ: subscription %s skipped due to throttling", sP->subscriptionId.c_str()));
+        continue;
+      }
+    }
+
+    TriggeredSubscription* sub = new TriggeredSubscription((long long) sP->throttling,
+                                                           (long long) sP->lastNotificationTime,
+                                                           sP->format,
+                                                           sP->reference.get(),
+                                                           aList,
+                                                           sP);
+    subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
   }
 
   return true;
@@ -1180,7 +1196,7 @@ static bool processSubscriptions
 {
   DBClientBase* connection = NULL;
 
-  /* For each one of the subscriptions in the map, send notification */
+  /* For each subscription in the map, send notification */
   bool ret = true;
   err = "";
 
@@ -1224,6 +1240,7 @@ static bool processSubscriptions
       BSONObj update = BSON("$set" << BSON(CSUB_LASTNOTIFICATION << getCurrentTime()) <<
                             "$inc" << BSON(CSUB_COUNT << 1));
 
+
       try
       {
         LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getSubscribeContextCollectionName(tenant).c_str(),
@@ -1237,6 +1254,19 @@ static bool processSubscriptions
         LM_I(("Database Operation Successful (update: %s, query: %s)",
               update.toString().c_str(),
               query.toString().c_str()));
+
+        //
+        // Saving lastNotificationTime for cached subscription
+        //
+        if (trigs->cacheSubReference != NULL)
+        {
+          trigs->cacheSubReference->pendingNotifications -= 1;
+
+          if (trigs->cacheSubReference->pendingNotifications == 0)
+          {
+            trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
+          }
+        }
       }
       catch (const DBException &e)
       {

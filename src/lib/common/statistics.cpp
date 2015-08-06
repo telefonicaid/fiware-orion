@@ -127,6 +127,11 @@ int noOfEntityAttributeResponses                         = -1;
 
 int noOfPostEntity                                       = -1;
 
+int noOfSubCacheEntries                                  = -1;
+int noOfSubCacheLookups                                  = -1;
+int noOfSubCacheRemovals                                 = -1;
+int noOfSubCacheRemovalFailures                          = -1;
+
 
 
 /* ****************************************************************************

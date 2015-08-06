@@ -29,6 +29,7 @@
 #include <string>
 #include "common/Format.h"
 #include "ngsi/AttributeList.h"
+#include "cache/SubscriptionCache.h"
 
 /* ****************************************************************************
 *
@@ -52,12 +53,14 @@ class TriggeredSubscription
   Format        format;
   std::string   reference;
   AttributeList attrL;
+  Subscription* cacheSubReference;
 
   TriggeredSubscription(long long          _throttling,
                         long long          _lastNotification,
                         Format             _format,
                         const std::string& _reference,
-                        AttributeList      _attrL);
+                        AttributeList      _attrL,
+                        Subscription*      _cacheSubReference);
 
   TriggeredSubscription(Format             _format,
                         const std::string& _reference,

@@ -89,10 +89,10 @@ std::string ConditionValueList::check
 */
 void ConditionValueList::present(const std::string& indent)
 {
-  LM_F(("%sConditionValue List\n",    indent.c_str()));
+  LM_F(("%sConditionValue List",    indent.c_str()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
-    LM_F(("%s  %s\n", indent.c_str(), vec[ix].c_str()));
+    LM_F(("%s  %s", indent.c_str(), vec[ix].c_str()));
 }
 
 
@@ -137,4 +137,18 @@ unsigned int ConditionValueList::size(void)
 std::string ConditionValueList::get(int ix)
 {
   return vec[ix];
+}
+
+
+
+/* ****************************************************************************
+*
+* ConditionValueList::fill - 
+*/
+void ConditionValueList::fill(ConditionValueList& list)
+{
+  for (unsigned int cvIx = 0; cvIx < list.size(); ++cvIx)
+  {
+    push_back(list[cvIx]);
+  }
 }

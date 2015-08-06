@@ -233,6 +233,8 @@ SET (SOURCES
     rest/restReply_test.cpp
     rest/RestService_test.cpp
     rest/rest_test.cpp
+
+    cache/SubscriptionCache_test.cpp
 )
 
 SET (HEADERS
@@ -246,6 +248,7 @@ SET (STATIC_LIBS
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
     mongoBackend
+    cache
     rest
     ngsiNotify
     jsonParse

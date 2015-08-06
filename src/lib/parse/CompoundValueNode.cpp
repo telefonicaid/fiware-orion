@@ -573,14 +573,11 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
   bool         jsonComma = siblingNo < (int) container->childV.size() - 1;
   std::string  tagName   = (container->valueType == orion::ValueTypeVector)? "item" : name;
 
-  LM_M(("In render"));
   if (ciP->apiVersion == "v2")
   {
-    LM_M(("V2 so toJson instead of render"));
     return toJson(true); // FIXME P8: The info on comma-after-or-not is not available here ...
   }
 
-  LM_M(("Still in render (ciP->apiVersion == %s)", ciP->apiVersion.c_str()));
   if (valueType == orion::ValueTypeString)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
@@ -660,9 +657,6 @@ std::string CompoundValueNode::toJson(bool isLastElement)
   {
     jsonComma = false;
   }
-
-  LM_M(("In CompoundValueNode::toJson (%s, type %s, jsonComma: %s, siblings: %d)",
-        name.c_str(), orion::valueTypeName(valueType), jsonComma? "true" : "false", container->childV.size()));
 
   if (valueType == orion::ValueTypeString)
   {
@@ -768,15 +762,13 @@ std::string CompoundValueNode::toJson(bool isLastElement)
       LM_T(LmtCompoundValueRender, ("I am the TREE ROOT (%s: %d children)", name.c_str(), childV.size()));
       for (uint64_t ix = 0; ix < childV.size(); ++ix)
       {
-        LM_M(("Calling toJson for child %d: %s", ix, childV[ix]->name.c_str()));
         out += childV[ix]->toJson(true);
-        LM_M(("out: %s", out.c_str()));
       }
     }
   }
 
   out += jsonComma? "," : "";
-  LM_M(("out[%s]: %s", name.c_str(), out.c_str()));
+
   return out;
 }
 

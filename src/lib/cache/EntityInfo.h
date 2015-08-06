@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_CACHE_ENTITYINFO_H_
+#define SRC_LIB_CACHE_ENTITYINFO_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,35 +25,35 @@
 *
 * Author: Ken Zangelin
 */
+#include <regex.h>
 #include <string>
-#include <vector>
 
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
-#include "jsonParseV2/jsonRequestTreat.h"
-#include "jsonParseV2/parseEntity.h"
-
+namespace orion
+{
 
 
 /* ****************************************************************************
 *
-* jsonRequestTreat - 
+* EntityInfo - 
+*
+* The struct fields:
+* -------------------------------------------------------------------------------
+* o entityIdPattern      regex describing EntityId::id (OMA NGSI type)
+* o entityType           string containing the type of the EntityId
+*
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
+typedef struct EntityInfo
 {
-  std::string answer;
+  regex_t       entityIdPattern;
+  std::string   entityType;
 
-  switch (requestType)
-  {
-  case EntitiesRequest:
-    answer = parseEntity(ciP, &parseDataP->ent.res);
-    break;
+  EntityInfo() {}
+  EntityInfo(const std::string& idPattern, const std::string& _entityType);
+  bool          match(const std::string& idPattern, const std::string& type);
+  void          release(void);
+  void          present(const std::string& prefix);
+} EntityInfo;
 
-  default:
-    answer = "Request Treat function not implemented";
-    break;
-  }
-  
-  return answer;
-}
+}  // namespace orion
+
+#endif  // SRC_LIB_CACHE_ENTITYINFO_H_

@@ -22,35 +22,31 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
+#include "cache/subCache.h"
+#include "cache/SubscriptionCache.h"
 
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
-#include "jsonParseV2/jsonRequestTreat.h"
-#include "jsonParseV2/parseEntity.h"
+
+
+namespace orion
+{
+
+
+/* ****************************************************************************
+*
+* subCache - global singleton for the subscription cache
+*/
+SubscriptionCache* subCache = NULL;
 
 
 
 /* ****************************************************************************
 *
-* jsonRequestTreat - 
+* subscriptionCacheInit - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
+void subscriptionCacheInit(std::string dbName)
 {
-  std::string answer;
+  subCache = new SubscriptionCache(dbName);
+  subCache->init();
+}
 
-  switch (requestType)
-  {
-  case EntitiesRequest:
-    answer = parseEntity(ciP, &parseDataP->ent.res);
-    break;
-
-  default:
-    answer = "Request Treat function not implemented";
-    break;
-  }
-  
-  return answer;
 }

@@ -39,6 +39,7 @@
 #include "common/sem.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "ngsiNotify/Notifier.h"
+#include "cache/SubscriptionCache.h"
 
 #include "unittest.h"
 

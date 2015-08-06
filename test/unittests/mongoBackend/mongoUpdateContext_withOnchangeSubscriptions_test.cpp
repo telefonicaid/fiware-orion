@@ -1,4 +1,3 @@
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -35,6 +34,8 @@
 #include "ngsi/ContextElementResponse.h"
 #include "ngsi10/UpdateContextRequest.h"
 #include "ngsi10/UpdateContextResponse.h"
+#include "cache/SubscriptionCache.h"
+#include "cache/subCache.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -122,7 +123,7 @@ extern void setMongoConnectionForUnitTest(DBClientBase*);
 * This function is called before every test, to populate some information in the
 * entities and csbus collections.
 */
-static void prepareDatabase(void) {
+static void prepareDatabase(bool initializeCache = true) {
 
   /* Set database */
   setupDatabase();
@@ -233,7 +234,7 @@ static void prepareDatabase(void) {
                     );
 
   BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
-                      "expiration" << 1500000000 <<
+                      "expiration" << (long long) 1500000000 <<
                       "lastNotification" << 20000000 <<
                       "reference" << "http://notify1.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
@@ -245,7 +246,7 @@ static void prepareDatabase(void) {
                       );
 
   BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
-                      "expiration" << 2000000000 <<
+                      "expiration" << (long long) 2000000000 <<
                       "lastNotification" << 30000000 <<
                       "reference" << "http://notify2.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E2" << "type" << "T2" << "isPattern" << "false")) <<
@@ -269,7 +270,7 @@ static void prepareDatabase(void) {
                       );
 
   BSONObj sub3 = BSON("_id" << OID("51307b66f481db11bf860003") <<
-                      "expiration" << 1500000000 <<
+                      "expiration" << (long long) 1500000000 <<
                       "lastNotification" << 20000000 <<
                       "reference" << "http://notify3.me" <<
                       "entities" << BSON_ARRAY(BSON("id" << "E[1-2]" << "type" << "T" << "isPattern" << "true")) <<
@@ -289,7 +290,14 @@ static void prepareDatabase(void) {
   connection->insert(SUBSCRIBECONTEXT_COLL, sub2);
   connection->insert(SUBSCRIBECONTEXT_COLL, sub3);
 
+  /* Given that preparation including csubs, we have to init cache */
+  if (initializeCache == true)
+  {
+    subscriptionCacheInit("");
+  }
 }
+
+
 
 /* ****************************************************************************
 *
@@ -301,7 +309,7 @@ static void prepareDatabase(void) {
 */
 static void prepareDatabaseWithNoTypeSubscriptions(void) {
 
-    prepareDatabase();
+    prepareDatabase(false);
 
     DBClientBase* connection = getMongoConnection();
 
@@ -338,7 +346,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
                       );
 
     BSONObj sub4 = BSON("_id" << OID("51307b66f481db11bf860004") <<
-                        "expiration" << 1500000000 <<
+                        "expiration" << (long long) 1500000000 <<
                         "lastNotification" << 20000000 <<
                         "reference" << "http://notify4.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "isPattern" << "false")) <<
@@ -350,7 +358,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
                         );
 
     BSONObj sub5 = BSON("_id" << OID("51307b66f481db11bf860005") <<
-                        "expiration" << 1500000000 <<
+                        "expiration" << (long long) 1500000000 <<
                         "lastNotification" << 20000000 <<
                         "reference" << "http://notify5.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E[2-3]" << "isPattern" << "true")) <<
@@ -366,6 +374,8 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
     connection->insert(SUBSCRIBECONTEXT_COLL, sub4);
     connection->insert(SUBSCRIBECONTEXT_COLL, sub5);
 
+    /* Given that preparation including csubs, we have to init cache */
+    subscriptionCacheInit("");
 }
 
 /* ****************************************************************************

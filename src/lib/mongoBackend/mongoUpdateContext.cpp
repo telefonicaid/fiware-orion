@@ -86,5 +86,6 @@ HttpStatusCode mongoUpdateContext
         responseP->errorCode.fill(SccOk);
     }    
     reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
+    
     return SccOk;
 }
