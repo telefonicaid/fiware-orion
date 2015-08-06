@@ -1984,6 +1984,11 @@ void searchContextProviders
 * 0. Preparations
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
+*
+* RETURN VALUE
+*   This function returns zero on success (or errors that are already handled by responseP),
+*    and 1 in the case of an intent to 'append-only' an entity that already exists.
+*   
 */
 int processContextElement
 (
