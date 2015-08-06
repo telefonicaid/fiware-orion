@@ -37,7 +37,9 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
+#include "cache/Subscription.h"
 #include "cache/SubscriptionCache.h"
+#include "cache/subCache.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -1134,8 +1136,9 @@ static bool addTriggeredSubscriptions
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
   std::vector<Subscription*> subVec;
+  LM_M(("KZ: looking up subscriptions from subCache (tenant: %s, servicePath: %s, entityId: %s, entityType: %s)", tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str()));
   subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
-
+  LM_M(("KZ: got %d subscriptions from subCache", subVec.size()));
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
@@ -1145,6 +1148,7 @@ static bool addTriggeredSubscriptions
     // Outdated subscriptions are skipped
     if (sP->expirationTime < now)
     {
+      LM_M(("KZ: subscription %s is expired", sP->subscriptionId.c_str()));
       continue;
     }
 
@@ -1157,6 +1161,7 @@ static bool addTriggeredSubscriptions
     {
       if ((now - sP->lastNotificationTime) < sP->throttling)
       {
+        LM_M(("KZ: subscription %s skipped due to throttling", sP->subscriptionId.c_str()));
         continue;
       }
     }
@@ -1236,19 +1241,6 @@ static bool processSubscriptions
                             "$inc" << BSON(CSUB_COUNT << 1));
 
 
-      //
-      // Saving lastNotificationTime for cached subscription
-      //
-      if (trigs->cacheSubReference != NULL)
-      {
-        trigs->cacheSubReference->pendingNotifications -= 1;
-
-        if (trigs->cacheSubReference->pendingNotifications == 0)
-        {
-          trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
-        }
-      }
-
       try
       {
         LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getSubscribeContextCollectionName(tenant).c_str(),
@@ -1262,6 +1254,19 @@ static bool processSubscriptions
         LM_I(("Database Operation Successful (update: %s, query: %s)",
               update.toString().c_str(),
               query.toString().c_str()));
+
+        //
+        // Saving lastNotificationTime for cached subscription
+        //
+        if (trigs->cacheSubReference != NULL)
+        {
+          trigs->cacheSubReference->pendingNotifications -= 1;
+
+          if (trigs->cacheSubReference->pendingNotifications == 0)
+          {
+            trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
+          }
+        }
       }
       catch (const DBException &e)
       {
