@@ -70,11 +70,6 @@ HttpStatusCode mongoUpdateContext
         /* Process each ContextElement */
         for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
         {
-          //
-          // For an appendonly operation, there is only one ContextElement.
-          // If this ContextElement is already existing in mongo, processContextElement
-          // returns error 1
-          //
           processContextElement(requestP->contextElementVector.get(ix),
                                 responseP,
                                 requestP->updateActionType.get(),
