@@ -55,8 +55,9 @@ std::string deleteEntity
   ParseData*                 parseDataP
 )
 {
-  std::string answer;
-  Entity  *eP = new Entity();
+  std::string  answer;
+  Entity*      eP = new Entity();
+
   eP->id = compV[2];
 
   // Fill in UpdateContextRequest
@@ -67,8 +68,9 @@ std::string deleteEntity
 
 
   // Prepare status code
-  if (ciP->httpStatusCode == SccOk || ciP->httpStatusCode == SccNone) {
-      ciP->httpStatusCode = SccNoContent;
+  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
+  {
+    ciP->httpStatusCode = SccNoContent;
   }
 
   // Cleanup and return result
