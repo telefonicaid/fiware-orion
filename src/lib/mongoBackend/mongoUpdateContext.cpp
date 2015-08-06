@@ -86,7 +86,6 @@ HttpStatusCode mongoUpdateContext
           if ((r == 1) && (strcasecmp(requestP->updateActionType.get().c_str(), "appendonly") == 0))
           {
             reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
-            LM_M(("KZ: mongoUpdateContext returns SccNoContent"));
             return SccNoContent;
           }
         }

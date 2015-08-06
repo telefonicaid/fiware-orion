@@ -2147,7 +2147,7 @@ int processContextElement
       // This directly indicates an error
       //
 
-      LM_W(("KZ: Bad Input (entity already exists)"));
+      LM_W(("Bad Input (entity already exists)"));
       return 1;
     }
 
