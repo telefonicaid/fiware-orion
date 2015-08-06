@@ -77,7 +77,7 @@ std::string parseAttributes(ConnectionInfo* ciP, Entity* eP)
     }
     else if (name == "type")
     {
-      LM_W(("Bad Input ('type'' is not a valid attribute"));
+      LM_W(("Bad Input ('type' is not a valid attribute"));
       eP->errorCode.fill("ParseError", "invalid input, 'type' as attribute");
       ciP->httpStatusCode = SccBadRequest;;
       return eP->render(ciP, EntitiesRequest);

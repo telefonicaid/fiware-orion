@@ -2026,7 +2026,7 @@ int processContextElement
                                   " - offending attribute: " + aP->toString() +
                                   " - empty attribute not allowed in APPEND or UPDATE");
         LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
-        return 0;   // Erroralreadyin responseP
+        return 0;   // Error already in responseP
       }
     }
   }
