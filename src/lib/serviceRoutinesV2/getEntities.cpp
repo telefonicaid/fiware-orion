@@ -33,8 +33,6 @@
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutines/postQueryContext.h"
 
-
-
 /* ****************************************************************************
 *
 * getEntities - 
@@ -67,14 +65,23 @@ std::string getEntities
   Entities     entities;
   typedef vector<string> vstr;
   typedef vstr::size_type vstr_sz;
+  string answer;
 
   // optional parameter for list of IDs
-  string listIDs = ciP->uriParam["id"];
-  string pattern;
+  string paramIDs = ciP->uriParam["id"];
+  string paramPattern = ciP->uriParam["idPattern"];
+  string pattern = ".*"; // all entities, default value
 
-  if (listIDs != "") {
+  if (paramPattern != "" && paramIDs != "")
+  {
+    ciP->httpStatusCode = SccBadRequest;
+    answer = "{\"error\":\"Incompatible parameters: id, IdPattern\"";
+    return answer;
+  }
+  else if (paramIDs != "") {
+    // TODO: a more efficient query could be possible ...
     vstr idsV;
-    stringSplit(listIDs, ',', idsV);
+    stringSplit(paramIDs, ',', idsV);
     vstr_sz sz = idsV.size();
     for(vstr_sz ix = 0; ix != sz; ++ix) {
       if (ix != 0)
@@ -84,19 +91,24 @@ std::string getEntities
       pattern += idsV[ix];
     }
   }
-  else
+  else if (paramPattern != "")
   {
-    pattern = ".*";
+    pattern = paramPattern;
   }
 
-
   // 01. Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(pattern, "", "true", EntityTypeEmptyOrNotEmpty, "");
+  // type "" is valid for all types
+  parseDataP->qcr.res.fill(pattern, ciP->uriParam["type"], "true", EntityTypeEmptyOrNotEmpty, "");
   
 
   // 02. Call standard op postQueryContext
-  string answer = postQueryContext(ciP, components, compV, parseDataP);
+  answer = postQueryContext(ciP, components, compV, parseDataP);
 
+  if (ciP->httpStatusCode != SccOk)
+  {
+    // Something went wrong in the query, an invalid pattern for example
+    return answer;
+  }
 
   // 03. Render Entities response
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)

@@ -30,17 +30,17 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. GET /v2/entities?id=E1
+# 01. GET /v2/entities?idPattern=E.*
 # 02. POST /v1/updateContext
-# 03. GET /v2/entities?id=E1
-# 04. GET /v2/entities?id=E1&count=true
+# 03. GET /v2/entities?idPattern=E.*
+# 04. GET /v2/entities?idPattern=E1&count=true
 # 05. POST /v1/updateContext with compound attribute value
-# 06. GET /v2/entities?id=E1,E2
-# 07. GET /v2/entities?id=E2,E3
+# 06. GET /v2/entities?idPattern=E(1|2)
+# 07. GET /v2/entities?idPattern=E[2-3]
 
-echo "01. GET /v2/entities?id=E1"
-echo "=========================="
-orionCurl --url /v2/entities?id=E1 --json
+echo "01. GET /v2/entities?idPattern=E.*"
+echo "=================================="
+orionCurl --url '/v2/entities?idPattern=E.*' --json
 echo
 echo
 
@@ -126,16 +126,16 @@ echo
 echo
 
 
-echo "03. GET /v2/entities?id=E1"
-echo "=========================="
-orionCurl --url /v2/entities?id=E1 --json
+echo "03. GET /v2/entities?idPattern=E.*"
+echo "=================================="
+orionCurl --url '/v2/entities?idPattern=E.*' --json
 echo
 echo
 
 
-echo "04. GET /v2/entities?id=E1&count=true"
-echo "====================================="
-orionCurl --url /v2/entities?id=E1\&count=true --json
+echo "04. GET /v2/entities?idPattern=E1&count=true"
+echo "============================================"
+orionCurl --url '/v2/entities?idPattern=E1&count=true' --json
 echo
 echo
 
@@ -162,21 +162,21 @@ echo
 echo
 
 
-echo "06. GET /v2/entities?id=E1,E2"
-echo "============================="
-orionCurl --url /v2/entities?id=E1,E2 --json
+echo "06. GET /v2/entities?idPattern=E(1|2)"
+echo "====================================="
+orionCurl --url '/v2/entities?idPattern=E(1|2)' --json
 echo
 echo
 
 
-echo "07. GET /v2/entities?id=E2,E3"
-echo "============================="
-orionCurl --url /v2/entities?id=E2,E3 --json
+echo "07. GET /v2/entities?idPattern=E\[23\]"
+echo "======================================"
+orionCurl --url '/v2/entities?idPattern=E\[23\]' --json
 echo
 echo
 --REGEXPECT--
-01. GET /v2/entities?id=E1
-==========================
+01. GET /v2/entities?idPattern=E.*
+==================================
 HTTP/1.1 200 OK
 Content-Length: 2
 Content-Type: application/json
@@ -280,8 +280,8 @@ Date: REGEX(.*)
 }
 
 
-03. GET /v2/entities?id=E1
-==========================
+03. GET /v2/entities?idPattern=E.*
+==================================
 HTTP/1.1 200 OK
 Content-Length: 288
 Content-Type: application/json
@@ -322,8 +322,8 @@ Date: REGEX(.*)
 ]
 
 
-04. GET /v2/entities?id=E1&count=true
-=====================================
+04. GET /v2/entities?idPattern=E1&count=true
+============================================
 HTTP/1.1 200 OK
 Content-Length: 288
 Content-Type: application/json
@@ -396,8 +396,8 @@ Date: REGEX(.*)
 }
 
 
-06. GET /v2/entities?id=E1,E2
-=============================
+06. GET /v2/entities?idPattern=E(1|2)
+=====================================
 HTTP/1.1 200 OK
 Content-Length: 337
 Content-Type: application/json
@@ -446,8 +446,8 @@ Date: REGEX(.*)
 ]
 
 
-07. GET /v2/entities?id=E2,E3
-=============================
+07. GET /v2/entities?idPattern=E\[23\]
+======================================
 HTTP/1.1 200 OK
 Content-Length: 50
 Content-Type: application/json
