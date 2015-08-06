@@ -36,7 +36,6 @@ brokerStart CB
 # 04. Make sure it didn't work
 # 05. Now update E1, using POST /v2/entities/E1
 # 06. Make sure it worked
-# 07. Try some other verb
 #
 
 echo "01. Create E1"
@@ -84,13 +83,6 @@ echo
 echo
 
 
-echo "07. Try some other verb"
-echo "======================="
-orionCurl --url /v2/entities/E1 --json -X PUT --payload "123"
-echo
-echo
-
-
 --REGEXPECT--
 01. Create E1
 =============
@@ -117,10 +109,15 @@ Date: REGEX(.*)
 
 03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append
 ===================================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "description": "one or more of the attributes in the request already exist: [ attr1 ]",
+    "error": "BadRequest"
+}
 
 
 
@@ -158,15 +155,6 @@ Date: REGEX(.*)
     "attr1": 5.0, 
     "id": "E1"
 }
-
-
-07. Try some other verb
-=======================
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: GET, POST, DELETE
-Date: REGEX(.*)
-
 
 
 --TEARDOWN--

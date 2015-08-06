@@ -31,110 +31,22 @@
 #include <string>
 #include <vector>
 
+#include "mongo/client/dbclient.h"
+
 #include "common/Format.h"
 #include "ngsi/Restriction.h"
 #include "ngsi/Reference.h"
 #include "ngsi/NotifyConditionVector.h"
+#include "cache/EntityInfo.h"
+#include "cache/Subscription.h"
 
 struct SubscribeContextRequest;
 struct UpdateContextSubscriptionRequest;
 
+using namespace mongo;
+
 namespace orion
 {
-
-
-/* ****************************************************************************
-*
-* EntityInfo - 
-*
-* The struct fields:
-* -------------------------------------------------------------------------------
-* o entityIdPattern      regex describing EntityId::id (OMA NGSI type)
-* o entityType           string containing the type of the EntityId
-*
-*/
-typedef struct EntityInfo
-{
-  regex_t       entityIdPattern;
-  std::string   entityType;
-
-  EntityInfo() {}
-  EntityInfo(const std::string& idPattern, const std::string& _entityType);
-  bool          match(const std::string& idPattern, const std::string& type);
-  void          release(void);
-} EntityInfo;
-
-
-
-/* ****************************************************************************
-*
-* Subscription -
-*
-* The class fields:
-* -------------------------------------------------------------------------------
-* o subscriptionId         the subscription ID from the database
-* o entityIdInfos          list of EntityInfo
-* o attributes             list of strings of attribute names
-* o throttling             throttling time in seconds
-* o expirationTime         expiration time expressed as Unix seconds since epoch
-* o restriction            Restriction (OMA NGSI type)
-* o notifyConditionVector  list of NotifyCondition (OMA NGSI type)
-* o Reference              Info on the receiver of the notification
-*
-*/
-class Subscription
-{
- public:
-  std::string               tenant;
-  std::string               servicePath;
-  std::string               subscriptionId;
-  std::vector<EntityInfo*>  entityIdInfos;
-  std::vector<std::string>  attributes;
-  int64_t                   throttling;
-  int64_t                   expirationTime;
-  Restriction               restriction;
-  NotifyConditionVector     notifyConditionVector;
-  Reference                 reference;
-
-  int                       lastNotificationTime;
-  int                       pendingNotifications;
-  Format                    format;
-
-  Subscription();
-  Subscription(const std::string& _tenant, const std::string& _servicePath, const std::string& _subscriptionId, Format _format);
-
-  Subscription(const std::string&        _tenant,
-               const std::string&        _servicePath,
-               SubscribeContextRequest*  scrP,
-               std::string               _subscriptionId,
-               int64_t                   _expiration,
-               Format                    _format);
-
-  Subscription(const std::string&               _tenant,
-               const std::string&               _servicePath,
-               const std::string&               _subscriptionId,
-               const std::vector<EntityInfo*>&  _entityIdInfos,
-               const std::vector<std::string>&  _attributes,
-               int64_t                          _throttling,
-               int64_t                          _expirationTime,
-               const Restriction&               _restriction,
-               NotifyConditionVector&           _notifyConditionVector,
-               const std::string&               _reference,
-               Format                           _format);
-
-  void entityIdInfoAdd(EntityInfo* entityIdInfoP);
-  bool match(const std::string&  _tenant,
-             const std::string&  _servicePath,
-             const std::string&  idPattern,
-             const std::string&  type,
-             const std::string&  attributeName);
-  bool servicePathMatch(const std::string&  _servicePath);
-  bool attributeMatch(const std::string& attributeName);
-  bool hasAttribute(const std::string&attributeName);
-  void update(UpdateContextSubscriptionRequest* ucsrP);
-  void release(void);
-};
-
 
 
 /* ****************************************************************************
@@ -158,23 +70,25 @@ class SubscriptionCache
 {
 private:
   std::vector<Subscription*>  subs;
-  std::string                 dbName;
+  std::string                 dbPrefix;
   sem_t                       mutex;
   pthread_t                   mutexOwner;
 
 public:
   SubscriptionCache();
-  SubscriptionCache(std::string _dbName);
+  SubscriptionCache(std::string _dbPrefix);
 
   void           init(void);
   void           fillFromDb(void);
   void           insert(Subscription* sub);
+  void           insert(const std::string& tenant, BSONObj bobj);
   int            remove(Subscription* sub);
   int            remove(const std::string&  tenant,
                         const std::string&  servicePath,
                         const std::string&  subId);
   void           release();
   int            refresh(void);
+  void           present(const std::string& prefix);
   int            size(void) { return subs.size(); }
   Subscription*  lookupById(const std::string&       tenant,
                             const std::string&       servicePath,
@@ -191,30 +105,6 @@ private:
   void           semTake(void);
   void           semGive(void);
 };
-
-
-
-/* ****************************************************************************
-*
-* subCache - 
-*/
-extern SubscriptionCache* subCache;
-
-
-
-/* ****************************************************************************
-*
-* subscriptionCacheInit - 
-*/
-extern void subscriptionCacheInit(std::string dbName);
-
-
-
-/* ****************************************************************************
-*
-* subCacheMutexWaitingTimeGet - 
-*/
-extern void subCacheMutexWaitingTimeGet(char* buf, int bufLen);
 
 }  // namespace orion
 

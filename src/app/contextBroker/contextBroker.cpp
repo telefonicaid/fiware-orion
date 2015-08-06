@@ -186,6 +186,7 @@
 
 #include "common/string.h"
 
+#include "cache/subCache.h"
 #include "cache/SubscriptionCache.h"
 
 
@@ -1569,7 +1570,7 @@ int main(int argC, char* argV[])
     if (subCacheInterval != 0)
     {
       sleep(subCacheInterval);
-      // orion::subCache->refresh();
+      orion::subCache->refresh();
     }
     else
     {

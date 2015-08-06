@@ -34,6 +34,7 @@
 using namespace rapidjson;
 
 
+
 /* ****************************************************************************
 *
 * parseAttributes -
@@ -67,22 +68,19 @@ std::string parseAttributes(ConnectionInfo* ciP, Entity* eP)
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
-    LM_M(("KZ: %s (type: %s)", name.c_str(), type.c_str()));
-
     if (name == "id")
     {
-        LM_W(("Bad Input ('id' is not a valid attribute"));
-        eP->errorCode.fill("ParseError", "invalid input, 'id' as attribute");
-        ciP->httpStatusCode = SccBadRequest;;
-        return eP->render(ciP, EntitiesRequest);
+      LM_W(("Bad Input ('id' is not a valid attribute"));
+      eP->errorCode.fill("ParseError", "invalid input, 'id' as attribute");
+      ciP->httpStatusCode = SccBadRequest;;
+      return eP->render(ciP, EntitiesRequest);
     }
     else if (name == "type")
     {
-
-        LM_W(("Bad Input ('type'' is not a valid attribute"));
-        eP->errorCode.fill("ParseError", "invalid input, 'type' as attribute");
-        ciP->httpStatusCode = SccBadRequest;;
-        return eP->render(ciP, EntitiesRequest);
+      LM_W(("Bad Input ('type' is not a valid attribute"));
+      eP->errorCode.fill("ParseError", "invalid input, 'type' as attribute");
+      ciP->httpStatusCode = SccBadRequest;;
+      return eP->render(ciP, EntitiesRequest);
     }
     else
     {
