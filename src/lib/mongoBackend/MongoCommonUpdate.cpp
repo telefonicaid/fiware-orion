@@ -1431,6 +1431,11 @@ static bool processContextAttributeVector
   {
     ContextAttribute*  targetAttr = ceP->contextAttributeVector.get(ix);
 
+    if (targetAttr->skip == true)
+    {
+      continue;
+    }
+
     /* No matter if success or fail, we have to include the attribute in the response */
     ContextAttribute*  ca         = new ContextAttribute(targetAttr->name, targetAttr->type, "");
 
@@ -1984,6 +1989,7 @@ void searchContextProviders
 * 0. Preparations
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
+*
 */
 void processContextElement
 (
@@ -1997,7 +2003,9 @@ void processContextElement
   const std::string&                   caller
 )
 {
-  DBClientBase* connection = NULL;
+  DBClientBase* connection                  = NULL;
+  bool          attributeAlreadyExistsError = false;
+  std::string   attributeAlreadyExistsList  = "[ ";
 
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
@@ -2006,11 +2014,11 @@ void processContextElement
   if (isTrue(enP->isPattern))
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
-    return;
+    return;  // Error already in responseP
   }
 
   /* Check that UPDATE or APPEND is not used with attributes with empty value */
-  if (strcasecmp(action.c_str(), "update") == 0 || strcasecmp(action.c_str(), "append") == 0)
+  if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "appendonly") == 0))
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -2026,7 +2034,7 @@ void processContextElement
                                   " - offending attribute: " + aP->toString() +
                                   " - empty attribute not allowed in APPEND or UPDATE");
         LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
-        return;
+        return;   // Error already in responseP
       }
     }
   }
@@ -2114,7 +2122,7 @@ void processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
-    return;
+    return;  // Error already in responseP
   }
   catch (...)
   {
@@ -2125,7 +2133,7 @@ void processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + "generic");
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
-    return;
+    return;  // Error already in responseP
   }
 
 
@@ -2181,7 +2189,7 @@ void processContextElement
      * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
      * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
      * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
-    BSONObj           attrs = r.getField(ENT_ATTRS).embeddedObject();
+    BSONObj           attrs     = r.getField(ENT_ATTRS).embeddedObject();
     BSONObjBuilder    toSet;
     BSONObjBuilder    toUnset;
     BSONArrayBuilder  toPush;
@@ -2211,6 +2219,36 @@ void processContextElement
       locAttr     = loc.getStringField(ENT_LOCATION_ATTRNAME);
       coordLong   = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[0].Double();
       coordLat    = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[1].Double();
+    }
+
+    //
+    // Before calling processContextAttributeVector and actually do the work, let's check if the
+    // request is of type 'append-only' and if we have any problem with attributes already existing.
+    //
+    if (strcasecmp(action.c_str(), "appendonly") == 0)
+    {
+      for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+      {
+        if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name) != 0)
+        {
+          LM_W(("Bad Input (attribute already exists)"));
+          attributeAlreadyExistsError = true;
+
+          //
+          // This attribute should now be removed from the 'query' ...
+          // processContextAttributeVector looks at the 'skip' field
+          //
+          ceP->contextAttributeVector[ix]->skip = true;
+
+          // Add to the list of existing attributes - for the error response
+          if (attributeAlreadyExistsList != "[ ")
+          {
+            attributeAlreadyExistsList += ", ";
+          }
+          attributeAlreadyExistsList += ceP->contextAttributeVector[ix]->name;          
+        }
+      }
+      attributeAlreadyExistsList += " ]";
     }
 
     if (!processContextAttributeVector(ceP,
@@ -2253,7 +2291,7 @@ void processContextElement
       toUnset.append(ENT_LOCATION, 1);
     }
 
-    /* FIXME: I don't like the obj() step, but it could be the only possible way, let's wait for the answer to
+    /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
      * http://stackoverflow.com/questions/29668439/get-number-of-fields-in-bsonobjbuilder-object */
     BSONObjBuilder  updatedEntity;
     BSONObj         toSetObj    = toSet.obj();
@@ -2386,6 +2424,7 @@ void processContextElement
   }
   LM_T(LmtServicePath, ("Docs found: %d", docs));
 
+
   /*
    * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()
    * before the query() to check this. However this would add a second interaction with MongoDB.
@@ -2404,7 +2443,7 @@ void processContextElement
     /* All the attributes existing in the request are added to the response with 'found' set to false
      * in the of UPDATE/DELETE and true in the case of APPEND
      */
-    bool foundValue = (strcasecmp(action.c_str(), "append") == 0);
+    bool foundValue = (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "appendonly") == 0);
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -2427,7 +2466,7 @@ void processContextElement
       cerP->statusCode.fill(SccContextElementNotFound);
       responseP->contextElementResponseVector.push_back(cerP);
     }
-    else   /* APPEND */
+    else   /* APPEND or APPENDONLY */
     {
       std::string errReason, errDetail;
 
@@ -2456,7 +2495,7 @@ void processContextElement
           {
             cerP->statusCode.fill(SccReceiverInternalError, err);
             responseP->contextElementResponseVector.push_back(cerP);
-            return;
+            return;  // Error already in responseP
           }
         }
 
@@ -2466,4 +2505,13 @@ void processContextElement
       responseP->contextElementResponseVector.push_back(cerP);
     }
   }
+
+  if (attributeAlreadyExistsError == true)
+  {
+    std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
+
+    buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
+  }
+
+  // Response in responseP
 }

@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_SERVICEROUTINES_POSTATTRIBUTES_H_
+#define SRC_LIB_SERVICEROUTINES_POSTATTRIBUTES_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -20,42 +23,26 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
 #include <string>
 #include <vector>
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
-#include "jsonParseV2/jsonRequestTreat.h"
-#include "jsonParseV2/parseEntity.h"
-#include "jsonParseV2/parseAttributes.h"
 
 
 
 /* ****************************************************************************
 *
-* jsonRequestTreat - 
+* postEntities - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
-{
-  std::string answer;
+extern std::string postAttributes
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-  switch (requestType)
-  {
-  case EntitiesRequest:
-    answer = parseEntity(ciP, &parseDataP->ent.res);
-    break;
-
-  case PostAttributes:
-    answer = parseAttributes(ciP, &parseDataP->ent.res);
-    break;
-
-  default:
-    answer = "Request Treat function not implemented";
-    break;
-  }
-  
-  return answer;
-}
+#endif  // SRC_LIB_SERVICEROUTINES_POSTATTRIBUTES_H_

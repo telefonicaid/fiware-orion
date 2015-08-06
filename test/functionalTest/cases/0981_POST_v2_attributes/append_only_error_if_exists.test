@@ -1,0 +1,159 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST /v2/entities/E1 on entity that exists
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1
+# 02. Make sure E1 exists
+# 03. Try to create E1 again, using POST /v2/entities/E1?op=append
+# 04. Make sure it didn't work
+# 05. Now update E1, using POST /v2/entities/E1
+# 06. Make sure it worked
+#
+
+echo "01. Create E1"
+echo "============="
+payload='{ "attr1": 1 }'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Make sure E1 exists"
+echo "======================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append"
+echo "==================================================================="
+payload='{  "attr1": 2 }'
+orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Make sure it didn't work"
+echo "============================"
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "05. Now update E1, using POST /v2/entities/E1"
+echo "============================================="
+payload='{  "attr1": 5 }'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Make sure it worked"
+echo "======================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1
+=============
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+02. Make sure E1 exists
+=======================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": 1.0, 
+    "id": "E1"
+}
+
+
+03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append
+===================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "one or more of the attributes in the request already exist: [ attr1 ]",
+    "error": "BadRequest"
+}
+
+
+04. Make sure it didn't work
+============================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": 1.0, 
+    "id": "E1"
+}
+
+
+05. Now update E1, using POST /v2/entities/E1
+=============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+06. Make sure it worked
+=======================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": 5.0, 
+    "id": "E1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

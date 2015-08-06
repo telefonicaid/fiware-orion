@@ -127,6 +127,7 @@ int noOfEntityAttributeResponses                         = -1;
 
 int noOfPostEntity                                       = -1;
 
+int noOfPostAttributes                                   = -1;
 int noOfSubCacheEntries                                  = -1;
 int noOfSubCacheLookups                                  = -1;
 int noOfSubCacheRemovals                                 = -1;
@@ -230,5 +231,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case EntityAttributeResponse:                          ++noOfEntityAttributeResponses; break;
 
   case PostEntity:                                       ++noOfPostEntity; break;
+  case PostAttributes:                                    ++noOfPostAttributes; break;
   }
 }
