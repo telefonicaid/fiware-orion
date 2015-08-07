@@ -171,12 +171,13 @@
 #include "serviceRoutinesV2/getEntity.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
 #include "serviceRoutinesV2/postEntities.h"
-#include "serviceRoutinesV2/postAttributes.h"
 #include "serviceRoutinesV2/putEntity.h"
+#include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
+#include "cache/subCache.h"
 #include "cache/SubscriptionCache.h"
 
 
@@ -612,7 +613,7 @@ PaArgument paArgs[] =
   { "*",      ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       badVerbGetPostOnly         }, \
                                                                                                    \
   { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
-  { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postAttributes             }, \
+  { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postEntity                 }, \
   { "PUT",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      putEntity                  }, \
   { "DELETE", IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      deleteEntity               }, \
   { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbAllFour             }, \
@@ -1561,7 +1562,7 @@ int main(int argC, char* argV[])
     if (subCacheInterval != 0)
     {
       sleep(subCacheInterval);
-      // orion::subCache->refresh();
+      orion::subCache->refresh();
     }
     else
     {

@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSEATTRIBUTES_H_
-#define SRC_LIB_JSONPARSEV2_PARSEATTRIBUTES_H_
+#ifndef SRC_LIB_SERVICEROUTINES_POSTENTITY_H_
+#define SRC_LIB_SERVICEROUTINES_POSTENTITY_H_
 
 /*
 *
@@ -25,16 +25,24 @@
 *
 * Author: Orion dev team
 */
+#include <string>
+#include <vector>
+
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
 
 
 
 /* ****************************************************************************
 *
-* parseEntity - 
+* postEntities - 
 */
-extern std::string parseAttributes(ConnectionInfo* ciP, Entity* eP);
+extern std::string postEntity
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSEATTRIBUTES_H_
+#endif  // SRC_LIB_SERVICEROUTINES_POSTENTITY_H_

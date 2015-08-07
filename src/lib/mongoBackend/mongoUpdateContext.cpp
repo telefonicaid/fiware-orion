@@ -70,25 +70,14 @@ HttpStatusCode mongoUpdateContext
         /* Process each ContextElement */
         for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
         {
-          //
-          // For an appendonly operation, there is only one ContextElement.
-          // If this ContextElement is already existing in mongo, processContextElement
-          // returns error 1
-          //
-          int r = processContextElement(requestP->contextElementVector.get(ix),
-                                        responseP,
-                                        requestP->updateActionType.get(),
-                                        tenant,
-                                        servicePathV,
-                                        uriParams,
-                                        xauthToken,
-                                        caller);
-          if ((r == 1) && (strcasecmp(requestP->updateActionType.get().c_str(), "appendonly") == 0))
-          {
-            reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
-            LM_M(("KZ: mongoUpdateContext returns SccNoContent"));
-            return SccNoContent;
-          }
+          processContextElement(requestP->contextElementVector.get(ix),
+                                responseP,
+                                requestP->updateActionType.get(),
+                                tenant,
+                                servicePathV,
+                                uriParams,
+                                xauthToken,
+                                caller);
         }
 
         /* Note that although individual processContextElements() invocations return ConnectionError, this

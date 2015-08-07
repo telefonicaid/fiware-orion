@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSEENTITY_H_
-#define SRC_LIB_JSONPARSEV2_PARSEENTITY_H_
+#ifndef SRC_LIB_CACHE_ENTITYINFO_H_
+#define SRC_LIB_CACHE_ENTITYINFO_H_
 
 /*
 *
@@ -25,16 +25,35 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
+#include <regex.h>
+#include <string>
 
+namespace orion
+{
 
 
 /* ****************************************************************************
 *
-* parseEntity - 
+* EntityInfo - 
+*
+* The struct fields:
+* -------------------------------------------------------------------------------
+* o entityIdPattern      regex describing EntityId::id (OMA NGSI type)
+* o entityType           string containing the type of the EntityId
+*
 */
-extern std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL);
+typedef struct EntityInfo
+{
+  regex_t       entityIdPattern;
+  std::string   entityType;
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSEENTITY_H_
+  EntityInfo() {}
+  EntityInfo(const std::string& idPattern, const std::string& _entityType);
+  bool          match(const std::string& idPattern, const std::string& type);
+  void          release(void);
+  void          present(const std::string& prefix);
+} EntityInfo;
+
+}  // namespace orion
+
+#endif  // SRC_LIB_CACHE_ENTITYINFO_H_

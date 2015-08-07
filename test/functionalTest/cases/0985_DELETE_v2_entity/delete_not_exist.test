@@ -18,28 +18,44 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
-SET (SOURCES
-    SubscriptionCache.cpp
-    Subscription.cpp
-    EntityInfo.cpp
-    subCache.cpp
-)
+--NAME--
+DELETE Entity V2 Not exist
 
-SET (HEADERS
-    SubscriptionCache.h
-    Subscription.h
-    EntityInfo.h
-    subCache.h
-)
+--SHELL-INIT--
+dbInit CB
+brokerStart CB 51
+
+--SHELL--
+
+#
+# 01. DELETE /v2/entities/E1NOTEXIST
+#
+
+echo "01. DELETE /v2/entities/E1NOTEXIST"
+echo "=================================="
+orionCurl --url /v2/entities/E1 -X DELETE --json
+echo
+echo
 
 
 
-# Include directories
-# -----------------------------------------------------------------
-include_directories("${PROJECT_SOURCE_DIR}/src/lib")
+--REGEXPECT--
+01. DELETE /v2/entities/E1NOTEXIST
+==================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
+Content-Type: application/json
+Date: REGEX(.*)
 
-# Library declaration
-# -----------------------------------------------------------------
-ADD_LIBRARY(cache STATIC ${SOURCES} ${HEADERS})
+{
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

@@ -64,6 +64,7 @@ ContextAttribute::ContextAttribute()
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   found                 = false;
+  skip                  = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -87,6 +88,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   caP->compoundValueP   = NULL;
   found                 = caP->found;
   typeFromXmlAttribute  = "";
+  skip                  = false;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setFormat(caP->providingApplication.getFormat());
@@ -130,6 +132,7 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
+  skip                  = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -160,6 +163,7 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   found                 = _found;
+  skip                  = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -190,6 +194,7 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeNumber;
   compoundValueP        = NULL;
   found                 = _found;
+  skip                  = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -220,6 +225,7 @@ ContextAttribute::ContextAttribute
   valueType             = orion::ValueTypeBoolean;
   compoundValueP        = NULL;
   found                 = _found;
+  skip                  = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -247,6 +253,7 @@ ContextAttribute::ContextAttribute
   typeFromXmlAttribute  = "";
   found                 = false;
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
+  skip                  = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);

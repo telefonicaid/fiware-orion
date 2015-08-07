@@ -33,24 +33,24 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
-#include "serviceRoutinesV2/postAttributes.h"
+#include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 
 
 
 /* ****************************************************************************
 *
-* postAttributes -
+* postEntity -
 *
 * POST /v2/entities/{entityId}
 *
-* Payload In:  Attributes
+* Payload In:  Entity
 * Payload Out: None
 *
 * URI parameters:
 *   op:    operation
 */
-std::string postAttributes
+std::string postEntity
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -87,6 +87,26 @@ std::string postAttributes
 
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
+
+  // Any error in the response?
+  UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
+  for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
+  {
+    if ((upcrsP->contextElementResponseVector[ix]->statusCode.code != SccOk) &&
+        (upcrsP->contextElementResponseVector[ix]->statusCode.code != SccNone))
+    {
+      OrionError error(upcrsP->contextElementResponseVector[ix]->statusCode);
+      std::string  res;
+
+      ciP->httpStatusCode = error.code;
+
+      res = error.render(ciP, "");
+
+      eP->release();
+
+      return res;      
+    }
+  }
 
   // Default value for status code: SccCreated
   if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone) || (ciP->httpStatusCode == SccCreated))

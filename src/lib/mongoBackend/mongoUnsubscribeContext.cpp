@@ -33,7 +33,7 @@
 #include "mongoBackend/mongoUnsubscribeContext.h"
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
-#include "cache/SubscriptionCache.h"
+#include "cache/subCache.h"
 
 
 

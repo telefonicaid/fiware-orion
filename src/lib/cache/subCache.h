@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSEENTITY_H_
-#define SRC_LIB_JSONPARSEV2_PARSEENTITY_H_
+#ifndef SRC_LIB_CACHE_SUBCACHE_H_
+#define SRC_LIB_CACHE_SUBCACHE_H_
 
 /*
 *
@@ -25,16 +25,37 @@
 *
 * Author: Ken Zangelin
 */
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
-#include "ngsi/Request.h"
+#include <string>
+
+
+namespace orion
+{
+
+class SubscriptionCache;
+
+
+/* ****************************************************************************
+*
+* subCache - 
+*/
+extern SubscriptionCache* subCache;
 
 
 
 /* ****************************************************************************
 *
-* parseEntity - 
+* subscriptionCacheInit - 
 */
-extern std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL);
+extern void subscriptionCacheInit(std::string dbName);
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSEENTITY_H_
+
+
+/* ****************************************************************************
+*
+* subCacheMutexWaitingTimeGet - 
+*/
+extern void subCacheMutexWaitingTimeGet(char* buf, int bufLen);
+
+}  // namespace orion
+
+#endif  // SRC_LIB_CACHE_SUBCACHE_H_

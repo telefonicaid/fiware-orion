@@ -94,7 +94,7 @@ std::string NotifyConditionVector::check
 */
 void NotifyConditionVector::present(const std::string& indent)
 {
-  LM_F(("%lu NotifyConditions", (uint64_t) vec.size()));
+  LM_F(("%s%lu NotifyConditions", indent.c_str(), (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
