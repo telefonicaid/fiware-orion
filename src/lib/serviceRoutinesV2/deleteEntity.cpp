@@ -73,28 +73,30 @@ std::string deleteEntity
   ciP->outFormat = JSON;
 
   for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
-   {
-      StatusCode sc = upcrsP->contextElementResponseVector[ix]->statusCode;
-      HttpStatusCode scc = sc.code;
-      if ((scc != SccOk) && (scc != SccNone))
-      {
-        ErrorCode error;
-        if (scc == SccContextElementNotFound)
-        {
-          error.fill("NotFound", "The requested entity has not been found. Check type and id");
+  {
+    StatusCode      sc  = upcrsP->contextElementResponseVector[ix]->statusCode;
+    HttpStatusCode  scc = sc.code;
 
-        }
-        else
-        {
-          error.fill(sc);
-        }
+    if ((scc != SccOk) && (scc != SccNone))
+    {
+      ErrorCode error;
+
+      if (scc == SccContextElementNotFound)
+      {
+        error.fill("NotFound", "The requested entity has not been found. Check type and id");
+      }
+      else
+      {
+        error.fill(sc);
+      }
+
         ciP->httpStatusCode = scc;
-        answer = error.toJson(true);
+        answer              = error.toJson(true);
+
         eP->release();
         return answer;
      }
    }
-
 
   // Prepare status code
   if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
