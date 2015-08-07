@@ -32,6 +32,7 @@ brokerStart CB
 #
 # 01. POST /v1/updateContext to create 8787GHY entity
 # 02. GET /v2/entities/8787GHY?attrs=speed
+# 03. GET /v2/entities/8787GHY?attrs=speed,plateCountry
 #
 
 echo "01. POST /v1/updateContext to create 8787GHY entity"
@@ -78,6 +79,12 @@ echo
 echo "02. GET /v2/entities/8787GHY?attrs=speed"
 echo "========================================"
 orionCurl --url /v2/entities/8787GHY?attrs=speed --json
+echo
+echo
+
+echo "03. GET /v2/entities/8787GHY?attrs=speed,plateCountry"
+echo "====================================================="
+orionCurl --url /v2/entities/8787GHY?attrs=speed,plateCountry --json
 echo
 echo
 
@@ -146,6 +153,24 @@ Date: REGEX(.*)
         "type": "number", 
         "value": "150"
     }, 
+    "type": "Car"
+}
+
+
+03. GET /v2/entities/8787GHY?attrs=speed,plateCountry
+=====================================================
+HTTP/1.1 200 OK
+Content-Length: 89
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "id": "8787GHY",
+    "plateCountry": "ES",
+    "speed": {
+        "type": "number",
+        "value": "150"
+    },
     "type": "Car"
 }
 
