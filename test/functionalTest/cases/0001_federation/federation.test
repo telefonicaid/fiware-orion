@@ -208,7 +208,6 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </queryContextResponse>
-
 --TEARDOWN--
 brokerStop CB_A
 brokerStop CB_B
