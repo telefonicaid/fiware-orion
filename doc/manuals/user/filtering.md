@@ -117,3 +117,34 @@ described in detail in [the following section](geolocation.md#geo-located-querie
 
 In the current version of Orion, there is no equivalent convenience
 operation filter.
+
+## String filter
+
+The scope corresponding to this type is "FIWARE::StringFilter".
+
+      ...
+      {
+          "restriction": {
+              "scopes": [
+                  {
+                      "type": "FIWARE::StringFilter",
+                      "value": "temperature<24;humidity==75..90;status=running"
+                  }
+              ]
+          }
+      }
+      ...
+
+This scope allows to express filtering conditions such as equality, unequality,
+greater/less than, range or existence.
+
+There isn't any URL parameter correspondence for this filter in NGSI v1. In NGSI v2
+it correspons with the `q` parameter:
+
+    curl localhost:1026/v2/entities?q=temperature<24;humidity==75..90;status=running
+
+For a detailed syntax description of the `value` or `q` parameter, see [NGSIv2 specification
+document](http://telefonicaid.github.io/fiware-orion/api/v2/).
+
+You can use this scope in NGSI v1, but take into account that in order to set attribute
+values to numbers, you need to use NGSI v2 (NGSI v1 always uses strings for values).

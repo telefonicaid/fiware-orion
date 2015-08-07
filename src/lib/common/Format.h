@@ -67,7 +67,11 @@ extern const char* formatToString(Format format);
 */
 extern Format stringToFormat(const std::string& s);
 
-
+/* ****************************************************************************
+*
+* isFloat -
+*/
+bool isFloat(const std::string& s);
 
 /* ****************************************************************************
 *
