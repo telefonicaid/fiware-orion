@@ -69,7 +69,7 @@ std::string postEntity
   }
   else if (op == "append") // pure-append
   {
-    op = "APPENDONLY";
+    op = "APPEND_STRICT";
   }
   else
   {
