@@ -179,8 +179,8 @@
 #include "serviceRoutinesV2/getEntityAttribute.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutinesV2/postEntity.h"
-
 #include "serviceRoutinesV2/deleteEntity.h"
+#include "serviceRoutinesV2/getEntityType.h"
 
 #include "contextBroker/version.h"
 
@@ -363,9 +363,13 @@ PaArgument paArgs[] =
 #define IENT_COMPS_WORD     ""
 
 
-#define IENTATTR                EntityAttributeRequest
-#define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
-#define IENTATTR_COMPS_WORD     ""
+#define IENTATTR            EntityAttributeRequest
+#define IENTATTR_COMPS_V2   5, { "v2", "entities", "*", "attrs", "*" }
+#define IENTATTR_COMPS_WORD ""
+
+#define ENTT                EntityTypeRequest
+#define ENTT_COMPS_V2       3, { "v2", "type", "*" }
+#define ENTT_COMPS_WORD     ""
 
 
 //
@@ -627,8 +631,10 @@ PaArgument paArgs[] =
   { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetPostDeleteOnly   }, \
                                                                                                    \
   { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
-  { "*",      IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  badVerbGetOnly             }
-
+  { "*",      IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  badVerbGetOnly             }, \
+                                                                                                   \
+  { "GET",    ENTT,      ENTT_COMPS_V2,        ENTT_COMPS_WORD,      getEntityType              }, \
+  { "*",      ENTT,      ENTT_COMPS_V2,        ENTT_COMPS_WORD,      badVerbGetOnly             }
 
 
 #define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
