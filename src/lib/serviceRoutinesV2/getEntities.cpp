@@ -75,7 +75,7 @@ std::string getEntities
   if (paramPattern != "" && paramIDs != "")
   {
     ciP->httpStatusCode = SccBadRequest;
-    answer = "{\"error\":\"Incompatible parameters: id, IdPattern\"";
+    answer = "{\"error\":\"Incompatible parameters: id, IdPattern\"}";
     return answer;
   }
   else if (paramIDs != "") {
