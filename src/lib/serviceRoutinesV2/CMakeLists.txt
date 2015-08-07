@@ -28,6 +28,7 @@ getEntity.cpp
 getEntityAttribute.cpp
 postEntity.cpp
 deleteEntity.cpp
+getEntityType.cpp
 )
 
 SET (HEADERS
@@ -38,6 +39,7 @@ getEntity.h
 getEntityAttribute.h
 postEntity.h
 deleteEntity.h
+getEntityType.h
 )
 
 
