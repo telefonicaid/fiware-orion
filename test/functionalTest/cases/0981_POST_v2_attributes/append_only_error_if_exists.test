@@ -41,7 +41,7 @@ brokerStart CB
 echo "01. Create E1"
 echo "============="
 payload='{ "attr1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json --noPayloadCheck
+orionCurl --url /v2/entities/E1 --payload "$payload" --json
 echo
 echo
 
@@ -71,7 +71,7 @@ echo
 echo "05. Now update E1, using POST /v2/entities/E1"
 echo "============================================="
 payload='{  "attr1": 5 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json --noPayloadCheck
+orionCurl --url /v2/entities/E1 --payload "$payload" --json
 echo
 echo
 
@@ -90,7 +90,6 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1
 Date: REGEX(.*)
-
 
 
 
@@ -139,7 +138,6 @@ HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1
 Date: REGEX(.*)
-
 
 
 
