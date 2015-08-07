@@ -88,7 +88,6 @@ std::string payloadParse
     if (compV[0] == "v2")
     {
       result = jsonRequestTreat(ciP, parseDataP, service->request);
-      LM_M(("After jsonRequestTreat: result == '%s'", result.c_str()));
     }
     else
     {
@@ -106,7 +105,6 @@ std::string payloadParse
 
   if (result != "OK")
   {
-    LM_M(("Replying with '%s'", result.c_str()));
     restReply(ciP, result);
   }
 
@@ -378,7 +376,6 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       ciP->parseDataP = &parseData;
-      LM_M(("Calling payloadParse"));
       response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
@@ -447,9 +444,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     commonFilters(ciP, &parseData, &serviceV[ix]);
     scopeFilter(ciP, &parseData, &serviceV[ix]);
 
-    LM_M(("Treating request"));
     std::string response = serviceV[ix].treat(ciP, components, compV, &parseData);
-    LM_M(("Treat Response: '%s'", response.c_str()));
     filterRelease(&parseData, serviceV[ix].request);
 
     if (reqP != NULL)

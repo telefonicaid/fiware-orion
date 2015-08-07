@@ -42,15 +42,16 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 {
   std::string answer;
 
-  LM_M(("KZ: requestType: %d", requestType));
   switch (requestType)
   {
   case EntitiesRequest:
     answer = parseEntity(ciP, &parseDataP->ent.res);
     break;
-  case PostAttributes:
-      answer = parseAttributes(ciP, &parseDataP->ent.res);
-      break;
+
+  case EntityRequest:
+    answer = parseAttributes(ciP, &parseDataP->ent.res);
+    break;
+
   default:
     answer = "Request Treat function not implemented";
     break;

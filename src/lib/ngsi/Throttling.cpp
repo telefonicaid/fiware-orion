@@ -117,7 +117,7 @@ void Throttling::set(const std::string& value)
 *
 * Throttling::get -
 */
-std::string Throttling::get(void)
+const std::string Throttling::get(void)
 {
   return string;
 }

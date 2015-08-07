@@ -36,6 +36,29 @@
 
 /* ****************************************************************************
 *
+* NotifyCondition::NotifyCondition - 
+*/
+NotifyCondition::NotifyCondition()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* NotifyCondition::NotifyCondition - 
+*/
+NotifyCondition::NotifyCondition(NotifyCondition* ncP)
+{
+  type = ncP->type;
+  condValueList.fill(ncP->condValueList);
+  restriction.set(ncP->restriction.get());
+}
+
+
+
+/* ****************************************************************************
+*
 * NotifyCondition::render -
 */
 std::string NotifyCondition::render(Format format, const std::string& indent, bool notLastInVector)
@@ -120,14 +143,14 @@ void NotifyCondition::present(const std::string& indent, int ix)
 
   if (ix == -1)
   {
-    LM_F(("%sNotify Condition:\n", indent2.c_str()));
+    LM_F(("%sNotify Condition:", indent2.c_str()));
   }
   else
   {
-    LM_F(("%sNotify Condition %d:\n", indent2.c_str(), ix));
+    LM_F(("%sNotify Condition %d:", indent2.c_str(), ix));
   }
 
-  LM_F(("%stype: %s\n", indent2.c_str(), type.c_str()));
+  LM_F(("%stype: %s", indent2.c_str(), type.c_str()));
   condValueList.present(indent2);
   restriction.present(indent2);
 }

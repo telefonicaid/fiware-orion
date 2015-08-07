@@ -25,18 +25,17 @@
 #include <string>
 #include <vector>
 
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "apiTypesV2/Entities.h"
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
+#include "rest/OrionError.h"
 #include "serviceRoutinesV2/postAttributes.h"
 #include "serviceRoutines/postUpdateContext.h"
 
-
-
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
 
 /* ****************************************************************************
@@ -49,7 +48,7 @@
 * Payload Out: None
 *
 * URI parameters:
-*   -
+*   op:    operation
 */
 std::string postAttributes
 (
@@ -59,36 +58,64 @@ std::string postAttributes
   ParseData*                 parseDataP
 )
 {
-  Entity*  eP = &parseDataP->ent.res;
+  Entity*      eP  = &parseDataP->ent.res;
+  std::string  op  = ciP->uriParam["op"];
+
   eP->id = compV[2];
 
-
-  std::string op = ciP->uriParam["op"];
-   LM_W(("OP: '%s'", op.c_str()));
   if (op == "")
   {
-   op = "APPEND";   // append or update
-
+    op = "APPEND";   // append or update
   }
   else if (op == "append") // pure-append
   {
-   op = "UPDATE";
+    op = "APPENDONLY";
   }
   else
   {
+    OrionError   error(SccBadRequest, "invalid value for URL parameter op");
+    std::string  res;
+
     ciP->httpStatusCode = SccBadRequest;
-    return "{\"ERROR\": \"What in hell is '"+op+"'?\"}";
+    
+    res = error.render(ciP, "");
+    return res;
   }
+
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, op);
 
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
+  // Any error in the response?
+  UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
+  for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
+  {
+    if ((upcrsP->contextElementResponseVector[ix]->statusCode.code != SccOk) &&
+        (upcrsP->contextElementResponseVector[ix]->statusCode.code != SccNone))
+    {
+      OrionError error(upcrsP->contextElementResponseVector[ix]->statusCode);
+      std::string  res;
 
-  // Prepare status code
-  if (ciP->httpStatusCode == SccOk || ciP->httpStatusCode == SccNone) {
-      ciP->httpStatusCode = SccNoContent;
+      ciP->httpStatusCode = error.code;
+
+      res = error.render(ciP, "");
+
+      eP->release();
+
+      return res;      
+    }
+  }
+
+  // Default value for status code: SccCreated
+  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone) || (ciP->httpStatusCode == SccCreated))
+  {
+    std::string location = "/v2/entities/" + eP->id;
+    ciP->httpHeader.push_back("Location");
+    ciP->httpHeaderValue.push_back(location);
+    
+    ciP->httpStatusCode = SccCreated;
   }
 
   // Cleanup and return result
