@@ -90,13 +90,13 @@ std::string deleteEntity
         error.fill(sc);
       }
 
-        ciP->httpStatusCode = scc;
-        answer              = error.toJson(true);
+      ciP->httpStatusCode = scc;
+      answer              = error.toJson(true);
 
-        eP->release();
-        return answer;
-     }
-   }
+      eP->release();
+      return answer;
+    }
+  }
 
   // Prepare status code
   if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
