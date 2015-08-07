@@ -1,0 +1,219 @@
+
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+
+--NAME--
+Federation
+
+--SHELL-INIT--
+dbInit CB_A
+dbInit CB_B
+dbInit CB_C
+brokerStart CB_A
+brokerStart CB_B
+brokerStart CB_C
+
+--SHELL--
+echo "0.1.Send a subscribe to A"
+echo "==============================================================="
+url="/v1/subscribeContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>Room1</id>
+    </entityId>
+  </entityIdList>
+  <reference>http://localhost:'$CB_B_PORT'/v1/notifyContext</reference>
+  <duration>P1M</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>temperature</condValue>
+      </condValueList>
+    </notifyCondition>
+  </notifyConditions>
+  <throttling>PT5S</throttling>
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload" --port $CB_A_PORT
+
+echo "0.2.Send a subscribe to B"
+echo "==============================================================="
+url="/v1/subscribeContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<subscribeContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>Room1</id>
+    </entityId>
+  </entityIdList>
+  <reference>http://localhost:'$CB_C_PORT'/v1/notifyContext</reference>
+  <duration>P1M</duration>
+  <notifyConditions>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>temperature</condValue>
+      </condValueList>
+    </notifyCondition>
+  </notifyConditions>
+  <throttling>PT5S</throttling>
+</subscribeContextRequest>'
+orionCurl --url "$url" --payload "$payload" --port $CB_B_PORT
+
+echo "0.3.Create an entity in context broker A"
+echo "==============================================================="
+url="/v1/updateContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>Room1</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>temperature</name>
+          <type>float</type>
+          <contextValue>23</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url "$url" --payload "$payload" --port $CB_A_PORT
+
+echo "0.4.Query to context broker C"
+echo "==============================================================="
+url="/v1/queryContext"
+payload='<?xml version="1.0" encoding="UTF-8"?>
+<queryContextRequest>
+  <entityIdList>
+    <entityId type="Room" isPattern="false">
+      <id>Room1</id>
+    </entityId>
+  </entityIdList>
+  <attributeList/>
+</queryContextRequest>'
+orionCurl --url "$url" --payload "$payload" --port $CB_B_PORT
+
+--REGEXPECT--
+0.1.Send a subscribe to A
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 225
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>P1M</duration>
+    <throttling>PT5S</throttling>
+  </subscribeResponse>
+</subscribeContextResponse>
+0.2.Send a subscribe to B
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 225
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<subscribeContextResponse>
+  <subscribeResponse>
+    <subscriptionId>REGEX([0-9a-f]{24})</subscriptionId>
+    <duration>P1M</duration>
+    <throttling>PT5S</throttling>
+  </subscribeResponse>
+</subscribeContextResponse>
+0.3.Create an entity in context broker A
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 634
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<updateContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>Room1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>float</type>
+            <contextValue/>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</updateContextResponse>
+0.4.Query to context broker C
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 634
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<queryContextResponse>
+  <contextResponseList>
+    <contextElementResponse>
+      <contextElement>
+        <entityId type="Room" isPattern="false">
+          <id>Room1</id>
+        </entityId>
+        <contextAttributeList>
+          <contextAttribute>
+            <name>temperature</name>
+            <type>float</type>
+            <contextValue>23</contextValue>
+          </contextAttribute>
+        </contextAttributeList>
+      </contextElement>
+      <statusCode>
+        <code>200</code>
+        <reasonPhrase>OK</reasonPhrase>
+      </statusCode>
+    </contextElementResponse>
+  </contextResponseList>
+</queryContextResponse>
+
+--TEARDOWN--
+brokerStop CB_A
+brokerStop CB_B
+brokerStop CB_C
+dbDrop CB_A
+dbDrop CB_B
+dbDrop CB_C
+
