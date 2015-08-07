@@ -37,8 +37,19 @@ using namespace rapidjson;
 /* ****************************************************************************
 *
 * parseEntity - 
+*
+* This function is used to parse two slightly different payloads:
+* - POST /v2/entities
+* - POST /v2/entities/<eid>
+*
+* In the latter case, "id" CANNOT be in the payload, while in the former case, 
+* "id" MUST be in the payload.
+*
+* In the case of /v2/entities/<eid>, the entityId of 'Entity* eP' is set in
+* the service routine postEntity.
+* 
 */
-std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
+std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
 {
   Document document;
 
@@ -62,12 +73,15 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
   }
 
 
-  if (!document.HasMember("id"))
+  if (eidInURL == false)
   {
-    LM_W(("Bad Input (No entity id specified"));
-    eP->errorCode.fill("ParseError", "no entity id specified");
-    ciP->httpStatusCode = SccBadRequest;;
-    return eP->render(ciP, EntitiesRequest);
+    if (!document.HasMember("id"))
+    {
+      LM_W(("Bad Input (No entity id specified"));
+      eP->errorCode.fill("ParseError", "no entity id specified");
+      ciP->httpStatusCode = SccBadRequest;;
+      return eP->render(ciP, EntitiesRequest);
+    }
   }
 
 
@@ -78,15 +92,25 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
 
     if (name == "id")
     {
-      if (type != "String")
+      if (eidInURL == false)
       {
-        LM_W(("Bad Input (invalid JSON type for entity id"));
-        eP->errorCode.fill("ParseError", "invalid JSON type for entity id");
+        if (type != "String")
+        {
+          LM_W(("Bad Input (invalid JSON type for entity id"));
+          eP->errorCode.fill("ParseError", "invalid JSON type for entity id");
+          ciP->httpStatusCode = SccBadRequest;;
+          return eP->render(ciP, EntitiesRequest);
+        }
+
+        eP->id = iter->value.GetString();
+      }
+      else  // "id" present in payload for /v2/entities/<eid> - not a valid payload
+      {
+        LM_W(("Bad Input ('id' is not a valid attribute"));
+        eP->errorCode.fill("ParseError", "invalid input, 'id' as attribute");
         ciP->httpStatusCode = SccBadRequest;;
         return eP->render(ciP, EntitiesRequest);
       }
-
-      eP->id = iter->value.GetString();
     }
     else if (name == "type")
     {
@@ -116,12 +140,15 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP)
     }
   }
 
-  if (eP->id == "")
+  if (eidInURL == false)
   {
-    LM_W(("Bad Input (empty entity id"));
-    eP->errorCode.fill("ParseError", "empty entity id");
-    ciP->httpStatusCode = SccBadRequest;;
-    return eP->render(ciP, EntitiesRequest);
+    if (eP->id == "")
+    {
+      LM_W(("Bad Input (empty entity id"));
+      eP->errorCode.fill("ParseError", "empty entity id");
+      ciP->httpStatusCode = SccBadRequest;;
+      return eP->render(ciP, EntitiesRequest);
+    }
   }
 
   eP->present("");

@@ -35,6 +35,6 @@
 *
 * parseEntity - 
 */
-extern std::string parseEntity(ConnectionInfo* ciP, Entity* eP);
+extern std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL);
 
 #endif  // SRC_LIB_JSONPARSEV2_PARSEENTITY_H_

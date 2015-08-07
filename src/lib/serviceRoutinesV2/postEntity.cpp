@@ -33,24 +33,24 @@
 #include "rest/ConnectionInfo.h"
 #include "rest/EntityTypeInfo.h"
 #include "rest/OrionError.h"
-#include "serviceRoutinesV2/postAttributes.h"
+#include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 
 
 
 /* ****************************************************************************
 *
-* postAttributes -
+* postEntity -
 *
 * POST /v2/entities/{entityId}
 *
-* Payload In:  Attributes
+* Payload In:  Entity
 * Payload Out: None
 *
 * URI parameters:
 *   op:    operation
 */
-std::string postAttributes
+std::string postEntity
 (
   ConnectionInfo*            ciP,
   int                        components,

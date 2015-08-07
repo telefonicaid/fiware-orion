@@ -178,7 +178,7 @@
 #include "serviceRoutinesV2/getEntity.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
 #include "serviceRoutinesV2/postEntities.h"
-#include "serviceRoutinesV2/postAttributes.h"
+#include "serviceRoutinesV2/postEntity.h"
 
 #include "serviceRoutinesV2/deleteEntity.h"
 
@@ -623,7 +623,7 @@ PaArgument paArgs[] =
                                                                                                    \
   { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
   { "DELETE", IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      deleteEntity               }, \
-  { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postAttributes             }, \
+  { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postEntity                 }, \
   { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetPostDeleteOnly   }, \
                                                                                                    \
   { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
