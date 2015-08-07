@@ -65,10 +65,12 @@ std::string getEntity
   parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
   // optional parameter for attributes
   string attrs = ciP->uriParam["attrs"];
-  if (attrs!="") {
+
+  if (attrs != "") {
     vector<string> attrsV;
+
     stringSplit(attrs, ',', attrsV);
-    for(vector<string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it) {
+    for (vector<string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it) {
       parseDataP->qcr.res.attributeList.push_back_if_absent(*it);
     }
   }
@@ -79,9 +81,11 @@ std::string getEntity
 
   // Render entity response
   Entity       entity;
+
   entity.fill(&parseDataP->qcrs.res);
 
   string answer = entity.render(ciP, EntityResponse);
+
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {
       // No problem found, but we expect only one entity
