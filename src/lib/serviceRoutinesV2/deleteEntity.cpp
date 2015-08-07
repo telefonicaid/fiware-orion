@@ -25,32 +25,30 @@
 #include <string>
 #include <vector>
 
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+#include "apiTypesV2/Entities.h"
+#include "rest/EntityTypeInfo.h"
+#include "apiTypesV2/ErrorCode.h"
+#include "serviceRoutinesV2/deleteEntity.h"
+#include "serviceRoutines/postUpdateContext.h"
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
-#include "apiTypesV2/Entities.h"
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/EntityTypeInfo.h"
-#include "rest/OrionError.h"
-#include "serviceRoutinesV2/postAttributes.h"
-#include "serviceRoutines/postUpdateContext.h"
-
-
-
 /* ****************************************************************************
 *
-* postAttributes -
+* deleteEntity -
 *
-* POST /v2/entities/{entityId}
+* DELETE /v2/entities/{entityId}
 *
-* Payload In:  Attributes
+* Payload In:  None
 * Payload Out: None
 *
 * URI parameters:
-*   op:    operation
+*   -
 */
-std::string postAttributes
+std::string deleteEntity
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -58,64 +56,52 @@ std::string postAttributes
   ParseData*                 parseDataP
 )
 {
-  Entity*      eP  = &parseDataP->ent.res;
-  std::string  op  = ciP->uriParam["op"];
+  std::string  answer;
+  Entity*      eP = new Entity();
 
   eP->id = compV[2];
 
-  if (op == "")
-  {
-    op = "APPEND";   // append or update
-  }
-  else if (op == "append") // pure-append
-  {
-    op = "APPENDONLY";
-  }
-  else
-  {
-    OrionError   error(SccBadRequest, "invalid value for URL parameter op");
-    std::string  res;
-
-    ciP->httpStatusCode = SccBadRequest;
-    
-    res = error.render(ciP, "");
-    return res;
-  }
-
   // Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(eP, op);
+  parseDataP->upcr.res.fill(eP, "DELETE");
 
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
   // Any error in the response?
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
+
+  ciP->outFormat = JSON;
+
   for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
   {
-    if ((upcrsP->contextElementResponseVector[ix]->statusCode.code != SccOk) &&
-        (upcrsP->contextElementResponseVector[ix]->statusCode.code != SccNone))
+    StatusCode      sc  = upcrsP->contextElementResponseVector[ix]->statusCode;
+    HttpStatusCode  scc = sc.code;
+
+    if ((scc != SccOk) && (scc != SccNone))
     {
-      OrionError error(upcrsP->contextElementResponseVector[ix]->statusCode);
-      std::string  res;
+      ErrorCode error;
 
-      ciP->httpStatusCode = error.code;
+      if (scc == SccContextElementNotFound)
+      {
+        error.fill("NotFound", "The requested entity has not been found. Check type and id");
+      }
+      else
+      {
+        error.fill(sc);
+      }
 
-      res = error.render(ciP, "");
+      ciP->httpStatusCode = scc;
+      answer              = error.toJson(true);
 
       eP->release();
-
-      return res;      
+      return answer;
     }
   }
 
-  // Default value for status code: SccCreated
-  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone) || (ciP->httpStatusCode == SccCreated))
+  // Prepare status code
+  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
   {
-    std::string location = "/v2/entities/" + eP->id;
-    ciP->httpHeader.push_back("Location");
-    ciP->httpHeaderValue.push_back(location);
-    
-    ciP->httpStatusCode = SccCreated;
+    ciP->httpStatusCode = SccNoContent;
   }
 
   // Cleanup and return result

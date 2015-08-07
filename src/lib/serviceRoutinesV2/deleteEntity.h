@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_SERVICEROUTINES_POSTATTRIBUTES_H_
-#define SRC_LIB_SERVICEROUTINES_POSTATTRIBUTES_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_DELETEENTITY_H_
+#define SRC_LIB_SERVICEROUTINESV2_DELETEENTITY_H_
 
 /*
 *
@@ -35,9 +35,9 @@
 
 /* ****************************************************************************
 *
-* postEntities - 
+* deleteEntity -
 */
-extern std::string postAttributes
+extern std::string deleteEntity
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -45,4 +45,4 @@ extern std::string postAttributes
   ParseData*                 parseDataP
 );
 
-#endif  // SRC_LIB_SERVICEROUTINES_POSTATTRIBUTES_H_
+#endif  // SRC_LIB_SERVICEROUTINESV2_DELETEENTITY_H_

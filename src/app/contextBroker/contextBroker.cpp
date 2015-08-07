@@ -178,7 +178,9 @@
 #include "serviceRoutinesV2/getEntity.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
 #include "serviceRoutinesV2/postEntities.h"
-#include "serviceRoutinesV2/postAttributes.h"
+#include "serviceRoutinesV2/postEntity.h"
+
+#include "serviceRoutinesV2/deleteEntity.h"
 
 #include "contextBroker/version.h"
 
@@ -357,7 +359,6 @@ PaArgument paArgs[] =
 
 
 #define IENT                EntityRequest
-#define IENTA               PostAttributes
 #define IENT_COMPS_V2       3, { "v2", "entities", "*" }
 #define IENT_COMPS_WORD     ""
 
@@ -621,8 +622,9 @@ PaArgument paArgs[] =
   { "*",      ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       badVerbGetPostOnly         }, \
                                                                                                    \
   { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
-  { "POST",   IENTA,     IENT_COMPS_V2,        IENT_COMPS_WORD,      postAttributes             }, \
-  { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetPostOnly         }, \
+  { "DELETE", IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      deleteEntity               }, \
+  { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postEntity                 }, \
+  { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetPostDeleteOnly   }, \
                                                                                                    \
   { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
   { "*",      IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  badVerbGetOnly             }

@@ -30,7 +30,6 @@
 #include "ngsi/Request.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/parseEntity.h"
-#include "jsonParseV2/parseAttributes.h"
 
 
 
@@ -44,12 +43,12 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 
   switch (requestType)
   {
-  case EntitiesRequest:
-    answer = parseEntity(ciP, &parseDataP->ent.res);
+  case EntitiesRequest:  // POST /v2/entities
+    answer = parseEntity(ciP, &parseDataP->ent.res, false);
     break;
 
-  case PostAttributes:
-    answer = parseAttributes(ciP, &parseDataP->ent.res);
+  case EntityRequest:  // POST /v2/entities/<eid>
+    answer = parseEntity(ciP, &parseDataP->ent.res, true);
     break;
 
   default:
