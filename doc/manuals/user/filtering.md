@@ -136,7 +136,7 @@ The scope corresponding to this type is "FIWARE::StringFilter".
       ...
 
 This scope allows to express filtering conditions such as equality, unequality,
-greater/lesser than, range or existence.
+greater/less than, range or existence.
 
 There isn't any URL parameter correspondence for this filter in NGSI v1. In NGSI v2
 it correspons with the `q` parameter:
