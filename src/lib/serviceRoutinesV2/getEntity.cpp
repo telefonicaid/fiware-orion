@@ -66,11 +66,13 @@ std::string getEntity
   // optional parameter for attributes
   string attrs = ciP->uriParam["attrs"];
 
-  if (attrs != "") {
+  if (attrs != "")
+  {
     vector<string> attrsV;
 
     stringSplit(attrs, ',', attrsV);
-    for (vector<string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it) {
+    for (vector<string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
+    {
       parseDataP->qcr.res.attributeList.push_back_if_absent(*it);
     }
   }
