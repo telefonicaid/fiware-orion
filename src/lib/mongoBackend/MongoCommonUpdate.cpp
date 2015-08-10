@@ -1480,7 +1480,8 @@ static bool updateContextAttributeItem
   }
 
   /* Check aspects related with location */
-  // FIXME P5: note that with the current logic, the name of the attribute meaning location
+  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
+  // note that with the current logic, the name of the attribute meaning location
   // is preserved on a replace operation. By the moment, we can leave this as it is now
   // given that the logic in NGSIv2 for specifying location attributes is gogint to change
   // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
@@ -1734,58 +1735,6 @@ static bool processContextAttributeVector
         return false;
       }
     }
-#if 0
-    {
-      if (updateAttribute(attrs, toSet, targetAttr, actualUpdate))
-      {
-        entityModified = actualUpdate || entityModified;
-      }
-      else
-      {
-        /* If updateAttribute() returns false, then that particular attribute has not
-         * been found. In this case, we interrupt the processing and early return with
-         * an error StatusCode */
-        // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
-        // another .fill() in this function caller. We keep it by the moment, but it probably
-        // will removed when we refactor this function
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: UPDATE") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString());
-
-        /* Although ca has been already pushed into cerP, it can be used */
-        ca->found = false;
-      }
-
-      /* Check aspects related with location */
-      if (targetAttr->getLocation().length() > 0 && targetAttr->name != locAttr)
-      {
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: UPDATE") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString() +
-                              " - location nature of an attribute has to be defined at creation time, with APPEND");
-
-        LM_W(("Bad Input (location nature of an attribute has to be defined at creation time, with APPEND)"));
-        return false;
-      }
-
-      if (locAttr == targetAttr->name)
-      {
-        if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
-        {
-          cerP->statusCode.fill(SccInvalidParameter,
-                                std::string("action: UPDATE") +
-                                " - entity: [" + eP->toString() + "]" +
-                                " - offending attribute: " + targetAttr->toString() +
-                                " - error parsing location attribute, value: <" + targetAttr->stringValue + ">");
-
-          LM_W(("Bad Input (error parsing location attribute)"));
-          return false;
-        }
-      }
-    }
-#endif
     else if (strcasecmp(action.c_str(), "append") == 0)
     {
       if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong))
@@ -1793,72 +1742,6 @@ static bool processContextAttributeVector
         return false;
       }
     }
-#if 0
-    {
-      if (legalIdUsage(attrs, targetAttr))
-      {
-        appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate);
-        entityModified = actualUpdate || entityModified;
-
-        /* Check aspects related with location */
-        if (targetAttr->getLocation().length() > 0)
-        {
-          if (locAttr.length() > 0 && targetAttr->name != locAttr)
-          {
-            cerP->statusCode.fill(
-              SccInvalidParameter,
-              std::string("action: APPEND") +
-              " - entity: [" + eP->toString() + "]" +
-              " - offending attribute: " + targetAttr->toString() +
-              " - attempt to define a location attribute [" + targetAttr->name + "]" +
-              " when another one has been previously defined [" + locAttr + "]");
-
-            LM_W(("Bad Input (attempt to define a second location attribute)"));
-            return false;
-          }
-
-          if ((targetAttr->getLocation() != LOCATION_WGS84) && (targetAttr->getLocation() != LOCATION_WGS84_LEGACY))
-          {
-            cerP->statusCode.fill(
-              SccInvalidParameter,
-              std::string("action: APPEND") +
-              " - entity: [" + eP->toString() + "]" +
-              " - offending attribute: " + targetAttr->toString() +
-              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
-
-            LM_W(("Bad Input (only WGS84 is supported for location)"));
-            return false;
-          }
-
-          if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
-          {
-            cerP->statusCode.fill(SccInvalidParameter,
-                                  std::string("action: APPEND") +
-                                  " - entity: [" + eP->toString() + "]" +
-                                  " - offending attribute: " + targetAttr->toString() +
-                                  " - error parsing location attribute, value: [" + targetAttr->stringValue + "]");
-            LM_W(("Bad Input (error parsing location attribute)"));
-            return false;
-          }
-
-          locAttr = targetAttr->name;
-        }
-      }
-      else
-      {
-        /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
-         * we interrupt the processing and early return with
-         * a error StatusCode */
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: APPEND") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString() +
-                              " - attribute can not be appended");
-        LM_W(("Bad Input (attribute can not be appended)"));
-        return false;
-      }
-    }
-#endif
     else if (strcasecmp(action.c_str(), "delete") == 0)
     {
       if (!deleteContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toUnset, entityModified, locAttr, &deletedAttributesCounter))
@@ -1866,51 +1749,6 @@ static bool processContextAttributeVector
         return false;
       }
     }
-#if 0
-    {
-      if (deleteAttribute(attrs, toUnset, &deletedAttributesCounter, targetAttr))
-      {
-        entityModified = true;
-
-        /* Check aspects related with location */
-        if (targetAttr->getLocation().length() > 0)
-        {
-          cerP->statusCode.fill(SccInvalidParameter,
-                                std::string("action: DELETE") +
-                                " - entity: [" + eP->toString() + "]" +
-                                " - offending attribute: " + targetAttr->toString() +
-                                " - location attribute has to be defined at creation time, with APPEND");
-
-          LM_W(("Bad Input (location attribute has to be defined at creation time)"));
-          return false;
-        }
-
-        /* Check aspects related with location. "Nullining" locAttr is the way of specifying
-         * that location field is no longer used */
-        if (locAttr == targetAttr->name)
-        {
-          locAttr = "";
-        }
-
-        ca->found = true;
-      }
-      else
-      {
-        /* If deleteAttribute() returns false, then that particular attribute has not
-         * been found. In this case, we interrupt the processing and early return with
-         * a error StatusCode */
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: DELETE") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString() +
-                              " - attribute not found");
-        LM_W(("Bad Input (attribute to be deleted is not found)"));
-        ca->found = false;
-
-        return false;
-      }
-    }
-#endif
     else
     {
       cerP->statusCode.fill(SccInvalidParameter, std::string("unknown actionType: '") + action + "'");
@@ -2619,7 +2457,8 @@ void processContextElement
       toSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
     }
 
-    // FIXME: not sure how the following if behaves in the case of "replace"...
+    // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
+    // not sure how the following if behaves in the case of "replace"...
     if (locAttr.length() > 0)
     {
       toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
