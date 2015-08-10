@@ -7,6 +7,8 @@ This project is part of [FIWARE](http://www.fiware.org). Check also the [FIWARE 
 Any feedback on this documentation is highly welcome, including bugs, typos
 or things you think should be included but aren't. You can use [github issues](https://github.com/telefonicaid/fiware-orion/issues/new) to provide feedback.
 
+You can find the User & Programmer's Manual and the Administration Guide on [readthedocs.org](https://fiware-orion.readthedocs.org)
+
 For documentation previous to Orion 0.23.0 please check the manuals at FIWARE public wiki:
 
 * [Orion Context Broker - Installation and Administration Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)
@@ -271,7 +273,7 @@ The functional_test makefile target is used for running end-to-end tests:
 
 Please have a look to the section [on building the source code](#from-sources) in order to get more information about how to prepare the environment to run the functional_test target.
 
-### Unit tets
+### Unit Tests
 
 The unit_test makefile target is used for running the unit tests:
 
@@ -279,43 +281,21 @@ The unit_test makefile target is used for running the unit tests:
 
 Please have a look to the section [on building the source code](#from-sources) in order to get more information about how to prepare the environment to run the unit_test target.
 
-## Advanced topics:
+## Advanced topics
 
-* Installation and administration
-  * [Building from sources](doc/manuals/admin/build_source.md)
-  * [Running Orion from command line](doc/manuals/admin/cli.md)
-  * [Database administration](doc/manuals/admin/database_admin.md)
-  * [Logs](doc/manuals/admin/logs.md)
-  * [Watchdog](doc/manuals/admin/watchdog.md)
-  * [Rush relayer](doc/manuals/admin/rush.md)
-  * [Management REST inferface](doc/manuals/admin/management_api.md)
-  * [Data model](doc/manuals/admin/database_model.md)
-  * [Resources & I/O Flows](doc/manuals/admin/resources.md)
-  * [Problem diagnosis procedures](doc/manuals/admin/diagnosis.md)
-* API
-  * [Pagination](doc/manuals/user/pagination.md)
-  * [Geolocation ](doc/manuals/user/geolocation.md)
-  * [Structured values for attributes](doc/manuals/user/structured_attribute_valued.md)
-  * [Context Providers registration and request forwarding](doc/manuals/user/context_providers.md)
-  * [Attribute metadata](doc/manuals/user/metadata.md)
-  * [Filtering results](doc/manuals/user/filtering.md)
-  * [Multy tenancy](doc/manuals/user/multitenancy.md)
-  * [Entity service paths](doc/manuals/user/service_path.md)
-  * [Adding and removing attributes and entities with APPEND and DELETE in updateContext](doc/manuals/user/append_and_delete.md)
-  * [Updating registrations and subscriptions](doc/manuals/user/updating_regs_and_subs.md)
-  * [Context broker federation](doc/manuals/user/federation.md)
-  * [Forbidden characters](doc/manuals/user/forbidden_characters.md)
-  * [Duration (for registration and subscriptions)](doc/manuals/user/duration.md)
-  * [Using empty types](doc/manuals/user/empty_types.md)
-  * [Mixing standard and convenience operations](doc/manuals/user/std_conv_mix.md)
-  * [HTTP and NGSI response codes](doc/manuals/user/http_and_ngsi_sc.md)
-  * [Security considerations](doc/manuals/user/security.md)
-  * [Known limitations](doc/manuals/user/known_limitations.md)
+* [Advanced Programming](doc/manuals/user/README.md)
+* [Installation and administration](doc/manuals/admin/README.md)
 * Container-based deployment
   * [Vagrant](doc/manuals/vagrant.md)
+  * [Docker](docker/README.md)
 * [Sample code contributions](doc/manuals/code_contributions.md)
 * [Deprecated features](doc/manuals/deprecated.md)
 
 ## License
 
 Orion Context Broker is licensed under Affero General Public License (GPL) version 3.
+
+## Support
+
+Ask your thorough programmming questions using [stackoverflow](http://stackoverflow.com/questions/ask)
+and your general questions on [FIWARE Q&A](https://ask.fiware.org). In both cases please use the tag `fiware-orion`
