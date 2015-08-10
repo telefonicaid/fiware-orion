@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_SERVICEROUTINES_BADVERBALLFIVE_H_
+#define SRC_LIB_SERVICEROUTINES_BADVERBALLFIVE_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -22,31 +25,24 @@
 *
 * Author: Ken Zangelin
 */
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
+#include <string>
+#include <vector>
 
-
-
-namespace orion
-{
-
-
-/* ****************************************************************************
-*
-* subCache - global singleton for the subscription cache
-*/
-SubscriptionCache* subCache = NULL;
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* subscriptionCacheInit - 
+* badVerbAllFive - 
 */
-void subscriptionCacheInit(std::string tenant)
-{
-  subCache = new SubscriptionCache(tenant);
-  subCache->init();
-}
+extern std::string badVerbAllFive
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-}
+#endif  // SRC_LIB_SERVICEROUTINES_BADVERBALLFIVE_H_

@@ -22,31 +22,36 @@
 *
 * Author: Ken Zangelin
 */
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
+#include <string>
+#include <vector>
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
 
-
-namespace orion
-{
-
-
-/* ****************************************************************************
-*
-* subCache - global singleton for the subscription cache
-*/
-SubscriptionCache* subCache = NULL;
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/restReply.h"
+#include "serviceRoutines/badVerbAllFive.h"
 
 
 
 /* ****************************************************************************
 *
-* subscriptionCacheInit - 
+* badVerbAllFive - 
 */
-void subscriptionCacheInit(std::string tenant)
+std::string badVerbAllFive
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
-  subCache = new SubscriptionCache(tenant);
-  subCache->init();
-}
+  ciP->httpHeader.push_back("Allow");
+  ciP->httpHeaderValue.push_back("POST, GET, PUT, DELETE, PATCH");
+  ciP->httpStatusCode = SccBadVerb;
 
+  LM_W(("Bad Input (bad verb for url '%s', method '%s')", ciP->url.c_str(), ciP->method.c_str()));
+
+  return "";
 }

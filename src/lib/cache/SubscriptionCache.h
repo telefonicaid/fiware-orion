@@ -70,13 +70,13 @@ class SubscriptionCache
 {
 private:
   std::vector<Subscription*>  subs;
-  std::string                 dbPrefix;
+  std::string                 tenant;
   sem_t                       mutex;
   pthread_t                   mutexOwner;
 
 public:
   SubscriptionCache();
-  SubscriptionCache(std::string _dbPrefix);
+  SubscriptionCache(std::string _tenant);
 
   void           init(void);
   void           fillFromDb(void);

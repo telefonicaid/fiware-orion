@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_SERVICEROUTINES_PUTENTITY_H_
+#define SRC_LIB_SERVICEROUTINES_PUTENTITY_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -20,33 +23,26 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Ken Zangelin
+* Author: Orion dev team
 */
-#include "cache/subCache.h"
-#include "cache/SubscriptionCache.h"
+#include <string>
+#include <vector>
 
-
-
-namespace orion
-{
-
-
-/* ****************************************************************************
-*
-* subCache - global singleton for the subscription cache
-*/
-SubscriptionCache* subCache = NULL;
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* subscriptionCacheInit - 
+* putEntity - 
 */
-void subscriptionCacheInit(std::string tenant)
-{
-  subCache = new SubscriptionCache(tenant);
-  subCache->init();
-}
+extern std::string putEntity
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-}
+#endif  // SRC_LIB_SERVICEROUTINES_PUTENTITY_H_
