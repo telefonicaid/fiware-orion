@@ -54,9 +54,6 @@ export MAXIMUM_WAIT=${MAXIMUM_WAIT:-30}
 # o LISTENER2_PORT - port where a second listening (test) application listens for connections
 #
 export CB_PORT=${CB_PORT:-9999}
-export CB_A_PORT=${CB_A_PORT:-1030}
-export CB_B_PORT=${CB_B_PORT:-1031}
-export CB_C_PORT=${CB_C_PORT:-1032}
 export CM_PORT=${CM_PORT:-9998}
 export COAP_PORT=${COAP_PORT:-5683}
 export CP1_PORT=${CP1_PORT:-9801}
@@ -82,9 +79,6 @@ export LISTENER2_PORT=${LISTENER2_PORT:-9977}
 # o CP5_LOG_DIR       - directory where contextProvider5 keeps its log file
 #
 export CB_LOG_DIR=${CB_LOG_DIR:-/var/log/contextBroker}
-export CB_A_LOG_DIR=${CB_A_LOG_DIR:-/tmp/orion/logs//contextBrokerA}
-export CB_B_LOG_DIR=${CB_B_LOG_DIR:-/tmp/orion/logs/contextBrokerB}
-export CB_C_LOG_DIR=${CB_C_LOG_DIR:-/tmp/orion/logs/contextBrokerC}
 export CM_LOG_DIR=${CM_LOG_DIR:-/tmp/configManager}
 export CP1_LOG_DIR=${CP1_LOG_DIR:-/tmp/orion/logs/contextProvider1}
 export CP2_LOG_DIR=${CP2_LOG_DIR:-/tmp/orion/logs/contextProvider2}
@@ -108,9 +102,6 @@ export CP5_LOG_DIR=${CP5_LOG_DIR:-/tmp/orion/logs/contextProvider5}
 # o CP5_PID_FILE      - path to pid file for the fifth context provider
 #
 export CB_PID_FILE=${CB_PID_FILE:-/tmp/orion_${CB_PORT}.pid}
-export CB_A_PID_FILE=${CB_A_PID_FILE:-/tmp/orion_${CB_A_PORT}.pid}
-export CB_B_PID_FILE=${CB_B_PID_FILE:-/tmp/orion_${CB_B_PORT}.pid}
-export CB_C_PID_FILE=${CB_C_PID_FILE:-/tmp/orion_${CB_C_PORT}.pid}
 export CM_PID_FILE=${CM_PID_FILE:-/tmp/orion_${CM_PORT}.pid}
 export CP1_PID_FILE=${CP1_PID_FILE:-/tmp/orion_${CP1_PORT}.pid}
 export CP2_PID_FILE=${CP2_PID_FILE:-/tmp/orion_${CP2_PORT}.pid}
@@ -144,9 +135,6 @@ export ORION_DATABASE_PASSWORD=${ORION_DATABASE_PASSWORD:-orion}
 # o CP5_DATABASE_NAME      - database for fifth context provider
 #
 export CB_DATABASE_NAME=${CB_DATABASE_NAME:-ftest}
-export CB_A_DATABASE_NAME=${CB_A_DATABASE_NAME:-orion1030}
-export CB_B_DATABASE_NAME=${CB_B_DATABASE_NAME:-orion1031}
-export CB_C_DATABASE_NAME=${CB_C_DATABASE_NAME:-orion1032}
 export CM_DATABASE_NAME=${CM_DATABASE_NAME:-ftest_cm}
 export CP1_DATABASE_NAME=${CP1_DATABASE_NAME:-ftest_cp1}
 export CP2_DATABASE_NAME=${CP2_DATABASE_NAME:-ftest_cp2}
