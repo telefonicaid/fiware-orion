@@ -43,9 +43,9 @@ SubscriptionCache* subCache = NULL;
 *
 * subscriptionCacheInit - 
 */
-void subscriptionCacheInit(std::string dbName)
+void subscriptionCacheInit(std::string tenant)
 {
-  subCache = new SubscriptionCache(dbName);
+  subCache = new SubscriptionCache(tenant);
   subCache->init();
 }
 
