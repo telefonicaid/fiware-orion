@@ -65,7 +65,7 @@ std::string putEntity
   eP->id = compV[2];
 
   // 01. Fill in UpdateContextRequest
-  parseDataP->upcr.res.fill(eP, "UPDATE");
+  parseDataP->upcr.res.fill(eP, "REPLACE");
   
 
   // 02. Call standard op postUpdateContext
