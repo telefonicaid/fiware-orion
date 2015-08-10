@@ -62,7 +62,7 @@ information). Some remarks to take into account to use this stuff:
 -   Note that each main section is divided in two sub-sections: the
     first being about standard operations while the second is about
     convenience operations. In fact, each sub-section is an independent
-    tutorial (for efore starting...a total of 4 tutorials summing up both sections) that
+    tutorial (for a total of 4 tutorials summing up both sections) that
     can be done in a step-by-step manner, just copy-pasting the commands
     from this document.
 -   Before starting (or if you get lost in the middle and
