@@ -595,47 +595,6 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
 /* ****************************************************************************
 *
-* updateAttribute -
-*
-* Returns true if an attribute was found, false otherwise. If true,
-* the "actualUpdate" argument (passed by reference) is set to true in the case that the
-* original value of the attribute was different than the one used in the update (this is
-* important for ONCHANGE notifications)
-*
-*/
-static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttribute* caP, bool& actualUpdate)
-{
-  actualUpdate = false;
-
-  /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
-  std::string effectiveName = dbDotEncode(caP->name);
-  if (caP->getId() != "")
-  {
-    effectiveName += "__" + caP->getId();
-  }
-
-  if (!attrs.hasField(effectiveName.c_str()))
-  {
-    return false;
-  }
-
-  BSONObj  attr = attrs.getField(effectiveName).embeddedObject();
-  BSONObj  newAttr;
-
-  actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
-  if (actualUpdate)
-  {
-    const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
-
-    toSet->append(composedName, newAttr);
-  }
-
-  return true;
-}
-
-
-/* ****************************************************************************
-*
 * contextAttributeCustomMetadataToBson -
 *
 * Generates the BSON for metadata vector to be inserted in database for a given atribute.
@@ -670,6 +629,84 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 
 /* ****************************************************************************
 *
+* updateAttribute -
+*
+* Returns true if an attribute was found, false otherwise. If true,
+* the "actualUpdate" argument (passed by reference) is set to true in the case that the
+* original value of the attribute was different than the one used in the update (this is
+* important for ONCHANGE notifications)
+*
+* The isReplace boolean specifies how toSet has to be filled, either:
+*
+*   { attrs.A1: { ... }, attrs.A2: { ... } }  (in the case of isPeplace = false)
+*
+* or
+*
+*   { A1: { ... }, A2: { ... } }              (in the case of isPeplace = true)
+*
+* The former is to be used with { $set: <toSet> }, the later to be used with { attrs: <toSet> }
+*
+* In addition, in the case of isReplace, the attribute is added to toPush (otherwise, toPush is not
+* touched).
+*
+*/
+static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuilder* toPush, ContextAttribute* caP, bool& actualUpdate, bool isReplace)
+{
+  actualUpdate = false;
+
+  /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
+  std::string effectiveName = dbDotEncode(caP->name);
+  if (caP->getId() != "")
+  {
+    effectiveName += "__" + caP->getId();
+  }
+
+  if (isReplace)
+  {
+    actualUpdate = true;
+    BSONObjBuilder newAttr;
+
+    int now = getCurrentTime();
+    newAttr.appendElements(BSON(ENT_ATTRS_TYPE << caP->type <<
+                                ENT_ATTRS_CREATION_DATE << now <<
+                                ENT_ATTRS_MODIFICATION_DATE << now));
+    valueBson(caP, newAttr);
+
+    /* Custom metadata */
+    BSONObj mdV;
+    if (contextAttributeCustomMetadataToBson(mdV, caP));
+    {
+      newAttr.appendArray(ENT_ATTRS_MD, mdV);
+    }
+
+    toSet->append(effectiveName, newAttr.obj());
+    toPush->append(effectiveName);
+  }
+  else
+  {
+    if (!attrs.hasField(effectiveName.c_str()))
+    {
+      return false;
+    }
+
+    BSONObj newAttr;
+    BSONObj attr = attrs.getField(effectiveName).embeddedObject();
+    actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
+
+    if (actualUpdate)
+    {
+      const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
+      toSet->append(composedName, newAttr);
+    }
+  }
+
+
+  return true;
+}
+
+
+/* ****************************************************************************
+*
 * appendAttribute -
 *
 * The "actualUpdate" argument (passed by reference) is set to true 1) in the case
@@ -694,7 +731,7 @@ static void appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuil
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, caP, actualUpdate);
+    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false);
     return;
   }
 
@@ -1408,36 +1445,46 @@ static bool updateContextAttributeItem
   ContextAttribute*         targetAttr,
   EntityId*                 eP,
   BSONObjBuilder*           toSet,
+  BSONArrayBuilder*         toPush,
   bool&                     actualUpdate,
   bool&                     entityModified,
   std::string&              locAttr,
   double&                   coordLat,
-  double&                   coordLong
+  double&                   coordLong,
+  bool                      isReplace
 )
 {
 
-  if (updateAttribute(attrs, toSet, targetAttr, actualUpdate))
+  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace))
   {
     entityModified = actualUpdate || entityModified;
   }
   else
   {
-    /* If updateAttribute() returns false, then that particular attribute has not
+    if (!isReplace)
+    {
+      /* If updateAttribute() returns false, then that particular attribute has not
        * been found. In this case, we interrupt the processing and early return with
        * an error StatusCode */
-    // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
-    // another .fill() in this function caller. We keep it by the moment, but it probably
-    // will removed when we refactor this function
-    cerP->statusCode.fill(SccInvalidParameter,
-                          std::string("action: UPDATE") +
-                          " - entity: [" + eP->toString() + "]" +
-                          " - offending attribute: " + targetAttr->toString());
+      // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
+      // another .fill() in this function caller. We keep it by the moment, but it probably
+      // will removed when we refactor this function
+      cerP->statusCode.fill(SccInvalidParameter,
+                            std::string("action: UPDATE") +
+                            " - entity: [" + eP->toString() + "]" +
+                            " - offending attribute: " + targetAttr->toString());
 
-    /* Although ca has been already pushed into cerP, it can be used */
-    ca->found = false;
+      /* Although ca has been already pushed into cerP, it can be used */
+      ca->found = false;
+    }
   }
 
   /* Check aspects related with location */
+  // FIXME P5: note that with the current logic, the name of the attribute meaning location
+  // is preserved on a replace operation. By the moment, we can leave this as it is now
+  // given that the logic in NGSIv2 for specifying location attributes is gogint to change
+  // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
+  // removed from code)
   if (targetAttr->getLocation().length() > 0 && targetAttr->name != locAttr)
   {
     cerP->statusCode.fill(SccInvalidParameter,
@@ -1668,9 +1715,21 @@ static bool processContextAttributeVector
     /* actualUpdate could be changed to false in the "update" case (or "append as update"). For "delete" and
      * "append" it would keep the true value untouched */
     bool actualUpdate = true;
-    if (strcasecmp(action.c_str(), "update") == 0)
+    if ((strcasecmp(action.c_str(), "update")) == 0 || (strcasecmp(action.c_str(), "replace")) == 0)
     {
-      if (!updateContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, actualUpdate, entityModified, locAttr, coordLat, coordLong))
+      if (!updateContextAttributeItem(cerP,
+                                      ca,
+                                      attrs,
+                                      targetAttr,
+                                      eP,
+                                      toSet,
+                                      toPush,
+                                      actualUpdate,
+                                      entityModified,
+                                      locAttr,
+                                      coordLat,
+                                      coordLong,
+                                      strcasecmp(action.c_str(), "replace") == 0))
       {
         return false;
       }
@@ -2292,7 +2351,10 @@ void processContextElement
   }
 
   /* Check that UPDATE or APPEND is not used with attributes with empty value */
-  if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "appendonly") == 0))
+  if ((strcasecmp(action.c_str(), "update") == 0) ||
+      (strcasecmp(action.c_str(), "append") == 0) ||
+      (strcasecmp(action.c_str(), "appendonly") == 0) ||
+      (strcasecmp(action.c_str(), "replace") == 0))
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -2552,7 +2614,12 @@ void processContextElement
     /* Compose the final update on database */
     LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 
-    toSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
+    if (strcasecmp(action.c_str(), "replace") != 0)
+    {
+      toSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
+    }
+
+    // FIXME: not sure how the following if behaves in the case of "replace"...
     if (locAttr.length() > 0)
     {
       toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
@@ -2573,24 +2640,33 @@ void processContextElement
     BSONArray       toPushArr   = toPush.arr();
     BSONArray       toPullArr   = toPull.arr();
 
-    if (toSetObj.nFields() > 0)
+    if (strcasecmp(action.c_str(), "replace") == 0)
     {
-      updatedEntity.append("$set", toSetObj);
+      // toSet: { A1: { ... }, A2: { ... } }
+      updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << getCurrentTime()));
     }
-
-    if (toUnsetObj.nFields() > 0)
+    else
     {
-      updatedEntity.append("$unset", toUnsetObj);
-    }
+      // toSet:  { attrs.A1: { ... }, attrs.A2: { ... } }
+      if (toSetObj.nFields() > 0)
+      {
+        updatedEntity.append("$set", toSetObj);
+      }
 
-    if (toPushArr.nFields() > 0)
-    {
-      updatedEntity.append("$addToSet", BSON(ENT_ATTRNAMES << BSON("$each" << toPushArr)));
-    }
+      if (toUnsetObj.nFields() > 0)
+      {
+        updatedEntity.append("$unset", toUnsetObj);
+      }
 
-    if (toPullArr.nFields() > 0)
-    {
-      updatedEntity.append("$pullAll", BSON(ENT_ATTRNAMES << toPullArr));
+      if (toPushArr.nFields() > 0)
+      {
+        updatedEntity.append("$addToSet", BSON(ENT_ATTRNAMES << BSON("$each" << toPushArr)));
+      }
+
+      if (toPullArr.nFields() > 0)
+      {
+        updatedEntity.append("$pullAll", BSON(ENT_ATTRNAMES << toPullArr));
+      }
     }
 
     BSONObj updatedEntityObj = updatedEntity.obj();
