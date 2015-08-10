@@ -97,16 +97,16 @@ void ScopeVector::present(const std::string& indent)
 {
   if (vec.size() == 0)
   {
-    LM_F(("No scopes\n"));
+    LM_F(("%sNo scopes", indent.c_str()));
   }
   else
   {
-    LM_F(("%lu Scopes:\n", (uint64_t) vec.size()));
+    LM_F(("%s%lu Scopes:", indent.c_str(), (uint64_t) vec.size()));
   }
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
-    vec[ix]->present(indent, ix);
+    vec[ix]->present(indent + "  ", ix);
   }
 }
 

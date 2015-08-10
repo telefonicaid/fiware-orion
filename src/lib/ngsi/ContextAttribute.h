@@ -63,6 +63,7 @@ typedef struct ContextAttribute
   bool                       found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
                                                       // It means attribute found either locally or remotely in providing application
 
+  bool                       skip;                    // For internal use in mongoBackend - in case of 'op=append' and the attribute already exists
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
 

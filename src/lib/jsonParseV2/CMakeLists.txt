@@ -27,7 +27,6 @@ SET (SOURCES
     parseContextAttributeCompoundValue.cpp
     parseMetadata.cpp
     jsonParseTypeNames.cpp
-    parseAttributes.cpp
 )
 
 SET (HEADERS
@@ -37,7 +36,6 @@ SET (HEADERS
     parseContextAttributeCompoundValue.cpp
     parseMetadata.h
     jsonParseTypeNames.h
-    parseAttributes.h
 )
 
 

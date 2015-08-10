@@ -732,8 +732,6 @@ TEST(mongoContextProvidersUpdateRequest, noPatternNoAttribute)
   /* Invoke the function in mongoBackend library */
   ms = mongoUpdateContext(&req, &res, "", servicePathVector, uriParams, "");
 
-  res.present("TEST: ");
-
   /* Check response is as expected */
   EXPECT_EQ(SccOk, ms);
 
