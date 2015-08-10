@@ -1,5 +1,6 @@
-#<a name="top"></a>Contents
+#<a name="top"></a>FIWARE NGSI APIv1 Walkthrough
 
+* [Introduction](#introduction)
 * [Before starting...](#before-starting)
     * [Example Case](#example-case)
     * [Starting the broker for the tutorials](#starting-the-broker-for-the-tutorials)
@@ -36,7 +37,7 @@
 	  * [Convenience operations for context availability subscriptions](#convenience-operations-for-context-availability-subscriptions)
 	  * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
 
-# FIWARE NGSI APIv1 Walkthrough
+# Introduction
 
 This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
