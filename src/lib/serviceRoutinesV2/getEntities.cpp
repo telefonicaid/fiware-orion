@@ -61,31 +61,29 @@ std::string getEntities
 )
 {
   using namespace std;
-  typedef vector<string>  vstr;
-  typedef vstr::size_type vstr_sz;
 
   Entities entities;
   string   answer;
 
   // optional parameter for list of IDs
-  string paramIDs     = ciP->uriParam["id"];
-  string paramPattern = ciP->uriParam["idPattern"];
+  string id        = ciP->uriParam["id"];
+  string idPattern = ciP->uriParam["idPattern"];
   string pattern      = ".*"; // all entities, default value
 
-  if (paramPattern != "" && paramIDs != "")
+  if ((idPattern != "") && (id != ""))
   {
     ciP->httpStatusCode = SccBadRequest;
     answer = "{\"error\":\"Incompatible parameters: id, IdPattern\"}";
     return answer;
   }
-  else if (paramIDs != "")
+  else if (id != "")
   {
-    // TODO: a more efficient query could be possible ...
-    vstr idsV;
+    // FIXME: a more efficient query could be possible ...
+    vector<string> idsV;
 
-    stringSplit(paramIDs, ',', idsV);
-    vstr_sz sz = idsV.size();
-    for (vstr_sz ix = 0; ix != sz; ++ix)
+    stringSplit(id, ',', idsV);
+    vector<string>::size_type sz = idsV.size();
+    for (vector<string>::size_type ix = 0; ix != sz; ++ix)
     {
       if (ix != 0)
       {
@@ -94,9 +92,9 @@ std::string getEntities
       pattern += idsV[ix];
     }
   }
-  else if (paramPattern != "")
+  else if (idPattern != "")
   {
-    pattern = paramPattern;
+    pattern = idPattern;
   }
 
   // 01. Fill in QueryContextRequest
