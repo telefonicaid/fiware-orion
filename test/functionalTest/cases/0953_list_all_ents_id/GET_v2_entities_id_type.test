@@ -31,8 +31,8 @@ brokerStart CB
 
 #
 # 01. POST /v1/updateContext, creating 5 entities
-# 02. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&count=true
-# 03. GET /v2/entities?id=E1,E2,E3,E4,E5&offset=2
+# 02. GET /v2/entities?id=E1,E2&type=T1
+# 03. GET /v2/entities?id=E1&type=T3
 #
 
 echo "01. POST /v1/updateContext"
@@ -45,19 +45,19 @@ payload='{
     },
     {
       "id":   "E2",
-      "type": "T2"
+      "type": "T1"
     },
     {
       "id":   "E3",
+      "type": "T2"
+    },
+    {
+      "id":   "E1",
       "type": "T3"
     },
     {
-      "id":   "E4",
-      "type": "T4"
-    },
-    {
-      "id":   "E5",
-      "type": "T5"
+      "id":   "E2",
+      "type": "T3"
     }
   ],
   "updateAction": "APPEND"
@@ -67,16 +67,16 @@ echo
 echo
 
 
-echo "02. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&count=true"
-echo "========================================================="
-orionCurl --url '/v2/entities?id=E1,E2,E3,E4,E5&limit=2&count=true' --json
+echo "02. GET /v2/entities?id=E1,E2&type=T1"
+echo "====================================="
+orionCurl --url '/v2/entities?id=E1,E2&type=T1' --json
 echo
 echo
 
 
-echo "03. GET /v2/entities?id=E1,E2,E3,E4,E5&offset=2"
-echo "==============================================="
-orionCurl --url '/v2/entities?id=E1,E2,E3,E4,E5&offset=2' --json
+echo "03. GET /v2/entities?id=E1&type=T3"
+echo "=================================="
+orionCurl --url '/v2/entities?id=E1&type=T3' --json
 echo
 echo
 
@@ -93,56 +93,56 @@ Date: REGEX(.*)
     "contextResponses": [
         {
             "contextElement": {
-                "id": "E1", 
-                "isPattern": "false", 
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T1"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
-                "id": "E2", 
-                "isPattern": "false", 
+                "id": "E2",
+                "isPattern": "false",
+                "type": "T1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "id": "E3",
+                "isPattern": "false",
                 "type": "T2"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
-                "id": "E3", 
-                "isPattern": "false", 
+                "id": "E1",
+                "isPattern": "false",
                 "type": "T3"
-            }, 
+            },
             "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
-        }, 
+        },
         {
             "contextElement": {
-                "id": "E4", 
-                "isPattern": "false", 
-                "type": "T4"
-            }, 
+                "id": "E2",
+                "isPattern": "false",
+                "type": "T3"
+            },
             "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "id": "E5", 
-                "isPattern": "false", 
-                "type": "T5"
-            }, 
-            "statusCode": {
-                "code": "200", 
+                "code": "200",
                 "reasonPhrase": "OK"
             }
         }
@@ -150,45 +150,36 @@ Date: REGEX(.*)
 }
 
 
-02. GET /v2/entities?id=E1,E2,E3,E4,E5&limit=2&count=true
-=========================================================
+02. GET /v2/entities?id=E1,E2&type=T1
+=====================================
 HTTP/1.1 200 OK
 Content-Length: 49
 Content-Type: application/json
-X-Total-Count: 5
 Date: REGEX(.*)
 
 [
     {
-        "id": "E1", 
+        "id": "E1",
         "type": "T1"
-    }, 
+    },
     {
-        "id": "E2", 
-        "type": "T2"
+        "id": "E2",
+        "type": "T1"
     }
 ]
 
 
-03. GET /v2/entities?id=E1,E2,E3,E4,E5&offset=2
-===============================================
+03. GET /v2/entities?id=E1&type=T3
+==================================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 25
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "id": "E3", 
+        "id": "E1",
         "type": "T3"
-    }, 
-    {
-        "id": "E4", 
-        "type": "T4"
-    }, 
-    {
-        "id": "E5", 
-        "type": "T5"
     }
 ]
 
