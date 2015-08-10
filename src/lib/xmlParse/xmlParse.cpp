@@ -118,12 +118,21 @@ static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path
       //
       if (node->first_attribute() == NULL)
       {
-        if (forbiddenChars(node->value()) == true)
+        //
+        // If we're in a Scope, no forbiddenChars check made.
+        // We still don't know the type of the Scope, so the forbiddenChars check
+        // will have to be postponed until we know both the type and the value.
+        // For example, the 'check' method can take care of trhis
+        //
+        if (strcasecmp(node->name(), "scopeValue") == 0)
         {
-          LM_E(("Found a forbidden value in '%s'", node->value()));
-          ciP->httpStatusCode = SccBadRequest;
-          ciP->answer = std::string("Illegal value for XML attribute");
-          return true;
+          if (forbiddenChars(node->value()) == true)
+          {
+            LM_E(("Found a forbidden value in '%s'", node->value()));
+            ciP->httpStatusCode = SccBadRequest;
+            ciP->answer = std::string("Illegal value for XML attribute");
+            return true;
+          }
         }
       }
       else
