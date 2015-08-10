@@ -2643,7 +2643,7 @@ void processContextElement
       cerP->contextElement.contextAttributeVector.push_back(ca);
     }
 
-    if (strcasecmp(action.c_str(), "update") == 0)
+    if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
     {
       /* In the case of UPDATE or DELETE we look for context providers */
       searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
