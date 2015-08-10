@@ -61,16 +61,16 @@ std::string getEntities
 )
 {
   using namespace std;
-
-  Entities     entities;
-  typedef vector<string> vstr;
+  typedef vector<string>  vstr;
   typedef vstr::size_type vstr_sz;
-  string answer;
+
+  Entities entities;
+  string   answer;
 
   // optional parameter for list of IDs
-  string paramIDs = ciP->uriParam["id"];
+  string paramIDs     = ciP->uriParam["id"];
   string paramPattern = ciP->uriParam["idPattern"];
-  string pattern = ".*"; // all entities, default value
+  string pattern      = ".*"; // all entities, default value
 
   if (paramPattern != "" && paramIDs != "")
   {
@@ -78,12 +78,15 @@ std::string getEntities
     answer = "{\"error\":\"Incompatible parameters: id, IdPattern\"}";
     return answer;
   }
-  else if (paramIDs != "") {
+  else if (paramIDs != "")
+  {
     // TODO: a more efficient query could be possible ...
     vstr idsV;
+
     stringSplit(paramIDs, ',', idsV);
     vstr_sz sz = idsV.size();
-    for(vstr_sz ix = 0; ix != sz; ++ix) {
+    for (vstr_sz ix = 0; ix != sz; ++ix)
+    {
       if (ix != 0)
       {
           pattern += "|";
