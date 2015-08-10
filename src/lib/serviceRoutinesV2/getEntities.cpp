@@ -27,6 +27,7 @@
 
 #include "common/string.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
@@ -72,8 +73,8 @@ std::string getEntities
 
   if ((idPattern != "") && (id != ""))
   {
-    ciP->httpStatusCode = SccBadRequest;
-    answer = "{\"error\":\"Incompatible parameters: id, IdPattern\"}";
+    OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern");
+    answer = oe.render(ciP, "");
     return answer;
   }
   else if (id != "")

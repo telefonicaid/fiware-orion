@@ -131,12 +131,13 @@ echo
 01. GET /v2/entities?id=E1&idPattern=.*
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 50
+Content-Length: 77
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "error": "Incompatible parameters: id, IdPattern"
+    "description": "Incompatible parameters: id, IdPattern",
+    "error": "BadRequest"
 }
 
 
@@ -238,12 +239,13 @@ Date: REGEX(.*)
 03. GET /v2/entities?id=E1&idPattern=.*
 =======================================
 HTTP/1.1 400 Bad Request
-Content-Length: 50
+Content-Length: 77
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "error": "Incompatible parameters: id, IdPattern"
+    "description": "Incompatible parameters: id, IdPattern",
+    "error": "BadRequest"
 }
 
 
