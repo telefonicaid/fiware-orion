@@ -4,7 +4,7 @@
     * [Backup](#backup)
     * [Restore](#restore)
     * [Database authorization](#database-authorization)
-    * [Multiservice/multitenant database separation](#multitenantmultiservice-database-separation)
+    * [Multiservice/multitenant database separation](#multiservicemultitenant-database-separation)
     * [Delete complete database](#delete-complete-database)
     * [Setting indexes](#setting-indexes)
 	  * [Analysis](#analysis)
@@ -34,7 +34,7 @@ mongodump --host <dbhost> --db <db>
 This will create the backup in the dump/ directory.
 
 Note that if you are using
-[multitenant/multiservice](#multitenantmultiservice-database-separation)
+[multitenant/multiservice](#multiservicemultitenant-database-separation)
 you need to apply the procedures to each per-tenant/service database
 
 [Top](#top)
@@ -56,7 +56,7 @@ mongorestore --host <dbhost> --db <db> dump/<db>
 ```
 
 Note that if you are using
-[multitenant/multiservice](#multitenantmultiservice-database-separation)
+[multitenant/multiservice](#multiservicemultitenant-database-separation)
 you need to apply the procedures to each per-tenant/service database
 
 [Top](#top)
@@ -89,7 +89,7 @@ to take into account:
 
 Normally, Orion Context Broker uses just one database at MongoDB level
 (the one specified with the `-db` command line option, typically "orion").
-However, when [multitenant/multiservice](#multitenantmultiservice-database-separation) is used
+However, when [multitenant/multiservice](#multiservicemultitenant-database-separation) is used
 the behaviour is different and the following databases are used (let
 `<db>` be the value of the `-db` command line option):
 
