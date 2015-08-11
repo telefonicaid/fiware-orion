@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entity Attribute V2 Attribute not found
+GET Entities V2, error using id and idPattern
 
 --SHELL-INIT--
 dbInit CB
@@ -30,39 +30,55 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v2/entities
-# 02. GET /v2/entities/E1/attrs/NONE
-#
+# 01. GET /v2/entities?id=E1&idPattern=.*
+# 02. POST /v2/entities, creating E1
+# 03. GET /v2/entities?id=E1&idPattern=.*
+
+echo "01. GET /v2/entities?id=E1&idPattern=.*"
+echo "======================================="
+orionCurl --url '/v2/entities?id=E1&idPattern=.*' --json
+echo
+echo
 
 
-echo "01. POST /v2/entities"
-echo "=========================="
-payload='{
-
-      "id":   "E1",
-      "type": "T1",
-      "A0" : 
-        {
-          "type": "number",
-          "value" : 255
-        }
-      
+echo "02. POST /v2/entities, creating E1"
+echo "=================================="
+payload='
+{
+   "id":"E1",
+   "type":"T1",
+   "A0":255,
+   "A1":"E1/T1/A1",
+   "A2":{
+      "value":"E1/T1/A2",
+      "type":"AT2"
+   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
-
-echo "02. GET /v2/entities/E1/attrs/NONE"
-echo "=================================="
-orionCurl --url /v2/entities/E1/attrs/NONE --json
+echo "03. GET /v2/entities?id=E1&idPattern=.*"
+echo "======================================="
+orionCurl --url '/v2/entities?id=E1&idPattern=.*' --json
 echo
 echo
-
-
 --REGEXPECT--
-01. POST /v2/entities
-==========================
+01. GET /v2/entities?id=E1&idPattern=.*
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 77
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Incompatible parameters: id, IdPattern",
+    "error": "BadRequest"
+}
+
+
+02. POST /v2/entities, creating E1
+==================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1
@@ -70,16 +86,16 @@ Date: REGEX(.*)
 
 
 
-02. GET /v2/entities/E1/attrs/NONE
-==================================
-HTTP/1.1 404 Not Found
-Content-Length: 79
+03. GET /v2/entities?id=E1&idPattern=.*
+=======================================
+HTTP/1.1 400 Bad Request
+Content-Length: 77
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "The entity does not have such an attribute",
-    "error": "NotFound"
+    "description": "Incompatible parameters: id, IdPattern",
+    "error": "BadRequest"
 }
 
 

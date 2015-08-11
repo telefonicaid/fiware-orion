@@ -25,14 +25,14 @@
 #include <string>
 #include <vector>
 
+#include "common/string.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/getEntities.h"
 #include "serviceRoutines/postQueryContext.h"
-
-
 
 /* ****************************************************************************
 *
@@ -61,17 +61,56 @@ std::string getEntities
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
-  Entities     entities;
+  using namespace std;
 
+  Entities entities;
+  string   answer;
+
+  // optional parameter for list of IDs
+  string id        = ciP->uriParam["id"];
+  string idPattern = ciP->uriParam["idPattern"];
+  string pattern      = ".*"; // all entities, default value
+
+  if ((idPattern != "") && (id != ""))
+  {
+    OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern");
+    answer = oe.render(ciP, "");
+    return answer;
+  }
+  else if (id != "")
+  {
+    // FIXME: a more efficient query could be possible ...
+    vector<string> idsV;
+
+    stringSplit(id, ',', idsV);
+    vector<string>::size_type sz = idsV.size();
+    for (vector<string>::size_type ix = 0; ix != sz; ++ix)
+    {
+      if (ix != 0)
+      {
+          pattern += "|";
+      }
+      pattern += idsV[ix];
+    }
+  }
+  else if (idPattern != "")
+  {
+    pattern = idPattern;
+  }
 
   // 01. Fill in QueryContextRequest
-  parseDataP->qcr.res.fill(".*", "", "true", EntityTypeEmptyOrNotEmpty, "");
+  // type "" is valid for all types
+  parseDataP->qcr.res.fill(pattern, ciP->uriParam["type"], "true", EntityTypeEmptyOrNotEmpty, "");
   
 
   // 02. Call standard op postQueryContext
   answer = postQueryContext(ciP, components, compV, parseDataP);
 
+  if (ciP->httpStatusCode != SccOk)
+  {
+    // Something went wrong in the query, an invalid pattern for example
+    return answer;
+  }
 
   // 03. Render Entities response
   if (parseDataP->qcrs.res.contextElementResponseVector.size() == 0)

@@ -14,3 +14,4 @@ Add:  PUT /v2/entities/<entityId> - replace attributes (by entity ID) for API ve
 Fix:  Checking for forbidden chars in many fields of JDON payload for API version 2 (Issue #1093)
 Fix:  Bug fix for receiving compound metadata values (which is not supported) (Issue #1110)
 Add:  GET /v2/entities/<entityId>/attrs/<attrName>/value - get a single attribute value (Issue #997)
+Add:  URI parameters id, idPattern and type for GET /v2/entities (Issues #952 #953 #969)
