@@ -37,6 +37,8 @@ brokerStart CB
 # 05. POST /v2/entities with JSON object in metadata::value
 # 06. POST /v2/entities with invalid field in metadata
 #
+# FIXME P1: Once metadata::value can be a compound, step 06 must be removed.
+#
 
 echo "01. POST /v2/entities with non-string in entity::id"
 echo "==================================================="
