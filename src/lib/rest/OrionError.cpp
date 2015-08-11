@@ -62,6 +62,19 @@ OrionError::OrionError(HttpStatusCode _code, const std::string& _details)
 *
 * OrionError::OrionError - 
 */
+OrionError::OrionError(HttpStatusCode _code, std::string& _details)
+{
+  code          = _code;
+  reasonPhrase  = httpStatusCodeString(code);
+  details       = _details;
+}
+
+
+
+/* ****************************************************************************
+*
+* OrionError::OrionError - 
+*/
 OrionError::OrionError(StatusCode& sc)
 {
   code          = sc.code;
