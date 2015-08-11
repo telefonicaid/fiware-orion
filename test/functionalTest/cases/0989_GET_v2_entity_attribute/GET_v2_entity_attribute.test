@@ -30,62 +30,51 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v1/updateContext
+# 01. POST /v2/entities/8787GHY
 # 02. GET /v2/entities/8787GHY/brand
 # 03. GET /v2/entities/8787GHY/model
 # 04. GET /v2/entities/8787GHY/speed
 # 05. GET /v2/entities/8787GHY/A3
 #
 
-echo "01. POST /v1/updateContext"
+echo "01. POST /v2/entities/8787GHY"
 echo "=========================="
 payload='{
-  "contextElements": [
-    {
-      "id":   "8787GHY",
-      "type": "Car",
-      "attributes" : [
-        {
-          "name" : "speed",
-          "type": "number",
-          "value" : 150
+    "id": "8787GHY",
+    "type": "Car",
+    "brand":{
+    
+            "type": "string",
+            "value": "Mercedes Benz"
         },
-        {
-          "name" : "brand",
-          "type": "string",
-          "value" : "Mercedes Benz"
+    "speed":{
+    
+            "type": "number",
+            "value" : "150"
         },
-        {
-          "name" : "plateCountry",
+    "plateCountry": {
           "value" : "ES"
         },
-        {
-          "name" : "madeInCountry",
+    "madeInCountry": {
           "value" : "DE",
           "type" : ""
         },
-        {
-          "name" : "model",
+    "model" : {
           "type": "myString",
           "value" : "Klasse C"
         },
-        {
-          "name": "A3",
+    "A3" : {
           "type": "a",
           "value": "E1/T1/A3/M1",
-          "metadatas": [
+          "m1": 
             {
-              "name": "m1",
               "value": "M1"
             }
-          ]
         }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
+
+   
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
@@ -114,67 +103,13 @@ echo
 echo
 
 --REGEXPECT--
-01. POST /v1/updateContext
+01. POST /v2/entities/8787GHY
 ==========================
-HTTP/1.1 200 OK
-Content-Length: 1110
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/8787GHY
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "speed",
-                        "type": "number",
-                        "value": ""
-                    },
-                    {
-                        "name": "brand",
-                        "type": "string",
-                        "value": ""
-                    },
-                    {
-                        "name": "plateCountry",
-                        "type": "",
-                        "value": ""
-                    },
-                    {
-                        "name": "madeInCountry",
-                        "type": "",
-                        "value": ""
-                    },
-                    {
-                        "name": "model",
-                        "type": "myString",
-                        "value": ""
-                    },
-                    {
-                        "metadatas": [
-                            {
-                                "name": "m1",
-                                "type": "",
-                                "value": "M1"
-                            }
-                        ],
-                        "name": "A3",
-                        "type": "a",
-                        "value": ""
-                    }
-                ],
-                "id": "8787GHY",
-                "isPattern": "false",
-                "type": "Car"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
 
 02. GET /v2/entities/8787GHY/attrs/brand

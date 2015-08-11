@@ -1,4 +1,12 @@
-# Data model
+#<a name="top"></a>Data model
+
+* [Introduction](#introduction)
+    * [entities collection](#entities-collection)
+    * [registrations collection](#registrations-collection)
+    * [csubs collection](#csubs-collection)
+    * [casubs collection](#casubs-collection)
+
+# Introduction
 
 Normally you don't need to access MongoDB directly as Orion Contex
 Broker uses it transparently. However, for some operations (e.g. backup,
@@ -11,6 +19,8 @@ it's a good idea).
 
 Orion Context Broker uses four collections in the database, described in
 the following subsections.
+
+[Top](#top)
 
 ## entities collection
 
@@ -126,6 +136,7 @@ Example document:
    }
  }
 ```
+[Top](#top)
 
 ## registrations collection
 
@@ -202,6 +213,7 @@ Example document:
   ]
  }
 ```
+[Top](#top)
 
 ## csubs collection
 
@@ -276,6 +288,7 @@ Example document:
    "format": "JSON"
  }
 ```
+[Top](#top)
 
 ## casubs collection
 
@@ -334,3 +347,4 @@ Example document:
    "format": "JSON"
  }
 ```
+[Top](#top)

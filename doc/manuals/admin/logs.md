@@ -1,4 +1,12 @@
-# Logs
+#<a name="top"></a>Logs
+
+* [Introduction](#introduction)
+    * [Log file](#log-file)
+    * [Log format](#log-format)
+    * [Error and warning types](#error-and-warning-types)
+    * [Log rotation](#log-rotation)
+
+# Introduction
 
 The log system has been re-worked in deep in release 0.14.1. This
 section describes its main characteristics.
@@ -13,6 +21,8 @@ When starting the Orion context broker, if a previous log file exist:
     existing file.
 -   If **-logAppend** is not used, then the existing file is renamed,
     appending the text ".old" to its name.
+
+[Top](#top)
 
 ## Log format
 
@@ -95,6 +105,8 @@ The different fields in each line are as follows:
     include the name of the file and line number generating the trace
     (this information is useful mainly for Orion developers).
 
+[Top](#top)
+    
 ## Error and warning types
 
 -   FATAL Fatal Error. This error causes the Context Broker to stop.
@@ -140,6 +152,8 @@ Alarm conditions
 | 4          | WARNING    | The following WARNING text appear in the 'msg' field: "Bad Input (...)"                       | A transaction comming from the same client (identified by IP and port) is processed correctly, without any "Bad Input (...)" message between the "Starting transaction from" message to the "Transaction ended" message for that particular transaction. | Bad Input. The text within parenthesis in the 'msg' field containts the detailed information.                | The client has sent a request to Orion that doesn't conform to the API specification, e.g. bad URL, bad payload, syntax/semantic error in the request, etc. Depending on the IP, it could correspond to a platform client or to an external third-party client. In any case, the client owner should be reported in order to know and fix the issue. No specific fixing action has to be done at Orion Context Broker service.
 | 5          | WARNING    | The following WARNING text appears in the 'msg' field: "Notification failure for <url> (...)" | The following INFO text appears in the 'msg' field: "Notification Successfully Sent to <url>", where <url> is the same one that triggered the alarm.                                                                                                     | Notification Failure. The text within parenthesis in the 'msg' field containts the detailed information.     | Orion is trying to send the notification to a given receiver and some problem has happended. It could be due to a problem on the network connectivy or on the receiver e.g. the receiver is down. In the second case, the owner of the receiver of the owner should be reported. No specific fixing action has to be done at Orion Context Broker service.
 
+[Top](#top)
+
 ## Log rotation
 
 Logrotate is installed as RPM dependency along with contextBroker. The
@@ -161,3 +175,5 @@ settings. In this sense, take into account that every transaction can
 consume around 1-2 KB (measured with Orion 0.14.1), e.g. if your
 expected load is around 200 TPS, then your log file will grow 200-400 KB
 per second.
+
+[Top](#top)

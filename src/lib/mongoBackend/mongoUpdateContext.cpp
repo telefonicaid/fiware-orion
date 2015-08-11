@@ -68,7 +68,7 @@ HttpStatusCode mongoUpdateContext
     else
     {
         /* Process each ContextElement */
-        for (unsigned int ix= 0; ix < requestP->contextElementVector.size(); ++ix)
+        for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
         {
           processContextElement(requestP->contextElementVector.get(ix),
                                 responseP,
@@ -86,5 +86,6 @@ HttpStatusCode mongoUpdateContext
         responseP->errorCode.fill(SccOk);
     }    
     reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
+    
     return SccOk;
 }

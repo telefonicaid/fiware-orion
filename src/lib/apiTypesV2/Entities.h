@@ -41,8 +41,8 @@ struct QueryContextResponse;
 class Entities
 {
 public:
-  EntityVector vec;          // Optional - mandatory if 200-OK
-  ErrorCode   errorCode;     // Optional - mandatory if not 200-OK
+  EntityVector  vec;          // Optional - mandatory if 200-OK
+  ErrorCode     errorCode;    // Optional - mandatory if not 200-OK
 
   Entities();
   ~Entities();

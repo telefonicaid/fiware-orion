@@ -46,7 +46,6 @@ void* startSenderThread(void* p)
                        params->resource.c_str(),
                        params->content_type.c_str()));
 
-    LM_M(("KZ: Sending notification - calling httpRequestSend"));
     httpRequestSend(params->ip,
                     params->port,
                     params->protocol,                   
