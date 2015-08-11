@@ -62,12 +62,12 @@ echo
 01. POST /v2/entities with Compound Metadata
 ============================================
 HTTP/1.1 400 Bad Request
-Content-Length: 91
+Content-Length: 85
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "JSON Parse Error in ContextAttributeObject::Metadata", 
+    "description": "invalid JSON type for attribute metadata value", 
     "error": "ParseError"
 }
 
