@@ -1,4 +1,32 @@
-# Orion Context Broker
+#<a name="top"></a>Orion Context Broker
+
+* [Introduction](#introduction)
+    * [GEi overall description](#gei-overall-description)
+    * [Build and Install](#build-and-install)
+	  * [Requirements](#requirements)
+	  * [Installation](#installation)
+		* [Using yum (recommended)](#using-yum-(recommended))
+		* [Using RPM file](#using-rpm-file)
+		* [Optional packages](#optional-packages)
+	  * [Upgrading from a previous version](#upgrading-from-a-previous-version)
+		* [Upgrading MongoDB version](#upgrading-mongodb-version)
+		* [Migrating the data stored in DB](#migrating-the-data-stored-in-db)
+		* [Standard upgrade](#standard-upgrade)
+    * [Running](#running)
+	  * [Configuration file](#configuration-file)
+	  * [Checking status](#checking-status)
+    * [API Overview](#api-overview)
+    * [API Walkthrough](#api-walkthrough)
+    * [API Reference Documentation](#api-reference-documentation)
+    * [Testing](#testing)
+	  * [Ent-to-end tests](#ent-to-end-tests)
+	  * [Unit Tests](#unit-tests)
+    * [Advanced topics](#advanced-topics)
+    * [License](#license)
+    * [Support](#support)
+	  
+		  
+# Introduction
 
 This is the code repository for the Orion Context Broker, the reference implementation of the Publish/Subscribe Context Broker GE.
 
@@ -14,6 +42,8 @@ For documentation previous to Orion 0.23.0 please check the manuals at FIWARE pu
 * [Orion Context Broker - Installation and Administration Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_Installation_and_Administration_Guide)
 * [Orion Context Broker - User and Programmers Guide](https://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/Publish/Subscribe_Broker_-_Orion_Context_Broker_-_User_and_Programmers_Guide)
 
+[Top](#top)
+
 ## GEi overall description
 
 Orion is a C++ implementation of the NGSI9/10 REST API binding developed as a part of the FIWARE platform.
@@ -21,6 +51,8 @@ Orion is a C++ implementation of the NGSI9/10 REST API binding developed as a pa
 Orion Context Broker allows you to manage all the whole lifecycle of context information including updates, queries, registrations and subscriptions. It is an NGSI9/10 server implementation to manage context information and its availability. Using the Orion Context Broker, you are able to register context elements and manage them through updates and queries. In addition, you can subscribe to context information so when some condition occurs (e.g. an interval of time has passed or the context elements have changed) you receive a notification. These usage scenarios and the Orion Context Broker features are described in this document.
 
 If this is your first contact with the Orion Context Broker, it is highly recommended to have a look to the brief [Quick Start guide](doc/manuals/quick_start_guide.md).
+
+[Top](#top)
 
 ## Build and Install
 
@@ -38,6 +70,8 @@ but it should work also in any later CentOS/RedHat 6.x version.
 * RPM dependencies (some of these packages could not be in the official CentOS/RedHat repository but in EPEL, in which case you have to configure EPEL repositories, see <http://fedoraproject.org/wiki/EPEL>):
     * The contextBroker package (mandatory) depends on the following packages: boost-filesystem, boost-thread, libmicrohttpd, logrotate, libcurl and boost-regex.
     * The contextBroker-test package (optional) depends on the following packages: python, python-flask, python-jinja2, curl, libxml2, libxslt, nc, mongo-10gen and contextBroker. The mongo-10gen dependency needs to configure MongoDB repository, check [this piece of documentation about that](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-red-hat-centos-or-fedora-linux/).
+
+[Top](#top)
 
 ### Installation
 
@@ -67,6 +101,8 @@ Apart from the mandatory RPM described above, you can install the contextBroker-
 or
 
     rpm -i contextBroker-test-X.Y.Z-1.x86_64.rpm
+
+[Top](#top)
 
 ### Upgrading from a previous version
 
@@ -116,6 +152,8 @@ Then upgrade the package using the rpm command (as root):
 
     rpm -U contextBroker-X.Y.Z-1.x86_64.rpm
 
+[Top](#top)
+
 ## Running
 
 Once installed, there are two ways of running Orion Context Broker: manually from the command line or as a system service (the later only available if Orion was installed as RPM package). It is not recommended to mix both ways (e.g. start the context broker from the command line, then use `/etc/init.d/contextBroker status` to check its status). This section assumes you are running Orion as system service. From command line alternative, check [this document](doc/md/admin/cli.md).
@@ -140,6 +178,8 @@ You can use chkconfig command to make contextBroker automatically
 start/stop when your system boots/shutdowns (see [chkconfig
 documentation](http://www.centos.org/docs/5/html/Deployment_Guide-en-US/s1-services-chkconfig.html)
 for details).
+
+[Top](#top)
 
 ### Configuration file
 
@@ -203,6 +243,8 @@ user named 'orion'. Note that if you want to run the broker in a
 privileged port (i.e. 1024 or below) you will need to use 'root' as
 BROKER\_USER.
 
+[Top](#top)
+
 ### Checking status
 
 In order to check the status of the broker, use the following command
@@ -217,6 +259,8 @@ If broker is running you will get:
 If broker is not running you will get:
 
     Checking contextBroker...                         Service not running
+
+[Top](#top)
 
 ## API Overview
 
@@ -253,15 +297,21 @@ In order to update one of the entity atributes (temperature):
 
 Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) if you want to test these operations in an actual public instance of Orion Context Broker. In addition, have a look to the API Walkthrough and API Reference sections below in order to know more details about the API (subscriptions, registrations, etc.).
 
+[Top](#top)
+
 ## API Walkthrough
 
 * [FIWARE NGSI v1](doc/manuals/user/walkthrough_apiv1.md) (Markdown)
 * [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/cookbook) (Apiary) - *ongoing, not yet suitable for production*
 
+[Top](#top)
+
 ## API Reference Documentation
 
 * [FIWARE NGSI v1](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_NGSI:_publicly_available_documents) (XSD and PDF)
 * [FIWARE NGSI v2](http://telefonicaid.github.io/fiware-orion/api/v2/) (Apiary) - *ongoing, not yet suitable for production*
+
+[Top](#top)
 
 ## Testing
 
@@ -281,6 +331,8 @@ The unit_test makefile target is used for running the unit tests:
 
 Please have a look to the section [on building the source code](#from-sources) in order to get more information about how to prepare the environment to run the unit_test target.
 
+[Top](#top)
+
 ## Advanced topics
 
 * [Advanced Programming](doc/manuals/user/README.md)
@@ -291,11 +343,17 @@ Please have a look to the section [on building the source code](#from-sources) i
 * [Sample code contributions](doc/manuals/code_contributions.md)
 * [Deprecated features](doc/manuals/deprecated.md)
 
+[Top](#top)
+
 ## License
 
 Orion Context Broker is licensed under Affero General Public License (GPL) version 3.
+
+[Top](#top)
 
 ## Support
 
 Ask your thorough programmming questions using [stackoverflow](http://stackoverflow.com/questions/ask)
 and your general questions on [FIWARE Q&A](https://ask.fiware.org). In both cases please use the tag `fiware-orion`
+
+[Top](#top)

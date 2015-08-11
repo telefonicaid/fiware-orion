@@ -1,4 +1,12 @@
-# Filtering results
+#<a name="top"></a>Filtering results
+
+* [Introduction](#introduction)
+    * [Existence type filter](#existence-type-filter)
+    * [No-Existence type filter](#no-existence-type-filter)
+    * [Entity type filter](#entity-type-filter)
+    * [Geo-location filter](#geo-location-filter)
+    
+# Introduction
 
 Orion Context Broker implements several filters
 that can be used to filter the results in NGSI10 query operations. These
@@ -38,6 +46,8 @@ the same restriction (in the case of standard operations) or several URL
 argument separated by '&' in order to specify several filters. The
 result is a logic "and" between all of them.
 
+[Top](#top)
+
 ## Existence type filter
 
 The scope correspoding to this type is "FIWARE::Filter::Existence". 
@@ -61,6 +71,8 @@ The URL parameter corresponding to this filter is 'exist'.
 
 In the current version, the only parameter than can be checked for
 existence is the entity type, corresponding to "entity::type".
+
+[Top](#top)
 
 ## No-Existence type filter
 
@@ -89,6 +101,8 @@ that this is the only way of selecting an "entity without type" (given
 that queries without type resolve to "any type", as explained in the
 [following section](empty_types.md#using-empty-types)).
 
+[Top](#top)
+
 ## Entity type filter
 
 There is no scope corresponding to this filter, given that you can use
@@ -110,6 +124,8 @@ The URL parameter corresponding to this filter is 'entity::type'.
 
     curl localhost:1026/v1/contextEntities?entity::type=Room ...
 
+[Top](#top)
+
 ## Geo-location filter
 
 The scope corresponding to this type is "FIWARE::Location". It is
@@ -117,3 +133,6 @@ described in detail in [the following section](geolocation.md#geo-located-querie
 
 In the current version of Orion, there is no equivalent convenience
 operation filter.
+
+[Top](#top)
+

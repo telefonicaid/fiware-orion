@@ -1,4 +1,19 @@
-# Database administration 
+#<a name="top"></a>Database administration 
+
+* [Introduction](#introduction)
+    * [Backup](#backup)
+    * [Restore](#restore)
+    * [Database authorization](#database-authorization)
+    * [Multiservice/multitenant database separation](#multiservicemultitenant-database-separation)
+    * [Delete complete database](#delete-complete-database)
+    * [Setting indexes](#setting-indexes)
+	  * [Analysis](#analysis)
+    * [Database management scripts](#database-management-scripts)
+	  * [Deleting expired documents](#deleting-expired-documents)
+	  * [Latest updated document](#latest-updated-document)
+	  
+	  
+# Introduction 
 
 We assume that the system administrator has knowledge of MongoDB (there
 are very good and free courses at [MongoDB education
@@ -19,8 +34,10 @@ mongodump --host <dbhost> --db <db>
 This will create the backup in the dump/ directory.
 
 Note that if you are using
-[multitenant/multiservice](#multitenant/multiservice-database-separation)
+[multitenant/multiservice](#multiservicemultitenant-database-separation)
 you need to apply the procedures to each per-tenant/service database
+
+[Top](#top)
 
 ## Restore
 
@@ -39,8 +56,10 @@ mongorestore --host <dbhost> --db <db> dump/<db>
 ```
 
 Note that if you are using
-[multitenant/multiservice](#multitenant/multiservice-database-separation)
+[multitenant/multiservice](#multiservicemultitenant-database-separation)
 you need to apply the procedures to each per-tenant/service database
+
+[Top](#top)
 
 ## Database authorization
 
@@ -63,12 +82,14 @@ to take into account:
         in multi service/tenant mode, Orion uses several databases
         (which in addition can potentially be created on the fly), thus
         authorizing on `admin` DB ensures permisions in all them.
+     
+[Top](#top)
 
 ## Multiservice/multitenant database separation
 
 Normally, Orion Context Broker uses just one database at MongoDB level
 (the one specified with the `-db` command line option, typically "orion").
-However, when [multitenant/multiservice](#multitenant/multiservice-database-separation) is used
+However, when [multitenant/multiservice](#multiservicemultitenant-database-separation) is used
 the behaviour is different and the following databases are used (let
 `<db>` be the value of the `-db` command line option):
 
@@ -89,6 +110,8 @@ Finally, in the case of per-service/tenant databases, all collections
 and administrative procedures (backup, restore, etc.) are associated to
 each particular service/tenant database.
 
+[Top](#top)
+
 ## Delete complete database
 
 This operation is done using the MongoDB shell:
@@ -97,6 +120,7 @@ This operation is done using the MongoDB shell:
 mongo <host>/<db>
 > db.dropDatabase()
 ```
+[Top](#top)
 
 ## Setting indexes
 
@@ -133,6 +157,8 @@ The only index that Orion Context Broker actually ensures is the
 "2dsphere" one in the location.coords field in the entities collection,
 due to functional needs [geo-location functionality](../user/geolocation.md)to work. The index is ensured at Orion startup or when entities are
 created for the first time.
+
+[Top](#top)
 
 ### Analysis
 
@@ -208,6 +234,8 @@ indexes.
 **Hint:** considering the above information, it is hihgly recommended to
 set up an index on `_id.id` in the entities collection.
 
+[Top](#top)
+
 ## Database management scripts
 
 Orion Context Broker comes along with some scripts that can be use to do
@@ -219,6 +247,8 @@ In order to use them, you need to install the pymongo driver (version
 root or using the sudo command):
 
 ` pip-python install pymongo`
+
+[Top](#top)
 
 ### Deleting expired documents
 
@@ -261,6 +291,7 @@ mongo <host>/<db>
 > db.csubs.remove({expired: 1})
 > db.casubs.remove({expired: 1})
 ```
+[Top](#top)
 
 ### Latest updated document
 
@@ -285,4 +316,5 @@ Ej:
     -- 2013-10-30 18:14:44: Room3 (Room)
     -- 2013-10-30 16:11:26: Room4 (Room)
 
+[Top](#top)
 
