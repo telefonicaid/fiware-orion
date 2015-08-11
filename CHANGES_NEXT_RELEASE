@@ -15,4 +15,4 @@ Fix:  Checking for forbidden chars in many fields of JDON payload for API versio
 Fix:  Bug fix for receiving compound metadata values (which is not supported) (Issue #1110)
 Add:  GET /v2/entities/<entityId>/attrs/<attrName>/value - get a single attribute value (Issue #997)
 Add:  URI parameters id, idPattern and type for GET /v2/entities (Issues #952 #953 #969)
-Fix:  error handling for non-string entity::id/type (Issue #1108)
+Fix:  Error handling for non-string entity::id/type (Issue #1108), attribute::name/type, and metadata::name/type/value
