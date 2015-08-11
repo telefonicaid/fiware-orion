@@ -9,3 +9,5 @@ Add:  Implemented a RAM-cache for patterned subscriptions (Issue #1048)
 Add:  POST /v2/entities/<entityId> entity creation under version 2 (Issue #981)
 Add:  PUT /v2/entities/<entityId> entity creation under version 2 (Issue #987)
 Fix:  Checking for forbidden chars in many fields (Issue #1093)
+Fix:  Bug fix for receiving compound metadata values (which is not supported) (Issue #1110)
+
