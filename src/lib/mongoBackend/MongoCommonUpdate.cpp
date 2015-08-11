@@ -2191,7 +2191,7 @@ void processContextElement
   /* Check that UPDATE or APPEND is not used with attributes with empty value */
   if ((strcasecmp(action.c_str(), "update") == 0) ||
       (strcasecmp(action.c_str(), "append") == 0) ||
-      (strcasecmp(action.c_str(), "appendonly") == 0) ||
+      (strcasecmp(action.c_str(), "append_strict") == 0) ||
       (strcasecmp(action.c_str(), "replace") == 0))
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
@@ -2399,7 +2399,7 @@ void processContextElement
     // Before calling processContextAttributeVector and actually do the work, let's check if the
     // request is of type 'append-only' and if we have any problem with attributes already existing.
     //
-    if (strcasecmp(action.c_str(), "appendonly") == 0)
+    if (strcasecmp(action.c_str(), "append_strict") == 0)
     {
       for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
       {
@@ -2632,7 +2632,7 @@ void processContextElement
     /* All the attributes existing in the request are added to the response with 'found' set to false
      * in the of UPDATE/DELETE and true in the case of APPEND
      */
-    bool foundValue = (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "appendonly") == 0);
+    bool foundValue = (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0);
 
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -2663,7 +2663,7 @@ void processContextElement
       cerP->statusCode.fill(SccContextElementNotFound);
       responseP->contextElementResponseVector.push_back(cerP);
     }
-    else   /* APPEND or APPENDONLY */
+    else   /* APPEND or APPEND_STRICT */
     {
       std::string errReason, errDetail;
 
