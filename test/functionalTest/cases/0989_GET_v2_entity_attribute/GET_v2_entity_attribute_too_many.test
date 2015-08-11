@@ -30,100 +30,69 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v1/updateContext, creating 2 entities
-# 02. GET /v2/entities/E1/attrs/A0
+# 01. POST /v2/entities, create entity with A0:1
+# 02. POST /v2/entities, create entity with A0:2
+# 03. GET /v2/entities/E1/attrs/A0
 #
 
-echo "01. POST /v1/updateContext"
-echo "=========================="
+echo "01. POST /v2/entities, create entity with A0:1"
+echo "==============================================="
 payload='{
-  "contextElements": [
-    {
+    
       "id":   "E1",
       "type": "T1",
-      "attributes": [
-          {
-              "name": "A0",
+      "A0": { 
               "type": "number",
               "value": "1"
-          }
-      ]
-    },
-    {
-      "id":   "E1",
-      "type": "T2",
-      "attributes": [
-          {
-              "name": "A0",
-              "type": "number",
-              "value": "2"
-          }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
+            }
+
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
-echo "02. GET /v2/entities/E1/attrs/A0"
+echo "02. POST /v2/entities, create entity with A0:2"
+echo "==============================================="
+payload='{
+    
+      "id":   "E1",
+      "type": "T2",
+      "A0": { 
+              "type": "number",
+              "value": "1"
+            }
+     
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+echo "03. GET /v2/entities/E1/attrs/A0"
 echo "================================"
-orionCurl --url '/v2/entities/E1/attrs/A0' --json
+orionCurl --url /v2/entities/E1/attrs/A0 --json
 echo
 echo
 
 --REGEXPECT--
-01. POST /v1/updateContext
-==========================
-HTTP/1.1 200 OK
-Content-Length: 734
-Content-Type: application/json
+01. POST /v2/entities, create entity with A0:1
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A0",
-                        "type": "number",
-                        "value": ""
-                    }
-                ],
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A0",
-                        "type": "number",
-                        "value": ""
-                    }
-                ],
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T2"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
 
-02. GET /v2/entities/E1/attrs/A0
+02. POST /v2/entities, create entity with A0:2
+===============================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+03. GET /v2/entities/E1/attrs/A0
 ================================
 HTTP/1.1 409 Conflict
 Content-Length: 105

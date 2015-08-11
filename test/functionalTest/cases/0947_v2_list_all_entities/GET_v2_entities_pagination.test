@@ -30,127 +30,137 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v1/updateContext, creating 5 entities
-# 02. GET /v2/entities?limit=2&count=true
-# 03. GET /v2/entities?offset=2
+# 01. POST /v2/entities, created first  entity
+# 02. POST /v2/entities, created second entity
+# 03. POST /v2/entities, created third  entity
+# 04. POST /v2/entities, created fourth entity
+# 05. POST /v2/entities, created fifth  entity
+# 06. GET  /v2/entities?limit=2&count=true
+# 07. GET  /v2/entities?offset=2
 #
 
-echo "01. POST /v1/updateContext"
-echo "=========================="
+echo "01. POST /v2/entities created first entity"
+echo "=========================================="
 payload='{
-  "contextElements": [
-    {
+
       "id":   "E1",
       "type": "T1"
-    },
-    {
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. POST /v2/entities created second entity"
+echo "==========================================="
+payload='{
+
       "id":   "E2",
       "type": "T2"
-    },
-    {
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. POST /v2/entities created third entity"
+echo "=========================================="
+payload='{
+
       "id":   "E3",
       "type": "T3"
-    },
-    {
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "04. POST /v2/entities created fourth entity"
+echo "==========================================="
+payload='{
+
       "id":   "E4",
       "type": "T4"
-    },
-    {
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "05. POST /v2/entities created fifth entity"
+echo "=========================================="
+payload='{
+
       "id":   "E5",
       "type": "T5"
-    }
-  ],
-  "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
 
-echo "02. GET /v2/entities?limit=2&count=true"
+echo "06. GET /v2/entities?limit=2&count=true"
 echo "======================================="
 orionCurl --url '/v2/entities?limit=2&count=true' --json
 echo
 echo
 
 
-echo "03. GET /v2/entities?offset=2"
+echo "07. GET /v2/entities?offset=2"
 echo "============================="
 orionCurl --url /v2/entities?offset=2 --json
 echo
 echo
 
 
+
 --REGEXPECT--
-01. POST /v1/updateContext
-==========================
-HTTP/1.1 200 OK
-Content-Length: 1072
-Content-Type: application/json
+01. POST /v2/entities created first entity
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T2"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "id": "E3", 
-                "isPattern": "false", 
-                "type": "T3"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "id": "E4", 
-                "isPattern": "false", 
-                "type": "T4"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }, 
-        {
-            "contextElement": {
-                "id": "E5", 
-                "isPattern": "false", 
-                "type": "T5"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
 
-02. GET /v2/entities?limit=2&count=true
+02. POST /v2/entities created second entity
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+03. POST /v2/entities created third entity
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3
+Date: REGEX(.*)
+
+
+
+04. POST /v2/entities created fourth entity
+===========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4
+Date: REGEX(.*)
+
+
+
+05. POST /v2/entities created fifth entity
+==========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E5
+Date: REGEX(.*)
+
+
+
+06. GET /v2/entities?limit=2&count=true
 =======================================
 HTTP/1.1 200 OK
 Content-Length: 49
@@ -170,7 +180,7 @@ Date: REGEX(.*)
 ]
 
 
-03. GET /v2/entities?offset=2
+07. GET /v2/entities?offset=2
 =============================
 HTTP/1.1 200 OK
 Content-Length: 73
