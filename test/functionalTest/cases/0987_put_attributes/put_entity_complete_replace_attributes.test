@@ -1,0 +1,117 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT /v2/entities/E1 on entity that doesn't exist
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1/A1+A2
+# 02. Make sure E1 is as created
+# 03. Modify E1 to E1/A3+A4
+# 04. Make sure E1 is as modified
+#
+
+echo "01. Create E1/A1+A2"
+echo "==================="
+payload='{ "A1": 1, "A2": 2 }'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Make sure E1 is as created"
+echo "=============================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "03. Modify E1 to E1/A3+A4"
+echo "========================="
+payload='{ "A3": 3, "A4": 4 }'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "04. Make sure E1 is as modified"
+echo "==============================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1/A1+A2
+===================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+02. Make sure E1 is as created
+==============================
+HTTP/1.1 200 OK
+Content-Length: 39
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": 1.0, 
+    "A2": 2.0, 
+    "id": "E1"
+}
+
+
+03. Modify E1 to E1/A3+A4
+=========================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+04. Make sure E1 is as modified
+===============================
+HTTP/1.1 200 OK
+Content-Length: 39
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A3": 3.0, 
+    "A4": 4.0, 
+    "id": "E1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

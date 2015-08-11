@@ -1,0 +1,227 @@
+
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+
+--NAME--
+Federation
+
+--SHELL-INIT--
+dbInit CP1
+dbInit CP2
+dbInit CP3
+brokerStart CP1
+brokerStart CP2
+brokerStart CP3
+
+--SHELL--
+echo "0.1.Send a subscribe to CP1"
+echo "==============================================================="
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "reference": "http://localhost:'$CP2_PORT'/v1/notifyContext",
+    "duration": "P1M",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "temperature"
+            ]
+        }
+    ],
+    "throttling": "PT5S"
+
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json --port $CP1_PORT
+echo
+echo
+
+echo "0.2.Send a subscribe to CP2"
+echo "==============================================================="
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "reference": "http://localhost:'$CP3_PORT'/v1/notifyContext",
+    "duration": "P1M",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "temperature"
+            ]
+        }
+    ],
+    "throttling": "PT5S"
+
+}'
+orionCurl --url /v1/subscribeContext --payload "$payload" --json --port $CP2_PORT
+echo
+echo
+
+echo "0.3.Create an entity in context broker CP1"
+echo "==============================================================="
+payload='{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "23"
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}'
+orionCurl --url /v1/updateContext --payload "$payload" --json --port $CP1_PORT
+echo
+
+
+echo "0.4.Query to context broker CP3"
+echo "==============================================================="
+url="/v1/queryContext"
+payload='{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ]
+}'
+orionCurl --url /v1/queryContext --payload "$payload" --json --port $CP2_PORT
+echo
+
+--REGEXPECT--
+0.1.Send a subscribe to CP1
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT5S"
+    }
+}
+
+
+0.2.Send a subscribe to CP2
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT5S"
+    }
+}
+
+
+0.3.Create an entity in context broker CP1
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 396
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": ""
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+0.4.Query to context broker CP3
+===============================================================
+HTTP/1.1 200 OK
+Content-Length: 398
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "23"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+
+--TEARDOWN--
+brokerStop CP1
+brokerStop CP2
+brokerStop CP3
+dbDrop CP1
+dbDrop CP2
+dbDrop CP3
+

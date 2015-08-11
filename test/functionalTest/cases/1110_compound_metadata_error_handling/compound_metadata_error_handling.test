@@ -29,6 +29,14 @@ brokerStart CB
 
 --SHELL--
 
+#
+# 01. POST /v2/entities with Compound Metadata
+#
+# FIXME P5: Once compound metadatas are allowed, this test must be modified to
+#           provoke the same error in some other way - making the error handling
+#           "return r", in that very same place.
+#
+
 echo "01. POST /v2/entities with Compound Metadata"
 echo "============================================"
 payload='{

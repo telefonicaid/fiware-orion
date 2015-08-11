@@ -30,48 +30,38 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v1/updateContext
+# 01. POST /v2/entities
 # 03. GET /v2/entities
 #
 
-echo "01. POST /v1/updateContext"
+echo "01. POST /v2/entities"
 echo "=========================="
 payload='{
-  "contextElements": [
-    {
+
+    
       "id":   "8787GHY",
       "type": "Car",
-      "attributes" : [
-        {
-          "name" : "speed",
-          "type": "number",
-          "value" : 150
+      "brand":{ 
+            "type": "string",
+            "value": "Mercedes Benz"
         },
-        {
-          "name" : "brand",
-          "type": "string",
-          "value" : "Mercedes Benz"
+      "speed":{  
+            "type": "number",
+            "value" : "150"
         },
-        {
-          "name" : "plateCountry",
-          "value" : "ES"
+      "plateCountry": {
+            "value" : "ES"
         },
-        {
-          "name" : "madeInCountry",
-          "value" : "DE",
-          "type" : ""
+      "madeInCountry": {
+            "value" : "DE",
+            "type" : ""
         },
-        {
-          "name" : "model",
-          "type": "myString",
-          "value" : "Klasse C"
+      "model" : {
+           "type": "myString",
+           "value" : "Klasse C"
         }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
@@ -82,55 +72,13 @@ echo
 echo
 
 --REGEXPECT--
-01. POST /v1/updateContext
+01. POST /v2/entities
 ==========================
-HTTP/1.1 200 OK
-Content-Length: 841
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/8787GHY
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "speed",
-                        "type": "number",
-                        "value": ""
-                    },
-                    {
-                        "name": "brand",
-                        "type": "string",
-                        "value": ""
-                    },
-                    {
-                        "name": "plateCountry",
-                        "type": "",
-                        "value": ""
-                    },
-                    {
-                        "name": "madeInCountry",
-                        "type": "",
-                        "value": ""
-                    },
-                    {
-                        "name": "model",
-                        "type": "myString",
-                        "value": ""
-                    }
-                ],
-                "id": "8787GHY",
-                "isPattern": "false",
-                "type": "Car"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
 
 02. GET /v2/entities

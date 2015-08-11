@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PUTT /v2/entities/E1 on entity that doesn't exist
+PUT /v2/entities/E1 on entity that doesn't exist
 
 --SHELL-INIT--
 dbInit CB

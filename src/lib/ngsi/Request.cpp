@@ -111,7 +111,6 @@ const char* requestType(RequestType rt)
   case PostEntity:                                       return "PostEntity";
   case PostAttributes:                                   return "PostAttributes";
   case DeleteEntity:                                     return "DeleteEntity";
-
   }
 
   return "";

@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_SERVICEROUTINES_POSTATTRIBUTES_H_
-#define SRC_LIB_SERVICEROUTINES_POSTATTRIBUTES_H_
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -23,26 +20,33 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
+#include "cache/subCache.h"
+#include "cache/SubscriptionCache.h"
 
-#include "rest/ConnectionInfo.h"
-#include "ngsi/ParseData.h"
+
+
+namespace orion
+{
+
+
+/* ****************************************************************************
+*
+* subCache - global singleton for the subscription cache
+*/
+SubscriptionCache* subCache = NULL;
 
 
 
 /* ****************************************************************************
 *
-* postEntities - 
+* subscriptionCacheInit - 
 */
-extern std::string postAttributes
-(
-  ConnectionInfo*            ciP,
-  int                        components,
-  std::vector<std::string>&  compV,
-  ParseData*                 parseDataP
-);
+void subscriptionCacheInit(std::string tenant)
+{
+  subCache = new SubscriptionCache(tenant);
+  subCache->init();
+}
 
-#endif  // SRC_LIB_SERVICEROUTINES_POSTATTRIBUTES_H_
+}
