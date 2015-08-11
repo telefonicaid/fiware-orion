@@ -35,6 +35,7 @@
 #include "apiTypesV2/Attribute.h"
 
 
+
 /* ****************************************************************************
 *
 * getEntityAttributeValue -
@@ -65,7 +66,6 @@ std::string getEntityAttributeValue
   attribute.fill(&parseDataP->qcrs.res, compV[4]);
 
   // Render entity attribute response
-
   if (attribute.errorCode.error == "TooManyResults")
   {
     ciP->httpStatusCode = SccConflict;
@@ -78,7 +78,7 @@ std::string getEntityAttributeValue
   }
   else
   {
-      // the same of the wrapped operation
+    // the same of the wrapped operation
     ciP->httpStatusCode = parseDataP->qcrs.res.errorCode.code;
 
     // Remove unwanted fields from attribute before rendering
@@ -96,4 +96,3 @@ std::string getEntityAttributeValue
 
   return answer;
 }
-
