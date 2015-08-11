@@ -4,7 +4,7 @@
     * [Sanity check procedures](#sanity-check-procedures)
 	  * [Checking Orion is up and running](#checking-orion-is-up-and-running)
 	  * [List of Running Processes](#list-of-running-processes)
-	  * [Network interfaces Up & Open](#network-interfaces-up-&-open)
+	  * [Network interfaces Up & Open](#network-interfaces-up--open)
 	  * [Database server](#database-server)
     * [Diagnose database connection problems](#diagnose-database-connection-problems)
     * [Diagnose spontaneous binary corruption problems**](#diagnose-spontaneous-binary-corruption-problems**)
