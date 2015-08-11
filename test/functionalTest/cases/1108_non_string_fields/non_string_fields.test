@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-POST /v2/entities with invalid service-path
+POST /v2/entities with invalid types for varios fields
 
 --SHELL-INIT--
 dbInit CB
