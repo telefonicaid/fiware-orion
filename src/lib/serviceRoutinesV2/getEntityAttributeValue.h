@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_APITYPESV2_ATTRIBUTE_H_
-#define SRC_LIB_APITYPESV2_ATTRIBUTE_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTEVALUE_H_
+#define SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTEVALUE_H_
 
 /*
 *
@@ -27,27 +27,24 @@
 */
 #include <string>
 #include <vector>
-#include <cstdlib>
 
-#include "ngsi/ContextAttributeVector.h"
-#include "ngsi/ContextAttribute.h"
-#include "apiTypesV2/ErrorCode.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
-struct QueryContextResponse;
+
 
 /* ****************************************************************************
 *
-* Attribute -
+* getEntity -
 */
-class Attribute
-{
-public:
-  ContextAttribute*  pcontextAttribute;
-  ErrorCode          errorCode;                    // Optional - mandatory if not 200-OK
+extern std::string getEntityAttributeValue
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-  Attribute(): pcontextAttribute(0) {}
-  std::string  render(ConnectionInfo* ciP, RequestType requestType, bool comma = false);
-  void         fill(QueryContextResponse* qcrsP, std::string attrName);
-};
+#endif  // SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTEVALUE_H_
 
-#endif  // SRC_LIB_APITYPESV2_ATTRIBUTE_H_
+

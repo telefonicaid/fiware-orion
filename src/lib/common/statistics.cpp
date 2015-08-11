@@ -125,6 +125,9 @@ int noOfEntityResponses                                  = -1;
 int noOfEntityAttributeRequests                          = -1;
 int noOfEntityAttributeResponses                         = -1;
 
+int noOfEntityAttributeValueRequests                     = -1;
+int noOfEntityAttributeValueResponses                    = -1;
+
 int noOfPostEntity                                       = -1;
 
 int noOfPostAttributes                                   = -1;
@@ -230,6 +233,9 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case EntityResponse:                                   ++noOfEntityResponses; break;
   case EntityAttributeRequest:                           ++noOfEntityAttributeRequests; break;
   case EntityAttributeResponse:                          ++noOfEntityAttributeResponses; break;
+  case EntityAttributeValueRequest:                      ++noOfEntityAttributeValueRequests; break;
+  case EntityAttributeValueResponse:                     ++noOfEntityAttributeValueResponses; break;
+
 
   case PostEntity:                                       ++noOfPostEntity; break;
   case PostAttributes:                                   ++noOfPostAttributes; break;

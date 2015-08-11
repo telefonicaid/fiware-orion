@@ -170,6 +170,7 @@
 #include "serviceRoutinesV2/entryPointsTreat.h"
 #include "serviceRoutinesV2/getEntity.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "serviceRoutinesV2/getEntityAttributeValue.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutinesV2/postEntity.h"
@@ -357,6 +358,11 @@ PaArgument paArgs[] =
 #define IENTATTR                EntityAttributeRequest
 #define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
 #define IENTATTR_COMPS_WORD     ""
+
+
+#define IENTATTRVAL                EntityAttributeValueRequest
+#define IENTATTRVAL_COMPS_V2       6, { "v2", "entities", "*", "attrs", "*", "value" }
+#define IENTATTRVAL_COMPS_WORD     ""
 
 
 //
@@ -604,22 +610,25 @@ PaArgument paArgs[] =
 
 
 
-#define API_V2                                                                                     \
-  { "GET",    EPS,       EPS_COMPS_V2,         ENT_COMPS_WORD,       entryPointsTreat           }, \
-  { "*",      EPS,       EPS_COMPS_V2,         ENT_COMPS_WORD,       badVerbAllFour             }, \
-                                                                                                   \
-  { "GET",    ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       getEntities                }, \
-  { "POST",   ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       postEntities               }, \
-  { "*",      ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       badVerbGetPostOnly         }, \
-                                                                                                   \
-  { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
-  { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postEntity                 }, \
-  { "PUT",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      putEntity                  }, \
-  { "DELETE", IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      deleteEntity               }, \
-  { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbAllFour             }, \
-                                                                                                   \
-  { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
-  { "*",      IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  badVerbGetOnly             }
+#define API_V2                                                                                         \
+  { "GET",    EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          entryPointsTreat         }, \
+  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbAllFour           }, \
+                                                                                                       \
+  { "GET",    ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          getEntities              }, \
+  { "POST",   ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          postEntities             }, \
+  { "*",      ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
+                                                                                                       \
+  { "GET",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         getEntity                }, \
+  { "POST",   IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         postEntity               }, \
+  { "PUT",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         putEntity                }, \
+  { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
+  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbAllFour           }, \
+                                                                                                       \
+  { "GET",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  getEntityAttributeValue  }, \
+  { "*",      IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  badVerbGetOnly           }, \
+                                                                                                       \
+  { "GET",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     getEntityAttribute       }, \
+  { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetOnly           }
 
 
 
