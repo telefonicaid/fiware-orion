@@ -150,9 +150,9 @@ using namespace mongo;
 
 /* ****************************************************************************
 *
-* OtisTreatFunction - callback signature for treatOntimeintervalSubscriptions
+* MongoTreatFunction - callback signature for Mongo callback functions
 */
-typedef void (*OtisTreatFunction)(std::string tenant, BSONObj& bobj);
+typedef void (*MongoTreatFunction)(std::string tenant, BSONObj& bobj);
 
 
 
@@ -579,6 +579,6 @@ extern std::string dbDotDecode(std::string fromString);
 *
 * Lookup all subscriptions in the database and call a treat function for each
 */
-extern void subscriptionsTreat(std::string tenant, OtisTreatFunction treatFunction);
+extern void subscriptionsTreat(std::string tenant, MongoTreatFunction treatFunction);
 
 #endif

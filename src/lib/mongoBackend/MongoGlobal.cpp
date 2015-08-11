@@ -473,7 +473,7 @@ void ensureLocationIndex(std::string tenant)
 *
 * Look for ONTIMEINTERVAL subscriptions in the database
 */
-static void treatOnTimeIntervalSubscriptions(std::string tenant, OtisTreatFunction treatFunction)
+static void treatOnTimeIntervalSubscriptions(std::string tenant, MongoTreatFunction treatFunction)
 {
   std::string               condType   = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
   BSONObj                   query      = BSON(condType << ON_TIMEINTERVAL_CONDITION);
@@ -2483,7 +2483,7 @@ std::string dbDotDecode(std::string s)
 *
 * Lookup all subscriptions in the database and call a treat function for each
 */
-void subscriptionsTreat(std::string tenant, OtisTreatFunction treatFunction)
+void subscriptionsTreat(std::string tenant, MongoTreatFunction treatFunction)
 {
   BSONObj                   query;
   DBClientBase*             connection = getMongoConnection();

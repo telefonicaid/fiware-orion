@@ -37,7 +37,9 @@
 #include "common/globals.h"
 #include "common/string.h"
 #include "common/sem.h"
+#include "cache/Subscription.h"
 #include "cache/SubscriptionCache.h"
+#include "cache/subCache.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/TriggeredSubscription.h"
@@ -593,47 +595,6 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
 
 /* ****************************************************************************
 *
-* updateAttribute -
-*
-* Returns true if an attribute was found, false otherwise. If true,
-* the "actualUpdate" argument (passed by reference) is set to true in the case that the
-* original value of the attribute was different than the one used in the update (this is
-* important for ONCHANGE notifications)
-*
-*/
-static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, ContextAttribute* caP, bool& actualUpdate)
-{
-  actualUpdate = false;
-
-  /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
-  std::string effectiveName = dbDotEncode(caP->name);
-  if (caP->getId() != "")
-  {
-    effectiveName += "__" + caP->getId();
-  }
-
-  if (!attrs.hasField(effectiveName.c_str()))
-  {
-    return false;
-  }
-
-  BSONObj  attr = attrs.getField(effectiveName).embeddedObject();
-  BSONObj  newAttr;
-
-  actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
-  if (actualUpdate)
-  {
-    const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
-
-    toSet->append(composedName, newAttr);
-  }
-
-  return true;
-}
-
-
-/* ****************************************************************************
-*
 * contextAttributeCustomMetadataToBson -
 *
 * Generates the BSON for metadata vector to be inserted in database for a given atribute.
@@ -668,6 +629,84 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 
 /* ****************************************************************************
 *
+* updateAttribute -
+*
+* Returns true if an attribute was found, false otherwise. If true,
+* the "actualUpdate" argument (passed by reference) is set to true in the case that the
+* original value of the attribute was different than the one used in the update (this is
+* important for ONCHANGE notifications)
+*
+* The isReplace boolean specifies how toSet has to be filled, either:
+*
+*   { attrs.A1: { ... }, attrs.A2: { ... } }  (in the case of isPeplace = false)
+*
+* or
+*
+*   { A1: { ... }, A2: { ... } }              (in the case of isPeplace = true)
+*
+* The former is to be used with { $set: <toSet> }, the later to be used with { attrs: <toSet> }
+*
+* In addition, in the case of isReplace, the attribute is added to toPush (otherwise, toPush is not
+* touched).
+*
+*/
+static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuilder* toPush, ContextAttribute* caP, bool& actualUpdate, bool isReplace)
+{
+  actualUpdate = false;
+
+  /* Attributes with metadata ID are stored as <attrName>__<ID> in the attributes embedded document */
+  std::string effectiveName = dbDotEncode(caP->name);
+  if (caP->getId() != "")
+  {
+    effectiveName += "__" + caP->getId();
+  }
+
+  if (isReplace)
+  {
+    actualUpdate = true;
+    BSONObjBuilder newAttr;
+
+    int now = getCurrentTime();
+    newAttr.appendElements(BSON(ENT_ATTRS_TYPE << caP->type <<
+                                ENT_ATTRS_CREATION_DATE << now <<
+                                ENT_ATTRS_MODIFICATION_DATE << now));
+    valueBson(caP, newAttr);
+
+    /* Custom metadata */
+    BSONObj mdV;
+    if (contextAttributeCustomMetadataToBson(mdV, caP));
+    {
+      newAttr.appendArray(ENT_ATTRS_MD, mdV);
+    }
+
+    toSet->append(effectiveName, newAttr.obj());
+    toPush->append(effectiveName);
+  }
+  else
+  {
+    if (!attrs.hasField(effectiveName.c_str()))
+    {
+      return false;
+    }
+
+    BSONObj newAttr;
+    BSONObj attr = attrs.getField(effectiveName).embeddedObject();
+    actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
+
+    if (actualUpdate)
+    {
+      const std::string composedName = std::string(ENT_ATTRS) + "." + effectiveName;
+      toSet->append(composedName, newAttr);
+    }
+  }
+
+
+  return true;
+}
+
+
+/* ****************************************************************************
+*
 * appendAttribute -
 *
 * The "actualUpdate" argument (passed by reference) is set to true 1) in the case
@@ -692,7 +731,7 @@ static void appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuil
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, caP, actualUpdate);
+    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false);
     return;
   }
 
@@ -1134,8 +1173,9 @@ static bool addTriggeredSubscriptions
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
   std::vector<Subscription*> subVec;
+  LM_M(("KZ: looking up subscriptions from subCache (tenant: %s, servicePath: %s, entityId: %s, entityType: %s)", tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str()));
   subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
-
+  LM_M(("KZ: got %d subscriptions from subCache", subVec.size()));
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
@@ -1145,6 +1185,7 @@ static bool addTriggeredSubscriptions
     // Outdated subscriptions are skipped
     if (sP->expirationTime < now)
     {
+      LM_M(("KZ: subscription %s is expired", sP->subscriptionId.c_str()));
       continue;
     }
 
@@ -1157,6 +1198,7 @@ static bool addTriggeredSubscriptions
     {
       if ((now - sP->lastNotificationTime) < sP->throttling)
       {
+        LM_M(("KZ: subscription %s skipped due to throttling", sP->subscriptionId.c_str()));
         continue;
       }
     }
@@ -1236,19 +1278,6 @@ static bool processSubscriptions
                             "$inc" << BSON(CSUB_COUNT << 1));
 
 
-      //
-      // Saving lastNotificationTime for cached subscription
-      //
-      if (trigs->cacheSubReference != NULL)
-      {
-        trigs->cacheSubReference->pendingNotifications -= 1;
-
-        if (trigs->cacheSubReference->pendingNotifications == 0)
-        {
-          trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
-        }
-      }
-
       try
       {
         LM_T(LmtMongo, ("update() in '%s' collection: {%s, %s}", getSubscribeContextCollectionName(tenant).c_str(),
@@ -1262,6 +1291,19 @@ static bool processSubscriptions
         LM_I(("Database Operation Successful (update: %s, query: %s)",
               update.toString().c_str(),
               query.toString().c_str()));
+
+        //
+        // Saving lastNotificationTime for cached subscription
+        //
+        if (trigs->cacheSubReference != NULL)
+        {
+          trigs->cacheSubReference->pendingNotifications -= 1;
+
+          if (trigs->cacheSubReference->pendingNotifications == 0)
+          {
+            trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
+          }
+        }
       }
       catch (const DBException &e)
       {
@@ -1390,6 +1432,240 @@ static unsigned int howManyAttrs(BSONObj& attrs, std::string& attrName)
   return c;
 }
 
+/* ****************************************************************************
+*
+* updateContextAttributeItem -
+*
+*/
+static bool updateContextAttributeItem
+(
+  ContextElementResponse*   cerP,
+  ContextAttribute*         ca,
+  BSONObj&                  attrs,
+  ContextAttribute*         targetAttr,
+  EntityId*                 eP,
+  BSONObjBuilder*           toSet,
+  BSONArrayBuilder*         toPush,
+  bool&                     actualUpdate,
+  bool&                     entityModified,
+  std::string&              locAttr,
+  double&                   coordLat,
+  double&                   coordLong,
+  bool                      isReplace
+)
+{
+
+  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace))
+  {
+    entityModified = actualUpdate || entityModified;
+  }
+  else
+  {
+    if (!isReplace)
+    {
+      /* If updateAttribute() returns false, then that particular attribute has not
+       * been found. In this case, we interrupt the processing and early return with
+       * an error StatusCode */
+      // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
+      // another .fill() in this function caller. We keep it by the moment, but it probably
+      // will removed when we refactor this function
+      cerP->statusCode.fill(SccInvalidParameter,
+                            std::string("action: UPDATE") +
+                            " - entity: [" + eP->toString() + "]" +
+                            " - offending attribute: " + targetAttr->toString());
+
+      /* Although ca has been already pushed into cerP, it can be used */
+      ca->found = false;
+    }
+  }
+
+  /* Check aspects related with location */
+  // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
+  // note that with the current logic, the name of the attribute meaning location
+  // is preserved on a replace operation. By the moment, we can leave this as it is now
+  // given that the logic in NGSIv2 for specifying location attributes is gogint to change
+  // (the best moment to address this FIXME is probably once NGSIv1 has been deprecated and
+  // removed from code)
+  if (targetAttr->getLocation().length() > 0 && targetAttr->name != locAttr)
+  {
+    cerP->statusCode.fill(SccInvalidParameter,
+                          std::string("action: UPDATE") +
+                          " - entity: [" + eP->toString() + "]" +
+                          " - offending attribute: " + targetAttr->toString() +
+                          " - location nature of an attribute has to be defined at creation time, with APPEND");
+
+    LM_W(("Bad Input (location nature of an attribute has to be defined at creation time, with APPEND)"));
+    return false;
+  }
+
+  if (locAttr == targetAttr->name)
+  {
+    if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
+    {
+      cerP->statusCode.fill(SccInvalidParameter,
+                            std::string("action: UPDATE") +
+                            " - entity: [" + eP->toString() + "]" +
+                            " - offending attribute: " + targetAttr->toString() +
+                            " - error parsing location attribute, value: <" + targetAttr->stringValue + ">");
+
+      LM_W(("Bad Input (error parsing location attribute)"));
+      return false;
+    }
+  }
+
+  return true;
+}
+
+/* ****************************************************************************
+*
+* appendContextAttributeItem -
+*
+*/
+static bool appendContextAttributeItem
+(
+  ContextElementResponse*   cerP,
+  ContextAttribute*         ca,
+  BSONObj&                  attrs,
+  ContextAttribute*         targetAttr,
+  EntityId*                 eP,
+  BSONObjBuilder*           toSet,
+  BSONArrayBuilder*         toPush,
+  bool&                     actualUpdate,
+  bool&                     entityModified,
+  std::string&              locAttr,
+  double&                   coordLat,
+  double&                   coordLong
+)
+{
+  if (legalIdUsage(attrs, targetAttr))
+  {
+    appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate);
+    entityModified = actualUpdate || entityModified;
+
+    /* Check aspects related with location */
+    if (targetAttr->getLocation().length() > 0)
+    {
+      if (locAttr.length() > 0 && targetAttr->name != locAttr)
+      {
+        cerP->statusCode.fill(
+              SccInvalidParameter,
+              std::string("action: APPEND") +
+              " - entity: [" + eP->toString() + "]" +
+              " - offending attribute: " + targetAttr->toString() +
+              " - attempt to define a location attribute [" + targetAttr->name + "]" +
+              " when another one has been previously defined [" + locAttr + "]");
+
+        LM_W(("Bad Input (attempt to define a second location attribute)"));
+        return false;
+      }
+
+      if ((targetAttr->getLocation() != LOCATION_WGS84) && (targetAttr->getLocation() != LOCATION_WGS84_LEGACY))
+      {
+        cerP->statusCode.fill(
+              SccInvalidParameter,
+              std::string("action: APPEND") +
+              " - entity: [" + eP->toString() + "]" +
+              " - offending attribute: " + targetAttr->toString() +
+              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
+
+        LM_W(("Bad Input (only WGS84 is supported for location)"));
+        return false;
+      }
+
+      if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
+      {
+        cerP->statusCode.fill(SccInvalidParameter,
+                              std::string("action: APPEND") +
+                              " - entity: [" + eP->toString() + "]" +
+                              " - offending attribute: " + targetAttr->toString() +
+                              " - error parsing location attribute, value: [" + targetAttr->stringValue + "]");
+        LM_W(("Bad Input (error parsing location attribute)"));
+        return false;
+      }
+
+      locAttr = targetAttr->name;
+    }
+  }
+  else
+  {
+    /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
+     * we interrupt the processing and early return with
+     * a error StatusCode */
+    cerP->statusCode.fill(SccInvalidParameter,
+                          std::string("action: APPEND") +
+                          " - entity: [" + eP->toString() + "]" +
+                          " - offending attribute: " + targetAttr->toString() +
+                          " - attribute can not be appended");
+    LM_W(("Bad Input (attribute can not be appended)"));
+    return false;
+  }
+
+  return true;
+}
+
+/* ****************************************************************************
+*
+* deleteContextAttributeItem -
+*
+*/
+static bool deleteContextAttributeItem
+(
+  ContextElementResponse*               cerP,
+  ContextAttribute*                     ca,
+  BSONObj&                              attrs,
+  ContextAttribute*                     targetAttr,
+  EntityId*                             eP,
+  BSONObjBuilder*                       toUnset,
+  bool&                                 entityModified,
+  std::string&                          locAttr,
+  std::map<std::string, unsigned int>*  deletedAttributesCounter
+)
+{
+  if (deleteAttribute(attrs, toUnset, deletedAttributesCounter, targetAttr))
+  {
+    entityModified = true;
+
+    /* Check aspects related with location */
+    if (targetAttr->getLocation().length() > 0)
+    {
+      cerP->statusCode.fill(SccInvalidParameter,
+                            std::string("action: DELETE") +
+                            " - entity: [" + eP->toString() + "]" +
+                            " - offending attribute: " + targetAttr->toString() +
+                            " - location attribute has to be defined at creation time, with APPEND");
+
+      LM_W(("Bad Input (location attribute has to be defined at creation time)"));
+      return false;
+    }
+
+    /* Check aspects related with location. "Nullining" locAttr is the way of specifying
+     * that location field is no longer used */
+    if (locAttr == targetAttr->name)
+    {
+      locAttr = "";
+    }
+
+    ca->found = true;
+  }
+  else
+  {
+    /* If deleteAttribute() returns false, then that particular attribute has not
+     * been found. In this case, we interrupt the processing and early return with
+     * a error StatusCode */
+    cerP->statusCode.fill(SccInvalidParameter,
+                          std::string("action: DELETE") +
+                          " - entity: [" + eP->toString() + "]" +
+                          " - offending attribute: " + targetAttr->toString() +
+                          " - attribute not found");
+    LM_W(("Bad Input (attribute to be deleted is not found)"));
+    ca->found = false;
+
+    return false;
+  }
+
+  return true;
+}
+
 
 /* ****************************************************************************
 *
@@ -1426,6 +1702,11 @@ static bool processContextAttributeVector
   {
     ContextAttribute*  targetAttr = ceP->contextAttributeVector.get(ix);
 
+    if (targetAttr->skip == true)
+    {
+      continue;
+    }
+
     /* No matter if success or fail, we have to include the attribute in the response */
     ContextAttribute*  ca         = new ContextAttribute(targetAttr->name, targetAttr->type, "");
 
@@ -1435,163 +1716,36 @@ static bool processContextAttributeVector
     /* actualUpdate could be changed to false in the "update" case (or "append as update"). For "delete" and
      * "append" it would keep the true value untouched */
     bool actualUpdate = true;
-    if (strcasecmp(action.c_str(), "update") == 0)
+    if ((strcasecmp(action.c_str(), "update")) == 0 || (strcasecmp(action.c_str(), "replace")) == 0)
     {
-      if (updateAttribute(attrs, toSet, targetAttr, actualUpdate))
+      if (!updateContextAttributeItem(cerP,
+                                      ca,
+                                      attrs,
+                                      targetAttr,
+                                      eP,
+                                      toSet,
+                                      toPush,
+                                      actualUpdate,
+                                      entityModified,
+                                      locAttr,
+                                      coordLat,
+                                      coordLong,
+                                      strcasecmp(action.c_str(), "replace") == 0))
       {
-        entityModified = actualUpdate || entityModified;
-      }
-      else
-      {
-        /* If updateAttribute() returns false, then that particular attribute has not
-         * been found. In this case, we interrupt the processing and early return with
-         * an error StatusCode */
-        // FIXME P10: not sure if this .fill() is useless... it seems it is "overriden" by
-        // another .fill() in this function caller. We keep it by the moment, but it probably
-        // will removed when we refactor this function
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: UPDATE") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString());
-
-        /* Although ca has been already pushed into cerP, it can be used */
-        ca->found = false;
-      }
-
-      /* Check aspects related with location */
-      if (targetAttr->getLocation().length() > 0 && targetAttr->name != locAttr)
-      {
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: UPDATE") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString() +
-                              " - location nature of an attribute has to be defined at creation time, with APPEND");
-
-        LM_W(("Bad Input (location nature of an attribute has to be defined at creation time, with APPEND)"));
         return false;
-      }
-
-      if (locAttr == targetAttr->name)
-      {
-        if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
-        {
-          cerP->statusCode.fill(SccInvalidParameter,
-                                std::string("action: UPDATE") +
-                                " - entity: [" + eP->toString() + "]" +
-                                " - offending attribute: " + targetAttr->toString() +
-                                " - error parsing location attribute, value: <" + targetAttr->stringValue + ">");
-
-          LM_W(("Bad Input (error parsing location attribute)"));
-          return false;
-        }
       }
     }
     else if (strcasecmp(action.c_str(), "append") == 0)
     {
-      if (legalIdUsage(attrs, targetAttr))
+      if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong))
       {
-        appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate);
-        entityModified = actualUpdate || entityModified;
-
-        /* Check aspects related with location */
-        if (targetAttr->getLocation().length() > 0)
-        {
-          if (locAttr.length() > 0 && targetAttr->name != locAttr)
-          {
-            cerP->statusCode.fill(
-              SccInvalidParameter,
-              std::string("action: APPEND") +
-              " - entity: [" + eP->toString() + "]" +
-              " - offending attribute: " + targetAttr->toString() +
-              " - attempt to define a location attribute [" + targetAttr->name + "]" +
-              " when another one has been previously defined [" + locAttr + "]");
-
-            LM_W(("Bad Input (attempt to define a second location attribute)"));
-            return false;
-          }
-
-          if ((targetAttr->getLocation() != LOCATION_WGS84) && (targetAttr->getLocation() != LOCATION_WGS84_LEGACY))
-          {
-            cerP->statusCode.fill(
-              SccInvalidParameter,
-              std::string("action: APPEND") +
-              " - entity: [" + eP->toString() + "]" +
-              " - offending attribute: " + targetAttr->toString() +
-              " - only WGS84 is supported for location, found: [" + targetAttr->getLocation() + "]");
-
-            LM_W(("Bad Input (only WGS84 is supported for location)"));
-            return false;
-          }
-
-          if (!string2coords(targetAttr->stringValue, coordLat, coordLong))
-          {
-            cerP->statusCode.fill(SccInvalidParameter,
-                                  std::string("action: APPEND") +
-                                  " - entity: [" + eP->toString() + "]" +
-                                  " - offending attribute: " + targetAttr->toString() +
-                                  " - error parsing location attribute, value: [" + targetAttr->stringValue + "]");
-            LM_W(("Bad Input (error parsing location attribute)"));
-            return false;
-          }
-
-          locAttr = targetAttr->name;
-        }
-      }
-      else
-      {
-        /* If legalIdUsage() returns false, then that particular attribute can not be appended. In this case,
-         * we interrupt the processing and early return with
-         * a error StatusCode */
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: APPEND") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString() +
-                              " - attribute can not be appended");
-        LM_W(("Bad Input (attribute can not be appended)"));
         return false;
       }
     }
     else if (strcasecmp(action.c_str(), "delete") == 0)
     {
-      if (deleteAttribute(attrs, toUnset, &deletedAttributesCounter, targetAttr))
+      if (!deleteContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toUnset, entityModified, locAttr, &deletedAttributesCounter))
       {
-        entityModified = true;
-
-        /* Check aspects related with location */
-        if (targetAttr->getLocation().length() > 0)
-        {
-          cerP->statusCode.fill(SccInvalidParameter,
-                                std::string("action: DELETE") +
-                                " - entity: [" + eP->toString() + "]" +
-                                " - offending attribute: " + targetAttr->toString() +
-                                " - location attribute has to be defined at creation time, with APPEND");
-
-          LM_W(("Bad Input (location attribute has to be defined at creation time)"));
-          return false;
-        }
-
-        /* Check aspects related with location. "Nullining" locAttr is the way of specifying
-         * that location field is no longer used */
-        if (locAttr == targetAttr->name)
-        {
-          locAttr = "";
-        }
-
-        ca->found = true;
-      }
-      else
-      {
-        /* If deleteAttribute() returns false, then that particular attribute has not
-         * been found. In this case, we interrupt the processing and early return with
-         * a error StatusCode */
-        cerP->statusCode.fill(SccInvalidParameter,
-                              std::string("action: DELETE") +
-                              " - entity: [" + eP->toString() + "]" +
-                              " - offending attribute: " + targetAttr->toString() +
-                              " - attribute not found");
-        LM_W(("Bad Input (attribute to be deleted is not found)"));
-        ca->found = false;
-
         return false;
       }
     }
@@ -2006,8 +2160,9 @@ static bool forwardsPending(UpdateContextResponse* upcrsP)
 * 0. Preparations
 * 1. Preconditions
 * 2. Get the complete list of entities from mongo
+*
 */
-int processContextElement
+void processContextElement
 (
   ContextElement*                      ceP,
   UpdateContextResponse*               responseP,
@@ -2019,7 +2174,9 @@ int processContextElement
   const std::string&                   caller
 )
 {
-  DBClientBase* connection = NULL;
+  DBClientBase* connection                  = NULL;
+  bool          attributeAlreadyExistsError = false;
+  std::string   attributeAlreadyExistsList  = "[ ";
 
   /* Getting the entity in the request (helpful in other places) */
   EntityId* enP = &ceP->entityId;
@@ -2028,11 +2185,14 @@ int processContextElement
   if (isTrue(enP->isPattern))
   {
     buildGeneralErrorResponse(ceP, NULL, responseP, SccNotImplemented);
-    return 0;  // Error already in responseP
+    return;  // Error already in responseP
   }
 
   /* Check that UPDATE or APPEND is not used with attributes with empty value */
-  if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "appendonly") == 0))
+  if ((strcasecmp(action.c_str(), "update") == 0) ||
+      (strcasecmp(action.c_str(), "append") == 0) ||
+      (strcasecmp(action.c_str(), "appendonly") == 0) ||
+      (strcasecmp(action.c_str(), "replace") == 0))
   {
     for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
     {
@@ -2048,7 +2208,7 @@ int processContextElement
                                   " - offending attribute: " + aP->toString() +
                                   " - empty attribute not allowed in APPEND or UPDATE");
         LM_W(("Bad Input (empty attribute not allowed in APPEND or UPDATE)"));
-        return 0;   // Erroralreadyin responseP
+        return;   // Error already in responseP
       }
     }
   }
@@ -2136,7 +2296,7 @@ int processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + e.what());
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
-    return 0;  // Error already in responseP
+    return;  // Error already in responseP
   }
   catch (...)
   {
@@ -2147,7 +2307,7 @@ int processContextElement
                               " - query(): " + query.toString() +
                               " - exception: " + "generic");
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
-    return 0;  // Error already in responseP
+    return;  // Error already in responseP
   }
 
 
@@ -2162,17 +2322,6 @@ int processContextElement
 
   while (cursor->more())
   {
-    if (strcasecmp(action.c_str(), "appendonly") == 0)
-    {
-      //
-      // For the case of appendonly, no entity can be found.
-      // This directly indicates an error
-      //
-
-      LM_W(("KZ: Bad Input (entity already exists)"));
-      return 1;
-    }
-
     BSONObj r = cursor->next();
 
     LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
@@ -2214,7 +2363,7 @@ int processContextElement
      * BSON object for $set (updates and appends) and a BSON object for $unset (deletes). Note that depending
      * the request one of the BSON objects could be empty (it use to be the $unset one). In addition, for
      * APPEND and DELETE updates we use two arrays to push/pull attributes in the attrsNames vector */
-    BSONObj           attrs = r.getField(ENT_ATTRS).embeddedObject();
+    BSONObj           attrs     = r.getField(ENT_ATTRS).embeddedObject();
     BSONObjBuilder    toSet;
     BSONObjBuilder    toUnset;
     BSONArrayBuilder  toPush;
@@ -2246,6 +2395,36 @@ int processContextElement
       coordLat    = loc.getObjectField(ENT_LOCATION_COORDS).getField("coordinates").Array()[1].Double();
     }
 
+    //
+    // Before calling processContextAttributeVector and actually do the work, let's check if the
+    // request is of type 'append-only' and if we have any problem with attributes already existing.
+    //
+    if (strcasecmp(action.c_str(), "appendonly") == 0)
+    {
+      for (unsigned int ix = 0; ix < ceP->contextAttributeVector.size(); ++ix)
+      {
+        if (howManyAttrs(attrs, ceP->contextAttributeVector[ix]->name) != 0)
+        {
+          LM_W(("Bad Input (attribute already exists)"));
+          attributeAlreadyExistsError = true;
+
+          //
+          // This attribute should now be removed from the 'query' ...
+          // processContextAttributeVector looks at the 'skip' field
+          //
+          ceP->contextAttributeVector[ix]->skip = true;
+
+          // Add to the list of existing attributes - for the error response
+          if (attributeAlreadyExistsList != "[ ")
+          {
+            attributeAlreadyExistsList += ", ";
+          }
+          attributeAlreadyExistsList += ceP->contextAttributeVector[ix]->name;          
+        }
+      }
+      attributeAlreadyExistsList += " ]";
+    }
+
     if (!processContextAttributeVector(ceP,
                                        action,
                                        subsToNotify,
@@ -2273,7 +2452,13 @@ int processContextElement
     /* Compose the final update on database */
     LM_T(LmtServicePath, ("Updating the attributes of the ContextElement"));
 
-    toSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
+    if (strcasecmp(action.c_str(), "replace") != 0)
+    {
+      toSet.append(ENT_MODIFICATION_DATE, getCurrentTime());
+    }
+
+    // FIXME P5 https://github.com/telefonicaid/fiware-orion/issues/1142:
+    // not sure how the following if behaves in the case of "replace"...
     if (locAttr.length() > 0)
     {
       toSet.append(ENT_LOCATION, BSON(ENT_LOCATION_ATTRNAME << locAttr <<
@@ -2286,7 +2471,7 @@ int processContextElement
       toUnset.append(ENT_LOCATION, 1);
     }
 
-    /* FIXME: I don't like the obj() step, but it could be the only possible way, let's wait for the answer to
+    /* FIXME: I don't like the obj() step, but it seems to be the only possible way, let's wait for the answer to
      * http://stackoverflow.com/questions/29668439/get-number-of-fields-in-bsonobjbuilder-object */
     BSONObjBuilder  updatedEntity;
     BSONObj         toSetObj    = toSet.obj();
@@ -2294,24 +2479,33 @@ int processContextElement
     BSONArray       toPushArr   = toPush.arr();
     BSONArray       toPullArr   = toPull.arr();
 
-    if (toSetObj.nFields() > 0)
+    if (strcasecmp(action.c_str(), "replace") == 0)
     {
-      updatedEntity.append("$set", toSetObj);
+      // toSet: { A1: { ... }, A2: { ... } }
+      updatedEntity.append("$set", BSON(ENT_ATTRS << toSetObj << ENT_ATTRNAMES << toPushArr << ENT_MODIFICATION_DATE << getCurrentTime()));
     }
-
-    if (toUnsetObj.nFields() > 0)
+    else
     {
-      updatedEntity.append("$unset", toUnsetObj);
-    }
+      // toSet:  { attrs.A1: { ... }, attrs.A2: { ... } }
+      if (toSetObj.nFields() > 0)
+      {
+        updatedEntity.append("$set", toSetObj);
+      }
 
-    if (toPushArr.nFields() > 0)
-    {
-      updatedEntity.append("$addToSet", BSON(ENT_ATTRNAMES << BSON("$each" << toPushArr)));
-    }
+      if (toUnsetObj.nFields() > 0)
+      {
+        updatedEntity.append("$unset", toUnsetObj);
+      }
 
-    if (toPullArr.nFields() > 0)
-    {
-      updatedEntity.append("$pullAll", BSON(ENT_ATTRNAMES << toPullArr));
+      if (toPushArr.nFields() > 0)
+      {
+        updatedEntity.append("$addToSet", BSON(ENT_ATTRNAMES << BSON("$each" << toPushArr)));
+      }
+
+      if (toPullArr.nFields() > 0)
+      {
+        updatedEntity.append("$pullAll", BSON(ENT_ATTRNAMES << toPullArr));
+      }
     }
 
     BSONObj updatedEntityObj = updatedEntity.obj();
@@ -2449,7 +2643,7 @@ int processContextElement
       cerP->contextElement.contextAttributeVector.push_back(ca);
     }
 
-    if (strcasecmp(action.c_str(), "update") == 0)
+    if ((strcasecmp(action.c_str(), "update") == 0) || (strcasecmp(action.c_str(), "replace") == 0))
     {
       /* In the case of UPDATE or DELETE we look for context providers */
       searchContextProviders(tenant, servicePathV, *enP, ceP->contextAttributeVector, cerP);
@@ -2498,7 +2692,7 @@ int processContextElement
           {
             cerP->statusCode.fill(SccReceiverInternalError, err);
             responseP->contextElementResponseVector.push_back(cerP);
-            return 0;  // Error already in responseP
+            return;  // Error already in responseP
           }
         }
 
@@ -2509,5 +2703,12 @@ int processContextElement
     }
   }
 
-  return 0;  // Response in responseP
+  if (attributeAlreadyExistsError == true)
+  {
+    std::string details = "one or more of the attributes in the request already exist: " + attributeAlreadyExistsList;
+
+    buildGeneralErrorResponse(ceP, NULL, responseP, SccBadRequest, details);
+  }
+
+  // Response in responseP
 }

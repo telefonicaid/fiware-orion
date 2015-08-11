@@ -27,7 +27,7 @@ entryPointsTreat.cpp
 getEntity.cpp
 putEntity.cpp
 getEntityAttribute.cpp
-postAttributes.cpp
+postEntity.cpp
 deleteEntity.cpp
 )
 
@@ -38,7 +38,7 @@ entryPointsTreat.h
 getEntity.h
 putEntity.h
 getEntityAttribute.h
-postAttributes.h
+postEntity.h
 deleteEntity.h
 )
 

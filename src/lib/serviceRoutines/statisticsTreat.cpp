@@ -34,7 +34,7 @@
 #include "common/statistics.h"
 #include "common/sem.h"
 
-#include "cache/SubscriptionCache.h"
+#include "cache/subCache.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "serviceRoutines/statisticsTreat.h"

@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PUTT /v2/entities/E1 on entity that doesn't exist
+PUT /v2/entities/E1 on entity that doesn't exist
 
 --SHELL-INIT--
 dbInit CB
@@ -31,11 +31,6 @@ brokerStart CB
 
 #
 # 01. Modify non-existing entity E1
-# 02. Make sure E1 does not exist
-# 03. Create E1
-# 04. Make sure E1 is as created
-# 05. Modify E1
-# 06. Make sure E1 is as modified
 #
 
 echo "01. Modify non-existing entity E1"
