@@ -118,7 +118,7 @@ payload='{
   "restriction": {
       "scopes": [
           {
-              "type": "FIWARE::StringFilter",
+              "type": "FIWARE::StringQuery",
               "value": "temperature<60;humidity==83..61;status==ERR"
           }
       ]
@@ -178,24 +178,16 @@ Date: REGEX(.*)
 06. v1 Query: temperature<60;humidity==83..61;status==ERR -> E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 94
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-   <Needs to be adjusted before merging this into develop. A solution
-    is on the way, based on doing an exception for the illegal characters
-    checking in the following cases:
-    * q= parameters
-    * "value" of an "scope" if the scope falue is SCOPE_TYPE_SIMPLE_QUERY
-    >
     "errorCode": {
-        "code": "400",
-        "details": "Illegal value for JSON field",
-        "reasonPhrase": "Bad Request"
+        "code": "404",
+        "reasonPhrase": "No context element found"
     }
 }
-
 
 
 --TEARDOWN--

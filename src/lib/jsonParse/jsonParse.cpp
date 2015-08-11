@@ -109,6 +109,33 @@ static bool isCompoundPath(const char* path)
 
 /* ****************************************************************************
 *
+* isScopeValue - 
+*
+* A path is a scope value if the path ends with /scopes/scope/value
+*/
+static bool isScopeValue(const char* path)
+{
+  int          slen   = strlen(path);
+  const char*  end    = "/scopes/scope/value";
+  int          start  = slen - strlen(end);
+
+  if (start < 0)
+  {
+    return false;
+  }
+
+  if (strcmp(&path[start], end) == 0)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
+
+/* ****************************************************************************
+*
 * treat -
 */
 static bool treat
@@ -127,14 +154,18 @@ static bool treat
     //
     // Before treating a node, a check is made that the value of the node has no forbidden
     // characters.
-    // However, if the the node has attributes, then the values of the attributes are checked instead
+    // 
+    // For scopes, the check for forbiddenChars is postponed to the check() method of scope
     //
-    if (forbiddenChars(value.c_str()) == true)
+    if (!isScopeValue(path.c_str()))
     {
-      LM_W(("Bad Input (found a forbidden value in '%s')", value.c_str()));
-      ciP->httpStatusCode = SccBadRequest;
-      ciP->answer = std::string("Illegal value for JSON field");
-      return false;
+      if (forbiddenChars(value.c_str()) == true)
+      {
+        LM_W(("Bad Input (found a forbidden value in '%s')", value.c_str()));
+        ciP->httpStatusCode = SccBadRequest;
+        ciP->answer = std::string("Illegal value for JSON field");
+        return false;
+      }
     }
 
     if (path == parseVector[ix].path)

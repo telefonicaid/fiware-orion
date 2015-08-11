@@ -122,9 +122,9 @@ static bool treat(ConnectionInfo* ciP, xml_node<>* node, const std::string& path
         // If we're in a Scope, no forbiddenChars check made.
         // We still don't know the type of the Scope, so the forbiddenChars check
         // will have to be postponed until we know both the type and the value.
-        // For example, the 'check' method can take care of trhis
+        // For example, the 'check' method can take care of this
         //
-        if (strcasecmp(node->name(), "scopeValue") == 0)
+        if (strcasecmp(node->name(), "scopeValue") != 0)
         {
           if (forbiddenChars(node->value()) == true)
           {
