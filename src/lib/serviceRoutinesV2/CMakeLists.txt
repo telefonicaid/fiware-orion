@@ -28,7 +28,7 @@ getEntity.cpp
 putEntity.cpp
 getEntityAttribute.cpp
 getEntityAttributeValue.cpp
-postAttributes.cpp
+postEntity.cpp
 deleteEntity.cpp
 )
 
@@ -40,7 +40,7 @@ getEntity.h
 putEntity.h
 getEntityAttribute.h
 getEntityAttributeValue.h
-postAttributes.h
+postEntity.h
 deleteEntity.h
 )
 

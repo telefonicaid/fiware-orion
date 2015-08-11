@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PUT /v2/entities/E1 on entity that doesn't exist
+PUT /v2/entities/E1 replacing some attributes
 
 --SHELL-INIT--
 dbInit CB
@@ -30,53 +30,36 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. Modify non-existing entity E1
-# 02. Make sure E1 does not exist
-# 03. Create E1
-# 04. Make sure E1 is as created
-# 05. Modify E1
-# 06. Make sure E1 is as modified
+# 01. Create E1/A1+A2
+# 02. Make sure E1 is as created
+# 03. Modify E1 to E1/A2+A3
+# 04. Make sure E1 is as modified
 #
 
-echo "01. Modify non-existing entity E1"
-echo "================================="
-payload='{ "attr1": 1 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
-echo
-echo
-
-
-echo "02. Make sure E1 does not exist"
-echo "==============================="
-orionCurl --url /v2/entities/E1 --json
-echo
-echo
-
-
-echo "03. Create E1"
-echo "============="
-payload='{ "attr1": 3 }'
+echo "01. Create E1/A1+A2"
+echo "==================="
+payload='{ "A1": 1, "A2": 2 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json
 echo
 echo
 
 
-echo "04. Make sure E1 is as created"
+echo "02. Make sure E1 is as created"
 echo "=============================="
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
 
-echo "05. Modify E1"
-echo "============="
-payload='{ "attr1": 5 }'
+echo "03. Modify E1 to E1/A2+A3"
+echo "========================="
+payload='{ "A2": 2, "A3": 3 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PUT
 echo
 echo
 
 
-echo "06. Make sure E1 is as modified"
+echo "04. Make sure E1 is as modified"
 echo "==============================="
 orionCurl --url /v2/entities/E1 --json
 echo
@@ -84,29 +67,8 @@ echo
 
 
 --REGEXPECT--
-01. Modify non-existing entity E1
-=================================
-HTTP/1.1 404 Not Found
-Content-Length: 0
-Date: REGEX(.*)
-
-
-
-02. Make sure E1 does not exist
-===============================
-HTTP/1.1 404 Not Found
-Content-Length: 95
-Content-Type: application/json
-Date: REGEX(.*)
-
-{
-    "description": "The requested entity has not been found. Check type and id", 
-    "error": "NotFound"
-}
-
-
-03. Create E1
-=============
+01. Create E1/A1+A2
+===================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1
@@ -114,36 +76,38 @@ Date: REGEX(.*)
 
 
 
-04. Make sure E1 is as created
+02. Make sure E1 is as created
 ==============================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 39
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 3.0, 
+    "A1": 1.0, 
+    "A2": 2.0, 
     "id": "E1"
 }
 
 
-05. Modify E1
-=============
+03. Modify E1 to E1/A2+A3
+=========================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
 
 
 
-06. Make sure E1 is as modified
+04. Make sure E1 is as modified
 ===============================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 39
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attr1": 5.0, 
+    "A2": 2.0, 
+    "A3": 3.0, 
     "id": "E1"
 }
 

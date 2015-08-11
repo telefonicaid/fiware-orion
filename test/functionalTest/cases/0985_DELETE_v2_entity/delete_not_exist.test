@@ -21,57 +21,41 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-Compound Metadata Error Handling Test
+DELETE Entity V2 Not exist
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB
+brokerStart CB 51
 
 --SHELL--
 
 #
-# 01. POST /v2/entities with Compound Metadata
-#
-# FIXME P5: Once compound metadatas are allowed, this test must be modified to
-#           provoke the same error in some other way - making the error handling
-#           "return r", in that very same place.
+# 01. DELETE /v2/entities/E1NOTEXIST
 #
 
-echo "01. POST /v2/entities with Compound Metadata"
-echo "============================================"
-payload='{
-  "type": "room",
-  "id": "room_0",
-  "attr":
-  {
-    "type": "date",
-    "value": 19,
-    "meta1":
-    {
-      "value": { "compound": "value" }
-    },
-    "meta2": [ 1, 2, 3 ]
-  }
-}'
-orionCurl --url /v2/entities --payload "$payload" --json
+echo "01. DELETE /v2/entities/E1NOTEXIST"
+echo "=================================="
+orionCurl --url /v2/entities/E1 -X DELETE --json
 echo
 echo
+
 
 
 --REGEXPECT--
-01. POST /v2/entities with Compound Metadata
-============================================
-HTTP/1.1 400 Bad Request
-Content-Length: 91
+01. DELETE /v2/entities/E1NOTEXIST
+==================================
+HTTP/1.1 404 Not Found
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "JSON Parse Error in ContextAttributeObject::Metadata", 
-    "error": "ParseError"
+    "description": "The requested entity has not been found. Check type and id",
+    "error": "NotFound"
 }
 
 
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
+

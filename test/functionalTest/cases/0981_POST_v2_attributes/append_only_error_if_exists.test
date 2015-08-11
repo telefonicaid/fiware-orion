@@ -36,7 +36,6 @@ brokerStart CB
 # 04. Make sure it didn't work
 # 05. Now update E1, using POST /v2/entities/E1
 # 06. Make sure it worked
-# 07. Try some other verb
 #
 
 echo "01. Create E1"
@@ -57,7 +56,7 @@ echo
 echo "03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append"
 echo "==================================================================="
 payload='{  "attr1": 2 }'
-orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json --noPayloadCheck
+orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
 echo
 echo
 
@@ -72,7 +71,7 @@ echo
 echo "05. Now update E1, using POST /v2/entities/E1"
 echo "============================================="
 payload='{  "attr1": 5 }'
-orionCurl --url /v2/entities/E1 --payload "$payload" --json --noPayloadCheck
+orionCurl --url /v2/entities/E1 --payload "$payload" --json
 echo
 echo
 
@@ -80,13 +79,6 @@ echo
 echo "06. Make sure it worked"
 echo "======================="
 orionCurl --url /v2/entities/E1 --json
-echo
-echo
-
-
-echo "07. Try some other verb"
-echo "======================="
-orionCurl --url /v2/entities/E1 --json -X GETT --payload '{ "a": "1" }'
 echo
 echo
 
@@ -116,11 +108,15 @@ Date: REGEX(.*)
 
 03. Try to create E1/T1 again, using POST /v2/entities/E1?op=append
 ===================================================================
-HTTP/1.1 204 No Content
-Content-Length: 0
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
 Date: REGEX(.*)
 
-
+{
+    "description": "one or more of the attributes in the request already exist: [ attr1 ]",
+    "error": "BadRequest"
+}
 
 
 04. Make sure it didn't work
@@ -145,7 +141,6 @@ Date: REGEX(.*)
 
 
 
-
 06. Make sure it worked
 =======================
 HTTP/1.1 200 OK
@@ -157,15 +152,6 @@ Date: REGEX(.*)
     "attr1": 5.0, 
     "id": "E1"
 }
-
-
-07. Try some other verb
-=======================
-HTTP/1.1 405 Method Not Allowed
-Content-Length: 0
-Allow: POST, GET, PUT, DELETE
-Date: REGEX(.*)
-
 
 
 --TEARDOWN--

@@ -28,7 +28,9 @@
 #include "logMsg/traceLevels.h"
 
 #include "common/globals.h"
+#include "cache/subCache.h"
 #include "cache/SubscriptionCache.h"
+#include "cache/Subscription.h"
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoUpdateContextSubscription.h"
 #include "ngsi10/UpdateContextSubscriptionRequest.h"
@@ -256,28 +258,46 @@ HttpStatusCode mongoUpdateContextSubscription
       return SccOk;
   }
 
-  /* Duration and throttling are optional parameters, they are only added in the case they
-   * was used for update */
-  if (!requestP->duration.isEmpty()) {      
-      responseP->subscribeResponse.duration = requestP->duration;
+  // Duration and throttling are optional parameters, they are only added in the case they were used for update
+  if (!requestP->duration.isEmpty())
+  {
+    responseP->subscribeResponse.duration = requestP->duration;
   }
-  if (!requestP->throttling.isEmpty()) {      
-      responseP->subscribeResponse.throttling = requestP->throttling;
-  }  
+
+  if (!requestP->throttling.isEmpty())
+  {
+    responseP->subscribeResponse.throttling = requestP->throttling;
+  }
   responseP->subscribeResponse.subscriptionId = requestP->subscriptionId;
 
   reqSemGive(__FUNCTION__, "ngsi10 update subscription request", reqSemTaken);
 
 
   //
-  // Update the entry in the cache of subscriptions, if applicable
+  // Modification of the subscription cache
   //
-  Subscription* subP = subCache->lookupById(tenant, servicePathV[0], requestP->subscriptionId.get());
+  // The subscription before this updatye is stored in 'sub'.
+  // The updated subscription is stored in 'newSub'
+  // 
+  // All we need to do now for the cache is to:
+  //   1. Remove 'sub' from sub-cache (if present)
+  //   2. Create 'newSub' in sub-cache (if applicable)
+  //
 
-  if (subP != NULL)
+  // 0. Lookup matching subscription in subscription-cache
+  std::string servicePath;
+
+  servicePath = (servicePathV.size() == 0)? "" : servicePathV[0];
+  Subscription* subP = subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
+
+  // 1. Remove 'sub' from sub-cache (if present)
+  if (subP)
   {
-    subP->update(requestP);
+    subCache->remove(subP);
   }
+
+  // 2. Create 'newSub' in sub-cache (if applicable)
+  subCache->insert(tenant, newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
 
   return SccOk;
 }

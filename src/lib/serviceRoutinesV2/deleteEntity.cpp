@@ -29,6 +29,7 @@
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
+#include "apiTypesV2/ErrorCode.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 
@@ -55,8 +56,9 @@ std::string deleteEntity
   ParseData*                 parseDataP
 )
 {
-  std::string answer;
-  Entity  *eP = new Entity();
+  std::string  answer;
+  Entity*      eP = new Entity();
+
   eP->id = compV[2];
 
   // Fill in UpdateContextRequest
@@ -65,10 +67,41 @@ std::string deleteEntity
   // Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
+  // Any error in the response?
+  UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
+
+  ciP->outFormat = JSON;
+
+  for (unsigned int ix = 0; ix < upcrsP->contextElementResponseVector.size(); ++ix)
+  {
+    StatusCode      sc  = upcrsP->contextElementResponseVector[ix]->statusCode;
+    HttpStatusCode  scc = sc.code;
+
+    if ((scc != SccOk) && (scc != SccNone))
+    {
+      ErrorCode error;
+
+      if (scc == SccContextElementNotFound)
+      {
+        error.fill("NotFound", "The requested entity has not been found. Check type and id");
+      }
+      else
+      {
+        error.fill(sc);
+      }
+
+      ciP->httpStatusCode = scc;
+      answer              = error.toJson(true);
+
+      eP->release();
+      return answer;
+    }
+  }
 
   // Prepare status code
-  if (ciP->httpStatusCode == SccOk || ciP->httpStatusCode == SccNone) {
-      ciP->httpStatusCode = SccNoContent;
+  if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
+  {
+    ciP->httpStatusCode = SccNoContent;
   }
 
   // Cleanup and return result
