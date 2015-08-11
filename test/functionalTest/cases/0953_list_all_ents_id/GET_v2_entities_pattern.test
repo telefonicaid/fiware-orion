@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entities V2 by id
+GET Entities V2 by idPattern
 
 --SHELL-INIT--
 dbInit CB
@@ -31,10 +31,10 @@ brokerStart CB
 
 #
 # 01. GET /v2/entities?idPattern=E.*
-# 02. POST /v1/updateContext
+# 02. POST /v2/entities, creating E1
 # 03. GET /v2/entities?idPattern=E.*
 # 04. GET /v2/entities?idPattern=E1&count=true
-# 05. POST /v1/updateContext with compound attribute value
+# 05. POST /v2/entities, creating E2 with compound attribute value
 # 06. GET /v2/entities?idPattern=E(1|2)
 # 07. GET /v2/entities?idPattern=E[2-3]
 
@@ -45,83 +45,20 @@ echo
 echo
 
 
-echo "02. POST /v1/updateContext"
-echo "=========================="
-payload='{
-  "contextElements": [
-    {
-      "id":   "E1",
-      "type": "T1",
-      "attributes" : [
-        {
-          "name" : "A0",
-          "type": "number",
-          "value" : 255
-        },
-        {
-          "name" : "A1",
-          "value" : "E1/T1/A1"
-        },
-        {
-          "name": "A2",
-          "value": "E1/T1/A2",
-          "type": "AT2" 
-        },
-        {
-          "name": "A3",
-          "type": "a",
-          "value": "E1/T1/A3/M1",
-          "metadatas": [
-            {
-              "name": "m1",
-              "value": "M1"
-            }
-          ]
-        },
-        {
-          "name": "A4",
-          "type": "a4",
-          "value": "E1/T1/A4/M1-3",
-          "metadatas": [
-            {
-              "name": "m1",
-              "value": "M1"
-            },
-            {
-              "name": "m2",
-              "type": "tm2",
-              "value": "M2"
-            },
-            {
-              "name": "m3",
-              "type": "number",
-              "value": 3
-            },
-            {
-              "name": "type",
-              "value": "TYPE"
-            },
-            {
-              "name": "value",
-              "value": "VALUE"
-            }
-          ]
-        },
-        {
-          "name": "id",
-          "value": "ID"
-        },
-        {
-          "name": "type",
-          "type": "VALUE",
-          "value": "TYPE"
-        }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
+echo "02. POST /v2/entities, creating E1"
+echo "=================================="
+payload='
+{
+   "id":"E1",
+   "type":"T1",
+   "A0":255,
+   "A1":"E1/T1/A1",
+   "A2":{
+      "value":"E1/T1/A2",
+      "type":"AT2"
+   }
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
@@ -140,24 +77,19 @@ echo
 echo
 
 
-echo "05. POST /v1/updateContext with compound attribute value"
-echo "========================================================"
-payload='{
-  "contextElements": [
+echo "05. POST /v2/entities, creating E2 with compound attribute value"
+echo "================================================================="
+payload='
     {
       "id":   "E2",
       "type": "T1",
-      "attributes" : [
+      "A0" :
         {
-          "name" : "A0",
           "value" : { "i1": 1, "s1": "s" }
         }
-      ]
     }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+'
+orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
@@ -185,138 +117,31 @@ Date: REGEX(.*)
 []
 
 
-02. POST /v1/updateContext
-==========================
-HTTP/1.1 200 OK
-Content-Length: 1854
-Content-Type: application/json
+02. POST /v2/entities, creating E1
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A0", 
-                        "type": "number", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A1", 
-                        "type": "", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A2", 
-                        "type": "AT2", 
-                        "value": ""
-                    }, 
-                    {
-                        "metadatas": [
-                            {
-                                "name": "m1", 
-                                "type": "", 
-                                "value": "M1"
-                            }
-                        ], 
-                        "name": "A3", 
-                        "type": "a", 
-                        "value": ""
-                    }, 
-                    {
-                        "metadatas": [
-                            {
-                                "name": "m1", 
-                                "type": "", 
-                                "value": "M1"
-                            }, 
-                            {
-                                "name": "m2", 
-                                "type": "tm2", 
-                                "value": "M2"
-                            }, 
-                            {
-                                "name": "m3", 
-                                "type": "number", 
-                                "value": "3"
-                            }, 
-                            {
-                                "name": "type", 
-                                "type": "", 
-                                "value": "TYPE"
-                            }, 
-                            {
-                                "name": "value", 
-                                "type": "", 
-                                "value": "VALUE"
-                            }
-                        ], 
-                        "name": "A4", 
-                        "type": "a4", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "id", 
-                        "type": "", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "type", 
-                        "type": "VALUE", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
 
 03. GET /v2/entities?idPattern=E.*
 ==================================
 HTTP/1.1 200 OK
-Content-Length: 288
+Content-Length: 96
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "A0": {
-            "type": "number", 
-            "value": "255"
-        }, 
-        "A1": "E1/T1/A1", 
+        "A0": 255.0,
+        "A1": "E1/T1/A1",
         "A2": {
-            "type": "AT2", 
+            "type": "AT2",
             "value": "E1/T1/A2"
-        }, 
-        "A3": {
-            "m1": "M1", 
-            "type": "a", 
-            "value": "E1/T1/A3/M1"
-        }, 
-        "A4": {
-            "m1": "M1", 
-            "m2": {
-                "type": "tm2", 
-                "value": "M2"
-            }, 
-            "m3": {
-                "type": "number", 
-                "value": "3"
-            }, 
-            "type": "a4", 
-            "value": "E1/T1/A4/M1-3"
-        }, 
-        "id": "E1", 
+        },
+        "id": "E1",
         "type": "T1"
     }
 ]
@@ -325,122 +150,58 @@ Date: REGEX(.*)
 04. GET /v2/entities?idPattern=E1&count=true
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 288
+Content-Length: 96
 Content-Type: application/json
 X-Total-Count: 1
 Date: REGEX(.*)
 
 [
     {
-        "A0": {
-            "type": "number", 
-            "value": "255"
-        }, 
-        "A1": "E1/T1/A1", 
+        "A0": 255.0,
+        "A1": "E1/T1/A1",
         "A2": {
-            "type": "AT2", 
+            "type": "AT2",
             "value": "E1/T1/A2"
-        }, 
-        "A3": {
-            "m1": "M1", 
-            "type": "a", 
-            "value": "E1/T1/A3/M1"
-        }, 
-        "A4": {
-            "m1": "M1", 
-            "m2": {
-                "type": "tm2", 
-                "value": "M2"
-            }, 
-            "m3": {
-                "type": "number", 
-                "value": "3"
-            }, 
-            "type": "a4", 
-            "value": "E1/T1/A4/M1-3"
-        }, 
-        "id": "E1", 
+        },
+        "id": "E1",
         "type": "T1"
     }
 ]
 
 
-05. POST /v1/updateContext with compound attribute value
-========================================================
-HTTP/1.1 200 OK
-Content-Length: 377
-Content-Type: application/json
+05. POST /v2/entities, creating E2 with compound attribute value
+=================================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A0", 
-                        "type": "", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E2", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
 
 06. GET /v2/entities?idPattern=E(1|2)
 =====================================
 HTTP/1.1 200 OK
-Content-Length: 337
+Content-Length: 150
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
-        "A0": {
-            "type": "number", 
-            "value": "255"
-        }, 
-        "A1": "E1/T1/A1", 
+        "A0": 255.0,
+        "A1": "E1/T1/A1",
         "A2": {
-            "type": "AT2", 
+            "type": "AT2",
             "value": "E1/T1/A2"
-        }, 
-        "A3": {
-            "m1": "M1", 
-            "type": "a", 
-            "value": "E1/T1/A3/M1"
-        }, 
-        "A4": {
-            "m1": "M1", 
-            "m2": {
-                "type": "tm2", 
-                "value": "M2"
-            }, 
-            "m3": {
-                "type": "number", 
-                "value": "3"
-            }, 
-            "type": "a4", 
-            "value": "E1/T1/A4/M1-3"
-        }, 
-        "id": "E1", 
+        },
+        "id": "E1",
         "type": "T1"
-    }, 
+    },
     {
         "A0": {
-            "i1": "1", 
+            "i1": 1.0,
             "s1": "s"
-        }, 
-        "id": "E2", 
+        },
+        "id": "E2",
         "type": "T1"
     }
 ]
@@ -449,14 +210,14 @@ Date: REGEX(.*)
 07. GET /v2/entities?idPattern=E\[23\]
 ======================================
 HTTP/1.1 200 OK
-Content-Length: 50
+Content-Length: 55
 Content-Type: application/json
 Date: REGEX(.*)
 
 [
     {
         "A0": {
-            "i1": "1",
+            "i1": 1.0,
             "s1": "s"
         },
         "id": "E2",

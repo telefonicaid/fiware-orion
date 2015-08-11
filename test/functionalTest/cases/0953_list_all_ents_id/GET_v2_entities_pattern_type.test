@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entities V2 with Pagination by Id
+GET Entities V2 with pattern and type
 
 --SHELL-INIT--
 dbInit CB
@@ -30,51 +30,83 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. POST /v1/updateContext, creating 5 entities
-# 02. GET /v2/entities?idPattern=E.*&type=T1
-# 03. GET /v2/entities?idPattern=E.*&type=T3
+# 01. POST /v2/entities, creating E1/T1
+# 02. POST /v2/entities, creating E2/T1
+# 03. POST /v2/entities, creating E3/T2
+# 04. POST /v2/entities, creating E1/T3
+# 05. POST /v2/entities, creating E2/T3
+# 06. GET /v2/entities?idPattern=E.*&type=T1
+# 07. GET /v2/entities?idPattern=E.*&type=T3
 #
 
-echo "01. POST /v1/updateContext"
-echo "=========================="
-payload='{
-  "contextElements": [
+echo "01. POST /v2/entities, creating E1/T1"
+echo "====================================="
+payload='
     {
       "id":   "E1",
       "type": "T1"
-    },
+    }'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. POST /v2/entities, creating E2/T1"
+echo "====================================="
+payload='
     {
       "id":   "E2",
       "type": "T1"
-    },
+    }'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. POST /v2/entities, creating E3/T2"
+echo "====================================="
+payload='
     {
       "id":   "E3",
       "type": "T2"
-    },
+    }'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "04. POST /v2/entities, creating E1/T3"
+echo "====================================="
+payload='
     {
       "id":   "E1",
       "type": "T3"
-    },
+    }'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "05. POST /v2/entities, creating E2/T3"
+echo "====================================="
+payload='
     {
       "id":   "E2",
       "type": "T3"
-    }
-  ],
-  "updateAction": "APPEND"
-}'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+    }'
+orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
 
-echo "02. GET /v2/entities?idPattern=E.*&type=T1"
+echo "06. GET /v2/entities?idPattern=E.*&type=T1"
 echo "=========================================="
 orionCurl --url '/v2/entities?idPattern=E.*&type=T1' --json
 echo
 echo
 
 
-echo "03. GET /v2/entities?idPattern=E.*&type=T3"
+echo "07. GET /v2/entities?idPattern=E.*&type=T3"
 echo "=========================================="
 orionCurl --url '/v2/entities?idPattern=E.*&type=T3' --json
 echo
@@ -82,75 +114,52 @@ echo
 
 
 --REGEXPECT--
-01. POST /v1/updateContext
-==========================
-HTTP/1.1 200 OK
-Content-Length: 1072
-Content-Type: application/json
+01. POST /v2/entities, creating E1/T1
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "id": "E2",
-                "isPattern": "false",
-                "type": "T1"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "id": "E3",
-                "isPattern": "false",
-                "type": "T2"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "id": "E1",
-                "isPattern": "false",
-                "type": "T3"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        },
-        {
-            "contextElement": {
-                "id": "E2",
-                "isPattern": "false",
-                "type": "T3"
-            },
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
 
-02. GET /v2/entities?idPattern=E.*&type=T1
+02. POST /v2/entities, creating E2/T1
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+03. POST /v2/entities, creating E3/T2
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3
+Date: REGEX(.*)
+
+
+
+04. POST /v2/entities, creating E1/T3
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+05. POST /v2/entities, creating E2/T3
+=====================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+06. GET /v2/entities?idPattern=E.*&type=T1
 ==========================================
 HTTP/1.1 200 OK
 Content-Length: 49
@@ -169,7 +178,7 @@ Date: REGEX(.*)
 ]
 
 
-03. GET /v2/entities?idPattern=E.*&type=T3
+07. GET /v2/entities?idPattern=E.*&type=T3
 ==========================================
 HTTP/1.1 200 OK
 Content-Length: 49

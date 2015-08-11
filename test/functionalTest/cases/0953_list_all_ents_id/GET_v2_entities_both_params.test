@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entities V2 by id
+GET Entities V2, error using id and idPattern
 
 --SHELL-INIT--
 dbInit CB
@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. GET /v2/entities?id=E1&idPattern=.*
-# 02. POST /v1/updateContext
+# 02. POST /v2/entities, creating E1
 # 03. GET /v2/entities?id=E1&idPattern=.*
 
 echo "01. GET /v2/entities?id=E1&idPattern=.*"
@@ -41,86 +41,22 @@ echo
 echo
 
 
-echo "02. POST /v1/updateContext"
-echo "=========================="
-payload='{
-  "contextElements": [
-    {
-      "id":   "E1",
-      "type": "T1",
-      "attributes" : [
-        {
-          "name" : "A0",
-          "type": "number",
-          "value" : 255
-        },
-        {
-          "name" : "A1",
-          "value" : "E1/T1/A1"
-        },
-        {
-          "name": "A2",
-          "value": "E1/T1/A2",
-          "type": "AT2" 
-        },
-        {
-          "name": "A3",
-          "type": "a",
-          "value": "E1/T1/A3/M1",
-          "metadatas": [
-            {
-              "name": "m1",
-              "value": "M1"
-            }
-          ]
-        },
-        {
-          "name": "A4",
-          "type": "a4",
-          "value": "E1/T1/A4/M1-3",
-          "metadatas": [
-            {
-              "name": "m1",
-              "value": "M1"
-            },
-            {
-              "name": "m2",
-              "type": "tm2",
-              "value": "M2"
-            },
-            {
-              "name": "m3",
-              "type": "number",
-              "value": 3
-            },
-            {
-              "name": "type",
-              "value": "TYPE"
-            },
-            {
-              "name": "value",
-              "value": "VALUE"
-            }
-          ]
-        },
-        {
-          "name": "id",
-          "value": "ID"
-        },
-        {
-          "name": "type",
-          "type": "VALUE",
-          "value": "TYPE"
-        }
-      ]
-    }
-  ],
-  "updateAction": "APPEND"
+echo "02. POST /v2/entities, creating E1"
+echo "=================================="
+payload='
+{
+   "id":"E1",
+   "type":"T1",
+   "A0":255,
+   "A1":"E1/T1/A1",
+   "A2":{
+      "value":"E1/T1/A2",
+      "type":"AT2"
+   }
 }'
-orionCurl --url /v1/updateContext --payload "$payload" --json
+orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
-
 
 echo "03. GET /v2/entities?id=E1&idPattern=.*"
 echo "======================================="
@@ -141,99 +77,13 @@ Date: REGEX(.*)
 }
 
 
-02. POST /v1/updateContext
-==========================
-HTTP/1.1 200 OK
-Content-Length: 1854
-Content-Type: application/json
+02. POST /v2/entities, creating E1
+==================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
-{
-    "contextResponses": [
-        {
-            "contextElement": {
-                "attributes": [
-                    {
-                        "name": "A0", 
-                        "type": "number", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A1", 
-                        "type": "", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "A2", 
-                        "type": "AT2", 
-                        "value": ""
-                    }, 
-                    {
-                        "metadatas": [
-                            {
-                                "name": "m1", 
-                                "type": "", 
-                                "value": "M1"
-                            }
-                        ], 
-                        "name": "A3", 
-                        "type": "a", 
-                        "value": ""
-                    }, 
-                    {
-                        "metadatas": [
-                            {
-                                "name": "m1", 
-                                "type": "", 
-                                "value": "M1"
-                            }, 
-                            {
-                                "name": "m2", 
-                                "type": "tm2", 
-                                "value": "M2"
-                            }, 
-                            {
-                                "name": "m3", 
-                                "type": "number", 
-                                "value": "3"
-                            }, 
-                            {
-                                "name": "type", 
-                                "type": "", 
-                                "value": "TYPE"
-                            }, 
-                            {
-                                "name": "value", 
-                                "type": "", 
-                                "value": "VALUE"
-                            }
-                        ], 
-                        "name": "A4", 
-                        "type": "a4", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "id", 
-                        "type": "", 
-                        "value": ""
-                    }, 
-                    {
-                        "name": "type", 
-                        "type": "VALUE", 
-                        "value": ""
-                    }
-                ], 
-                "id": "E1", 
-                "isPattern": "false", 
-                "type": "T1"
-            }, 
-            "statusCode": {
-                "code": "200", 
-                "reasonPhrase": "OK"
-            }
-        }
-    ]
-}
 
 
 03. GET /v2/entities?id=E1&idPattern=.*
