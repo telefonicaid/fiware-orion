@@ -322,12 +322,12 @@ HttpStatusCode mongoAttributesForEntityType
       return SccOk;
   }
 
-  /* Processing result to build response*/
+  /* Processing result to build response */
   LM_T(LmtMongo, ("aggregation result: %s", result.toString().c_str()));
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
 
-  responseP->entityCount = resultsArray.size();
+  responseP->entityCount = resultsArray.size();  // FIXME P10: Here we need the number of entities with type 'entityType'
 
   if (resultsArray.size() == 0)
   {
@@ -339,7 +339,7 @@ HttpStatusCode mongoAttributesForEntityType
   /* See comment above in the other method regarding this strategy to implement pagination */
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
-    BSONElement        idField    = resultsArray[ix].embeddedObject().getField("_id");
+    BSONElement  idField    = resultsArray[ix].embeddedObject().getField("_id");
 
     //
     // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
@@ -353,7 +353,9 @@ HttpStatusCode mongoAttributesForEntityType
       continue;
     }
 
-    ContextAttribute*  ca = new ContextAttribute(idField.str(), "", "");
+    std::string attrType = "";  // FIXME P10: Here we need the name of the attribute-type
+
+    ContextAttribute*  ca = new ContextAttribute(idField.str(), attrType, "");
     responseP->entityType.contextAttributeVector.push_back(ca);
   }
 

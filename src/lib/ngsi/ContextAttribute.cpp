@@ -470,13 +470,17 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement)
+std::string ContextAttribute::toJson(bool isLastElement, bool types)
 {
   std::string  out;
 
-  LM_M(("KZ2: valueType: %d, type: '%s'", valueType, type.c_str()));
+  LM_M(("KZ: Attribute '%s': valueType '%s', type '%s'", name.c_str(), valueTypeName(valueType), type.c_str()));
 
-  if ((type == "") && (metadataVector.size() == 0))
+  if (types == true)
+  {
+    out = JSON_STR(name) + ":{" + JSON_STR("type") + ":" + JSON_STR(type) + "}"; 
+  }
+  else if ((type == "") && (metadataVector.size() == 0))
   {
     if (compoundValueP != NULL)
     {

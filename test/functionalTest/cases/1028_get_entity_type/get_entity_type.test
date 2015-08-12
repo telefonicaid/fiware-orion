@@ -48,8 +48,8 @@ echo "======================"
 payload='{
   "type": "T1",
   "id":   "E1",
-  "A1": 1,
-  "A2": "2"
+  "A1": { "type": "String", "value": "s" },
+  "A2": { "type": "Int", "value": 2 }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -91,10 +91,10 @@ Date: REGEX(.*)
     "attrs":
     {
         "A1": {
-            "value": 1
+            "type": "String"
         }, 
         "A2": {
-            "value": "2"
+            "type": "Int"
         }
     }
 }
@@ -102,4 +102,4 @@ Date: REGEX(.*)
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB
