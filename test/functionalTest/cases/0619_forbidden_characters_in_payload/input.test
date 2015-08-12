@@ -700,14 +700,14 @@ Date: REGEX(.*)
 15. JSON: Intent to query an entity with  ';' as part of a scopeType
 ====================================================================
 HTTP/1.1 200 OK
-Content-Length: 129
+Content-Length: 128
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "errorCode": {
         "code": "400", 
-        "details": "Illegal value for JSON field", 
+        "details": "illegal chars in scope type", 
         "reasonPhrase": "Bad Request"
     }
 }

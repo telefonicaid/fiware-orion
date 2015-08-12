@@ -25,7 +25,10 @@ getEntities.cpp
 postEntities.cpp
 entryPointsTreat.cpp
 getEntity.cpp
+putEntity.cpp
+patchEntity.cpp
 getEntityAttribute.cpp
+getEntityAttributeValue.cpp
 postEntity.cpp
 deleteEntity.cpp
 getEntityType.cpp
@@ -36,7 +39,10 @@ getEntities.h
 postEntities.h
 entryPointsTreat.h
 getEntity.h
+putEntity.h
+patchEntity.h
 getEntityAttribute.h
+getEntityAttributeValue.h
 postEntity.h
 deleteEntity.h
 getEntityType.h

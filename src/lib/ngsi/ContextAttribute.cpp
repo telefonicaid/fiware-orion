@@ -31,6 +31,7 @@
 #include "common/globals.h"
 #include "common/tag.h"
 #include "orionTypes/OrionValueType.h"
+#include "parse/forbiddenChars.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -324,14 +325,39 @@ std::string ContextAttribute::renderAsJsonObject
   {
     if (omitValue == false)
     {
+      std::string effectiveValue        = "";
+      bool        valueIsNumberOrBool   = false;
+
+      switch (valueType)
+      {
+      case ValueTypeString:
+        effectiveValue = stringValue;
+        break;
+
+      case ValueTypeBoolean:
+        effectiveValue      = boolValue? "true" : "false";
+        valueIsNumberOrBool = true;
+        break;
+
+      case ValueTypeNumber:
+        char num[32];
+        snprintf(num, sizeof(num), "%f", numberValue);
+        effectiveValue      = std::string(num);
+        valueIsNumberOrBool = true;
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", valueType));
+      }
+
       //
       // NOTE
       // renderAsJsonObject is used in v1 only.
       // => we only need to care about stringValue (not boolValue nor numberValue)
       //
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                      (request != RtUpdateContextResponse)? stringValue : "",
-                      ciP->outFormat, commaAfterContextValue);
+                      (request != RtUpdateContextResponse)? effectiveValue : "",
+                      ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);
     }
   }
   else
@@ -427,12 +453,35 @@ std::string ContextAttribute::render
   {
     if (omitValue == false)
     {
-      if ((valueType == orion::ValueTypeString) || (ciP->apiVersion != "v2"))
+      std::string effectiveValue      = "";
+      bool        valueIsNumberOrBool = false;
+
+      switch (valueType)
       {
-        out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                        (request != RtUpdateContextResponse)? stringValue : "",
-                        ciP->outFormat, commaAfterContextValue);
+      case ValueTypeString:
+        effectiveValue = stringValue;
+        break;
+
+      case ValueTypeBoolean:
+        effectiveValue      = boolValue? "true" : "false";
+        valueIsNumberOrBool = true;
+        break;
+
+      case ValueTypeNumber:
+        char num[32];
+        snprintf(num, sizeof(num), "%f", numberValue);
+        effectiveValue      = std::string(num);
+        valueIsNumberOrBool = true;
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
+
+      out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                        (request != RtUpdateContextResponse)? effectiveValue : "",
+                        ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);
+
     }
     else if (request == RtUpdateContextResponse)
     {
@@ -591,6 +640,9 @@ std::string ContextAttribute::check
     return "missing attribute name";
   }
 
+  if (forbiddenChars(name.c_str()))  { return "Invalid characters in attribute name"; }
+  if (forbiddenChars(type.c_str()))  { return "Invalid characters in attribute type"; }
+
   if ((compoundValueP != NULL) && (compoundValueP->childV.size() != 0))
   {
     // FIXME P9: Use CompoundValueNode::check here and stop calling it from where it is called right now.
@@ -598,7 +650,15 @@ std::string ContextAttribute::check
     return "OK";
   }
 
-  return "OK";
+  if (valueType == orion::ValueTypeString)
+  {
+    if (forbiddenChars(stringValue.c_str()))
+    {
+      return "Invalid characters in attribute value";
+    }
+  }
+
+  return metadataVector.check(requestType, format, indent + "  ", predetectedError, counter);
 }
 
 

@@ -80,7 +80,7 @@ void subCacheMutexWaitingTimeGet(char* buf, int bufLen)
 */
 SubscriptionCache::SubscriptionCache()
 {
-  dbPrefix = "";
+  tenant = "";
 }
 
 
@@ -89,9 +89,9 @@ SubscriptionCache::SubscriptionCache()
 *
 * SubscriptionCache::SubscriptionCache - 
 */
-SubscriptionCache::SubscriptionCache(std::string _dbPrefix)
+SubscriptionCache::SubscriptionCache(std::string _tenant)
 {
-  dbPrefix = _dbPrefix;
+  tenant = _tenant;
 }
 
 
@@ -253,7 +253,7 @@ void SubscriptionCache::fillFromDb(void)
   //
   // Add the 'default tenant'
   //
-  tenantV.push_back(dbPrefix);
+  tenantV.push_back(tenant);
 
   for (unsigned int ix = 0; ix < tenantV.size(); ++ix)
   {

@@ -86,16 +86,12 @@
 #include "common/compileInfo.h"
 
 #include "orionTypes/EntityTypesResponse.h"
-
-#include "serviceRoutines/logTraceTreat.h"
-
 #include "ngsi/ParseData.h"
 #include "ngsiNotify/onTimeIntervalThread.h"
-
+#include "serviceRoutines/logTraceTreat.h"
 #include "serviceRoutines/getEntityTypes.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
 #include "serviceRoutines/getAllContextEntities.h"
-
 #include "serviceRoutines/versionTreat.h"
 #include "serviceRoutines/statisticsTreat.h"
 #include "serviceRoutines/exitTreat.h"
@@ -113,7 +109,6 @@
 #include "serviceRoutines/postUnsubscribeContext.h"
 #include "serviceRoutines/postNotifyContext.h"
 #include "serviceRoutines/postNotifyContextAvailability.h"
-
 #include "serviceRoutines/postSubscribeContextConvOp.h"
 #include "serviceRoutines/postSubscribeContextAvailabilityConvOp.h"
 #include "serviceRoutines/getContextEntitiesByEntityId.h"
@@ -128,7 +123,6 @@
 #include "serviceRoutines/postContextEntityTypeAttribute.h"
 #include "serviceRoutines/putAvailabilitySubscriptionConvOp.h"
 #include "serviceRoutines/deleteAvailabilitySubscriptionConvOp.h"
-
 #include "serviceRoutines/getIndividualContextEntity.h"
 #include "serviceRoutines/putIndividualContextEntity.h"
 #include "serviceRoutines/badVerbPostOnly.h"
@@ -137,6 +131,7 @@
 #include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
+#include "serviceRoutines/badVerbAllFive.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
@@ -164,7 +159,6 @@
 #include "serviceRoutines/postContextEntitiesByEntityIdAndType.h"
 #include "serviceRoutines/getEntityByIdAttributeByNameWithTypeAndId.h"
 #include "serviceRoutines/postEntityByIdAttributeByNameWithTypeAndId.h"
-
 #include "serviceRoutines/badVerbGetPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
 #include "serviceRoutines/badVerbGetOnly.h"
@@ -177,15 +171,16 @@
 #include "serviceRoutinesV2/entryPointsTreat.h"
 #include "serviceRoutinesV2/getEntity.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "serviceRoutinesV2/getEntityAttributeValue.h"
 #include "serviceRoutinesV2/postEntities.h"
+#include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 #include "serviceRoutinesV2/getEntityType.h"
+#include "serviceRoutinesV2/patchEntity.h"
 
 #include "contextBroker/version.h"
-
 #include "common/string.h"
-
 #include "cache/subCache.h"
 #include "cache/SubscriptionCache.h"
 
@@ -370,6 +365,11 @@ PaArgument paArgs[] =
 #define ENTT                EntityTypeRequest
 #define ENTT_COMPS_V2       3, { "v2", "type", "*" }
 #define ENTT_COMPS_WORD     ""
+
+
+#define IENTATTRVAL                EntityAttributeValueRequest
+#define IENTATTRVAL_COMPS_V2       6, { "v2", "entities", "*", "attrs", "*", "value" }
+#define IENTATTRVAL_COMPS_WORD     ""
 
 
 //
@@ -617,25 +617,29 @@ PaArgument paArgs[] =
 
 
 
-#define API_V2                                                                                     \
-  { "GET",    EPS,       EPS_COMPS_V2,         ENT_COMPS_WORD,       entryPointsTreat           }, \
-  { "*",      EPS,       EPS_COMPS_V2,         ENT_COMPS_WORD,       badVerbAllFour             }, \
-                                                                                                   \
-  { "GET",    ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       getEntities                }, \
-  { "POST",   ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       postEntities               }, \
-  { "*",      ENT,       ENT_COMPS_V2,         ENT_COMPS_WORD,       badVerbGetPostOnly         }, \
-                                                                                                   \
-  { "GET",    IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      getEntity                  }, \
-  { "DELETE", IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      deleteEntity               }, \
-  { "POST",   IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      postEntity                 }, \
-  { "*",      IENT,      IENT_COMPS_V2,        IENT_COMPS_WORD,      badVerbGetPostDeleteOnly   }, \
-                                                                                                   \
-  { "GET",    IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  getEntityAttribute         }, \
-  { "*",      IENTATTR,  IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,  badVerbGetOnly             }, \
-                                                                                                   \
-  { "GET",    ENTT,      ENTT_COMPS_V2,        ENTT_COMPS_WORD,      getEntityType              }, \
-  { "*",      ENTT,      ENTT_COMPS_V2,        ENTT_COMPS_WORD,      badVerbGetOnly             }
-
+#define API_V2                                                                                         \
+  { "GET",    EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          entryPointsTreat         }, \
+  { "*",      EPS,          EPS_COMPS_V2,         ENT_COMPS_WORD,          badVerbAllFour           }, \
+                                                                                                       \
+  { "GET",    ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          getEntities              }, \
+  { "POST",   ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          postEntities             }, \
+  { "*",      ENT,          ENT_COMPS_V2,         ENT_COMPS_WORD,          badVerbGetPostOnly       }, \
+                                                                                                       \
+  { "GET",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         getEntity                }, \
+  { "POST",   IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         postEntity               }, \
+  { "PUT",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         putEntity                }, \
+  { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
+  { "PATCH",  IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         patchEntity              }, \
+  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbAllFive           }, \
+                                                                                                       \
+  { "GET",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  getEntityAttributeValue  }, \
+  { "*",      IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  badVerbGetOnly           }, \
+                                                                                                       \
+  { "GET",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     getEntityAttribute       }, \
+  { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetOnly           }, \
+                                                                                                       \
+  { "GET",    ENTT,          ENTT_COMPS_V2,       ENTT_COMPS_WORD,         getEntityType            }, \
+  { "*",      ENTT,          ENTT_COMPS_V2,       ENTT_COMPS_WORD,         badVerbGetOnly           }
 
 #define REGISTRY_STANDARD_REQUESTS_V0                                                                    \
   { "POST",   RCR,   RCR_COMPS_V0,         RCR_POST_WORD,   postRegisterContext                       }, \

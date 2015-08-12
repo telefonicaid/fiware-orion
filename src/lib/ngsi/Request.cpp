@@ -106,6 +106,8 @@ const char* requestType(RequestType rt)
   case EntityResponse:                                   return "EntityResponse";
   case EntityAttributeRequest:                           return "EntityAttributeRequest";
   case EntityAttributeResponse:                          return "EntityAttributeResponse";
+  case EntityAttributeValueRequest:                      return "EntityAttributeValueRequest";
+  case EntityAttributeValueResponse:                     return "EntityAttributeValueResponse";
   case PostEntity:                                       return "PostEntity";
   case PostAttributes:                                   return "PostAttributes";
   case DeleteEntity:                                     return "DeleteEntity";

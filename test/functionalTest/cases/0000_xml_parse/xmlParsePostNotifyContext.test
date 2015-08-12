@@ -52,9 +52,9 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
                 <value>1110</value>
               </contextMetadata>
               <contextMetadata>
-                <name></name>
-                <type></type>
-                <value></value>
+                <name>id2</name>
+                <type>t2</type>
+                <value>vvv</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>
@@ -69,9 +69,9 @@ payload='<?xml version="1.0" encoding="UTF-8"?>
                 <value>1110</value>
               </contextMetadata>
               <contextMetadata>
-                <name></name>
-                <type></type>
-                <value></value>
+                <name>id2</name>
+                <type>td2</type>
+                <value>ccc</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>

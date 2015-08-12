@@ -54,6 +54,8 @@
 #include "ngsiNotify/Notifier.h"
 #include "parse/CompoundValueNode.h"
 
+#include "common/wsStrip.h"
+
 using namespace mongo;
 using std::auto_ptr;
 
@@ -1003,6 +1005,348 @@ static bool processAreaScope(Scope* scoP, BSONObj &areaQuery)
   return true;
 }
 
+/* ****************************************************************************
+*
+* qStringFilters -
+*
+* FIXME P9: this function currently abuses of the std::string() wrapping for char* in order to
+* make comparisons work. An smarter solution could be developed.
+*
+*/
+static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
+{
+  char* str         = strdup(in.c_str());
+  char* toFree      = str;
+#if 0
+  int   statementNo = 0;
+#endif
+  char* s;
+
+  while ((s = strtok(str, ";")) != NULL)
+  {
+    char*               left;
+    char*               op;
+    char*               right;
+    char*               rangeFrom = (char*) "";
+    char*               rangeTo   = (char*) "";
+    std::vector<char*>  valVector;
+
+    s = wsStrip(s);
+
+#if 0
+    printf("statement %d: %s\n", statementNo, s);
+#endif
+
+    left = s;
+    if ((op = (char*) strstr(s, "==")) != NULL)
+    {
+      *op = 0;
+
+      right = &op[2];
+      op    = (char*) "==";
+
+    }
+    else if ((op = (char*) strstr(s, "!=")) != NULL)
+    {
+      *op = 0;
+
+      right = &op[2];
+      op    = (char*) "!=";
+    }
+    else if ((op = (char*) strstr(s, ">=")) != NULL)
+    {
+      *op = 0;
+
+      right = &op[2];
+      op    = (char*) ">=";
+    }
+    else if ((op = (char*) strstr(s, "<=")) != NULL)
+    {
+      *op = 0;
+
+      right = &op[2];
+      op    = (char*) "<=";
+    }
+    else if ((op = (char*) strstr(s, "<")) != NULL)
+    {
+      *op = 0;
+
+      right = &op[1];
+      op    = (char*) "<";
+    }
+    else if ((op = (char*) strstr(s, ">")) != NULL)
+    {
+      *op = 0;
+
+      right = &op[1];
+      op    = (char*) ">";
+    }
+    else if (s[0] == '-')
+    {
+      left  = (char*) "";
+      op    = (char*) "NOT EXISTS";
+      right = wsStrip(&s[1]);
+    }
+    else if (s[0] == '+')
+    {
+      left  = (char*) "";
+      op    = (char*) "EXISTS";
+      right = wsStrip(&s[1]);
+    }
+    else
+    {
+      printf("\nNo OP found\n");
+      op    = (char*) "";
+      right = (char*) "";
+    }
+
+    left  = wsStrip(left);
+    right = wsStrip(right);
+
+    if ((std::string(op) == "==") || (std::string(op) == "!="))
+    {
+      char* del;
+
+      //
+      // 1.  range?   A..B
+      // 2.  list?    A,B,C
+      // 2.1 if list, check single quotes
+      //
+
+      if ((del = strstr(right, "..")) != NULL)
+      {
+        *del = 0;
+        rangeFrom = right;
+        rangeTo   = &del[2];
+
+        right     = (char*) "";
+        rangeFrom = wsStrip(rangeFrom);
+        rangeTo   = wsStrip(rangeTo);
+      }
+      else if ((del = strstr(right, ",")) != NULL)
+      {
+        char* start         = right;
+        char* cP            = right;
+        bool  insideQuotes  = false;
+        bool  done          = false;
+
+        while (done == false)
+        {
+          if (*cP == '\'')
+          {
+            insideQuotes = (insideQuotes == true)? false : true;
+          }
+          else if ((*cP == ',') || (*cP == 0))
+          {
+            // 1. If end-of-string reached, then this is the last loop
+            if (*cP == 0)
+            {
+              done = true;
+            }
+
+
+            if (!insideQuotes)
+            {
+              //
+              // If we are inside single-quotes, then do nothing, just advance the char pointer (++cP)
+              // If not inside queotes, we are on a comma, so a new value is to be pushed onto the value vector.
+              //
+
+              // 2. Remove beginning quote, if there
+              if (*start == '\'')
+              {
+                *start = 0;
+                ++start;
+              }
+
+              // 3. Null-out the comma
+              *cP = 0;
+
+              // 4. Remove trailing quote, if there
+              if (cP[-1] == '\'')
+              {
+                cP[-1] = 0;
+              }
+
+              // 5. Push the value onto the vector of values
+              valVector.push_back(wsStrip(start));
+
+              // 6. Make point start to the beginning of the next value
+              start = &cP[1];
+            }
+          }
+
+          ++cP;
+        }
+
+        right = (char*) "";
+      }
+    }
+
+#if 0
+    // FIXME P10: I leave this block just in case you need if you continue working on this. It should
+    // be removed at the end
+    if (std::string(left)      != "") printf("  left:        %s\n", left);
+    if (std::string(op)        != "") printf("  OP:          %s\n", op);
+    if (std::string(right)     != "") printf("  right:       %s\n", right);
+    if (std::string(rangeFrom) != "") printf("  rangeFrom:   %s\n", rangeFrom);
+    if (std::string(rangeTo)   != "") printf("  rangeTo:     %s\n", rangeTo);
+    if (valVector.size() != 0)
+    {
+      for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+      {
+        printf("  value %02d: \"%s\"\n", ix, valVector[ix]);
+      }
+    }
+    printf("\n");
+
+    ++statementNo;
+#endif
+    str = NULL;  // So that strtok continues eating the initial string
+
+    /* Build the BSON filter */
+    std::string k = std::string(ENT_ATTRS) + "." + left + "." ENT_ATTRS_VALUE;
+    bool pushBackFilter = true;
+    BSONObj f;
+    if (std::string(op) == "==")
+    {
+      if (std::string(rangeFrom) != "")
+      {
+        f = BSON(k << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo)));
+      }
+      else if (valVector.size() > 0)
+      {
+        BSONArrayBuilder ba;
+        for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+        {
+          if (isFloat(valVector[ix]))
+          {
+            // number
+            ba.append(atof(valVector[ix]));
+          }
+          else
+          {
+            // string
+            ba.append(valVector[ix]);
+          }
+        }
+        f = BSON(k << BSON("$in" << ba.arr()));
+      }
+      else
+      {
+        // Single value
+        if (isFloat(right))
+        {
+          // number
+          f = BSON(k << BSON("$in" << BSON_ARRAY(atof(right))));
+        }
+        else
+        {
+          // string
+          f = BSON(k << BSON("$in" << BSON_ARRAY(right)));
+        }
+      }
+    }
+    else if (std::string(op) == "!=")
+    {
+      if (std::string(rangeFrom) != "")
+      {
+        f = BSON(k << BSON("$exists" << true << "$not" << BSON("$gte" << atof(rangeFrom) << "$lte"  << atof(rangeTo))));
+      }
+      else if (valVector.size() > 0)
+      {
+        BSONArrayBuilder ba;
+        for (unsigned int ix = 0; ix < valVector.size(); ++ix)
+        {
+          if (isFloat(valVector[ix]))
+          {
+            // number
+            ba.append(atof(valVector[ix]));
+          }
+          else
+          {
+            // string
+            ba.append(valVector[ix]);
+          }
+        }
+        f = BSON(k << BSON("$exists" << true << "$nin" << ba.arr()));
+      }
+      else
+      {
+        // Single value
+        if (isFloat(right))
+        {
+          // number
+          f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(atof(right))));
+        }
+        else
+        {
+          // string
+          f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(right)));
+        }
+      }
+    }
+    else if (std::string(op) == ">")
+    {
+     f = BSON(k << BSON("$gt" << atof(right)));
+    }
+    else if (std::string(op) == "<")
+    {
+      f = BSON(k << BSON("$lt" << atof(right)));
+    }
+    else if (std::string(op) == ">=")
+    {
+      f = BSON(k << BSON("$gte" << atof(right)));
+    }
+    else if (std::string(op) == "<=")
+    {
+      f = BSON(k << BSON("$lte" << atof(right)));
+    }
+    else if (std::string(op) == "EXISTS")
+    {
+      if (std::string(right) == ENT_ENTITY_TYPE)
+      {
+        // Special case: entity type
+        k = std::string("_id.") + ENT_ENTITY_TYPE;
+        f = BSON(k << BSON("$exists" << true << "$ne" << ""));
+      }
+      else
+      {
+        // Regular attribute
+        k = std::string(ENT_ATTRS) + "." + right;
+        f = BSON(k << BSON("$exists" << true));
+      }
+    }
+    else if (std::string(op) == "NOT EXISTS")
+    {
+      if (std::string(right) == ENT_ENTITY_TYPE)
+      {
+        // Special case: entity type
+        k = std::string("_id.") + ENT_ENTITY_TYPE;
+        f = BSON("$or" << BSON_ARRAY(BSON(k << "") << BSON(k << BSON("$exists" << false))));
+      }
+      else
+      {
+        // Regular attribute
+        k = std::string(ENT_ATTRS) + "." + right;
+        f = BSON(k << BSON("$exists" << false));
+      }
+    }
+    else
+    {
+       LM_W(("Bad Input (unknown query operator: %s", op));
+       pushBackFilter = false;
+    }
+
+    if (pushBackFilter)
+    {
+      filters.push_back(f);
+    }
+  }
+
+  free(toFree);
+}
+
 
 /* *****************************************************************************
 *
@@ -1150,6 +1494,7 @@ bool entitiesQuery
 
     if (sco->type.find(SCOPE_FILTER) == 0)
     {
+      // FIXME P5: NGSI "v1" filter, probably to be removed in the future
       addFilterScope(sco, filters);
     }
     else if (sco->type == FIWARE_LOCATION || sco->type == FIWARE_LOCATION_DEPRECATED)
@@ -1170,6 +1515,10 @@ bool entitiesQuery
           finalQuery.append(locCoords, areaQuery);
         }
       }
+    }
+    else if (sco->type == SCOPE_TYPE_SIMPLE_QUERY)
+    {
+      qStringFilters(sco->value, filters);
     }
     else
     {

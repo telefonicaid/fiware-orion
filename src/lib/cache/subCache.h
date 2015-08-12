@@ -46,7 +46,7 @@ extern SubscriptionCache* subCache;
 *
 * subscriptionCacheInit - 
 */
-extern void subscriptionCacheInit(std::string dbName);
+extern void subscriptionCacheInit(std::string tenant);
 
 
 

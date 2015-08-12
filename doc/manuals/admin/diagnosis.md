@@ -1,4 +1,15 @@
-# Problem diagnosis procedures
+#<a name="top"></a>Problem diagnosis procedures
+
+* [Introduction](#introduction)
+    * [Sanity check procedures](#sanity-check-procedures)
+	  * [Checking Orion is up and running](#checking-orion-is-up-and-running)
+	  * [List of Running Processes](#list-of-running-processes)
+	  * [Network interfaces Up & Open](#network-interfaces-up--open)
+	  * [Database server](#database-server)
+    * [Diagnose database connection problems](#diagnose-database-connection-problems)
+    * [Diagnose spontaneous binary corruption problems**](#diagnose-spontaneous-binary-corruption-problems**)
+	  
+# Introduction
 
 The Diagnosis Procedures are the first steps that a System Administrator
 will take to locate the source of an error in Orion. Once the nature of
@@ -16,6 +27,8 @@ will take to verify that an installation is ready to be tested. This is
 therefore a preliminary set of tests to ensure that obvious or basic
 malfunctioning is fixed before proceeding to unit tests, integration
 tests and user validation.
+
+[Top](#top)
 
 ### Checking Orion is up and running
 
@@ -39,6 +52,7 @@ curl localhost:1026/version
   <compiled_in>debvm</compiled_in>
 </orion>
 ```
+[Top](#top)
 
 ### List of Running Processes
 
@@ -49,10 +63,14 @@ $ ps ax | grep contextBroker
  8517 ?        Ssl    8:58 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbhost localhost -db orion
 ```
 
+[Top](#top)
+
 ### Network interfaces Up & Open
 
 Orion Context Broker uses TCP 1026 as default port, although it can be
 changed using the -port command line option.
+
+[Top](#top)
 
 ### Database server
 
@@ -81,6 +99,8 @@ given moment.
 > db.csubs.count()
 > db.casubs.count()
 ```
+
+[Top](#top)
 
 ## Diagnose database connection problems
 
@@ -140,6 +160,8 @@ is able to reconnect to the database once it gets ready again. In other
 words, you don't need to restart the broker in order to re-connect to
 the database.
 
+[Top](#top)
+
 ## Diagnose spontaneous binary corruption problems**
 
 The symptoms of this problem are:
@@ -182,4 +204,5 @@ The solution fo this problems is:
 yum remove contextBroker
 yum install contextBroker
 ```
+[Top](#top)
 
