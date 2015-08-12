@@ -332,7 +332,7 @@ contextAttribute elements ('attributes' for short, in JSON). Each
 contextAttribute provides the value for a given attribute (identified by
 name and type) of the entity. Apart from the list of contextElement
 elements, the payload includes also an updateAction element. We use
-APPEND, which means that we want to add new information.
+APPEND, which means that we wa      nt to add new information.
 
 Orion Context Broker doesn't perform any checking on types (e.g. it doesn't
 check that when a context producer application updates the value of the
@@ -343,35 +343,35 @@ Upon receipt of this request, the broker will create the entity in its
 internal database, set the values for its attributes and will response
 with the following:
 
-      ```
-      {
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": ""
-			  },
-			  {
-			      "name": "pressure",
-			      "type": "integer",
-			      "value": ""
-			  }
-		      ],
-		      "id": "Room1",
-		      "isPattern": "false",
-		      "type": "Room"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	    ]
-      }
-      ```                          
+```
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": ""
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "integer",
+                        "value": ""
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+```                          
 
 As you can see, it follows the same structure as the request, just to
 acknowledge that the request was correctly processed for these context
@@ -383,62 +383,61 @@ Next, let's create Room2 in a similar way (in this case, setting
 temperature and pressure to 21 ºC and 711 mmHg respectively).
 
 ```
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool ) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room2",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "21"
-		      },
-		      {
-			  "name": "pressure",
-			  "type": "integer",
-			  "value": "711"
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "APPEND"
-      }
-      EOF                                                                                                                       
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool ) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room2",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "21"
+                },
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "value": "711"
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}EOF                                                                                                                       
 ```
 
 The response to this request is:
 
 ```
-      {
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": ""
-			  },
-			  {
-			      "name": "pressure",
-			      "type": "integer",
-			      "value": ""
-			  }
-		      ],
-		      "id": "Room2",
-		      "isPattern": "false",
-		      "type": "Room"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-		}
-	    ]
-      }	             
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": ""
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "integer",
+                        "value": ""
+                    }
+                ],
+                "id": "Room2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}            
 ```
 
 Apart from simple values (i.e. strings) for attribute values, you can
@@ -458,17 +457,17 @@ graphical user interface). The NGSI10 queryContext request is used in
 this case, e.g. to get context information for Room1:
 
 ```
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      }
-	  ]
-      }
-      EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ]
+}
+EOF
 ```
 
 The response includes all the attributes belonging to Room1 and we can
@@ -476,79 +475,79 @@ check that temperature and pressure have the values that we set at
 entity creation with updateContext (23ºC and 720 mmHg).
 
 ```
-      {
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": "23"
-			  },
-			  {
-			      "name": "pressure",
-			      "type": "integer",
-			      "value": "720"
-			  }
-		      ],
-		      "id": "Room1",
-		      "isPattern": "false",
-		      "type": "Room"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "23"
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "integer",
+                        "value": "720"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
 ```                       
 
 If you use an empty attributes element in the request, the response will include all the attributes of the entity. If you include an actual list of attributes (e.g. temperature) only that are retrieved, as shown in the following request:
 
 ```
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ]
-      }
-      EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ]
+}
+EOF
 ```
 
 which response is as follows:
 
 ```
-      {
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": "23"
-			  }
-		      ],
-		      "id": "Room1",
-		      "isPattern": "false",
-		      "type": "Room"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		    }
-	      }
-	  ]
-      }                       
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "23"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}                    
 ```
 
 Moreover, a powerful feature of Orion Context Broker is that you can use
@@ -557,131 +556,131 @@ entities which ID starts with "Room" using the regex "Room.\*". In this
 case, you have to set isPattern to "true" as shown below:
 
 ```
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      },
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room2"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ]
-      }
-      EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        },
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room2"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ]
+}
+EOF
 ```
 ```
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "true",
-		  "id": "Room.*"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ]
-      }
-      EOF                                                                                                                       }
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "true",
+            "id": "Room.*"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ]
+}
+EOF                                                                                                                       }
 ```                                                                                                                                  
   
 
 Both produce the same response:
 
 ```
-      {
-	  "contextResponses": [
-	    {
-		"contextElement": {
-		      "attributes": [
-			{
-			      "name": "temperature",
-			      "type": "float",
-			      "value": "23"
-			}
-		      ],
-		      "id": "Room1",
-		      "isPattern": "false",
-		      "type": "Room"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      },
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": "21"
-			  }
-		      ],
-		      "id": "Room2",
-		      "isPattern": "false",	
-		      "type": "Room"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }                        
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "23"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "21"
+                    }
+                ],
+                "id": "Room2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}                        
 ```
 
 Finally, note that you will get an error in case you try to query a
 non-existing entity or attribute, as shown in the following cases below:
 
 ```
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room5"
-	      }
-	  ]
-      }
-      EOF                                                                                                                   
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room5"
+        }
+    ]
+}
+EOF                                                                                                                   
 ```
 ```
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      }
-	  ],
-	  "attributes": [
-	      "humidity"
-	  ]
-      }
-      EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "attributes": [
+        "humidity"
+    ]
+}
+EOF
 ```
 
 Both requests will produce the same error response:
 
 ```
-      {
-	  "errorCode": {
-	      "code": "404",
-	      "reasonPhrase": "No context elements found"
-	  }
-      }
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context elements found"
+    }
+}
 ```
 
 Additional comments:
@@ -700,17 +699,17 @@ Additional comments:
 
 <!-- -->
 ```
-      (curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      }
-	  ]
-      }
-      EOF
+(curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ]
+}
+EOF
 ```
 
 [Top](#top)
@@ -730,30 +729,29 @@ given moment wants to set the temperature and pressure of Room1 to 26.5
 ºC and 763 mmHg respectively, so it issues the following request:
 
 ```
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "26.5"
-		      },
-		      {
-			  "name": "pressure",
-			  "type": "integer",
-			  "value": "763"
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "UPDATE"
-      }
-      EOF                                                                                                                    
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "26.5"
+                },
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "value": "763"
+                }
+            ]
+        }
+    ],
+"updateAction": "UPDATE"
+}EOF                                                                                                                    
 ```
 
 As you can see, the structure of the request is exactly the same we used
@@ -767,33 +765,33 @@ following:
 
 
 ```
-      {
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": ""
-			  },
-			  {
-			      "name": "pressure",
-			      "type": "integer",
-			      "value": ""
-			  }
-		      ],
-		      "id": "Room1",
-		      "isPattern": "false",
-		      "type": "Room"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }                     
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": ""
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "integer",
+                        "value": ""
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}                    
       
 ```
 
@@ -816,97 +814,97 @@ entity in the updateContext, just the ones you want to update (the other
 attributes maintain their current value).
 
 ```
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room2",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "27.4"
-		      }
-		  ]
-	      }
-	    ],
-	    "updateAction": "UPDATE"
-      }
-      EOF                                                                                                                       
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room2",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "27.4"
+                }
+            ]
+        }
+    ],
+    "updateAction": "UPDATE"
+} EOF                                                                                                                       
 ```
 ```
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room2",
-		  "attributes": [
-		      {
-			  "name": "pressure",
-			  "type": "integer",
-			  "value": "755"
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "UPDATE"
-      }
-      EOF 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room2",
+            "attributes": [
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "value": "755"
+                }
+            ]
+        }
+    ],
+    "updateAction": "UPDATE"
+} EOF 
 ```
   
 The responses for these requests are respectively:
 
-      {
-	  "contextResponses": [
-	      {
-		    "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": ""
-			  }
-		      ],
-		      "id": "Room2",
-		      "isPattern": "false",
-		      "type": "Room"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }
-                 
+```
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": ""
+                    }
+                ],
+                "id": "Room2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+```                
   
- 
-      {
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "pressure",
-			      "type": "integer",
-			      "value": ""
-			  }
-		      ],
-		      "id": "Room2",
-		      "isPattern": "false",
-		      "type": "Room"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }
+```
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "pressure",
+                        "type": "integer",
+                        "value": ""
+                    }
+                ],
+                "id": "Room2",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+```
 
 Now, you can use queryContext operation [as previously
 described](#query-context-operation) to check that Room1 and
@@ -948,30 +946,32 @@ current version of the Orion Context Broker doesn't support it.
 The following is the request corresponding to an ONTIMEINTERVAL
 subscription:
 
-      (curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ],
-	  "reference": "http://localhost:1028/accumulate",
-	  "duration": "P1M",
-	  "notifyConditions": [
-	      {
-		  "type": "ONTIMEINTERVAL",
-		  "condValues": [
-		      "PT10S"
-		    ]
-	      }
-	  ]
-      }
-      EOF
+```
+(curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ],
+    "reference": "http://localhost:1028/accumulate",
+    "duration": "P1M",
+    "notifyConditions": [
+        {
+            "type": "ONTIMEINTERVAL",
+            "condValues": [
+                "PT10S"
+            ]
+        }
+    ]
+}
+EOF
+```
 
 Let's examine in detail the different elements included in the payload:
 
@@ -1013,48 +1013,51 @@ The response corresponding to that request contains a subscription ID (a
 -Write it down because you will need it later in this tutorial) and a
 duration acknowledgement:
 
-      {
-	  "subscribeResponse": {
-	      "duration": "P1M",
-	      "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-	  }
-      }                                   
+```
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+    }
+}                            
+```
 
 If you look at the accumulator-script.py terminal window, you will see
 that a message resembling the following one is received each 10 seconds:
 
+```
+ POST http://localhost:1028/accumulate
+ Content-Length: 492
+ User-Agent: orion/0.9.0
+ Host: localhost:1028
+ Accept: application/xml, application/json
+ Content-Type: application/json
 
-      POST http://localhost:1028/accumulate
-      Content-Length: 492
-      User-Agent: orion/0.9.0
-      Host: localhost:1028
-      Accept: application/xml, application/json
-      Content-Type: application/json
-
-      {
-	  "subscriptionId": "51c04a21d714fb3b37d7d5a7",
-	  "originator": "localhost",
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": "26.5"
-			  }
-		      ],
-		      "type": "Room",
-		      "isPattern": "false",
-		      "id": "Room1"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }
+{
+    "subscriptionId": "51c04a21d714fb3b37d7d5a7",
+    "originator": "localhost",
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "26.5"
+                    }
+                ],
+                "type": "Room",
+                "isPattern": "false",
+                "id": "Room1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+```
 
 Orion Context Broker notifies NGSI10 subscribeContext using the POST
 HTTP method (on the URL used as reference for the subscription) with a
@@ -1084,27 +1087,32 @@ change the notification interval to 5 seconds we will use the following
 one that you have got in the subscribeContext response in the previous
 step) command:
 
-      (curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "subscriptionId": "51c04a21d714fb3b37d7d5a7",
-	  "notifyConditions": [
-	      {
-		  "type": "ONTIMEINTERVAL",
-		  "condValues": [
-		      "PT5S"
-		  ]
-	      }
-	  ]
-      }
-      EOF                                                                                                                                 
-  
+```
+(curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "subscriptionId": "51c04a21d714fb3b37d7d5a7",
+    "notifyConditions": [
+        {
+            "type": "ONTIMEINTERVAL",
+            "condValues": [
+                "PT5S"
+            ]
+        }
+    ]
+}
+EOF                                                                                                                                 
+```
+
 The response is very similar to the one for subscribeContext request:
 
-      {
-	  "subscribeResponse" : {
-	    "subscriptionId" : "51c04a21d714fb3b37d7d5a7",
-	  }
-      }             
+```
+{
+    "subscribeResponse": {
+        "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+       
+    }
+}          
+```
 
 You can check in accumulator-server.py that the notification frequency
 has changed to 5 seconds.
@@ -1115,23 +1123,24 @@ request payload (replace the subscriptionId value after copy-paste with
 the one that you get in the subscribeContext response in the previous
 step):
 
-      (curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-      }
-      EOF                                                                                                                          
-
+```
+(curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+} EOF                                                                                                                          
+```
 The response is just an acknowledgement of that the cancellation was
 successful.
 
-      {
-	    "statusCode": {
-		"code": "200",
-		"reasonPhrase": "OK"
-	    },
-	    "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-      }                              
-
+```
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+}                              
+```
 You can have a look at accumulator-server.py to check that the
 notification flow has stopped.
 
@@ -1147,32 +1156,32 @@ ONCHANGE subscriptions are used when you want to be notified not when a
 given time interval has passed but when some attribute changes. Let's
 consider the following example:
 
-      (curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ],
-	  "reference": "http://localhost:1028/accumulate",
-	  "duration": "P1M",
-	  "notifyConditions": [
-	      {
-		  "type": "ONCHANGE",
-		  "condValues": [
-		      "pressure"
-		  ]
-	      }
-	  ],
-	  "throttling": "PT5S"
-      }
-      EOF
-
+```
+(curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ],
+    "reference": "http://localhost:1028/accumulate",
+    "duration": "P1M",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "pressure"
+            ]
+        }
+    ],
+    "throttling": "PT5S"
+}EOF
+```
 
 Having a look at the payload we can check that it is very similar to the
 one used in ONTIMEINTERVAL, with two exceptions:
@@ -1213,50 +1222,52 @@ As in ONTIMEINTERVAL subscriptions, the response consists of a
 subscription ID, a duration acknowledgement and (given that we used
 throttling in the request) a throttling acknowledgement:
 
-      {
-	  "subscribeResponse": {
-	      "duration": "P1M",
-	      "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
-	      "throttling": "PT5S"
-	  }
-      }                                    
+```
+{
+    "subscribeResponse": {
+        "duration": "P1M",
+        "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
+        "throttling": "PT5S"
+    }
+}                                    
+```
 
 Let's have a look now at accumulator-server.py. We will see one (and
 just one by the moment, no matter how much you wait)
 notifyContextRequest, similar to this one:
 
-      POST http://localhost:1028/accumulate
-      Content-Length: 492
-      User-Agent: orion/0.9.0
-      Host: localhost:1028
-      Accept: application/xml, application/json
-      Content-Type: application/json
-    
-      {
-	  "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
-	  "originator": "localhost",
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": "26.5"
-			  }
-		      ],
-		      "type": "Room",
-		      "isPattern": "false",
-		      "id": "Room1"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }
-
+```
+POST http://localhost:1028/accumulate
+Content-Length: 492
+User-Agent: orion/0.9.0
+Host: localhost:1028
+Accept: application/xml, application/json
+Content-Type: application/json
+{
+    "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
+    "originator": "localhost",
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "26.5"
+                    }
+                ],
+                "type": "Room",
+                "isPattern": "false",
+                "id": "Room1"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+```
 
 You may wonder why accumulator-server.py is getting this message if you
 don't actually do any update. This is because the Orion Context Broker
@@ -1340,108 +1351,117 @@ need to make it aware of the existence of certain entities. Thus, let's
 first create Room1 entity with temperature and pressure attributes (with
 its initial values)
 
-      (curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
-      {
-	  "attributes": [
-	      {
-		  "name": "temperature",
-		  "type": "float",
-		  "value": "23"
-	      },
-	      {
-		  "name": "pressure",
-		  "type": "integer",
-		  "value": "720"
-	      }
-	  ]
-      }
-      EOF
+```
+(curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+{
+    "attributes": [
+        {
+            "name": "temperature",
+            "type": "float",
+            "value": "23"
+        },
+        {
+            "name": "pressure",
+            "type": "integer",
+            "value": "720"
+        }
+    ]
+} EOF
+```
 
 the response is:
 
-      {
-	  "contextResponses": [
-	      {
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": ""
-		      },
-		      {
-			  "name": "pressure",
-			  "type": "integer",
-			  "value": ""
-		      }
-		  ],
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ],
-	  "id": "Room1",
-	  "isPattern": "false",
-	  "type": ""
-      }        
+```
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": ""
+                },
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "Room1",
+    "isPattern": "false",
+    "type": ""
+}       
+```
 
 Now, let's do the same with Room2:
 
-      (curl localhost:1026/v1/contextEntities/Room2 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
-      {
-	  "attributes": [
-	      {
-		  "name": "temperature",
-		  "type": "float",
-		  "value": "21"
-	      },
-	      {
-		  "name": "pressure",
-		  "type": "integer",
-		  "value": "711"
-	      }
-	  ]
-      }
-      
+```
+(curl localhost:1026/v1/contextEntities/Room2 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+{
+    "attributes": [
+        {
+            "name": "temperature",
+            "type": "float",
+            "value": "21"
+        },
+        {
+            "name": "pressure",
+            "type": "integer",
+            "value": "711"
+        }
+    ]
+}
+```  
+
 which response is:
 
-      {
-	  "contextResponses": [
-	      {
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": ""
-		      },
-		      {
-			  "name": "pressure",
-			  "type": "integer",
-			  "value": ""
-		      }
-		    ],
-		    "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ],
-	  "id": "Room2",
-	  "isPattern": "false",
-	  "type": ""
-      }         
+```
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": ""
+                },
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ],
+    "id": "Room2",
+    "isPattern": "false",
+    "type": ""
+}      
+```
 
 You can also create an attribute (and the containing entity along the
 way) in the following way (additional attributes could be added after
 that, as described in [this
 section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)):
 
-      (curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
-      {
-	  "value" : "21"
-      }
+```
+(curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+{
+    "value" : "21"
+}
       EOF                                                                                                                                                               
- 
+```
+
 Compared to [entity creation based on standard
 operation](#entity_creation) we observe the following
 differences:
@@ -1461,24 +1481,25 @@ As alterative, you can use "POST /v1/contextEntitites" to create entities. In th
 entity information (ID and type) is included in the payload and the URL
 is independent of that fields, as shown below:
 
-    (curl localhost:1026/v1/contextEntities -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
-    {
-      "id": "Room1",
-      "type": "Room",
-      "attributes" : [
+```
+(curl localhost:1026/v1/contextEntities -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+{
+    "id": "Room1",
+    "type": "Room",
+    "attributes": [
         {
-          "name" : "temperature",
-          "type" : "float",
-          "value" : "23"
+            "name": "temperature",
+            "type": "float",
+            "value": "23"
         },
         {
-          "name" : "pressure",
-          "type" : "integer",
-          "value" : "720"
+            "name": "pressure",
+            "type": "integer",
+            "value": "720"
         }
-      ]
-    }
-    EOF
+    ]
+} EOF
+```
 
 Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures or custom metadata. These are advance
@@ -1497,31 +1518,31 @@ e.g. Room1 attributes:
       curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Accept: application/json' | python -mjson.tool
 
 which response is:
-
-      {
-	  "contextElement": {
-	      "attributes": [
-		  {
-		      "name": "temperature",
-		      "type": "float",
-		      "value": "23"
-		  },
-		  {
-		      "name": "pressure",
-		      "type": "integer",
-		      "value": "720"
-		  }
-	      ],
-	      "id": "Room1",
-	      "isPattern": "false",
-	      "type": "Room"
-	  },
-	  "statusCode": {
-	      "code": "200",
-	      "reasonPhrase": "OK"
-	  }
-      }                 
-
+```
+{
+    "contextElement": {
+        "attributes": [
+            {
+                "name": "temperature",
+                "type": "float",
+                "value": "23"
+            },
+            {
+                "name": "pressure",
+                "type": "integer",
+                "value": "720"
+            }
+        ],
+        "id": "Room1",
+        "isPattern": "false",
+        "type": "Room"
+    },
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}               
+```
 We can also query a single attribute of a given entity, e.g. Room2
 temperature:
 
@@ -1529,19 +1550,21 @@ temperature:
 
 which response is:
 
-      {
-	  "attributes": [
-	      {
-		  "name": "temperature",
-		  "type": "float",
-		  "value": "21"
-	      }
-	  ],
-	  "statusCode": {
-	      "code": "200",
-	      "reasonPhrase": "OK"
-	  }
-      }     
+```
+{
+    "attributes": [
+        {
+            "name": "temperature",
+            "type": "float",
+            "value": "21"
+        }
+    ],
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}    
+```
 
 Comparing to [standard queryContext
 operation](#query-context-operation) we observe the following
@@ -1565,75 +1588,57 @@ couple of entities of type Car using standard updateContext APPEND operations
 (given that, as described in previous section, you cannot create entities with
 types using convenience operations):
 
+```
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Car",
+            "isPattern": "false",
+            "id": "Car1",
+            "attributes": [
+                {
+                    "name": "speed",
+                    "type": "integer",
+                    "value": "75"
+                },
+                {
+                    "name": "fuel",
+                    "type": "float",
+                    "value": "12.5"
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+} EOF                                                                                                                    
+```
+```
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	    {
-	      "type": "Car",
-	      "isPattern": "false",
-	      "id": "Car1",
-	      "attributes": [
-	      {
-		"name": "speed",
-		"type": "integer",
-		"value": "75"
-	      },
-	      {
-		"name": "fuel",
-		"type": "float",
-		"value": "12.5"
-	      }
-	      ]
-	    }
-	    ],
-	    "updateAction": "APPEND"
-      }
-      EOF                                                                                                                    
- 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	    {
-	      "type": "Car",
-	      "isPattern": "false",
-	      "id": "Car2",
-	      "attributes": [
-	      {
-		"name": "speed",
-		"type": "integer",
-		"value": "90"
-	      },
-	      {
-		"name": "fuel",
-		"type": "float",
-		"value": "25.7"
-	      }
-	      ]
-	    }
-	  ],
-	  "updateAction": "APPEND"
-	}
-      EOF                                                                         
-        	"contextElements": [
-       	  {
-       	    "type": "Car",
-       	    "isPattern": "false",
-       	    "id": "Car1",
-       	    "attributes": [
-       	    {
-       	      "name": "speed",
-       	      "type": "integer",
-       	      "value": "75"
-       	    },
-       	    {
-       	      "name": "fuel",
-       	      "type": "float",
-       	      "value": "12.5"
-       	    }
-       	    ]
-       	  }
-       	  ],
-       	  "updateAction": "APPEND"
+{
+    "contextElements": [
+        {
+            "type": "Car",
+            "isPattern": "false",
+            "id": "Car2",
+            "attributes": [
+                {
+                    "name": "speed",
+                    "type": "integer",
+                    "value": "90"
+                },
+                {
+                    "name": "fuel",
+                    "type": "float",
+                    "value": "25.7"
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+} EOF  
+```
+
 Request to get all the attributes:
 
       curl localhost:1026/v1/contextEntityTypes/Car -s -S --header 'Accept: application/json' | python -mjson.tool
@@ -1646,56 +1651,59 @@ Request to get only one attribute (e.g. speed):
 
 Response:
 
-      {
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "speed",
-			      "type": "integer",
-			      "value": "75"
-			  },
-			  {
-			      "name": "fuel",
-			      "type": "float",
-			      "value": "12.5"
-			  }
-		      ],
-		      "id": "Car1",
-		      "isPattern": "false",
-		      "type": "Car"
-		    },
-		    "statusCode": {
-			"code": "200",
-			"reasonPhrase": "OK"
-		    }
-		},
-	      {
-	  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "speed",
-			      "type": "integer",
-			      "value": "90"
-			  },
-			  {
-			      "name": "fuel",
-			      "type": "float",
-			      "value": "25.7"
-			  }
-		      ],
-		      "id": "Car2",
-		      "isPattern": "false",
-		      "type": "Car"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }                        
+``` 
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "speed",
+                        "type": "integer",
+                        "value": "75"
+                    },
+                    {
+                        "name": "fuel",
+                        "type": "float",
+                        "value": "12.5"
+                    }
+                ],
+                "id": "Car1",
+                "isPattern": "false",
+                "type": "Car"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "speed",
+                        "type": "integer",
+                        "value": "90"
+                    },
+                    {
+                        "name": "fuel",
+                        "type": "float",
+                        "value": "25.7"
+                    }
+                ],
+                "id": "Car2",
+                "isPattern": "false",
+                "type": "Car"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+} 
+
+``` 
 
 Additional comments:
 
@@ -1708,33 +1716,36 @@ Additional comments:
 
 <!-- -->
 
-    curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S --header 'Accept: application/json' | python -mjson.tool
+``` 
+curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S --header 'Accept: application/json' | python -mjson.tool
 
-    {
-        "contextResponses": [
-            {
-                "contextElement": {
-                    "attributes": {
-                        "pressure": {
-                            "type": "integer",
-                            "value": "720"
-                        },
-                        "temperature": {
-                            "type": "float",
-                            "value": "23"
-                        }
+ {
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": {
+                    "pressure": {
+                        "type": "integer",
+                        "value": "720"
                     },
-                    "id": "Room1",
-                    "isPattern": "false",
-                    "type": "Room"
+                    "temperature": {
+                        "type": "float",
+                        "value": "23"
+                    }
                 },
-                "statusCode": {
-                    "code": "200",
-                    "reasonPhrase": "OK"
-                }
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
             }
-        ]
-    }
+        }
+    ]
+}
+
+``` 
 
 [Top](#top)
 
@@ -1746,56 +1757,58 @@ You can get all the entities using the following convenience operation:
 
 In our case, it will return both Room1 and Room2:
 
-    {
-        "contextResponses": [
-            {
-                "contextElement": {
-                    "attributes": [
-                        {
-                            "name": "temperature",
-                            "type": "float",
-                            "value": "23"
-                        },
-                        {
-                            "name": "pressure",
-                            "type": "integer",
-                            "value": "720"
-                        }
-                    ],
-                    "id": "Room1",
-                    "isPattern": "false",
-                    "type": ""
-                },
-                "statusCode": {
-                    "code": "200",
-                    "reasonPhrase": "OK"
-                }
+``` 
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "23"
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "integer",
+                        "value": "720"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": ""
             },
-            {
-                "contextElement": {
-                    "attributes": [
-                        {
-                            "name": "temperature",
-                            "type": "float",
-                            "value": "21"
-                        },
-                        {
-                            "name": "pressure",
-                            "type": "integer",
-                            "value": "711"
-                        }
-                    ],
-                    "id": "Room2",
-                    "isPattern": "false",
-                    "type": ""
-                },
-                "statusCode": {
-                    "code": "200",
-                    "reasonPhrase": "OK"
-                }
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
             }
-        ]
-    }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "21"
+                    },
+                    {
+                        "name": "pressure",
+                        "type": "integer",
+                        "value": "711"
+                    }
+                ],
+                "id": "Room2",
+                "isPattern": "false",
+                "type": ""
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+``` 
 
 Additional comments:
 
@@ -1819,33 +1832,34 @@ Additional comments:
 The following operation can be used to get a list of all entity types
 existing at Orion Context Broker in a given moment:
 
-      curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+``` 
+curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
-      {
-	  "statusCode": {
-	      "code": "200",
-	      "reasonPhrase": "OK"
-	  },
-	  "types": [
-	      {
-		  "attributes": [
-		      "speed",
-		      "fuel",
-		      "temperature"
-		  ],
-		  "name": "Car"
-	      },
-	      {
-		  "attributes": [
-		      "pressure",
-		      "hummidity",
-		      "temperature"
-		  ],
-		  "name": "Room"
-	      }
-	  ]
-      }
-
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "types": [
+        {
+            "attributes": [
+                "speed",
+                "fuel",
+                "temperature"
+            ],
+            "name": "Car"
+        },
+        {
+            "attributes": [
+                "pressure",
+                "hummidity",
+                "temperature"
+            ],
+            "name": "Room"
+        }
+    ]
+}
+``` 
 As you can see, attribute information for each type is provided. Some
 important remarks:
 
@@ -1861,19 +1875,21 @@ In addition, you can use the following operation to get detailed
 information of a given type (by the time being, that information consits
 of a list of all its attributes):
 
-      curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-      {
-        "attributes": [
-          "hummidity",
-          "pressure",
-          "temperature"
-        ],
-           "name": "Room",
-	    "statusCode": {
-		"code": "200",
-		"reasonPhrase": "OK"
-	    }
-      }
+``` 
+curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+{
+    "attributes": [
+        "hummidity",
+        "pressure",
+        "temperature"
+    ],
+    "name": "Room",
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+``` 
        
 Note that [pagination mechanism](pagination.md#pagination) also works in
 the operations described above.
@@ -1886,99 +1902,106 @@ In addition, note that this convenience operation doesn't have any standard oper
 
 Let's set the Room1 temperature and pressure values:
 
-      (curl localhost:1026/v1/contextEntities/Room1/attributes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) << EOF
-      {
-	  "attributes": [
-	      {
-		  "name": "temperature",
-		  "type": "float",
-		  "value": "26.5"
-	      },
-	      {
-		  "name": "pressure",
-		  "type": "integer",
-		  "value": "763"
-	      }
-	  ]
-      }
-      EOF                                                                                                                                                
+``` 
+(curl localhost:1026/v1/contextEntities/Room1/attributes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) << EOF
+{
+    "attributes": [
+        {
+            "name": "temperature",
+            "type": "float",
+            "value": "26.5"
+        },
+        {
+            "name": "pressure",
+            "type": "integer",
+            "value": "763"
+        }
+    ]
+}EOF                                                                                                                                                
+``` 
 
 the response is:
 
-      {
-	  "contextResponses": [
-	      {
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": ""
-		      },
-		      {
-			  "name": "pressure",
-			  "type": "integer",
-			  "value": ""
-		      }
-		  ],
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }
+``` 
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": ""
+                },
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+``` 
 
 Now, let's do the same with Room2:
 
-      (curl localhost:1026/v1/contextEntities/Room2/attributes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) << EOF
-      {			
-	  "attributes": [
-	      {
-		  "name": "temperature",
-		  "type": "float",
-		  "value": "27.4"
-	      },
-	      {
-		  "name": "pressure",
-		  "type": "integer",
-		  "value": "755"
-	      }
-	  ]
-      }
-      EOF                                                                                                                                                 
+``` 
+(curl localhost:1026/v1/contextEntities/Room2/attributes -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) << EOF
+{
+    "attributes": [
+        {
+            "name": "temperature",
+            "type": "float",
+            "value": "27.4"
+        },
+        {
+            "name": "pressure",
+            "type": "integer",
+            "value": "755"
+        }
+    ]
+} EOF
+``` 
  
 which response is:
 
-      {
-	  "contextResponses": [
-	      {
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": ""
-		      },
-		      {
-			  "name": "pressure",
-			  "type": "integer",
-			  "value": ""
-		      }
-		  ],
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }
+``` 
+{
+    "contextResponses": [
+        {
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": ""
+                },
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "value": ""
+                }
+            ],
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+``` 
 
 You can update a single attribute of a given entity in the following way:
 
-      (curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
-      {
-	    "value" : "26.3"
-      }
-      EOF                                                                                                                                                            
+``` 
+(curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
+{
+    "value": "26.3"
+} EOF                                                                                                                                                            
+``` 
 
 Comparing to [standard updateContext
 operation](#update-context-elements) we observe the following
@@ -2065,40 +2088,41 @@ Broker with NGSI9 standard operations:
 First of all you have to register Room1 and Room2. In order to do so, we
 use the following NGSI9 registerContext operation:
 
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextRegistrations": [
-	      {
-		  "entities": [
-		      {
-			  "type": "Room",
-			  "isPattern": "false",
-			   "id": "Room1"
-		      },
-		      {
-			  "type": "Room",
-			  "isPattern": "false",
-			  "id": "Room2"
-		      }
-		  ],
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "isDomain": "false"
-		      },
-		      {
-			  "name": "pressure",
-			  "type": "integer",
-			  "isDomain": "false"
-		      }
-		  ],
-		  "providingApplication": "http://mysensors.com/Rooms"
-	      }
-	    ],
-	  "duration": "P1M"
-      }
-      EOF
+``` 
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextRegistrations": [
+        {
+            "entities": [
+                {
+                    "type": "Room",
+                    "isPattern": "false",
+                    "id": "Room1"
+                },
+                {
+                    "type": "Room",
+                    "isPattern": "false",
+                    "id": "Room2"
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "isDomain": "false"
+                },
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "isDomain": "false"
+                }
+            ],
+            "providingApplication": "http://mysensors.com/Rooms"
+        }
+    ],
+    "duration": "P1M"
+}EOF
+``` 
 
 The payload includes a list of contextRegistration elements, each one
 with the following information:
@@ -2169,194 +2193,208 @@ How can we access that information? Using the NGSI9
 discoverContextAvailability operation. For example, we can discover
 registrations for Room1 using:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      }
-	    ]
-      }
-      EOF                                                                                                                                              
-  
+``` 
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ]
+} EOF                                                                                                                                              
+``` 
+
 This would produce the following response:
 
-      {
-	  "contextRegistrationResponses": [
-	      {
-		"contextRegistration": {
-		      "attributes": [
-			  {
-			      "isDomain": "false",
-			      "name": "temperature",
-			      "type": "float"
-			  },
-			  {
-			      "isDomain": "false",
-			      "name": "pressure",
-			      "type": "integer"
-			  }
-		      ],
-		      "entities": [
-			  {
-			      "id": "Room1",
-			      "isPattern": "false",
-			      "type": "Room"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Rooms"
-		  }
-	      }
-	  ]
-      }
-      
+``` 
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": "float"
+                    },
+                    {
+                        "isDomain": "false",
+                        "name": "pressure",
+                        "type": "integer"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Room1",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Rooms"
+            }
+        }
+    ]
+}
+``` 
+
 Note that we used an empty attributes in the request. Doing so, the discover searches for Room1, no
 matter which attributes have been registered. If we want to be more
 precise, we can include the name of an attribute to search for:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ]
-      }
-      EOF                                                                                                                                                   
+``` 
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ]
+}EOF                                                                                                                                                   
+``` 
 
 which produces the following response:
 
-      {
-	  "contextRegistrationResponses": [
-	      {
-		  "contextRegistration": {
-		      "attributes": [
-			  {
-			      "isDomain": "false",
-			      "name": "temperature",
-			      "type": "float"
-			  }
-		      ],
-		      "entities": [
-			  {
-			      "id": "Room1",
-			      "isPattern": "false",
-			      "type": "Room"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Rooms"
-		    }
-	      }
-	  ]
-      }
+``` 
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": "float"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Room1",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Rooms"
+            }
+        }
+    ]
+}
+``` 
 
 If the broker doesn't have any registration information, it will return
 a response telling so. Thus, the following request:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		"type": "Room",
-		"isPattern": "false",
-		"id": "Room1"
-	      }
-	  ],
-	  "attributes": [
-	    "humidity"
-	  ]
-      }
-      EOF
+``` 
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "attributes": [
+        "humidity"
+    ]
+}EOF
+``` 
 
 would produce the following response:
 
-      {
-	  "errorCode": {
-	      "code": "404",
-	      "reasonPhrase": "No context element registrations found"
-	  }
-      }                    
+``` 
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element registrations found"
+    }
+}                   
+``` 
 
 You can also search for a list of entities, e.g. to discover temperature
 in both Room1 and Room2:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      },
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room2"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	]
-      }
-      EOF
+``` 
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        },
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room2"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ]
+}EOF
+``` 
 
 which will produce the following response:
 
-      {
-	  "contextRegistrationResponses": [
-	      {
-		  "contextRegistration": {
-		      "attributes": [
-			  {
-			      "isDomain": "false",
-			      "name": "temperature",
-			      "type": "float"
-			  }
-		      ],
-		      "entities": [
-			  {
-			      "id": "Room1",
-			      "isPattern": "false",
-			      "type": "Room"
-			  },
-			  {
-			      "id": "Room2",
-			      "isPattern": "false",
-			      "type": "Room"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Rooms"
-		  }
-	      }
-	  ]
-      }
+``` 
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": "float"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Room1",
+                        "isPattern": "false",
+                        "type": "Room"
+                    },
+                    {
+                        "id": "Room2",
+                        "isPattern": "false",
+                        "type": "Room"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Rooms"
+            }
+        }
+    ]
+}
+``` 
 
 Finally, a powerful feature of Orion Context Broker is that you can use
 a regular expression for the entity ID. For example, you can discover
 entities whose ID starts with "Room" using the regex "Room.\*". In this
 case, you have to set isPattern to "true" as shown below:
 
-      (curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	    "entities": [
-		{
-		    "type": "Room",
-		    "isPattern": "true",
-		    "id": "Room.*"
-		}
-	    ],
-	    "attributes": [
-		"temperature"
-	    ]
-	}
-      EOF
+``` 
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "true",
+            "id": "Room.*"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ]
+}EOF
+``` 
+
 This will produce the exact same response as the previous example.
 
 Note that by default only 20 registrations are returned (which is fine
@@ -2400,22 +2438,24 @@ able to send notifications.
 In order to configure this behavior, we use the following NGSI9
 subscribeContextAvailability request:
 
-     (curl localhost:1026/v1/registry/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-     {
-	"entities": [
+``` 
+(curl localhost:1026/v1/registry/subscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
         {
-             "type": "Room",
-             "isPattern": "true",
-             "id": ".*"
+            "type": "Room",
+            "isPattern": "true",
+            "id": ".*"
         }
-        ],
-        "attributes": [
-	     "temperature"
-        ],
-        "reference": "http://localhost:1028/accumulate",
-        "duration": "P1M"
-     }
-     EOF
+    ],
+    "attributes": [
+        "temperature"
+    ],
+    "reference": "http://localhost:1028/accumulate",
+    "duration": "P1M"
+}EOF
+``` 
+
 
 
 The payload has the following elements:
@@ -2468,42 +2508,45 @@ pretty similar to a subscribeContext.
 Looking at accumulator-server.py, we will see the following initial
 notification:
 
-      POST http://localhost:1028/accumulate
-      Content-Length: 638
-      User-Agent: orion/0.9.0
-      Host: localhost:1028
-      Accept: application/xml, application/json
-      Content-Type: application/json
+``` 
+POST http://localhost:1028/accumulate
+Content-Length: 638
+User-Agent: orion/0.9.0
+Host: localhost:1028
+Accept: application/xml, application/json
+Content-Type: application/json
                                                                                         
-      {
-	  "subscriptionId": "52a745e011f5816465943d59",
-	  "contextRegistrationResponses": [
-	      {
-		  "contextRegistration": {
-		      "entities": [
-			  {
-			      "type": "Room",
-			      "isPattern": "false",
-			      "id": "Room1"
-			  },
-			  {
-			      "type": "Room",
-			      "isPattern": "false",
-			      "id": "Room2"
-			  }
-		      ],
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "isDomain": "false"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Rooms"
-		  }
-	      }
-	  ]
-	}
+{
+    "subscriptionId": "52a745e011f5816465943d59",
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "type": "Room",
+                        "isPattern": "false",
+                        "id": "Room1"
+                    },
+                    {
+                        "type": "Room",
+                        "isPattern": "false",
+                        "id": "Room2"
+                    }
+                ],
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "isDomain": "false"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Rooms"
+            }
+        }
+    ]
+}
+``` 
+
 Orion Context Broker notifies NGSI9 subscribeContextAvailability using
 the POST HTTP method (on the URL used as reference for the subscription)
 with a notifyContextAvailabilityRequest payload. Apart from the
@@ -2535,103 +2578,104 @@ could be changed in a later version. What is your opinion? :)
 Let's see what happens when we register a new room (Room3) with
 temperature and pressure:
 
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextRegistrations": [
-	      {
-		  "entities": [
-		      {
-			  "type": "Room",
-			  "isPattern": "false",
-			  "id": "Room3"
-		      }
-		  ],
-		    "attributes": [
-			{
-			  "name": "temperature",
-			  "type": "float",
-			  "isDomain": "false"
-			},
-			{
-			  "name": "pressure",
-			  "type": "integer",
-			  "isDomain": "false"
-			}
-			],
-		  "providingApplication": "http://mysensors.com/Rooms"
-	      }
-	    ],
-	    "duration": "P1M"
-      }
-      EOF
-
+``` 
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextRegistrations": [
+        {
+            "entities": [
+                {
+                    "type": "Room",
+                    "isPattern": "false",
+                    "id": "Room3"
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "isDomain": "false"
+                },
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "isDomain": "false"
+                }
+            ],
+            "providingApplication": "http://mysensors.com/Rooms"
+        }
+    ],
+    "duration": "P1M"
+}EOF
+``` 
 As expected, the accumulator-server.py will be notified of the new
 registration. Again, although Room3 registration includes temperature
 and pressure, only the first attribute is included in the notification.
 
-      POST http://localhost:1028/accumulate
-      Content-Length: 522
-      User-Agent: orion/0.9.0
-      Host: localhost:1028
-      Accept: application/xml, application/json
-      Content-Type: application/json
+``` 
+POST http://localhost:1028/accumulate
+Content-Length: 522
+User-Agent: orion/0.9.0
+Host: localhost:1028
+Accept: application/xml, application/json
+Content-Type: application/json
 
-      {
-	  "subscriptionId": "52a745e011f5816465943d59",
-	  "contextRegistrationResponses": [
-	      {
-		  "contextRegistration": {
-		      "entities": [
-			  {
-			      "type": "Room",
-			      "isPattern": "false",
-			      "id": "Room3"
-			  }
-		      ],
-		    "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "isDomain": "false"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Rooms"
-		  }
-	      }
-	  ]
-      }
-
+{
+    "subscriptionId": "52a745e011f5816465943d59",
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "type": "Room",
+                        "isPattern": "false",
+                        "id": "Room3"
+                    }
+                ],
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "isDomain": "false"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Rooms"
+            }
+        }
+    ]
+}
+``` 
 We can also check that context registrations not matching the
 subscription doesn't trigger any notifications. For example, let's
 register a room (Room4) with only attribute pressure (remember that the
 subscription only includes temperature in attributeList).
 
-  
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextRegistrations": [
-	      {
-		  "entities": [
-		      {
-			  "type": "Room",
-			  "isPattern": "false",
-			  "id": "Room4"
-		      }
-		  ],
-		  "attributes": [
-		      {
-			  "name": "pressure",
-			  "type": "integer",
-			  "isDomain": "false"
-		      }
-		  ],
-		  "providingApplication": "http://mysensors.com/Rooms"
-	      }
-	  ],
-	  "duration": "P1M"
-      }
-      EOF
-  
+``` 
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextRegistrations": [
+        {
+            "entities": [
+                {
+                    "type": "Room",
+                    "isPattern": "false",
+                    "id": "Room4"
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "pressure",
+                    "type": "integer",
+                    "isDomain": "false"
+                }
+            ],
+            "providingApplication": "http://mysensors.com/Rooms"
+        }
+    ],
+    "duration": "P1M"
+} EOF
+``` 
+
 You can now check that no new notification arrives to
 accumulator-server.py.
 
@@ -2645,92 +2689,96 @@ element). As always you have to replace the *subscriptionId* value after
 copy-pasting with the value you got from the
 subscribeContextAvailability response in the previous step).
 
-      (curl localhost:1026/v1/registry/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Car",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "duration": "P1M",
-	  "subscriptionId": "52a745e011f5816465943d59"
-      }
-      EOF                                                                                                                                                           EOF
- 
+```
+(curl localhost:1026/v1/registry/updateContextAvailabilitySubscription -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Car",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "duration": "P1M",
+    "subscriptionId": "52a745e011f5816465943d59"
+}EOF                                                                                                                                                           EOF
+```
 The response is very similar to the one for subscribeContextAvailability
 request:
 
-      {
-      "duration": "P1M",
-        "subscriptionId": "52a745e011f5816465943d59"
-      }
-           
+```
+{
+    "duration": "P1M",
+    "subscriptionId": "52a745e011f5816465943d59"
+}
+```          
 
 Given that there are currently no car entities registered, you will not
 receive any initial notification. So. let's register two cars: Car1 with
 an attribute named speed and Car2 with an attribute named location.
 
+```
      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextRegistrations": [
-	      {
-		  "entities": [
-		      {
-			  "type": "Car",
-			  "isPattern": "false",
-			  "id": "Car1"
-		      }
-		    ],
-		  "attributes": [
-		      {
-			  "name": "speed",
-			  "type": "integer",
-			  "isDomain": "false"
-		      }
-		    ],
-		      "providingApplication": "http://mysensors.com/Cars"
-	      }
-	  ],
-	  "duration": "P1M"
-      }
-      EOF
-  
-     (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextRegistrations": [
-	      {
-		    "entities": [
-		      {
-			  "type": "Car",
-			  "isPattern": "false",
-			  "id": "Car2"
-		      }
-		  ],
-		  "attributes": [
-		      {
-			  "name": "location",
-			  "type": "ISO6709",
-			  "isDomain": "false"
-		      }
-		  ],
-		  "providingApplication": "http://mysensors.com/Cars"
-	      }
-	  ],
-	    "duration": "P1M"
-      }
-      EOF
+     {
+    "contextRegistrations": [
+        {
+            "entities": [
+                {
+                    "type": "Car",
+                    "isPattern": "false",
+                    "id": "Car1"
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "speed",
+                    "type": "integer",
+                    "isDomain": "false"
+                }
+            ],
+            "providingApplication": "http://mysensors.com/Cars"
+        }
+    ],
+    "duration": "P1M"
+}EOF
+```
+
+```
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextRegistrations": [
+        {
+            "entities": [
+                {
+                    "type": "Car",
+                    "isPattern": "false",
+                    "id": "Car2"
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "location",
+                    "type": "ISO6709",
+                    "isDomain": "false"
+                }
+            ],
+            "providingApplication": "http://mysensors.com/Cars"
+        }
+    ],
+    "duration": "P1M"
+}EOF
+```
 As both registrations match the entityIdList and attributeList used in
 the updateContextAvailabilitySubscription, we will get a notification
 for each car registration, as can be seen in accumulator-server.py:
 
-      POST http://localhost:1028/accumulate
-      Content-Length: 529
-      User-Agent: orion/0.9.0
-      Host: localhost:1028
-      Accept: application/xml, application/json
-      Content-Type: application/json
+```
+POST http://localhost:1028/accumulate
+Content-Length: 529
+User-Agent: orion/0.9.0
+Host: localhost:1028
+Accept: application/xml, application/json
+Content-Type: application/json
                                                                                        
       {
 	  "subscriptionId": "52a745e011f5816465943d59",
@@ -2756,38 +2804,41 @@ for each car registration, as can be seen in accumulator-server.py:
 	      }
 	  ]
       }
+```
+```
 
-      POST http://localhost:1028/accumulate
-      Content-Length: 535
-      User-Agent: orion/0.9.0
-      Host: localhost:1028
-      Accept: application/xml, application/json
-      Content-Type: application/json
+POST http://localhost:1028/accumulate
+Content-Length: 535
+User-Agent: orion/0.9.0
+Host: localhost:1028
+Accept: application/xml, application/json
+Content-Type: application/json
                                                                                        
-      {
-	  "subscriptionId": "52a745e011f5816465943d59",
-	  "contextRegistrationResponses": [
-	      {
-		  "contextRegistration": {
-		      "entities": [
-			  {
-			      "type": "Car",
-			      "isPattern": "false",
-			      "id": "Car2"
-			  }
-		      ],
-		      "attributes": [
-			  {
-			      "name": "location",
-			      "type": "ISO6709",
-			      "isDomain": "false"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Cars"
-		  }
-	      }
-	  ]
-      }
+{
+    "subscriptionId": "52a745e011f5816465943d59",
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "type": "Car",
+                        "isPattern": "false",
+                        "id": "Car2"
+                    }
+                ],
+                "attributes": [
+                    {
+                        "name": "location",
+                        "type": "ISO6709",
+                        "isDomain": "false"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Cars"
+            }
+        }
+    ]
+}
+```
 
 Finally, you can cancel a subscription using the NGSI9
 unsubscribeContextAvailability operation, just using the subscriptionId
@@ -2795,23 +2846,25 @@ in the request payload (replace the subscriptionId value after
 copy-pasting with the one you received in the
 subscribeContextAvailability response in the previous step).
 
-      (curl localhost:1026/v1/registry/unsubscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-            "subscriptionId": "52a745e011f5816465943d59"
-      }
-      EOF
-                                                                                                                                                  
+```
+(curl localhost:1026/v1/registry/unsubscribeContextAvailability -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "subscriptionId": "52a745e011f5816465943d59"
+}EOF
+```                                                                                                                                                 
  
 The response is just an acknowledgement that the cancellation was
 successful.
-  
-      {
-	"statusCode": {
-	  "code": "200",
-	  "reasonPhrase": "OK"
-	},
-	    "subscriptionId": "52a745e011f5816465943d59"
-      }                    
+
+```
+{
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    },
+    "subscriptionId": "52a745e011f5816465943d59"
+}    
+```
   ---------------------------------------------------------------------------------------------------------------------------------
 
 After cancelling, you can try to register a new car (e.g. Car3) to check
@@ -3019,48 +3072,50 @@ Now, let's discover registrations for Room2-temperature:
 
 The response is as follows:
 
-      {
-	  "contextRegistrationResponses": [
-	      {
-		  "contextRegistration": {
-		      "attributes": [
-			  {
-			      "isDomain": "false",
-			      "name": "temperature",
-			      "type": ""
-			  }
-		      ],
-		      "entities": [
-			  {
-			      "id": "Room1",
-			      "isPattern": "false",
-			      "type": ""
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Rooms"
-		  }
-	      },
-	      {
-		  "contextRegistration": {
-		      "attributes": [
-			  {
-			      "isDomain": "false",
-			      "name": "pressure",
-			      "type": ""
-			  }
-		      ],
-		      "entities": [
-			  {
-			      "id": "Room1",
-			      "isPattern": "false",
-			      "type": ""
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Rooms"
-		  }
-	      }
-	  ]
-      }
+```
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": ""
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Room1",
+                        "isPattern": "false",
+                        "type": ""
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Rooms"
+            }
+        },
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "pressure",
+                        "type": ""
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Room1",
+                        "isPattern": "false",
+                        "type": ""
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Rooms"
+            }
+        }
+    ]
+}    
+```
 
 Discovery of not registered elements (e.g. Room5 or the humidity of
 Room1) will produce an error. E.g. the following requests:
@@ -3072,13 +3127,14 @@ Room1) will produce an error. E.g. the following requests:
 
 will produce the following error response:
 
-      {
-	"errorCode": {
-	  "code": "404",
-	   "reasonPhrase": "No context element found"
-         }
-      }
-                     
+```
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found"
+    }
+}
+```                     
 
 Compared to [standard discoverContextAvailability
 operation](#discover-context-availability-operation ):
@@ -3104,56 +3160,56 @@ couple of entities of type Car using standard registerContext operations
 (given that, as described in previous section, you cannot register
 entities with types using convenience operations):
 
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextRegistrations": [
-	      {
-		  "entities": [
-		      {
-			  "type": "Car",
-			  "isPattern": "false",
-			  "id": "Car1"
-		      }
-		  ],
-		  "attributes": [
-		      {
-			  "name": "speed",
-			  "type": "integer",
-			  "isDomain": "false"
-		      }
-		  ],
-		  "providingApplication": "http://mysensors.com/Cars"
-	      }
-	  ],
-	  "duration": "P1M"
-      }
-      EOF
-
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextRegistrations": [
-	      {
-		  "entities": [
-		      {
-			  "type": "Car",
-			  "isPattern": "false",
-			  "id": "Car2"
-		      }
-		  ],
-		  "attributes": [ 
-		      {
-			  "name": "fuel",
-			  "type": "float",
-			  "isDomain": "false"
-		      }
-		  ],
-		  "providingApplication": "http://mysensors.com/Cars"
-	      }
-	  ],
-	  "duration": "P1M"
-      }
-      EOF
-                                                                                                                                         
+``` 
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextRegistrations": [
+        {
+            "entities": [
+                {
+                    "type": "Car",
+                    "isPattern": "false",
+                    "id": "Car1"
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "speed",
+                    "type": "integer",
+                    "isDomain": "false"
+                }
+            ],
+            "providingApplication": "http://mysensors.com/Cars"
+        }
+    ],
+    "duration": "P1M"
+}EOF
+``` 
+``` 
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextRegistrations": [
+        {
+            "entities": [
+                {
+                    "type": "Car",
+                    "isPattern": "false",
+                    "id": "Car2"
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "fuel",
+                    "type": "float",
+                    "isDomain": "false"
+                }
+            ],
+            "providingApplication": "http://mysensors.com/Cars"
+        }
+    ],
+    "duration": "P1M"
+} EOF
+```                                                                                                                                          
 
 Request without specifying attributes:
 
@@ -3161,49 +3217,50 @@ Request without specifying attributes:
 
 Response:
 
-      {
-	  "contextRegistrationResponses": [
-	      {
-		  "contextRegistration": {
-		      "attributes": [
-			  {
-			      "isDomain": "false",
-			      "name": "speed",
-			      "type": "integer"
-			  }
-		      ],
-		      "entities": [
-			  {
-			      "id": "Car1",
-			      "isPattern": "false",
-			      "type": "Car"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Cars"
-		  }
-	      },
-	      {
-		  "contextRegistration": {
-		      "attributes": [
-			  {
-			      "isDomain": "false",
-			      "name": "fuel",
-			      "type": "float"
-			  }
-		      ],
-		      "entities": [
-			  {
-			      "id": "Car2",
-			      "isPattern": "false",
-			      "type": "Car"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Cars"
-		  }
-	      }
-	  ]
-      }
-
+``` 
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "speed",
+                        "type": "integer"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Car1",
+                        "isPattern": "false",
+                        "type": "Car"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Cars"
+            }
+        },
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "fuel",
+                        "type": "float"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Car2",
+                        "isPattern": "false",
+                        "type": "Car"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Cars"
+            }
+        }
+    ]
+}
+``` 
 
 
 Request specifying one attribute (e.g. speed):
@@ -3212,30 +3269,31 @@ Request specifying one attribute (e.g. speed):
 
 Response:
 
-      {
-	  "contextRegistrationResponses": [
-	      {
-		  "contextRegistration": {
-		      "attributes": [
-			  {
-			      "isDomain": "false",
-			      "name": "speed",
-			      "type": "integer"
-			  }
-		      ],
-		      "entities": [
-			  {
-			      "id": "Car1",
-			      "isPattern": "false",
-			      "type": "Car"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Cars"
-		  }
-	      }
-	  ]
-      }
-
+``` 
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "speed",
+                        "type": "integer"
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Car1",
+                        "isPattern": "false",
+                        "type": "Car"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Cars"
+            }
+        }
+    ]
+}
+``` 
 
 Note that by default only 20 registrations are returned (which is fine
 for this tutorial, but probably not for a real utilization scenario). In
