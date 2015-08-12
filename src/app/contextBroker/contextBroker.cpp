@@ -131,6 +131,7 @@
 #include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
+#include "serviceRoutines/badVerbAllFive.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
@@ -177,6 +178,7 @@
 #include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutinesV2/deleteEntity.h"
+#include "serviceRoutinesV2/patchEntity.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -624,7 +626,8 @@ PaArgument paArgs[] =
   { "POST",   IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         postEntity               }, \
   { "PUT",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         putEntity                }, \
   { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
-  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbAllFour           }, \
+  { "PATCH",  IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         patchEntity              }, \
+  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbAllFive           }, \
                                                                                                        \
   { "GET",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  getEntityAttributeValue  }, \
   { "*",      IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  badVerbGetOnly           }, \

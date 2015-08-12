@@ -31,6 +31,7 @@
 #include "common/tag.h"
 #include "ngsi/Scope.h"
 #include "common/Format.h"
+#include "parse/forbiddenChars.h"
 
 
 
@@ -95,6 +96,22 @@ std::string Scope::check
   int                 counter
 )
 {
+  //
+  // Check for forbidden characters
+  //
+  if (forbiddenChars(type.c_str()))
+  {
+    return "illegal chars in scope type";
+  }
+
+  if (type != SCOPE_TYPE_SIMPLE_QUERY)
+  {
+    if (forbiddenChars(value.c_str()))
+    {
+      return "illegal chars in scope";
+    }
+  }
+
   if (type == FIWARE_LOCATION || type == FIWARE_LOCATION_DEPRECATED)
   {
     if (areaType == orion::CircleType)
@@ -188,7 +205,8 @@ std::string Scope::check
       }
     }
   }
-  else
+
+  if ((type != FIWARE_LOCATION) && (type != FIWARE_LOCATION_DEPRECATED))
   {
     if (type == "")
     {

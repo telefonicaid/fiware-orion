@@ -26,6 +26,7 @@ postEntities.cpp
 entryPointsTreat.cpp
 getEntity.cpp
 putEntity.cpp
+patchEntity.cpp
 getEntityAttribute.cpp
 putEntityAttribute.cpp
 getEntityAttributeValue.cpp
@@ -40,6 +41,7 @@ postEntities.h
 entryPointsTreat.h
 getEntity.h
 putEntity.h
+patchEntity.h
 getEntityAttribute.h
 putEntityAttribute.h
 getEntityAttributeValue.h

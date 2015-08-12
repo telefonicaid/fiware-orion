@@ -23,3 +23,4 @@
   * [HTTP and NGSI response codes](http_and_ngsi_sc.md)
   * [Security considerations](security.md)
   * [Known Limitations](known_limitations.md)
+  * [Considerations on NGSIv1 and NGSIv2 coexistence](v1_v2_coexistence.md)

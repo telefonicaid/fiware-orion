@@ -325,14 +325,39 @@ std::string ContextAttribute::renderAsJsonObject
   {
     if (omitValue == false)
     {
+      std::string effectiveValue        = "";
+      bool        valueIsNumberOrBool   = false;
+
+      switch (valueType)
+      {
+      case ValueTypeString:
+        effectiveValue = stringValue;
+        break;
+
+      case ValueTypeBoolean:
+        effectiveValue      = boolValue? "true" : "false";
+        valueIsNumberOrBool = true;
+        break;
+
+      case ValueTypeNumber:
+        char num[32];
+        snprintf(num, sizeof(num), "%f", numberValue);
+        effectiveValue      = std::string(num);
+        valueIsNumberOrBool = true;
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", valueType));
+      }
+
       //
       // NOTE
       // renderAsJsonObject is used in v1 only.
       // => we only need to care about stringValue (not boolValue nor numberValue)
       //
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                      (request != RtUpdateContextResponse)? stringValue : "",
-                      ciP->outFormat, commaAfterContextValue);
+                      (request != RtUpdateContextResponse)? effectiveValue : "",
+                      ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);
     }
   }
   else
@@ -428,12 +453,35 @@ std::string ContextAttribute::render
   {
     if (omitValue == false)
     {
-      if ((valueType == orion::ValueTypeString) || (ciP->apiVersion != "v2"))
+      std::string effectiveValue      = "";
+      bool        valueIsNumberOrBool = false;
+
+      switch (valueType)
       {
-        out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                        (request != RtUpdateContextResponse)? stringValue : "",
-                        ciP->outFormat, commaAfterContextValue);
+      case ValueTypeString:
+        effectiveValue = stringValue;
+        break;
+
+      case ValueTypeBoolean:
+        effectiveValue      = boolValue? "true" : "false";
+        valueIsNumberOrBool = true;
+        break;
+
+      case ValueTypeNumber:
+        char num[32];
+        snprintf(num, sizeof(num), "%f", numberValue);
+        effectiveValue      = std::string(num);
+        valueIsNumberOrBool = true;
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
+
+      out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                        (request != RtUpdateContextResponse)? effectiveValue : "",
+                        ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);
+
     }
     else if (request == RtUpdateContextResponse)
     {
