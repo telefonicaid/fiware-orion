@@ -63,13 +63,12 @@ std::string getEntities
 {
   using namespace std;
 
-  Entities entities;
-  string   answer;
-
-  // optional parameter for list of IDs
-  string id        = ciP->uriParam["id"];
-  string idPattern = ciP->uriParam["idPattern"];
-  string pattern      = ".*"; // all entities, default value
+  Entities  entities;
+  string    answer;
+  string    pattern    = ".*"; // all entities, default value
+  string    id         = ciP->uriParam["id"];
+  string    idPattern  = ciP->uriParam["idPattern"];
+  string    q          = ciP->uriParam["q"];
 
   if ((idPattern != "") && (id != ""))
   {
@@ -98,10 +97,20 @@ std::string getEntities
     pattern = idPattern;
   }
 
-  // 01. Fill in QueryContextRequest
-  // type "" is valid for all types
+
+  //
+  // 01. Fill in QueryContextRequest - type "" is valid for all types
+  //
   parseDataP->qcr.res.fill(pattern, ciP->uriParam["type"], "true", EntityTypeEmptyOrNotEmpty, "");
-  
+
+  // If URI param 'q' is given, its value must be put in a scope
+  if (q != "")
+  {
+    Scope* scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
+
+    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+  }
+
 
   // 02. Call standard op postQueryContext
   answer = postQueryContext(ciP, components, compV, parseDataP);

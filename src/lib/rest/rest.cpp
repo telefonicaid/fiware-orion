@@ -193,6 +193,21 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
   LM_T(LmtUriParams, ("URI parameter:   %s: %s", key.c_str(), ciP->uriParam[key].c_str()));
 
+  //
+  // Now check the URI param has no invalid characters
+  // Except for the URI param 'q' that is not to be checked for invalid characters
+  //
+  if (key != "q")
+  {
+    if (forbiddenChars(ckey) || forbiddenChars(val))
+    {
+      OrionError error(SccBadRequest, "invalid character in URI parameter");
+
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP, "");
+    }
+  }
+
   return MHD_YES;
 }
 
@@ -892,7 +907,6 @@ static int connectionTreat
 
     char tenant[128];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
-    LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
     ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
