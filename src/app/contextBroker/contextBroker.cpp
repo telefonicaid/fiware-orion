@@ -162,6 +162,7 @@
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
+#include "serviceRoutinesV2/badVerbGetPutOnly.h"
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
@@ -170,6 +171,7 @@
 #include "serviceRoutinesV2/entryPointsTreat.h"
 #include "serviceRoutinesV2/getEntity.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "serviceRoutinesV2/putEntityAttribute.h"
 #include "serviceRoutinesV2/getEntityAttributeValue.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutinesV2/putEntity.h"
@@ -628,7 +630,8 @@ PaArgument paArgs[] =
   { "*",      IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     getEntityAttribute       }, \
-  { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetOnly           }
+  { "PUT",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     putEntityAttribute       }, \
+  { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetPutOnly        }
 
 
 

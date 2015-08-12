@@ -17,3 +17,4 @@ Add:  GET /v2/entities/<entityId>/attrs/<attrName>/value - get a single attribut
 Add:  URI parameters id, idPattern and type for GET /v2/entities (Issues #952 #953 #969)
 Fix:  Error handling for non-string entity::id/type (Issue #1108), attribute::type, and metadata::type/value
 Fix:  Metadata updates involving boolean/number values were not correctly processed (Issue #1113)
+Add:  PUT /v2/entities/<entityId>/attrs/<attrName> (Issue #991)

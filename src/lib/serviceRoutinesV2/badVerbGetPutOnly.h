@@ -1,5 +1,5 @@
-#ifndef ORION_ERROR_H
-#define ORION_ERROR_H
+#ifndef SRC_LIB_SERVICEROUTINES_BADVERBGETPUTONLY_H_
+#define SRC_LIB_SERVICEROUTINES_BADVERBGETPUTONLY_H_
 
 /*
 *
@@ -26,31 +26,23 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "common/Format.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* OrionError - 
+* badVerbGetPutOnly - 
 */
-typedef struct OrionError
-{
-  HttpStatusCode  code;
-  std::string     reasonPhrase;
-  std::string     details;
+extern std::string badVerbGetPutOnly
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-  OrionError();
-  OrionError(StatusCode& statusCode);
-  OrionError(HttpStatusCode _code, const std::string& _details = "");
-  OrionError(HttpStatusCode _code, std::string& _details);
-
-  std::string  render(ConnectionInfo* ciP, const std::string& indent);
-  std::string  errorStringForV2(const std::string& reasonPhrase);
-  void         fill(HttpStatusCode _code, const char* _details);
-} OrionError;
-
-#endif
+#endif  // SRC_LIB_SERVICEROUTINES_BADVERBGETPUTONLY_H_

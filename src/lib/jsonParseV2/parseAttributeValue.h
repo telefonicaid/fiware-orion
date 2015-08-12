@@ -1,9 +1,9 @@
-#ifndef ORION_ERROR_H
-#define ORION_ERROR_H
+#ifndef SRC_LIB_JSONPARSEV2_PARSEATTRIBUTEVALUE_H_
+#define SRC_LIB_JSONPARSEV2_PARSEATTRIBUTEVALUE_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -25,32 +25,16 @@
 *
 * Author: Ken Zangelin
 */
-#include <string>
-
-#include "common/Format.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+#include "ngsi/Request.h"
 
 
 
 /* ****************************************************************************
 *
-* OrionError - 
+* parseAttributeValue - 
 */
-typedef struct OrionError
-{
-  HttpStatusCode  code;
-  std::string     reasonPhrase;
-  std::string     details;
+extern std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* eP);
 
-  OrionError();
-  OrionError(StatusCode& statusCode);
-  OrionError(HttpStatusCode _code, const std::string& _details = "");
-  OrionError(HttpStatusCode _code, std::string& _details);
-
-  std::string  render(ConnectionInfo* ciP, const std::string& indent);
-  std::string  errorStringForV2(const std::string& reasonPhrase);
-  void         fill(HttpStatusCode _code, const char* _details);
-} OrionError;
-
-#endif
+#endif  // SRC_LIB_JSONPARSEV2_PARSEATTRIBUTEVALUE_H_

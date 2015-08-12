@@ -86,6 +86,19 @@ OrionError::OrionError(StatusCode& sc)
 
 /* ****************************************************************************
 *
+* OrionError::fill - 
+*/
+void OrionError::fill(HttpStatusCode _code, const char* _details)
+{
+  code          = _code;
+  reasonPhrase  = httpStatusCodeString(code);
+  details       = _details;
+}
+
+
+
+/* ****************************************************************************
+*
 * OrionError::errorStringForV2 - 
 */
 std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
