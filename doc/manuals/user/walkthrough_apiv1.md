@@ -298,6 +298,7 @@ First, we are going to create Room1. Let's assume that at entity
 creation time temperature and pressure of Room1 are 23 ºC and 720 mmHg
 respectively.
 
+```
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF                                                                                    {                                                                          
       {
 	  "contextElements": [
@@ -322,6 +323,7 @@ respectively.
 	  "updateAction": "APPEND"
       }
       EOF                                                                                                                         
+```
 
 The updateContext request payload contains a list of contextElement
 elements. Each contextElement is associated to an entity (whose
@@ -342,6 +344,7 @@ Upon receipt of this request, the broker will create the entity in its
 internal database, set the values for its attributes and will response
 with the following:
 
+      ```
       {
 	  "contextResponses": [
 	      {
@@ -369,7 +372,7 @@ with the following:
 	      }
 	    ]
       }
-                           
+      ```                          
 
 As you can see, it follows the same structure as the request, just to
 acknowledge that the request was correctly processed for these context
@@ -380,6 +383,7 @@ because you were the one to provide them in the request.
 Next, let's create Room2 in a similar way (in this case, setting
 temperature and pressure to 21 ºC and 711 mmHg respectively).
 
+```
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool ) <<EOF
       {
 	  "contextElements": [
@@ -404,9 +408,11 @@ temperature and pressure to 21 ºC and 711 mmHg respectively).
 	  "updateAction": "APPEND"
       }
       EOF                                                                                                                       
-  
+```
+
 The response to this request is:
 
+```
       {
 	  "contextResponses": [
 	      {
@@ -434,6 +440,7 @@ The response to this request is:
 		}
 	    ]
       }	             
+```
 
 Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures or custom metadata. These are advance
@@ -451,6 +458,7 @@ interesting with it (e.g. show a graph with the room temperature in a
 graphical user interface). The NGSI10 queryContext request is used in
 this case, e.g. to get context information for Room1:
 
+```
       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "entities": [
@@ -462,11 +470,13 @@ this case, e.g. to get context information for Room1:
 	  ]
       }
       EOF
+```
 
 The response includes all the attributes belonging to Room1 and we can
 check that temperature and pressure have the values that we set at
 entity creation with updateContext (23ºC and 720 mmHg).
 
+```
       {
 	  "contextResponses": [
 	      {
@@ -494,10 +504,11 @@ entity creation with updateContext (23ºC and 720 mmHg).
 	      }
 	  ]
       }
-                         
+```                       
 
 If you use an empty attributes element in the request, the response will include all the attributes of the entity. If you include an actual list of attributes (e.g. temperature) only that are retrieved, as shown in the following request:
 
+```
       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "entities": [
@@ -512,9 +523,11 @@ If you use an empty attributes element in the request, the response will include
 	  ]
       }
       EOF
+```
 
 which response is as follows:
 
+```
       {
 	  "contextResponses": [
 	      {
@@ -537,12 +550,14 @@ which response is as follows:
 	      }
 	  ]
       }                       
+```
 
 Moreover, a powerful feature of Orion Context Broker is that you can use
 a regular expression for the entity ID. For example, you can query
 entities which ID starts with "Room" using the regex "Room.\*". In this
 case, you have to set isPattern to "true" as shown below:
 
+```
       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "entities": [
@@ -562,7 +577,8 @@ case, you have to set isPattern to "true" as shown below:
 	  ]
       }
       EOF
-
+```
+```
       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "entities": [
@@ -577,11 +593,12 @@ case, you have to set isPattern to "true" as shown below:
 	  ]
       }
       EOF                                                                                                                       }
-                                                                                                                                  
+```                                                                                                                                  
   
 
 Both produce the same response:
 
+```
       {
 	  "contextResponses": [
 	    {
@@ -622,10 +639,12 @@ Both produce the same response:
 	      }
 	  ]
       }                        
+```
 
 Finally, note that you will get an error in case you try to query a
 non-existing entity or attribute, as shown in the following cases below:
 
+```
       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "entities": [
@@ -637,7 +656,8 @@ non-existing entity or attribute, as shown in the following cases below:
 	  ]
       }
       EOF                                                                                                                   
-  
+```
+```
       (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "entities": [
@@ -652,17 +672,18 @@ non-existing entity or attribute, as shown in the following cases below:
 	  ]
       }
       EOF
-
+```
 
 Both requests will produce the same error response:
 
+```
       {
 	  "errorCode": {
 	      "code": "404",
 	      "reasonPhrase": "No context elements found"
 	  }
       }
-                                          
+```
 
 Additional comments:
 
@@ -679,7 +700,7 @@ Additional comments:
     a vector (default behaviour):
 
 <!-- -->
-
+```
       (curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "entities": [
@@ -691,6 +712,7 @@ Additional comments:
 	  ]
       }
       EOF
+```
 
 [Top](#top)
 
@@ -708,6 +730,7 @@ source of context information. Let's assume that this application in a
 given moment wants to set the temperature and pressure of Room1 to 26.5
 ºC and 763 mmHg respectively, so it issues the following request:
 
+```
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "contextElements": [
@@ -728,10 +751,11 @@ given moment wants to set the temperature and pressure of Room1 to 26.5
 		      }
 		  ]
 	      }
-	    ],
-	    "updateAction": "UPDATE"
+	  ],
+	  "updateAction": "UPDATE"
       }
       EOF                                                                                                                    
+```
 
 As you can see, the structure of the request is exactly the same we used
 for [updateContext with APPEND for creating
@@ -742,6 +766,8 @@ Upon receipt of this request, the broker will update the values for the
 entity attributes in its internal database and will response with the
 following:
 
+
+```
       {
 	  "contextResponses": [
 	      {
@@ -769,6 +795,8 @@ following:
 	      }
 	  ]
       }                     
+      
+```
 
 Again, the structure of the response is exactly the same one we used for
 [updateContext with APPEND for creating
@@ -788,6 +816,7 @@ also illustrates that you don't need to include all the attributes of an
 entity in the updateContext, just the ones you want to update (the other
 attributes maintain their current value).
 
+```
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "contextElements": [
@@ -807,7 +836,8 @@ attributes maintain their current value).
 	    "updateAction": "UPDATE"
       }
       EOF                                                                                                                       
- 
+```
+```
       (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
       {
 	  "contextElements": [
@@ -826,7 +856,8 @@ attributes maintain their current value).
 	  ],
 	  "updateAction": "UPDATE"
       }
-      EOF                                                                                                                
+      EOF 
+```
   
 The responses for these requests are respectively:
 
