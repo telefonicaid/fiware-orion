@@ -34,7 +34,7 @@ brokerStart CB
 # 02. Create E1/attr1+attr2
 # 03. GET /v2/entities/E1
 # 04. PATCH /v2/entities/E1 attr1=4
-# 05. GET /v2/entities/E1 - see attr1=4
+# 05. GET /v2/entities/E1 - see attr1=4 AND attr2=2 (untouched)
 # 06. PATCH /v2/entities/E1 attr3=6 - error, as attr3 doesn't exist
 #
 
@@ -69,8 +69,8 @@ echo
 echo
 
 
-echo "05. GET /v2/entities/E1 - see attr1=4"
-echo "====================================="
+echo "05. GET /v2/entities/E1 - see attr1=4 AND attr2=2 (untouched)"
+echo "============================================================="
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
@@ -125,8 +125,8 @@ Date: REGEX(.*)
 
 
 
-05. GET /v2/entities/E1 - see attr1=4
-=====================================
+05. GET /v2/entities/E1 - see attr1=4 AND attr2=2 (untouched)
+=============================================================
 HTTP/1.1 200 OK
 Content-Length: 57
 Content-Type: application/json
