@@ -424,7 +424,8 @@ std::string valueTag
   const std::string&  value,
   Format              format,
   bool                showComma,
-  bool                isAssociation
+  bool                isAssociation,
+  bool                valueIsNumberOrBool
 )
 {
   if (format == XML)
@@ -432,22 +433,24 @@ std::string valueTag
     return indent + "<" + xmlTag + ">" + value + "</" + xmlTag + ">" + "\n";
   }
 
+  std::string eValue = valueIsNumberOrBool? value : JSON_STR(value);
+
   if (jsonTag == "")
   {
     if (showComma == true)
     {
-      return indent + "\"" + value + "\",\n";
+      return indent + eValue + ",\n";
     }
     else
     {
-      return indent + "\"" + value + "\"\n";
+      return indent + eValue + "\n";
     }
   }
 
   if (showComma == true)
   {
-    return indent + "\"" + jsonTag + "\" : \"" + value + "\",\n";
+    return indent + "\"" + jsonTag + "\" : " + eValue + ",\n";
   }
 
-  return indent + "\"" + jsonTag + "\" : \"" + value + "\"\n";
+  return indent + "\"" + jsonTag + "\" : " + eValue + "\n";
 }

@@ -37,7 +37,7 @@ brokerStart CB
 # 03. v2 Create E3 temperature=40, humidity=60, status=OK
 # 04. v2 Create E4 temperature=50, humidity=50, status=ERR
 # 05. v2 Create E5 temperature=60, humidity=40, status=OK
-# 06. v1 Query: temperature<60;humidity==83..61;status==ERR -> E2
+# 06. v1 Query: temperature<60;humidity==61..83;status==ERR -> E2
 #
 
 echo "01. v2 Create E1 temperature=20, humidity=80, status=OK"
@@ -105,7 +105,7 @@ orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
-echo "06. v1 Query: temperature<60;humidity==83..61;status==ERR -> E2"
+echo "06. v1 Query: temperature<60;humidity==61..83;status==ERR -> E2"
 echo "==============================================================="
 payload='{
   "entities": [
@@ -119,7 +119,7 @@ payload='{
       "scopes": [
           {
               "type": "FIWARE::StringQuery",
-              "value": "temperature<60;humidity==83..61;status==ERR"
+              "value": "temperature<60;humidity==61..83;status==ERR"
           }
       ]
   }
@@ -175,21 +175,47 @@ Date: REGEX(.*)
 
 
 
-06. v1 Query: temperature<60;humidity==83..61;status==ERR -> E2
+06. v1 Query: temperature<60;humidity==61..83;status==ERR -> E2
 ===============================================================
 HTTP/1.1 200 OK
-Content-Length: 94
+Content-Length: 616
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "errorCode": {
-        "code": "404",
-        "reasonPhrase": "No context element found"
-    }
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "humidity",
+                        "type": "",
+                        "value": 70.0
+                    },
+                    {
+                        "name": "status",
+                        "type": "",
+                        "value": "ERR"
+                    },
+                    {
+                        "name": "temperature",
+                        "type": "",
+                        "value": 30.0
+                    }
+                ],
+                "id": "E2",
+                "isPattern": "false",
+                "type": "T"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
 }
 
 
 --TEARDOWN--
 brokerStop CB
-dbDrop CB
+#dbDrop CB
