@@ -52,6 +52,8 @@ payload='{
   "A2": "2"
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
 
 
 echo "03. GET /v2/type/T1 and get a non-empty list"
@@ -72,9 +74,9 @@ Date: REGEX(.*)
 
 02. Create E1/T1/A1+A2
 ======================
-HTTP/1.1 200 OK
-Content-Length: 
-Content-Type: application/json
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
@@ -84,6 +86,18 @@ HTTP/1.1 200 OK
 Content-Length: 
 Content-Type: application/json
 Date: REGEX(.*)
+
+{
+    "attrs":
+    {
+        "A1": {
+            "value": 1
+        }, 
+        "A2": {
+            "value": "2"
+        }
+    }
+}
 
 
 --TEARDOWN--

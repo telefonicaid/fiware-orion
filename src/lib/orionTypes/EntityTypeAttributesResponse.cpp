@@ -110,3 +110,28 @@ void EntityTypeAttributesResponse::release(void)
   entityType.release();
   statusCode.release();
 }
+
+
+
+/* ****************************************************************************
+*
+* EntityTypeAttributesResponse::toJson -
+*/
+std::string EntityTypeAttributesResponse::toJson(ConnectionInfo* ciP)
+{
+  std::string  out = "{";
+  char         countV[16];
+
+  out += JSON_STR("attrs") + ":";
+
+  out += "{";
+  out += entityType.contextAttributeVector.toJson(false);
+  out += "}";
+
+  snprintf(countV, sizeof(countV), "%d", entityCount);
+
+  out += "," + JSON_STR("count") + ":" + countV;
+  out += "}";
+
+  return out;
+}

@@ -327,6 +327,8 @@ HttpStatusCode mongoAttributesForEntityType
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
 
+  responseP->entityCount = resultsArray.size();
+
   if (resultsArray.size() == 0)
   {
     responseP->statusCode.fill(SccContextElementNotFound);
