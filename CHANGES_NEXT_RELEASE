@@ -22,4 +22,4 @@ Fix:  Error handling for non-string entity::id/type (Issue #1108), attribute::ty
 Fix:  Metadata updates involving boolean/number values were not correctly processed (Issue #1113)
 Add:  PATCH /v2/entities/<entityId> - modify an entity (Issue #979)
 Add:  URI parameter 'q' for GET /v2/entities (Issue #967)
-Add:  PUT /v2/entities/<entityId>/attrs/<attrName> (Issue #991)
+Add:  PUT /v2/entities/<entityId>/attrs/<attrName>/value (Issue #999)

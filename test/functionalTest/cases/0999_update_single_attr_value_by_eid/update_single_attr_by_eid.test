@@ -30,27 +30,27 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. PUT /v2/entities/E1/attrs/A1 and see it fail
+# 01. PUT /v2/entities/E1/attrs/A1/value and see it fail
 # 02. POST /v2/entities to create E1/A1=2
 # 03. GET /v2/entities/E1 to see A1==2
-# 04. PUT /v2/entities/E1/attrs/A1=4 and see it work
+# 04. PUT /v2/entities/E1/attrs/A1/value (=4) and see it work
 # 05. GET /v2/entities/E1 to see A1==4
-# 06. PUT /v2/entities/E1/attrs/A1=true
+# 06. PUT /v2/entities/E1/attrs/A1/value (=true)
 # 07. GET /v2/entities/E1 to see A1==true
-# 08. PUT /v2/entities/E1/attrs/A1=false
+# 08. PUT /v2/entities/E1/attrs/A1/value (=false)
 # 09. GET /v2/entities/E1 to see A1==false
-# 08. PUT /v2/entities/E1/attrs/A1="STRING"
+# 08. PUT /v2/entities/E1/attrs/A1/value (="STRING")
 # 09. GET /v2/entities/E1 to see A1=="STRING"
-# 10. PUT /v2/entities/E1/attrs/A1=[ 1, 2, 3 ]
+# 10. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])
 # 11. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
-# 12. PUT /v2/entities/E1/attrs/A1={ "a": 1, "b": 2, "c": 3 }
+# 12. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })
 # 13. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
 #
 
-echo "01. PUT /v2/entities/E1/attrs/A1 and see it fail"
-echo "================================================"
+echo "01. PUT /v2/entities/E1/attrs/A1/value and see it fail"
+echo "======================================================"
 payload='{ "value": 1 }'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
  
@@ -70,10 +70,10 @@ echo
 echo
 
 
-echo "04. PUT /v2/entities/E1/attrs/A1=4 and see it work"
-echo "=================================================="
+echo "04. PUT /v2/entities/E1/attrs/A1/value (=4) and see it work"
+echo "==========================================================="
 payload='{ "value": 4 }'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -85,10 +85,10 @@ echo
 echo
 
 
-echo "06. PUT /v2/entities/E1/attrs/A1=true"
-echo "====================================="
+echo "06. PUT /v2/entities/E1/attrs/A1/value (=true)"
+echo "=============================================="
 payload='{ "value": true }'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -100,10 +100,10 @@ echo
 echo
 
 
-echo "08. PUT /v2/entities/E1/attrs/A1=false"
-echo "======================================"
+echo "08. PUT /v2/entities/E1/attrs/A1/value (=false)"
+echo "==============================================="
 payload='{ "value": false }'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -115,10 +115,10 @@ echo
 echo
 
 
-echo '08. PUT /v2/entities/E1/attrs/A1="STRING"'
-echo "========================================="
+echo '08. PUT /v2/entities/E1/attrs/A1/value (="STRING")'
+echo "=================================================="
 payload='{ "value": "STRING" }'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -130,10 +130,10 @@ echo
 echo
 
 
-echo "10. PUT /v2/entities/E1/attrs/A1=[ 1, 2, 3 ]"
-echo "============================================"
+echo "10. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])"
+echo "====================================================="
 payload='{ "value": [ 1, 2, 3 ] }'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -145,10 +145,10 @@ echo
 echo
 
 
-echo '12. PUT /v2/entities/E1/attrs/A1={ "a": 1, "b": 2, "c": 3 }'
-echo "==========================================================="
+echo '12. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })'
+echo "===================================================================="
 payload='{ "value":  { "a": 1, "b": 2, "c": 3 } }'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
 echo
 echo
 
@@ -161,8 +161,8 @@ echo
 
 
 --REGEXPECT--
-01. PUT /v2/entities/E1/attrs/A1 and see it fail
-================================================
+01. PUT /v2/entities/E1/attrs/A1/value and see it fail
+======================================================
 HTTP/1.1 404 Not Found
 Content-Length: 0
 Date: REGEX(.*)
@@ -192,8 +192,8 @@ Date: REGEX(.*)
 }
 
 
-04. PUT /v2/entities/E1/attrs/A1=4 and see it work
-==================================================
+04. PUT /v2/entities/E1/attrs/A1/value (=4) and see it work
+===========================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
@@ -214,8 +214,8 @@ Date: REGEX(.*)
 }
 
 
-06. PUT /v2/entities/E1/attrs/A1=true
-=====================================
+06. PUT /v2/entities/E1/attrs/A1/value (=true)
+==============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
@@ -236,8 +236,8 @@ Date: REGEX(.*)
 }
 
 
-08. PUT /v2/entities/E1/attrs/A1=false
-======================================
+08. PUT /v2/entities/E1/attrs/A1/value (=false)
+===============================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
@@ -258,8 +258,8 @@ Date: REGEX(.*)
 }
 
 
-08. PUT /v2/entities/E1/attrs/A1="STRING"
-=========================================
+08. PUT /v2/entities/E1/attrs/A1/value (="STRING")
+==================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
@@ -280,8 +280,8 @@ Date: REGEX(.*)
 }
 
 
-10. PUT /v2/entities/E1/attrs/A1=[ 1, 2, 3 ]
-============================================
+10. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])
+=====================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)
@@ -306,8 +306,8 @@ Date: REGEX(.*)
 }
 
 
-12. PUT /v2/entities/E1/attrs/A1={ "a": 1, "b": 2, "c": 3 }
-===========================================================
+12. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })
+====================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
 Date: REGEX(.*)

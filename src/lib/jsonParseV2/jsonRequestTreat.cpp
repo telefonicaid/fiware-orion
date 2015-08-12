@@ -73,7 +73,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     }
     break;
 
-  case EntityAttributeRequest:
+  case EntityAttributeValueRequest:
     answer = parseAttributeValue(ciP, &parseDataP->av.attribute);
     if (answer != "OK")
     {
