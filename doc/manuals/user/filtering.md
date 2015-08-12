@@ -158,9 +158,9 @@ This scope allows to express filtering conditions such as equality, unequality,
 greater/less than, range or existence.
 
 There isn't any URL parameter correspondence for this filter in NGSI v1. In NGSI v2
-it correspons with the `q` parameter:
+it corresponds to the `q` parameter:
 
-    curl localhost:1026/v2/entities?q=temperature<24;humidity==75..90;status=running
+    curl 'localhost:1026/v2/entities?q=temperature<24;humidity==75..90;status=running'
 
 For a detailed syntax description of the `value` or `q` parameter, see [NGSIv2 specification
 document](http://telefonicaid.github.io/fiware-orion/api/v2/).
