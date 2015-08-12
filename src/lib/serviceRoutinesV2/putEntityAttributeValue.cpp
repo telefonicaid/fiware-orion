@@ -29,15 +29,15 @@
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postUpdateContext.h"
-#include "serviceRoutinesV2/putEntityAttribute.h"
+#include "serviceRoutinesV2/putEntityAttributeValue.h"
 
 
 
 /* ****************************************************************************
 *
-* putEntityAttribute -
+* putEntityAttributeValue -
 *
-* PUT /v2/entities/<id>/attrs/<attrName>
+* PUT /v2/entities/<id>/attrs/<attrName>/value
 *
 * Payload In:  AttributeValue
 * Payload Out: None
@@ -49,7 +49,7 @@
 * 04. Prepare HTTP headers
 * 05. Cleanup and return result
 */
-std::string putEntityAttribute
+std::string putEntityAttributeValue
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -91,4 +91,3 @@ std::string putEntityAttribute
 
   return "";
 }
-

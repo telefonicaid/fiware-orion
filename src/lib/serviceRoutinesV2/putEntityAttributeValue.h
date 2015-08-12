@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_SERVICEROUTINESV2_PUTENTITYATTRIBUTE_H_
-#define SRC_LIB_SERVICEROUTINESV2_PUTENTITYATTRIBUTE_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_PUTENTITYATTRIBUTEVALUE_H_
+#define SRC_LIB_SERVICEROUTINESV2_PUTENTITYATTRIBUTEVALUE_H_
 
 /*
 *
@@ -35,9 +35,9 @@
 
 /* ****************************************************************************
 *
-* putEntity -
+* putEntityAttributeValue -
 */
-extern std::string putEntityAttribute
+extern std::string putEntityAttributeValue
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -45,4 +45,4 @@ extern std::string putEntityAttribute
   ParseData*                 parseDataP
 );
 
-#endif  // SRC_LIB_SERVICEROUTINESV2_PUTENTITYATTRIBUTE_H_
+#endif  // SRC_LIB_SERVICEROUTINESV2_PUTENTITYATTRIBUTEVALUE_H_
