@@ -50,7 +50,6 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
-    LM_M(("Parsing ContextAttribute. Got '%s'", name.c_str()));
     if (name == "type")
     {
       if (type != "String")
@@ -60,7 +59,6 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       }
 
       caP->type = iter->value.GetString();
-      LM_M(("Parsing ContextAttribute. Set type to '%s'", caP->type.c_str()));
     }
     else if (name == "value")
     {

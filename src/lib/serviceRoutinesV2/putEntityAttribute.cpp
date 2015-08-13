@@ -64,9 +64,7 @@ std::string putEntityAttribute
   // 01. Fill in UpdateContextRequest from URL and payload
   parseDataP->attr.attribute.name = attributeName;
 
-  parseDataP->attr.attribute.present("Attribute Before Calling postUpdateContext: ", 0);
   parseDataP->upcr.res.fill(entityId, &parseDataP->attr.attribute, "UPDATE");
-  parseDataP->upcr.res.present("upcr Before Calling postUpdateContext: ");
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
