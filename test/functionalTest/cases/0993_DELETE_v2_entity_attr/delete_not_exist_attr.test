@@ -25,7 +25,7 @@ DELETE Entity Attribute v2 not exist attribute
 
 --SHELL-INIT--
 dbInit CB
-brokerStart CB 51
+brokerStart CB
 
 --SHELL--
 
