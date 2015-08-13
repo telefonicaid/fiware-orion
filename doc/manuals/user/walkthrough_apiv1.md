@@ -127,13 +127,13 @@ procedure](../admin/database_admin.md#delete-complete-database).
 To start the broker (as root or using the sudo command):
 
 ```
-/etc/init.d/contextBroker start
+/etc/init.d/contextBroker start
 ```
 
 To restart the broker (as root or using the sudo command):
 
 ```
-/etc/init.d/contextBroker restart
+/etc/init.d/contextBroker restart
 ```
 
 [Top](#top)
@@ -151,9 +151,9 @@ terminal window where it is executed. Run it using the following
 command:
 
 ```
-# cd /dir/where/accumulator-server/is/downloaded
-# chmod a+x accumulator-server.py
-# ./accumulator-server.py 1028 /accumulate ::1 on
+# cd /dir/where/accumulator-server/is/downloaded
+# chmod a+x accumulator-server.py
+# ./accumulator-server.py 1028 /accumulate ::1 on
 ```
 
 The accumulator-server.py is also part of the contextBroker-test package (see in the administrator manual [how to install](../../../README.md#optional-packages "wikilink")). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
@@ -241,7 +241,7 @@ Some additional remarks:
 -   Check that curl is installed in your system using:
 
 ```
-# which curl
+# which curl
 ```
 
 [Top](#top)
@@ -699,9 +699,9 @@ Additional comments:
 You can update the value of entities attributes using the updateContext
 operation with UPDATE action type. The basic rule to take into account
 with updateContext is that APPEND creates new context elements, while
-UPDATE updates already existing context elements (however, current Orion
-Context Broker version interprets APPEND as UPDATE if the entity already
-exists).
+UPDATE updates already existing context elements (however, Orion
+interprets APPEND as UPDATE if the entity already
+exists; you can avoid that using [APPEND_STRICT](append_and_delete.md)).
 
 Now we will play the role of a context producer application, i.e. a
 source of context information. Let's assume that this application in a
@@ -885,6 +885,12 @@ Room2 attributes has been actually updated.
 Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures. This is an advance topic, described in
 [this section](structured_attribute_valued.md#structured-attribute-values).
+
+Finally, you can use REPLACE as updateAction. In that case, the entity
+attributes are replaced by the ones in the request. For example, if your
+entity has the attributes A and B and you send an updateContext REPLACE
+request with A, then the entity at the end will have A (i.e. B attribute
+is removed).
 
 [Top](#top)
 

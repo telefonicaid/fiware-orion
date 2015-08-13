@@ -61,6 +61,11 @@ B are there:
 	  }
       }
 
+APPEND is interpreted as UPDATE in existing context elements. However, you can use APPEND_STRICT instead of APPEND as updateAction. In that case,
+existing attributes are not updated and an error is reported in that case. Note that if your APPEND_STRICT request includes several attributes
+(e.g. A and B), some of them existing and some other not existing (e.g. A exists and B doesn't exist) the ones that doesn't exist are added (in
+this case, B is added) and an error is reported for the existing ones (in this case, an error is reported about A already exists).
+
   
 We can also remove attributes in a similar way, using the DELETE action
 type. For example, to remove attribute 'A' we will use (note the empty
