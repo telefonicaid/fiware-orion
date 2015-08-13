@@ -34,6 +34,8 @@ brokerStart CB 51
 # 02. GET /v2/entities/E1
 # 03. DELETE /v2/entities/E1/attrs/compattr
 # 04. GET /v2/entities/E1
+# 05. DELETE /v2/entities/E1/attrs/simpleattr
+# 06. GET /v2/entities/E1
 #
 
 echo "01. POST /v2/entities"
@@ -41,6 +43,7 @@ echo "===================="
 payload='{
   "id": "E1",
   "type": "T1",
+  "simpleattr": "a simple value",
   "compattr": {
     "string":  "1",
     "number":  2,
@@ -61,7 +64,7 @@ echo
 
 echo "03. DELETE /v2/entities/E1/attrs/compattr"
 echo "========================================="
-orionCurl --url /v2/entities/E1/attrs/compattr -X DELETE
+orionCurl --url /v2/entities/E1/attrs/compattr -X DELETE --json
 echo
 echo
 
@@ -72,6 +75,19 @@ orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
+
+echo "05. DELETE /v2/entities/E1/attrs/simpleattr"
+echo "==========================================="
+orionCurl --url /v2/entities/E1/attrs/simpleattr -X DELETE --json
+echo
+echo
+
+
+echo "06. GET /v2/entities/E1"
+echo "======================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
 --REGEXPECT--
 01. POST /v2/entities
 ====================
@@ -85,7 +101,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 79
+Content-Length: 109
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -96,6 +112,7 @@ Date: REGEX(.*)
         "string": "1"
     },
     "id": "E1",
+    "simpleattr": "a simple value",
     "type": "T1"
 }
 
@@ -109,6 +126,28 @@ Date: REGEX(.*)
 
 
 04. GET /v2/entities/E1
+=======================
+HTTP/1.1 200 OK
+Content-Length: 53
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "id": "E1",
+    "simpleattr": "a simple value",
+    "type": "T1"
+}
+
+
+05. DELETE /v2/entities/E1/attrs/simpleattr
+===========================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+06. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
 Content-Length: 23
