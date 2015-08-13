@@ -116,7 +116,7 @@ echo
 
 echo "08. GET /v2/type and get a list of three types, T3 now has three attributes and two entities"
 echo "============================================================================================"
-orionCurl --url /v2/type --json
+orionCurl --url /v2/type?options=count --json
 echo
 echo
 
@@ -239,6 +239,7 @@ Date: REGEX(.*)
 HTTP/1.1 200 OK
 Content-Length: 233
 Content-Type: application/json
+X-Total-Count: 4
 Date: REGEX(.*)
 
 {

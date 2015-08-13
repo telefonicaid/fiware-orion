@@ -55,7 +55,22 @@ std::string getEntityAllTypes
 
   mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
   answer = response.toJson(ciP);
-  response.release();
 
+  if (ciP->uriParam["options"] == "count")
+  {
+    long long  acc = 0;
+    char       cVec[64];
+
+    for (unsigned int ix = 0; ix < response.typeEntityVector.size(); ++ix)
+    {
+      acc += response.typeEntityVector[ix]->count;
+    }
+
+    snprintf(cVec, sizeof(cVec), "%lld", acc);
+    ciP->httpHeader.push_back("X-Total-Count");
+    ciP->httpHeaderValue.push_back(cVec);
+  }
+
+  response.release();
   return answer;
 }
