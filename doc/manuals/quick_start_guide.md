@@ -35,23 +35,24 @@ The Orion Context Broker global instance can also be used to create new entities
 
 The following command creates an entity with the attributes "city_location" and "temperature" in the Orion Context Broker:
 
+``` 
     # (curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID -X POST -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' \
             --header "X-Auth-Token: $AUTH_TOKEN" -d @- | python -mjson.tool) <<EOF
-    {  
-      "attributes" : [    
-        {      
-          "name" : "city_location",      
-          "type" : "city",      
-          "value" : "Madrid"    
-        },    
-        {      
-          "name" : "temperature",      
-          "type" : "float",      
-          "value" : "23.8"    
-        }  
-      ]
-    }
-    EOF
+{
+    "attributes": [
+        {
+            "name": "city_location",
+            "type": "city",
+            "value": "Madrid"
+        },
+        {
+            "name": "temperature",
+            "type": "float",
+            "value": "23.8"
+        }
+    ]
+}EOF
+``` 
 
 In order to check that the entity is there, you can query it the same way you queried the public sensors:
 
@@ -60,12 +61,13 @@ In order to check that the entity is there, you can query it the same way you qu
 
 And you can, of course, modify the values for the attributes, e.g. to modify the temperature:
 
+```
     # (curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID/attributes/temperature -X PUT -s -S --header 'Content-Type: application/json' \
             --header 'Accept: application/json' --header "X-Auth-Token: $AUTH_TOKEN" -d @- | python -mjson.tool) <<EOF
-    {  
-      "value": "18.4"
-    }
-    EOF
+{
+    "value": "18.4"
+}EOF
+```
 
 If you re-run the query command above, you will see that the temperature has changed to 18.4 ºC.
 

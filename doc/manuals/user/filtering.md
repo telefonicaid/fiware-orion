@@ -15,26 +15,26 @@ filters are typically used with [queryContext with patterns](walkthrough_apiv1.m
 As a general rule, filters used in standard operation use a scope
 element:
 
- 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "myEntityType",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Filter::foobar",
-		      "value": ""
-		  }
-	      ]
-	  }
-      }
-      EOF                                                                                                                 
+``` 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "myEntityType",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Filter::foobar",
+                "value": ""
+            }
+        ]
+    }
+}EOF  
+``` 
 
 while filters in convenience operations are included as parameters in
 the URL:
@@ -52,18 +52,18 @@ result is a logic "and" between all of them.
 
 The scope correspoding to this type is "FIWARE::Filter::Existence". 
 
-      ...                                                           
-      {
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Filter::Existence",
-		      "value": "entity::type"
-		  }
-	      ]
-	  }
-      }
-      ...                                                           
+```                                                          
+{
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Filter::Existence",
+                "value": "entity::type"
+            }
+        ]
+    }
+}
+```                                                            
   
 The URL parameter corresponding to this filter is 'exist'.
 

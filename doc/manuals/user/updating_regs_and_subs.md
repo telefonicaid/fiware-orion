@@ -5,11 +5,13 @@ The response to a register context request (both in
 [convenience](walkthrough_apiv1.md#convenience_context_operation)) includes a
 registration ID (a 24 hexadecimal digit number):
 
-      {
-	"duration": "PT24H",
-        "registrationId": "51bf1e0ada053170df590f20"
-      }                                  
- 
+``` 
+{
+    "duration": "PT24H",
+    "registrationId": "51bf1e0ada053170df590f20"
+}                                  
+``` 
+
 This ID can be used to update the registration. There is no special
 operation to update a registration (in this sense, it is different from
 context subscriptions and context availability subscriptions, which have
@@ -17,32 +19,32 @@ updateContextSubscription and updateContextAvailabilitySubscription
 operations). The update is done issuing a new registerContextRequest,
 with the *registrationId* set:
 
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextRegistrations": [
-	      {
-		  "entities": [
-		      {
-			  "type": "Room",
-			  "isPattern": "false",
-			  "id": "Room8"
-		      }
-		  ],
-		  "attributes": [
-		      {
-			  "name": "humidity",
-			  "type": "percentage",
-			  "isDomain": "false"
-		      }
-		  ],
-		  "providingApplication": "http://mysensors.com/Rooms"
-	      }
-	  ],
-	  "duration": "P1M",
-	  "registrationId": "51bf1e0ada053170df590f20"
-      }
-      EOF                                                                                                                                  
-  
+``` 
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextRegistrations": [
+        {
+            "entities": [
+                {
+                    "type": "Room",
+                    "isPattern": "false",
+                    "id": "Room8"
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "humidity",
+                    "type": "percentage",
+                    "isDomain": "false"
+                }
+            ],
+            "providingApplication": "http://mysensors.com/Rooms"
+        }
+    ],
+    "duration": "P1M",
+    "registrationId": "51bf1e0ada053170df590f20"
+}EOF                                                                                                                                  
+```   
 This "update registration" replaces the existing registration associated
 to that ID with the new content, including [expiration
 recalculation](duration.md#extending-duration).
