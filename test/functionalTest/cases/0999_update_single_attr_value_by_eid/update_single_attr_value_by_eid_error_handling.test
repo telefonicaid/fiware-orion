@@ -30,15 +30,15 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. PUTT /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT 
+# 01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT 
 # 02. PUT /v2/entities/E1/attrs/A1/value without 'value' in payload
 # 03. PUT /v2/entities/E1/attrs/A1/value with 'value' and 'type' in payload
 #
 
-echo "01. PUTT /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT"
-echo "========================================================================"
+echo "01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT"
+echo "==========================================================================="
 payload='{ "value": 1 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X BADVERB
 echo
 echo
 
@@ -60,8 +60,8 @@ echo
 
 
 --REGEXPECT--
-01. PUTT /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT
-========================================================================
+01. BADVERB /v2/entities/E1/attrs/A1/value to see BAD METHOD, only GET, PUT
+===========================================================================
 HTTP/1.1 405 Method Not Allowed
 Content-Length: 0
 Allow: GET, PUT
