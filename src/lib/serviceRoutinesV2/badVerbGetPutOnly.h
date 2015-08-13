@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
-#define SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
+#ifndef SRC_LIB_SERVICEROUTINES_BADVERBGETPUTONLY_H_
+#define SRC_LIB_SERVICEROUTINES_BADVERBGETPUTONLY_H_
 
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Ken Zangelin
 */
 #include <string>
 #include <vector>
@@ -35,9 +35,9 @@
 
 /* ****************************************************************************
 *
-* getEntity -
+* badVerbGetPutOnly - 
 */
-extern std::string getEntityAttribute
+extern std::string badVerbGetPutOnly
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -45,4 +45,4 @@ extern std::string getEntityAttribute
   ParseData*                 parseDataP
 );
 
-#endif  // SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
+#endif  // SRC_LIB_SERVICEROUTINES_BADVERBGETPUTONLY_H_

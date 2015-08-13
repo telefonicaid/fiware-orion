@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-GET Entitity Attribute V2
+GET Entity Attribute V2
 
 --SHELL-INIT--
 dbInit CB

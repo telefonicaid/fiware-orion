@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
-#define SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSEATTRIBUTEVALUE_H_
+#define SRC_LIB_JSONPARSEV2_PARSEATTRIBUTEVALUE_H_
 
 /*
 *
@@ -23,26 +23,18 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Ken Zangelin
 */
-#include <string>
-#include <vector>
-
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
+#include "ngsi/Request.h"
 
 
 
 /* ****************************************************************************
 *
-* getEntity -
+* parseAttributeValue - 
 */
-extern std::string getEntityAttribute
-(
-  ConnectionInfo*            ciP,
-  int                        components,
-  std::vector<std::string>&  compV,
-  ParseData*                 parseDataP
-);
+extern std::string parseAttributeValue(ConnectionInfo* ciP, ContextAttribute* eP);
 
-#endif  // SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSEATTRIBUTEVALUE_H_

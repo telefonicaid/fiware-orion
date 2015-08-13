@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
-#define SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_PUTENTITYATTRIBUTEVALUE_H_
+#define SRC_LIB_SERVICEROUTINESV2_PUTENTITYATTRIBUTEVALUE_H_
 
 /*
 *
@@ -23,7 +23,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Ken Zangelin
 */
 #include <string>
 #include <vector>
@@ -35,9 +35,9 @@
 
 /* ****************************************************************************
 *
-* getEntity -
+* putEntityAttributeValue -
 */
-extern std::string getEntityAttribute
+extern std::string putEntityAttributeValue
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -45,4 +45,4 @@ extern std::string getEntityAttribute
   ParseData*                 parseDataP
 );
 
-#endif  // SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
+#endif  // SRC_LIB_SERVICEROUTINESV2_PUTENTITYATTRIBUTEVALUE_H_

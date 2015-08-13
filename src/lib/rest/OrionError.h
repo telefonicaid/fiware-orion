@@ -50,6 +50,7 @@ typedef struct OrionError
 
   std::string  render(ConnectionInfo* ciP, const std::string& indent);
   std::string  errorStringForV2(const std::string& reasonPhrase);
+  void         fill(HttpStatusCode _code, const char* _details);
 } OrionError;
 
 #endif

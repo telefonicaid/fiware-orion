@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
-#define SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
-
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,26 +20,38 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Ken Zangelin
 */
 #include <string>
 #include <vector>
 
-#include "rest/ConnectionInfo.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
 #include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/restReply.h"
+#include "serviceRoutinesV2/badVerbGetPutOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* getEntity -
+* badVerbGetPutOnly - 
 */
-extern std::string getEntityAttribute
+std::string badVerbGetPutOnly
 (
   ConnectionInfo*            ciP,
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP
-);
+)
+{
+  ciP->httpHeader.push_back("Allow");
+  ciP->httpHeaderValue.push_back("GET, PUT");
+  ciP->httpStatusCode = SccBadVerb;
 
-#endif  // SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
+  LM_W(("Bad Input (bad verb for url '%s', method '%s')", ciP->url.c_str(), ciP->method.c_str()));
+
+  return "";
+}

@@ -1,0 +1,337 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+PUT Individual Entity Attribute
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. PUT /v2/entities/E1/attrs/A1/value and see it fail
+# 02. POST /v2/entities to create E1/A1=2
+# 03. GET /v2/entities/E1 to see A1==2
+# 04. PUT /v2/entities/E1/attrs/A1/value (=4) and see it work
+# 05. GET /v2/entities/E1 to see A1==4
+# 06. PUT /v2/entities/E1/attrs/A1/value (=true)
+# 07. GET /v2/entities/E1 to see A1==true
+# 08. PUT /v2/entities/E1/attrs/A1/value (=false)
+# 09. GET /v2/entities/E1 to see A1==false
+# 08. PUT /v2/entities/E1/attrs/A1/value (="STRING")
+# 09. GET /v2/entities/E1 to see A1=="STRING"
+# 10. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])
+# 11. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
+# 12. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })
+# 13. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
+#
+
+echo "01. PUT /v2/entities/E1/attrs/A1/value and see it fail"
+echo "======================================================"
+payload='{ "value": 1 }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+ 
+
+echo "02. POST /v2/entities to create E1/A1=2"
+echo "======================================="
+payload='{ "id": "E1", "type": "T1", "A1": 2 }'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. GET /v2/entities/E1 to see A1==2"
+echo "===================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "04. PUT /v2/entities/E1/attrs/A1/value (=4) and see it work"
+echo "==========================================================="
+payload='{ "value": 4 }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "05. GET /v2/entities/E1 to see A1==4"
+echo "===================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "06. PUT /v2/entities/E1/attrs/A1/value (=true)"
+echo "=============================================="
+payload='{ "value": true }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "07. GET /v2/entities/E1 to see A1==true"
+echo "======================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "08. PUT /v2/entities/E1/attrs/A1/value (=false)"
+echo "==============================================="
+payload='{ "value": false }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "09. GET /v2/entities/E1 to see A1==false"
+echo "========================================"
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo '08. PUT /v2/entities/E1/attrs/A1/value (="STRING")'
+echo "=================================================="
+payload='{ "value": "STRING" }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo '09. GET /v2/entities/E1 to see A1=="STRING"'
+echo "==========================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "10. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])"
+echo "====================================================="
+payload='{ "value": [ 1, 2, 3 ] }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo "11. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]"
+echo "=============================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo '12. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })'
+echo "===================================================================="
+payload='{ "value":  { "a": 1, "b": 2, "c": 3 } }'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+echo
+echo
+
+
+echo '13. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }'
+echo "============================================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. PUT /v2/entities/E1/attrs/A1/value and see it fail
+======================================================
+HTTP/1.1 404 Not Found
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+02. POST /v2/entities to create E1/A1=2
+=======================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+03. GET /v2/entities/E1 to see A1==2
+====================================
+HTTP/1.1 200 OK
+Content-Length: 37
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": 2.0,
+    "id": "E1",
+    "type": "T1"
+}
+
+
+04. PUT /v2/entities/E1/attrs/A1/value (=4) and see it work
+===========================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+05. GET /v2/entities/E1 to see A1==4
+====================================
+HTTP/1.1 200 OK
+Content-Length: 37
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": 4.0,
+    "id": "E1",
+    "type": "T1"
+}
+
+
+06. PUT /v2/entities/E1/attrs/A1/value (=true)
+==============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+07. GET /v2/entities/E1 to see A1==true
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 33
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": true,
+    "id": "E1",
+    "type": "T1"
+}
+
+
+08. PUT /v2/entities/E1/attrs/A1/value (=false)
+===============================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09. GET /v2/entities/E1 to see A1==false
+========================================
+HTTP/1.1 200 OK
+Content-Length: 34
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": false,
+    "id": "E1",
+    "type": "T1"
+}
+
+
+08. PUT /v2/entities/E1/attrs/A1/value (="STRING")
+==================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+09. GET /v2/entities/E1 to see A1=="STRING"
+===========================================
+HTTP/1.1 200 OK
+Content-Length: 37
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": "STRING",
+    "id": "E1",
+    "type": "T1"
+}
+
+
+10. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])
+=====================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+11. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 57
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": [
+        1.0,
+        2.0,
+        3.0
+    ],
+    "id": "E1",
+    "type": "T1"
+}
+
+
+12. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })
+====================================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+13. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
+=============================================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "a": 1.0,
+        "b": 2.0,
+        "c": 3.0
+    },
+    "id": "E1",
+    "type": "T1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

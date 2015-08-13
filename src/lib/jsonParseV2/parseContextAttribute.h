@@ -39,4 +39,12 @@ using namespace rapidjson;
 */
 extern std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP);
 
+
+
+/* ****************************************************************************
+*
+* parseContextAttribute - 
+*/
+extern std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP);
+
 #endif  // SRC_LIB_JSONPARSEV2_PARSECONTEXTATTRIBUTE_H_

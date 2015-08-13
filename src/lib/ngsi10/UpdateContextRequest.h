@@ -94,7 +94,9 @@ typedef struct UpdateContextRequest
                     const std::string&                   _updateActionType);
 
   void         fill(const Entity* entP, const std::string& _updateActionType);
-
+  void         fill(const std::string&   entityId,
+                    ContextAttribute*    attributeP,
+                    const std::string&   _updateActionType);
 } UpdateContextRequest;
 
 #endif
