@@ -519,24 +519,24 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement)
+std::string ContextAttribute::toJson(bool isLastElement, bool types)
 {
   std::string  out;
 
-  LM_M(("KZ2: valueType: %d, type: '%s'", valueType, type.c_str()));
-
-  if ((type == "") && (metadataVector.size() == 0))
+  if (types == true)
+  {
+    out = JSON_STR(name) + ":{" + JSON_STR("type") + ":" + JSON_STR(type) + "}"; 
+  }
+  else if ((type == "") && (metadataVector.size() == 0))
   {
     if (compoundValueP != NULL)
     {
-      LM_M(("compoundValueP != NULL"));
       if (compoundValueP->isObject())
       {
         out = JSON_STR(name) + ":{" + compoundValueP->toJson(true) + "}";
       }
       else if (compoundValueP->isVector())
       {
-        LM_M(("KZ: compoundValue is a vector"));
         out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
       }
     }
@@ -569,13 +569,10 @@ std::string ContextAttribute::toJson(bool isLastElement)
     {
       if (compoundValueP->isObject())
       {
-        LM_M(("compoundValueP != NULL 2"));
         out += JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
-        LM_M(("out: %s", out.c_str()));
       }
       else if (compoundValueP->isVector())
       {
-        LM_M(("compoundValueP != NULL 3"));
         out += JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
       }
     }

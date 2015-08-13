@@ -41,6 +41,7 @@ class TypeEntity
  public:
   std::string              type;
   ContextAttributeVector   contextAttributeVector;
+  long long                count;
 
   TypeEntity();
   explicit TypeEntity(std::string _type);

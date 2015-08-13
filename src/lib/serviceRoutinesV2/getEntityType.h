@@ -1,9 +1,9 @@
-#ifndef SRC_LIB_UTILITY_ENTITYTYPEATTRIBUTESRESPONSE_H_
-#define SRC_LIB_UTILITY_ENTITYTYPEATTRIBUTESRESPONSE_H_
+#ifndef SRC_LIB_SERVICEROUTINESV2_GETENTITYTYPE_H_
+#define SRC_LIB_SERVICEROUTINESv2_GETENTITYTYPE_H_
 
 /*
 *
-* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -28,28 +28,21 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "orionTypes/TypeEntity.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityTypeAttributesResponse -
+* getEntityType -
 */
-class EntityTypeAttributesResponse
-{
- public:
-  TypeEntity    entityType;
-  StatusCode    statusCode;
+extern std::string getEntityType
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-  std::string   render(ConnectionInfo* ciP, const std::string& indent);
-  std::string   toJson(ConnectionInfo* ciP);
-  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
-  void          present(const std::string& indent);
-  void          release(void);
-};
-
-#endif  // SRC_LIB_UTILITY_ENTITYTYPEATTRIBUTESRESPONSE_H_
+#endif  // SRC_LIB_SERVICEROUTINESv2_GETENTITYTYPE_H_

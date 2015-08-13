@@ -33,6 +33,7 @@ getEntityAttributeValue.cpp
 putEntityAttributeValue.cpp
 postEntity.cpp
 deleteEntity.cpp
+getEntityType.cpp
 badVerbGetPutOnly.cpp
 )
 
@@ -49,6 +50,7 @@ getEntityAttributeValue.h
 putEntityAttributeValue.h
 postEntity.h
 deleteEntity.h
+getEntityType.h
 badVerbGetPutOnly.h
 )
 

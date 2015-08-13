@@ -95,8 +95,8 @@ std::string EntityTypeAttributesResponse::check
 void EntityTypeAttributesResponse::present(const std::string& indent)
 {
   LM_F(("%sEntityTypeAttributesResponse:\n", indent.c_str()));
-  entityType.present("indent + "  "");
-  statusCode.present("indent + "  "");
+  entityType.present(indent + "  ");
+  statusCode.present(indent + "  ");
 }
 
 
@@ -109,4 +109,29 @@ void EntityTypeAttributesResponse::release(void)
 {
   entityType.release();
   statusCode.release();
+}
+
+
+
+/* ****************************************************************************
+*
+* EntityTypeAttributesResponse::toJson -
+*/
+std::string EntityTypeAttributesResponse::toJson(ConnectionInfo* ciP)
+{
+  std::string  out = "{";
+  char         countV[16];
+
+  snprintf(countV, sizeof(countV), "%lld", entityType.count);
+
+  out += JSON_STR("attrs") + ":";
+
+  out += "{";
+  out += entityType.contextAttributeVector.toJson(false, true);
+  out += "}";  
+
+  out += "," + JSON_STR("count") + ":" + countV;
+  out += "}";
+
+  return out;
 }

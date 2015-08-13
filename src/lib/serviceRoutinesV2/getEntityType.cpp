@@ -1,9 +1,6 @@
-#ifndef SRC_LIB_UTILITY_ENTITYTYPEATTRIBUTESRESPONSE_H_
-#define SRC_LIB_UTILITY_ENTITYTYPEATTRIBUTESRESPONSE_H_
-
 /*
 *
-* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -28,28 +25,39 @@
 #include <string>
 #include <vector>
 
-#include "common/Format.h"
-#include "ngsi/Request.h"
-#include "ngsi/StatusCode.h"
-#include "orionTypes/TypeEntity.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/ParseData.h"
+#include "serviceRoutinesV2/getEntityType.h"
+#include "mongoBackend/mongoQueryTypes.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityTypeAttributesResponse -
+* getEntityType -
+*
+* GET /v2/type/<entityType>
+*
+* Payload In:  None
+* Payload Out: EntityTypeAttributesResponse
 */
-class EntityTypeAttributesResponse
+std::string getEntityType
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
- public:
-  TypeEntity    entityType;
-  StatusCode    statusCode;
+  EntityTypeAttributesResponse  response;
+  std::string                   entityTypeName = compV[2];
+  std::string                   answer;
 
-  std::string   render(ConnectionInfo* ciP, const std::string& indent);
-  std::string   toJson(ConnectionInfo* ciP);
-  std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
-  void          present(const std::string& indent);
-  void          release(void);
-};
+  mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 
-#endif  // SRC_LIB_UTILITY_ENTITYTYPEATTRIBUTESRESPONSE_H_
+  answer = response.toJson(ciP);
+  response.release();
+
+  return answer;
+}
+

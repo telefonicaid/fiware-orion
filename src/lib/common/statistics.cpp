@@ -136,6 +136,7 @@ int noOfSubCacheEntries                                  = -1;
 int noOfSubCacheLookups                                  = -1;
 int noOfSubCacheRemovals                                 = -1;
 int noOfSubCacheRemovalFailures                          = -1;
+int noOfEntityTypeRequest                                = -1;
 
 
 
@@ -241,5 +242,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
   case PostAttributes:                                   ++noOfPostAttributes; break;
   case DeleteEntity:                                     ++noOfDeleteEntity; break;
 
+  case EntityTypeRequest:                                ++noOfEntityTypeRequest; break;
   }
 }
