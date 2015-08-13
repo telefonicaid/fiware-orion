@@ -31,6 +31,7 @@
 #include "ngsi/Request.h"
 #include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/parseEntity.h"
+#include "jsonParseV2/parseContextAttribute.h"
 
 
 
@@ -69,6 +70,14 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     {
       OrionError error(SccBadRequest, "Parse Error (" + answer + ")");
       return error.render(ciP, "");
+    }
+    break;
+
+  case EntityAttributeRequest:
+    answer = parseContextAttribute(ciP, &parseDataP->attr.attribute);
+    if (answer != "OK")
+    {
+      return answer;
     }
     break;
 

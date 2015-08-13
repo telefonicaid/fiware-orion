@@ -33,6 +33,7 @@
 #include "jsonParseV2/parseMetadata.h"
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
 
 using namespace rapidjson;
 
@@ -217,4 +218,41 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   }
 
   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseContextAttribute - 
+*/
+std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
+{
+  Document document;
+
+  document.Parse(ciP->payload);
+
+  if (document.HasParseError())
+  {
+    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
+
+    LM_W(("Bad Input (JSON parse error)"));
+    ciP->httpStatusCode = SccBadRequest;;
+    return oe.render(ciP, "");
+  }
+
+
+  if (!document.IsObject())
+  {
+    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer");
+
+    LM_E(("Bad Input (JSON Parse Error)"));
+    ciP->httpStatusCode = SccBadRequest;;
+    return oe.render(ciP, "");
+  }
+
+  Value::ConstMemberIterator iter = document.MemberBegin();
+  std::string                res  = parseContextAttributeObject(iter->value, caP);
+
+  return res;
 }

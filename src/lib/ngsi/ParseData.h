@@ -344,6 +344,16 @@ typedef struct EntityData
 
 
 /* ****************************************************************************
+ *
+* AttributeData - 
+*/
+typedef struct AttributeData
+{
+  ContextAttribute attribute;
+} AttributeData;
+
+
+/* ****************************************************************************
 *
 * ParseData -
 */
@@ -381,6 +391,7 @@ typedef struct ParseData
   UpdateContextResponseData                   upcrs;
 
   EntityData                                  ent;
+  AttributeData                               attr;
 } ParseData;
 
 #endif  // SRC_LIB_NGSI_PARSEDATA_H_
