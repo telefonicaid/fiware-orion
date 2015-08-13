@@ -29,8 +29,9 @@
 #include "rest/OrionError.h"
 #include "ngsi/ParseData.h"
 #include "ngsi/Request.h"
-#include "jsonParseV2/jsonRequestTreat.h"
 #include "jsonParseV2/parseEntity.h"
+#include "jsonParseV2/parseAttributeValue.h"
+#include "jsonParseV2/jsonRequestTreat.h"
 
 
 
@@ -72,6 +73,15 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     }
     break;
 
+  case EntityAttributeValueRequest:
+    answer = parseAttributeValue(ciP, &parseDataP->av.attribute);
+    if (answer != "OK")
+    {
+      return answer;
+    }
+    break;
+
+    
   default:
     answer = "Request Treat function not implemented";
     break;
