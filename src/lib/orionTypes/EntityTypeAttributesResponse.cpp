@@ -122,6 +122,8 @@ std::string EntityTypeAttributesResponse::toJson(ConnectionInfo* ciP)
   std::string  out = "{";
   char         countV[16];
 
+  snprintf(countV, sizeof(countV), "%lld", entityType.count);
+
   out += JSON_STR("attrs") + ":";
 
   out += "{";

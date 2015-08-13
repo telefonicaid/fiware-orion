@@ -33,8 +33,11 @@ brokerStart CB
 # 01. GET /v2/type/T1 and get an empty list
 # 02. Create E1/T1/A1+A2
 # 03. GET /v2/type/T1 and get a non-empty list
+# 04. Create E2/T1/A1+A3
+# 05. Create E3/T1/A2+A4
+# 06. Create E4/T1/A4+A3
+# 07. GET /v2/type/T1 and get a list of four attrs and four entities
 #
-
 
 echo "01. GET /v2/type/T1 and get an empty list"
 echo "========================================="
@@ -63,13 +66,64 @@ echo
 echo
 
 
+echo "04. Create E2/T1/A1+A3"
+echo "======================"
+payload='{
+  "type": "T1",
+  "id":   "E2",
+  "A1": { "type": "String", "value": "s" },
+  "A3": { "type": "Bool", "value": true }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "05. Create E3/T1/A2+A4"
+echo "======================"
+payload='{
+  "type": "T1",
+  "id":   "E3",
+  "A2": { "type": "Int", "value": 2 },
+  "A4": { "type": "String", "value": "a4" }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Create E4/T1/A4+A3"
+echo "======================"
+payload='{
+  "type": "T1",
+  "id":   "E4",
+  "A4": { "type": "String", "value": "a4" },
+  "A3": { "type": "Bool", "value": true }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "07. GET /v2/type/T1 and get a list of four attrs and four entities"
+echo "=================================================================="
+orionCurl --url /v2/type/T1 --json
+echo
+echo
+
+
 --REGEXPECT--
 01. GET /v2/type/T1 and get an empty list
 =========================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 22
 Content-Type: application/json
 Date: REGEX(.*)
+
+{
+    "attrs": {},
+    "count": 0
+}
 
 
 02. Create E1/T1/A1+A2
@@ -80,26 +134,80 @@ Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
+
 03. GET /v2/type/T1 and get a non-empty list
 ============================================
 HTTP/1.1 200 OK
-Content-Length: 
+Content-Length: 64
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "attrs":
-    {
+    "attrs": {
         "A1": {
             "type": "String"
-        }, 
+        },
         "A2": {
             "type": "Int"
         }
-    }
+    },
+    "count": 1
+}
+
+
+04. Create E2/T1/A1+A3
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+05. Create E3/T1/A2+A4
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3
+Date: REGEX(.*)
+
+
+
+06. Create E4/T1/A4+A3
+======================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4
+Date: REGEX(.*)
+
+
+
+07. GET /v2/type/T1 and get a list of four attrs and four entities
+==================================================================
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attrs": {
+        "A1": {
+            "type": "String"
+        },
+        "A2": {
+            "type": "Int"
+        },
+        "A3": {
+            "type": "Bool"
+        },
+        "A4": {
+            "type": "String"
+        }
+    },
+    "count": 4
 }
 
 
 --TEARDOWN--
 brokerStop CB
-#dbDrop CB
+dbDrop CB
