@@ -1775,7 +1775,7 @@ static bool processContextAttributeVector
         return false;
       }
     }
-    else if (strcasecmp(action.c_str(), "append") == 0)
+    else if ((strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0))
     {
       if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong))
       {
