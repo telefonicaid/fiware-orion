@@ -348,32 +348,29 @@ PaArgument paArgs[] =
 //
 // /v2 API
 //
+#define EPS                     EntryPointsRequest
+#define EPS_COMPS_V2            1, { "v2"             }
 
-#define EPS                EntryPointsRequest
-#define EPS_COMPS_V2       1, { "v2"             }
+#define ENT                     EntitiesRequest
+#define ENT_COMPS_V2            2, { "v2", "entities" }
+#define ENT_COMPS_WORD          ""
 
-#define ENT                EntitiesRequest
-#define ENT_COMPS_V2       2, { "v2", "entities" }
-#define ENT_COMPS_WORD     ""
+#define IENT                    EntityRequest
+#define IENT_COMPS_V2           3, { "v2", "entities", "*" }
+#define IENT_COMPS_WORD         ""
 
+#define IENTATTR                EntityAttributeRequest
+#define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
+#define IENTATTR_COMPS_WORD     ""
 
-#define IENT                EntityRequest
-#define IENT_COMPS_V2       3, { "v2", "entities", "*" }
-#define IENT_COMPS_WORD     ""
+#define ENTT                    EntityTypeRequest
+#define ENTT_COMPS_V2           3, { "v2", "type", "*" }
+#define ENTT_COMPS_WORD         ""
 
+#define IENTATTRVAL             EntityAttributeValueRequest
+#define IENTATTRVAL_COMPS_V2    6, { "v2", "entities", "*", "attrs", "*", "value" }
+#define IENTATTRVAL_COMPS_WORD  ""
 
-#define IENTATTR            EntityAttributeRequest
-#define IENTATTR_COMPS_V2   5, { "v2", "entities", "*", "attrs", "*" }
-#define IENTATTR_COMPS_WORD ""
-
-#define ENTT                EntityTypeRequest
-#define ENTT_COMPS_V2       3, { "v2", "type", "*" }
-#define ENTT_COMPS_WORD     ""
-
-
-#define IENTATTRVAL                EntityAttributeValueRequest
-#define IENTATTRVAL_COMPS_V2       6, { "v2", "entities", "*", "attrs", "*", "value" }
-#define IENTATTRVAL_COMPS_WORD     ""
 
 
 //
