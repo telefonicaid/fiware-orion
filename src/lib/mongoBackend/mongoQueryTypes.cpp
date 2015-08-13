@@ -50,12 +50,13 @@ static std::string attributeType
   std::string idType        = std::string("_id.") + ENT_ENTITY_TYPE;
   std::string idServicePath = std::string("_id.") + ENT_SERVICE_PATH;
   std::string attributeName = std::string(ENT_ATTRS) + "." + attrName;
+
   BSONObj query = BSON(idType        << entityType <<
                        idServicePath << fillQueryServicePath(servicePathV) <<
                        attributeName << BSON("$exists" << true));
 
   std::auto_ptr<DBClientCursor> cursor;
-  DBClientBase* connection;
+  DBClientBase*                 connection = NULL;
 
   try
   {
@@ -109,6 +110,49 @@ static std::string attributeType
 
 }
 
+/* ****************************************************************************
+*
+* countEntities -
+*
+*/
+static long long countEntities(const std::string& tenant, const std::vector<std::string>& servicePathV,std::string entityType)
+{
+  DBClientBase* connection = NULL;
+
+  std::string idType        = std::string("_id.") + ENT_ENTITY_TYPE;
+  std::string idServicePath = std::string("_id.") + ENT_SERVICE_PATH;
+
+  BSONObj query = BSON(idType        << entityType <<
+                       idServicePath << fillQueryServicePath(servicePathV));
+
+  try
+  {
+    LM_T(LmtMongo, ("count() in '%s' collection: '%s'",
+                    getEntitiesCollectionName(tenant).c_str(),
+                    query.toString().c_str()));
+
+    connection = getMongoConnection();
+    long long c = connection->count(getEntitiesCollectionName(tenant).c_str(), query);
+
+    releaseMongoConnection(connection);
+    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
+    return c;
+  }
+  catch (const DBException& e)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
+    return false;
+  }
+  catch (...)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
+    return -1;
+  }
+
+  return -1;
+}
 
 /* ****************************************************************************
 *
@@ -256,6 +300,8 @@ HttpStatusCode mongoEntityTypes
     BSONObj                  resultItem = resultsArray[ix].embeddedObject();
     TypeEntity*              entityType = new TypeEntity(resultItem.getStringField("_id"));
     std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
+
+    entityType->count = countEntities(tenant, servicePathV, entityType->type);
 
     if (!attrsArray[0].isNull())
     {
@@ -409,7 +455,7 @@ HttpStatusCode mongoAttributesForEntityType
 
   std::vector<BSONElement> resultsArray = result.getField("result").Array();
 
-  responseP->entityCount = resultsArray.size();  // FIXME P10: Here we need the number of entities with type 'entityType'
+  responseP->entityType.count = countEntities(tenant, servicePathV, entityType);
 
   if (resultsArray.size() == 0)
   {

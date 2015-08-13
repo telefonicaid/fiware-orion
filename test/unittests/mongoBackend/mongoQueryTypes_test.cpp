@@ -215,6 +215,7 @@ TEST(mongoQueryTypes, queryAllType)
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
+    EXPECT_EQ(3, res.typeEntityVector.get(0)->count);
     ASSERT_EQ(5, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
@@ -254,6 +255,7 @@ TEST(mongoQueryTypes, queryAllType)
 
     /* Type # 2 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(1)->type);
+    EXPECT_EQ(1, res.typeEntityVector.get(1)->count);
     ASSERT_EQ(2, res.typeEntityVector.get(1)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "status");
@@ -272,6 +274,7 @@ TEST(mongoQueryTypes, queryAllType)
 
     /* Type # 3 */
     EXPECT_EQ("Room", res.typeEntityVector.get(2)->type);
+    EXPECT_EQ(2, res.typeEntityVector.get(2)->count);
     ASSERT_EQ(3, res.typeEntityVector.get(2)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "humidity");
@@ -332,6 +335,7 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
+    EXPECT_EQ(3, res.typeEntityVector.get(0)->count);
     ASSERT_EQ(5, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
@@ -371,6 +375,7 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
 
     /* Type # 2 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(1)->type);
+    EXPECT_EQ(1, res.typeEntityVector.get(1)->count);
     ASSERT_EQ(2, res.typeEntityVector.get(1)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "status");
@@ -389,6 +394,7 @@ TEST(mongoQueryTypes, queryAllPaginationDetails)
 
     /* Type # 3 */
     EXPECT_EQ("Room", res.typeEntityVector.get(2)->type);
+    EXPECT_EQ(2, res.typeEntityVector.get(2)->count);
     ASSERT_EQ(3, res.typeEntityVector.get(2)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "humidity");
@@ -450,6 +456,7 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
+    EXPECT_EQ(3, res.typeEntityVector.get(0)->count);
     ASSERT_EQ(5, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
@@ -489,6 +496,7 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
 
     /* Type # 2 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(1)->type);
+    EXPECT_EQ(1, res.typeEntityVector.get(1)->count);
     ASSERT_EQ(2, res.typeEntityVector.get(1)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "status");
@@ -507,6 +515,7 @@ TEST(mongoQueryTypes, queryAllPaginationAll)
 
     /* Type # 3 */
     EXPECT_EQ("Room", res.typeEntityVector.get(2)->type);
+    EXPECT_EQ(2, res.typeEntityVector.get(2)->count);
     ASSERT_EQ(3, res.typeEntityVector.get(2)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(2)->contextAttributeVector, "humidity");
@@ -568,6 +577,7 @@ TEST(mongoQueryTypes, queryAllPaginationOnlyFirst)
 
     /* Type # 1 */
     EXPECT_EQ("Car", res.typeEntityVector.get(0)->type);
+    EXPECT_EQ(3, res.typeEntityVector.get(0)->count);
     ASSERT_EQ(5, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "fuel");
@@ -644,6 +654,7 @@ TEST(mongoQueryTypes, queryAllPaginationOnlySecond)
 
     /* Type # 2 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(0)->type);
+    EXPECT_EQ(1, res.typeEntityVector.get(0)->count);
     ASSERT_EQ(2, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "status");
@@ -699,6 +710,7 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
 
     /* Type # 1 */
     EXPECT_EQ("Lamp", res.typeEntityVector.get(0)->type);
+    EXPECT_EQ(1, res.typeEntityVector.get(0)->count);
     ASSERT_EQ(2, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "status");
@@ -717,6 +729,7 @@ TEST(mongoQueryTypes, queryAllPaginationRange)
 
     /* Type # 2 */
     EXPECT_EQ("Room", res.typeEntityVector.get(1)->type);
+    EXPECT_EQ(2, res.typeEntityVector.get(1)->count);
     ASSERT_EQ(3, res.typeEntityVector.get(1)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(1)->contextAttributeVector, "humidity");
@@ -815,6 +828,7 @@ TEST(mongoQueryTypes, queryAllPaginationNonExistingOverlap)
 
     /* Type # 1 */
     EXPECT_EQ("Room", res.typeEntityVector.get(0)->type);
+    EXPECT_EQ(2, res.typeEntityVector.get(0)->count);
     ASSERT_EQ(3, res.typeEntityVector.get(0)->contextAttributeVector.size());
 
     ca = getAttr(res.typeEntityVector.get(0)->contextAttributeVector, "humidity");
@@ -987,6 +1001,7 @@ TEST(mongoQueryTypes, queryGivenTypeBasic)
     EXPECT_EQ("OK", res.statusCode.reasonPhrase);
     EXPECT_EQ("", res.statusCode.details);
 
+    EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(5, res.entityType.contextAttributeVector.size());
 
     /* Attr # 1 */
@@ -1057,6 +1072,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationDetails)
     EXPECT_EQ("OK", res.statusCode.reasonPhrase);
     EXPECT_EQ("Count: 5", res.statusCode.details);
 
+    EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(5, res.entityType.contextAttributeVector.size());
 
     /* Attr # 1 */
@@ -1127,6 +1143,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationAll)
     EXPECT_EQ("OK", res.statusCode.reasonPhrase);
     EXPECT_EQ("", res.statusCode.details);
 
+    EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(5, res.entityType.contextAttributeVector.size());
 
     /* Attr # 1 */
@@ -1240,6 +1257,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationOnlySecond)
     EXPECT_EQ("OK", res.statusCode.reasonPhrase);
     EXPECT_EQ("", res.statusCode.details);
 
+    EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(1, res.entityType.contextAttributeVector.size());
 
     /* Attr 1 */
@@ -1283,6 +1301,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationRange)
     EXPECT_EQ("OK", res.statusCode.reasonPhrase);
     EXPECT_EQ("", res.statusCode.details);
 
+    EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(3, res.entityType.contextAttributeVector.size());
 
     /* Attr 3 */
@@ -1376,6 +1395,7 @@ TEST(mongoQueryTypes, queryGivenTypePaginationNonExistingOverlap)
     EXPECT_EQ("OK", res.statusCode.reasonPhrase);
     EXPECT_EQ("", res.statusCode.details);
 
+    EXPECT_EQ(3, res.entityType.count);
     ASSERT_EQ(2, res.entityType.contextAttributeVector.size());
 
     /* Attr 1 */

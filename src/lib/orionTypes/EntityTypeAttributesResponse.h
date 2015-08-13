@@ -43,8 +43,7 @@ class EntityTypeAttributesResponse
 {
  public:
   TypeEntity    entityType;
-  StatusCode    statusCode;
-  int           entityCount;
+  StatusCode    statusCode;  
 
   std::string   render(ConnectionInfo* ciP, const std::string& indent);
   std::string   toJson(ConnectionInfo* ciP);
