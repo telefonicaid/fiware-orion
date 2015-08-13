@@ -12,7 +12,7 @@ independence, let's consider a queryContext operation on a non-existing
 entity (e.g. "foo"). Note the -v flag in the curl command, in order to
 print the HTTP response codes and headers:
 
-    # curl localhost:1026/v1/contextEntities/foo -s -S --header 'Content-Type: application/xml' -v | xmllint --format -
+    # curl localhost:1026/v1/contextEntities/foo -s -S --header 'Content-Type: application/xml' \ -v | xmllint --format -
     * About to connect() to localhost port 1026 (#0)
     *   Trying ::1... connected
     * Connected to localhost (::1) port 1026 (#0)

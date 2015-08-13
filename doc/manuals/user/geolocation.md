@@ -15,7 +15,7 @@ example, the following updateContext request creates the entity "Madrid"
 (of type "City") with attribute "position" defined as location.
 
 ``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
         {
@@ -103,7 +103,7 @@ longitude) that provide the coordinates of the vertex. The result of the
 query would be A and B.
 
 ``` 
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -152,7 +152,7 @@ defined by coordinates (3, 3), (3, 8), (11, 8) and (11, 3).
 The result of the query would be B and C.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -199,7 +199,7 @@ to the area external to the polygon we include the inverted element set
 to "true".
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -249,7 +249,7 @@ defined by coordinates (0, 0), (0, 6) and (6, 0).
 The result of the query would be A.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -291,7 +291,7 @@ However, if we consider the query to the external area to that triangle
 would be B and C.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -352,7 +352,7 @@ center), centerLongitude (the longitude of the circle center) and radius
 (in meters). The result of the query would be Madrid and Leganes.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -386,7 +386,7 @@ meters) centred in Madrid.
 The result of the query would be Madrid, Leganes and Alcobendas.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -420,7 +420,7 @@ We use the inverted element set to "true". The result of the query would
 be Alcobendas.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {

@@ -33,7 +33,7 @@ Next, let's send a subscribeContext to A (to make B subscribe to updates
 made in A). Note that the URL used in the reference has to be
 "/v1/notifyContext":
 
-    (curl localhost:1030/v1/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+    (curl localhost:1030/v1/subscribeContext -s -S --header 'Content-Type: application/xml' \ -d @- | xmllint --format -) <<EOF
     <?xml version="1.0"?>
     <subscribeContextRequest>
       <entityIdList>
@@ -59,7 +59,7 @@ Next, let's send a subscribeContext to B (to make C subscribe to updates
 made in B). The subscription is basically the same, only the port in the
 curl line and reference elements are different.
 
-    (curl localhost:1031/v1/subscribeContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+    (curl localhost:1031/v1/subscribeContext -s -S --header 'Content-Type: application/xml' \ -d @- | xmllint --format -) <<EOF
     <?xml version="1.0"?>
     <subscribeContextRequest>
       <entityIdList>
@@ -83,7 +83,7 @@ curl line and reference elements are different.
 
 Now, let's create an entity in context broker A.
 
-    (curl localhost:1030/v1/updateContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format - ) <<EOF
+    (curl localhost:1030/v1/updateContext -s -S --header 'Content-Type: application/xml'\ -d @- | xmllint --format - ) <<EOF
     <?xml version="1.0" encoding="UTF-8"?>
     <updateContextRequest>
       <contextElementList>
@@ -110,7 +110,7 @@ notifyContextRequest to be sent to C. So, at the end, the creation of an
 entity in A causes the creation of the same entity (with the same
 attribute values) in C. You can check it by doing a queryContext to C:
 
-    (curl localhost:1032/v1/queryContext -s -S --header 'Content-Type: application/xml' -d @- | xmllint --format -) <<EOF
+    (curl localhost:1032/v1/queryContext -s -S --header 'Content-Type: application/xml' \ -d @- | xmllint --format -) <<EOF
     <?xml version="1.0" encoding="UTF-8"?>
     <queryContextRequest>
       <entityIdList>
