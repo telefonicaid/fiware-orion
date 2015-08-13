@@ -128,6 +128,7 @@
 #include "serviceRoutines/badVerbPostOnly.h"
 #include "serviceRoutines/badVerbPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostOnly.h"
+#include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
@@ -636,7 +637,8 @@ PaArgument paArgs[] =
                                                                                                        \
   { "GET",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     getEntityAttribute       }, \
   { "PUT",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     putEntityAttribute       }, \
-  { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetOnly           }
+  { "DELETE", IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     deleteEntity             }, \
+  { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetPutDeleteOnly  }
 
 
 
