@@ -344,6 +344,16 @@ typedef struct EntityData
 
 
 /* ****************************************************************************
+ *
+* AttributeData - 
+*/
+typedef struct AttributeData
+{
+  ContextAttribute attribute;
+} AttributeData;
+
+
+/* ****************************************************************************
 *
 * AttributeValueData - 
 */
@@ -392,6 +402,7 @@ typedef struct ParseData
   UpdateContextResponseData                   upcrs;
 
   EntityData                                  ent;
+  AttributeData                               attr;
   AttributeValueData                          av;
 } ParseData;
 

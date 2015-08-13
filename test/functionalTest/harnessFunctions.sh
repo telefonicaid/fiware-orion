@@ -861,14 +861,22 @@ function orionCurl()
   dMsg Executing the curl-command
   _response=$(eval $command 2> /dev/null)
 
+  if [ ! -f /tmp/httpHeaders.out ]
+  then
+    echo "Broker seems to have died ..."
+  else
+    #
+    # Remove "Connection: Keep-Alive" and "Connection: close" headers
+    #
+    sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
+    sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
+    sed '/Connection: Close/d'      /tmp/httpHeaders.out  
+  fi
 
   #
-  # Remove "Connection: Keep-Alive" and "Connection: close" headers
+  # Unless we remove the HTTP header file, it will remain for the next execution
   #
-  sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
-  sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
-  sed '/Connection: Close/d'      /tmp/httpHeaders.out  
-  
+  \rm -f /tmp/httpHeaders2.out /tmp/httpHeaders.out
 
   #
   # Print and beautify response body, if any - and if option --noPayloadCheck hasn't been set

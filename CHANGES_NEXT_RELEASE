@@ -24,4 +24,4 @@ Add:  PATCH /v2/entities/<entityId> - modify an entity (Issue #979)
 Add:  URI parameter 'q' for GET /v2/entities (Issue #967)
 Add:  PUT /v2/entities/<entityId>/attrs/<attrName>/value (Issue #999)
 Add:  DELETE /v2/entities/<entityId>/attrs/<attrName> (Issue #993)
-
+Add:  PUT /v2/entities/<entityId>/attrs/<attrName> (Issue #991)
