@@ -37,13 +37,13 @@
 
 /* ****************************************************************************
 *
-* EntityTypeAttributesResponse - 
+* EntityTypeAttributesResponse -
 */
 class EntityTypeAttributesResponse
 {
  public:
   TypeEntity    entityType;
-  StatusCode    statusCode;  
+  StatusCode    statusCode;
 
   std::string   render(ConnectionInfo* ciP, const std::string& indent);
   std::string   toJson(ConnectionInfo* ciP);

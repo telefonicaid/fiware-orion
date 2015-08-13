@@ -54,7 +54,6 @@ std::string getEntityType
   std::string                   answer;
 
   mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-  response.present("After mongoAttributesForEntityType: ");
 
   answer = response.toJson(ciP);
   response.release();
