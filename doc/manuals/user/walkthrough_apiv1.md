@@ -1605,7 +1605,7 @@ types using convenience operations):
 } EOF                                                                                                                    
 ```
 ```
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
         {
@@ -1710,6 +1710,10 @@ Additional comments:
 ``` 
 curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S \ --header 'Accept: application/json' | python -mjson.tool
 
+```
+
+
+```
  {
     "contextResponses": [
         {
@@ -2770,7 +2774,8 @@ User-Agent: orion/0.9.0
 Host: localhost:1028
 Accept: application/xml, application/json
 Content-Type: application/json
-                                                                                       
+```     
+```
       {
 	  "subscriptionId": "52a745e011f5816465943d59",
 	  "contextRegistrationResponses": [
@@ -2804,7 +2809,8 @@ User-Agent: orion/0.9.0
 Host: localhost:1028
 Accept: application/xml, application/json
 Content-Type: application/json
-                                                                                       
+```
+```
 {
     "subscriptionId": "52a745e011f5816465943d59",
     "contextRegistrationResponses": [
