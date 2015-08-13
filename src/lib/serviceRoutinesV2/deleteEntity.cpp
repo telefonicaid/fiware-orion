@@ -28,13 +28,12 @@
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
+#include "rest/OrionError.h"
 #include "rest/EntityTypeInfo.h"
 #include "apiTypesV2/ErrorCode.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
 
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
 
 /* ****************************************************************************
 *
@@ -48,6 +47,10 @@
 * URI parameters:
 *   -
 */
+
+using std::string;
+using std::vector;
+
 std::string deleteEntity
 (
   ConnectionInfo*            ciP,
@@ -56,11 +59,17 @@ std::string deleteEntity
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
-  Entity*      eP = new Entity();
+  string  answer;
+  Entity* eP    = new Entity();
 
   eP->id = compV[2];
 
+  if (compV.size() == 5)  // Deleting an attribute
+  {
+    ContextAttribute *ca = new ContextAttribute;
+    ca->name = compV[4];
+    eP->attributeVector.push_back(ca);
+  }
   // Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "DELETE");
 
@@ -79,19 +88,28 @@ std::string deleteEntity
 
     if ((scc != SccOk) && (scc != SccNone))
     {
-      ErrorCode error;
+      OrionError oe;
 
+      ciP->httpStatusCode = scc;
       if (scc == SccContextElementNotFound)
       {
-        error.fill("NotFound", "The requested entity has not been found. Check type and id");
+        oe.code = scc;
+        oe.reasonPhrase ="NotFound";
+        oe.details = "The requested entity has not been found. Check type and id";
+      }
+      else if (scc == SccInvalidParameter)
+      {
+        oe.code = SccContextElementNotFound;
+        oe.reasonPhrase ="NotFound";
+        oe.details = "Attribute not found";
+        ciP->httpStatusCode = SccContextElementNotFound; // We don't want a 472
       }
       else
       {
-        error.fill(sc);
+        oe.code = scc;
+        oe.reasonPhrase = sc.reasonPhrase;
       }
-
-      ciP->httpStatusCode = scc;
-      answer              = error.toJson(true);
+      answer = oe.render(ciP, "");
 
       eP->release();
       return answer;
@@ -103,6 +121,7 @@ std::string deleteEntity
   {
     ciP->httpStatusCode = SccNoContent;
   }
+
 
   // Cleanup and return result
   eP->release();
