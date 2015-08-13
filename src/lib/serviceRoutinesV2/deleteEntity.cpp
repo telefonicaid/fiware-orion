@@ -93,20 +93,20 @@ std::string deleteEntity
       ciP->httpStatusCode = scc;
       if (scc == SccContextElementNotFound)
       {
-          oe.code = scc;
-          oe.reasonPhrase ="NotFound";
-          oe.details = "The requested entity has not been found. Check type and id";
+        oe.code = scc;
+        oe.reasonPhrase ="NotFound";
+        oe.details = "The requested entity has not been found. Check type and id";
       }
       else if (scc == SccInvalidParameter)
       {
-          oe.code = SccContextElementNotFound;
-          oe.reasonPhrase ="NotFound";
-          oe.details = "Attribute not found";
-          ciP->httpStatusCode = SccContextElementNotFound; // We don't want a 472
+        oe.code = SccContextElementNotFound;
+        oe.reasonPhrase ="NotFound";
+        oe.details = "Attribute not found";
+        ciP->httpStatusCode = SccContextElementNotFound; // We don't want a 472
       }
       else
       {
-          oe.code = scc;
+        oe.code = scc;
       }
       answer = oe.render(ciP, "");
 
