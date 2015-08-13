@@ -20,7 +20,7 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Ken Zangelin 
 */
 #include <string>
 #include <vector>
@@ -29,27 +29,27 @@
 #include "ngsi/ParseData.h"
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postUpdateContext.h"
-#include "serviceRoutinesV2/putEntityAttribute.h"
+#include "serviceRoutinesV2/putEntityAttributeValue.h"
 
 
 
 /* ****************************************************************************
 *
-* putEntityAttribute -
+* putEntityAttributeValue -
 *
-* PUT /v2/entities/<id>/attrs/<attrName>
+* PUT /v2/entities/<id>/attrs/<attrName>/value
 *
-* Payload In:  None
-* Payload Out: Entity Attribute
+* Payload In:  AttributeValue
+* Payload Out: None
 *
 *
-* 01. Fill in UpdateContextRequest
-* 02. Call standard op postQueryContext
+* 01. Fill in UpdateContextRequest with data from URI and payload
+* 02. Call standard op postUpdateContext
 * 03. Check output from mongoBackend - any errors?
 * 04. Prepare HTTP headers
 * 05. Cleanup and return result
 */
-std::string putEntityAttribute
+std::string putEntityAttributeValue
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -57,16 +57,13 @@ std::string putEntityAttribute
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
   std::string  entityId       = compV[2];
   std::string  attributeName  = compV[4];
 
-  // 01. Fill in UpdateContextRequest from URL and payload
-  parseDataP->attr.attribute.name = attributeName;
+  // 01. Fill in UpdateContextRequest with data from URI and payload
+  parseDataP->av.attribute.name = attributeName;
+  parseDataP->upcr.res.fill(entityId, &parseDataP->av.attribute, "UPDATE");
 
-  parseDataP->attr.attribute.present("Attribute Before Calling postUpdateContext: ", 0);
-  parseDataP->upcr.res.fill(entityId, &parseDataP->attr.attribute, "UPDATE");
-  parseDataP->upcr.res.present("upcr Before Calling postUpdateContext: ");
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
@@ -91,7 +88,6 @@ std::string putEntityAttribute
 
   // 05. Cleanup and return result
   parseDataP->upcr.res.release();
-  parseDataP->upcrs.res.release();
 
-  return answer;
+  return "";
 }

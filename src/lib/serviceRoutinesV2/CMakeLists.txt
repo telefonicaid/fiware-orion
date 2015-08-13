@@ -30,8 +30,10 @@ patchEntity.cpp
 getEntityAttribute.cpp
 putEntityAttribute.cpp
 getEntityAttributeValue.cpp
+putEntityAttributeValue.cpp
 postEntity.cpp
 deleteEntity.cpp
+badVerbGetPutOnly.cpp
 )
 
 SET (HEADERS
@@ -44,8 +46,10 @@ patchEntity.h
 getEntityAttribute.h
 putEntityAttribute.h
 getEntityAttributeValue.h
+putEntityAttributeValue.h
 postEntity.h
 deleteEntity.h
+badVerbGetPutOnly.h
 )
 
 

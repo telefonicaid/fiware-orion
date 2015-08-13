@@ -50,6 +50,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
+    LM_M(("Parsing ContextAttribute. Got '%s'", name.c_str()));
     if (name == "type")
     {
       if (type != "String")
@@ -59,6 +60,7 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
       }
 
       caP->type = iter->value.GetString();
+      LM_M(("Parsing ContextAttribute. Set type to '%s'", caP->type.c_str()));
     }
     else if (name == "value")
     {
@@ -164,7 +166,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   }
   else if (type == "Array")
   {
-    LM_M(("KZ: Compound array"));
     caP->valueType = orion::ValueTypeObject;
     std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
     if (r != "OK")
@@ -178,7 +179,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   {
     std::string r;
 
-    LM_M(("KZ: Object"));
     //
     // Either Compound or '{ "type": "xxx", "value": "yyy" }'
     //
@@ -186,9 +186,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     //
     if (iter->value.HasMember("value"))
     {
-      LM_M(("KZ: Normal object"));
       r = parseContextAttributeObject(iter->value, caP);
-      LM_M(("KZ: Normal object parsed"));
       if (r != "OK")
       {
         LM_W(("Bad Input (JSON parse error in ContextAttribute::Object"));
@@ -198,7 +196,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     }
     else
     {
-      LM_M(("KZ: Compound object"));
       parseContextAttributeCompoundValue(iter, caP, NULL);
       caP->valueType = orion::ValueTypeObject;
     }
@@ -251,8 +248,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     return oe.render(ciP, "");
   }
 
-  Value::ConstMemberIterator iter = document.MemberBegin();
-  std::string                res  = parseContextAttributeObject(iter->value, caP);
+  std::string  res  = parseContextAttributeObject(document, caP);
 
   return res;
 }

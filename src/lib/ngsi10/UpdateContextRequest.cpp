@@ -332,8 +332,6 @@ void UpdateContextRequest::fill(const Entity* entP, const std::string& _updateAc
 
   contextElementVector.push_back(ceP);
   updateActionType.set(_updateActionType);
-
-  present("Before mongo: ");
 }
 
 
@@ -351,7 +349,7 @@ void UpdateContextRequest::fill
 {
   ContextElement*   ceP = new ContextElement(entityId, "", "false");
   ContextAttribute* aP  = new ContextAttribute(attributeP);
- 
+
   ceP->contextAttributeVector.push_back(aP);
   contextElementVector.push_back(ceP);
   updateActionType.set(_updateActionType);

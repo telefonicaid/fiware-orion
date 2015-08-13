@@ -87,6 +87,7 @@ std::string payloadParse
   {
     if (compV[0] == "v2")
     {
+      LM_M(("Calling jsonRequestTreat"));
       result = jsonRequestTreat(ciP, parseDataP, service->request);
     }
     else

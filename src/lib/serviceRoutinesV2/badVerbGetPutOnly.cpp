@@ -1,6 +1,3 @@
-#ifndef ORION_ERROR_H
-#define ORION_ERROR_H
-
 /*
 *
 * Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
@@ -26,31 +23,35 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "common/Format.h"
-#include "ngsi/StatusCode.h"
-#include "rest/HttpStatusCode.h"
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "rest/restReply.h"
+#include "serviceRoutinesV2/badVerbGetPutOnly.h"
 
 
 
 /* ****************************************************************************
 *
-* OrionError - 
+* badVerbGetPutOnly - 
 */
-typedef struct OrionError
+std::string badVerbGetPutOnly
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+)
 {
-  HttpStatusCode  code;
-  std::string     reasonPhrase;
-  std::string     details;
+  ciP->httpHeader.push_back("Allow");
+  ciP->httpHeaderValue.push_back("GET, PUT");
+  ciP->httpStatusCode = SccBadVerb;
 
-  OrionError();
-  OrionError(StatusCode& statusCode);
-  OrionError(HttpStatusCode _code, const std::string& _details = "");
-  OrionError(HttpStatusCode _code, std::string& _details);
+  LM_W(("Bad Input (bad verb for url '%s', method '%s')", ciP->url.c_str(), ciP->method.c_str()));
 
-  std::string  render(ConnectionInfo* ciP, const std::string& indent);
-  std::string  errorStringForV2(const std::string& reasonPhrase);
-  void         fill(HttpStatusCode _code, const char* _details);
-} OrionError;
-
-#endif
+  return "";
+}
