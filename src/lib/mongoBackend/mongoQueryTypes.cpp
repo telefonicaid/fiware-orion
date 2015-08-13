@@ -34,6 +34,84 @@
 
 /* ****************************************************************************
 *
+* attributeType -
+*
+*/
+static std::string attributeType
+(
+  const std::string&                    tenant,
+  const std::vector<std::string>&       servicePathV,
+  const std::string                     entityType,
+  const std::string                     attrName
+)
+{
+
+
+  std::string idType        = std::string("_id.") + ENT_ENTITY_TYPE;
+  std::string idServicePath = std::string("_id.") + ENT_SERVICE_PATH;
+  std::string attributeName = std::string(ENT_ATTRS) + "." + attrName;
+  BSONObj query = BSON(idType        << entityType <<
+                       idServicePath << fillQueryServicePath(servicePathV) <<
+                       attributeName << BSON("$exists" << true));
+
+  std::auto_ptr<DBClientCursor> cursor;
+  DBClientBase* connection;
+
+  try
+  {
+    LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
+                    getEntitiesCollectionName(tenant).c_str(),
+                    query.toString().c_str()));
+
+    connection = getMongoConnection();
+    cursor     = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
+
+    /*
+     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+     * exception ourselves
+     */
+    if (cursor.get() == NULL)
+    {
+      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+    }
+    releaseMongoConnection(connection);
+
+    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
+  }
+  catch (const DBException &e)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
+    return "";
+  }
+  catch (...)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
+    return "";
+  }
+
+  while (cursor->more())
+  {
+    BSONObj r = cursor->next();
+
+    LM_T(LmtMongo, ("retrieved document: '%s'", r.toString().c_str()));
+
+    /* It could happen that different entities within the same entity type may have attributes with the same name
+     * but different types. In that case, one type (at random) is returned. A list could be returned but the
+     * NGSIv2 operations only allow to set one type */
+    return r.getField(ENT_ATTRS).embeddedObject().getField(attrName).embeddedObject().getStringField(ENT_ATTRS_TYPE);
+
+  }
+
+  return "";
+
+}
+
+
+/* ****************************************************************************
+*
 * mongoEntityTypes -
 */
 HttpStatusCode mongoEntityTypes
@@ -176,7 +254,7 @@ HttpStatusCode mongoEntityTypes
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
     BSONObj                  resultItem = resultsArray[ix].embeddedObject();
-    TypeEntity*              type       = new TypeEntity(resultItem.getStringField("_id"));
+    TypeEntity*              entityType = new TypeEntity(resultItem.getStringField("_id"));
     std::vector<BSONElement> attrsArray = resultItem.getField("attrs").Array();
 
     if (!attrsArray[0].isNull())
@@ -187,13 +265,17 @@ HttpStatusCode mongoEntityTypes
         if (attrsArray[jx].isNull())
         {
           continue;
-        }        
-        ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), "", "");
-        type->contextAttributeVector.push_back(ca);
+        }
+        /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
+         * This could be unefficient, specially if the number of attributes is large */
+        std::string attrType = attributeType(tenant, servicePathV, entityType->type , attrsArray[jx].str());
+
+        ContextAttribute* ca = new ContextAttribute(attrsArray[jx].str(), attrType, "");
+        entityType->contextAttributeVector.push_back(ca);
       }
     }
 
-    responseP->typeEntityVector.push_back(type);
+    responseP->typeEntityVector.push_back(entityType);
   }
 
   char detailsMsg[256];
@@ -353,7 +435,9 @@ HttpStatusCode mongoAttributesForEntityType
       continue;
     }
 
-    std::string attrType = "";  // FIXME P10: Here we need the name of the attribute-type
+    /* Note that we need and extra query() to the database (inside attributeType() function) to get each attribute type.
+     * This could be unefficient, specially if the number of attributes is large */
+    std::string attrType = attributeType(tenant, servicePathV, entityType , idField.str());
 
     ContextAttribute*  ca = new ContextAttribute(idField.str(), attrType, "");
     responseP->entityType.contextAttributeVector.push_back(ca);
