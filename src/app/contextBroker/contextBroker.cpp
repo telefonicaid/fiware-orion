@@ -642,8 +642,8 @@ PaArgument paArgs[] =
   { "DELETE", IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     deleteEntity             }, \
   { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetPutDeleteOnly  }, \
                                                                                                        \
-  { "GET",    ENTT,          ENTT_COMPS_V2,       ENTT_COMPS_WORD,         getEntityType            }, \
-  { "*",      ENTT,          ENTT_COMPS_V2,       ENTT_COMPS_WORD,         badVerbGetOnly           }
+  { "GET",    ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         getEntityType            }, \
+  { "*",      ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         badVerbGetOnly           }
 
 
 
