@@ -107,6 +107,7 @@ std::string deleteEntity
       else
       {
         oe.code = scc;
+        oe.reasonPhrase = sc.reasonPhrase;
       }
       answer = oe.render(ciP, "");
 
