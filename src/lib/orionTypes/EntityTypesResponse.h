@@ -49,6 +49,7 @@ class EntityTypesResponse
   std::string       check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
   void              present(const std::string& indent);
   void              release(void);
+  std::string       toJson(ConnectionInfo* ciP);
 };
 
 #endif  // SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_

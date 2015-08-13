@@ -149,3 +149,28 @@ void TypeEntity::release(void)
 {
   contextAttributeVector.release();
 }
+
+
+
+/* ****************************************************************************
+*
+* TypeEntity::toJson -
+*/
+std::string TypeEntity::toJson(ConnectionInfo* ciP)
+{
+  std::string  out = "{";
+  char         countV[16];
+
+  snprintf(countV, sizeof(countV), "%lld", count);
+
+  out += JSON_STR("attrs") + ":";
+
+  out += "{";
+  out += contextAttributeVector.toJson(false, true);
+  out += "}";
+
+  out += "," + JSON_STR("count") + ":" + countV;
+  out += "}";
+
+  return out;
+}

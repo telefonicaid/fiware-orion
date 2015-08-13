@@ -27,21 +27,22 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "serviceRoutinesV2/getEntityType.h"
+#include "serviceRoutinesV2/getEntityAllTypes.h"
+#include "orionTypes/EntityTypesResponse.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
 
 
 /* ****************************************************************************
 *
-* getEntityType -
+* getEntityAllTypes -
 *
-* GET /v2/type/<entityType>
+* GET /v2/type
 *
 * Payload In:  None
-* Payload Out: EntityTypeAttributesResponse
+* Payload Out: EntityTypesResponse
 */
-std::string getEntityType
+std::string getEntityAllTypes
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -49,12 +50,10 @@ std::string getEntityType
   ParseData*                 parseDataP
 )
 {
-  EntityTypeAttributesResponse  response;
-  std::string                   entityTypeName = compV[2];
-  std::string                   answer;
+  EntityTypesResponse  response;
+  std::string          answer;
 
-  mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-
+  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
   answer = response.toJson(ciP);
   response.release();
 

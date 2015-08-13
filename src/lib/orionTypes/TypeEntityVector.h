@@ -38,9 +38,9 @@
 */
 class TypeEntityVector
 {
+ public:
   std::vector<TypeEntity*> vec;
 
- public:
   TypeEntityVector();
 
   void          present(const std::string& indent);

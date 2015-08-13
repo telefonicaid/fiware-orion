@@ -181,6 +181,7 @@
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutinesV2/deleteEntity.h"
 #include "serviceRoutinesV2/getEntityType.h"
+#include "serviceRoutinesV2/getEntityAllTypes.h"
 #include "serviceRoutinesV2/patchEntity.h"
 
 #include "contextBroker/version.h"
@@ -371,6 +372,9 @@ PaArgument paArgs[] =
 #define IENTATTRVAL_COMPS_V2    6, { "v2", "entities", "*", "attrs", "*", "value" }
 #define IENTATTRVAL_COMPS_WORD  ""
 
+#define ETT                     EntityAllTypesRequest
+#define ETT_COMPS_V2            2, { "v2", "type" }
+#define ETT_COMPS_WORD          ""
 
 
 //
@@ -643,7 +647,11 @@ PaArgument paArgs[] =
   { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetPutDeleteOnly  }, \
                                                                                                        \
   { "GET",    ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         getEntityType            }, \
-  { "*",      ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         badVerbGetOnly           }
+  { "*",      ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         badVerbGetOnly           }, \
+                                                                                                       \
+  { "GET",    ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          getEntityAllTypes        }, \
+  { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }
+
 
 
 
