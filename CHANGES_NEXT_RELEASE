@@ -26,4 +26,6 @@ Add:  PUT /v2/entities/<entityId>/attrs/<attrName>/value (Issue #999)
 Add:  DELETE /v2/entities/<entityId>/attrs/<attrName> (Issue #993)
 Add:  PUT /v2/entities/<entityId>/attrs/<attrName> (Issue #991)
 Add:  GET /v2/type/<type> (Issue #1028)
+Add:  APPEND_STRICT action type for POST /v1/updateContext operation
+Add:  REPLACE action type for POST /v1/updateContext operation
 Add:  GET /v2/type (Issue #1027)
