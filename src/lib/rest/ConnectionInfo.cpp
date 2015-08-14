@@ -65,11 +65,11 @@ static bool isValidOption(std::string item)
 
 /* ****************************************************************************
 *
-* uriParamOptionsParse - 
+* uriParamOptionsParse - parse the URI param 'options' into uriParamOptions map
 *
-* FIXME P5: We could maintain a vector of 'allowed' option valuess and if a call is made with 
-*           any other value we could return an error.
-*           It would be fairly easy and it would make life easier for our users ...
+* RETURN VALUE
+*  0  on success
+* <0  on error
 */
 int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
 {
