@@ -365,7 +365,7 @@ PaArgument paArgs[] =
 #define IENTATTR_COMPS_WORD     ""
 
 #define ENTT                    EntityTypeRequest
-#define ENTT_COMPS_V2           3, { "v2", "type", "*" }
+#define ENTT_COMPS_V2           3, { "v2", "types", "*" }
 #define ENTT_COMPS_WORD         ""
 
 #define IENTATTRVAL             EntityAttributeValueRequest
@@ -373,7 +373,7 @@ PaArgument paArgs[] =
 #define IENTATTRVAL_COMPS_WORD  ""
 
 #define ETT                     EntityAllTypesRequest
-#define ETT_COMPS_V2            2, { "v2", "type" }
+#define ETT_COMPS_V2            2, { "v2", "types" }
 #define ETT_COMPS_WORD          ""
 
 
