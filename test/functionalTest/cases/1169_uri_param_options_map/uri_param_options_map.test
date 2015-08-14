@@ -75,7 +75,7 @@ echo
 
 echo "06. Error: Test an arbitrary API v2 path"
 echo "========================================"
-orionCurl --url /v2/type?options=BAD --json
+orionCurl --url /v2/types?options=BAD --json
 echo
 echo
 
