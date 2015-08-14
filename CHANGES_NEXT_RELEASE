@@ -28,3 +28,4 @@ Add:  PUT /v2/entities/<entityId>/attrs/<attrName> (Issue #991)
 Add:  GET /v2/types/<type> (Issue #1028)
 Add:  APPEND_STRICT action type for POST /v1/updateContext operation
 Add:  REPLACE action type for POST /v1/updateContext operation
+Fix:  Removed the check of forbidden characters for the values of the URI parameter 'idPattern'
