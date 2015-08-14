@@ -195,9 +195,9 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
 
   //
   // Now check the URI param has no invalid characters
-  // Except for the URI param 'q' that is not to be checked for invalid characters
+  // Except for the URI params 'q' and 'idPattern' that are not to be checked for invalid characters
   //
-  if (key != "q")
+  if ((key != "q") && (key != "idPattern"))
   {
     if (forbiddenChars(ckey) || forbiddenChars(val))
     {
