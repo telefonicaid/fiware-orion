@@ -45,7 +45,6 @@ std::string EntityTypeAttributesResponse::render(ConnectionInfo* ciP, const std:
   std::string out                 = "";
   std::string tag                 = "entityTypeAttributesResponse";
 
-  
   out += startTag(indent, tag, ciP->outFormat, false);
 
   out += entityType.render(ciP, indent + "  ", true, true);

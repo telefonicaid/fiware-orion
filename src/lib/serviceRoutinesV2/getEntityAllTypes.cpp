@@ -27,21 +27,22 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "serviceRoutinesV2/getEntityType.h"
+#include "serviceRoutinesV2/getEntityAllTypes.h"
+#include "orionTypes/EntityTypesResponse.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
 
 
 /* ****************************************************************************
 *
-* getEntityType -
+* getEntityAllTypes -
 *
-* GET /v2/type/<entityType>
+* GET /v2/type
 *
 * Payload In:  None
-* Payload Out: EntityTypeAttributesResponse
+* Payload Out: EntityTypesResponse
 */
-std::string getEntityType
+std::string getEntityAllTypes
 (
   ConnectionInfo*            ciP,
   int                        components,
@@ -49,14 +50,27 @@ std::string getEntityType
   ParseData*                 parseDataP
 )
 {
-  EntityTypeAttributesResponse  response;
-  std::string                   entityTypeName = compV[2];
-  std::string                   answer;
+  EntityTypesResponse  response;
+  std::string          answer;
 
-  mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-
+  mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
   answer = response.toJson(ciP);
-  response.release();
 
+  if (ciP->uriParam["options"] == "count")
+  {
+    long long  acc = 0;
+    char       cVec[64];
+
+    for (unsigned int ix = 0; ix < response.typeEntityVector.size(); ++ix)
+    {
+      acc += response.typeEntityVector[ix]->count;
+    }
+
+    snprintf(cVec, sizeof(cVec), "%lld", acc);
+    ciP->httpHeader.push_back("X-Total-Count");
+    ciP->httpHeaderValue.push_back(cVec);
+  }
+
+  response.release();
   return answer;
 }

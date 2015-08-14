@@ -50,6 +50,7 @@ class TypeEntity
   std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool typeNameBefore = false);  
   void          present(const std::string& indent);
   void          release(void);
+  std::string   toJson(ConnectionInfo* ciP);
 };
 
 #endif  // SRC_LIB_UTILITY_TYPEENTITY_H_

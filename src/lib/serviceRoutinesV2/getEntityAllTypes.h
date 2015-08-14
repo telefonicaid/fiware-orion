@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_SERVICEROUTINESV2_GETENTITYALLTYPES_H_
+#define SRC_LIB_SERVICEROUTINESv2_GETENTITYALLTYPES_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -27,36 +30,19 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "serviceRoutinesV2/getEntityType.h"
-#include "mongoBackend/mongoQueryTypes.h"
 
 
 
 /* ****************************************************************************
 *
-* getEntityType -
-*
-* GET /v2/type/<entityType>
-*
-* Payload In:  None
-* Payload Out: EntityTypeAttributesResponse
+* getEntityAllTypes -
 */
-std::string getEntityType
+extern std::string getEntityAllTypes
 (
   ConnectionInfo*            ciP,
   int                        components,
   std::vector<std::string>&  compV,
   ParseData*                 parseDataP
-)
-{
-  EntityTypeAttributesResponse  response;
-  std::string                   entityTypeName = compV[2];
-  std::string                   answer;
+);
 
-  mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
-
-  answer = response.toJson(ciP);
-  response.release();
-
-  return answer;
-}
+#endif  // SRC_LIB_SERVICEROUTINESv2_GETENTITYALLTYPES_H_

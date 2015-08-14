@@ -113,6 +113,7 @@ const char* requestType(RequestType rt)
   case DeleteEntity:                                     return "DeleteEntity";
 
   case EntityTypeRequest:                                return "EntityTypeRequest";
+  case EntityAllTypesRequest:                            return "EntityAllTypesRequest";
   }
 
   return "";

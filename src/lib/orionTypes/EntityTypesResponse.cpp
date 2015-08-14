@@ -112,3 +112,27 @@ void EntityTypesResponse::release(void)
   statusCode.release();
 }
 
+
+/* ****************************************************************************
+*
+* EntityTypesResponse::toJson - 
+*/
+std::string EntityTypesResponse::toJson(ConnectionInfo* ciP)
+{
+  std::string  out = "{";
+
+  for (unsigned int ix = 0; ix < typeEntityVector.vec.size(); ++ix)
+  {
+    out += JSON_STR(typeEntityVector.vec[ix]->type) + ":";
+    out += typeEntityVector.vec[ix]->toJson(ciP);
+
+    if (ix != typeEntityVector.vec.size() - 1)
+    {
+      out += ",";
+    }
+  }
+
+  out += "}";
+
+  return out;
+}
