@@ -30,3 +30,4 @@ Add:  APPEND_STRICT action type for POST /v1/updateContext operation
 Add:  REPLACE action type for POST /v1/updateContext operation
 Fix:  Removed the check of forbidden characters for the values of the URI parameter 'idPattern'
 Add:  GET /v2/types (Issue #1027)
+Fix:  Made broker respond with 400 Bad Request on encountering invalid items in URI parameter 'options' (Issue #1169)

@@ -183,6 +183,18 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     // If URI_PARAM_ATTRIBUTE_FORMAT used, set URI_PARAM_ATTRIBUTES_FORMAT as well
     ciP->uriParam[URI_PARAM_ATTRIBUTES_FORMAT] = value;
   }
+  else if (key == URI_PARAM_OPTIONS)
+  {
+    ciP->uriParam[URI_PARAM_OPTIONS] = value;
+
+    if (uriParamOptionsParse(ciP, val) != 0)
+    {
+      OrionError error(SccBadRequest, "Invalid value for URI param /options/");
+
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP, "");
+    }
+  }
   else
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
 

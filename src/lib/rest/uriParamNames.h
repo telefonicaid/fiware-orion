@@ -43,6 +43,7 @@
 #define URI_PARAM_EXIST                   "exist"
 #define URI_PARAM_ATTRIBUTES_FORMAT       "attributesFormat"
 #define URI_PARAM_ATTRIBUTE_FORMAT        "attributeFormat"
+#define URI_PARAM_OPTIONS                 "options"
 
 
 
