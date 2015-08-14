@@ -61,10 +61,6 @@ bool EntityInfo::match
   // If type non-empty - perfect match is mandatory
   // If type is empty - always matches
   //
-
-  LM_M(("KZ: type: '%s'", type.c_str()));
-  LM_M(("KZ: entityType: '%s'", entityType.c_str()));
-
   if ((type != "") && (entityType != type) && (entityType != ""))
   {
     return false;

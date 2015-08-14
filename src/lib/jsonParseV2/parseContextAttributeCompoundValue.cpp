@@ -54,39 +54,6 @@ static orion::ValueType stringToCompoundType(std::string nodeType)
 
 /* ****************************************************************************
 *
-* stringValue - 
-*/
-static char* stringValue(orion::CompoundValueNode* cvnP, char* buffer)
-{
-  if (cvnP->valueType == orion::ValueTypeString)
-  {
-    return (char*) cvnP->stringValue.c_str();
-  }
-  else if (cvnP->valueType == orion::ValueTypeBoolean)
-  {
-    return (char*) "Boolean";
-  }
-  else if (cvnP->valueType == orion::ValueTypeObject)
-  {
-    return (char*) "Object";
-  }
-  else if (cvnP->valueType == orion::ValueTypeVector)
-  {
-    return (char*) "Array";
-  }
-  else if (cvnP->valueType == orion::ValueTypeNumber)
-  {
-    sprintf(buffer, "%f", cvnP->numberValue);
-    return buffer;
-  }
-
-  return (char*) "unknown type";
-}
-
-
-
-/* ****************************************************************************
-*
 * parseContextAttributeCompoundValue - 
 */
 std::string parseContextAttributeCompoundValue
@@ -98,23 +65,16 @@ std::string parseContextAttributeCompoundValue
 {
   std::string  type   = jsonParseTypeNames[node->GetType()];
 
-  LM_M(("Got a node of type %s", type.c_str()));
-
   if (node->IsObject())
   {
     int counter  = 0;
 
-    LM_M(("Got an OBJECT (%d members) in a vector", node->MemberCount(), type.c_str()));
-
     for (Value::ConstMemberIterator iter = node->MemberBegin(); iter != node->MemberEnd(); ++iter)
     {
-      char                       buffer[256];
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
       orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
 
       cvnP->valueType  = stringToCompoundType(nodeType);
-
-      LM_M(("Object Member: %s", iter->name.GetString()));
 
       cvnP->name       = iter->name.GetString();
       cvnP->container  = parent;
@@ -147,14 +107,12 @@ std::string parseContextAttributeCompoundValue
       }
 
       parent->childV.push_back(cvnP);
-      LM_M(("KZ: pushed %s: %s (%s)", nodeType.c_str(), cvnP->path.c_str(), stringValue(cvnP, buffer)));
         
       //
       // Recursive call if Object or Array
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        LM_M(("Recursive call as Object or Array"));
         parseContextAttributeCompoundValue(iter, caP, cvnP);
       }
 
@@ -163,12 +121,10 @@ std::string parseContextAttributeCompoundValue
   }
   else if (node->IsArray())
   {
-    LM_M(("Got an ARRAY (size: %d) in a vector - parsing stops here. For now ...", node->Size(), type.c_str()));
     int counter  = 0;
 
     for (Value::ConstValueIterator iter = node->Begin(); iter != node->End(); ++iter)
     {
-      char                       buffer[256];
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
       char                       itemNo[4];
@@ -207,14 +163,12 @@ std::string parseContextAttributeCompoundValue
       }
 
       parent->childV.push_back(cvnP);
-      LM_M(("KZ: pushed Array-member %d: %s: %s (%s)", counter, nodeType.c_str(), cvnP->path.c_str(), stringValue(cvnP, buffer)));
 
       //
       // Recursive call if Object or Array
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        LM_M(("Object/Array inside Array"));
         parseContextAttributeCompoundValue(iter, caP, cvnP);
       }
 
@@ -241,11 +195,8 @@ std::string parseContextAttributeCompoundValue
   std::string type   = jsonParseTypeNames[node->value.GetType()];
   std::string name   = node->name.GetString();
 
-  LM_M(("Got: %s (%s)", name.c_str(), type.c_str()));
-
   if (caP->compoundValueP == NULL)
   {
-    LM_M(("KZ-Comp: Got a TOPLEVEL %s", type.c_str()));
     caP->compoundValueP            = new orion::CompoundValueNode();
     caP->compoundValueP->name      = "TOP";
     caP->compoundValueP->container = caP->compoundValueP;
@@ -268,7 +219,6 @@ std::string parseContextAttributeCompoundValue
 
     for (Value::ConstValueIterator iter = node->value.Begin(); iter != node->value.End(); ++iter)
     {
-      char                       buffer[256];
       std::string                nodeType  = jsonParseTypeNames[iter->GetType()];
       orion::CompoundValueNode*  cvnP      = new orion::CompoundValueNode();
       char                       itemNo[4];
@@ -307,14 +257,12 @@ std::string parseContextAttributeCompoundValue
       }
 
       parent->childV.push_back(cvnP);
-      LM_M(("KZ: pushed Array-member %d: %s: %s (%s)", counter, nodeType.c_str(), cvnP->path.c_str(), stringValue(cvnP, buffer)));
 
       //
       // Recursive call if Object or Array
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        LM_M(("Object/Array inside Array"));
         parseContextAttributeCompoundValue(iter, caP, cvnP);
       }
 
@@ -327,7 +275,6 @@ std::string parseContextAttributeCompoundValue
 
     for (Value::ConstMemberIterator iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
     {
-      char                       buffer[256];
       std::string                nodeType = jsonParseTypeNames[iter->value.GetType()];
       orion::CompoundValueNode*  cvnP     = new orion::CompoundValueNode();
 
@@ -363,14 +310,12 @@ std::string parseContextAttributeCompoundValue
       }
 
       parent->childV.push_back(cvnP);
-      LM_M(("KZ: pushed %s: %s (%s)", nodeType.c_str(), cvnP->path.c_str(), stringValue(cvnP, buffer)));
         
       //
       // Recursive call if Object or Array
       //
       if ((nodeType == "Object") || (nodeType == "Array"))
       {
-        LM_M(("Recursive call as Object or Array"));
         parseContextAttributeCompoundValue(iter, caP, cvnP);
       }
 
