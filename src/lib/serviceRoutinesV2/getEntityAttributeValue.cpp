@@ -36,6 +36,10 @@
 
 
 
+#include "logMsg/logMsg.h"
+#include "logMsg/traceLevels.h"
+
+
 /* ****************************************************************************
 *
 * getEntityAttributeValue -
@@ -56,6 +60,12 @@ std::string getEntityAttributeValue
 {
   std::string  answer;
   Attribute    attribute;
+
+  bool text = (ciP->uriParam["options"]=="text" || ciP->httpHeaders.accept == "text/plain");
+
+  LM_W((">>>>>>>>>>>>>>>>>>>>>>>>>>>>    Accept '%s'", ciP->httpHeaders.accept.c_str()));
+
+
 
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
@@ -88,8 +98,16 @@ std::string getEntityAttributeValue
     // Do not use attribute name, change to value
     attribute.pcontextAttribute->name = "value";
 
-    answer = attribute.render(ciP, EntityAttributeResponse);
-  }
+    if (!text)
+    {
+      answer = attribute.render(ciP, EntityAttributeResponse);
+    }
+    else
+    {
+      answer = attribute.pcontextAttribute->toStringValue();
+      ciP->outFormat = TEXT;
+    }
+ }
 
   // Cleanup and return result
   parseDataP->qcr.res.release();

@@ -328,6 +328,7 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
 
   bool xml  = false;
   bool json = false;
+  bool text = true;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -353,12 +354,13 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
      }
 
      std::string format = vec[ix].c_str();
-     if (format == "*/*")              { xml  = true; json = true; }
+     if (format == "*/*")              { xml  = true; json = true; text=true;}
      if (format == "*/xml")            xml  = true;
      if (format == "application/*")    { xml  = true; json = true; }
      if (format == "application/xml")  xml  = true;
      if (format == "application/json") json = true;
      if (format == "*/json")           json = true;
+     if (format == "text/plain")       text = true;
      
      if ((acceptTextXml == true) && (format == "text/xml"))  xml = true;
 
@@ -381,6 +383,10 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
     else if (xml == true)
     {
       return XML;
+    }
+    else if (text)
+    {
+      return TEXT;
     }
   }
   else

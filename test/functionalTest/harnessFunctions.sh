@@ -816,11 +816,14 @@ function orionCurl()
 
   if   [ "$_in"  == "xml" ];   then _inFormat='--header "Content-Type: application/xml"'
   elif [ "$_in"  == "json" ];  then _inFormat='--header "Content-Type: application/json"'
+  elif [ "$_in"  == "text" ];  then _inFormat='--header "Content-Type: text/plain"'
   elif [ "$_in"  != "" ];      then _inFormat='--header "Content-Type: '${_in}'"'
   fi
 
   if   [ "$_out" == "xml" ];   then _outFormat='--header "Accept: application/xml"'; payloadCheckFormat='xml'
   elif [ "$_out" == "json" ];  then _outFormat='--header "Accept: application/json"'; payloadCheckFormat='json'
+  elif [ "$_out" == "text" ];  then _outFormat='--header "Accept: text/plain"'; _noPayloadCheck='on'
+  elif [ "$_out" == "any" ];   then _outFormat='--header "Accept: */*"'; _noPayloadCheck='on'
   elif [ "$_out" != "" ];      then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
   fi
 
