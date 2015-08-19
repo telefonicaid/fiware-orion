@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. POST /v1/updateContext
-# 02. GET /v2/entities/8787GHY/brand/value?options=text
+# 02. GET /v2/entities/8787GHY/brand/value with Accept
 #
 
 echo "01. POST /v1/updateContext"

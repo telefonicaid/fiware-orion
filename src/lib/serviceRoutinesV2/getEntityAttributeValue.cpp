@@ -35,11 +35,6 @@
 #include "apiTypesV2/Attribute.h"
 
 
-
-#include "logMsg/logMsg.h"
-#include "logMsg/traceLevels.h"
-
-
 /* ****************************************************************************
 *
 * getEntityAttributeValue -
@@ -60,12 +55,7 @@ std::string getEntityAttributeValue
 {
   std::string  answer;
   Attribute    attribute;
-
-  bool text = (ciP->uriParam["options"]=="text" || ciP->httpHeaders.accept == "text/plain");
-
-  LM_W((">>>>>>>>>>>>>>>>>>>>>>>>>>>>    Accept '%s'", ciP->httpHeaders.accept.c_str()));
-
-
+  bool         text = (ciP->uriParam["options"]=="text" || ciP->httpHeaders.accept == "text/plain");
 
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
@@ -95,16 +85,31 @@ std::string getEntityAttributeValue
     attribute.pcontextAttribute->type = "";
     attribute.pcontextAttribute->metadataVector.release();
 
-    // Do not use attribute name, change to value
-    attribute.pcontextAttribute->name = "value";
-
     if (!text)
     {
+      //Do not use attribute name, change to value
+      attribute.pcontextAttribute->name = "value";
       answer = attribute.render(ciP, EntityAttributeResponse);
     }
     else
     {
-      answer = attribute.pcontextAttribute->toStringValue();
+
+      if (attribute.pcontextAttribute->compoundValueP != NULL)
+      {
+        answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, "");
+        if (attribute.pcontextAttribute->compoundValueP->isObject())
+        {
+            answer = "{" + answer + "}";
+        }
+        else if (attribute.pcontextAttribute->compoundValueP->isVector())
+        {
+           answer = "[" + answer + "]";
+        }
+      }
+      else
+      {
+        answer = attribute.pcontextAttribute->toStringValue();
+      }
       ciP->outFormat = TEXT;
     }
  }
