@@ -55,7 +55,7 @@ std::string getEntityAttributeValue
 {
   std::string  answer;
   Attribute    attribute;
-  bool         text = (ciP->uriParam["options"]=="text" || ciP->httpHeaders.accept == "text/plain");
+  bool         text = (ciP->uriParam["options"] == "text" || ciP->outFormat == TEXT);
 
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
@@ -87,13 +87,12 @@ std::string getEntityAttributeValue
 
     if (!text)
     {
-      //Do not use attribute name, change to value
+      // Do not use attribute name, change to 'value'
       attribute.pcontextAttribute->name = "value";
       answer = attribute.render(ciP, EntityAttributeResponse);
     }
     else
     {
-
       if (attribute.pcontextAttribute->compoundValueP != NULL)
       {
         answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, "");
