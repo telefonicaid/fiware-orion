@@ -35,7 +35,6 @@
 #include "apiTypesV2/Attribute.h"
 
 
-
 /* ****************************************************************************
 *
 * getEntityAttributeValue -
@@ -56,6 +55,7 @@ std::string getEntityAttributeValue
 {
   std::string  answer;
   Attribute    attribute;
+  bool         text = (ciP->uriParam["options"] == "text" || ciP->outFormat == TEXT);
 
   // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
@@ -85,11 +85,33 @@ std::string getEntityAttributeValue
     attribute.pcontextAttribute->type = "";
     attribute.pcontextAttribute->metadataVector.release();
 
-    // Do not use attribute name, change to value
-    attribute.pcontextAttribute->name = "value";
-
-    answer = attribute.render(ciP, EntityAttributeResponse);
-  }
+    if (!text)
+    {
+      // Do not use attribute name, change to 'value'
+      attribute.pcontextAttribute->name = "value";
+      answer = attribute.render(ciP, EntityAttributeResponse);
+    }
+    else
+    {
+      if (attribute.pcontextAttribute->compoundValueP != NULL)
+      {
+        answer = attribute.pcontextAttribute->compoundValueP->render(ciP, JSON, "");
+        if (attribute.pcontextAttribute->compoundValueP->isObject())
+        {
+            answer = "{" + answer + "}";
+        }
+        else if (attribute.pcontextAttribute->compoundValueP->isVector())
+        {
+           answer = "[" + answer + "]";
+        }
+      }
+      else
+      {
+        answer = attribute.pcontextAttribute->toStringValue();
+      }
+      ciP->outFormat = TEXT;
+    }
+ }
 
   // Cleanup and return result
   parseDataP->qcr.res.release();
