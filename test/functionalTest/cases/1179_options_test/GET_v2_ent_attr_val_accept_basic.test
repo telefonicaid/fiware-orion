@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 # 01. POST /v1/updateContext
-# 02. GET /v2/entities/8787GHY/brand/value with Accept
+# 02. GET /v2/entities/8787GHY/brand/value with Accept == text/plain
 #
 
 echo "01. POST /v1/updateContext"
@@ -57,8 +57,8 @@ echo
 echo
 
 
-echo "02. GET /v2/entities/8787GHY/attrs/speed/value with Accept"
-echo "=========================================================="
+echo "02. GET /v2/entities/8787GHY/attrs/speed/value with Accept == plain/text"
+echo "========================================================================"
 orionCurl --url /v2/entities/8787GHY/attrs/speed/value --out text
 echo
 echo
@@ -95,8 +95,8 @@ Date: REGEX(.*)
 }
 
 
-02. GET /v2/entities/8787GHY/attrs/speed/value with Accept
-==========================================================
+02. GET /v2/entities/8787GHY/attrs/speed/value with Accept == plain/text
+========================================================================
 HTTP/1.1 200 OK
 Content-Length: 3
 Content-Type: text/plain
