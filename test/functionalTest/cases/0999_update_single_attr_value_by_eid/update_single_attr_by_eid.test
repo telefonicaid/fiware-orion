@@ -39,12 +39,12 @@ brokerStart CB
 # 07. GET /v2/entities/E1 to see A1==true
 # 08. PUT /v2/entities/E1/attrs/A1/value (=false)
 # 09. GET /v2/entities/E1 to see A1==false
-# 08. PUT /v2/entities/E1/attrs/A1/value (="STRING")
-# 09. GET /v2/entities/E1 to see A1=="STRING"
-# 10. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])
-# 11. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
-# 12. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })
-# 13. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
+# 10. PUT /v2/entities/E1/attrs/A1/value (="STRING")
+# 11. GET /v2/entities/E1 to see A1=="STRING"
+# 12. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])
+# 13. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
+# 14. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })
+# 15. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
 #
 
 echo "01. PUT /v2/entities/E1/attrs/A1/value and see it fail"
@@ -114,8 +114,7 @@ orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
-
-echo '08. PUT /v2/entities/E1/attrs/A1/value (="STRING")'
+echo '10. PUT /v2/entities/E1/attrs/A1/value (="STRING")'
 echo "=================================================="
 payload='{ "value": "STRING" }'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
@@ -123,14 +122,14 @@ echo
 echo
 
 
-echo '09. GET /v2/entities/E1 to see A1=="STRING"'
+echo '11. GET /v2/entities/E1 to see A1=="STRING"'
 echo "==========================================="
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
 
-echo "10. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])"
+echo "12. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])"
 echo "====================================================="
 payload='{ "value": [ 1, 2, 3 ] }'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
@@ -138,14 +137,14 @@ echo
 echo
 
 
-echo "11. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]"
+echo "13. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]"
 echo "=============================================="
 orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
 
-echo '12. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })'
+echo '14. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })'
 echo "===================================================================="
 payload='{ "value":  { "a": 1, "b": 2, "c": 3 } }'
 orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
@@ -153,7 +152,7 @@ echo
 echo
 
 
-echo '13. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }'
+echo '15. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }'
 echo "============================================================="
 orionCurl --url /v2/entities/E1 --json
 echo
@@ -258,7 +257,7 @@ Date: REGEX(.*)
 }
 
 
-08. PUT /v2/entities/E1/attrs/A1/value (="STRING")
+10. PUT /v2/entities/E1/attrs/A1/value (="STRING")
 ==================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -266,7 +265,7 @@ Date: REGEX(.*)
 
 
 
-09. GET /v2/entities/E1 to see A1=="STRING"
+11. GET /v2/entities/E1 to see A1=="STRING"
 ===========================================
 HTTP/1.1 200 OK
 Content-Length: 37
@@ -280,7 +279,7 @@ Date: REGEX(.*)
 }
 
 
-10. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])
+12. PUT /v2/entities/E1/attrs/A1/value (=[ 1, 2, 3 ])
 =====================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -288,7 +287,7 @@ Date: REGEX(.*)
 
 
 
-11. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
+13. GET /v2/entities/E1 to see A1==[ 1, 2, 3 ]
 ==============================================
 HTTP/1.1 200 OK
 Content-Length: 57
@@ -306,7 +305,7 @@ Date: REGEX(.*)
 }
 
 
-12. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })
+14. PUT /v2/entities/E1/attrs/A1/value (={ "a": 1, "b": 2, "c": 3 })
 ====================================================================
 HTTP/1.1 204 No Content
 Content-Length: 0
@@ -314,7 +313,7 @@ Date: REGEX(.*)
 
 
 
-13. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
+15. GET /v2/entities/E1 to see A1=={ "a": 1, "b": 2, "c": 3 }
 =============================================================
 HTTP/1.1 200 OK
 Content-Length: 69
