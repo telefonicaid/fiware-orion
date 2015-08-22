@@ -1257,8 +1257,7 @@ static bool addTriggeredSubscriptions
 
 /* ****************************************************************************
 *
-* processSubscriptions
-*
+* processSubscriptions - send a notification for each subscription in the map
 */
 static bool processSubscriptions
 (
@@ -1270,10 +1269,9 @@ static bool processSubscriptions
   std::vector<std::string>                  servicePathV
 )
 {
-  DBClientBase* connection = NULL;
+  DBClientBase*  connection  = NULL;
+  bool           ret         = true;
 
-  /* For each subscription in the map, send notification */
-  bool ret = true;
   err = "";
 
   for (std::map<string, TriggeredSubscription*>::iterator it = subs.begin(); it != subs.end(); ++it)
@@ -1369,7 +1367,7 @@ static bool processSubscriptions
     /* Release object created dynamically (including the value in the map created by addTriggeredSubscriptions */
     trigs->attrL.release();
     enV.release();
-    delete it->second;
+    delete trigs;
   }
 
   subs.clear();

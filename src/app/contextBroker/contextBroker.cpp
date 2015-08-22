@@ -1182,6 +1182,13 @@ void orionExit(int code, const std::string& reason)
 */
 void exitFunc(void)
 {
+  if (subCache != NULL)
+  {
+    subCache->release();
+    delete subCache;
+    subCache = NULL;
+  }
+
   curl_context_cleanup();
   curl_global_cleanup();
 

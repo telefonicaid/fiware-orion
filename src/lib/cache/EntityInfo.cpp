@@ -42,7 +42,9 @@ namespace orion
 EntityInfo::EntityInfo(const std::string& idPattern, const std::string& _entityType)
 {
   regcomp(&entityIdPattern, idPattern.c_str(), 0);
-  entityType = _entityType;
+
+  entityType               = _entityType;
+  entityIdPatternToBeFreed = true;
 }
 
 
@@ -78,7 +80,11 @@ bool EntityInfo::match
 */
 void EntityInfo::release(void)
 {
-  regfree(&entityIdPattern);
+  if (entityIdPatternToBeFreed)
+  {
+    regfree(&entityIdPattern);
+    entityIdPatternToBeFreed = false;
+  }
 }
 
 

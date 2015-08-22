@@ -27,6 +27,9 @@
 # ------------------------------------------------------------------------------
 #
 # Find out in which directory this script resides
+# And also, and the script directory under toplevel to PATH - to reach
+# the DB scripts dbList.sh, dbReset.sh, and dbResetAllFtest.sh
+# We need those to remove all ftest* databases before starting a functest
 #
 dirname=$(dirname $0)
 
@@ -39,6 +42,11 @@ cd $dirname
 export SCRIPT_HOME=$(pwd)
 cd - > /dev/null 2>&1
 
+cd $SCRIPT_HOME/../../
+export PROJ_HOME=$(pwd)
+cd - > /dev/null 2>&1
+
+export PATH=$PATH:$PROJ_HOME/scripts
 
 
 # ------------------------------------------------------------------------------
@@ -58,7 +66,7 @@ fi
 #
 rm -f /tmp/orionFuncTestDebug.log
 echo $(date) > /tmp/orionFuncTestDebug.log
-
+echo $(date) > /tmp/orionFuncTestDbReset.log
 
 
 # -----------------------------------------------------------------------------
@@ -598,6 +606,7 @@ function partExecute()
 # runTest - the function that runs ONE test case
 #
 # 1.    Remove old output files
+# 1.1   Clean mongo from ftest* databases
 # 2.1.  Create the various test files from '$path'
 # 3.1.  Run the SHELL-INIT part
 # 3.2.  If [ $? != 0 ] || [ STDERR != empty ]   ERROR
@@ -635,6 +644,11 @@ function runTest()
     return
   fi
 
+  # 1.1 Clean mongo from ftest* databases
+  echo Cleaning mongo from ftest databases for $filename >> /tmp/orionFuncTestDbReset.log
+  dbResetAllFtest.sh                                     >> /tmp/orionFuncTestDbReset.log
+  echo                                                   >> /tmp/orionFuncTestDbReset.log
+
   # 2. Create the various test files from '$path'
   fileCreation $path $filename
   if [ "$toBeStopped" == "yes" ]
@@ -667,7 +681,7 @@ function runTest()
     # a try to start a broker while the old one (from the previous functest) is still running.
     # No way to test this, except with some patience.
     #
-    # We have seem 'ERROR 11' around once every 500-1000 functests (the suite is of almost 400 tests)
+    # We have seen 'ERROR 11' around once every 500-1000 functests (the suite is of almost 400 tests)
     # and this fix, if working, will make us not see those 'ERROR 11' again.
     # If we keep seeing 'ERROR 11' after this change then we will need to investigate further.
     #

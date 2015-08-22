@@ -417,6 +417,12 @@ void Subscription::release(void)
   }
 
   entityIdInfos.clear();
+
+  for (unsigned int ix = 0; ix < attributes.size(); ++ix)
+  {
+    attributes.erase(attributes.begin() + ix);
+  }
+  attributes.clear();
 }
 
 

@@ -54,6 +54,27 @@
 
 
 /* ****************************************************************************
+ *
+* delayedRelease - 
+*/
+static void delayedRelease(JsonDelayedRelease* releaseP)
+{
+  if (releaseP->entity != NULL)
+  {
+    releaseP->entity->release();
+    releaseP->entity = NULL;
+  }
+
+  if (releaseP->attribute != NULL)
+  {
+    releaseP->attribute->release();
+    releaseP->attribute = NULL;
+  }
+}
+
+
+
+/* ****************************************************************************
 *
 * payloadParse - 
 */
@@ -64,6 +85,7 @@ std::string payloadParse
   RestService*               service,
   XmlRequest**               reqPP,
   JsonRequest**              jsonPP,
+  JsonDelayedRelease*        jsonReleaseP,
   std::vector<std::string>&  compV
 )
 {
@@ -87,7 +109,7 @@ std::string payloadParse
   {
     if (compV[0] == "v2")
     {
-      result = jsonRequestTreat(ciP, parseDataP, service->request);
+      result = jsonRequestTreat(ciP, parseDataP, service->request, jsonReleaseP);
     }
     else
     {
@@ -321,6 +343,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
   XmlRequest*               reqP       = NULL;
   JsonRequest*              jsonReqP   = NULL;
   ParseData                 parseData;
+  JsonDelayedRelease        jsonRelease;
 
   if ((ciP->url.length() == 0) || ((ciP->url.length() == 1) && (ciP->url.c_str()[0] == '/')))
   {
@@ -376,7 +399,7 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
 
       LM_T(LmtParsedPayload, ("Parsing payload for URL '%s', method '%s', service vector index: %d", ciP->url.c_str(), ciP->method.c_str(), ix));
       ciP->parseDataP = &parseData;
-      response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP, compV);
+      response = payloadParse(ciP, &parseData, &serviceV[ix], &reqP, &jsonReqP, &jsonRelease, compV);
       LM_T(LmtParsedPayload, ("payloadParse returns '%s'", response.c_str()));
 
       if (response != "OK")
@@ -387,9 +410,15 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         {
           reqP->release(&parseData);
         }
+
         if (jsonReqP != NULL)
         {
           jsonReqP->release(&parseData);
+        }
+
+        if (ciP->apiVersion == "v2")
+        {
+          delayedRelease(&jsonRelease);
         }
 
         compV.clear();
@@ -435,6 +464,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
         jsonReqP->release(&parseData);
       }
 
+      if (ciP->apiVersion == "v2")
+      {
+        delayedRelease(&jsonRelease);
+      }
+
       compV.clear();
         
       return response;
@@ -455,6 +489,11 @@ std::string restService(ConnectionInfo* ciP, RestService* serviceV)
     if (jsonReqP != NULL)
     {
       jsonReqP->release(&parseData);
+    }
+
+    if (ciP->apiVersion == "v2")
+    {
+      delayedRelease(&jsonRelease);
     }
 
     compV.clear();

@@ -125,6 +125,7 @@ std::string deleteEntity
 
   // Cleanup and return result
   eP->release();
+  delete eP;
 
   return "";
 }

@@ -612,8 +612,9 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   for (int ix = 0; ix < servicePaths; ++ix)
   {
-    ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));    
-    ciP->servicePathV[ix] = removeTrailingSlash(ciP->servicePathV[ix]);
+    std::string stripped = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));
+
+    ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 
     LM_T(LmtServicePath, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
