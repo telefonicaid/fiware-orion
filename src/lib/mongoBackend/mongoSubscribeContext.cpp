@@ -212,7 +212,7 @@ HttpStatusCode mongoSubscribeContext
     if (patternBased && onchange)
     {
       std::string oidString = oid.toString();
-      subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oidString, expiration, notifyFormat));    // LEAK: three_subscriptions.valgrind.out
+      subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oidString, expiration, notifyFormat));
     }
 
 

@@ -353,17 +353,22 @@ function localBrokerStart()
 
   #  
   # Start broker under valgrind if VALGRIND set to 1 and if it's the 'main' broker
-  #  
+  # 
+  # This is IMPORTANT
+  # In test cases involving more than **one** broker - valgrind is run only for the CB, not CP1 etc.
+  # Having valgrind run for *every broker* destroys the result of the main broker (the 'CB' broker).
+  # The 'other' brokers mess up the output file from valgrind, i.e. the result of the main broker 
+  # is destroyed.
+  # So, now ONLY the broker started as 'CB' is started under VALGRIND
+  # 
+  # [ A *number* of old leaks were discovered when this modification was made. ]
+  #
   if [ "$VALGRIND" == "" ] || [ "$port" != "$CB_PORT" ]; then
     $CB_START_CMD
     # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
     sleep 1
-    # FIXME: brokerStartAwait $port ...
+    # FIXME: brokerStartAwait $port  instead of sleep 1?
   else
-    #
-    # FIXME: What happens with valgrind when more than one broker is started ... ?
-    #
-    #
     valgrind $CB_START_CMD > /tmp/valgrind.out 2>&1 &
 
     # Waiting for valgrind to start (sleep a maximum of 10 secs)

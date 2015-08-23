@@ -595,7 +595,7 @@ std::string postUpdateContext
         if (aP->providingApplication.get() == "")
         {
           ContextAttribute ca(aP);
-          response.foundPush(&cerP->contextElement.entityId, &ca);  // LEAK: update_false_registration_and_one_more_value.valgrind.out
+          response.foundPush(&cerP->contextElement.entityId, &ca);
           continue;
         }
 
