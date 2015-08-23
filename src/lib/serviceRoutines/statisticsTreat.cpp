@@ -368,10 +368,18 @@ std::string statisticsTreat
     out += TAG_ADD_COUNTER("logRequests", noOfLogRequests);
   }
 
+#if 0
+  //
+  // The valgrind test suite uses REST GET /version to check that the broker is alive
+  // This fact makes the statistics change and some working functests fail under valgrindTestSuite
+  // due to the 'extra' version-request in the statistics.
+  // Removing version-requests from the statistics 'report' fixes this problem.
+  //
   if (noOfVersionRequests != -1)
   {
     out += TAG_ADD_COUNTER("versionRequests", noOfVersionRequests);
   }
+#endif
 
   if (noOfExitRequests != -1)
   {

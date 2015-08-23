@@ -583,7 +583,8 @@ std::string postUpdateContext
         //
         if (aP->found == false)
         {
-          response.notFoundPush(&cerP->contextElement.entityId, new ContextAttribute(aP), NULL);
+          ContextAttribute ca(aP);
+          response.notFoundPush(&cerP->contextElement.entityId, &ca, NULL);
           continue;
         }
 
@@ -593,7 +594,8 @@ std::string postUpdateContext
         //
         if (aP->providingApplication.get() == "")
         {
-          response.foundPush(&cerP->contextElement.entityId, new ContextAttribute(aP));
+          ContextAttribute ca(aP);
+          response.foundPush(&cerP->contextElement.entityId, &ca);  // LEAK: update_false_registration_and_one_more_value.valgrind.out
           continue;
         }
 

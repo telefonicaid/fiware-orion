@@ -158,8 +158,15 @@ echo
 echo
 
 
-echo "05. Statistics"
-echo "=============="
+echo "05. Statistics in XML"
+echo "====================="
+orionCurl --url /statistics
+echo
+echo
+
+
+echo "06. Statistics in JSON"
+echo "======================"
 orionCurl --url /statistics --json
 echo
 echo
@@ -220,20 +227,38 @@ Broker Stopped
 Broker Restarted
 
 
-05. Statistics
-==============
+05. Statistics in XML
+=====================
 HTTP/1.1 200 OK
-Content-Length: 176
+Content-Length: 230
+Content-Type: application/xml
+Date: REGEX(.*)
+
+<?xml version="1.0"?>
+<orion>
+  <xmlRequests>REGEX((1|2))</xmlRequests>
+  <statisticsRequests>1</statisticsRequests>
+  <subCacheEntries>3</subCacheEntries>
+  <uptime_in_secs>REGEX(\d)</uptime_in_secs>
+  <measuring_interval_in_secs>REGEX(\d)</measuring_interval_in_secs>
+</orion>
+
+
+06. Statistics in JSON
+======================
+HTTP/1.1 200 OK
+Content-Length: 201
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "orion": {
-        "jsonRequests": "1", 
-        "measuring_interval_in_secs": "REGEX(\d)", 
-        "statisticsRequests": "1", 
-        "subCacheEntries": "3", 
-        "uptime_in_secs": "REGEX(\d)"
+        "jsonRequests": "1",
+        "measuring_interval_in_secs": "REGEX(\d)",
+        "statisticsRequests": "2",
+        "subCacheEntries": "3",
+        "uptime_in_secs": "REGEX(\d)",
+        "xmlRequests": "REGEX((1|2))"
     }
 }
 

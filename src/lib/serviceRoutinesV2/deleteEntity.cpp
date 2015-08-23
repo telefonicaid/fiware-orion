@@ -112,6 +112,7 @@ std::string deleteEntity
       answer = oe.render(ciP, "");
 
       eP->release();
+      delete eP;
       return answer;
     }
   }

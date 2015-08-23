@@ -199,7 +199,7 @@ int stringSplit(const std::string& in, char delimiter, std::vector<std::string>&
   // 4. pick up all components
   for (int ix = 0; ix < components; ix++)
   {
-    outV.push_back(start);
+    outV.push_back(start);  // LEAK: three_subscriptions.valgrind.out
     start = &start[strlen(start) + 1];
   }
 

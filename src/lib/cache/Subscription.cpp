@@ -137,7 +137,7 @@ Subscription::Subscription
   //
   for (ix = 0; ix < scrP->attributeList.attributeV.size(); ++ix)
   {
-    attributes.push_back(scrP->attributeList.attributeV[ix]);
+    attributes.push_back(scrP->attributeList.attributeV[ix]);  // LEAK, see three_subscriptions.valgrind.out
   }
 
 
@@ -227,7 +227,7 @@ Subscription::Subscription
 */
 void Subscription::entityIdInfoAdd(EntityInfo* entityIdInfoP)
 {
-  entityIdInfos.push_back(entityIdInfoP);
+  entityIdInfos.push_back(entityIdInfoP);  // LEAK: three_subscriptions.valgrind.out
 }
 
 
@@ -417,12 +417,15 @@ void Subscription::release(void)
   }
 
   entityIdInfos.clear();
+  attributes.clear();
 
+#if 0
+  I think 'clear' takes care of this ...
   for (unsigned int ix = 0; ix < attributes.size(); ++ix)
   {
     attributes.erase(attributes.begin() + ix);
   }
-  attributes.clear();
+#endif
 }
 
 

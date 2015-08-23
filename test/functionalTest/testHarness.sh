@@ -22,14 +22,12 @@
 #
 # Author: Ken Zangelin
 
-
+date
+testStartTime=$(date +%s.%2N)
 
 # ------------------------------------------------------------------------------
 #
 # Find out in which directory this script resides
-# And also, and the script directory under toplevel to PATH - to reach
-# the DB scripts dbList.sh, dbReset.sh, and dbResetAllFtest.sh
-# We need those to remove all ftest* databases before starting a functest
 #
 dirname=$(dirname $0)
 
@@ -42,11 +40,6 @@ cd $dirname
 export SCRIPT_HOME=$(pwd)
 cd - > /dev/null 2>&1
 
-cd $SCRIPT_HOME/../../
-export PROJ_HOME=$(pwd)
-cd - > /dev/null 2>&1
-
-export PATH=$PATH:$PROJ_HOME/scripts
 
 
 # ------------------------------------------------------------------------------
@@ -66,7 +59,7 @@ fi
 #
 rm -f /tmp/orionFuncTestDebug.log
 echo $(date) > /tmp/orionFuncTestDebug.log
-echo $(date) > /tmp/orionFuncTestDbReset.log
+
 
 
 # -----------------------------------------------------------------------------
@@ -606,7 +599,6 @@ function partExecute()
 # runTest - the function that runs ONE test case
 #
 # 1.    Remove old output files
-# 1.1   Clean mongo from ftest* databases
 # 2.1.  Create the various test files from '$path'
 # 3.1.  Run the SHELL-INIT part
 # 3.2.  If [ $? != 0 ] || [ STDERR != empty ]   ERROR
@@ -643,11 +635,6 @@ function runTest()
     echo toBeStopped == yes
     return
   fi
-
-  # 1.1 Clean mongo from ftest* databases
-  echo Cleaning mongo from ftest databases for $filename >> /tmp/orionFuncTestDbReset.log
-  dbResetAllFtest.sh                                     >> /tmp/orionFuncTestDbReset.log
-  echo                                                   >> /tmp/orionFuncTestDbReset.log
 
   # 2. Create the various test files from '$path'
   fileCreation $path $filename
@@ -784,6 +771,10 @@ do
   fi
 done
 
+
+testEndTime=$(date +%s.%2N)
+testDiffTime=$(echo $testEndTime - $testStartTime | bc)" seconds"
+echo Total test time: $testDiffTime
 
 
 # ------------------------------------------------------------------------------

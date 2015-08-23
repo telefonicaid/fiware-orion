@@ -106,5 +106,5 @@ Date: REGEX(.*)
 brokerStop CB
 dbDrop CB
 
-# The following drop is to prevent the case in which the test failed and two databases were created
+# The following drop is in case the test failed and two databases were actually created
 dbDrop ${CB_DATABASE_NAME}-foo

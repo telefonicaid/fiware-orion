@@ -49,7 +49,7 @@ Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orion>
-  <xmlRequests>1</xmlRequests>
+  <xmlRequests>REGEX((1|2))</xmlRequests>
   <statisticsRequests>1</statisticsRequests>
   <uptime_in_secs>REGEX(1?\d)</uptime_in_secs>
   <measuring_interval_in_secs>REGEX(1?\d)</measuring_interval_in_secs>
@@ -68,7 +68,7 @@ Date: REGEX(.*)
         "measuring_interval_in_secs": "REGEX(1?\d)", 
         "statisticsRequests": "2", 
         "uptime_in_secs": "REGEX(1?\d)", 
-        "xmlRequests": "1"
+        "xmlRequests": "REGEX((1|2))"
     }
 }
 

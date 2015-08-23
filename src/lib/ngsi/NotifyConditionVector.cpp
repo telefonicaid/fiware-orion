@@ -110,7 +110,7 @@ void NotifyConditionVector::present(const std::string& indent)
 */
 void NotifyConditionVector::push_back(NotifyCondition* item)
 {
-  vec.push_back(item);
+  vec.push_back(item);  // LEAK: three_subscriptions.valgrind.out
 }
 
 

@@ -51,6 +51,15 @@ export FUNC_TEST_RUNNING_UNDER_VALGRIND="true"
 export CB_TEST_PORT=9999
 
 
+# -----------------------------------------------------------------------------
+#
+# valgrindTestSuite.sh is always executed from the git root directory
+#
+# To find the executables under 'scripts', we add the directory to the PATH variable
+#
+export PATH=$PATH:$PWD/scripts
+
+
 
 # -----------------------------------------------------------------------------
 #
@@ -58,7 +67,7 @@ export CB_TEST_PORT=9999
 #
 function usage()
 {
-  echo $0 "[-u (usage)] [-v (verbose)] [-filter (test filter)] [-dryrun (don't execute any tests)] [-leakTest (test a memory leak)] <pure|harness>"
+  echo $0 "[-u (usage)] [-v (verbose)] [-filter (test filter)] [-dryrun (don't execute any tests)] [-leakTest (test a memory leak)] [-dryLeaks (simulate leaks and functest errors)] [-fromIx (index of test where to start)] [-ixList <list of testNo indexes> ] <pure|harness|both>"
   exit $1
 }
 
@@ -98,6 +107,25 @@ function fileCleanup()
 
 # -----------------------------------------------------------------------------
 #
+# If any mongo database ftest-ftest exists, strange memory leaks appear ...
+# So, before starting, it's important to remove all ftest DBs
+#
+function dbReset()
+{
+  test=$1
+
+  echo "Resetting database for $test" >> /tmp/valgrindDbReset.log
+  dbResetAllFtest.sh >> /tmp/valgrindDbReset.log 2>&1
+}
+
+date
+date > /tmp/valgrindDbReset.log
+dbReset ALL
+totalStartTime=$(date +%s.%2N)
+
+
+# -----------------------------------------------------------------------------
+#
 # Init file already sourced?
 #
 if [ "$CONTEXTBROKER_TESTENV_SOURCED" != "YES" ]
@@ -120,11 +148,15 @@ fi
 #
 # Parsing parameters
 #
+typeset -i fromIx
 verbose=off
-mode=all
+mode=harness
 TEST_FILTER=${TEST_FILTER:-"*.*test"}
 dryrun=off
 leakTest=off
+dryLeaks=off
+fromIx=0
+ixLists=""
 
 vMsg "parsing options"
 while [ "$#" != 0 ]
@@ -134,8 +166,12 @@ do
   elif [ "$1" == "-leakTest" ]; then leakTest=on;
   elif [ "$1" == "-filter" ];   then TEST_FILTER=$2; shift;
   elif [ "$1" == "-dryrun" ];   then dryrun=on;
+  elif [ "$1" == "-dryLeaks" ]; then dryLeaks=on;
   elif [ "$1" == "pure" ];      then mode=pure;
   elif [ "$1" == "harness" ];   then mode=harness;
+  elif [ "$1" == "both" ];      then mode=both;
+  elif [ "$1" == "-fromIx" ];   then  shift; fromIx=$1;
+  elif [ "$1" == "-ixList" ];   then  shift; ixList=$1;
   else
     echo $0: bad parameter/option: "'"${1}"'";
     usage 1
@@ -214,19 +250,18 @@ function add()
 function brokerStart()
 {
     # Starting contextBroker in valgrind with a clean database
+    dbReset "$1"
     killall contextBroker 2> /dev/null
     echo 'db.dropDatabase()' | mongo valgrindtest --quiet > /dev/null
-    echo NAME: $NAME > /tmp/NAME
-    valgrind --memcheck:leak-check=full --show-reachable=yes --trace-children=yes contextBroker -port ${CB_TEST_PORT} -db leaktest -harakiri -t0-255 > "${NAME}.out" 2>&1 &
+    valgrind --memcheck:leak-check=full --show-reachable=yes --trace-children=yes contextBroker -port ${CB_TEST_PORT} -db leaktest -harakiri -t0-255 > ${NAME}.out 2>&1 &
     valgrindPid=$!
 
-    # Awaiting valgrind to start contextBroker (sleep 10)
+    # Awaiting valgrind to start contextBroker (sleep a maximum of 10 seconds)
     typeset -i loopNo
     typeset -i loops
     loopNo=0
     loops=10
 
-    vMsg
     while [ $loopNo -lt $loops ]
     do
       nc -z localhost ${CB_TEST_PORT} > /dev/null
@@ -244,6 +279,9 @@ function brokerStart()
     # Check CB started fine
     curl -s localhost:${CB_TEST_PORT}/version | grep version > /dev/null
     result=$?
+
+    # Reset statistics, so that functional tests will work
+    curl -s localhost:${CB_TEST_PORT}/statistics -X DELETE
 }
 
 # -----------------------------------------------------------------------------
@@ -332,7 +370,7 @@ function printTestLinePrefix()
 
 function printNotImplementedString()
 {
-  echo "NOT IMPLEMENTED - skipped"
+  echo "Not apt for valgrind - skipped"
   echo                                    >> /tmp/valgrindTestSuiteLog
   echo "$1 not implemented - skipped"     >> /tmp/valgrindTestSuiteLog
   echo                                    >> /tmp/valgrindTestSuiteLog
@@ -388,13 +426,26 @@ function setNumberOfTests()
 #
 function failedTest()
 {
-  if [ "$3" != "0" ]
+  _valgrindFile=$1
+  _file=$2
+  _lost=$3
+  _dir=$4
+  _testNo=$5
+
+  if [ "$_lost" != "0" ]
   then
-    echo "FAILED (lost: $3). Check $2.valgrind.out for clues"
+    echo "FAILED (lost: $_lost). Check $_valgrindFile for clues"
   fi
 
   testFailures=$testFailures+1
-  failedTests[$testFailures]=$2
+
+  if [ "$_dir" != "" ]
+  then
+    failedTests[$testFailures]=$_testNo": "$_dir/$_file".test (lost $_lost bytes, see $_valgrindFile)"
+  else
+    failedTests[$testFailures]=$_testNo": "$_file".test (lost $_lost bytes, see $_valgrindFile)"
+  fi
+
   failedTests[$testFailures+1]=$okString
 }
 
@@ -457,7 +508,7 @@ then
   leakTestFile=""
   if [ "$leakTest" == "on" ]
   then
-    fileList="leakTest.xtest"
+    fileList="leakTest.vtestx"
   else
     fileList=$(ls $TEST_FILTER 2> /dev/null)
   fi
@@ -465,10 +516,12 @@ then
   for vtest in $fileList
   do
     testNo=$testNo+1
+    xTestNo=$(printf "%03d" $testNo)
+
     printTestLinePrefix
 
-    init="$testNoString $vtest ............................................................................................................................."
-    init=${init:0:120}
+    init="$testNoString $vtest ..........................................................................................................................................................."
+    init=${init:0:150}
     echo -n $init" "
 
     typeset -i lines
@@ -488,7 +541,7 @@ then
     if [ "$dryrun" == "off" ]
     then
       fileCleanup $vtest
-      brokerStart
+      brokerStart $vtest
       if [ "$result" != "0" ]
       then
         echo "context broker didn't start! check $NAME.out"
@@ -496,9 +549,12 @@ then
       fi
 
       vMsg Executing $vtest
+      startTime=$(date +%s.%2N)
       command ./$vtest > /tmp/valgrindTestLog.stdout 2> /tmp/valgrindTestLog.stderr    
-      cat /tmp/valgrindTestLog.stdout >> /tmp/valgrindTestSuiteLog
       vTestResult=$?
+      endTime=$(date +%s.%2N)
+      diffTime=$(echo $endTime - $startTime | bc)
+      cat /tmp/valgrindTestLog.stdout >> /tmp/valgrindTestSuiteLog
       vMsg vTestResult=$vTestResult
 
       brokerStop
@@ -513,13 +569,14 @@ then
         mv /tmp/accumulator_$LISTENER_PORT       $vtest.accumulator_$LISTENER_PORT
         mv /tmp/accumulator_$LISTENER2_PORT      $vtest.accumulator_$LISTENER2_PORT
 
-        failedTest "$vtest.valgrind.out" $vtest 0
+        failText=$(failedTest "$vtest.valgrind.out" $vtest 0 "valgrind" $xTestNo)
       else
         fileCleanup $vtest
 
         typeset -i headEndLine1
         typeset -i headEndLine2
         processResult ${NAME}.out
+        failText=''
       fi
     else
       echo "dryRun"
@@ -527,10 +584,10 @@ then
 
     if [ "$lost" != "0" ]
     then
-      failedTest "test/valgrind/$vtest.*" $vtest $lost
+      failedTest "test/valgrind/$vtest.*" $vtest $lost "valgrind" $xTestNo
     elif [ "$vTestResult" == 0 ]
     then
-      echo $okString
+      echo $okString "($diffTime seconds)" $failText
       rm -f $vtest.out
     fi
 
@@ -556,6 +613,28 @@ then
   vMsg TEST_FILTER: $TEST_FILTER
   for file in $(find . -name "$TEST_FILTER" | sort)
   do
+    testNo=$testNo+1
+    xTestNo=$(printf "%03d" $testNo)
+
+    if [ $fromIx != 0 ]
+    then
+      if [ $testNo -lt $fromIx ]
+      then
+        continue
+      fi
+    fi
+
+    if [ "$ixList" != "" ]
+    then
+      hit=$(echo ' '$ixList' ' | grep ' '$testNo' ')
+      if [ "$hit" == "" ]
+      then
+        continue
+      fi
+    fi
+
+    dbReset "$file"
+
     htest=$(basename $file | awk -F '.' '{print $1}')
     directory=$(dirname $file)
     dir=$(basename $directory)
@@ -564,10 +643,9 @@ then
     vMsg file: $file
     vMsg htest: $htest
 
-    testNo=$testNo+1
     printTestLinePrefix
-    init="$testNoString $dir/$htest ............................................................................................................................."
-    init=${init:0:120}
+    init="$testNoString $dir/$htest ..........................................................................................................................................................."
+    init=${init:0:150}
     echo -n $init" "
 
     # In the case of harness test, we check that the test is implemented checking
@@ -587,17 +665,23 @@ then
     if [ "$dryrun" == "off" ]
     then
       detailForOkString=''
+
       vMsg "------------------------------------------------"
       vMsg running harnessTest.sh with $file in $(pwd)
       vMsg "------------------------------------------------"
+
+      startTime=$(date +%s.%2N)
       VALGRIND=1 test/functionalTest/testHarness.sh --filter $file > /tmp/testHarness 2>&1
       status=$?
+      endTime=$(date +%s.%2N)
+      diffTime=$(echo $endTime - $startTime | bc)
+      vMsg status=$status
       if [ "$status" != "0" ]
       then
         mv /tmp/testHarness         test/functionalTest/cases/$directory/$htest.harness.out
         cp /tmp/contextBroker.log   test/functionalTest/cases/$directory/$htest.contextBroker.log
-        detailForOkString=" (functional test exit code: $status)"
-        harnessErrorV[$harnessErrors]="$file"
+        detailForOkString=" (no leak but ftest error $status)"
+        harnessErrorV[$harnessErrors]="$xTestNo: $file (exit code $status)"
         harnessErrors=$harnessErrors+1
         # No exit here - sometimes harness tests fail under valgrind ...
       fi
@@ -616,14 +700,30 @@ then
       vMsg "calling processResult"
       processResult test/functionalTest/cases/$directory/$htest.valgrind.out
       vMsg "called processResult"
+    else
+      if [ "$dryLeaks" == "on" ]
+      then
+        modula3=$(echo $testNo % 30 | bc)
+        if [ $modula3 == 0 ]
+        then
+            failedTest "$htest.valgrind.out" $htest 1024 $dir $xTestNo
+        fi
+
+        modula4=$(echo $testNo % 40 | bc)
+        if [ $modula4 == 0 ]
+        then
+            harnessErrorV[$harnessErrors]="$testNo: $file (exit code XXX)"
+            harnessErrors=$harnessErrors+1
+        fi
+      fi
     fi
     cd - > /dev/null
 
     if [ "$lost" != "0" ]
     then
-      failedTest "test/functionalTest/cases/$htest.valgrind.*" $htest $lost
+      failedTest "$htest.valgrind.out" $htest $lost $dir $xTestNo
     else
-      echo $okString $detailForOkString
+      echo $okString "($diffTime seconds)" $detailForOkString
     fi
 
   done
@@ -633,7 +733,7 @@ if [ "${failedTests[1]}" != "" ]
 then
   echo
   echo
-  echo "$testFailures valgrind tests failed:"
+  echo "$testFailures tests leaked memory:"
   typeset -i ix
   ix=0
 
@@ -644,15 +744,14 @@ then
   done
 
   echo "---------------------------------------"
-  exit 1
 fi
 
 
-if [ "${harnessErrorV[1]}" != "" ]
+if [ $harnessErrors != 0 ]
 then
   echo
   echo
-  echo "$harnessErrors harness tests failed:"
+  echo "$harnessErrors functional tests failed (not a leak, just a func-test failure):"
   typeset -i ix
   ix=0
 
@@ -665,8 +764,12 @@ then
   echo "---------------------------------------"
 fi
 
+totalEndTime=$(date +%s.%2N)
+totalDiffTime=$(echo $totalEndTime - $totalStartTime | bc)
+min=$(echo $totalDiffTime / 60 | bc)
+echo Total test time: $totalDiffTime" seconds ($min minutes)"
 
-if [ "$dryrun" == "off" ]
+if [ "$dryrun" == "off" ] && [ "$testFailures" == "0" ]
 then
   echo "Great, all valgrind tests ran without any memory leakage"
 fi

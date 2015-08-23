@@ -49,7 +49,7 @@ Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orion>
-  <xmlRequests>1</xmlRequests>
+  <xmlRequests>REGEX((1|2))</xmlRequests>
   <statisticsRequests>1</statisticsRequests>
   <requestSemaphoreWaitingTime>REGEX(\d+.\d+)</requestSemaphoreWaitingTime>
   <dbConnectionPoolWaitingTime>REGEX(\d+.\d+)</dbConnectionPoolWaitingTime>
@@ -78,7 +78,7 @@ Date: REGEX(.*)
         "subCacheMutexWaitingTime": "REGEX(\d+.\d+)", 
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "uptime_in_secs": "REGEX(1?\d)", 
-        "xmlRequests": "1"
+        "xmlRequests": "REGEX((1|2))"
     }
 }
 
