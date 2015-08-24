@@ -186,7 +186,7 @@ echo
 echo
 
 
-valgrindSleep 2
+valgrindSleep 10
 echo "07. Update OfficeRoom/Room/pressure and OfficeRoom2/Room/pressure"
 echo "================================================================="
 url="/v1/updateContext"
