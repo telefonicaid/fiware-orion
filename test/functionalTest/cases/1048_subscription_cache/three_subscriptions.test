@@ -31,6 +31,7 @@ accumulatorStart
 --SHELL--
 
 #
+# 00. Making sure only ONE ftest database exists
 # 01. Subscribe to E1/A1 (no pattern)
 # 02. Subscribe to E2.*/A1
 # 03. Subscribe to E3.*/A1
@@ -40,6 +41,14 @@ accumulatorStart
 # 07. Remove second subscription (cached SUB2)
 # 08. Statistics
 #
+
+
+echo "00. Making sure only ONE ftest database exists"
+echo "=============================================="
+dbList ftest*
+echo
+echo
+
 
 echo "01. Subscribe to E1/A1 (no pattern)"
 echo "==================================="
@@ -177,6 +186,11 @@ echo
 
 
 --REGEXPECT--
+00. Making sure only ONE ftest database exists
+==============================================
+ftest
+
+
 01. Subscribe to E1/A1 (no pattern)
 ===================================
 HTTP/1.1 200 OK
@@ -244,8 +258,8 @@ Date: REGEX(.*)
   <transactionSemaphoreWaitingTime>REGEX(\d+.\d+)</transactionSemaphoreWaitingTime>
   <curlContextMutexWaitingTime>REGEX(\d+.\d+)</curlContextMutexWaitingTime>
   <subCacheMutexWaitingTime>REGEX(\d+.\d+)</subCacheMutexWaitingTime>
-  <uptime_in_secs>REGEX(\d)</uptime_in_secs>
-  <measuring_interval_in_secs>REGEX(\d)</measuring_interval_in_secs>
+  <uptime_in_secs>REGEX(\d+)</uptime_in_secs>
+  <measuring_interval_in_secs>REGEX(\d+)</measuring_interval_in_secs>
 </orion>
 
 
@@ -277,7 +291,7 @@ Date: REGEX(.*)
         "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
         "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
         "jsonRequests": "5", 
-        "measuring_interval_in_secs": "REGEX(\d)", 
+        "measuring_interval_in_secs": "REGEX(\d+)", 
         "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "statisticsRequests": "2", 
         "subCacheEntries": "2", 
@@ -285,7 +299,7 @@ Date: REGEX(.*)
         "subscriptions": "3", 
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "1", 
-        "uptime_in_secs": "REGEX(\d)",
+        "uptime_in_secs": "REGEX(\d+)",
         "xmlRequests": "REGEX((1|2))"
     }
 }

@@ -63,6 +63,7 @@ echo "====================================================="
 # multiline in a general case
 echo "show dbs" | mongo | grep ${CB_DATABASE_NAME} | wc -l
 echo "show dbs" | mongo | grep ${CB_DATABASE_NAME}-foo | wc -l
+echo "show dbs" | mongo | grep ftest | awk '{ print $1 }'
 
 --REGEXPECT--
 1. Create an entity using foo as tenant
@@ -101,6 +102,7 @@ Date: REGEX(.*)
 =====================================================
 1
 0
+ftest
 --TEARDOWN--
 
 brokerStop CB

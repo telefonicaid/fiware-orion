@@ -158,6 +158,24 @@ function dbDrop()
 
 
 
+# -----------------------------------------------------------------------------
+#
+# dbList
+#
+function dbList
+{
+  name="$1"
+
+  if [ "$name" != "" ]
+  then
+    echo show dbs | mongo --quiet | grep "$name" | awk '{ print $1 }'
+  else
+    echo show dbs | mongo --quiet | awk '{ print $1 }'
+  fi
+}
+
+
+
 # ------------------------------------------------------------------------------
 #
 # dbResetAll - 
@@ -1193,6 +1211,7 @@ function coapCurl()
 
 
 export -f dbInit
+export -f dbList
 export -f dbDrop
 export -f dbResetAll
 export -f brokerStart

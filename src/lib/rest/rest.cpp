@@ -859,6 +859,7 @@ static int connectionTreat
 {
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
+  static int             reqNo       = 1;
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
@@ -896,10 +897,12 @@ static int connectionTreat
       return MHD_NO;
     }
 
-    *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
-    ciP->port = port;
-    ciP->ip   = ip;
+    *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
+    ciP->port    = port;
+    ciP->ip      = ip;
+    ciP->callNo  = reqNo;
 
+    ++reqNo;
 
     //
     // Transaction starts here
@@ -938,6 +941,7 @@ static int connectionTreat
     }
 
     ciP->servicePath = ciP->httpHeaders.servicePath;
+
     if (servicePathSplit(ciP) != 0)
     {
       LM_W(("Bad Input (error in ServicePath http-header)"));

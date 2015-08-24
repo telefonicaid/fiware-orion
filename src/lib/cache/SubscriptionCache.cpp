@@ -459,7 +459,7 @@ int SubscriptionCache::remove(Subscription* subP)
     {
       semTake();
 
-      free(subP);
+      delete(subP);
       subs.erase(subs.begin() + ix);
       
       semGive();
