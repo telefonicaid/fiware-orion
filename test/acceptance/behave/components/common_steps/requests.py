@@ -178,16 +178,6 @@ def delete_database_in_mongo(context):
         m.disconnect()
         __logger__.debug("...Database \"%s\" is deleted" % database_name.lower())
 
-# ------------------------- list entities ----------------------------
-
-
-@step(u'get all entities')
-def get_all_entities(context):
-    """
-    list all entities
-    """
-    global cb, resp
-    resp = cb.list_all_entities(context)
 
 # ------------------------------------- validations ----------------------------------------------
 
@@ -318,6 +308,7 @@ def verify_that_receive_several_http_codes(context, http_code):
     __logger__.info("...Verified that http code returned in all entities are %s" % http_code)
 
 
+@step(u'verify that entities are stored in default mongo')
 @step(u'verify that entities are stored in mongo')
 def entities_are_stored_in_mongo(context):
     """
@@ -337,7 +328,7 @@ def entities_are_stored_in_mongo(context):
 @step(u'verify that entities are not stored in mongo')
 def entities_are_not_stored_in_mongo(context):
     """
-    verify that entities are stored in mongo
+    verify that entities are not stored in mongo
     """
     global cb
     properties_class = Properties()

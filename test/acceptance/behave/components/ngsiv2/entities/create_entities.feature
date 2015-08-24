@@ -66,7 +66,7 @@ Feature: create entities requests (POST) in NGSI v2
     And verify that entities are stored in mongo
 
   @maximum_size
-  Scenario:  try to create a new entity NGSI v2 with maximun size in payload (8972 attributes = 1048576 bytes)
+  Scenario:  try to create a new entity NGSI v2 with maximum size in payload (8972 attributes = 1048576 bytes)
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_maximum_size |
@@ -151,7 +151,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     Then verify that receive several "Created" http code
-    And verify that entities are stored in mongo
+    And verify that entities are stored in default mongo
 
   @service
   Scenario Outline:  create entities in NGSI v2 with several services headers
