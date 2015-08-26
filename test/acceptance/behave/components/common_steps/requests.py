@@ -178,6 +178,16 @@ def delete_database_in_mongo(context):
         m.disconnect()
         __logger__.debug("...Database \"%s\" is deleted" % database_name.lower())
 
+# ------------------------- list entities ----------------------------
+
+
+@step(u'get all entities')
+def get_all_entities(context):
+    """
+    list all entities
+    """
+    global cb, resp
+    resp = cb.list_all_entities(context)
 
 # ------------------------------------- validations ----------------------------------------------
 
@@ -285,7 +295,7 @@ def verify_if_version_is_the_expected(context):
                                               " expected: %s \n" \
                                               " installed: %s" % (
                                               props_cb_env["CB_VERSION"], resp_dict["orion"]["version"])
-        __logger__.debug("-- version %s is correct in base request v2" % props_cb_env["CB_VERSION"])
+        __logger__.debug("-- version %s is correct in version request" % props_cb_env["CB_VERSION"])
 
 
 @step(u'verify that receive several "([^"]*)" http code')
@@ -367,3 +377,16 @@ def verify_error_message(context):
     for i in range(int(entities_context["entities_number"])):
         ngsi.verify_error_response(context, resp_list[i])
     __logger__.info("...Verified that error message is the expected in all entities ")
+
+@step(u'verify that all entities are returned')
+def verify_get_all_entities(context):
+    """
+    verify get all entities
+    """
+    global cb, resp
+    __logger__.debug("Verifying all entities are returned in get request...")
+    queries_parameters = cb.get_entities_parameters()
+    entities_context = cb.get_entity_context()
+    ngsi = NGSI()
+    ngsi.verify_get_all_entities(queries_parameters, entities_context, resp)
+    __logger__.info("...Verified all entities are returned in get request...")

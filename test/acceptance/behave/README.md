@@ -123,9 +123,11 @@ Feature: feature name...
 
  - entities
     * general_operations - 16 testcases
-    * create_entities - 555 testcases
+    * create_entities - 535 testcases
+    * list_all_entities - 51 testcases
+    * list_one_entity (pending)
     * update_entities (pending)
-    * list_all_entities (pending)
+    * remove_entity (pending)
 
  -  alarms (pending)
 
