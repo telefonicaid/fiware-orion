@@ -183,6 +183,18 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     // If URI_PARAM_ATTRIBUTE_FORMAT used, set URI_PARAM_ATTRIBUTES_FORMAT as well
     ciP->uriParam[URI_PARAM_ATTRIBUTES_FORMAT] = value;
   }
+  else if (key == URI_PARAM_OPTIONS)
+  {
+    ciP->uriParam[URI_PARAM_OPTIONS] = value;
+
+    if (uriParamOptionsParse(ciP, val) != 0)
+    {
+      OrionError error(SccBadRequest, "Invalid value for URI param /options/");
+
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP, "");
+    }
+  }
   else
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
 
@@ -192,6 +204,21 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     ciP->uriParam[key] = "SET";
 
   LM_T(LmtUriParams, ("URI parameter:   %s: %s", key.c_str(), ciP->uriParam[key].c_str()));
+
+  //
+  // Now check the URI param has no invalid characters
+  // Except for the URI params 'q' and 'idPattern' that are not to be checked for invalid characters
+  //
+  if ((key != "q") && (key != "idPattern"))
+  {
+    if (forbiddenChars(ckey) || forbiddenChars(val))
+    {
+      OrionError error(SccBadRequest, "invalid character in URI parameter");
+
+      ciP->httpStatusCode = SccBadRequest;
+      ciP->answer         = error.render(ciP, "");
+    }
+  }
 
   return MHD_YES;
 }
@@ -301,6 +328,7 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
 
   bool xml  = false;
   bool json = false;
+  bool text = true;
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -326,12 +354,13 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
      }
 
      std::string format = vec[ix].c_str();
-     if (format == "*/*")              { xml  = true; json = true; }
+     if (format == "*/*")              { xml  = true; json = true; text=true;}
      if (format == "*/xml")            xml  = true;
      if (format == "application/*")    { xml  = true; json = true; }
      if (format == "application/xml")  xml  = true;
      if (format == "application/json") json = true;
      if (format == "*/json")           json = true;
+     if (format == "text/plain")       text = true;
      
      if ((acceptTextXml == true) && (format == "text/xml"))  xml = true;
 
@@ -354,6 +383,10 @@ static Format wantedOutputSupported(const std::string& apiVersion, const std::st
     else if (xml == true)
     {
       return XML;
+    }
+    else if (text)
+    {
+      return TEXT;
     }
   }
   else
@@ -892,7 +925,6 @@ static int connectionTreat
 
     char tenant[128];
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
-    LM_T(LmtTenant, ("HTTP tenant: '%s'", ciP->httpHeaders.tenant.c_str()));
     ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format

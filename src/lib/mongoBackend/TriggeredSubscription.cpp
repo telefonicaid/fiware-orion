@@ -37,7 +37,8 @@ TriggeredSubscription::TriggeredSubscription
   long long          _lastNotification,
   Format             _format,
   const std::string& _reference,
-  AttributeList      _attrL
+  AttributeList      _attrL,
+  Subscription*      _cacheSubReference
 )
 {
   throttling        = _throttling;
@@ -45,6 +46,7 @@ TriggeredSubscription::TriggeredSubscription
   format            = _format;
   reference         = _reference;
   attrL             = _attrL;
+  cacheSubReference = _cacheSubReference;
 }
 
 
@@ -66,6 +68,7 @@ TriggeredSubscription::TriggeredSubscription
   format            = _format;
   reference         = _reference;
   attrL             = _attrL;
+  cacheSubReference = NULL;
 }
 
 
@@ -81,4 +84,3 @@ std::string TriggeredSubscription::toString(const std::string& delimiter)
 
   return ss.str();
 }
-

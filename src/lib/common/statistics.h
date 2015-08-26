@@ -104,6 +104,11 @@ extern int noOfRtUnsubscribeContextResponse;
 extern int noOfRtSubscribeResponse;
 extern int noOfRtSubscribeError;
 
+extern int noOfSubCacheEntries;
+extern int noOfSubCacheLookups;
+extern int noOfSubCacheRemovals;
+extern int noOfSubCacheRemovalFailures;
+
 
 
 /* ****************************************************************************

@@ -378,12 +378,26 @@ function brokerStart()
 #
 function brokerStop
 {
+  if [ "$1" == "-v" ]
+  then
+    _verbose=1
+    shift
+  fi
+
   role=$1
+  if [ "$role" == "" ]
+  then
+    role=CB
+  fi
+ 
+  vMsg "Stopping broker $1"
 
   if [ "$role" == "CB" ]
   then
     pidFile=$CB_PID_FILE
     port=$CB_PORT
+    vMsg pidFile: $pidFile
+    vMsg port: $port
   elif [ "$role" == "CM" ]
   then
     pidFile=$CM_PID_FILE
@@ -411,7 +425,9 @@ function brokerStop
   fi
 
   if [ "$VALGRIND" == "" ]; then
+    vMsg "killing with PID from pidFile"
     kill $(cat $pidFile 2> /dev/null) 2> /dev/null
+    vMsg "should be dead"
     if [ -f /tmp/orion_${port}.pid ]
     then
       rm -f /tmp/orion_${port}.pid 2> /dev/null
@@ -800,11 +816,14 @@ function orionCurl()
 
   if   [ "$_in"  == "xml" ];   then _inFormat='--header "Content-Type: application/xml"'
   elif [ "$_in"  == "json" ];  then _inFormat='--header "Content-Type: application/json"'
+  elif [ "$_in"  == "text" ];  then _inFormat='--header "Content-Type: text/plain"'
   elif [ "$_in"  != "" ];      then _inFormat='--header "Content-Type: '${_in}'"'
   fi
 
   if   [ "$_out" == "xml" ];   then _outFormat='--header "Accept: application/xml"'; payloadCheckFormat='xml'
   elif [ "$_out" == "json" ];  then _outFormat='--header "Accept: application/json"'; payloadCheckFormat='json'
+  elif [ "$_out" == "text" ];  then _outFormat='--header "Accept: text/plain"'; _noPayloadCheck='on'
+  elif [ "$_out" == "any" ];   then _outFormat='--header "Accept: */*"'; _noPayloadCheck='on'
   elif [ "$_out" != "" ];      then _outFormat='--header "Accept: '${_out}'"'; _noPayloadCheck='off'
   fi
 
@@ -845,14 +864,22 @@ function orionCurl()
   dMsg Executing the curl-command
   _response=$(eval $command 2> /dev/null)
 
+  if [ ! -f /tmp/httpHeaders.out ]
+  then
+    echo "Broker seems to have died ..."
+  else
+    #
+    # Remove "Connection: Keep-Alive" and "Connection: close" headers
+    #
+    sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
+    sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
+    sed '/Connection: Close/d'      /tmp/httpHeaders.out  
+  fi
 
   #
-  # Remove "Connection: Keep-Alive" and "Connection: close" headers
+  # Unless we remove the HTTP header file, it will remain for the next execution
   #
-  sed '/Connection: Keep-Alive/d' /tmp/httpHeaders.out  > /tmp/httpHeaders2.out
-  sed '/Connection: close/d'      /tmp/httpHeaders2.out > /tmp/httpHeaders.out
-  sed '/Connection: Close/d'      /tmp/httpHeaders.out  
-  
+  \rm -f /tmp/httpHeaders2.out /tmp/httpHeaders.out
 
   #
   # Print and beautify response body, if any - and if option --noPayloadCheck hasn't been set

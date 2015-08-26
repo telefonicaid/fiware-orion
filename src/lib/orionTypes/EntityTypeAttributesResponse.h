@@ -37,7 +37,7 @@
 
 /* ****************************************************************************
 *
-* EntityTypeAttributesResponse - 
+* EntityTypeAttributesResponse -
 */
 class EntityTypeAttributesResponse
 {
@@ -46,6 +46,7 @@ class EntityTypeAttributesResponse
   StatusCode    statusCode;
 
   std::string   render(ConnectionInfo* ciP, const std::string& indent);
+  std::string   toJson(ConnectionInfo* ciP);
   std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
   void          present(const std::string& indent);
   void          release(void);

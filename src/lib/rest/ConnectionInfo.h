@@ -152,6 +152,7 @@ public:
   std::string                apiVersion;
 
   std::map<std::string, std::string>   uriParam;
+  std::map<std::string, bool>          uriParamOptions;
 
   bool                       inCompoundValue;
   orion::CompoundValueNode*  compoundValueP;    // Points to current node in the tree
@@ -163,5 +164,13 @@ public:
   std::vector<std::string>  httpHeader;
   std::vector<std::string>  httpHeaderValue;
 };
+
+
+
+/* ****************************************************************************
+*
+* uriParamOptionsParse - 
+*/
+extern int uriParamOptionsParse(ConnectionInfo* ciP, const char* value);
 
 #endif

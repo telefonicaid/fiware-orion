@@ -195,6 +195,7 @@ SET (SOURCES
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
     mongoBackend/mongoOntimeintervalOperations_test.cpp
     mongoBackend/mongoQueryContext_test.cpp
+    mongoBackend/mongoQueryContext_filters_test.cpp
     mongoBackend/mongoQueryContextCompoundValues_test.cpp
     mongoBackend/mongoQueryContextGeo_test.cpp
     mongoBackend/mongoRegisterContext_test.cpp
@@ -233,6 +234,8 @@ SET (SOURCES
     rest/restReply_test.cpp
     rest/RestService_test.cpp
     rest/rest_test.cpp
+
+    cache/SubscriptionCache_test.cpp
 )
 
 SET (HEADERS
@@ -246,6 +249,7 @@ SET (STATIC_LIBS
     ${HAVE_GMOCK}
     ${GMOCKMAIN_LIBRARY}
     mongoBackend
+    cache
     rest
     ngsiNotify
     jsonParse

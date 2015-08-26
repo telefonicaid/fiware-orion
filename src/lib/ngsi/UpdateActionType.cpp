@@ -47,9 +47,11 @@ std::string UpdateActionType::check
   int                 counter
 )
 {
-  if ((string == "update") || (string == "UPDATE") || (string == "Update") ||
-      (string == "append") || (string == "APPEND") || (string == "Append") ||
-      (string == "delete") || (string == "DELETE") || (string == "Delete"))
+  if ((string == "update")        || (string == "UPDATE")        || (string == "Update")        ||
+      (string == "append")        || (string == "APPEND")        || (string == "Append")        ||
+      (string == "append_strict") || (string == "APPEND_STRICT") || (string == "Append_Strict") ||
+      (string == "delete")        || (string == "DELETE")        || (string == "Delete")        ||
+      (string == "replace")       || (string == "REPLACE")       || (string == "Replace"))
   {
     return "OK";
   }

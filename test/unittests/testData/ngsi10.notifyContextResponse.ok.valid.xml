@@ -19,9 +19,9 @@
                 <value>1110</value>
               </contextMetadata>
               <contextMetadata>
-                <name></name>
-                <type></type>
-                <value></value>
+                <name>id2</name>
+                <type>mt2</type>
+                <value>12</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>
@@ -36,9 +36,9 @@
                 <value>1110</value>
               </contextMetadata>
               <contextMetadata>
-                <name></name>
+                <name>id4</name>
                 <type></type>
-                <value></value>
+                <value>44</value>
               </contextMetadata>
             </metadata>
           </contextAttribute>

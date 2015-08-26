@@ -29,6 +29,7 @@ SET (SOURCES
     orionReply.cpp
     OrionError.cpp
     HttpStatusCode.cpp
+    ConnectionInfo.cpp
 )
 
 SET (HEADERS

@@ -16,7 +16,7 @@ to other services/tentants. For example, queryContext on tenantA space
 will never return entities/attributes from tenantB space. This isolation
 is based on database separation, which [details are described in the
 Installation and Administration
-manual](../admin/database_admin.md#multiservice/multitenant-database-separation).
+manual](../admin/database_admin.md#multiservicemultitenant-database-separation).
 
 In addition, note that when "-multiservice" is used Orion includes the
 "Fiware-Service" header in the notifyContextRequest and

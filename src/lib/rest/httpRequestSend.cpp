@@ -184,8 +184,6 @@ std::string httpRequestSend
 
   ++callNo;
 
-  LM_M(("KZ: Sending a message to %s:%d", ip.c_str(), port));
-
   if (timeoutInMilliseconds == -1)
   {
     timeoutInMilliseconds = defaultTimeout;
@@ -196,76 +194,54 @@ std::string httpRequestSend
   // Preconditions check
   if (port == 0)
   {
-    LM_M(("KZ: ERROR Sending a message to %s:%d", ip.c_str(), port));
     LM_E(("Runtime Error (port is ZERO)"));
     LM_TRANSACTION_END();
     return "error";
   }
 
-  LM_M(("KZ: Sending a message to %s:%d", ip.c_str(), port));
-
   if (ip.empty())
   {
-    LM_M(("KZ: ERROR Sending a message to %s:%d", ip.c_str(), port));
     LM_E(("Runtime Error (ip is empty)"));
     LM_TRANSACTION_END();
     return "error";
   }
 
-  LM_M(("KZ: Sending a message to %s:%d", ip.c_str(), port));
-
   if (verb.empty())
   {
-    LM_M(("KZ: ERROR Sending a message to %s:%d", ip.c_str(), port));
     LM_E(("Runtime Error (verb is empty)"));
     LM_TRANSACTION_END();
     return "error";
   }
 
-  LM_M(("KZ: Sending a message to %s:%d", ip.c_str(), port));
-
   if (resource.empty())
   {
-    LM_M(("KZ: ERROR Sending a message to %s:%d", ip.c_str(), port));
     LM_E(("Runtime Error (resource is empty)"));
     LM_TRANSACTION_END();
     return "error";
   }
 
-  LM_M(("KZ: Sending a message to %s:%d", ip.c_str(), port));
-
   if ((content_type.empty()) && (!content.empty()))
   {
-    LM_M(("KZ: ERROR Sending a message to %s:%d", ip.c_str(), port));
     LM_E(("Runtime Error (Content-Type is empty but there is actual content)"));
     LM_TRANSACTION_END();
     return "error";
   }
 
-  LM_M(("KZ: Sending a message to %s:%d", ip.c_str(), port));
-
   if ((!content_type.empty()) && (content.empty()))
   {
-    LM_M(("KZ: ERROR Sending a message to %s:%d", ip.c_str(), port));
     LM_E(("Runtime Error (Content-Type non-empty but there is no content)"));
     LM_TRANSACTION_END();
     return "error";
   }
 
-  LM_M(("KZ: Sending a message to %s:%d (calling get_curl_context)", ip.c_str(), port));
-
   get_curl_context(ip, &cc);
-  LM_M(("KZ: Sending a message to %s:%d (after get_curl_context)", ip.c_str(), port));
   if ((curl = cc.curl) == NULL)
   {
     release_curl_context(&cc);
-    LM_M(("KZ: ERROR Sending a message to %s:%d", ip.c_str(), port));
     LM_E(("Runtime Error (could not init libcurl)"));
     LM_TRANSACTION_END();
     return "error";
   }
-
-  LM_M(("KZ: Sending a message to %s:%d", ip.c_str(), port));
 
   // Allocate to hold HTTP response
   httpResponse = new MemoryStruct;
@@ -332,8 +308,6 @@ std::string httpRequestSend
   headers = curl_slist_append(headers, headerHost);
   outgoingMsgSize += strlen(headerHost) + 1;
 
-  LM_M(("KZ: Sending a message to %s:%d", ip.c_str(), port));
-
   // ----- Tenant
   if (tenant != "")
   {
@@ -387,7 +361,6 @@ std::string httpRequestSend
   // Check if total outgoing message size is too big
   if (outgoingMsgSize > MAX_DYN_MSG_SIZE)
   {
-    LM_M(("KZ: NOT Sending a message to %s:%d - too big!", ip.c_str(), port));
     LM_E(("Runtime Error (HTTP request to send is too large: %d bytes)", outgoingMsgSize));
 
     // Cleanup curl environment
@@ -444,7 +417,6 @@ std::string httpRequestSend
 
   // Synchronous HTTP request
   LM_T(LmtClientOutputPayload, ("Sending message %lu to HTTP server: sending message of %d bytes to HTTP server", callNo, outgoingMsgSize));
-  LM_M(("KZ: REALLY Sending a message to %s:%d", ip.c_str(), port));
   res = curl_easy_perform(curl);
 
   if (res != CURLE_OK)
@@ -454,7 +426,6 @@ std::string httpRequestSend
     //       So, this line should not be removed/altered, at least not without also modifying the functests.
     //
     LM_W(("Notification failure for %s:%s (curl_easy_perform failed: %s)", ip.c_str(), portAsString, curl_easy_strerror(res)));
-    LM_M(("KZ: ERROR Sending a message to %s:%d", ip.c_str(), port));
     result = "";
   }
   else

@@ -19,7 +19,7 @@ upgrading procedure.
     [swap\_coords.js](https://github.com/telefonicaid/fiware-orion/tree/0.14.1-FIWARE-3.5.1/scripts/managedb/swap_coords.js)
 -   Apply the script to your DBs, using the following (where 'db' is the
     database name). Note that if you are using
-    [multitenant/multiservice](database_admin.md#multiservice/multitenant-database-separation)
+    [multitenant/multiservice](database_admin.md#multiservicemultitenant-database-separation)
     you need to apply the procedure to each per-tenant/service database.
 
         mongo <db> swap_coords.js

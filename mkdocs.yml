@@ -1,24 +1,26 @@
 site_name: Fiware-Orion
-site_url: https://telefonicaid.github.io/fiware-orion/doc
+site_url: https://fiware-orion.readthedocs.org
 repo_url: https://github.com/telefonicaid/fiware-orion.git
-site_description: Orion Context Broker
+site_description: Orion Context Broker Documentation
 docs_dir: doc/manuals
 site_dir: html
 markdown_extensions: [toc,fenced_code]
 use_directory_urls: false
 theme: readthedocs
+extra_css: ["http://fiware.org/style/monokai_sublime.css"]
 pages:
   - Home: index.md
   - 'Getting Started': 'quick_start_guide.md'
-  - 'User Manual':
-      - Introduction: 'user/walkthrough_apiv1.md'
+  - 'User & Programmers Manual':
+      - 'Introduction': 'user/index.md'
+      - 'API Walkthrough': 'user/walkthrough_apiv1.md'
       - 'Adding entities and attributes': 'user/append_and_delete.md'
       - 'Attribute Metadata': 'user/metadata.md'
       - 'Empty Types': 'user/empty_types.md'
       - 'Structured values for attributes': 'user/structured_attribute_valued.md'
-      - Filtering: 'user/filtering.md'
-      - Pagination: 'user/pagination.md'
-      - Geolocation: 'user/geolocation.md'
+      - 'Filtering': 'user/filtering.md'
+      - 'Pagination': 'user/pagination.md'
+      - 'Geolocation': 'user/geolocation.md'
       - 'Context Providers': 'user/context_providers.md'
       - 'Updating Registrations and Subscriptions': 'user/updating_regs_and_subs.md'
       - 'Multi tenancy': 'user/multitenancy.md'
@@ -30,7 +32,10 @@ pages:
       - 'Security considerations': 'user/security.md'
       - 'Known limitations': 'user/known_limitations.md'
       - 'Forbidden characters': 'user/forbidden_characters.md'
+      - 'Docker': 'user/docker.md'
+      - 'Considerations on NGSIv1 and NGSIv2 coexistence': 'user/v1_v2_coexistence.md'
   - 'Admin Guide':
+      - 'Introduction': 'admin/index.md'
       - 'Building from Sources': 'admin/build_source.md'
       - 'Running Orion from command line': 'admin/cli.md'
       - 'Database administration': 'admin/database_admin.md'

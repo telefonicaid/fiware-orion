@@ -33,6 +33,7 @@
 #include "jsonParseV2/parseMetadata.h"
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
 #include "rest/ConnectionInfo.h"
+#include "rest/OrionError.h"
 
 using namespace rapidjson;
 
@@ -49,14 +50,12 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     std::string name   = iter->name.GetString();
     std::string type   = jsonParseTypeNames[iter->value.GetType()];
 
-    LM_M(("parseContextAttributeObject: %s/%s", name.c_str(), type.c_str()));
-
     if (name == "type")
     {
       if (type != "String")
       {
         LM_E(("Bad Input (ContextAttributeObject::type must be a String"));
-        return "Parse Error";
+        return "invalid JSON type for attribute type";
       }
 
       caP->type = iter->value.GetString();
@@ -117,14 +116,12 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 
       if (r != "OK")
       {
-        LM_W(("Bad Input (error parsing Metadata)"));
-        return "json error in ContextAttributeObject::Metadata";
+        LM_W(("Bad Input (error parsing Metadata): %s", r.c_str()));
+        return r;
       }
-      LM_M(("Metadata OK"));
     }
   }
 
-  LM_M(("Done"));
   return "OK";
 }
 
@@ -136,14 +133,10 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
 */
 std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberIterator& iter, ContextAttribute* caP)
 {
-  LM_M(("KZ: In parseContextAttribute"));
-
   std::string name   = iter->name.GetString();
   std::string type   = jsonParseTypeNames[iter->value.GetType()];
   
   caP->name = name;
-
-  LM_M(("KZ: name: %s", caP->name.c_str()));
 
   if (type == "String")
   {
@@ -171,7 +164,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   }
   else if (type == "Array")
   {
-    LM_M(("KZ: Compound array"));
     caP->valueType = orion::ValueTypeObject;
     std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
     if (r != "OK")
@@ -185,7 +177,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   {
     std::string r;
 
-    LM_M(("KZ: Object"));
     //
     // Either Compound or '{ "type": "xxx", "value": "yyy" }'
     //
@@ -193,19 +184,16 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     //
     if (iter->value.HasMember("value"))
     {
-      LM_M(("KZ: Normal object"));
       r = parseContextAttributeObject(iter->value, caP);
-      LM_M(("KZ: Normal object parsed"));
       if (r != "OK")
       {
-        LM_W(("Bad Input (json error in ContextAttribute::Object"));
+        LM_W(("Bad Input (JSON parse error in ContextAttribute::Object"));
         ciP->httpStatusCode = SccBadRequest;
-        return "r";
+        return r;
       }
     }
     else
     {
-      LM_M(("KZ: Compound object"));
       parseContextAttributeCompoundValue(iter, caP, NULL);
       caP->valueType = orion::ValueTypeObject;
     }
@@ -225,4 +213,40 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   }
 
   return "OK";
+}
+
+
+
+/* ****************************************************************************
+*
+* parseContextAttribute - 
+*/
+std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
+{
+  Document document;
+
+  document.Parse(ciP->payload);
+
+  if (document.HasParseError())
+  {
+    OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
+
+    LM_W(("Bad Input (JSON parse error)"));
+    ciP->httpStatusCode = SccBadRequest;;
+    return oe.render(ciP, "");
+  }
+
+
+  if (!document.IsObject())
+  {
+    OrionError oe(SccBadRequest, "Error parsing incoming JSON buffer");
+
+    LM_E(("Bad Input (JSON Parse Error)"));
+    ciP->httpStatusCode = SccBadRequest;;
+    return oe.render(ciP, "");
+  }
+
+  std::string  res  = parseContextAttributeObject(document, caP);
+
+  return res;
 }

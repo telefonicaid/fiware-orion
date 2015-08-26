@@ -30,87 +30,102 @@ accumulatorStart
 
 --SHELL--
 
-url="/v1/subscribeContext"
+#
+# 01. Subscribe to OfficeRoom.* / Room
+# 02. Create OfficeRoom/Room/pressure
+# 03. 0.5 seconds later, update OfficeRoom/Room/pressure
+# 04. 0.5 seconds later, create OfficeRoom2/Room/pressure
+# 05. Add attribute 'temperature' to OfficeRoom/Room
+# 06. Unsubscribe
+# 07. Update OfficeRoom/Room/pressure and OfficeRoom2/Room/pressure
+# 08. Get accumulated data
+#
+
+echo "01. Subscribe to OfficeRoom.* / Room"
+echo "===================================="
 payload='<?xml version="1.0"?>
 <subscribeContextRequest>
   <entityIdList>
-        <entityId type="Room" isPattern="true">
-          <id>OfficeRoom.*</id>
-        </entityId>
+    <entityId type="Room" isPattern="true">
+      <id>OfficeRoom.*</id>
+    </entityId>
   </entityIdList>
   <attributeList>
   </attributeList>
   <reference>http://127.0.0.1:'${LISTENER_PORT}'/notify</reference>
   <duration>PT1H</duration>
   <notifyConditions>
-        <notifyCondition>
-          <type>ONCHANGE</type>
-          <condValueList>
-                <condValue>temperature</condValue>
-                <condValue>pressure</condValue>
-                <condValue>lightstatus</condValue>
-          </condValueList>          
-        </notifyCondition>
+    <notifyCondition>
+      <type>ONCHANGE</type>
+      <condValueList>
+        <condValue>temperature</condValue>
+        <condValue>pressure</condValue>
+        <condValue>lightstatus</condValue>
+      </condValueList>          
+    </notifyCondition>
   </notifyConditions>
 </subscribeContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/subscribeContext --payload "$payload"
 SUB_ID=$(echo "$_response" | grep subscriptionId | awk -F '>' '{print $2}' | awk -F '<' '{print $1}' | grep -v '^$' )
+echo
+echo
 
-echo "1: ++++++++++++++++++++"
 
+echo "02. Create OfficeRoom/Room/pressure"
+echo "==================================="
+payload='<?xml version="1.0"?>
+<updateContextRequest>
+  <contextElementList>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
+          <name>pressure</name>
+          <type>clima</type>
+          <contextValue>p23</contextValue>
+        </contextAttribute>
+      </contextAttributeList>
+    </contextElement>
+  </contextElementList>
+  <updateAction>APPEND</updateAction>
+</updateContextRequest>'
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
+
+
+echo "03. 0.5 seconds later, update OfficeRoom/Room/pressure"
+echo "======================================================"
+sleep 0.5s # to avoid a race condition in the order of the notifications
 url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p23</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p83</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
 orionCurl --url "$url" --payload "$payload"
+echo
+echo
 
-echo "2: ++++++++++++++++++++"
 
-# to avoid a race condition in the order of notifications
-sleep 0.5s
-
-url="/v1/updateContext"
-payload='<?xml version="1.0"?>
-<updateContextRequest>
-  <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-          <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p83</contextValue>
-                </contextAttribute>
-      </contextAttributeList>
-    </contextElement>
-  </contextElementList>
-  <updateAction>APPEND</updateAction>
-</updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
-
-echo "3: ++++++++++++++++++++"
-
-# to avoid a race condition in the order of notifications
-sleep 0.5s
-
-url="/v1/updateContext"
+echo "04. 0.5 seconds later, create OfficeRoom2/Room/pressure"
+echo "======================================================="
+sleep 0.5s  # to assure the order of the notifications
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
@@ -129,85 +144,96 @@ payload='<?xml version="1.0"?>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-echo "4: ++++++++++++++++++++"
 
-# to avoid a race condition in the order of notifications
-sleep 0.5s
-
-url="/v1/updateContext"
+echo "05. Add attribute 'temperature' to OfficeRoom/Room"
+echo "=================================================="
+sleep 0.5s  # to assure the order of the notifications
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>temperature</name>
-                  <type>degree</type>
-                  <contextValue>t39</contextValue>
-                </contextAttribute>
+          <type>degree</type>
+          <contextValue>t39</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-echo "5: ++++++++++++++++++++"
 
-url="/v1/unsubscribeContext"
+echo "06. Unsubscribe"
+echo "==============="
 payload='<?xml version="1.0"?>
 <unsubscribeContextRequest>
   <subscriptionId>'$SUB_ID'</subscriptionId>
 </unsubscribeContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/unsubscribeContext --payload "$payload"
+echo
+echo
 
-echo "6: ++++++++++++++++++++"
 
+echo "07. Update OfficeRoom/Room/pressure and OfficeRoom2/Room/pressure"
+echo "================================================================="
 url="/v1/updateContext"
 payload='<?xml version="1.0"?>
 <updateContextRequest>
   <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p73</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p73</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-                <id>OfficeRoom2</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
+    <contextElement>
+      <entityId type="Room" isPattern="false">
+        <id>OfficeRoom2</id>
+      </entityId>
+      <contextAttributeList>
+        <contextAttribute>
           <name>pressure</name>
-                  <type>clima</type>
-                  <contextValue>p73</contextValue>
-                </contextAttribute>
+          <type>clima</type>
+          <contextValue>p73</contextValue>
+        </contextAttribute>
       </contextAttributeList>
     </contextElement>
   </contextElementList>
   <updateAction>APPEND</updateAction>
 </updateContextRequest>'
-orionCurl --url "$url" --payload "$payload"
+orionCurl --url /v1/updateContext --payload "$payload"
+echo
+echo
 
-echo "7: ++++++++++++++++++++"
 
-#Get accumulated data
+echo "08. Get accumulated data"
+echo "========================"
 accumulatorDump
+echo
+echo
 
 
 --REGEXPECT--
+01. Subscribe to OfficeRoom.* / Room
+====================================
 HTTP/1.1 200 OK
 Content-Length: 192
 Content-Type: application/xml
@@ -220,7 +246,10 @@ Date: REGEX(.*)
     <duration>PT1H</duration>
   </subscribeResponse>
 </subscribeContextResponse>
-1: ++++++++++++++++++++
+
+
+02. Create OfficeRoom/Room/pressure
+===================================
 HTTP/1.1 200 OK
 Content-Length: 636
 Content-Type: application/xml
@@ -249,7 +278,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-2: ++++++++++++++++++++
+
+
+03. 0.5 seconds later, update OfficeRoom/Room/pressure
+======================================================
 HTTP/1.1 200 OK
 Content-Length: 636
 Content-Type: application/xml
@@ -278,7 +310,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-3: ++++++++++++++++++++
+
+
+04. 0.5 seconds later, create OfficeRoom2/Room/pressure
+=======================================================
 HTTP/1.1 200 OK
 Content-Length: 637
 Content-Type: application/xml
@@ -307,7 +342,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-4: ++++++++++++++++++++
+
+
+05. Add attribute 'temperature' to OfficeRoom/Room
+==================================================
 HTTP/1.1 200 OK
 Content-Length: 640
 Content-Type: application/xml
@@ -336,7 +374,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-5: ++++++++++++++++++++
+
+
+06. Unsubscribe
+===============
 HTTP/1.1 200 OK
 Content-Length: 207
 Content-Type: application/xml
@@ -350,7 +391,10 @@ Date: REGEX(.*)
     <reasonPhrase>OK</reasonPhrase>
   </statusCode>
 </unsubscribeContextResponse>
-6: ++++++++++++++++++++
+
+
+07. Update OfficeRoom/Room/pressure and OfficeRoom2/Room/pressure
+=================================================================
 HTTP/1.1 200 OK
 Content-Length: 1175
 Content-Type: application/xml
@@ -397,7 +441,10 @@ Date: REGEX(.*)
     </contextElementResponse>
   </contextResponseList>
 </updateContextResponse>
-7: ++++++++++++++++++++
+
+
+08. Get accumulated data
+========================
 POST http://127.0.0.1:REGEX(\d+)/notify
 Content-Length: 734
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
@@ -531,6 +578,8 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 =======================================
+
+
 --TEARDOWN--
 brokerStop CB
 accumulatorStop

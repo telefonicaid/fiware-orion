@@ -63,6 +63,7 @@ typedef struct ContextAttribute
   bool                       found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
                                                       // It means attribute found either locally or remotely in providing application
 
+  bool                       skip;                    // For internal use in mongoBackend - in case of 'op=append' and the attribute already exists
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
 
@@ -82,7 +83,7 @@ typedef struct ContextAttribute
   std::string  render(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false, bool omitValue = false);
   std::string  renderAsJsonObject(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma, bool omitValue = false);
   std::string  renderAsNameString(ConnectionInfo* ciP, RequestType request, const std::string& indent, bool comma = false);
-  std::string  toJson(bool isLastElement);
+  std::string  toJson(bool isLastElement, bool types);
   void         present(const std::string& indent, int ix);
   void         release(void);
   std::string  toString(void);

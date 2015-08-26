@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 
+#include "common/string.h"
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
@@ -38,16 +39,16 @@
 *
 * getEntity -
 *
-* GET /v2/entities/:id:
+* GET /v2/entities/:id:[?attrs=:list:]
 *
 * Payload In:  None
 * Payload Out: Entity
 *
 *
-* 01. Fill in QueryContextRequest
-* 02. Call standard op postQueryContext
-* 03. Render Entity response
-* 04. Cleanup and return result
+* Fill in QueryContextRequest
+* Call standard op postQueryContext
+* Render Entity response
+* Cleanup and return result
 */
 std::string getEntity
 (
@@ -57,21 +58,36 @@ std::string getEntity
   ParseData*                 parseDataP
 )
 {
-  std::string  answer;
-  Entity       entity;
+  using namespace std;
 
 
-  // 01. Fill in QueryContextRequest
+  // Fill in QueryContextRequest
   parseDataP->qcr.res.fill(compV[2], "", "false", EntityTypeEmptyOrNotEmpty, "");
+  // optional parameter for attributes
+  string attrs = ciP->uriParam["attrs"];
 
+  if (attrs != "")
+  {
+    vector<string> attrsV;
 
-  // 02. Call standard op postQueryContext
+    stringSplit(attrs, ',', attrsV);
+    for (vector<string>::const_iterator it = attrsV.begin(); it != attrsV.end(); ++it)
+    {
+      parseDataP->qcr.res.attributeList.push_back_if_absent(*it);
+    }
+  }
+
+  // Call standard op postQueryContext
   postQueryContext(ciP, components, compV, parseDataP);
 
 
-  // 03. Render entity response
+  // Render entity response
+  Entity       entity;
+
   entity.fill(&parseDataP->qcrs.res);
-  answer = entity.render(ciP, EntityResponse);
+
+  string answer = entity.render(ciP, EntityResponse);
+
   if (parseDataP->qcrs.res.errorCode.code == SccOk && parseDataP->qcrs.res.contextElementResponseVector.size() > 1)
   {
       // No problem found, but we expect only one entity

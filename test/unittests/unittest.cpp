@@ -26,6 +26,7 @@
 
 #include "unittest.h"
 #include "testInit.h"
+#include "cache/subCache.h"
 
 
 
@@ -134,6 +135,9 @@ void utInit(void)
   // Resetting servicePathVector
   //
   servicePathVector.clear();
+
+  // Init subs cache (this initialization is overriden in test that use csubs)
+  subscriptionCacheInit("");
 }
 
 

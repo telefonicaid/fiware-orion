@@ -1,4 +1,43 @@
-# FIWARE NGSI APIv1 Walkthrough
+#<a name="top"></a>FIWARE NGSI APIv1 Walkthrough
+
+* [Introduction](#introduction)
+* [Before starting...](#before-starting)
+    * [Example Case](#example-case)
+    * [Starting the broker for the tutorials](#starting-the-broker-for-the-tutorials)
+    * [Starting accumulator server](#starting-accumulator-server)
+    * [Issuing commands to the broker](#issuing-commands-to-the-broker)
+    * [Text colour convention](#text-colour-convention)
+* [Context management using NGSI10](#context-management-using-ngsi10)
+    * [NGSI10 standard operations](#ngsi10-standard-operations)
+	  * [Entity Creation](#entity-creation)
+	  * [Query Context operation](#query-context-operation)
+	  * [Update Context elements](#update-context-elements)
+	  * [Context Subscriptions](#context-subscriptions)
+		* [ONTIMEINTERVAL](#ontimeinterval)
+		* [ONCHANGE](#onchange)
+	  * [Summary of NGSI10 standard operations URLs](#summary-of-ngsi10-standard-operations-urls)
+    * [NGSI10 convenience operations](#ngsi10-convenience-operations)
+	  * [Convenience Entity Creation](#convenience-entity-creation)
+	  * [Convenience Query Context](#convenience-query-context)
+	  * [Getting all entities](#getting-all-entities)
+	  * [Browsing all types and detailed information on a type](#browsing-all-types-and-detailed-information-on-a-type)
+	  * [Convenience Update Context](#convenience-update-context)
+	  * [Convenience operations for context subscriptions](#convenience-operations-for-context-subscriptions)
+	  * [Summary of NGSI10 convenience operations URLs](#summary-of-ngsi10-convenience-operations-urls)
+* [Context availability management using NGSI9](#context-availability-management-using-ngsi9)
+    * [NGSI9 standard operations](#ngsi9-standard-operations)
+	  * [Register Context operation](#register-context-operation)
+	  * [Discover Context Availability operation](#discover-context-availability-operation)
+	  * [Context availability subscriptions](#context-availability-subscriptions)
+	  * [Summary of NGSI9 standard operations URLs](#summary-of-ngsi9-standard-operations-urls)
+    * [NGSI9 convenience operations](#ngsi9-convenience-operations)
+	  * [Convenience Register Context](#convenience-register-context)
+	  * [Only-type entity registrations using convenience operations](#only-type-entity-registrations-using-convenience-operations)
+	  * [Convenience Discover Context Availability](#convenience-discover-context-availability)
+	  * [Convenience operations for context availability subscriptions](#convenience-operations-for-context-availability-subscriptions)
+	  * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
+
+# Introduction
 
 This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
@@ -40,10 +79,14 @@ the NGSI model is based before starting. E.g. entities, attributes, etc.
 Have a look at the FIWARE documentation about this, e.g. [this public
 presentation](http://bit.l/fiware-orion).
 
+[Top](#top)
+
 ## Before starting...
 
 Before starting, let's introduce the example case that is used in the
 tutorials and how to run and interact with Orion Context Broker.
+
+[Top](#top)
 
 #### Example Case
 
@@ -68,6 +111,8 @@ The Orion Context Broker interacts with context producer applications
 interface). We will play the role of both kinds of applications in the
 tutorials.
 
+[Top](#top)
+
 ### Starting the broker for the tutorials
 
 Before starting, you need to install the broker as described in the
@@ -82,14 +127,16 @@ procedure](../admin/database_admin.md#delete-complete-database).
 To start the broker (as root or using the sudo command):
 
 ```
-/etc/init.d/contextBroker start
+/etc/init.d/contextBroker start
 ```
 
 To restart the broker (as root or using the sudo command):
 
 ```
-/etc/init.d/contextBroker restart
+/etc/init.d/contextBroker restart
 ```
+
+[Top](#top)
 
 ### Starting accumulator server
 
@@ -104,12 +151,14 @@ terminal window where it is executed. Run it using the following
 command:
 
 ```
-# cd /dir/where/accumulator-server/is/downloaded
-# chmod a+x accumulator-server.py
-# ./accumulator-server.py 1028 /accumulate ::1 on
+# cd /dir/where/accumulator-server/is/downloaded
+# chmod a+x accumulator-server.py
+# ./accumulator-server.py 1028 /accumulate ::1 on
 ```
 
 The accumulator-server.py is also part of the contextBroker-test package (see in the administrator manual [how to install](../../../README.md#optional-packages "wikilink")). The script is located at `/usr/share/contextBroker/tests/accumulator-server.py` after installation. However, if you only need the accumulator-server.py it uses to be simpler just downloading it from GitHub, as suggested above.
+
+[Top](#top)
 
 ### Issuing commands to the broker
 
@@ -192,8 +241,10 @@ Some additional remarks:
 -   Check that curl is installed in your system using:
 
 ```
-# which curl
+# which curl
 ```
+
+[Top](#top)
 
 ### Text colour convention
 
@@ -203,6 +254,8 @@ fragments:
 -   <span style="color:darkblue">Blue</span>: request messages
 -   <span style="color:darkgreen">Green</span>: response messages
 -   <span style="color:purple">Purple</span>: notification messages
+
+[Top](#top)
 
 ## Context management using NGSI10
 
@@ -228,6 +281,8 @@ Broker with NGSI10 standard operations:
 -   subscribeContext
 -   updateContextSubscription
 -   unsubscribeContext
+
+[Top](#top)
 
 #### Entity Creation
 
@@ -385,6 +440,8 @@ also use complex structures or custom metadata. These are advance
 topics, described in [this
 section](structured_attribute_valued.md#structured-attribute-values ) and [this
 other](metadata.md#custom-attribute-metadata ), respectively.
+
+[Top](#top)
 
 #### Query Context operation
 
@@ -635,16 +692,16 @@ Additional comments:
       }
       EOF
 
-
+[Top](#top)
 
 #### Update context elements
 
 You can update the value of entities attributes using the updateContext
 operation with UPDATE action type. The basic rule to take into account
 with updateContext is that APPEND creates new context elements, while
-UPDATE updates already existing context elements (however, current Orion
-Context Broker version interprets APPEND as UPDATE if the entity already
-exists).
+UPDATE updates already existing context elements (however, Orion
+interprets APPEND as UPDATE if the entity already
+exists; you can avoid that using [APPEND_STRICT](append_and_delete.md)).
 
 Now we will play the role of a context producer application, i.e. a
 source of context information. Let's assume that this application in a
@@ -829,6 +886,14 @@ Apart from simple values (i.e. strings) for attribute values, you can
 also use complex structures. This is an advance topic, described in
 [this section](structured_attribute_valued.md#structured-attribute-values).
 
+Finally, you can use REPLACE as updateAction. In that case, the entity
+attributes are replaced by the ones in the request. For example, if your
+entity has the attributes A and B and you send an updateContext REPLACE
+request with A, then the entity at the end will have A (i.e. B attribute
+is removed).
+
+[Top](#top)
+
 #### Context subscriptions
 
 The NGSI10 operations you know up to now (updateContext and
@@ -851,6 +916,8 @@ ONCHANGE subscriptions, described in the next two subsections.
 
 NGSI standard describes a third subscription type, called ONVALUE, but the
 current version of the Orion Context Broker doesn't support it.
+
+[Top](#top)
 
 ##### ONTIMEINTERVAL
 
@@ -1044,6 +1111,8 @@ successful.
 You can have a look at accumulator-server.py to check that the
 notification flow has stopped.
 
+[Top](#top)
+
 ##### ONCHANGE
 
 We assume that the accumulator-server.py program is still running.
@@ -1202,6 +1271,8 @@ ONTIMEINTERVAL subscriptions. You can do that as a final exercise in
 this section of the tutorial, e.g try to set a new throttling value,
 check that it works as expected and cancel after that.
 
+[Top](#top)
+
 #### Summary of NGSI10 standard operations URLs
 
 Each standard operation has a unique URL. All of them use the POST
@@ -1212,6 +1283,8 @@ method. The summary is below:
 -   <host:port>/v1/subscribeContext
 -   <host:port>/v1/updateContextSubscription
 -   <host:port>/v1/unsubscribeContext
+
+[Top](#top)
 
 ### NGSI10 convenience operations
 
@@ -1233,6 +1306,8 @@ section](#tutorial-on-ngsi10-standard-operations). It is
 highly recommended to do that tutorial before, to get familiar with
 update and query context, etc. and to be able to compare between the two
 approaches.
+
+[Top](#top)
 
 #### Convenience Entity Creation
 
@@ -1386,6 +1461,8 @@ also use complex structures or custom metadata. These are advance
 topics, described in [this
 section](Structured_attribute_valued.md#structured-attribute-values) and [this
 other](metadata.md#custom-attribute-metadata "), respectively.
+
+[Top](#top)
 
 #### Convenience Query Context
 
@@ -1635,6 +1712,8 @@ Additional comments:
         ]
     }
 
+[Top](#top)
+
 #### Getting all entities
 
 You can get all the entities using the following convenience operation:
@@ -1709,6 +1788,8 @@ Additional comments:
     behaviour), as described in the [previous
     section](#convenience-query-context).
 
+[Top](#top)
+
 #### Browsing all types and detailed information on a type
 
 The following operation can be used to get a list of all entity types
@@ -1774,6 +1855,8 @@ Note that [pagination mechanism](pagination.md#pagination) also works in
 the operations described above.
 
 In addition, note that this convenience operation doesn't have any standard operation counterpart.
+
+[Top](#top)
 
 #### Convenience Update Context
 
@@ -1892,6 +1975,8 @@ topics, described in [this
 section](structured_attribute_valued.md#structured-attribute-values ) and [this
 other](metadata.md#custom-attribute-metadata ), respectively.
 
+[Top](#top)
+
 #### Convenience operations for context subscriptions
 
 You can use the following convenience operations to manage context
@@ -1909,6 +1994,8 @@ subscriptions:
     subscription identified by {subscriptionID}. In this case, payload
     is not used
 
+[Top](#top)
+
 #### Summary of NGSI10 convenience operations URLs
 
 Convenience operations use a URL to identify the resource and a HTTP
@@ -1919,6 +2006,8 @@ destroy information.
 
 You find a summary in [the following
 document](https://docs.google.com/spreadsheet/ccc?key=0Aj_S9VF3rt5DdEhqZHlBaGVURmhZRDY3aDRBdlpHS3c#gid=0).
+
+[Top](#top)
 
 ## Context availability management using NGSI9
 
@@ -1944,6 +2033,8 @@ Broker with NGSI9 standard operations:
 -   subscribeContextAvailability
 -   updateContextAvailabilitySubscription
 -   unsubscribeContextAvailability
+
+[Top](#top)
 
 #### Register Context operation
 
@@ -2044,6 +2135,8 @@ request, as it is generated using the timestamp of the current time :)
 is a 24 hexadecimal digit which provides an unique reference to the
 registration. It is used for updating the registration as explained
 [later in this manual](context_providers.md#updating-registrations).
+
+[Top](#top)
 
 #### Discover Context Availability operation
 
@@ -2246,6 +2339,8 @@ Note that by default only 20 registrations are returned (which is fine
 for this tutorial, but probably not for a real utilization scenario). In
 order to change this behaviour, see [the section on
 pagination](pagination.md#pagination ) in this manual.
+
+[Top](#top)
 
 #### Context availability subscriptions
 
@@ -2698,6 +2793,8 @@ successful.
 After cancelling, you can try to register a new car (e.g. Car3) to check
 that no new notification is sent to accumulator-server.py.
 
+[Top](#top)
+
 #### Summary of NGSI9 standard operations URLs
 
 Each standard operation has a unique URL. All of them use the POST
@@ -2708,6 +2805,8 @@ method. The summary is below:
 -   <host:port>/v1/registry/subscribeContextAvailability
 -   <host:port>/v1/registry/updateContextAvailabilitySubscription
 -   <host:port>/v1/registry/unsubscribeContextAvailability
+
+[Top](#top)
 
 ### NGSI9 convenience operations
 
@@ -2729,6 +2828,8 @@ section](#tutorial-on-ngsi9-standard-operations). It is
 highly recommended to do that tutorial before, to get familiar with
 register, discover, etc. to be able to compare between the two
 approaches.
+
+[Top](#top)
 
 #### Convenience Register Context
 
@@ -2797,6 +2898,8 @@ with a different ID):
         "registrationId": "51c1f5c31612797e4fe6b6b6"
       }
                                 
+
+[Top](#top)
 
 #### Only-type entity registrations using convenience operations
 
@@ -2871,6 +2974,8 @@ Moreover, you can register attributes in these registrations, e.g:
         </contextRegistrationResponse>
       </contextRegistrationResponseList>
     </discoverContextAvailabilityResponse>
+
+[Top](#top)
 
 #### Convenience Discover Context Availability
 
@@ -3113,6 +3218,8 @@ for this tutorial, but probably not for a real utilization scenario). In
 order to change this behaviour, see [the section on
 pagination](pagination.md#pagination ) in this manual.
 
+[Top](#top)
+
 #### Convenience operations for context availability subscriptions
 
 You can use the following convenience operations to manage context
@@ -3132,6 +3239,8 @@ availability subscriptions:
     cancel the subscription identified by {subscriptionID}. In this
     case, payload is not used.
 
+[Top](#top)
+
 #### Summary of NGSI9 convenience operations URLs
 
 Convenience operations use a URL to identify the resource and a HTTP
@@ -3143,3 +3252,5 @@ destroy information.
 You find a summary in [the following
 document](https://docs.google.com/spreadsheet/ccc?key=0Aj_S9VF3rt5DdEhqZHlBaGVURmhZRDY3aDRBdlpHS3c#gid=0).
 <span style="color:red">.
+
+[Top](#top)
