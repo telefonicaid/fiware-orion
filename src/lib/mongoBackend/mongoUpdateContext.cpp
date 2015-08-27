@@ -67,25 +67,33 @@ HttpStatusCode mongoUpdateContext
     }
     else
     {
-        /* Process each ContextElement */
-        for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
+        try
         {
-          processContextElement(requestP->contextElementVector.get(ix),
-                                responseP,
-                                requestP->updateActionType.get(),
-                                tenant,
-                                servicePathV,
-                                uriParams,
-                                xauthToken,
-                                caller);
+            /* Process each ContextElement */
+            for (unsigned int ix = 0; ix < requestP->contextElementVector.size(); ++ix)
+            {
+                processContextElement(requestP->contextElementVector.get(ix),
+                        responseP,
+                        requestP->updateActionType.get(),
+                        tenant,
+                        servicePathV,
+                        uriParams,
+                        xauthToken,
+                        caller);
+            }
+           /* Note that although individual processContextElements() invocations return ConnectionError, this
+              error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
+              consider the overall mongoUpdateContext() as OK. */
+            responseP->errorCode.fill(SccOk);
         }
-
-        /* Note that although individual processContextElements() invocations return ConnectionError, this
-           error gets "encapsulated" in the StatusCode of the corresponding ContextElementResponse and we
-           consider the overall mongoUpdateContext() as OK. */
-        responseP->errorCode.fill(SccOk);
-    }    
+        catch (OrionCreateException &e)
+        {
+            responseP->errorCode.fill(SccUnprocessableEntity);
+            reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
+            return SccUnprocessableEntity;
+        }
+    }
     reqSemGive(__FUNCTION__, "ngsi10 update request", reqSemTaken);
-    
+
     return SccOk;
 }
