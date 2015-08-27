@@ -270,6 +270,8 @@ Feature: list all entities with get requests in NGSI v2
       | error       | BadRequest                         |
       | description | too many components in ServicePath |
 
+  # -------------- with/without attribute type or metadatas -----------------------
+
   @without_attribute_type
   Scenario:  list all entities in NGSI v2 but without attribute type
     Given  a definition of headers

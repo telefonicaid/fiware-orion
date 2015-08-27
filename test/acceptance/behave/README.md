@@ -125,11 +125,22 @@ Feature: feature name...
     * general_operations - 16 testcases
     * create_entities - 535 testcases
     * list_all_entities - 51 testcases
-    * list_one_entity (pending)
+    * list_an_entity_by_id - 68 testcases
     * update_entities (pending)
     * remove_entity (pending)
 
  -  alarms (pending)
+
+
+### Hints:
+  - If we need " char, use \' and it will be replaced (mappping_quotes method in helpers_utils library) (limitation in behave and lettuce).
+  - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.
+  - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated random values.
+      The number after "=" is the number of chars
+        ex: | attr_name | random=10 |
+  - If attribute number is "1", the attribute name is without consecutive, ex: attributes_name=temperature.
+    Else attributes number is major than "1" the attributes name are prefix plus consecutive, ex:
+        attributes_name=temperature_1,...,temperature_N
 
 
 ### Tags
