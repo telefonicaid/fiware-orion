@@ -126,6 +126,7 @@ Feature: feature name...
     * create_entities - 535 testcases
     * list_all_entities - 51 testcases
     * list_an_entity_by_id - 68 testcases
+    * list_an_attribute_by_id - 57 testcases
     * update_entities (pending)
     * remove_entity (pending)
 

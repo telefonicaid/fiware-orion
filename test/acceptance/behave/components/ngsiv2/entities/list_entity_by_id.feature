@@ -65,12 +65,12 @@ Feature: get an entity by ID in NGSI v2
     And verify that the entity by ID is returned
 
   @more_entities
-  Scenario:  try get an entity by ID in NGSI v2 with more than one entity with that id
+  Scenario:  try get an entity by ID in NGSI v2 with more than one entity with the same id
     Given  a definition of headers
-      | parameter          | value              |
-      | Fiware-Service     | test_id_happy_path |
-      | Fiware-ServicePath | /test              |
-      | Content-Type       | application/json   |
+      | parameter          | value                 |
+      | Fiware-Service     | test_id_more_entities |
+      | Fiware-ServicePath | /test                 |
+      | Content-Type       | application/json      |
     When create "1" entities with "3" attributes
       | parameter        | value       |
       | entities_type    | house       |
@@ -372,7 +372,7 @@ Feature: get an entity by ID in NGSI v2
  # --------------------- entity ID ----------------------------------------------
 
   @entity_id
-  Scenario Outline:  try to get an entity by ID in NGSI v2 with several entities id
+  Scenario Outline:  get an entity by ID in NGSI v2 with several entity id values
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_id_entity_id |
@@ -402,7 +402,7 @@ Feature: get an entity by ID in NGSI v2
       | room_2    |
 
   @entity_id_unknown
-  Scenario:  get an entity by ID in NGSI v2 with unknown entity id
+  Scenario:  try to get an entity by ID in NGSI v2 with unknown entity id
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_id_entity_id_unknown |

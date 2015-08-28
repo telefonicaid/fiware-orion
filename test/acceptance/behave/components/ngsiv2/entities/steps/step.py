@@ -29,7 +29,7 @@ from components.common_steps.requests import *
 # --------------------------------- common steps -------------------------------------
 # ---- initial_steps.py --------------------------------------------------------------
 """
-@step(u'update properties.py from "([^"]*)" and sudo local "([^"]*)"')
+@step(u'update properties test file from "([^"]*)" and sudo local "([^"]*)"')
 @step(u'update contextBroker config file and restart service')
 @step(u'verify contextBroker is installed successfully')
 @step(u'verify mongo is installed successfully')
@@ -37,13 +37,28 @@ from components.common_steps.requests import *
 
 # ---- requests.py -------------------------------------------------------------------
 """
-@step (u'send a base request')
-@step (u'a definition of headers')
-@step (u'create "([^"]*)" entities with "([^"]*)" attributes')
-@step (u'delete database in mongo')
-@step (u'verify that receive an "([^"]*)" http code')
-@step (u'verify that receive several "([^"]*)" http code')
-@step (u'verify main paths')
-@step (u'verify that entities are stored in mongo')
-@step (u'verify that entities are not stored in mongo')
+@step(u'send a API entry point request')
+@step(u'send a version request')
+@step(u'send a statistics request')
+@step(u'a definition of headers')
+@step(u'create "([^"]*)" entities with "([^"]*)" attributes')
+@step(u'create an entity and attribute with special values in raw')
+@step(u'delete database in mongo')
+@step(u'get all entities')
+@step(u'get an entity by ID "([^"]*)"')
+@step(u'get an attribute "([^"]*)" by ID "([^"]*)"')
+@step(u'verify that receive an "([^"]*)" http code')
+@step(u'verify "([^"]*)" url with "([^"]*)" value in response')
+@step(u'verify statistics "([^"]*)" field does exists')
+@step(u'verify version "([^"]*)" field does exists')
+@step(u'verify if version is the expected')
+@step(u'verify that receive several "([^"]*)" http code')
+@step(u'verify that entities are stored in default mongo')
+@step(u'verify that entities are stored in mongo')
+@step(u'verify that entities are not stored in mongo')
+@step(u'verify an error response')
+@step(u'verify several error responses')
+@step(u'verify that all entities are returned')
+@step(u'verify that the entity by ID is returned')
+@step(u'verify that the attribute by ID is returned')
 """
