@@ -407,13 +407,13 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
       return true;
 
     case NumberDouble:
-      return caP->numberValue != attr.getField(ENT_ATTRS_VALUE).Number();
+      return caP->valueType != ValueTypeNumber || caP->numberValue != attr.getField(ENT_ATTRS_VALUE).Number();
 
     case Bool:
-      return caP->boolValue != attr.getBoolField(ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeBoolean || caP->boolValue != attr.getBoolField(ENT_ATTRS_VALUE);
 
     case String:
-      return caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeString || caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
 
     default:
       LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
