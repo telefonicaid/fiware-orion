@@ -289,6 +289,46 @@ static bool matchMetadata(BSONObj& md1, BSONObj& md2)
     STR_FIELD(md1, ENT_ATTRS_MD_NAME) == STR_FIELD(md2, ENT_ATTRS_MD_NAME);
 }
 
+/* ****************************************************************************
+*
+* equalMetadataValues -
+*
+*/
+static bool equalMetadataValues(BSONObj& md1, BSONObj& md2)
+{
+
+  if (md1.getField(ENT_ATTRS_MD_VALUE).type() != md2.getField(ENT_ATTRS_MD_VALUE).type())
+  {
+    return false;
+  }
+
+  switch (md1.getField(ENT_ATTRS_MD_VALUE).type())
+  {
+    /* FIXME not yet
+    case Object:
+      ...
+      break;
+
+    case Array:
+      ...
+      break;
+    */
+
+    case NumberDouble:
+      return md1.getField(ENT_ATTRS_MD_VALUE).Number() == md2.getField(ENT_ATTRS_MD_VALUE).Number();
+
+    case Bool:
+      return md1.getBoolField(ENT_ATTRS_MD_VALUE) == md2.getBoolField(ENT_ATTRS_MD_VALUE);
+
+    case String:
+      return STR_FIELD(md1, ENT_ATTRS_MD_VALUE) == STR_FIELD(md2, ENT_ATTRS_MD_VALUE);
+
+    default:
+      LM_E(("Runtime Error (unknown metadata value type in DB: %d)", md1.getField(ENT_ATTRS_MD_VALUE).type()));
+      return false;
+  }
+
+}
 
 /* ****************************************************************************
 *
@@ -314,7 +354,7 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
       /* Check metadata match */
       if (matchMetadata(md1, md2))
       {
-        if (STR_FIELD(md1, ENT_ATTRS_MD_VALUE) != STR_FIELD(md2, ENT_ATTRS_MD_VALUE))
+        if (!equalMetadataValues(md1, md2))
         {
           return false;
         }
@@ -367,13 +407,13 @@ bool attrValueChanges(BSONObj& attr, ContextAttribute* caP)
       return true;
 
     case NumberDouble:
-      return caP->numberValue != attr.getField(ENT_ATTRS_VALUE).Number();
+      return caP->valueType != ValueTypeNumber || caP->numberValue != attr.getField(ENT_ATTRS_VALUE).Number();
 
     case Bool:
-      return caP->boolValue != attr.getBoolField(ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeBoolean || caP->boolValue != attr.getBoolField(ENT_ATTRS_VALUE);
 
     case String:
-      return caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
+      return caP->valueType != ValueTypeString || caP->stringValue != STR_FIELD(attr, ENT_ATTRS_VALUE);
 
     default:
       LM_E(("Runtime Error (unknown attribute value type in DB: %d)", attr.getField(ENT_ATTRS_VALUE).type()));
@@ -1173,19 +1213,19 @@ static bool addTriggeredSubscriptions
   // Now, take the 'patterned subscriptions' from the Subscription Cache and add more TriggeredSubscription to subs
   //
   std::vector<Subscription*> subVec;
-  LM_M(("KZ: looking up subscriptions from subCache (tenant: %s, servicePath: %s, entityId: %s, entityType: %s)", tenant.c_str(), servicePath.c_str(), entityId.c_str(), entityType.c_str()));
+
   subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
-  LM_M(("KZ: got %d subscriptions from subCache", subVec.size()));
+
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)
   {
     Subscription* sP = subVec[ix];
 
     sP->pendingNotifications += 1;
+
     // Outdated subscriptions are skipped
     if (sP->expirationTime < now)
     {
-      LM_M(("KZ: subscription %s is expired", sP->subscriptionId.c_str()));
       continue;
     }
 
@@ -1198,7 +1238,6 @@ static bool addTriggeredSubscriptions
     {
       if ((now - sP->lastNotificationTime) < sP->throttling)
       {
-        LM_M(("KZ: subscription %s skipped due to throttling", sP->subscriptionId.c_str()));
         continue;
       }
     }
@@ -1735,7 +1774,7 @@ static bool processContextAttributeVector
         return false;
       }
     }
-    else if (strcasecmp(action.c_str(), "append") == 0)
+    else if ((strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0))
     {
       if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong))
       {

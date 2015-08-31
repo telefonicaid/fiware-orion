@@ -107,9 +107,9 @@ extern std::string valueTag
   const std::string&  tagName,
   const std::string&  value,
   Format              format,
-  bool                showComma       = false,
-  bool                isAssociation   = false,
-  bool                isVectorElement = false
+  bool                showComma           = false,
+  bool                isAssociation       = false,
+  bool                isVectorElement     = false
 );
 
 extern std::string valueTag
@@ -129,8 +129,9 @@ extern std::string valueTag
   const std::string&  jsonTag,
   const std::string&  value,
   Format              format,
-  bool                showComma     = false,
-  bool                isAssociation = false
+  bool                showComma           = false,
+  bool                isAssociation       = false,
+  bool                valueIsNumberOrBool = false
 );
 
 

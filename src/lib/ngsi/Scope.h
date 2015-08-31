@@ -50,6 +50,8 @@ using namespace orion;
 #define SCOPE_FILTER_EXISTENCE       SCOPE_FILTER "::" "Existence"
 #define SCOPE_FILTER_NOT_EXISTENCE   SCOPE_FILTER "::" SCOPE_OPERATOR_NOT "::" "Existence"
 
+#define SCOPE_TYPE_SIMPLE_QUERY      "FIWARE::StringQuery"
+
 #define SCOPE_VALUE_ENTITY_TYPE      "entity::type"
 
 

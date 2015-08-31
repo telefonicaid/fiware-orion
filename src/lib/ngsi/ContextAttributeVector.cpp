@@ -71,16 +71,16 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 
 /* ****************************************************************************
 *
-* ContextAttributeVector::renderV2 - 
+* ContextAttributeVector::toJson - 
 *
 * Attributes named 'id' or 'type' are not rendered in API version 2, due to the 
 * compact way in which API v2 is rendered. Attributes named 'id' or 'type' would simply
 * collide with the 'id' and 'type' of the entity itself (holder of the attribute).
 *
 * If anybody needs an attribute named 'id' or 'type', then API v1
-* will have to be used to retreive that information.
+* will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement)
+std::string ContextAttributeVector::toJson(bool isLastElement, bool types)
 {
   if (vec.size() == 0)
   {
@@ -125,7 +125,7 @@ std::string ContextAttributeVector::toJson(bool isLastElement)
     }
 
     ++renderedAttributes;
-    out += vec[ix]->toJson(renderedAttributes == validAttributes);
+    out += vec[ix]->toJson(renderedAttributes == validAttributes, types);
   }
 
   return out;

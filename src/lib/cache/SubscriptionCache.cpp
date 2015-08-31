@@ -275,8 +275,6 @@ void SubscriptionCache::insert(Subscription* subP)
     return;
   }
 
-  LM_M(("KZ: Really Inserting subscription into subCache: '%s'", subP->subscriptionId.c_str()));
-
   semTake();
   subs.push_back(subP);
   semGive();
@@ -301,11 +299,9 @@ void SubscriptionCache::insert(const std::string& tenant, BSONObj bobj)
   }
 
 
-
   //
   // 01. Extract values from database object 'bobj'
   //
-
   std::string               subId             = idField.OID().toString();
   int64_t                   expiration        = bobj.hasField(CSUB_EXPIRATION)? bobj.getField(CSUB_EXPIRATION).Long() : 0;
   std::string               reference         = bobj.getField(CSUB_REFERENCE).String();
@@ -317,16 +313,14 @@ void SubscriptionCache::insert(const std::string& tenant, BSONObj bobj)
   std::string               servicePath       = bobj.hasField(CSUB_SERVICE_PATH)? bobj.getField(CSUB_SERVICE_PATH).String() : "/";
   Format                    format            = stringToFormat(formatString);
   int                       lastNotification  = bobj.hasField(CSUB_LASTNOTIFICATION)? bobj.getField(CSUB_LASTNOTIFICATION).Int() : 0;
+  std::vector<EntityInfo*>  eiV;
+  std::vector<std::string>  attrV;
+  Restriction               restriction;
+  NotifyConditionVector     notifyConditionVector;
 
-  std::vector<EntityInfo*> eiV;
-  std::vector<std::string> attrV;
-  Restriction              restriction;
-  NotifyConditionVector    notifyConditionVector;
-
-  LM_M(("KZ: Inserting subscription '%s' into subCache?", subId.c_str()));
 
   //
-  // 02. Pushing Entity-data names to EntityInfo Vector (eiV)
+  // 02. Push Entity-data names to EntityInfo Vector (eiV)
   //
   for (unsigned int ix = 0; ix < eVec.size(); ++ix)
   {
@@ -368,7 +362,7 @@ void SubscriptionCache::insert(const std::string& tenant, BSONObj bobj)
 
 
   //
-  // 03. Pushing attribute names to Attribute Vector (attrV)
+  // 03. Push attribute names to Attribute Vector (attrV)
   //
   for (unsigned int ix = 0; ix < attrVec.size(); ++ix)
   {
@@ -426,6 +420,7 @@ void SubscriptionCache::insert(const std::string& tenant, BSONObj bobj)
 
     return;
   }
+
 
   //
   // 06. Create Subscription and add it to the subscription-cache

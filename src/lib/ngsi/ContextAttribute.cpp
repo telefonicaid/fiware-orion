@@ -325,14 +325,39 @@ std::string ContextAttribute::renderAsJsonObject
   {
     if (omitValue == false)
     {
+      std::string effectiveValue        = "";
+      bool        valueIsNumberOrBool   = false;
+
+      switch (valueType)
+      {
+      case ValueTypeString:
+        effectiveValue = stringValue;
+        break;
+
+      case ValueTypeBoolean:
+        effectiveValue      = boolValue? "true" : "false";
+        valueIsNumberOrBool = true;
+        break;
+
+      case ValueTypeNumber:
+        char num[32];
+        snprintf(num, sizeof(num), "%f", numberValue);
+        effectiveValue      = std::string(num);
+        valueIsNumberOrBool = true;
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", valueType));
+      }
+
       //
       // NOTE
       // renderAsJsonObject is used in v1 only.
       // => we only need to care about stringValue (not boolValue nor numberValue)
       //
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                      (request != RtUpdateContextResponse)? stringValue : "",
-                      ciP->outFormat, commaAfterContextValue);
+                      (request != RtUpdateContextResponse)? effectiveValue : "",
+                      ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);
     }
   }
   else
@@ -428,12 +453,35 @@ std::string ContextAttribute::render
   {
     if (omitValue == false)
     {
-      if ((valueType == orion::ValueTypeString) || (ciP->apiVersion != "v2"))
+      std::string effectiveValue      = "";
+      bool        valueIsNumberOrBool = false;
+
+      switch (valueType)
       {
-        out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
-                        (request != RtUpdateContextResponse)? stringValue : "",
-                        ciP->outFormat, commaAfterContextValue);
+      case ValueTypeString:
+        effectiveValue = stringValue;
+        break;
+
+      case ValueTypeBoolean:
+        effectiveValue      = boolValue? "true" : "false";
+        valueIsNumberOrBool = true;
+        break;
+
+      case ValueTypeNumber:
+        char num[32];
+        snprintf(num, sizeof(num), "%f", numberValue);
+        effectiveValue      = std::string(num);
+        valueIsNumberOrBool = true;
+        break;
+
+      default:
+        LM_E(("Runtime Error (unknown value type: %d)", valueType));
       }
+
+      out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                        (request != RtUpdateContextResponse)? effectiveValue : "",
+                        ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);
+
     }
     else if (request == RtUpdateContextResponse)
     {
@@ -471,24 +519,24 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement)
+std::string ContextAttribute::toJson(bool isLastElement, bool types)
 {
   std::string  out;
 
-  LM_M(("KZ2: valueType: %d, type: '%s'", valueType, type.c_str()));
-
-  if ((type == "") && (metadataVector.size() == 0))
+  if (types == true)
+  {
+    out = JSON_STR(name) + ":{" + JSON_STR("type") + ":" + JSON_STR(type) + "}"; 
+  }
+  else if ((type == "") && (metadataVector.size() == 0))
   {
     if (compoundValueP != NULL)
     {
-      LM_M(("compoundValueP != NULL"));
       if (compoundValueP->isObject())
       {
         out = JSON_STR(name) + ":{" + compoundValueP->toJson(true) + "}";
       }
       else if (compoundValueP->isVector())
       {
-        LM_M(("KZ: compoundValue is a vector"));
         out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
       }
     }
@@ -521,13 +569,10 @@ std::string ContextAttribute::toJson(bool isLastElement)
     {
       if (compoundValueP->isObject())
       {
-        LM_M(("compoundValueP != NULL 2"));
         out += JSON_STR("value") + ":{" + compoundValueP->toJson(true) + "}";
-        LM_M(("out: %s", out.c_str()));
       }
       else if (compoundValueP->isVector())
       {
-        LM_M(("compoundValueP != NULL 3"));
         out += JSON_STR("value") + ":[" + compoundValueP->toJson(true) + "]";
       }
     }

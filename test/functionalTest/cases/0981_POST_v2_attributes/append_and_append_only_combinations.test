@@ -1,0 +1,246 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+POST /v2/entities/E1 on entity that exists
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. Create E1 with attr1
+# 02. Get E1 (only attr1)
+# 03. POST /v2/entities/E1 atribute 'attr2'
+# 04. Get E1 (attr1, attr2)
+# 05. POST /v2/entities/E1?op=append atribute 'attr3'
+# 06. Get E1 (attr1, attr2, attr3)
+# 07. POST /v2/entities/E1 atribute 'attr3+attr4' (no error)
+# 08. Get E1 (attr1, attr2, attr3, attr4)
+# 09. POST /v2/entities/E1?op=append atribute 'attr4+attr5' (attr4 already exists. error)
+# 10. Get E1 (attr1, attr2, attr3, attr4, attr5)
+
+echo "01. Create E1 with attr1"
+echo "========================"
+payload='{ "id": "E1", "attr1": 1 }'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "02. Get E1 (only attr1)"
+echo "======================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "03. POST /v2/entities/E1 atribute 'attr2'"
+echo "========================================="
+payload='{  "attr2": 2 }'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json
+echo
+echo
+
+
+echo "04. Get E1 (attr1, attr2)"
+echo "========================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "05. POST /v2/entities/E1?op=append atribute 'attr3'"
+echo "==================================================="
+payload='{  "attr3": 3 }'
+orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+echo
+echo
+
+
+echo "06. Get E1 (attr1, attr2, attr3)"
+echo "================================"
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "07. POST /v2/entities/E1 atribute 'attr3+attr4' (no error)"
+echo "=========================================================="
+payload='{  "attr3": 33, "attr4": 4 }'
+orionCurl --url /v2/entities/E1 --payload "$payload" --json
+echo
+echo
+
+
+echo "08. Get E1 (attr1, attr2, attr3, att4)"
+echo "======================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+echo "09. POST /v2/entities/E1?op=append atribute 'attr4+attr5' (attr4 already exists. error)"
+echo "======================================================================================="
+payload='{  "attr4": 44, "attr5": 5 }'
+orionCurl --url /v2/entities/E1?op=append --payload "$payload" --json
+echo
+echo
+
+
+echo "10. Get E1 (attr1, attr2, attr3, attr4, attr5)"
+echo "=============================================="
+orionCurl --url /v2/entities/E1 --json
+echo
+echo
+
+
+--REGEXPECT--
+01. Create E1 with attr1
+========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+02. Get E1 (only attr1)
+=======================
+HTTP/1.1 200 OK
+Content-Length: 28
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": 1.0,
+    "id": "E1"
+}
+
+
+03. POST /v2/entities/E1 atribute 'attr2'
+=========================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+04. Get E1 (attr1, attr2)
+=========================
+HTTP/1.1 200 OK
+Content-Length: 45
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": 1.0,
+    "attr2": 2.0,
+    "id": "E1"
+}
+
+
+05. POST /v2/entities/E1?op=append atribute 'attr3'
+===================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+06. Get E1 (attr1, attr2, attr3)
+================================
+HTTP/1.1 200 OK
+Content-Length: 62
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": 1.0,
+    "attr2": 2.0,
+    "attr3": 3.0,
+    "id": "E1"
+}
+
+
+07. POST /v2/entities/E1 atribute 'attr3+attr4' (no error)
+==========================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+08. Get E1 (attr1, attr2, attr3, att4)
+=======================================
+HTTP/1.1 200 OK
+Content-Length: 80
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": 1.0,
+    "attr2": 2.0,
+    "attr3": 33.0,
+    "attr4": 4.0,
+    "id": "E1"
+}
+
+
+09. POST /v2/entities/E1?op=append atribute 'attr4+attr5' (attr4 already exists. error)
+=======================================================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "one or more of the attributes in the request already exist: [ attr4 ]",
+    "error": "BadRequest"
+}
+
+
+10. Get E1 (attr1, attr2, attr3, attr4, attr5)
+==============================================
+HTTP/1.1 200 OK
+Content-Length: 97
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "attr1": 1.0,
+    "attr2": 2.0,
+    "attr3": 33.0,
+    "attr4": 4.0,
+    "attr5": 5.0,
+    "id": "E1"
+}
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB

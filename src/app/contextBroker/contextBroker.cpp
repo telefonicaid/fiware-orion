@@ -128,9 +128,11 @@
 #include "serviceRoutines/badVerbPostOnly.h"
 #include "serviceRoutines/badVerbPutDeleteOnly.h"
 #include "serviceRoutines/badVerbGetPostOnly.h"
+#include "serviceRoutines/badVerbGetDeleteOnly.h"
 #include "serviceRoutines/postIndividualContextEntity.h"
 #include "serviceRoutines/deleteIndividualContextEntity.h"
 #include "serviceRoutines/badVerbAllFour.h"
+#include "serviceRoutines/badVerbAllFive.h"
 #include "serviceRoutines/putIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getIndividualContextEntityAttribute.h"
 #include "serviceRoutines/getNgsi10ContextEntityTypes.h"
@@ -162,6 +164,7 @@
 #include "serviceRoutines/badVerbGetPostDeleteOnly.h"
 #include "serviceRoutines/badVerbGetOnly.h"
 #include "serviceRoutines/badVerbGetDeleteOnly.h"
+#include "serviceRoutinesV2/badVerbGetPutOnly.h"
 #include "serviceRoutines/badNgsi9Request.h"
 #include "serviceRoutines/badNgsi10Request.h"
 #include "serviceRoutines/badRequest.h"
@@ -170,11 +173,16 @@
 #include "serviceRoutinesV2/entryPointsTreat.h"
 #include "serviceRoutinesV2/getEntity.h"
 #include "serviceRoutinesV2/getEntityAttribute.h"
+#include "serviceRoutinesV2/putEntityAttribute.h"
 #include "serviceRoutinesV2/getEntityAttributeValue.h"
+#include "serviceRoutinesV2/putEntityAttributeValue.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutinesV2/postEntity.h"
 #include "serviceRoutinesV2/deleteEntity.h"
+#include "serviceRoutinesV2/getEntityType.h"
+#include "serviceRoutinesV2/getEntityAllTypes.h"
+#include "serviceRoutinesV2/patchEntity.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -341,28 +349,32 @@ PaArgument paArgs[] =
 //
 // /v2 API
 //
+#define EPS                     EntryPointsRequest
+#define EPS_COMPS_V2            1, { "v2"             }
 
-#define EPS                EntryPointsRequest
-#define EPS_COMPS_V2       1, { "v2"             }
+#define ENT                     EntitiesRequest
+#define ENT_COMPS_V2            2, { "v2", "entities" }
+#define ENT_COMPS_WORD          ""
 
-#define ENT                EntitiesRequest
-#define ENT_COMPS_V2       2, { "v2", "entities" }
-#define ENT_COMPS_WORD     ""
-
-
-#define IENT                EntityRequest
-#define IENT_COMPS_V2       3, { "v2", "entities", "*" }
-#define IENT_COMPS_WORD     ""
-
+#define IENT                    EntityRequest
+#define IENT_COMPS_V2           3, { "v2", "entities", "*" }
+#define IENT_COMPS_WORD         ""
 
 #define IENTATTR                EntityAttributeRequest
 #define IENTATTR_COMPS_V2       5, { "v2", "entities", "*", "attrs", "*" }
 #define IENTATTR_COMPS_WORD     ""
 
+#define ENTT                    EntityTypeRequest
+#define ENTT_COMPS_V2           3, { "v2", "types", "*" }
+#define ENTT_COMPS_WORD         ""
 
-#define IENTATTRVAL                EntityAttributeValueRequest
-#define IENTATTRVAL_COMPS_V2       6, { "v2", "entities", "*", "attrs", "*", "value" }
-#define IENTATTRVAL_COMPS_WORD     ""
+#define IENTATTRVAL             EntityAttributeValueRequest
+#define IENTATTRVAL_COMPS_V2    6, { "v2", "entities", "*", "attrs", "*", "value" }
+#define IENTATTRVAL_COMPS_WORD  ""
+
+#define ETT                     EntityAllTypesRequest
+#define ETT_COMPS_V2            2, { "v2", "types" }
+#define ETT_COMPS_WORD          ""
 
 
 //
@@ -622,13 +634,24 @@ PaArgument paArgs[] =
   { "POST",   IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         postEntity               }, \
   { "PUT",    IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         putEntity                }, \
   { "DELETE", IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         deleteEntity             }, \
-  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbAllFour           }, \
+  { "PATCH",  IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         patchEntity              }, \
+  { "*",      IENT,         IENT_COMPS_V2,        IENT_COMPS_WORD,         badVerbAllFive           }, \
                                                                                                        \
   { "GET",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  getEntityAttributeValue  }, \
-  { "*",      IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  badVerbGetOnly           }, \
+  { "PUT",    IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  putEntityAttributeValue  }, \
+  { "*",      IENTATTRVAL,  IENTATTRVAL_COMPS_V2, IENTATTRVAL_COMPS_WORD,  badVerbGetPutOnly        }, \
                                                                                                        \
   { "GET",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     getEntityAttribute       }, \
-  { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetOnly           }
+  { "PUT",    IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     putEntityAttribute       }, \
+  { "DELETE", IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     deleteEntity             }, \
+  { "*",      IENTATTR,     IENTATTR_COMPS_V2,    IENTATTR_COMPS_WORD,     badVerbGetPutDeleteOnly  }, \
+                                                                                                       \
+  { "GET",    ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         getEntityType            }, \
+  { "*",      ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         badVerbGetOnly           }, \
+                                                                                                       \
+  { "GET",    ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          getEntityAllTypes        }, \
+  { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }
+
 
 
 

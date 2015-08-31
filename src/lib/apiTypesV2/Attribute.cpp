@@ -38,14 +38,18 @@ std::string Attribute::render(ConnectionInfo* ciP, RequestType requestType, bool
 {
   if (pcontextAttribute)
   {
-      std::string out = "{";
-      out += pcontextAttribute->toJson(true /* is the last and only element */);
-      out += "}";
-      if (comma)
-      {
-        out += ",";
-      }
-      return out;
+    std::string out;
+
+    out = "{";
+    out += pcontextAttribute->toJson(true, false);  // param 1 'true' as it is the last and only element
+    out += "}";
+
+    if (comma)
+    {
+      out += ",";
+    }
+
+    return out;
   }
   return errorCode.toJson(true);
 }

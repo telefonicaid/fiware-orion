@@ -26,10 +26,16 @@ postEntities.cpp
 entryPointsTreat.cpp
 getEntity.cpp
 putEntity.cpp
+patchEntity.cpp
 getEntityAttribute.cpp
+putEntityAttribute.cpp
 getEntityAttributeValue.cpp
+putEntityAttributeValue.cpp
 postEntity.cpp
 deleteEntity.cpp
+getEntityType.cpp
+getEntityAllTypes.cpp
+badVerbGetPutOnly.cpp
 )
 
 SET (HEADERS
@@ -38,10 +44,16 @@ postEntities.h
 entryPointsTreat.h
 getEntity.h
 putEntity.h
+patchEntity.h
 getEntityAttribute.h
+putEntityAttribute.h
 getEntityAttributeValue.h
+putEntityAttributeValue.h
 postEntity.h
 deleteEntity.h
+getEntityType.h
+getEntityAllTypes.h
+badVerbGetPutOnly.h
 )
 
 

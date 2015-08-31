@@ -158,7 +158,6 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
   parseDataP->upcr.attributeP->stringValue = node->value();
   parseDataP->upcr.attributeP->valueType   = ValueTypeString;
 
-  LM_M(("KZ1: stringValue: '%s'", parseDataP->upcr.attributeP->stringValue.c_str()));
   if (parseDataP->upcr.attributeP->stringValue == " ")
   {
     parseDataP->upcr.attributeP->stringValue = "";

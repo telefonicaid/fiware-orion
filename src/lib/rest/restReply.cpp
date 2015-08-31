@@ -93,6 +93,10 @@ void restReply(ConnectionInfo* ciP, const std::string& answer)
     {
       MHD_add_response_header(response, "Content-Type", "application/json");
     }
+    else if (ciP->outFormat == TEXT)
+    {
+      MHD_add_response_header(response, "Content-Type", "text/plain");
+    }
 
     // At the present version, CORS is support only for GET requests
     if ((strlen(restAllowedOrigin) > 0) && (ciP->verb == GET))

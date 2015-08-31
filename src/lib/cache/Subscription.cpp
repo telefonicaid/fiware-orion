@@ -271,16 +271,11 @@ bool Subscription::match
 {
   if (composeDatabaseName(_tenant) != composeDatabaseName(tenant))
   {
-    LM_M(("KZ: no match due to tenant ('%s' vs '%s' (latter to match))", tenant.c_str(), _tenant.c_str()));
     return false;
   }
 
-  LM_M(("My service-path: '%s'", servicePath.c_str()));
-  LM_M(("Incoming service-path: '%s'", _servicePath.c_str()));
-
   if (servicePathMatch(_servicePath) == false)
   {
-    LM_M(("KZ: no match due to servicePath ('%s' vs '%s')", servicePath.c_str(), _servicePath.c_str()));
     return false;
   }
 
@@ -291,7 +286,6 @@ bool Subscription::match
   //
   if (!attributeMatch(attributeName))
   {
-    LM_M(("KZ: no match due to attributes (attributeName: %s)", attributeName.c_str()));
     return false;
   }
 
@@ -299,12 +293,10 @@ bool Subscription::match
   {
     if (entityIdInfos[ix]->match(id, type))
     {
-      LM_M(("KZ: MATCH"));
       return true;
     }
   }
 
-  LM_M(("KZ: no match due to entityIdInfos (id: '%s', type: '%s')", id.c_str(), type.c_str()));
   return false;
 }
 
@@ -325,10 +317,6 @@ bool Subscription::servicePathMatch
   //
   // Empty service path?
   //
-  LM_M(("Comparing service-paths"));
-  LM_M(("My service-path: '%s'", servicePath.c_str()));
-  LM_M(("comparing with service-path: '%s'", _servicePath.c_str()));
-
   if ((_servicePath.length() == 0) && (servicePath.length() == 0))
   {
     return true;

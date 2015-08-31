@@ -706,8 +706,8 @@ Date: REGEX(.*)
 
 {
     "errorCode": {
-        "code": "400", 
-        "details": "Illegal value for JSON field", 
+        "code": "400",
+        "details": "Illegal value for JSON field",
         "reasonPhrase": "Bad Request"
     }
 }

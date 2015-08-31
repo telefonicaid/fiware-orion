@@ -46,5 +46,3 @@ extern std::string getEntityAttribute
 );
 
 #endif  // SRC_LIB_SERVICEROUTINESV2_GETENTITYATTRIBUTE_H_
-
-
