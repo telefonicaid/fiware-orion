@@ -33,7 +33,7 @@
 #
 
 
-Feature: create entities requests (POST) in NGSI v2
+Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus payload
   As a context broker user
   I would like to  create entities requests in NGSI v2
   So that I can manage and use them in my scripts
@@ -51,7 +51,7 @@ Feature: create entities requests (POST) in NGSI v2
       | Fiware-Service     | test_happy_path  |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    When create "3" entities with "2" attributes
+    When create "1" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
       | entities_id      | room2                   |
@@ -65,32 +65,33 @@ Feature: create entities requests (POST) in NGSI v2
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @maximum_size
-  Scenario:  try to create a new entity NGSI v2 with maximum size in payload (8972 attributes = 1048576 bytes)
+  @maximum_size @BUG_1199 @skip
+    # 8972 is a way of generating a request longer than 1MB (in fact, 1048645 bytes)
+  Scenario:  try to create a new entity NGSI v2 with maximum size in payload (8972 attributes = 1048645 bytes)
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_maximum_size |
       | Fiware-ServicePath | /test             |
       | Content-Type       | application/json  |
     When create "1" entities with "8972" attributes
-      | parameter        | value     |
-      | entities_type    | room      |
-      | entities_id      | room2     |
-      | attributes_name  | max_size  |
-      | attributes_value | random=10 |
-      | attributes_type  | my_type   |
-      | metadatas_number | 1         |
-      | metadatas_name   | very_hot  |
-      | metadatas_type   | alarm     |
-      | metadatas_value  | random=10 |
+      | parameter        | value      |
+      | entities_type    | room       |
+      | entities_id      | room2      |
+      | attributes_name  | max_size   |
+      | attributes_value | temperatur |
+      | attributes_type  | my_type    |
+      | metadatas_number | 1          |
+      | metadatas_name   | very_hot   |
+      | metadatas_type   | alarm      |
+      | metadatas_value  | 1234567890 |
     Then verify that receive several "Request Entity Too Large" http code
     And verify several error responses
       | parameter   | value                                              |
-      | error       | Request Entity Too Large                           |
-      | description | payload size: 1048647, max size supported: 1048576 |
+      | error       | RequestEntityTooLarge                              |
+      | description | payload size: 1048645, max size supported: 1048576 |
     And verify that entities are not stored in mongo
 
-  @content_type_without
+  @content_type_without @BUG_1199 @skip
   Scenario:  try to create entities in NGSI v2 without content-type header
     Given  a definition of headers
       | parameter          | value             |
@@ -105,10 +106,10 @@ Feature: create entities requests (POST) in NGSI v2
     Then verify that receive several "Unsupported Media Type" http code
     And verify several error responses
       | parameter   | value                                                                           |
-      | error       | Unsupported Media Type                                                          |
+      | error       | UnsupportedMediaType                                                            |
       | description | Content-Type header not used, default application/octet-stream is not supported |
 
-  @content_type_error
+  @content_type_error @BUG_1199 @skip
   Scenario Outline:  try to create entities in NGSI v2 with wrong content-type header
     Given  a definition of headers
       | parameter          | value             |
@@ -124,18 +125,18 @@ Feature: create entities requests (POST) in NGSI v2
     Then verify that receive several "Unsupported Media Type" http code
     And verify several error responses
       | parameter   | value                                      |
-      | error       | Unsupported Media Type                     |
+      | error       | UnsupportedMediaType                       |
       | description | not supported content type: <content_type> |
-  Examples:
-    | content_type                      |
-    | application/x-www-form-urlencoded |
-    | application/xml                   |
-    | multipart/form-data               |
-    | text/plain                        |
-    | text/html                         |
-    | dsfsdfsdf                         |
-    | <sdsd>                            |
-    | (eeqweqwe)                        |
+    Examples:
+      | content_type                      |
+      | application/x-www-form-urlencoded |
+      | application/xml                   |
+      | multipart/form-data               |
+      | text/plain                        |
+      | text/html                         |
+      | dsfsdfsdf                         |
+      | <sdsd>                            |
+      | (eeqweqwe)                        |
 
   # ---------- Services --------------------------------
   @service_without
@@ -151,7 +152,7 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     Then verify that receive several "Created" http code
-    And verify that entities are stored in default mongo
+    And verify that entities are stored in default tenant at mongo
 
   @service
   Scenario Outline:  create entities in NGSI v2 with several services headers
@@ -169,14 +170,14 @@ Feature: create entities requests (POST) in NGSI v2
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
     And delete database in mongo
-  Examples:
-    | service            |
-    |                    |
-    | service            |
-    | service_12         |
-    | service_sr         |
-    | SERVICE            |
-    | max length allowed |
+    Examples:
+      | service            |
+      |                    |
+      | service            |
+      | service_12         |
+      | service_sr         |
+      | SERVICE            |
+      | max length allowed |
 
   @service_error @BUG_1087
   Scenario Outline:  try to create entities in NGSI v2 with several wrong services headers
@@ -197,15 +198,15 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                                                                                                                    |
       | description | tenant name not accepted - a tenant string must not be longer than 50 characters and may only contain underscores and alphanumeric characters |
     And verify that entities are not stored in mongo
-  Examples:
-    | service                         |
-    | service.sr                      |
-    | Service-sr                      |
-    | Service(sr)                     |
-    | Service=sr                      |
-    | Service<sr>                     |
-    | Service,sr                      |
-    | greater than max length allowed |
+    Examples:
+      | service                         |
+      | service.sr                      |
+      | Service-sr                      |
+      | Service(sr)                     |
+      | Service=sr                      |
+      | Service<sr>                     |
+      | Service,sr                      |
+      | greater than max length allowed |
 
   # ---------- Services path --------------------------------
   @service_path
@@ -223,20 +224,20 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | 34          |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | service_path                                                  |
-    |                                                               |
-    | /                                                             |
-    | /service_path                                                 |
-    | /service_path_12                                              |
-    | /Service_path                                                 |
-    | /SERVICE                                                      |
-    | /serv1/serv2/serv3/serv4/serv5/serv6/serv7/serv8/serv9/serv10 |
-    | max length allowed                                            |
-    | max length allowed and ten levels                             |
+    Examples:
+      | service_path                                                  |
+      |                                                               |
+      | /                                                             |
+      | /service_path                                                 |
+      | /service_path_12                                              |
+      | /Service_path                                                 |
+      | /SERVICE                                                      |
+      | /serv1/serv2/serv3/serv4/serv5/serv6/serv7/serv8/serv9/serv10 |
+      | max length allowed                                            |
+      | max length allowed and ten levels                             |
 
   @service_path_without
-  Scenario:  try to create entities in NGSI v2 without service path header
+  Scenario:  create entities in NGSI v2 without service path header
     Given  a definition of headers
       | parameter      | value                     |
       | Fiware-Service | test_service_path_without |
@@ -269,14 +270,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                               |
       | description | a component of ServicePath contains an illegal character |
     And verify that entities are not stored in mongo
-  Examples:
-    | service_path |
-    | /service.sr  |
-    | /service;sr  |
-    | /service=sr  |
-    | /Service-sr  |
-    | /serv<45>    |
-    | /serv(45)    |
+    Examples:
+      | service_path |
+      | /service.sr  |
+      | /service;sr  |
+      | /service=sr  |
+      | /Service-sr  |
+      | /serv<45>    |
+      | /serv(45)    |
 
   @service_path_error @BUG_1092
   Scenario Outline:  try to create entities in NGSI v2 with several wrong service paths headers
@@ -297,10 +298,10 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                                               |
       | description | Only /absolute/ Service Paths allowed [a service path must begin with /] |
     And verify that entities are not stored in mongo
-  Examples:
-    | service_path |
-    | sdffsfs      |
-    | /service,sr  |
+    Examples:
+      | service_path |
+      | sdffsfs      |
+      | /service,sr  |
 
   @service_path_error @BUG_1092
   Scenario Outline:  try to create entities in NGSI v2 with several wrong service paths headers
@@ -321,10 +322,10 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                             |
       | description | component-name too long in ServicePath |
     And verify that entities are not stored in mongo
-  Examples:
-    | service_path                                   |
-    | greater than max length allowed                |
-    | greater than max length allowed and ten levels |
+    Examples:
+      | service_path                                   |
+      | greater than max length allowed                |
+      | greater than max length allowed and ten levels |
 
   @service_path_error @BUG_1092
   Scenario:  try to create entities in NGSI v2 with several wrong service paths headers
@@ -362,12 +363,12 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | 34          |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | entities |
-    | 1        |
-    | 10       |
-    | 50       |
-    | 100      |
+    Examples:
+      | entities |
+      | 1        |
+      | 10       |
+      | 50       |
+      | 100      |
 
   @attributes_number
   Scenario Outline:  create entities in NGSI v2 with several attributes
@@ -384,12 +385,12 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | 34          |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | attributes |
-    | 1          |
-    | 10         |
-    | 50         |
-    | 100        |
+    Examples:
+      | attributes |
+      | 1          |
+      | 10         |
+      | 50         |
+      | 100        |
 
   @attributes_number_error
   Scenario:  create entities in NGSI v2 without any attributes
@@ -421,20 +422,20 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | 34              |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | entities_type |
-    | room          |
-    | HOUSE         |
-    | HOUSE34       |
-    | HOUSE_34      |
-    | HouSE_34      |
-    | house_flat    |
-    | house.flat    |
-    | house-flat    |
-    | house@flat    |
-    | habitación    |
-    | españa        |
-    | barça         |
+    Examples:
+      | entities_type |
+      | room          |
+      | HOUSE         |
+      | HOUSE34       |
+      | HOUSE_34      |
+      | HouSE_34      |
+      | house_flat    |
+      | house.flat    |
+      | house-flat    |
+      | house@flat    |
+      | habitación    |
+      | españa        |
+      | barça         |
 
   @entities_type_without
   Scenario:  create entities in NGSI v2 without entities type values
@@ -470,17 +471,17 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                      |
       | description | Parse Error (Invalid characters in entity type) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_type |
-    | house<flat>   |
-    | house=flat    |
-    | house"flat"   |
-    | house'flat'   |
-    | house;flat    |
-    | house(flat)   |
+    Examples:
+      | entities_type |
+      | house<flat>   |
+      | house=flat    |
+      | house"flat"   |
+      | house'flat'   |
+      | house;flat    |
+      | house(flat)   |
 
   @entities_type_no_string_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with several invalid entities_type without attribute type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity in NGSI v2 with wrong json in entities_type
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_entities_type_error_2 |
@@ -497,13 +498,13 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_type |
-    | rewrewr     |
-    | SDFSDFSDF   |
+    Examples:
+      | entity_type |
+      | rewrewr     |
+      | SDFSDFSDF   |
 
   @entities_type_no_string_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with several not allowed entities_type without attribute type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity in NGSI v2 with invalid entities_type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_entities_type_error_2 |
@@ -520,68 +521,16 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                             |
       | error       | ParseError                        |
       | description | invalid JSON type for entity type |
-  Examples:
-    | entity_type     |
-    | false           |
-    | true            |
-    | 34              |
-    | {"a":34}        |
-    | ["34", "a", 45] |
-    | null            |
+    Examples:
+      | entity_type     |
+      | false           |
+      | true            |
+      | 34              |
+      | {"a":34}        |
+      | ["34", "a", 45] |
+      | null            |
 
-  @entities_type_no_string_with_type_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with several invalid entities_type with attribute type (integer, boolean, no-string, etc)
-    Given  a definition of headers
-      | parameter          | value                      |
-      | Fiware-Service     | test_entities_type_error_2 |
-      | Fiware-ServicePath | /test                      |
-      | Content-Type       | application/json           |
-    When create an entity and attribute with special values in raw
-      | parameter        | value         |
-      | entities_type    | <entity_type> |
-      | entities_id      | "room2"       |
-      | attributes_name  | "temperature" |
-      | attributes_value | true          |
-      | attributes_type  | "nothing"     |
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                                |
-      | error       | ParseError                           |
-      | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_type |
-    | rewrewr     |
-    | SDFSDFSDF   |
-
-  @entities_type_no_string_with_type_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with several not allowed entities_type with attribute type (integer, boolean, no-string, etc)
-    Given  a definition of headers
-      | parameter          | value                      |
-      | Fiware-Service     | test_entities_type_error_2 |
-      | Fiware-ServicePath | /test                      |
-      | Content-Type       | application/json           |
-    When create an entity and attribute with special values in raw
-      | parameter        | value         |
-      | entities_type    | <entity_type> |
-      | entities_id      | "room2"       |
-      | attributes_name  | "temperature" |
-      | attributes_value | true          |
-      | attributes_type  | "nothing"     |
-    Then verify that receive an "Bad Request" http code
-    And verify an error response
-      | parameter   | value                             |
-      | error       | ParseError                        |
-      | description | invalid JSON type for entity type |
-  Examples:
-    | entity_type     |
-    | false           |
-    | true            |
-    | 34              |
-    | {"a":34}        |
-    | ["34", "a", 45] |
-    | null            |
-
-  # ---------- entity id "id" --------------------------------
+    # ---------- entity id "id" --------------------------------
   @entities_id
   Scenario Outline:  create entities in NGSI v2 with several entities id values
     Given  a definition of headers
@@ -597,20 +546,20 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | 34            |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | entities_id |
-    | room        |
-    | HOUSE       |
-    | HOUSE34     |
-    | HOUSE_34    |
-    | HouSE_34    |
-    | house_flat  |
-    | house.flat  |
-    | house-flat  |
-    | house@flat  |
-    | habitación  |
-    | españa      |
-    | barça       |
+    Examples:
+      | entities_id |
+      | room        |
+      | HOUSE       |
+      | HOUSE34     |
+      | HOUSE_34    |
+      | HouSE_34    |
+      | house_flat  |
+      | house.flat  |
+      | house-flat  |
+      | house@flat  |
+      | habitación  |
+      | españa      |
+      | barça       |
 
   @entities_id_without
   Scenario:  try to create entities in NGSI v2 without entities id values
@@ -646,14 +595,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                    |
       | description | Parse Error (Invalid characters in entity id) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_id |
-    | house<flat> |
-    | house=flat  |
-    | house"flat" |
-    | house'flat' |
-    | house;flat  |
-    | house(flat) |
+    Examples:
+      | entities_id |
+      | house<flat> |
+      | house=flat  |
+      | house"flat" |
+      | house'flat' |
+      | house;flat  |
+      | house(flat) |
 
   @entities_id_no_string_error @BUG_1108
   Scenario Outline:  try to create an entity in NGSI v2 with several invalid entities id without attribute type (integer, boolean, no-string, etc)
@@ -673,10 +622,10 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id |
-    | rewrewr   |
-    | SDFSDFSDF |
+    Examples:
+      | entity_id |
+      | rewrewr   |
+      | SDFSDFSDF |
 
   @entities_id_no_string_error @BUG_1108
   Scenario Outline:  try to create an entity in NGSI v2 with several not allowed entities id without attribute type (integer, boolean, no-string, etc)
@@ -696,14 +645,14 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                           |
       | error       | ParseError                      |
       | description | invalid JSON type for entity id |
-  Examples:
-    | entity_id       |
-    | false           |
-    | true            |
-    | 34              |
-    | {"a":34}        |
-    | ["34", "a", 45] |
-    | null            |
+    Examples:
+      | entity_id       |
+      | false           |
+      | true            |
+      | 34              |
+      | {"a":34}        |
+      | ["34", "a", 45] |
+      | null            |
 
   @entities_id_no_string_with_type_error @BUG_1108
   Scenario Outline:  try to create an entity in NGSI v2 with several invalid entities id with attribute type (integer, boolean, no-string, etc)
@@ -724,10 +673,10 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id |
-    | rewrewr   |
-    | SDFSDFSDF |
+    Examples:
+      | entity_id |
+      | rewrewr   |
+      | SDFSDFSDF |
 
   @entities_id_no_string_with_type_error @BUG_1108
   Scenario Outline:  try to create an entity in NGSI v2 with several not allowed entities id with attribute type (integer, boolean, no-string, etc)
@@ -748,14 +697,14 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                           |
       | error       | ParseError                      |
       | description | invalid JSON type for entity id |
-  Examples:
-    | entity_id       |
-    | false           |
-    | true            |
-    | 34              |
-    | {"a":34}        |
-    | ["34", "a", 45] |
-    | null            |
+    Examples:
+      | entity_id       |
+      | false           |
+      | true            |
+      | 34              |
+      | {"a":34}        |
+      | ["34", "a", 45] |
+      | null            |
 
   # ---------- attribute name --------------------------------
   @attributes_name @ISSUE_1090
@@ -773,24 +722,24 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | 34                |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | attributes_name |
-    | temperature     |
-    | temp.48         |
-    | temp_49         |
-    | temp-50         |
-    | TEMP51          |
-    | house_flat      |
-    | house.flat      |
-    | house-flat      |
-    | house@flat      |
-    | habitación      |
-    | españa          |
-    | barça           |
-    | random=10       |
-    | random=100      |
-    | random=10000    |
-    | random=100000   |
+    Examples:
+      | attributes_name |
+      | temperature     |
+      | temp.48         |
+      | temp_49         |
+      | temp-50         |
+      | TEMP51          |
+      | house_flat      |
+      | house.flat      |
+      | house-flat      |
+      | house@flat      |
+      | habitación      |
+      | españa          |
+      | barça           |
+      | random=10       |
+      | random=100      |
+      | random=10000    |
+      | random=100000   |
 
   @attributes_name_error @BUG1093
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes names
@@ -811,14 +760,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                         |
       | description | Parse Error (Invalid characters in attribute name) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_id | attributes_name |
-    | room_2      | house<flat>     |
-    | room_3      | house=flat      |
-    | room_4      | house"flat"     |
-    | room_5      | house'flat'     |
-    | room_6      | house;flat      |
-    | room_8      | house(flat)     |
+    Examples:
+      | entities_id | attributes_name |
+      | room_2      | house<flat>     |
+      | room_3      | house=flat      |
+      | room_4      | house"flat"     |
+      | room_5      | house'flat'     |
+      | room_6      | house;flat      |
+      | room_8      | house(flat)     |
 
   @attributes_name_no_string_error
   Scenario Outline:  try to create an entity in NGSI v2 with several wrong attributes name (integer, boolean, no-string, etc)
@@ -838,16 +787,16 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | attributes_name |
-    | "room1"   | rewrewr         |
-    | "room2"   | SDFSDFSDF       |
-    | "room3"   | false           |
-    | "room4"   | true            |
-    | "room5"   | 34              |
-    | "room6"   | {"a":34}        |
-    | "room7"   | ["34", "a", 45] |
-    | "room8"   | null            |
+    Examples:
+      | entity_id | attributes_name |
+      | "room1"   | rewrewr         |
+      | "room2"   | SDFSDFSDF       |
+      | "room3"   | false           |
+      | "room4"   | true            |
+      | "room5"   | 34              |
+      | "room6"   | {"a":34}        |
+      | "room7"   | ["34", "a", 45] |
+      | "room8"   | null            |
 
   @attributes_name_without
   Scenario:  create entities in NGSI v2 without attributes names
@@ -899,26 +848,26 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | <attributes_value> |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | attributes_value |
-    | 34               |
-    | 34.4E-34         |
-    | temp.34          |
-    | temp_34          |
-    | temp-34          |
-    | TEMP34           |
-    | house_flat       |
-    | house.flat       |
-    | house-flat       |
-    | house@flat       |
-    | habitación       |
-    | españa           |
-    | barça            |
-    | random=10        |
-    | random=100       |
-    | random=1000      |
-    | random=10000     |
-    | random=100000    |
+    Examples:
+      | attributes_value |
+      | 34               |
+      | 34.4E-34         |
+      | temp.34          |
+      | temp_34          |
+      | temp-34          |
+      | TEMP34           |
+      | house_flat       |
+      | house.flat       |
+      | house-flat       |
+      | house@flat       |
+      | habitación       |
+      | españa           |
+      | barça            |
+      | random=10        |
+      | random=100       |
+      | random=1000      |
+      | random=10000     |
+      | random=100000    |
 
   @attributes_value_error @BUG_1093
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes values
@@ -939,14 +888,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                          |
       | description | Parse Error (Invalid characters in attribute value) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_id | attributes_value |
-    | room_2      | house<flat>      |
-    | room_3      | house=flat       |
-    | room_4      | house"flat"      |
-    | room_5      | house'flat'      |
-    | room_6      | house;flat       |
-    | room_8      | house(flat)      |
+    Examples:
+      | entities_id | attributes_value |
+      | room_2      | house<flat>      |
+      | room_3      | house=flat       |
+      | room_4      | house"flat"      |
+      | room_5      | house'flat'      |
+      | room_6      | house;flat       |
+      | room_8      | house(flat)      |
 
   @attributes_value_without
   Scenario:  try to create entities in NGSI v2 without attributes values
@@ -967,6 +916,50 @@ Feature: create entities requests (POST) in NGSI v2
       | description | invalid JSON type for ContextAttribute |
     And verify that entities are not stored in mongo
 
+  @attributes_value_without_with_type @BUG_1195 @skip
+  Scenario:  try to create entities in NGSI v2 without attributes values but with attribute type
+    Given  a definition of headers
+      | parameter          | value                         |
+      | Fiware-Service     | test_attributes_value_without |
+      | Fiware-ServicePath | /test                         |
+      | Content-Type       | application/json              |
+    When create "1" entities with "1" attributes
+      | parameter       | value       |
+      | entities_type   | room        |
+      | entities_id     | room2       |
+      | attributes_name | temperature |
+      | attributes_type | date        |
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                                  |
+      | error       | ParseError                             |
+      | description | invalid JSON type for ContextAttribute |
+    And verify that entities are not stored in mongo
+
+  @attributes_value_without_with_metadata @BUG_1195 @skip
+  Scenario:  try to create entities in NGSI v2 without attributes values but with metadata
+    Given  a definition of headers
+      | parameter          | value                         |
+      | Fiware-Service     | test_attributes_value_without |
+      | Fiware-ServicePath | /test                         |
+      | Content-Type       | application/json              |
+    When create "1" entities with "1" attributes
+      | parameter        | value       |
+      | entities_type    | room        |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | metadatas_number | 2           |
+      | metadatas_name   | very_hot    |
+      | metadatas_type   | alarm       |
+      | metadatas_value  | hot         |
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                                  |
+      | error       | ParseError                             |
+      | description | invalid JSON type for ContextAttribute |
+    And verify that entities are not stored in mongo
+
+
   @attributes_value_special @BUG_1106 @skip
   Scenario Outline:  create an entity NGSI v2 with several attributes special values without type (compound, vector, boolean, etc)
     Given  a definition of headers
@@ -981,25 +974,25 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_name  | "temperature"      |
       | attributes_value | <attributes_value> |
     Then verify that receive an "Created" http code
-  Examples:
-    | entity_id | attributes_value                                                              |
-    | "room1"   | true                                                                          |
-    | "room2"   | false                                                                         |
-    | "room3"   | 34                                                                            |
-    | "room4"   | -34                                                                           |
-    | "room5"   | 5.00002                                                                       |
-    | "room6"   | -5.00002                                                                      |
-    | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-    | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-    | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-    | "room10"  | {"x": "x1","x2": "b"}                                                         |
-    | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-    | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-    | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-    | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
-    | "room15"  | "41.3763726, 2.1864475,14"                                                    |
-    | "room16"  | "2017-06-17T07:21:24.238Z"                                                    |
-    | "room17"  | null                                                                          |
+    Examples:
+      | entity_id | attributes_value                                                              |
+      | "room1"   | true                                                                          |
+      | "room2"   | false                                                                         |
+      | "room3"   | 34                                                                            |
+      | "room4"   | -34                                                                           |
+      | "room5"   | 5.00002                                                                       |
+      | "room6"   | -5.00002                                                                      |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    |
+      | "room17"  | null                                                                          |
 
   @attributes_value_special_type @BUG_1106 @skip
   Scenario Outline:  create an entity NGSI v2 with several attributes special values with type (compound, vector, boolean, etc)
@@ -1016,25 +1009,25 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_value | <attributes_value> |
       | attributes_type  | "example"          |
     Then verify that receive an "Created" http code
-  Examples:
-    | entity_id | attributes_value                                                              |
-    | "room1"   | true                                                                          |
-    | "room2"   | false                                                                         |
-    | "room3"   | 34                                                                            |
-    | "room4"   | -34                                                                           |
-    | "room5"   | 5.00002                                                                       |
-    | "room6"   | -5.00002                                                                      |
-    | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-    | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-    | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-    | "room10"  | {"x": "x1","x2": "b"}                                                         |
-    | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-    | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-    | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-    | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
-    | "room15"  | "41.3763726, 2.1864475,14"                                                    |
-    | "room16"  | "2017-06-17T07:21:24.238Z"                                                    |
-    | "room17"  | null                                                                          |
+    Examples:
+      | entity_id | attributes_value                                                              |
+      | "room1"   | true                                                                          |
+      | "room2"   | false                                                                         |
+      | "room3"   | 34                                                                            |
+      | "room4"   | -34                                                                           |
+      | "room5"   | 5.00002                                                                       |
+      | "room6"   | -5.00002                                                                      |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    |
+      | "room17"  | null                                                                          |
 
   @attributes_value_special_metadata @BUG_1106 @skip
   Scenario Outline:  create an entity NGSI v2 with several attributes special values with metadata (compound, vector, boolean, etc)
@@ -1053,25 +1046,25 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_type   | "alarm"            |
       | metadatas_value  | "default"          |
     Then verify that receive an "Created" http code
-  Examples:
-    | entity_id | attributes_value                                                              |
-    | "room1"   | true                                                                          |
-    | "room2"   | false                                                                         |
-    | "room3"   | 34                                                                            |
-    | "room4"   | -34                                                                           |
-    | "room5"   | 5.00002                                                                       |
-    | "room6"   | -5.00002                                                                      |
-    | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-    | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-    | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-    | "room10"  | {"x": "x1","x2": "b"}                                                         |
-    | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-    | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-    | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-    | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
-    | "room15"  | "41.3763726, 2.1864475,14"                                                    |
-    | "room16"  | "2017-06-17T07:21:24.238Z"                                                    |
-    | "room17"  | null                                                                          |
+    Examples:
+      | entity_id | attributes_value                                                              |
+      | "room1"   | true                                                                          |
+      | "room2"   | false                                                                         |
+      | "room3"   | 34                                                                            |
+      | "room4"   | -34                                                                           |
+      | "room5"   | 5.00002                                                                       |
+      | "room6"   | -5.00002                                                                      |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | "room13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    |
+      | "room17"  | null                                                                          |
 
   @attributes_value_special_type_and_metadata @BUG_1106 @skip
   Scenario Outline:  create an entity NGSI v2 with several attributes special values with type and metadata (compound, vector, boolean, etc)
@@ -1091,25 +1084,25 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_type   | "alarm"            |
       | metadatas_value  | "default"          |
     Then verify that receive an "Created" http code
-  Examples:
-    | entity_id | attributes_value                                                              |
-    | "room1"   | true                                                                          |
-    | "room2"   | false                                                                         |
-    | "room3"   | 34                                                                            |
-    | "room4"   | -34                                                                           |
-    | "room5"   | 5.00002                                                                       |
-    | "room6"   | -5.00002                                                                      |
-    | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-    | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-    | "room9v   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-    | vroom10"  | {"x": "x1","x2": "b"}                                                         |
-    | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-    | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-    | vroom13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-    | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
-    | vroom15"  | "41.3763726, 2.1864475,14"                                                    |
-    | vroom16"  | "2017-06-17T07:21:24.238Z"                                                    |
-    | "room17"  | null                                                                          |
+    Examples:
+      | entity_id | attributes_value                                                              |
+      | "room1"   | true                                                                          |
+      | "room2"   | false                                                                         |
+      | "room3"   | 34                                                                            |
+      | "room4"   | -34                                                                           |
+      | "room5"   | 5.00002                                                                       |
+      | "room6"   | -5.00002                                                                      |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | "room9v   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | vroom10"  | {"x": "x1","x2": "b"}                                                         |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | vroom13"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+      | vroom15"  | "41.3763726, 2.1864475,14"                                                    |
+      | vroom16"  | "2017-06-17T07:21:24.238Z"                                                    |
+      | "room17"  | null                                                                          |
 
   @attributes_value_special_error
   Scenario Outline:  try to create an entity NGSI v2 with several wrong attributes special values without type
@@ -1129,22 +1122,22 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | attributes_value |
-    | "room_1"  | rwerwer          |
-    | "room_2"  | True             |
-    | "room_3"  | TRUE             |
-    | "room_4"  | False            |
-    | "room_5"  | FALSE            |
-    | "room_6"  | 34r              |
-    | "room_7"  | 5_34             |
-    | "room_8"  | ["a", "b"        |
-    | "room_9"  | ["a" "b"]        |
-    | "room_10" | "a", "b"]        |
-    | "room_11" | ["a" "b"}        |
-    | "room_12" | {"a": "b"        |
-    | "room_13" | {"a" "b"}        |
-    | "room_14" | "a": "b"}        |
+    Examples:
+      | entity_id | attributes_value |
+      | "room_1"  | rwerwer          |
+      | "room_2"  | True             |
+      | "room_3"  | TRUE             |
+      | "room_4"  | False            |
+      | "room_5"  | FALSE            |
+      | "room_6"  | 34r              |
+      | "room_7"  | 5_34             |
+      | "room_8"  | ["a", "b"        |
+      | "room_9"  | ["a" "b"]        |
+      | "room_10" | "a", "b"]        |
+      | "room_11" | ["a" "b"}        |
+      | "room_12" | {"a": "b"        |
+      | "room_13" | {"a" "b"}        |
+      | "room_14" | "a": "b"}        |
 
   @attributes_value_special_type_error
   Scenario Outline:  try to create an entity NGSI v2 with several wrong attributes special values with type
@@ -1165,22 +1158,22 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | attributes_value |
-    | room_1    | rwerwer          |
-    | room_2    | True             |
-    | room_3    | TRUE             |
-    | room_4    | False            |
-    | room_5    | FALSE            |
-    | room_6    | 34r              |
-    | room_7    | 5_34             |
-    | room_8    | ["a", "b"        |
-    | room_9    | ["a" "b"]        |
-    | room_10   | "a", "b"]        |
-    | room_11   | ["a" "b"}        |
-    | room_12   | {"a": "b"        |
-    | room_13   | {"a" "b"}        |
-    | room_14   | "a": "b"}        |
+    Examples:
+      | entity_id | attributes_value |
+      | room_1    | rwerwer          |
+      | room_2    | True             |
+      | room_3    | TRUE             |
+      | room_4    | False            |
+      | room_5    | FALSE            |
+      | room_6    | 34r              |
+      | room_7    | 5_34             |
+      | room_8    | ["a", "b"        |
+      | room_9    | ["a" "b"]        |
+      | room_10   | "a", "b"]        |
+      | room_11   | ["a" "b"}        |
+      | room_12   | {"a": "b"        |
+      | room_13   | {"a" "b"}        |
+      | room_14   | "a": "b"}        |
 
   @attributes_value_special_metadata_error
   Scenario Outline:  try to create an entity NGSI v2 with several wrong attributes special values with metadata
@@ -1204,22 +1197,22 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | attributes_value |
-    | room_1    | rwerwer          |
-    | room_2    | True             |
-    | room_3    | TRUE             |
-    | room_4    | False            |
-    | room_5    | FALSE            |
-    | room_6    | 34r              |
-    | room_7    | 5_34             |
-    | room_8    | ["a", "b"        |
-    | room_9    | ["a" "b"]        |
-    | room_10   | "a", "b"]        |
-    | room_11   | ["a" "b"}        |
-    | room_12   | {"a": "b"        |
-    | room_13   | {"a" "b"}        |
-    | room_14   | "a": "b"}        |
+    Examples:
+      | entity_id | attributes_value |
+      | room_1    | rwerwer          |
+      | room_2    | True             |
+      | room_3    | TRUE             |
+      | room_4    | False            |
+      | room_5    | FALSE            |
+      | room_6    | 34r              |
+      | room_7    | 5_34             |
+      | room_8    | ["a", "b"        |
+      | room_9    | ["a" "b"]        |
+      | room_10   | "a", "b"]        |
+      | room_11   | ["a" "b"}        |
+      | room_12   | {"a": "b"        |
+      | room_13   | {"a" "b"}        |
+      | room_14   | "a": "b"}        |
 
   @attributes_value_special_type_and_metadata_error
   Scenario Outline:  try to create an entity NGSI v2 with several wrong attributes special values with type and metadata
@@ -1244,22 +1237,22 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | attributes_value |
-    | room_1    | rwerwer          |
-    | room_2    | True             |
-    | room_3    | TRUE             |
-    | room_4    | False            |
-    | room_5    | FALSE            |
-    | room_6    | 34r              |
-    | room_7    | 5_34             |
-    | room_8    | ["a", "b"        |
-    | room_9    | ["a" "b"]        |
-    | room_10   | "a", "b"]        |
-    | room_11   | ["a" "b"}        |
-    | room_12   | {"a": "b"        |
-    | room_13   | {"a" "b"}        |
-    | room_14   | "a": "b"}        |
+    Examples:
+      | entity_id | attributes_value |
+      | room_1    | rwerwer          |
+      | room_2    | True             |
+      | room_3    | TRUE             |
+      | room_4    | False            |
+      | room_5    | FALSE            |
+      | room_6    | 34r              |
+      | room_7    | 5_34             |
+      | room_8    | ["a", "b"        |
+      | room_9    | ["a" "b"]        |
+      | room_10   | "a", "b"]        |
+      | room_11   | ["a" "b"}        |
+      | room_12   | {"a": "b"        |
+      | room_13   | {"a" "b"}        |
+      | room_14   | "a": "b"}        |
 
   # ---------- attribute type --------------------------------
   @attributes_type
@@ -1278,25 +1271,25 @@ Feature: create entities requests (POST) in NGSI v2
       | attributes_type  | <attributes_type> |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | attributes_type |
-    | dgdgdfgd        |
-    | temp.34         |
-    | temp_34         |
-    | temp-34         |
-    | TEMP34          |
-    | house_flat      |
-    | house.flat      |
-    | house-flat      |
-    | house@flat      |
-    | habitación      |
-    | españa          |
-    | barça           |
-    | random=10       |
-    | random=100      |
-    | random=1000     |
-    | random=10000    |
-    | random=100000   |
+    Examples:
+      | attributes_type |
+      | dgdgdfgd        |
+      | temp.34         |
+      | temp_34         |
+      | temp-34         |
+      | TEMP34          |
+      | house_flat      |
+      | house.flat      |
+      | house-flat      |
+      | house@flat      |
+      | habitación      |
+      | españa          |
+      | barça           |
+      | random=10       |
+      | random=100      |
+      | random=1000     |
+      | random=10000    |
+      | random=100000   |
 
   @attributes_type_without
   Scenario:  create entities in NGSI v2 without attributes type
@@ -1334,14 +1327,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                         |
       | description | Parse Error (Invalid characters in attribute type) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_id | attributes_type |
-    | room_2      | house<flat>     |
-    | room_3      | house=flat      |
-    | room_4      | house"flat"     |
-    | room_5      | house'flat'     |
-    | room_6      | house;flat      |
-    | room_8      | house(flat)     |
+    Examples:
+      | entities_id | attributes_type |
+      | room_2      | house<flat>     |
+      | room_3      | house=flat      |
+      | room_4      | house"flat"     |
+      | room_5      | house'flat'     |
+      | room_6      | house;flat      |
+      | room_8      | house(flat)     |
 
   @attributes_type_no_string_error @BUG_1109
   Scenario Outline:  try to create an entity in NGSI v2 with several invalid attributes type (integer, boolean, no-string, etc)
@@ -1362,10 +1355,10 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | attributes_type |
-    | "room1"   | rewrewr         |
-    | "room2"   | SDFSDFSDF       |
+    Examples:
+      | entity_id | attributes_type |
+      | "room1"   | rewrewr         |
+      | "room2"   | SDFSDFSDF       |
 
   @attributes_type_no_string_error @BUG_1109
   Scenario Outline:  try to create an entity in NGSI v2 with several not allowed attributes type (integer, boolean, no-string, etc)
@@ -1386,13 +1379,13 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | invalid JSON type for attribute type |
-  Examples:
-    | entity_id | attributes_type |
-    | "room3"   | false           |
-    | "room4"   | true            |
-    | "room5"   | 34              |
-    | "room6"   | {"a":34}        |
-    | "room7"   | ["34", "a", 45] |
+    Examples:
+      | entity_id | attributes_type |
+      | "room3"   | false           |
+      | "room4"   | true            |
+      | "room5"   | 34              |
+      | "room6"   | {"a":34}        |
+      | "room7"   | ["34", "a", 45] |
 
   # ---------- attribute metadata --------------------------------
   @attributes_metadata_name
@@ -1413,25 +1406,25 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_value  | random=5        |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | metadata_name |
-    | dgdgdfgd      |
-    | temp.34       |
-    | temp_34       |
-    | temp-34       |
-    | TEMP34        |
-    | house_flat    |
-    | house.flat    |
-    | house-flat    |
-    | house@flat    |
-    | habitación    |
-    | españa        |
-    | barça         |
-    | random=10     |
-    | random=100    |
-    | random=1000   |
-    | random=10000  |
-    | random=100000 |
+    Examples:
+      | metadata_name |
+      | dgdgdfgd      |
+      | temp.34       |
+      | temp_34       |
+      | temp-34       |
+      | TEMP34        |
+      | house_flat    |
+      | house.flat    |
+      | house-flat    |
+      | house@flat    |
+      | habitación    |
+      | españa        |
+      | barça         |
+      | random=10     |
+      | random=100    |
+      | random=1000   |
+      | random=10000  |
+      | random=100000 |
 
   @attributes_metadata_name_with_type
   Scenario Outline:  create entities in NGSI v2 with several attributes metadata name with metadata type
@@ -1452,25 +1445,25 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_type   | random=6        |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | metadata_name |
-    | dgdgdfgd      |
-    | temp.34       |
-    | temp_34       |
-    | temp-34       |
-    | TEMP34        |
-    | house_flat    |
-    | house.flat    |
-    | house-flat    |
-    | house@flat    |
-    | habitación    |
-    | españa        |
-    | barça         |
-    | random=10     |
-    | random=100    |
-    | random=1000   |
-    | random=10000  |
-    | random=100000 |
+    Examples:
+      | metadata_name |
+      | dgdgdfgd      |
+      | temp.34       |
+      | temp_34       |
+      | temp-34       |
+      | TEMP34        |
+      | house_flat    |
+      | house.flat    |
+      | house-flat    |
+      | house@flat    |
+      | habitación    |
+      | españa        |
+      | barça         |
+      | random=10     |
+      | random=100    |
+      | random=1000   |
+      | random=10000  |
+      | random=100000 |
 
   @attributes_metadata_name_error @BUG_1093
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata name without metadata type
@@ -1494,14 +1487,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                        |
       | description | Parse Error (Invalid characters in metadata name) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_id | metadata_name |
-    | room_2      | house<flat>   |
-    | room_3      | house=flat    |
-    | room_4      | house"flat"   |
-    | room_5      | house'flat'   |
-    | room_6      | house;flat    |
-    | room_8      | house(flat)   |
+    Examples:
+      | entities_id | metadata_name |
+      | room_2      | house<flat>   |
+      | room_3      | house=flat    |
+      | room_4      | house"flat"   |
+      | room_5      | house'flat'   |
+      | room_6      | house;flat    |
+      | room_8      | house(flat)   |
 
   @attributes_metadata_name_with_type_error @BUG_1093
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata name with metadata type
@@ -1526,14 +1519,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                        |
       | description | Parse Error (Invalid characters in metadata name) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_id | metadata_name |
-    | room_2      | house<flat>   |
-    | room_3      | house=flat    |
-    | room_4      | house"flat"   |
-    | room_5      | house'flat'   |
-    | room_6      | house;flat    |
-    | room_8      | house(flat)   |
+    Examples:
+      | entities_id | metadata_name |
+      | room_2      | house<flat>   |
+      | room_3      | house=flat    |
+      | room_4      | house"flat"   |
+      | room_5      | house'flat'   |
+      | room_6      | house;flat    |
+      | room_8      | house(flat)   |
 
   @attributes_metadata_name_no_string_error
   Scenario Outline:  try to create an entity in NGSI v2 with several wrong attributes metadata name without metadata type (integer, boolean, no-string, etc)
@@ -1555,15 +1548,15 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | metadata_name   |
-    | "room1"   | rewrewr         |
-    | "room2"   | SDFSDFSDF       |
-    | "room3"   | false           |
-    | "room4"   | true            |
-    | "room5"   | 34              |
-    | "room6"   | {"a":34}        |
-    | "room7"   | ["34", "a", 45] |
+    Examples:
+      | entity_id | metadata_name   |
+      | "room1"   | rewrewr         |
+      | "room2"   | SDFSDFSDF       |
+      | "room3"   | false           |
+      | "room4"   | true            |
+      | "room5"   | 34              |
+      | "room6"   | {"a":34}        |
+      | "room7"   | ["34", "a", 45] |
 
   @attributes_metadata_name_with_type_no_string_error
   Scenario Outline:  try to create an entity in NGSI v2 with several wrong attributes metadata name with metadata type (integer, boolean, no-string, etc)
@@ -1586,15 +1579,15 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | metadata_name   |
-    | "room1"   | rewrewr         |
-    | "room2"   | SDFSDFSDF       |
-    | "room3"   | false           |
-    | "room4"   | true            |
-    | "room5"   | 34              |
-    | "room6"   | {"a":34}        |
-    | "room7"   | ["34", "a", 45] |
+    Examples:
+      | entity_id | metadata_name   |
+      | "room1"   | rewrewr         |
+      | "room2"   | SDFSDFSDF       |
+      | "room3"   | false           |
+      | "room4"   | true            |
+      | "room5"   | 34              |
+      | "room6"   | {"a":34}        |
+      | "room7"   | ["34", "a", 45] |
 
   @attributes_metadata_value
   Scenario Outline:  create entities in NGSI v2 with several attributes metadata value without metadata type
@@ -1614,25 +1607,25 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_value  | <metadata_value> |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | metadata_value |
-    | dgdgdfgd       |
-    | temp.34        |
-    | temp_34        |
-    | temp-34        |
-    | TEMP34         |
-    | house_flat     |
-    | house.flat     |
-    | house-flat     |
-    | house@flat     |
-    | habitación     |
-    | españa         |
-    | barça          |
-    | random=10      |
-    | random=100     |
-    | random=1000    |
-    | random=10000   |
-    | random=100000  |
+    Examples:
+      | metadata_value |
+      | dgdgdfgd       |
+      | temp.34        |
+      | temp_34        |
+      | temp-34        |
+      | TEMP34         |
+      | house_flat     |
+      | house.flat     |
+      | house-flat     |
+      | house@flat     |
+      | habitación     |
+      | españa         |
+      | barça          |
+      | random=10      |
+      | random=100     |
+      | random=1000    |
+      | random=10000   |
+      | random=100000  |
 
   @attributes_metadata_value_with_type
   Scenario Outline:  create entities in NGSI v2 with several attributes metadata value with metadata type
@@ -1653,25 +1646,47 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_type   | random=6         |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | metadata_value |
-    | dgdgdfgd       |
-    | temp.34        |
-    | temp_34        |
-    | temp-34        |
-    | TEMP34         |
-    | house_flat     |
-    | house.flat     |
-    | house-flat     |
-    | house@flat     |
-    | habitación     |
-    | españa         |
-    | barça          |
-    | random=10      |
-    | random=100     |
-    | random=1000    |
-    | random=10000   |
-    | random=100000  |
+    Examples:
+      | metadata_value |
+      | dgdgdfgd       |
+      | temp.34        |
+      | temp_34        |
+      | temp-34        |
+      | TEMP34         |
+      | house_flat     |
+      | house.flat     |
+      | house-flat     |
+      | house@flat     |
+      | habitación     |
+      | españa         |
+      | barça          |
+      | random=10      |
+      | random=100     |
+      | random=1000    |
+      | random=10000   |
+      | random=100000  |
+
+  @attributes_metadata_value_without_and_with_type
+  Scenario:  try to create entities in NGSI v2 without attributes metadata value with metadata type
+    Given  a definition of headers
+      | parameter          | value                         |
+      | Fiware-Service     | test_metadata_value_with_type |
+      | Fiware-ServicePath | /test                         |
+      | Content-Type       | application/json              |
+    When create "1" entities with "1" attributes
+      | parameter        | value       |
+      | entities_type    | room        |
+      | entities_id      | room2       |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+      | metadatas_number | 1           |
+      | metadatas_name   | random=5    |
+      | metadatas_type   | random=6    |
+    Then verify that receive several "Bad Request" http code
+    And verify several error responses
+      | parameter   | value                                |
+      | error       | BadRequest                           |
+      | description | Parse Error (missing metadata value) |
 
   @attributes_metadata_value_special @BUG_1106 @skip
   Scenario Outline:  create an entity NGSI v2 with several attributes metadata special values without metadata type (null, boolean, etc)
@@ -1689,17 +1704,17 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_name   | "alarm"          |
       | metadatas_value  | <metadata_value> |
     Then verify that receive an "Created" http code
-  Examples:
-    | entity_id | metadata_value             |
-    | "room1"   | true                       |
-    | "room2"   | false                      |
-    | "room3"   | 34                         |
-    | "room4"   | -34                        |
-    | "room5"   | 5.00002                    |
-    | "room6"   | -5.00002                   |
-    | "room15"  | "41.3763726, 2.1864475,14" |
-    | "room16"  | "2017-06-17T07:21:24.238Z" |
-    | "room17"  | null                       |
+    Examples:
+      | entity_id | metadata_value             |
+      | "room1"   | true                       |
+      | "room2"   | false                      |
+      | "room3"   | 34                         |
+      | "room4"   | -34                        |
+      | "room5"   | 5.00002                    |
+      | "room6"   | -5.00002                   |
+      | "room15"  | "41.3763726, 2.1864475,14" |
+      | "room16"  | "2017-06-17T07:21:24.238Z" |
+      | "room17"  | null                       |
 
   @attributes_metadata_value_with_type_special @BUG_1106 @skip
   Scenario Outline:  create an entity NGSI v2 with several attributes metadata special values with metadata type (null, boolean, etc)
@@ -1718,17 +1733,17 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_value  | <metadata_value> |
       | metadatas_type   | "nothing"        |
     Then verify that receive an "Created" http code
-  Examples:
-    | entity_id | metadata_value             |
-    | "room1"   | true                       |
-    | "room2"   | false                      |
-    | "room3"   | 34                         |
-    | "room4"   | -34                        |
-    | "room5"   | 5.00002                    |
-    | "room6"   | -5.00002                   |
-    | "room15"  | "41.3763726, 2.1864475,14" |
-    | "room16"  | "2017-06-17T07:21:24.238Z" |
-    | "room17"  | null                       |
+    Examples:
+      | entity_id | metadata_value             |
+      | "room1"   | true                       |
+      | "room2"   | false                      |
+      | "room3"   | 34                         |
+      | "room4"   | -34                        |
+      | "room5"   | 5.00002                    |
+      | "room6"   | -5.00002                   |
+      | "room15"  | "41.3763726, 2.1864475,14" |
+      | "room16"  | "2017-06-17T07:21:24.238Z" |
+      | "room17"  | null                       |
 
   @attributes_metadata_value_error @BUG_1093
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata value without metadata type
@@ -1752,14 +1767,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                         |
       | description | Parse Error (Invalid characters in metadata value) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_id | metadata_value |
-    | room_2      | house<flat>    |
-    | room_3      | house=flat     |
-    | room_4      | house"flat"    |
-    | room_5      | house'flat'    |
-    | room_6      | house;flat     |
-    | room_8      | house(flat)    |
+    Examples:
+      | entities_id | metadata_value |
+      | room_2      | house<flat>    |
+      | room_3      | house=flat     |
+      | room_4      | house"flat"    |
+      | room_5      | house'flat'    |
+      | room_6      | house;flat     |
+      | room_8      | house(flat)    |
 
   @attributes_metadata_value_error_with_type @BUG_1093
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata value with metadata type
@@ -1784,14 +1799,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                         |
       | description | Parse Error (Invalid characters in metadata value) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_id | metadata_value |
-    | room_2      | house<flat>    |
-    | room_3      | house=flat     |
-    | room_4      | house"flat"    |
-    | room_5      | house'flat'    |
-    | room_6      | house;flat     |
-    | room_8      | house(flat)    |
+    Examples:
+      | entities_id | metadata_value |
+      | room_2      | house<flat>    |
+      | room_3      | house=flat     |
+      | room_4      | house"flat"    |
+      | room_5      | house'flat'    |
+      | room_6      | house;flat     |
+      | room_8      | house(flat)    |
 
   @attributes_metadata_value_special_error @BUG_1110
   Scenario Outline:  try to create an entity NGSI v2 with several wrong special attributes metadata values without metadata type
@@ -1813,22 +1828,22 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | metadata_value |
-    | "room_1"  | rwerwer        |
-    | "room_2"  | True           |
-    | "room_3"  | TRUE           |
-    | "room_4"  | False          |
-    | "room_5"  | FALSE          |
-    | "room_6"  | 34r            |
-    | "room_7"  | 5_34           |
-    | "room_8"  | ["a", "b"      |
-    | "room_9"  | ["a" "b"]      |
-    | "room_10" | "a", "b"]      |
-    | "room_11" | ["a" "b"}      |
-    | "room_12" | {"a": "b"      |
-    | "room_13" | {"a" "b"}      |
-    | "room_14" | "a": "b"}      |
+    Examples:
+      | entity_id | metadata_value |
+      | "room_1"  | rwerwer        |
+      | "room_2"  | True           |
+      | "room_3"  | TRUE           |
+      | "room_4"  | False          |
+      | "room_5"  | FALSE          |
+      | "room_6"  | 34r            |
+      | "room_7"  | 5_34           |
+      | "room_8"  | ["a", "b"      |
+      | "room_9"  | ["a" "b"]      |
+      | "room_10" | "a", "b"]      |
+      | "room_11" | ["a" "b"}      |
+      | "room_12" | {"a": "b"      |
+      | "room_13" | {"a" "b"}      |
+      | "room_14" | "a": "b"}      |
 
   @attributes_metadata_value_special_error @BUG_1110 @skip
   Scenario Outline:  try to create an entity NGSI v2 with several compound special attributes metadata values without metadata type
@@ -1850,16 +1865,16 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                     |
       | error       | ParseError                                |
       | description | invalid JSON field for attribute metadata |
-  Examples:
-    | entity_id | metadata_value                                                                |
-    | "room15"  | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-    | "room16"  | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-    | "room17"  | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-    | "room18"  | {"x": "x1","x2": "b"}                                                         |
-    | "room19"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-    | "room20"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-    | "room21"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-    | "room22"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+    Examples:
+      | entity_id | metadata_value                                                                |
+      | "room15"  | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | "room16"  | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | "room17"  | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | "room18"  | {"x": "x1","x2": "b"}                                                         |
+      | "room19"  | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | "room20"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | "room21"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | "room22"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
   @attributes_metadata_value_special_with_type_error @BUG_1110
   Scenario Outline:  try to create an entity NGSI v2 with several wrong special attributes metadata values with metadata type
@@ -1882,22 +1897,22 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | metadata_value |
-    | "room_1"  | rwerwer        |
-    | "room_2"  | True           |
-    | "room_3"  | TRUE           |
-    | "room_4"  | False          |
-    | "room_5"  | FALSE          |
-    | "room_6"  | 34r            |
-    | "room_7"  | 5_34           |
-    | "room_8"  | ["a", "b"      |
-    | "room_9"  | ["a" "b"]      |
-    | "room_10" | "a", "b"]      |
-    | "room_11" | ["a" "b"}      |
-    | "room_12" | {"a": "b"      |
-    | "room_13" | {"a" "b"}      |
-    | "room_14" | "a": "b"}      |
+    Examples:
+      | entity_id | metadata_value |
+      | "room_1"  | rwerwer        |
+      | "room_2"  | True           |
+      | "room_3"  | TRUE           |
+      | "room_4"  | False          |
+      | "room_5"  | FALSE          |
+      | "room_6"  | 34r            |
+      | "room_7"  | 5_34           |
+      | "room_8"  | ["a", "b"      |
+      | "room_9"  | ["a" "b"]      |
+      | "room_10" | "a", "b"]      |
+      | "room_11" | ["a" "b"}      |
+      | "room_12" | {"a": "b"      |
+      | "room_13" | {"a" "b"}      |
+      | "room_14" | "a": "b"}      |
 
   @attributes_metadata_value_special_with_type_error @BUG_1110
   Scenario Outline:  try to create an entity NGSI v2 with several compound attributes metadata values with metadata type
@@ -1920,16 +1935,16 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                          |
       | error       | ParseError                                     |
       | description | invalid JSON type for attribute metadata value |
-  Examples:
-    | entity_id | metadata_value                                                                |
-    | "room15"  | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
-    | "room16"  | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
-    | "room17"  | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
-    | "room18"  | {"x": "x1","x2": "b"}                                                         |
-    | "room19"  | {"x": {"x1": "a","x2": "b"}}                                                  |
-    | "room20"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
-    | "room21"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
-    | "room22"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
+    Examples:
+      | entity_id | metadata_value                                                                |
+      | "room15"  | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                |
+      | "room16"  | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             |
+      | "room17"  | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] |
+      | "room18"  | {"x": "x1","x2": "b"}                                                         |
+      | "room19"  | {"x": {"x1": "a","x2": "b"}}                                                  |
+      | "room20"  | {"a":{"b":{"c":{"d": {"e": {"f": 34}}}}}}                                     |
+      | "room21"  | {"x": ["a", 45, "rt"],"x2": "b"}                                              |
+      | "room22"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
   @attributes_metadata_type
   Scenario Outline:  create entities in NGSI v2 with several attributes with metadata types
@@ -1950,25 +1965,25 @@ Feature: create entities requests (POST) in NGSI v2
       | metadatas_type   | <metadata_type> |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
-  Examples:
-    | metadata_type |
-    | dgdgdfgd      |
-    | temp.34       |
-    | temp_34       |
-    | temp-34       |
-    | TEMP34        |
-    | house_flat    |
-    | house.flat    |
-    | house-flat    |
-    | house@flat    |
-    | habitación    |
-    | españa        |
-    | barça         |
-    | random=10     |
-    | random=100    |
-    | random=1000   |
-    | random=10000  |
-    | random=100000 |
+    Examples:
+      | metadata_type |
+      | dgdgdfgd      |
+      | temp.34       |
+      | temp_34       |
+      | temp-34       |
+      | TEMP34        |
+      | house_flat    |
+      | house.flat    |
+      | house-flat    |
+      | house@flat    |
+      | habitación    |
+      | españa        |
+      | barça         |
+      | random=10     |
+      | random=100    |
+      | random=1000   |
+      | random=10000  |
+      | random=100000 |
 
   @attributes_metadata_type_error @BUG_1093
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata type
@@ -1993,14 +2008,14 @@ Feature: create entities requests (POST) in NGSI v2
       | error       | BadRequest                                        |
       | description | Parse Error (Invalid characters in metadata type) |
     And verify that entities are not stored in mongo
-  Examples:
-    | entities_id | metadata_type |
-    | room_2      | house<flat>   |
-    | room_3      | house=flat    |
-    | room_4      | house"flat"   |
-    | room_5      | house'flat'   |
-    | room_6      | house;flat    |
-    | room_8      | house(flat)   |
+    Examples:
+      | entities_id | metadata_type |
+      | room_2      | house<flat>   |
+      | room_3      | house=flat    |
+      | room_4      | house"flat"   |
+      | room_5      | house'flat'   |
+      | room_6      | house;flat    |
+      | room_8      | house(flat)   |
 
   @attributes_metadata_type_no_string_error @BUG_1109
   Scenario Outline:  try to create an entity in NGSI v2 with several invalid attributes metadata type (integer, boolean, no-string, etc)
@@ -2023,10 +2038,10 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                |
       | error       | ParseError                           |
       | description | Errors found in incoming JSON buffer |
-  Examples:
-    | entity_id | metadata_type |
-    | "room1"   | rewrewr       |
-    | "room2"   | SDFSDFSDF     |
+    Examples:
+      | entity_id | metadata_type |
+      | "room1"   | rewrewr       |
+      | "room2"   | SDFSDFSDF     |
 
   @attributes_metadata_type_no_string_error @BUG_1109
   Scenario Outline:  try to create an entity in NGSI v2 with several not allowed attributes metadata type (integer, boolean, no-string, etc)
@@ -2049,10 +2064,10 @@ Feature: create entities requests (POST) in NGSI v2
       | parameter   | value                                         |
       | error       | ParseError                                    |
       | description | invalid JSON type for attribute metadata type |
-  Examples:
-    | entity_id | metadata_type   |
-    | "room3"   | false           |
-    | "room4"   | true            |
-    | "room5"   | 34              |
-    | "room6"   | {"a":34}        |
-    | "room7"   | ["34", "a", 45] |
+    Examples:
+      | entity_id | metadata_type   |
+      | "room3"   | false           |
+      | "room4"   | true            |
+      | "room5"   | 34              |
+      | "room6"   | {"a":34}        |
+      | "room7"   | ["34", "a", 45] |

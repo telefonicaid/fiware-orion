@@ -235,6 +235,10 @@ Error list (HTTP response code in paranthesis):
   in the request. This typically the case of requesting an entity with not enough information and the
   solution is to enhance entity identification adding more information, e.g. adding entity type
   and/or service path.
+* LengthRequired (411).  Zero/No Content-Length in PUT/POST request
+* RequestEntityTooLarge (413). Payload too large, max size supported: 1048576
+* UnsupportedMediaType (415). Request content type is not supported.
+
 
 ## API Entry Point [/v2]
 
