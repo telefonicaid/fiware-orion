@@ -21,7 +21,11 @@ You are using this [docker-compose.yml](docker-compose.yml) file. This will inst
 
 ### Run a container pulling an image from the cloud (recommended)
 
-If you do not have or want to download the Orion repository, you can create a file called `docker-compose.yml` in a directory of your choice and fill it with the following content
+If you do not have or want to download the Orion repository, you can create a file called `docker-compose.yml` in a directory of your choice and fill it with the following content (uncomment the `--smallfiles` line if you host doesn't have too much free space)
+
+	mongo:
+	  image: mongo:2.6
+      #command: --smallfiles
 
 	orion:
 	  image: fiware/orion
@@ -30,9 +34,6 @@ If you do not have or want to download the Orion repository, you can create a fi
 	  ports:
 	    - "1026:1026"
 	  command: -dbhost mongo
-
-	mongo:
-	  image: mongo:2.6
 
 Then run
 
