@@ -51,7 +51,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | Fiware-Service     | test_happy_path  |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    When create "1" entities with "2" attributes
+    When create "3" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
       | entities_id      | room2                   |
