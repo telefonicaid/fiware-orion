@@ -13,12 +13,13 @@ WORKDIR /opt
 
 RUN \
     # Install dependencies
+    yum -y install epel-release && \
     yum -y install \
       boost-devel \
       bzip2 \
       cmake \
       clang \
-      CUnit-devel && \
+      CUnit-devel \
       epel-release \
       libcurl-devel \
       libmicrohttpd-devel \
@@ -28,7 +29,7 @@ RUN \
       gcc-c++ \
       scons \
       tar \
-      which \
+      which && \
     # Install mongodb driver from source
     curl -kOL https://github.com/mongodb/mongo-cxx-driver/archive/legacy-1.0.2.tar.gz && \
     tar xfz legacy-1.0.2.tar.gz && \
