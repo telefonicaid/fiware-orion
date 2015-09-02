@@ -87,9 +87,9 @@ def verify_context_broker_is_installed_successfully(context):
     if props_cb["CB_VERIFY_VERSION"].lower() == "true":
         resp_dict = convert_str_to_dict(str(resp.text), "JSON")
         assert resp_dict["orion"]["version"].find(
-            props_cb["CB_VERSION"]) >= 0, " ERROR in context broker version  value, \n" \
-                                              " expected: %s \n" \
-                                              " installed: %s" % (props_cb["CB_VERSION"], resp_dict["orion"]["version"])
+            props_cb["CB_VERSION"]) >= 0, " ERROR in context broker version  value, \n " \
+                                          " expected: %s \n" \
+                                          " installed: %s" % (props_cb["CB_VERSION"], resp_dict["orion"]["version"])
         __logger__.debug("-- version %s is correct in base request v2" % props_cb["CB_VERSION"])
     __logger__.info(" >> verified that contextBroker is installed successfully")
 
@@ -109,5 +109,3 @@ def verify_mongo_is_installed_successfully(context):
     m.eval_version()
     m.disconnect()
     __logger__.info(" >> verified that mongo is installed successfully")
-
-

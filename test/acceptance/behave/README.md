@@ -16,6 +16,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 - If you are going to use a virtual environment (optional):
   * Create a virtual environment somewhere, e.g. in ~/venv (virtualenv ~/venv) (optional)
   * Activate the virtual environment (source ~/venv/bin/activate) (optional)
+  * Remember to unset the virtual environment when you're done testing, if it has been previously activated (deactivate) (optional)
 - Both if you are using a virtual environment or not:
   * Change to the test/acceptance/behave folder of the project.
   * Install the requirements for the acceptance tests in the virtual environment
@@ -121,9 +122,12 @@ Feature: feature name...
 ### Tests Suites Coverage:
 
  - entities
-    * base
-    * create_entities
-    * list_entities (pending)
+    * general_operations - 16 testcases
+    * create_entities - 555 testcases
+    * update_entities (pending)
+    * list_all_entities (pending)
+
+ -  alarms (pending)
 
 
 ### Tags

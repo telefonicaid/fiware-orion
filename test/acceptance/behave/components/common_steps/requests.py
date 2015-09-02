@@ -37,7 +37,7 @@ from tools.NGSI_v2 import NGSI
 # constants
 CONTEXT_BROKER_ENV = u'context_broker_env'
 
-#HTTP status code
+# HTTP status code
 status_codes = {'OK': 200,
                 'Created': 201,
                 'No Content': 204,
@@ -49,6 +49,7 @@ status_codes = {'OK': 200,
                 'Bad Method': 405,
                 'Not Acceptable': 406,
                 'Conflict': 409,
+                'Request Entity Too Large': 413,
                 'Unsupported Media Type': 415,
                 'Internal Server Error': 500}
 
@@ -56,6 +57,8 @@ status_codes = {'OK': 200,
 # ------------- general_operations.feature -----------------------------------------
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
+
+# --------------- general_operations ----------------------
 
 
 @step(u'send a API entry point request')
@@ -102,6 +105,8 @@ def send_a_statistics_request(context):
     resp = cb.get_statistics_request()
     __logger__.info("..Sent a statistics request correctly")
 
+# ------------------ create_entities ------------------------------------------------
+
 
 @step(u'a definition of headers')
 def service_and_service_path(context):
@@ -129,6 +134,26 @@ def create_entities_with_properties(context, entities_number, attributes_number)
     resp_list = cb.create_entities(context, entities_number, attributes_number)
 
 
+@step(u'create an entity and attribute with special values in raw')
+def create_an_entity_and_attribute_with_special_values(context):
+    """
+    create an entity and attribute with special values in raw
+       ex:
+             "value": true
+             "value": false
+             "value": 34
+             "value": 5.00002
+             "value": [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]
+             "value": {"x": {"x1": "a","x2": "b"}}
+             "value": "41.3763726, 2.1864475,14"  -->  "type": "geo:point"
+             "value": "2017-06-17T07:21:24.238Z"  -->  "type: "date"
+        Some cases are not parsed correctly to dict in python
+    :param context: context variable (optional parameters)
+    """
+    global cb, resp
+    resp = cb.create_entity_raw(context)
+
+
 @step(u'delete database in mongo')
 def delete_database_in_mongo(context):
     """
@@ -154,7 +179,9 @@ def delete_database_in_mongo(context):
         __logger__.debug("...Database \"%s\" is deleted" % database_name.lower())
 
 
-#  ------------------------------------- validations ----------------------------------------------
+# ------------------------------------- validations ----------------------------------------------
+
+
 @step(u'verify that receive an "([^"]*)" http code')
 def verify_that_receive_an_http_code(context, http_code):
     """
@@ -189,7 +216,7 @@ def verify_entry_point(context, url, value):
     global resp
     __logger__.debug("Verifying url in API entry point response...")
     resp_dict = convert_str_to_dict(resp.text, "JSON")
-    assert resp_dict[url] == value, " ERROR - in \"%s\" url with  \"$s\" value " % (url, value)
+    assert resp_dict[url] == value, " ERROR - in \"%s\" url with  \"%s\" value " % (url, value)
     __logger__.info("...Verified url in API entry point response")
 
 
@@ -216,6 +243,7 @@ def verify_stat_fields(context, field):
     assert "orion" in resp_dict, "ERROR - orion field does no exist in statistics response"
     assert field in resp_dict["orion"], "ERROR - %s field does no exist in statistics response" % field
     __logger__.info("...Verified that statistics field %s is correct" % field)
+
 
 @step(u'verify version "([^"]*)" field does exists')
 def verify_version_fields(context, field):
@@ -270,7 +298,7 @@ def verify_that_receive_several_http_codes(context, http_code):
     global cb, resp_list
     __logger__.debug("Verifying that return an http code in several entities...")
     entities_context = cb.get_entity_context()
-    for i in range(entities_context["entities_number"]):
+    for i in range(int(entities_context["entities_number"])):
         assert resp_list[i].status_code == status_codes[http_code], " ERROR - http code is wrong in position: %s \n" \
                                                                     " expected: %s \n" \
                                                                     " received: %s" % (
@@ -280,6 +308,7 @@ def verify_that_receive_several_http_codes(context, http_code):
     __logger__.info("...Verified that http code returned in all entities are %s" % http_code)
 
 
+@step(u'verify that entities are stored in default mongo')
 @step(u'verify that entities are stored in mongo')
 def entities_are_stored_in_mongo(context):
     """
@@ -299,7 +328,7 @@ def entities_are_stored_in_mongo(context):
 @step(u'verify that entities are not stored in mongo')
 def entities_are_not_stored_in_mongo(context):
     """
-    verify that entities are stored in mongo
+    verify that entities are not stored in mongo
     """
     global cb
     properties_class = Properties()
@@ -312,7 +341,20 @@ def entities_are_not_stored_in_mongo(context):
     __logger__.info(" >> verified entities are not stored in mongo")
 
 
-@step(u'verify error response')
+@step(u'verify an error response')
+def verify_error_message(context):
+    """
+    verify error response
+    :param context: parameters to evaluate
+    """
+    global cb, resp
+    __logger__.debug("Verifying error message ...")
+    ngsi = NGSI()
+    ngsi.verify_error_response(context, resp)
+    __logger__.info("...Verified that error message is the expected")
+
+
+@step(u'verify several error responses')
 def verify_error_message(context):
     """
     verify error response
@@ -322,6 +364,6 @@ def verify_error_message(context):
     __logger__.debug("Verifying error message in several entities...")
     entities_context = cb.get_entity_context()
     ngsi = NGSI()
-    for i in range(entities_context["entities_number"]):
+    for i in range(int(entities_context["entities_number"])):
         ngsi.verify_error_response(context, resp_list[i])
-    __logger__.info("...Verified that error message in all entities ")
+    __logger__.info("...Verified that error message is the expected in all entities ")
