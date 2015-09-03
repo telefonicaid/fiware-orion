@@ -138,8 +138,8 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | <sdsd>                            |
       | (eeqweqwe)                        |
 
-  @length_required @BUG_1199 @skip
-  Scenario:  create several entities in NGSI v2 wihout payload
+  @length_required @BUG_1199 @BUG_1203 @skip
+  Scenario:  try to create several entities in NGSI v2 wihout payload
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_length_required |
@@ -148,9 +148,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     When create "1" entities with "0" attributes
     Then verify that receive several "Length Required" http code
     And verify several error responses
-      | parameter   | value                                      |
-      | error       | LengthRequired                             |
-      | description | Zero/No Content-Length in PUT/POST request |
+      | parameter   | value                                            |
+      | error       | LengthRequired                                   |
+      | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
 
   # ---------- Services --------------------------------
@@ -973,7 +973,6 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | error       | ParseError                             |
       | description | invalid JSON type for ContextAttribute |
     And verify that entities are not stored in mongo
-
 
   @attributes_value_special @BUG_1106 @skip
   Scenario Outline:  create an entity NGSI v2 with several attributes special values without type (compound, vector, boolean, etc)
