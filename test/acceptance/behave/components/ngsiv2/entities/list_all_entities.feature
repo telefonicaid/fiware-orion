@@ -330,7 +330,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
     And verify that receive an "Created" http code
     When get all entities
     Then verify that receive an "OK" http code
-    And verify an entity in raw mode with type "<type>" in attribute value
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
     Examples:
       | entity_id | attributes_value                                                              | type     |
       | "room1"   | true                                                                          | bool     |
@@ -411,7 +411,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
     And verify that receive an "Created" http code
     When get all entities
     Then verify that receive an "OK" http code
-    And verify an entity in raw mode with type "<type>" in attribute value
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
     Examples:
       | entity_id | attributes_value                                                              | type     |
       | "room1"   | true                                                                          | bool     |
@@ -498,7 +498,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
     And verify that receive an "Created" http code
     When get all entities
     Then verify that receive an "OK" http code
-    And verify an entity in raw mode with type "<type>" in attribute value
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
     Examples:
       | entity_id | attributes_value                                                              | type     |
       | "room1"   | true                                                                          | bool     |
@@ -583,7 +583,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
     And verify that receive an "Created" http code
     When get all entities
     Then verify that receive an "OK" http code
-    And verify an entity in raw mode with type "<type>" in attribute value
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
     Examples:
       | entity_id | attributes_value                                                              | type     |
       | "room1"   | true                                                                          | bool     |
