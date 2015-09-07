@@ -105,10 +105,12 @@ class NGSI:
                                        "_id.type": type,
                                        "_id.servicePath": service_path})
         curs_list = mongo_driver.get_cursor_value(curs)
+        # verify entities
         for i in range(int(entities_contexts["entities_number"])):
             # verify if the entity is stored in mongo
             if stored:
                 for entity in curs_list:  # manages N entities
+                    # verify attributes
                     for a in range(int(entities_contexts["attributes_number"])): # manages N attributes
                         if int(entities_contexts["attributes_number"]) == 1:
                             attr_name = entities_contexts["attributes_name"]
@@ -116,14 +118,13 @@ class NGSI:
                             # prefix plus _<consecutive>. ex: room1_2
                             attr_name = "%s_%s" % (entities_contexts["attributes_name"], str(a))
 
-                        #attr_name = "%s_%s" % (entities_contexts["attributes_name"], str(a))
                         if entities_contexts["attributes_name"] is not None:
                             assert attr_name in entity[u'attrNames'], \
                                 " ERROR -- attribute name: %s is not stored in attrNames list" % attr_name
 
-                            # '.' char is forbidden in MongoDB keys, so it needs to be replaced (we chose '=' as it is a
-                            # forbidden character in the API). When returning information to user, the '=' is translated
-                            # back to '.', thus from user perspective all works fine.
+                            # '.' char is forbidden in MongoDB keys, so it needs to be replaced in attribute name.
+                            # (we chose '=' as it is a forbidden character in the API). When returning information to user,
+                            # the '=' is translated back to '.', thus from user perspective all works fine.
                             if attr_name.find(".") >= 0:
                                 attr_name = attr_name.replace(".", "=")
                                 __logger__.debug("attribute name: %s is changed by \".\" is forbidden in MongoDB keys" % attr_name)
@@ -138,14 +139,17 @@ class NGSI:
                                 entities_contexts["attributes_type"] = EMPTY
                             assert entities_contexts["attributes_type"] == entity[u'attrs'][attr_name][u'type'], \
                                 " ERROR -- attribute type: %s is not stored successful in mongo" % entities_contexts["attributes_type"]
+                            # verify metadatas
                             if entities_contexts["metadatas_number"] is not None:
+                                md = entity[u'attrs'][attr_name][u'md']
                                 for m in range(int(entities_contexts["metadatas_number"])):    # manages N metadatas
-                                    md = entity[u'attrs'][attr_name][u'md']
                                     assert entities_contexts["metadatas_value"] == md[m][u'value'], \
                                         " ERROR -- metadata value: %s is not stored successful in mongo" % entities_contexts["metadatas_value"]
                                     if entities_contexts["metadatas_type"] is not None:
                                         assert entities_contexts["metadatas_type"] == md[m][u'type'], \
                                             " ERROR -- metadata type: %s is not stored successful in mongo" % entities_contexts["metadatas_type"]
+
+
                             assert u'creDate' in entity[u'attrs'][attr_name],\
                                 " ERROR -- creDate field into attribute does not exists in document"
                             assert u'modDate' in entity[u'attrs'][attr_name],\
@@ -178,6 +182,7 @@ class NGSI:
         __logger__.debug("Response: Code: %s Body: %s" % (resp.status_code, resp.text))
 
         resp_list = convert_str_to_dict(resp.text, JSON)
+
         for row in context.table:
             error[row[PARAMETER]] = row[VALUE]
 
@@ -189,3 +194,89 @@ class NGSI:
             assert error["description"] == resp_list["description"], \
                 'ERROR - description error: "%s" is not the expected: "%s"' % (str(resp_list["description"]),
                                                                            str(error["description"]))
+
+    def verify_get_all_entities(self, queries_parameters, entities_context, resp):
+        """
+        verify get all entities
+        :param queries_parameters: queries parameters used
+        :param entities_context: context values
+        :param resp: http response
+        """
+        total = int(entities_context["entities_number"])
+        if "limit" in queries_parameters:
+            limit = int(queries_parameters["limit"])
+        else:
+            limit = 10000000000
+        if "offset" in queries_parameters:
+            offset = int(queries_parameters["offset"])
+        else:
+            offset = 0
+        # determinate number od items and position in response
+        if offset >= total:
+           items = 0
+           position = 0
+        elif limit+offset > total:
+           items = total-offset
+           position = offset
+        else:
+           items = limit
+           position = offset
+        __logger__.debug("total:  %s" % str(total))
+        __logger__.debug("limit:  %s" % str(limit))
+        __logger__.debug("offset: %s" % str(offset))
+        __logger__.debug("items:  %s" % str(items))
+        __logger__.debug("pos:    %s" % str(position))
+
+        # verify entities
+        pos = position
+        items_list = convert_str_to_dict(resp.text, JSON)
+        assert len(items_list) == items, "ERROR - in number of items in response\n  received: %s \n  expected: %s" % \
+                                         (str(len(items_list)), str(items))
+        for i in range(items):
+            __logger__.debug(" id assertion |--> %s_%s == %s" % (entities_context["entities_id"], str(pos), items_list[i]["id"] ))
+            assert "%s_%s" % (entities_context["entities_id"], str(pos)) == items_list[i]["id"], \
+                'ERROR - in id "%s" in position %s' % (items_list[i]["id"], str(pos))
+            if "entities_id" in entities_context:
+                assert "%s" % (entities_context["entities_type"]) == items_list[i]["type"], \
+                    'ERROR - in type "%s" in position %s' % (items_list[i]["type"], str(pos))
+            # verify attributes
+            for a in range(int(entities_context["attributes_number"])):
+                if int(entities_context["attributes_number"]) == 1:
+                    attr_name = entities_context["attributes_name"]
+                else:
+                    # prefix plus _<consecutive>. ex: room1_2
+                    attr_name = "%s_%s" % (entities_context["attributes_name"], str(a))
+                assert attr_name in items_list[i], \
+                    'ERROR - attribute name "%s" does not exist in position:%s' % (attr_name, str(i))
+                attribute = items_list[i][attr_name]
+                if entities_context["attributes_type"] is not None:
+                    assert entities_context["attributes_type"] == attribute["type"], \
+                        'ERROR - in attribute type "%s" in position: %s' % (entities_context["attributes_type"], str(i))
+                    assert entities_context["attributes_value"] == attribute["value"], \
+                        'ERROR - in attribute value "%s" in position: %s' % (entities_context["attributes_value"], str(i))
+                else:
+                    if entities_context["metadatas_number"] is None:
+                        assert entities_context["attributes_value"] == attribute, \
+                            'ERROR - in attribute value "%s" in position: %s without attribute type nor metadatas' % (entities_context["attributes_value"], str(i))
+                    else:
+                        assert entities_context["attributes_value"] == attribute["value"], \
+                            'ERROR - in attribute value "%s" in position: %s without attribute type but with metadatas' % (entities_context["attributes_value"], str(i))
+                #verify attribute metadatas
+                if entities_context["metadatas_number"] is not None:
+                    for m in range(int(entities_context["metadatas_number"])):
+                        assert "%s_%s" % (entities_context["metadatas_name"], str(m)) in attribute,\
+                            'ERROR - attribute metadata name "%s_%s" does not exist in position:%s' \
+                            % (entities_context["metadatas_name"], str(a), str(m))
+                        metadata = attribute["%s_%s" % (entities_context["metadatas_name"], str(m))]
+                        if entities_context["metadatas_type"] is not None:
+                            assert entities_context["metadatas_type"] == metadata["type"], \
+                                'ERROR - in attribute metadata type "%s" in position: %s' % (entities_context["metadatas_type"],
+                                                                                             str(i))
+                            assert entities_context["metadatas_value"] == metadata["value"], \
+                                'ERROR - in attribute metadata value "%s" in position: %s' % (entities_context["metadatas_value"],
+                                                                                              str(i))
+                        else:
+                            assert entities_context["metadatas_value"] == metadata, \
+                                'ERROR - in attribute metadata value "%s" in position: %s' % (entities_context["metadatas_value"], str(i))
+            pos = pos + 1
+

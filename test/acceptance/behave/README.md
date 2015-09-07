@@ -119,15 +119,34 @@ Feature: feature name...
     Check: verify if the service is installed successfully
 ```
 
-### Tests Suites Coverage:
+### Tests Suites Coverage (features):
 
  - entities
     * general_operations - 16 testcases
-    * create_entities - 555 testcases
-    * update_entities (pending)
-    * list_all_entities (pending)
+    * create_entities - 535 testcases
+    * list_all_entities - 200 testcases
+    * list_an_entity_by_id -(pending)
+    * list_an_attribute_by_id (pending)
+    * update_append_attribute_by_id (pending)
+    * update_only_by_id (pending)
+    * replace_attributes_by_id (pending)
+    * remove_entity (pending)
 
  -  alarms (pending)
+
+
+### Hints:
+  - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).
+  - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.
+  - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
+      The number after "=" is the number of chars
+        ex: | attr_name | random=10 |
+  - If entities number is "1", the entity id is without consecutive, ex: `entity_id=room`
+    Else entities number is major than "1" the entities number are prefix plus consecutive, ex:
+        `entity_id=room_0, entity_id=room_1, ..., entity_id=room_N`
+  - If attribute number is "1", the attribute name is without consecutive, ex: `attributes_name=temperature`
+    Else attributes number is major than "1" the attributes name are prefix plus consecutive, ex:
+        `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
 
 
 ### Tags
