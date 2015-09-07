@@ -28,7 +28,7 @@
 #
 
 
-Feature: list all entities with get requests in NGSI v2
+Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
   As a context broker user
   I would like to list all entities with get requests in NGSI v2
   So that I can manage and use them in my scripts
@@ -116,7 +116,7 @@ Feature: list all entities with get requests in NGSI v2
     And verify that all entities are returned
 
   @service_error
-  Scenario Outline:  list all entities in NGSI v2 with several wrong services headers
+  Scenario Outline:  try to list all entities in NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value     |
       | Fiware-Service     | <service> |
@@ -191,7 +191,7 @@ Feature: list all entities with get requests in NGSI v2
     And verify that all entities are returned
 
   @service_path_error
-  Scenario Outline:  list all entities in NGSI v2 with wrong service path header
+  Scenario Outline:  try to list all entities in NGSI v2 with wrong service path header
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_list_service_path_error |
@@ -215,7 +215,7 @@ Feature: list all entities with get requests in NGSI v2
       | /serv(45)    |
 
   @service_path_error
-  Scenario Outline:  list all entities in NGSI v2 with wrong service path header
+  Scenario Outline:  try to list all entities in NGSI v2 with wrong service path header
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_list_service_path_error |
@@ -235,7 +235,7 @@ Feature: list all entities with get requests in NGSI v2
       | /service,sr  |
 
   @service_path_error
-  Scenario Outline:  list all entities in NGSI v2 with wrong service path header
+  Scenario Outline: try to list all entities in NGSI v2 with wrong service path header
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_list_service_path_error |
@@ -255,7 +255,7 @@ Feature: list all entities with get requests in NGSI v2
       | greater than max length allowed and ten levels |
 
   @service_path_error
-  Scenario:  list all entities in NGSI v2 with wrong service path header
+  Scenario: try to list all entities in NGSI v2 with wrong service path header
     Given  a definition of headers
       | parameter          | value                                |
       | Fiware-Service     | test_list_service_path_error         |
@@ -273,18 +273,18 @@ Feature: list all entities with get requests in NGSI v2
   # -------------- with/without attribute type or metadatas -----------------------
 
   @without_attribute_type
-  Scenario:  list all entities in NGSI v2 but without attribute type
+  Scenario Outline:  list all entities in NGSI v2 with several attribute values and without attribute type
     Given  a definition of headers
-      | parameter          | value                |
+      | parameter          | value                            |
       | Fiware-Service     | test_list_without_attribute_type |
-      | Fiware-ServicePath | /test                |
-      | Content-Type       | application/json     |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
     And create "5" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
+      | parameter        | value             |
+      | entities_type    | room              |
+      | entities_id      | room2             |
+      | attributes_name  | temperature       |
+      | attributes_value | <attribute_value> |
     And verify that receive several "Created" http code
     When get all entities
       | parameter | value |
@@ -292,24 +292,163 @@ Feature: list all entities with get requests in NGSI v2
       | offset    | 2     |
     Then verify that receive an "OK" http code
     And verify that all entities are returned
+    Examples:
+      | attribute_value         |
+      | 017-06-17T07:21:24.238Z |
+      | 34                      |
+      | 34.4E-34                |
+      | temp.34                 |
+      | temp_34                 |
+      | temp-34                 |
+      | TEMP34                  |
+      | house_flat              |
+      | house.flat              |
+      | house-flat              |
+      | house@flat              |
+      | habitación              |
+      | españa                  |
+      | barça                   |
+      | random=10               |
+      | random=100              |
+      | random=1000             |
+      | random=10000            |
+      | random=100000           |
+
+  @compound_without_attribute_type @BUG_1106 @skip
+  Scenario Outline:  list all entities in NGSI v2 with special attribute values and without attribute type (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                            |
+      | Fiware-Service     | test_list_without_attribute_type |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
+    And  create an entity and attribute with special values in raw
+      | parameter        | value              |
+      | entities_type    | "room"             |
+      | entities_id      | <entity_id>        |
+      | attributes_name  | "temperature"      |
+      | attributes_value | <attributes_value> |
+    And verify that receive an "Created" http code
+    When get all entities
+    Then verify that receive an "OK" http code
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
+    Examples:
+      | entity_id | attributes_value                                                              | type     |
+      | "room1"   | true                                                                          | bool     |
+      | "room2"   | false                                                                         | bool     |
+      | "room3"   | 34                                                                            | int      |
+      | "room4"   | -34                                                                           | int      |
+      | "room5"   | 5.00002                                                                       | float    |
+      | "room6"   | -5.00002                                                                      | float    |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                | list     |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             | list     |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] | list     |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         | dict     |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  | dict     |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": "ert"}}}}}}                                  | dict     |
+      | "room13"  | {"x": ["a", 45.56, "rt"],"x2": "b"}                                           | dict     |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                | dict     |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
+      | "room17"  | null                                                                          | NoneType |
+
+  @with_attribute_type
+  Scenario Outline:  list all entities in NGSI v2 with several attribute values and attribute type
+    Given  a definition of headers
+      | parameter          | value                         |
+      | Fiware-Service     | test_list_with_attribute_type |
+      | Fiware-ServicePath | /test                         |
+      | Content-Type       | application/json              |
+    And create "5" entities with "2" attributes
+      | parameter        | value             |
+      | entities_type    | room              |
+      | entities_id      | room2             |
+      | attributes_name  | temperature       |
+      | attributes_value | <attribute value> |
+      | attributes_type  | celcius           |
+    And verify that receive several "Created" http code
+    When get all entities
+      | parameter | value |
+      | limit     | 3     |
+      | offset    | 2     |
+    Then verify that receive an "OK" http code
+    And verify that all entities are returned
+    Examples:
+      | attribute value         |
+      | 017-06-17T07:21:24.238Z |
+      | 34                      |
+      | 34.4E-34                |
+      | temp.34                 |
+      | temp_34                 |
+      | temp-34                 |
+      | TEMP34                  |
+      | house_flat              |
+      | house.flat              |
+      | house-flat              |
+      | house@flat              |
+      | habitación              |
+      | españa                  |
+      | barça                   |
+      | random=10               |
+      | random=100              |
+      | random=1000             |
+      | random=10000            |
+      | random=100000           |
+
+  @compound_with_attribute_type @BUG_1106 @skip
+  Scenario Outline:  list all entities in NGSI v2 with special attribute values and attribute type (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                            |
+      | Fiware-Service     | test_list_without_attribute_type |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
+    And  create an entity and attribute with special values in raw
+      | parameter        | value              |
+      | entities_type    | "room"             |
+      | entities_id      | <entity_id>        |
+      | attributes_name  | "temperature"      |
+      | attributes_value | <attributes_value> |
+      | attributes_type  | "celcius"          |
+    And verify that receive an "Created" http code
+    When get all entities
+    Then verify that receive an "OK" http code
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
+    Examples:
+      | entity_id | attributes_value                                                              | type     |
+      | "room1"   | true                                                                          | bool     |
+      | "room2"   | false                                                                         | bool     |
+      | "room3"   | 34                                                                            | int      |
+      | "room4"   | -34                                                                           | int      |
+      | "room5"   | 5.00002                                                                       | float    |
+      | "room6"   | -5.00002                                                                      | float    |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                | list     |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             | list     |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] | list     |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         | dict     |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  | dict     |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": "ert"}}}}}}                                  | dict     |
+      | "room13"  | {"x": ["a", 45.56, "rt"],"x2": "b"}                                           | dict     |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                | dict     |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
+      | "room17"  | null                                                                          | NoneType |
 
   @with_metadatas
-  Scenario:  list all entities in NGSI v2 with metadatas
+  Scenario Outline:  list all entities in NGSI v2 with several attribute values and with metadatas
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_list_happy_path |
       | Fiware-ServicePath | /test                |
       | Content-Type       | application/json     |
     And create "5" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_type   | alarm                   |
-      | metadatas_value  | random=10               |
+      | parameter        | value             |
+      | entities_type    | room              |
+      | entities_id      | room2             |
+      | attributes_name  | temperature       |
+      | attributes_value | <attribute_value> |
+      | metadatas_number | 2                 |
+      | metadatas_name   | very_hot          |
+      | metadatas_type   | alarm             |
+      | metadatas_value  | random=10         |
     And verify that receive several "Created" http code
     When get all entities
       | parameter | value |
@@ -317,23 +456,85 @@ Feature: list all entities with get requests in NGSI v2
       | offset    | 2     |
     Then verify that receive an "OK" http code
     And verify that all entities are returned
+    Examples:
+      | attribute_value         |
+      | 017-06-17T07:21:24.238Z |
+      | 34                      |
+      | 34.4E-34                |
+      | temp.34                 |
+      | temp_34                 |
+      | temp-34                 |
+      | TEMP34                  |
+      | house_flat              |
+      | house.flat              |
+      | house-flat              |
+      | house@flat              |
+      | habitación              |
+      | españa                  |
+      | barça                   |
+      | random=10               |
+      | random=100              |
+      | random=1000             |
+      | random=10000            |
+      | random=100000           |
+
+  @compound_with_metadata @BUG_1106 @skip
+  Scenario Outline:  list all entities in NGSI v2 with special attribute values and metadatas (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                            |
+      | Fiware-Service     | test_list_without_attribute_type |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
+    And  create an entity and attribute with special values in raw
+      | parameter        | value              |
+      | entities_type    | "room"             |
+      | entities_id      | <entity_id>        |
+      | attributes_name  | "temperature"      |
+      | attributes_value | <attributes_value> |
+      | metadatas_number | 2                  |
+      | metadatas_name   | "very_hot"         |
+      | metadatas_type   | "alarm"            |
+      | metadatas_value  | "hot"              |
+    And verify that receive an "Created" http code
+    When get all entities
+    Then verify that receive an "OK" http code
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
+    Examples:
+      | entity_id | attributes_value                                                              | type     |
+      | "room1"   | true                                                                          | bool     |
+      | "room2"   | false                                                                         | bool     |
+      | "room3"   | 34                                                                            | int      |
+      | "room4"   | -34                                                                           | int      |
+      | "room5"   | 5.00002                                                                       | float    |
+      | "room6"   | -5.00002                                                                      | float    |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                | list     |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             | list     |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] | list     |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         | dict     |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  | dict     |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": "ert"}}}}}}                                  | dict     |
+      | "room13"  | {"x": ["a", 45.56, "rt"],"x2": "b"}                                           | dict     |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                | dict     |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
+      | "room17"  | null                                                                          | NoneType |
 
   @without_metadata_type
-  Scenario:  list all entities in NGSI v2 without metadata type
+  Scenario Outline:  list all entities in NGSI v2 without metadata type
     Given  a definition of headers
-      | parameter          | value                |
+      | parameter          | value                           |
       | Fiware-Service     | test_list_without_metadata_type |
-      | Fiware-ServicePath | /test                |
-      | Content-Type       | application/json     |
+      | Fiware-ServicePath | /test                           |
+      | Content-Type       | application/json                |
     And create "5" entities with "2" attributes
-      | parameter        | value                   |
-      | entities_type    | room                    |
-      | entities_id      | room2                   |
-      | attributes_name  | timestamp               |
-      | attributes_value | 017-06-17T07:21:24.238Z |
-      | metadatas_number | 2                       |
-      | metadatas_name   | very_hot                |
-      | metadatas_value  | random=10               |
+      | parameter        | value             |
+      | entities_type    | room              |
+      | entities_id      | room2             |
+      | attributes_name  | temperature       |
+      | attributes_value | <attribute_value> |
+      | metadatas_number | 2                 |
+      | metadatas_name   | very_hot          |
+      | metadatas_value  | random=10         |
     And verify that receive several "Created" http code
     When get all entities
       | parameter | value |
@@ -341,7 +542,67 @@ Feature: list all entities with get requests in NGSI v2
       | offset    | 2     |
     Then verify that receive an "OK" http code
     And verify that all entities are returned
+    Examples:
+      | attribute_value         |
+      | 017-06-17T07:21:24.238Z |
+      | 34                      |
+      | 34.4E-34                |
+      | temp.34                 |
+      | temp_34                 |
+      | temp-34                 |
+      | TEMP34                  |
+      | house_flat              |
+      | house.flat              |
+      | house-flat              |
+      | house@flat              |
+      | habitación              |
+      | españa                  |
+      | barça                   |
+      | random=10               |
+      | random=100              |
+      | random=1000             |
+      | random=10000            |
+      | random=100000           |
 
+  @compound_with_metadata_without_meta_type @BUG_1106 @skip
+  Scenario Outline:  list all entities in NGSI v2 with special attribute values and metatadas but without metadata type (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                            |
+      | Fiware-Service     | test_list_without_attribute_type |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
+    And  create an entity and attribute with special values in raw
+      | parameter        | value              |
+      | entities_type    | "room"             |
+      | entities_id      | <entity_id>        |
+      | attributes_name  | "temperature"      |
+      | attributes_value | <attributes_value> |
+      | metadatas_number | 2                  |
+      | metadatas_name   | "very_hot"         |
+      | metadatas_value  | "hot"              |
+    And verify that receive an "Created" http code
+    When get all entities
+    Then verify that receive an "OK" http code
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
+    Examples:
+      | entity_id | attributes_value                                                              | type     |
+      | "room1"   | true                                                                          | bool     |
+      | "room2"   | false                                                                         | bool     |
+      | "room3"   | 34                                                                            | int      |
+      | "room4"   | -34                                                                           | int      |
+      | "room5"   | 5.00002                                                                       | float    |
+      | "room6"   | -5.00002                                                                      | float    |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                | list     |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             | list     |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] | list     |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         | dict     |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  | dict     |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": "ert"}}}}}}                                  | dict     |
+      | "room13"  | {"x": ["a", 45.56, "rt"],"x2": "b"}                                           | dict     |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                | dict     |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
+      | "room17"  | null                                                                          | NoneType |
   # ------------------ queries parameters -------------------------------
 
   @only_limit
@@ -374,7 +635,7 @@ Feature: list all entities with get requests in NGSI v2
       | 20    |
 
   @only_limit_error
-  Scenario Outline:  list all entities in NGSI v2 with only wrong limit query parameter
+  Scenario Outline:  try to list all entities in NGSI v2 with only wrong limit query parameter
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_list_only_limit_error |
@@ -409,7 +670,7 @@ Feature: list all entities with get requests in NGSI v2
       | %@#   |
 
   @only_limit_error
-  Scenario:  list all entities in NGSI v2 with only wrong limit query parameter
+  Scenario:  try to list all entities in NGSI v2 with only wrong limit query parameter
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_list_only_limit_error |
@@ -467,7 +728,7 @@ Feature: list all entities with get requests in NGSI v2
       | 20     |
 
   @only_offset_error
-  Scenario Outline:  list all entities in NGSI v2 with only wrong offset query parameter
+  Scenario Outline:  try to list all entities in NGSI v2 with only wrong offset query parameter
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_list_only_offset_error |
@@ -532,4 +793,3 @@ Feature: list all entities with get requests in NGSI v2
       | 20    | 1      |
       | 1     | 20     |
       | 5     | 3      |
-

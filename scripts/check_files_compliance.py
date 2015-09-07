@@ -105,6 +105,14 @@ def ignore(root, file):
     if 'heavyTest' in root and (file.endswith('.json') or file.endswith('.xml')):
         return True
 
+    # Some files in docker/ directory are not processed
+    if 'docker' in root and file in ['Dockerfile', 'docker-compose.yml']:
+        return True
+
+    # Some files in test/acceptance/behave directory are not processed
+    if 'behave' in root and file in ['behave.ini', 'logging.ini', 'properties.json.base']:
+        return True
+
     # Files used by the Qt IDE (they start with contextBroker.*) are not processed
     if file.endswith('.creator') or file.endswith('.creator.user') or file.endswith('.config') \
             or file.endswith('.files') or file.endswith('.includes'):
@@ -122,7 +130,8 @@ def ignore(root, file):
     # Particular cases of files that are also ignored
     files_names = ['.gitignore', '.valgrindrc', '.valgrindSuppressions', 'LICENSE',
                    'ContributionPolicy.txt', 'CHANGES_NEXT_RELEASE', 'compileInfo.h',
-                   'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu']
+                   'unittests_that_fail_sporadically.txt', 'Vagrantfile', 'contextBroker.ubuntu',
+                   'mkdocs.yml' ]
     if file in files_names:
         return True
     if 'scripts' in root and (file == 'cpplint.py' or file == 'pdi-pep8.py' or file == 'uncrustify.cfg' \
