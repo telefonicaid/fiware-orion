@@ -111,7 +111,7 @@ class NGSI:
             if stored:
                 for entity in curs_list:  # manages N entities
                     # verify attributes
-                    for a in range(int(entities_contexts["attributes_number"])): # manages N attributes
+                    for a in range(int(entities_contexts["attributes_number"])):    # manages N attributes
                         if int(entities_contexts["attributes_number"]) == 1:
                             attr_name = entities_contexts["attributes_name"]
                         else:
@@ -148,8 +148,6 @@ class NGSI:
                                     if entities_contexts["metadatas_type"] is not None:
                                         assert entities_contexts["metadatas_type"] == md[m][u'type'], \
                                             " ERROR -- metadata type: %s is not stored successful in mongo" % entities_contexts["metadatas_type"]
-
-
                             assert u'creDate' in entity[u'attrs'][attr_name],\
                                 " ERROR -- creDate field into attribute does not exists in document"
                             assert u'modDate' in entity[u'attrs'][attr_name],\
@@ -193,7 +191,7 @@ class NGSI:
             assert "description" in resp_list, "ERROR - description field does not exists"
             assert error["description"] == resp_list["description"], \
                 'ERROR - description error: "%s" is not the expected: "%s"' % (str(resp_list["description"]),
-                                                                           str(error["description"]))
+                                                                               str(error["description"]))
 
     def verify_get_all_entities(self, queries_parameters, entities_context, resp):
         """
@@ -213,14 +211,14 @@ class NGSI:
             offset = 0
         # determinate number od items and position in response
         if offset >= total:
-           items = 0
-           position = 0
+            items = 0
+            position = 0
         elif limit+offset > total:
-           items = total-offset
-           position = offset
+            items = total-offset
+            position = offset
         else:
-           items = limit
-           position = offset
+            items = limit
+            position = offset
         __logger__.debug("total:  %s" % str(total))
         __logger__.debug("limit:  %s" % str(limit))
         __logger__.debug("offset: %s" % str(offset))
@@ -260,7 +258,7 @@ class NGSI:
                     else:
                         assert entities_context["attributes_value"] == attribute["value"], \
                             'ERROR - in attribute value "%s" in position: %s without attribute type but with metadatas' % (entities_context["attributes_value"], str(i))
-                #verify attribute metadatas
+                # verify attribute metadatas
                 if entities_context["metadatas_number"] is not None:
                     for m in range(int(entities_context["metadatas_number"])):
                         assert "%s_%s" % (entities_context["metadatas_name"], str(m)) in attribute,\
@@ -304,9 +302,9 @@ class NGSI:
         resp_json = convert_str_to_dict(resp.text, JSON)
         __logger__.debug(str(resp_json))
         __logger__.debug("query parameter: %s" % str(queries_parameters))
-        assert resp_json ["id"] == entity_id_to_test,  'ERROR - in id "%s" ' % (resp_json["id"])
-        if entities_context ["entities_type"] is not None:
-            assert resp_json ["type"] == entities_context ["entities_type"],  'ERROR - in type "%s" ' % (resp_json["type"])
+        assert resp_json["id"] == entity_id_to_test,  'ERROR - in id "%s"' % resp_json["id"]
+        if entities_context["entities_type"] is not None:
+            assert resp_json["type"] == entities_context["entities_type"],  'ERROR - in type "%s" ' % resp_json["type"]
         # queries parameters
         if queries_parameters != {}:
             attrs_list = queries_parameters["attrs"].split(",")
@@ -320,7 +318,7 @@ class NGSI:
         for i in range(len(attrs_list)):
             attr_name = attrs_list[i]
             __logger__.info("attribute name: %s" % attr_name)
-            assert attr_name in resp_json, 'ERROR - in attribute name "%s" ' % (attr_name)
+            assert attr_name in resp_json, 'ERROR - in attribute name "%s" ' % attr_name
             attribute = resp_json[attr_name]
             if entities_context["attributes_type"] is not None:
                 assert entities_context["attributes_type"] == attribute["type"], \
@@ -334,7 +332,7 @@ class NGSI:
                 else:
                     assert entities_context["attributes_value"] == attribute["value"], \
                         'ERROR - in attribute value "%s" in position: %s without attribute type but with metadatas' % (entities_context["attributes_value"], str(i))
-             #verify attribute metadatas
+            # verify attribute metadatas
             if entities_context["metadatas_number"] is not None:
                 for m in range(int(entities_context["metadatas_number"])):
                     assert "%s_%s" % (entities_context["metadatas_name"], str(m)) in attribute,\
@@ -351,3 +349,52 @@ class NGSI:
                     else:
                         assert entities_context["metadatas_value"] == metadata, \
                             'ERROR - in attribute metadata value "%s" in position: %s' % (entities_context["metadatas_value"], str(i))
+
+    def verify_an_attribute_by_id(self, entities_context, resp, attribute_name_to_request):
+        """
+        verify that the attribute by ID is returned
+        :param entities_context:
+        :param resp:
+        :param attribute_name_to_request:
+        ex:
+            {
+                timestamp: {
+                    type: "date"
+                    value: "017-06-17T07:21:24.238Z"
+                    very_hot: {
+                        type: "alarm"
+                        value: "false"
+                    }
+                }
+            }
+        """
+        resp_json = convert_str_to_dict(resp.text, JSON)
+        __logger__.debug(str(resp_json))
+        assert attribute_name_to_request in resp_json, 'ERROR - in attribute name "%s" ' % attribute_name_to_request
+        attribute = resp_json[attribute_name_to_request]
+        if entities_context["attributes_type"] is not None:
+            assert entities_context["attributes_type"] == attribute["type"],\
+                'ERROR - in attribute type "%s"' % (entities_context["attributes_type"])
+            assert entities_context["attributes_value"] == attribute["value"],\
+                'ERROR - in attribute value "%s"' % (entities_context["attributes_value"])
+        else:
+            if entities_context["metadatas_number"] is None:
+                assert entities_context["attributes_value"] == attribute,\
+                    'ERROR - in attribute value "%s" without attribute type nor metadatas' % (entities_context["attributes_value"])
+            else:
+                assert entities_context["attributes_value"] == attribute["value"],\
+                    'ERROR - in attribute value "%s" without attribute type but with metadatas' % (entities_context["attributes_value"])
+        # verify attribute metadatas
+        if entities_context["metadatas_number"] is not None:
+            for m in range(int(entities_context["metadatas_number"])):
+                assert "%s_%s" % (entities_context["metadatas_name"], str(m)) in attribute,\
+                    'ERROR - attribute metadata name "%s_%s" does not exist' % (entities_context["metadatas_name"], str(m))
+                metadata = attribute["%s_%s" % (entities_context["metadatas_name"], str(m))]
+                if entities_context["metadatas_type"] is not None:
+                    assert entities_context["metadatas_type"] == metadata["type"], \
+                        'ERROR - in attribute metadata type "%s"' % (entities_context["metadatas_type"])
+                    assert entities_context["metadatas_value"] == metadata["value"], \
+                        'ERROR - in attribute metadata value "%s"' % (entities_context["metadatas_value"])
+                else:
+                    assert entities_context["metadatas_value"] == metadata, \
+                        'ERROR - in attribute metadata value "%s"' % (entities_context["metadatas_value"])

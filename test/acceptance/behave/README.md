@@ -126,7 +126,7 @@ Feature: feature name...
     * create_entities - 535 testcases
     * list_all_entities - 200 testcases
     * list_an_entity_by_id - 209 testcases
-    * list_an_attribute_by_id (pending)
+    * list_an_attribute_by_id - 198 testcases
     * update_append_attribute_by_id (pending)
     * update_only_by_id (pending)
     * replace_attributes_by_id (pending)
@@ -156,6 +156,3 @@ You can to use multiples tags in each scenario, possibles tags used:
     - happy_path, skip, errors_40x, only_develop, ISSUE_XXX, BUG_XXX, etc
 
 and to filter scenarios by these tags: see Tests execution section.
-
-
-
