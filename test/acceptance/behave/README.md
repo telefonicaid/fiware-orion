@@ -127,6 +127,7 @@ Feature: feature name...
     * list_all_entities - 200 testcases
     * list_an_entity_by_id - 209 testcases
     * list_an_attribute_by_id - 198 testcases
+    * list_an_attribute_by_id (pending)
     * update_append_attribute_by_id (pending)
     * update_only_by_id (pending)
     * replace_attributes_by_id (pending)
