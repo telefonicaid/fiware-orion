@@ -270,29 +270,50 @@ extern void setDbPrefix(std::string _dbPrefix)
 *
 * getOrionDatabases -
 */
-extern void getOrionDatabases(std::vector<std::string>& dbs)
+extern bool getOrionDatabases(std::vector<std::string>& dbs)
 {
   BSONObj       result;
   DBClientBase* connection = getMongoConnection();
 
-  connection->runCommand("admin", BSON("listDatabases" << 1), result);
-  releaseMongoConnection(connection);
-
-  std::vector<BSONElement> databases = result.getField("databases").Array();
-
-  for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
+  try
   {
-    BSONObj      db      = (*i).Obj();
-    std::string  dbName  = STR_FIELD(db, "name");
-    std::string  prefix  = dbPrefix + "-";
+    connection->runCommand("admin", BSON("listDatabases" << 1), result);
+    releaseMongoConnection(connection);
 
-    if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
+    LM_I(("Database Operation Successful (listDatabases command)"));
+
+    std::vector<BSONElement> databases = result.getField("databases").Array();
+
+    for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
     {
-      LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
-      dbs.push_back(dbName);
-      LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      BSONObj      db      = (*i).Obj();
+      std::string  dbName  = STR_FIELD(db, "name");
+      std::string  prefix  = dbPrefix + "-";
+
+      if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
+      {
+        LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+        dbs.push_back(dbName);
+        LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      }
     }
+
+    return true;
+
   }
+  catch (const DBException &e)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error (%s)", e.what()));
+    return false;
+  }
+  catch (...)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error (generic exception)"));
+    return false;
+  }
+
 }
 
 /*****************************************************************************
