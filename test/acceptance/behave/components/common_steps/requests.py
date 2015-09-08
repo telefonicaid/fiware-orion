@@ -187,7 +187,19 @@ def get_all_entities(context):
     list all entities
     """
     global cb, resp
+    __logger__.debug("getting a list with all entities in a service...")
     resp = cb.list_all_entities(context)
+    __logger__.info("...returned a list with all entities in a service")
+
+@step(u'get an entity by ID "([^"]*)"')
+def get_an_entity_by_ID(context, entity_id):
+    """
+    get an entity by ID
+    """
+    global cb, resp
+    __logger__.debug("getting an entity by id...")
+    resp = cb.list_an_entity_by_ID(context, entity_id)
+    __logger__.debug("returned an entity by id...")
 
 # ------------------------------------- validations ----------------------------------------------
 
@@ -390,3 +402,18 @@ def verify_get_all_entities(context):
     ngsi = NGSI()
     ngsi.verify_get_all_entities(queries_parameters, entities_context, resp)
     __logger__.info("...Verified all entities are returned in get request...")
+
+
+@step(u'verify that the entity by ID is returned')
+def verify_that_the_entity_by_ID_is_returned(context):
+    """
+    verify that the entity by ID is returned
+    """
+    global cb, resp
+    __logger__.debug("Verifying an entity by ID returned from a request...")
+    queries_parameters = cb.get_entities_parameters()
+    entities_context = cb.get_entity_context()
+    entity_id_to_request = cb.get_entity_id_to_request()
+    ngsi = NGSI()
+    ngsi.verify_an_entity_by_id(queries_parameters, entities_context, resp, entity_id_to_request)
+    __logger__.info("...Verified an entity by ID returned from a request...")

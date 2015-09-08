@@ -121,11 +121,11 @@ Feature: feature name...
 
 ### Tests Suites Coverage (features):
 
- - entities
+  - entities
     * general_operations - 16 testcases
     * create_entities - 535 testcases
     * list_all_entities - 200 testcases
-    * list_an_entity_by_id -(pending)
+    * list_an_entity_by_id - 209 testcases
     * list_an_attribute_by_id (pending)
     * update_append_attribute_by_id (pending)
     * update_only_by_id (pending)
