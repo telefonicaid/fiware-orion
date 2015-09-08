@@ -15,8 +15,8 @@ example, the following updateContext request creates the entity "Madrid"
 (of type "City") with attribute "position" defined as location.
 
 ``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
         {
@@ -40,7 +40,7 @@ example, the following updateContext request creates the entity "Madrid"
         }
     ],
     "updateAction": "APPEND"
-} EOF                                                                                                                      
+} EOF
 ``` 
 
 Additional comments:
@@ -104,8 +104,8 @@ longitude) that provide the coordinates of the vertex. The result of the
 query would be A and B.
 
 ``` 
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -143,7 +143,7 @@ query would be A and B.
             }
         ]
     }
-}EOF                                                                                                         
+}EOF
 ``` 
 
 Let's consider a query whose scope is the internal area to the rectangle
@@ -154,8 +154,8 @@ defined by coordinates (3, 3), (3, 8), (11, 8) and (11, 3).
 The result of the query would be B and C.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -194,7 +194,7 @@ The result of the query would be B and C.
         ]
     }
 }EOF
-```                                                                                                                
+```
 
 However, if we consider the query to the external area to that
 rectangle, the result of the query would be A. To specify that we refer
@@ -202,8 +202,8 @@ to the area external to the polygon we include the inverted element set
 to "true".
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -242,7 +242,7 @@ to "true".
             }
         ]
     }
-}EOF                                                                                                            
+}EOF
 ```
 
 Let's consider a query whose scope is the internal area to the triangle
@@ -253,8 +253,8 @@ defined by coordinates (0, 0), (0, 6) and (6, 0).
 The result of the query would be A.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -289,15 +289,15 @@ The result of the query would be A.
         ]
     }
 }EOF
-```                                                                                                                    
+```
 
 However, if we consider the query to the external area to that triangle
 (using the inverted element set to "true"), the result of the query
 would be B and C.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -333,7 +333,7 @@ would be B and C.
         ]
     }
 }EOF
-```                                                                                                                    
+```
 
 Now, in order to illustrate circle areas, let's consider the following
 scenario: three entities (representing the cities of Madrid, Alcobendas
@@ -358,8 +358,8 @@ center), centerLongitude (the longitude of the circle center) and radius
 (in meters). The result of the query would be Madrid and Leganes.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -382,7 +382,7 @@ center), centerLongitude (the longitude of the circle center) and radius
             }
         ]
     }
-}EOF                                                                                                                                                                                                                                     
+}EOF
 ```
 
 Let's consider a query whose scope is inside a radius of 15 km (15000
@@ -393,8 +393,8 @@ meters) centred in Madrid.
 The result of the query would be Madrid, Leganes and Alcobendas.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -428,8 +428,8 @@ We use the inverted element set to "true". The result of the query would
 be Alcobendas.
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -453,5 +453,5 @@ be Alcobendas.
             }
         ]
     }
-}EOF     
+}EOF
 ```

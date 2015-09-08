@@ -299,7 +299,9 @@ creation time temperature and pressure of Room1 are 23 ºC and 720 mmHg
 respectively.
 
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF                                                                                    {                                                                          
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
 {
     "contextElements": [
         {
@@ -321,7 +323,7 @@ respectively.
         }
     ],
     "updateAction": "APPEND"
-} EOF                                                                                                                         
+} EOF
 ```
 
 The updateContext request payload contains a list of contextElement
@@ -371,7 +373,7 @@ with the following:
         }
     ]
 }
-```                          
+```
 
 As you can see, it follows the same structure as the request, just to
 acknowledge that the request was correctly processed for these context
@@ -383,7 +385,8 @@ Next, let's create Room2 in a similar way (in this case, setting
 temperature and pressure to 21 ºC and 711 mmHg respectively).
 
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool ) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool ) <<EOF
 {
     "contextElements": [
         {
@@ -405,7 +408,7 @@ temperature and pressure to 21 ºC and 711 mmHg respectively).
         }
     ],
     "updateAction": "APPEND"
-}EOF                                                                                                                       
+}EOF
 ```
 
 The response to this request is:
@@ -437,7 +440,7 @@ The response to this request is:
             }
         }
     ]
-}            
+}
 ```
 
 Apart from simple values (i.e. strings) for attribute values, you can
@@ -457,7 +460,8 @@ graphical user interface). The NGSI10 queryContext request is used in
 this case, e.g. to get context information for Room1:
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -501,12 +505,13 @@ entity creation with updateContext (23ºC and 720 mmHg).
         }
     ]
 }
-```                       
+```
 
 If you use an empty attributes element in the request, the response will include all the attributes of the entity. If you include an actual list of attributes (e.g. temperature) only that are retrieved, as shown in the following request:
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -545,7 +550,7 @@ which response is as follows:
             }
         }
     ]
-}                    
+}
 ```
 
 Moreover, a powerful feature of Orion Context Broker is that you can use
@@ -554,7 +559,8 @@ entities which ID starts with "Room" using the regex "Room.\*". In this
 case, you have to set isPattern to "true" as shown below:
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+--header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -574,7 +580,8 @@ case, you have to set isPattern to "true" as shown below:
 } EOF
 ```
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -586,8 +593,8 @@ case, you have to set isPattern to "true" as shown below:
     "attributes": [
         "temperature"
     ]
-} EOF                                                                                                                       
-```                                                                                                                                  
+} EOF
+```
   
 
 Both produce the same response:
@@ -632,14 +639,15 @@ Both produce the same response:
             }
         }
     ]
-}                        
+}
 ```
 
 Finally, note that you will get an error in case you try to query a
 non-existing entity or attribute, as shown in the following cases below:
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -648,10 +656,11 @@ non-existing entity or attribute, as shown in the following cases below:
             "id": "Room5"
         }
     ]
-} EOF                                                                                                
+} EOF
 ```
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -693,7 +702,9 @@ Additional comments:
 
 <!-- -->
 ```
-(curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S \--header  'Content-Type: application/json' --header 'Accept: application/json' \ -d @- | python -mjson.tool) <<EOF
+(curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S \
+    --header  'Content-Type: application/json' --header 'Accept: application/json' \
+    -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -722,7 +733,8 @@ given moment wants to set the temperature and pressure of Room1 to 26.5
 ºC and 763 mmHg respectively, so it issues the following request:
 
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
         {
@@ -744,7 +756,7 @@ given moment wants to set the temperature and pressure of Room1 to 26.5
         }
     ],
 "updateAction": "UPDATE"
-} EOF                                                                                                                    
+} EOF
 ```
 
 As you can see, the structure of the request is exactly the same we used
@@ -784,7 +796,7 @@ following:
             }
         }
     ]
-}                    
+}
       
 ```
 
@@ -807,7 +819,8 @@ entity in the updateContext, just the ones you want to update (the other
 attributes maintain their current value).
 
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
         {
@@ -824,10 +837,11 @@ attributes maintain their current value).
         }
     ],
     "updateAction": "UPDATE"
-} EOF                                                                                                                       
+} EOF
 ```
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
         {
@@ -872,7 +886,7 @@ The responses for these requests are respectively:
         }
     ]
 }
-```                
+```
   
 ```
 {
@@ -946,7 +960,8 @@ The following is the request corresponding to an ONTIMEINTERVAL
 subscription:
 
 ```
-(curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -1018,7 +1033,7 @@ duration acknowledgement:
         "duration": "P1M",
         "subscriptionId": "51c04a21d714fb3b37d7d5a7"
     }
-}                            
+}
 ```
 
 If you look at the accumulator-script.py terminal window, you will see
@@ -1087,7 +1102,8 @@ one that you have got in the subscribeContext response in the previous
 step) command:
 
 ```
-(curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "subscriptionId": "51c04a21d714fb3b37d7d5a7",
     "notifyConditions": [
@@ -1098,7 +1114,7 @@ step) command:
             ]
         }
     ]
-} EOF                                                                                                                                 
+} EOF
 ```
 
 The response is very similar to the one for subscribeContext request:
@@ -1109,7 +1125,7 @@ The response is very similar to the one for subscribeContext request:
         "subscriptionId": "51c04a21d714fb3b37d7d5a7"
        
     }
-}          
+}
 ```
 
 You can check in accumulator-server.py that the notification frequency
@@ -1122,10 +1138,11 @@ the one that you get in the subscribeContext response in the previous
 step):
 
 ```
-(curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/unsubscribeContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-} EOF                                                                                                                          
+} EOF
 ```
 The response is just an acknowledgement of that the cancellation was
 successful.
@@ -1137,7 +1154,7 @@ successful.
         "reasonPhrase": "OK"
     },
     "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-}                              
+}
 ```
 You can have a look at accumulator-server.py to check that the
 notification flow has stopped.
@@ -1155,7 +1172,8 @@ given time interval has passed but when some attribute changes. Let's
 consider the following example:
 
 ```
-(curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/subscribeContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -1227,7 +1245,7 @@ throttling in the request) a throttling acknowledgement:
         "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
         "throttling": "PT5S"
     }
-}                                    
+}
 ```
 
 Let's have a look now at accumulator-server.py. We will see one (and
@@ -1350,7 +1368,8 @@ first create Room1 entity with temperature and pressure attributes (with
 its initial values)
 
 ```
-(curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
 {
     "attributes": [
         {
@@ -1394,13 +1413,14 @@ the response is:
     "id": "Room1",
     "isPattern": "false",
     "type": ""
-}       
+}
 ```
 
 Now, let's do the same with Room2:
 
 ```
-(curl localhost:1026/v1/contextEntities/Room2 -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/contextEntities/Room2 -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
 {
     "attributes": [
         {
@@ -1415,7 +1435,7 @@ Now, let's do the same with Room2:
         }
     ]
 }
-```  
+```
 
 which response is:
 
@@ -1444,7 +1464,7 @@ which response is:
     "id": "Room2",
     "isPattern": "false",
     "type": ""
-}      
+}
 ```
 
 You can also create an attribute (and the containing entity along the
@@ -1453,10 +1473,12 @@ that, as described in [this
 section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)):
 
 ```
-(curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S   --header \ 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S \ 
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+    -X POST -d @- | python -mjson.tool) <<EOF
 {
     "value" : "21"
-} EOF                                                                                                                                                               
+} EOF
 ```
 
 Compared to [entity creation based on standard
@@ -1479,7 +1501,8 @@ entity information (ID and type) is included in the payload and the URL
 is independent of that fields, as shown below:
 
 ```
-(curl localhost:1026/v1/contextEntities -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/contextEntities -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
 {
     "id": "Room1",
     "type": "Room",
@@ -1512,7 +1535,8 @@ Finally, let's describe convenience operations for querying context
 information. We can query all the attribute values of a given entity,
 e.g. Room1 attributes:
 
-      curl localhost:1026/v1/contextEntities/Room1 -s -S \ --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/contextEntities/Room1 -s -S 
+          --header 'Accept: application/json' | python -mjson.tool
 
 which response is:
 ```
@@ -1538,12 +1562,13 @@ which response is:
         "code": "200",
         "reasonPhrase": "OK"
     }
-}               
+}
 ```
 We can also query a single attribute of a given entity, e.g. Room2
 temperature:
 
-      curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S \ --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S \
+         --header 'Accept: application/json' | python -mjson.tool
 
 which response is:
 
@@ -1560,7 +1585,7 @@ which response is:
         "code": "200",
         "reasonPhrase": "OK"
     }
-}    
+}
 ```
 
 Comparing to [standard queryContext
@@ -1586,7 +1611,8 @@ couple of entities of type Car using standard updateContext APPEND operations
 types using convenience operations):
 
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
         {
@@ -1608,10 +1634,11 @@ types using convenience operations):
         }
     ],
     "updateAction": "APPEND"
-} EOF                                                                                                                    
+} EOF
 ```
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
         {
@@ -1633,18 +1660,20 @@ types using convenience operations):
         }
     ],
     "updateAction": "APPEND"
-} EOF  
+} EOF
 ```
 
 Request to get all the attributes:
 
-      curl localhost:1026/v1/contextEntityTypes/Car -s -S \ --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/contextEntityTypes/Car -s -S \
+          --header 'Accept: application/json' | python -mjson.tool
 
 Response:
 
 Request to get only one attribute (e.g. speed):
 
-      curl localhost:1026/v1/contextEntityTypes/Car/attributes/speed -s -S \ --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/contextEntityTypes/Car/attributes/speed -s -S \ 
+          --header 'Accept: application/json' | python -mjson.tool
 
 Response:
 
@@ -1714,7 +1743,8 @@ Additional comments:
 <!-- -->
 
 ``` 
-curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S \ --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S \ 
+    --header 'Accept: application/json' | python -mjson.tool
 
 ```
 
@@ -1754,7 +1784,8 @@ curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S \ --he
 
 You can get all the entities using the following convenience operation:
 
-    curl localhost:1026/v1/contextEntities -s -S --header 'Content-Type: application/json' \  --header 'Accept: application/json' | python -mjson.tool
+    curl localhost:1026/v1/contextEntities -s -S --header 'Content-Type: application/json' \
+        --header 'Accept: application/json' | python -mjson.tool
 
 In our case, it will return both Room1 and Room2:
 
@@ -1834,7 +1865,8 @@ The following operation can be used to get a list of all entity types
 existing at Orion Context Broker in a given moment:
 
 ``` 
-curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' | python -mjson.tool
 
 {
     "statusCode": {
@@ -1877,7 +1909,8 @@ information of a given type (by the time being, that information consits
 of a list of all its attributes):
 
 ``` 
-curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' | python -mjson.tool
+curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' | python -mjson.tool
 {
     "attributes": [
         "hummidity",
@@ -1904,7 +1937,9 @@ In addition, note that this convenience operation doesn't have any standard oper
 Let's set the Room1 temperature and pressure values:
 
 ``` 
-(curl localhost:1026/v1/contextEntities/Room1/attributes -s -S \ --header 'Content-Type: application/json'  --header 'Accept: application/json' \  -X PUT -d @- | python -mjson.tool) << EOF
+(curl localhost:1026/v1/contextEntities/Room1/attributes -s -S \ 
+    --header 'Content-Type: application/json'  --header 'Accept: application/json' \ 
+    -X PUT -d @- | python -mjson.tool) << EOF
 {
     "attributes": [
         {
@@ -1918,7 +1953,7 @@ Let's set the Room1 temperature and pressure values:
             "value": "763"
         }
     ]
-}EOF                                                                                                                                                
+}EOF
 ``` 
 
 the response is:
@@ -1951,7 +1986,9 @@ the response is:
 Now, let's do the same with Room2:
 
 ``` 
-(curl localhost:1026/v1/contextEntities/Room2/attributes -s -S \ --header 'Content-Type: application/json'  --header 'Accept: application/json' \ -X PUT -d @- | python -mjson.tool) << EOF
+(curl localhost:1026/v1/contextEntities/Room2/attributes -s -S \ 
+    --header 'Content-Type: application/json'  --header 'Accept: application/json' \ 
+    -X PUT -d @- | python -mjson.tool) << EOF
 {
     "attributes": [
         {
@@ -1998,10 +2035,12 @@ which response is:
 You can update a single attribute of a given entity in the following way:
 
 ``` 
-(curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S \ --header  'Content-Type: application/json' --header 'Accept: application/json' \ -X PUT -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S \
+    --header  'Content-Type: application/json' --header 'Accept: application/json' \
+    -X PUT -d @- | python -mjson.tool) <<EOF
 {
     "value": "26.3"
-} EOF                                                                                                                                                            
+} EOF
 ``` 
 
 Comparing to [standard updateContext
@@ -2090,7 +2129,8 @@ First of all you have to register Room1 and Room2. In order to do so, we
 use the following NGSI9 registerContext operation:
 
 ``` 
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [
         {
@@ -2177,7 +2217,7 @@ We will get the following response :
       {
       "duration" : "P1M",
         "registrationId" : "52a744b011f5816465943d58"
-      }                                 
+      }
 
 The registrationId (whose value will be different when you run the
 request, as it is generated using the timestamp of the current time :)
@@ -2195,7 +2235,9 @@ discoverContextAvailability operation. For example, we can discover
 registrations for Room1 using:
 
 ``` 
-(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \ --header  'Content-Type: application/json' --header 'Accept: application/json' \ -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \
+    --header  'Content-Type: application/json' --header 'Accept: application/json' \
+    -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -2204,7 +2246,7 @@ registrations for Room1 using:
             "id": "Room1"
         }
     ]
-} EOF                                                                                                                                              
+} EOF
 ``` 
 
 This would produce the following response:
@@ -2245,7 +2287,9 @@ matter which attributes have been registered. If we want to be more
 precise, we can include the name of an attribute to search for:
 
 ``` 
-(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \ --header  'Content-Type: application/json' --header 'Accept: application/json' \ -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \
+    --header  'Content-Type: application/json' --header 'Accept: application/json' \ 
+    -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -2257,7 +2301,7 @@ precise, we can include the name of an attribute to search for:
     "attributes": [
         "temperature"
     ]
-}EOF                                                                                                                                                   
+}EOF
 ``` 
 
 which produces the following response:
@@ -2292,7 +2336,9 @@ If the broker doesn't have any registration information, it will return
 a response telling so. Thus, the following request:
 
 ``` 
-(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' \ -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \ 
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+    -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -2315,14 +2361,16 @@ would produce the following response:
         "code": "404",
         "reasonPhrase": "No context element registrations found"
     }
-}                   
+}
 ``` 
 
 You can also search for a list of entities, e.g. to discover temperature
 in both Room1 and Room2:
 
 ``` 
-(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' \ -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
+    -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -2381,7 +2429,9 @@ entities whose ID starts with "Room" using the regex "Room.\*". In this
 case, you have to set isPattern to "true" as shown below:
 
 ``` 
-(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' \ -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \ 
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+    -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -2440,7 +2490,9 @@ In order to configure this behavior, we use the following NGSI9
 subscribeContextAvailability request:
 
 ``` 
-(curl localhost:1026/v1/registry/subscribeContextAvailability -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' \ -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/subscribeContextAvailability -s -S \ 
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+    -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -2580,7 +2632,8 @@ Let's see what happens when we register a new room (Room3) with
 temperature and pressure:
 
 ``` 
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \  --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [
         {
@@ -2652,7 +2705,8 @@ register a room (Room4) with only attribute pressure (remember that the
 subscription only includes temperature in attributeList).
 
 ``` 
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [
         {
@@ -2691,7 +2745,9 @@ copy-pasting with the value you got from the
 subscribeContextAvailability response in the previous step).
 
 ```
-(curl localhost:1026/v1/registry/updateContextAvailabilitySubscription -s -S \  --header 'Content-Type: application/json' --header 'Accept: application/json' \ -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/updateContextAvailabilitySubscription -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+    -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -2712,14 +2768,15 @@ request:
     "duration": "P1M",
     "subscriptionId": "52a745e011f5816465943d59"
 }
-```          
+```
 
 Given that there are currently no car entities registered, you will not
 receive any initial notification. So. let's register two cars: Car1 with
 an attribute named speed and Car2 with an attribute named location.
 
 ```
-(curl localhost:1026/v1/registry/registerContext -s -S  --header 'Content-Type: application/json' \ --header 'Accept: application/json'  -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/registerContext -s -S  --header 'Content-Type: application/json' \
+    --header 'Accept: application/json'  -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [
         {
@@ -2745,7 +2802,8 @@ an attribute named speed and Car2 with an attribute named location.
 ```
 
 ```
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [
         {
@@ -2780,7 +2838,7 @@ User-Agent: orion/0.9.0
 Host: localhost:1028
 Accept: application/xml, application/json
 Content-Type: application/json
-```     
+```
 ```
       {
 	  "subscriptionId": "52a745e011f5816465943d59",
@@ -2850,11 +2908,13 @@ copy-pasting with the one you received in the
 subscribeContextAvailability response in the previous step).
 
 ```
-(curl localhost:1026/v1/registry/unsubscribeContextAvailability -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' \ -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/unsubscribeContextAvailability -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
+    -d @- | python -mjson.tool) <<EOF
 {
     "subscriptionId": "52a745e011f5816465943d59"
 }EOF
-```                                                                                                                                                 
+```
  
 The response is just an acknowledgement that the cancellation was
 successful.
@@ -2866,7 +2926,7 @@ successful.
         "reasonPhrase": "OK"
     },
     "subscriptionId": "52a745e011f5816465943d59"
-}    
+}
 ```
   ---------------------------------------------------------------------------------------------------------------------------------
 
@@ -2916,37 +2976,42 @@ approaches.
 First of all, we register Room1 and Room2 with attributes temperature
 and pressure, using the following commands:
 
-      (curl localhost:1026/v1/registry/contextEntities/Room1/attributes/temperature -s -S \ --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/registry/contextEntities/Room1/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json'  -d @- | python -mjson.tool) << EOF
-      <?xml version="1.0"?>                                                                                                                                                  {
-      <registerProviderRequest>                                                                                                                                                "duration" : "P1M",
-        <duration>P1M</duration>                                                                                                                                               "providingApplication" : "http://mysensors.com/Rooms"
-        <providingApplication>http://mysensors.com/Rooms</providingApplication>                                                                                              }
-      </registerProviderRequest>                                                                                                                                             EOF
-      EOF                                                                                                                                                                
- 
-      (curl localhost:1026/v1/registry/contextEntities/Room1/attributes/pressure -s -S \ --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/registry/contextEntities/Room1/attributes/pressure -s -S --header 'Content-Type: application/json' --header 'Accept: application/json'  -d @- | python -mjson.tool) << EOF
-      <?xml version="1.0"?>                                                                                                                                               {
-      <registerProviderRequest>                                                                                                                                             "duration" : "P1M",
-        <duration>P1M</duration>                                                                                                                                            "providingApplication" : "http://mysensors.com/Rooms"
-        <providingApplication>http://mysensors.com/Rooms</providingApplication>                                                                                           }
-      </registerProviderRequest>                                                                                                                                          EOF
-      EOF                                                                                                                                                             
-  
-      (curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S \ --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json'  -d @- | python -mjson.tool) << EOF
-      <?xml version="1.0"?>                                                                                                                                                  {
-      <registerProviderRequest>                                                                                                                                                "duration" : "P1M",
-        <duration>P1M</duration>                                                                                                                                               "providingApplication" : "http://mysensors.com/Rooms"
-        <providingApplication>http://mysensors.com/Rooms</providingApplication>                                                                                              }
-      </registerProviderRequest>                                                                                                                                             EOF
-      EOF                                                                                                                                                                
-  
-      (curl localhost:1026/v1/registry/contextEntities/Room2/attributes/pressure -s -S \--header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF       (curl localhost:1026/v1/registry/contextEntities/Room2/attributes/pressure -s -S --header 'Content-Type: application/json' --header 'Accept: application/json'  -d @- | python -mjson.tool) << EOF
-      <?xml version="1.0"?>                                                                                                                                               {
-      <registerProviderRequest>                                                                                                                                             "duration" : "P1M",
-        <duration>P1M</duration>                                                                                                                                            "providingApplication" : "http://mysensors.com/Rooms"
-        <providingApplication>http://mysensors.com/Rooms</providingApplication>                                                                                           }
-      </registerProviderRequest>                                                                                                                                          EOF
-      EOF                                                                                                                                                             
+(curl localhost:1026/v1/registry/contextEntities/Room1/attributes/temperature -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
+    -d @- | python -mjson.tool) << EOF
+{
+  "duration" : "P1M",
+  "providingApplication" : "http://mysensors.com/Rooms"
+}
+EOF
+
+(curl localhost:1026/v1/registry/contextEntities/Room1/attributes/pressure -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+    -d @- | python -mjson.tool) << EOF
+{
+  "duration" : "P1M",
+  "providingApplication" : "http://mysensors.com/Rooms"
+}
+EOF
+
+(curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
+    -d @- | python -mjson.tool) << EOF
+{
+  "duration" : "P1M",
+  "providingApplication" : "http://mysensors.com/Rooms"
+}
+EOF
+
+(curl localhost:1026/v1/registry/contextEntities/Room2/attributes/pressure -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+    -d @- | python -mjson.tool) << EOF
+{
+  "duration" : "P1M",
+  "providingApplication" : "http://mysensors.com/Rooms"
+}
+EOF
+
   
 So, what's the difference compared to [standard registerContext
 operation](#register-context-operation)?
@@ -2990,7 +3055,8 @@ example.
 Let's register the "Funny" entity type (note that we are not specifying
 any entity ID):
 
-    (curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \ --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
+    (curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \
+        --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
     <?xml version="1.0"?>
     <registerProviderRequest>
        <duration>P1M</duration>
@@ -3000,7 +3066,8 @@ any entity ID):
 
 Now, let's discover on that type:
 
-    curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \ --header 'Content-Type: application/xml' | xmllint --format -
+    curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \
+        --header 'Content-Type: application/xml' | xmllint --format -
 
     <discoverContextAvailabilityResponse>
       <contextRegistrationResponseList>
@@ -3022,7 +3089,9 @@ specify any ID at registration).
 
 Moreover, you can register attributes in these registrations, e.g:
 
-    (curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny/attributes/ATT -s -S \ --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
+    (curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny/attributes/ATT -s -S \
+        --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
+
     <?xml version="1.0"?>
     <registerProviderRequest>
        <duration>P1M</duration>
@@ -3030,7 +3099,8 @@ Moreover, you can register attributes in these registrations, e.g:
     </registerProviderRequest>
     EOF
 
-    curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny -s -S \ --header 'Content-Type: application/xml' | xmllint --format -
+    curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny -s -S \
+       --header 'Content-Type: application/xml' | xmllint --format -
 
     <?xml version="1.0"?>
     <discoverContextAvailabilityResponse>
@@ -3063,15 +3133,59 @@ Using convenience operations you can discover registration information
 for a single entity or for an entity-attribute pair. For example, to
 discover registrations for Room1 (no matter the attributes):
 
-      curl localhost:1026/v1/registry/contextEntities/Room1 -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/registry/contextEntities/Room1 -s -S \ 
+          --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 which produces the following response:
-
-
-
+```
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "temperature",
+                        "type": ""
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Room1",
+                        "isPattern": "false",
+                        "type": ""
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Rooms"
+            }
+        },
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "pressure",
+                        "type": ""
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "Room1",
+                        "isPattern": "false",
+                        "type": ""
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Rooms"
+            }
+        }
+    ]
+}
+```
 Now, let's discover registrations for Room2-temperature:
 
-     curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' \ | python -mjson.tool
+     curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S \ 
+         --header 'Content-Type: application/json' --header 'Accept: application/json' \
+         | python -mjson.tool
 
 The response is as follows:
 
@@ -3117,16 +3231,18 @@ The response is as follows:
             }
         }
     ]
-}    
+}
 ```
 
 Discovery of not registered elements (e.g. Room5 or the humidity of
 Room1) will produce an error. E.g. the following requests:
 
 
-      curl localhost:1026/v1/registry/contextEntities/Room3 -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/registry/contextEntities/Room3 -s -S  --header 'Content-Type: application/json' \
+          --header 'Accept: application/json' | python -mjson.tool
 
-      curl localhost:1026/v1/registry/contextEntities/Room2/attributes/humidity -s -S \--header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+      curl localhost:1026/v1/registry/contextEntities/Room2/attributes/humidity -s -S \
+          --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 will produce the following error response:
 
@@ -3137,7 +3253,7 @@ will produce the following error response:
         "reasonPhrase": "No context element found"
     }
 }
-```                     
+```
 
 Compared to [standard discoverContextAvailability
 operation](#discover-context-availability-operation ):
@@ -3164,7 +3280,8 @@ couple of entities of type Car using standard registerContext operations
 entities with types using convenience operations):
 
 ``` 
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \  --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [
         {
@@ -3189,7 +3306,8 @@ entities with types using convenience operations):
 }EOF
 ``` 
 ``` 
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [
         {
@@ -3212,11 +3330,12 @@ entities with types using convenience operations):
     ],
     "duration": "P1M"
 } EOF
-```                                                                                                                                          
+```
 
 Request without specifying attributes:
 
-     curl localhost:1026/v1/registry/contextEntityTypes/Car -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+     curl localhost:1026/v1/registry/contextEntityTypes/Car -s -S \
+         --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 Response:
 
@@ -3268,7 +3387,8 @@ Response:
 
 Request specifying one attribute (e.g. speed):
 
-     curl localhost:1026/v1/registry/contextEntityTypes/Car/attributes/speed -s -S \ --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+     curl localhost:1026/v1/registry/contextEntityTypes/Car/attributes/speed -s -S \
+         --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
 
 Response:
 

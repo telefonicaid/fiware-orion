@@ -18,8 +18,8 @@ key-map object (we use UPDATE as actionType, but this can be used at
 initial entity or attribute creation with APPEND).
 
 ``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json'  
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
         {

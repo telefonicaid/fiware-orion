@@ -11,17 +11,17 @@ First of all, you need an account in FIWARE Lab, so register for one in [the fol
 
 Let's assume that the authentication token you got is in the AUTH_TOKEN shell variable. Now, let's start querying some real-time information from the city sensors of Santander (in particular, a sound level meter):
 
-    # curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/urn:smartsantander:testbed:357 -X GET\
-    -s -S --header 'Content-Type: application/json'  --header 'Accept: application/json' --header\
-    "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
+    # curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/urn:smartsantander:testbed:357 \
+  	-X GET -s -S --header 'Content-Type: application/json'  --header 'Accept: application/json' \ 
+        --header  "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
 
 You will get a JSON document including the time of the last measure (TimeInstant), sound level (sound), sensor battery charge (batteryCharge) and sensor location (Latitud and Longitud... sorry for the Spanish in these last ones ;) for the sensor identified by "urn:smartsantander:testbed:357".
 
 Let's query another sensor, this time one related to road traffic:
 
-    # curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/urn:smartsantander:testbed:3332 -X GET\
-    -s -S  --header 'Content-Type: application/json' --header 'Accept: application/json' --header\
-    "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
+    # curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/urn:smartsantander:testbed:3332 \
+	 -X GET -s -S  --header 'Content-Type: application/json' --header 'Accept: application/json' \
+         --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
 
 The data you find in the returned JSON about the "urn:smartsantander:testbed:3332" sensor is:
 
@@ -38,9 +38,9 @@ The Orion Context Broker global instance can also be used to create new entities
 The following command creates an entity with the attributes "city_location" and "temperature" in the Orion Context Broker:
 
 ``` 
-(curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID -X POST -s -S --header\ 
-'Content-Type: application/json' --header 'Accept: application/json' --header\ 
-"X-Auth-Token: $AUTH_TOKEN" -d @- | python -mjson.tool) <<EOF
+(curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID -X POST -s -S \
+   --header 'Content-Type: application/json' --header 'Accept: application/json' \
+   --header "X-Auth-Token: $AUTH_TOKEN" -d @- | python -mjson.tool) <<EOF
 {
     "attributes": [
         {
@@ -59,16 +59,16 @@ The following command creates an entity with the attributes "city_location" and 
 
 In order to check that the entity is there, you can query it the same way you queried the public sensors:
 
-    # (curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID -X GET -s -S --header\
-    'Content-Type: application/json' --header 'Accept: application/json'\ 
-    --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool)
+    # (curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID -X GET -s -S \
+   	 --header 'Content-Type: application/json' --header 'Accept: application/json'\ 
+    	 --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool)
 
 And you can, of course, modify the values for the attributes, e.g. to modify the temperature:
 
 ```
-(curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID/attributes/temperature -X PUT\ 
--s -S --header  'Content-Type: application/json' --header 'Accept: application/json' --header\
-"X-Auth-Token: $AUTH_TOKEN" -d @- | python -mjson.tool) <<EOF
+(curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID/attributes/temperature \
+   -X PUT -s -S --header  'Content-Type: application/json' --header 'Accept: application/json' \
+   --header "X-Auth-Token: $AUTH_TOKEN" -d @- | python -mjson.tool) <<EOF
 {
     "value": "18.4"
 }EOF

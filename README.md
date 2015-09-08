@@ -266,7 +266,8 @@ If broker is not running you will get:
 
 In order to create an entity (Room1) with two attributes (temperature and pressure):
 
-    (curl <orion_host>:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+    (curl <orion_host>:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' \ 
+        --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
     {
       "attributes" : [
     {
@@ -289,7 +290,9 @@ In order to query the entity:
 
 In order to update one of the entity atributes (temperature):
 
-    (curl <orion_host>:1026/v1/contextEntities/Room2/attributes/temperature -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X PUT -d @- | python -mjson.tool) <<EOF
+    (curl <orion_host>:1026/v1/contextEntities/Room2/attributes/temperature -s -S \ 
+        --header 'Content-Type: application/json' --header 'Accept: application/json' \  
+        -X PUT -d @- | python -mjson.tool) <<EOF
     {
        "value" : "26.3"
     }

@@ -7,9 +7,9 @@ source of the context information for the entities/attributes included
 in that registration. We call that source the "Context Provider" (or
 CPr, for short).
 
-     ...                                                                           
+     ...
      "providingApplication" : "http://mysensors.com/Rooms"
-     ...                                                                           
+     ...
   
 If Orion receives a query or update operation (either in the standard or
 in the convenience family) and it cannot find the targeted context
@@ -34,8 +34,8 @@ Let's illustrate this with an example.
       
 <!-- -->
 ```
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [
         {
@@ -58,7 +58,7 @@ Let's illustrate this with an example.
     ],
     "duration": "P1M"
 }EOF
-```      
+```
       
       
 -     Next, consider that a client queries the Street4 temperature
@@ -67,8 +67,8 @@ Let's illustrate this with an example.
       
 <!-- -->
 ``` 
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
