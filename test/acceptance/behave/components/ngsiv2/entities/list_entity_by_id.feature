@@ -28,7 +28,7 @@
 #
 
 
-Feature: get an entity by ID in NGSI v2
+Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
   As a context broker user
   I would like to get an entity by ID in NGSI v2
   So that I can manage and use them in my scripts
@@ -58,7 +58,7 @@ Feature: get an entity by ID in NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value                       |
       | attrs     | temperature_0,temperature_1 |
     Then verify that receive an "OK" http code
@@ -71,21 +71,21 @@ Feature: get an entity by ID in NGSI v2
       | Fiware-Service     | test_id_more_entities |
       | Fiware-ServicePath | /test                 |
       | Content-Type       | application/json      |
-    When create "1" entities with "3" attributes
+    And create "1" entities with "3" attributes
       | parameter        | value       |
       | entities_type    | house       |
       | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When create "1" entities with "3" attributes
+    And create "1" entities with "3" attributes
       | parameter        | value       |
       | entities_type    | home        |
       | entities_id      | room        |
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value                       |
       | attrs     | temperature_0,temperature_1 |
     Then verify that receive an "Conflict" http code
@@ -110,7 +110,7 @@ Feature: get an entity by ID in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
@@ -137,7 +137,7 @@ Feature: get an entity by ID in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
@@ -183,7 +183,7 @@ Feature: get an entity by ID in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
@@ -213,7 +213,7 @@ Feature: get an entity by ID in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
@@ -302,72 +302,336 @@ Feature: get an entity by ID in NGSI v2
   # -------------- with/without attribute type or metadatas -----------------------
 
   @without_attribute_type
-  Scenario:  get an entity by ID in NGSI v2 without attribute type
+  Scenario Outline:  get an entity by ID in NGSI v2 without attribute type
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_id_without_attribute_type |
       | Fiware-ServicePath | /test                          |
       | Content-Type       | application/json               |
     When create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | attributes_type  | celcius     |
+      | parameter        | value             |
+      | entities_type    | house             |
+      | entities_id      | room              |
+      | attributes_name  | temperature       |
+      | attributes_value | <attribute_value> |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
     And verify that the entity by ID is returned
+    Examples:
+      | attribute_value         |
+      | 017-06-17T07:21:24.238Z |
+      | 34                      |
+      | 34.4E-34                |
+      | temp.34                 |
+      | temp_34                 |
+      | temp-34                 |
+      | TEMP34                  |
+      | house_flat              |
+      | house.flat              |
+      | house-flat              |
+      | house@flat              |
+      | habitación              |
+      | españa                  |
+      | barça                   |
+      | random=10               |
+      | random=100              |
+      | random=1000             |
+      | random=10000            |
+      | random=100000           |
+
+  @compound_without_attribute_type @BUG_1106 @skip
+  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and without attribute type (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_without_attribute_type |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
+    And  create an entity and attribute with special values in raw
+      | parameter        | value              |
+      | entities_type    | "room"             |
+      | entities_id      | <entity_id>        |
+      | attributes_name  | "temperature"      |
+      | attributes_value | <attributes_value> |
+    And verify that receive an "Created" http code
+    When get all entities
+    Then verify that receive an "OK" http code
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
+    Examples:
+      | entity_id | attributes_value                                                              | type     |
+      | "room1"   | true                                                                          | bool     |
+      | "room2"   | false                                                                         | bool     |
+      | "room3"   | 34                                                                            | int      |
+      | "room4"   | -34                                                                           | int      |
+      | "room5"   | 5.00002                                                                       | float    |
+      | "room6"   | -5.00002                                                                      | float    |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                | list     |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             | list     |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] | list     |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         | dict     |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  | dict     |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": "ert"}}}}}}                                  | dict     |
+      | "room13"  | {"x": ["a", 45.56, "rt"],"x2": "b"}                                           | dict     |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                | dict     |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
+      | "room17"  | null                                                                          | NoneType |
+
+  @with_attribute_type
+  Scenario Outline:  get an entity by ID in NGSI v2 with attribute type
+    Given  a definition of headers
+      | parameter          | value                          |
+      | Fiware-Service     | test_id_without_attribute_type |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
+    When create "1" entities with "3" attributes
+      | parameter        | value             |
+      | entities_type    | house             |
+      | entities_id      | room              |
+      | attributes_name  | temperature       |
+      | attributes_value | <attribute_value> |
+      | attributes_type  | celcius           |
+    And verify that receive several "Created" http code
+    When get an entity by ID "room"
+      | parameter | value         |
+      | attrs     | temperature_0 |
+    Then verify that receive an "OK" http code
+    And verify that the entity by ID is returned
+    Examples:
+      | attribute_value         |
+      | 017-06-17T07:21:24.238Z |
+      | 34                      |
+      | 34.4E-34                |
+      | temp.34                 |
+      | temp_34                 |
+      | temp-34                 |
+      | TEMP34                  |
+      | house_flat              |
+      | house.flat              |
+      | house-flat              |
+      | house@flat              |
+      | habitación              |
+      | españa                  |
+      | barça                   |
+      | random=10               |
+      | random=100              |
+      | random=1000             |
+      | random=10000            |
+      | random=100000           |
+
+  @compound_with_attribute_type @BUG_1106 @skip
+  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and with attribute type (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                       |
+      | Fiware-Service     | test_id_with_attribute_type |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
+    And  create an entity and attribute with special values in raw
+      | parameter        | value              |
+      | entities_type    | "room"             |
+      | entities_id      | <entity_id>        |
+      | attributes_name  | "temperature"      |
+      | attributes_value | <attributes_value> |
+      | attributes_type  | "celcius"          |
+    And verify that receive an "Created" http code
+    When get all entities
+    Then verify that receive an "OK" http code
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
+    Examples:
+      | entity_id | attributes_value                                                              | type     |
+      | "room1"   | true                                                                          | bool     |
+      | "room2"   | false                                                                         | bool     |
+      | "room3"   | 34                                                                            | int      |
+      | "room4"   | -34                                                                           | int      |
+      | "room5"   | 5.00002                                                                       | float    |
+      | "room6"   | -5.00002                                                                      | float    |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                | list     |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             | list     |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] | list     |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         | dict     |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  | dict     |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": "ert"}}}}}}                                  | dict     |
+      | "room13"  | {"x": ["a", 45.56, "rt"],"x2": "b"}                                           | dict     |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                | dict     |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
+      | "room17"  | null                                                                          | NoneType |
 
   @with_metadata
-  Scenario:  get an entity by ID in NGSI v2 with metadata
+  Scenario Outline:  get an entity by ID in NGSI v2 with metadata
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_id_metadata |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
     When create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_type   | alarm       |
-      | metadatas_value  | hot         |
+      | parameter        | value             |
+      | entities_type    | house             |
+      | entities_id      | room              |
+      | attributes_name  | temperature       |
+      | attributes_value | <attribute_value> |
+      | metadatas_number | 2                 |
+      | metadatas_name   | very_hot          |
+      | metadatas_type   | alarm             |
+      | metadatas_value  | hot               |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
     And verify that the entity by ID is returned
+    Examples:
+      | attribute_value         |
+      | 017-06-17T07:21:24.238Z |
+      | 34                      |
+      | 34.4E-34                |
+      | temp.34                 |
+      | temp_34                 |
+      | temp-34                 |
+      | TEMP34                  |
+      | house_flat              |
+      | house.flat              |
+      | house-flat              |
+      | house@flat              |
+      | habitación              |
+      | españa                  |
+      | barça                   |
+      | random=10               |
+      | random=100              |
+      | random=1000             |
+      | random=10000            |
+      | random=100000           |
+
+  @compound_with_metadata @BUG_1106 @skip
+  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and with metadatas (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                       |
+      | Fiware-Service     | test_id_with_attribute_type |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
+    And  create an entity and attribute with special values in raw
+      | parameter        | value              |
+      | entities_type    | "room"             |
+      | entities_id      | <entity_id>        |
+      | attributes_name  | "temperature"      |
+      | attributes_value | <attributes_value> |
+      | attributes_type  | "celcius"          |
+      | metadatas_number | 2                  |
+      | metadatas_name   | "very_hot"         |
+      | metadatas_type   | "alarm"            |
+      | metadatas_value  | "hot"              |
+    And verify that receive an "Created" http code
+    When get all entities
+    Then verify that receive an "OK" http code
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
+    Examples:
+      | entity_id | attributes_value                                                              | type     |
+      | "room1"   | true                                                                          | bool     |
+      | "room2"   | false                                                                         | bool     |
+      | "room3"   | 34                                                                            | int      |
+      | "room4"   | -34                                                                           | int      |
+      | "room5"   | 5.00002                                                                       | float    |
+      | "room6"   | -5.00002                                                                      | float    |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                | list     |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             | list     |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] | list     |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         | dict     |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  | dict     |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": "ert"}}}}}}                                  | dict     |
+      | "room13"  | {"x": ["a", 45.56, "rt"],"x2": "b"}                                           | dict     |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                | dict     |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
+      | "room17"  | null                                                                          | NoneType |
 
   @without_metadata_type
-  Scenario:  get an entity by ID in NGSI v2 without metadata type
+  Scenario Outline:  get an entity by ID in NGSI v2 without metadata type
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_id_metadata |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
     When create "1" entities with "3" attributes
-      | parameter        | value       |
-      | entities_type    | house       |
-      | entities_id      | room        |
-      | attributes_name  | temperature |
-      | attributes_value | 34          |
-      | metadatas_number | 2           |
-      | metadatas_name   | very_hot    |
-      | metadatas_value  | hot         |
+      | parameter        | value             |
+      | entities_type    | house             |
+      | entities_id      | room              |
+      | attributes_name  | temperature       |
+      | attributes_value | <attribute_value> |
+      | metadatas_number | 2                 |
+      | metadatas_name   | very_hot          |
+      | metadatas_value  | hot               |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
     And verify that the entity by ID is returned
+    And verify that the entity by ID is returned
+    Examples:
+      | attribute_value         |
+      | 017-06-17T07:21:24.238Z |
+      | 34                      |
+      | 34.4E-34                |
+      | temp.34                 |
+      | temp_34                 |
+      | temp-34                 |
+      | TEMP34                  |
+      | house_flat              |
+      | house.flat              |
+      | house-flat              |
+      | house@flat              |
+      | habitación              |
+      | españa                  |
+      | barça                   |
+      | random=10               |
+      | random=100              |
+      | random=1000             |
+      | random=10000            |
+      | random=100000           |
+
+  @compound_with_metadata_without_meta_type @BUG_1106 @skip
+  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and with metadatas but without
+                    metadata type (compound, vector, boolean, etc)
+    Given  a definition of headers
+      | parameter          | value                       |
+      | Fiware-Service     | test_id_with_attribute_type |
+      | Fiware-ServicePath | /test                       |
+      | Content-Type       | application/json            |
+    And  create an entity and attribute with special values in raw
+      | parameter        | value              |
+      | entities_type    | "room"             |
+      | entities_id      | <entity_id>        |
+      | attributes_name  | "temperature"      |
+      | attributes_value | <attributes_value> |
+      | attributes_type  | "celcius"          |
+      | metadatas_number | 2                  |
+      | metadatas_name   | "very_hot"         |
+      | metadatas_value  | "hot"              |
+    And verify that receive an "Created" http code
+    When get all entities
+    Then verify that receive an "OK" http code
+    And verify an entity in raw mode with type "<type>" in attribute value from http response
+    Examples:
+      | entity_id | attributes_value                                                              | type     |
+      | "room1"   | true                                                                          | bool     |
+      | "room2"   | false                                                                         | bool     |
+      | "room3"   | 34                                                                            | int      |
+      | "room4"   | -34                                                                           | int      |
+      | "room5"   | 5.00002                                                                       | float    |
+      | "room6"   | -5.00002                                                                      | float    |
+      | "room7"   | [ "json", "vector", "of", 6, "strings", "and", 2, "integers" ]                | list     |
+      | "room8"   | [ "json", ["a", 34, "c", ["r", 4, "t"]], "of", 6]                             | list     |
+      | "room9"   | [ "json", ["a", 34, "c", {"r": 4, "t":"4", "h":{"s":"3", "g":"v"}}], "of", 6] | list     |
+      | "room10"  | {"x": "x1","x2": "b"}                                                         | dict     |
+      | "room11"  | {"x": {"x1": "a","x2": "b"}}                                                  | dict     |
+      | "room12"  | {"a":{"b":{"c":{"d": {"e": {"f": "ert"}}}}}}                                  | dict     |
+      | "room13"  | {"x": ["a", 45.56, "rt"],"x2": "b"}                                           | dict     |
+      | "room14"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                | dict     |
+      | "room15"  | "41.3763726, 2.1864475,14"                                                    | str      |
+      | "room16"  | "2017-06-17T07:21:24.238Z"                                                    | str      |
+      | "room17"  | null                                                                          | NoneType |
 
  # --------------------- entity ID ----------------------------------------------
 
@@ -476,7 +740,7 @@ Feature: get an entity by ID in NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
     Then verify that receive an "OK" http code
     And verify that the entity by ID is returned
 
@@ -494,7 +758,7 @@ Feature: get an entity by ID in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
@@ -518,7 +782,7 @@ Feature: get an entity by ID in NGSI v2
       | metadatas_type   | alarm       |
       | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
@@ -541,7 +805,7 @@ Feature: get an entity by ID in NGSI v2
       | metadatas_name   | very_hot    |
       | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value         |
       | attrs     | temperature_0 |
     Then verify that receive an "OK" http code
@@ -561,7 +825,7 @@ Feature: get an entity by ID in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value            |
       | attrs     | <attribute_name> |
     Then verify that receive an "OK" http code
@@ -609,7 +873,7 @@ Feature: get an entity by ID in NGSI v2
       | attributes_name  | temperature |
       | attributes_value | 34          |
     And verify that receive several "Created" http code
-    When get an entity by ID "room_0"
+    When get an entity by ID "room"
       | parameter | value            |
       | attrs     | <attribute_name> |
     Then verify that receive an "Bad Request" http code

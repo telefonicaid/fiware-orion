@@ -51,7 +51,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | Fiware-Service     | test_happy_path  |
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
-    When create "1" entities with "2" attributes
+    When create "3" entities with "2" attributes
       | parameter        | value                   |
       | entities_type    | room                    |
       | entities_id      | room2                   |
@@ -137,6 +137,21 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | dsfsdfsdf                         |
       | <sdsd>                            |
       | (eeqweqwe)                        |
+
+  @length_required @BUG_1199 @BUG_1203 @skip
+  Scenario:  try to create several entities in NGSI v2 wihout payload
+    Given  a definition of headers
+      | parameter          | value                |
+      | Fiware-Service     | test_length_required |
+      | Fiware-ServicePath | /test                |
+      | Content-Type       | application/json     |
+    When create "1" entities with "0" attributes
+    Then verify that receive several "Length Required" http code
+    And verify several error responses
+      | parameter   | value                                            |
+      | error       | LengthRequired                                   |
+      | description | Zero/No Content-Length in PUT/POST/PATCH request |
+
 
   # ---------- Services --------------------------------
   @service_without
@@ -452,7 +467,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @entities_type_error @BUG_1093
+  @entities_type_error @BUG_1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong entities type values
     Given  a definition of headers
       | parameter          | value                    |
@@ -467,9 +482,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | attributes_value | 34              |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                           |
-      | error       | BadRequest                                      |
-      | description | Parse Error (Invalid characters in entity type) |
+      | parameter   | value                             |
+      | error       | BadRequest                        |
+      | description | Invalid characters in entity type |
     And verify that entities are not stored in mongo
     Examples:
       | entities_type |
@@ -576,7 +591,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Then verify that receive several "Bad Request" http code
     And verify that entities are not stored in mongo
 
-  @entities_id_error @BUG_1093
+  @entities_id_error @BUG_1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong entities id values
     Given  a definition of headers
       | parameter          | value                  |
@@ -591,9 +606,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | attributes_value | 34            |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                         |
-      | error       | BadRequest                                    |
-      | description | Parse Error (Invalid characters in entity id) |
+      | parameter   | value                           |
+      | error       | BadRequest                      |
+      | description | Invalid characters in entity id |
     And verify that entities are not stored in mongo
     Examples:
       | entities_id |
@@ -741,7 +756,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000    |
       | random=100000   |
 
-  @attributes_name_error @BUG1093
+  @attributes_name_error @BUG1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes names
     Given  a definition of headers
       | parameter          | value                      |
@@ -756,9 +771,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | attributes_value | 34                |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                              |
-      | error       | BadRequest                                         |
-      | description | Parse Error (Invalid characters in attribute name) |
+      | parameter   | value                                |
+      | error       | BadRequest                           |
+      | description | Invalid characters in attribute name |
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | attributes_name |
@@ -869,7 +884,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000     |
       | random=100000    |
 
-  @attributes_value_error @BUG_1093
+  @attributes_value_error @BUG_1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes values
     Given  a definition of headers
       | parameter          | value                       |
@@ -884,9 +899,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | attributes_value | <attributes_value> |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                               |
-      | error       | BadRequest                                          |
-      | description | Parse Error (Invalid characters in attribute value) |
+      | parameter   | value                                 |
+      | error       | BadRequest                            |
+      | description | Invalid characters in attribute value |
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | attributes_value |
@@ -958,7 +973,6 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | error       | ParseError                             |
       | description | invalid JSON type for ContextAttribute |
     And verify that entities are not stored in mongo
-
 
   @attributes_value_special @BUG_1106 @skip
   Scenario Outline:  create an entity NGSI v2 with several attributes special values without type (compound, vector, boolean, etc)
@@ -1307,7 +1321,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @attributes_type_error @BUG_1093
+  @attributes_type_error @BUG_1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes types
     Given  a definition of headers
       | parameter          | value                      |
@@ -1323,9 +1337,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | attributes_type  | <attributes_type> |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                              |
-      | error       | BadRequest                                         |
-      | description | Parse Error (Invalid characters in attribute type) |
+      | parameter   | value                                |
+      | error       | BadRequest                           |
+      | description | Invalid characters in attribute type |
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | attributes_type |
@@ -1465,7 +1479,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000  |
       | random=100000 |
 
-  @attributes_metadata_name_error @BUG_1093
+  @attributes_metadata_name_error @BUG_1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata name without metadata type
     Given  a definition of headers
       | parameter          | value                    |
@@ -1483,9 +1497,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | metadatas_value  | random=5        |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | Parse Error (Invalid characters in metadata name) |
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | Invalid characters in metadata name |
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | metadata_name |
@@ -1496,7 +1510,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_6      | house;flat    |
       | room_8      | house(flat)   |
 
-  @attributes_metadata_name_with_type_error @BUG_1093
+  @attributes_metadata_name_with_type_error @BUG_1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata name with metadata type
     Given  a definition of headers
       | parameter          | value                                 |
@@ -1515,9 +1529,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | attributes_type  | random=6        |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | Parse Error (Invalid characters in metadata name) |
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | Invalid characters in metadata name |
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | metadata_name |
@@ -1666,7 +1680,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000   |
       | random=100000  |
 
-  @attributes_metadata_value_without_and_with_type
+  @attributes_metadata_value_without_and_with_type @BUG_1200 @skip
   Scenario:  try to create entities in NGSI v2 without attributes metadata value with metadata type
     Given  a definition of headers
       | parameter          | value                         |
@@ -1684,9 +1698,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | metadatas_type   | random=6    |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                |
-      | error       | BadRequest                           |
-      | description | Parse Error (missing metadata value) |
+      | parameter   | value                  |
+      | error       | BadRequest             |
+      | description | missing metadata value |
 
   @attributes_metadata_value_special @BUG_1106 @skip
   Scenario Outline:  create an entity NGSI v2 with several attributes metadata special values without metadata type (null, boolean, etc)
@@ -1745,7 +1759,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room16"  | "2017-06-17T07:21:24.238Z" |
       | "room17"  | null                       |
 
-  @attributes_metadata_value_error @BUG_1093
+  @attributes_metadata_value_error @BUG_1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata value without metadata type
     Given  a definition of headers
       | parameter          | value                     |
@@ -1763,9 +1777,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | metadatas_value  | <metadata_value> |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                              |
-      | error       | BadRequest                                         |
-      | description | Parse Error (Invalid characters in metadata value) |
+      | parameter   | value                                |
+      | error       | BadRequest                           |
+      | description | Invalid characters in metadata value |
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | metadata_value |
@@ -1776,7 +1790,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_6      | house;flat     |
       | room_8      | house(flat)    |
 
-  @attributes_metadata_value_error_with_type @BUG_1093
+  @attributes_metadata_value_error_with_type @BUG_1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata value with metadata type
     Given  a definition of headers
       | parameter          | value                               |
@@ -1795,9 +1809,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | metadatas_type   | random=6         |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                              |
-      | error       | BadRequest                                         |
-      | description | Parse Error (Invalid characters in metadata value) |
+      | parameter   | value                                |
+      | error       | BadRequest                           |
+      | description | Invalid characters in metadata value |
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | metadata_value |
@@ -1985,7 +1999,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000  |
       | random=100000 |
 
-  @attributes_metadata_type_error @BUG_1093
+  @attributes_metadata_type_error @BUG_1093 @BUG_1200 @skip
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata type
     Given  a definition of headers
       | parameter          | value                    |
@@ -2004,9 +2018,9 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | metadatas_type   | <metadata_type> |
     Then verify that receive several "Bad Request" http code
     And verify several error responses
-      | parameter   | value                                             |
-      | error       | BadRequest                                        |
-      | description | Parse Error (Invalid characters in metadata type) |
+      | parameter   | value                               |
+      | error       | BadRequest                          |
+      | description | Invalid characters in metadata type |
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | metadata_type |
