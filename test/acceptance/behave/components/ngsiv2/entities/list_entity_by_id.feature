@@ -592,8 +592,8 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | random=100000           |
 
   @compound_with_metadata_without_meta_type @BUG_1106 @skip
-  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and with metadatas but without metadata
-                    type (compound, vector, boolean, etc)
+  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and with metadatas but without
+                    metadata type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_id_with_attribute_type |
