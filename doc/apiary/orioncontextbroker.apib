@@ -1,28 +1,12 @@
 FORMAT: 1A
+HOST: http://telefonicaid.github.io/fiware-orion/api/v1/
+TITLE: Orion Context Broker NGSI API v1 Specification
+DATE: 08 September 2015
+VERSION: v1.0
+PREVIOUS_VERSION: v0.9
+APIARY_PROJECT: orioncontextbroker
 
-# Orion Context Broker
-
-<!--
- Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
-
- This file is part of Orion Context Broker.
-
- Orion Context Broker is free software: you can redistribute it and/or
- modify it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
- License, or (at your option) any later version.
-
- Orion Context Broker is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
- General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
-
- For those usages not covered by this license please contact with
- iot_support at tid dot es
--->
+# Orion Context Broker NGSI API v1 Specification
 
 The Orion Context Broker is an implementation of the Publish/Subscribe Context Broker GE, providing the NGSI9 and NGSI10 interfaces. Using these interfaces, clients can do several operations:
 
@@ -31,8 +15,21 @@ The Orion Context Broker is an implementation of the Publish/Subscribe Context B
 * Being notified when changes on context information take place (e.g. the temperature has changed) or with a given frequency (e.g. get the temperature each minute).
 * Query context information. The Orion Context Broker stores context information updated from applications, so queries are resolved based on that information.
 
+## Editors
 
-* <b>Multi service tenancy</b>  
+  + Fermín Galán, Telefónica I+D.
+
+## Copyright
+
+This specification is licensed under the
+[FIWARE Open Specification License]
+(http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_%28essential_patents_license%29).
+
+## Status
+
+Final version aligned with FIWARE Release 4.
+
+## Multi service tenancy
 
 Fiware-Service and Fiware-ServicePath are set at entity creation time using HTTP headers in the entity creation REST request.
 
@@ -41,7 +38,7 @@ The Orion Context Broker implements a simple multitenant/multiservice model base
 Multitenant/multiservice ensures that the entities/attributes/subscriptions of one service/tenant are "invisible" to other services/tentants. For example, queryContext on tenantA space will never return entities/attributes from tenantB space.
    
    
-* <b>Entity service paths</b>   
+## Entity service paths
    
 Orion Context Broker supports hierarchical scopes, so entities can be assigned to a scope at creation time with updateContext (or related convenience operation). Then, queryContext (and related convenience operations)can be also scoped to locate entities in the corresponding scopes.
 
@@ -117,7 +114,7 @@ The entity Car has been created with the specific attribute speed.
 
 # Context management using NGSI10 
 
-### Tutorial on NGSI10 convenience operations   
+### NGSI10 convenience operations
 
 This section describes the different convenience operations described as part of the FI-WARE NGSI REST API NGSI10 that Orion Context Broker supports, showing examples of requests and responses. 
 Convenience operations are a set of operations that have been defined by FI-WARE project to ease the usage of NGSI implementations as a complement to the standard operations defined in the OMA NGSI specification. 
@@ -135,7 +132,7 @@ At the end, you will have the basic knowledge to create applications (both conte
 + /v1/contextSubscriptions
 + /v1/contextSubscriptions/{subscriptionID}
 
-### Tutorial on NGSI10 standard operations 
+### NGSI10 standard operations
 
 This section describes the different standard NGSI10 operations that the Orion Context Broker supports, showing examples of requests and responses. We use the term "standard" as they are directly derived from the OMA NGSI specification, to distinguish them from the other family of operations ("convenience") which has been defined by the FI-WARE project to ease the usage of NGSI implementations
 
