@@ -211,9 +211,9 @@ attributeList, as in the following example:
 ``` 
  
 You can also use the following equivalent convenience operation:
-
+``` 
       curl localhost:1026/v1/contextEntities/E1 -s -S \ 
-	  --header 'Content-Type: application/json' \ 
+          --header 'Content-Type: application/json' \ 
           --header 'Accept: application/json' -X DELETE
-
+``` 
 

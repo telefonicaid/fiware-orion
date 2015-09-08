@@ -2976,6 +2976,7 @@ approaches.
 First of all, we register Room1 and Room2 with attributes temperature
 and pressure, using the following commands:
 
+``` 
 (curl localhost:1026/v1/registry/contextEntities/Room1/attributes/temperature -s -S \
     --header 'Content-Type: application/json' --header 'Accept: application/json' \
     -d @- | python -mjson.tool) << EOF
@@ -2984,7 +2985,8 @@ and pressure, using the following commands:
   "providingApplication" : "http://mysensors.com/Rooms"
 }
 EOF
-
+```
+```
 (curl localhost:1026/v1/registry/contextEntities/Room1/attributes/pressure -s -S \
     --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
     -d @- | python -mjson.tool) << EOF
@@ -2993,7 +2995,8 @@ EOF
   "providingApplication" : "http://mysensors.com/Rooms"
 }
 EOF
-
+```
+```
 (curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S \
     --header 'Content-Type: application/json' --header 'Accept: application/json' \
     -d @- | python -mjson.tool) << EOF
@@ -3002,7 +3005,8 @@ EOF
   "providingApplication" : "http://mysensors.com/Rooms"
 }
 EOF
-
+```
+```
 (curl localhost:1026/v1/registry/contextEntities/Room2/attributes/pressure -s -S \
     --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
     -d @- | python -mjson.tool) << EOF
@@ -3011,7 +3015,7 @@ EOF
   "providingApplication" : "http://mysensors.com/Rooms"
 }
 EOF
-
+```
   
 So, what's the difference compared to [standard registerContext
 operation](#register-context-operation)?

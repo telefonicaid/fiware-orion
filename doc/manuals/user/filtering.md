@@ -41,10 +41,11 @@ element:
 while filters in convenience operations are included as parameters in
 the URL:
 
+``` 
     curl localhost:1026/v1/contextEntities?filter=value -s -S 
-    --header 'Content-Type: application/json'  --header 'Accept: application/json' 
-    | python -mjson.tool
-
+        --header 'Content-Type: application/json'  --header 'Accept: application/json' 
+        | python -mjson.tool
+``` 
 Filters are cumulative. In other words, you can use several scopes in
 the same restriction (in the case of standard operations) or several URL
 argument separated by '&' in order to specify several filters. The
