@@ -228,6 +228,12 @@ extern void getOrionDatabases(std::vector<std::string>& dbs);
 
 /*****************************************************************************
 *
+* tenantFromDb -
+*/
+extern std::string tenantFromDb(std::string& database);
+
+/*****************************************************************************
+*
 * setEntitiesCollectionName -
 */
 extern void setEntitiesCollectionName(std::string name);

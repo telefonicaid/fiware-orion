@@ -295,6 +295,34 @@ extern void getOrionDatabases(std::vector<std::string>& dbs)
   }
 }
 
+/*****************************************************************************
+*
+* tenantFromDb -
+*
+* Given a database name as an argument (e.g. orion-myservice1) it returns the
+* corresponding tenant name as result (myservice1) or "" if the string doesn't
+* start with the database prefix
+*/
+std::string tenantFromDb(std::string& database)
+{
+  std::string r;
+  std::string prefix  = dbPrefix + "-";
+  if (strncmp(prefix.c_str(), database.c_str(), strlen(prefix.c_str())) == 0)
+  {
+    char tenant[MAX_SERVICE_NAME_LEN];
+    strcpy(tenant, prefix.c_str() + strlen(prefix.c_str()));
+    r = std::string(tenant);
+  }
+  else
+  {
+    r = "";
+  }
+
+  LM_T(LmtMongo, ("DB -> tenant: <%s> -> <%s>", database.c_str(), r.c_str()));
+  return r;
+
+}
+
 
 /*****************************************************************************
 *
@@ -2832,12 +2860,13 @@ std::string dbDotDecode(std::string s)
 *
 * Lookup all subscriptions in the database and call a treat function for each
 */
-void subscriptionsTreat(std::string tenant, MongoTreatFunction treatFunction)
+void subscriptionsTreat(std::string database, MongoTreatFunction treatFunction)
 {
   BSONObj                   query;
   DBClientBase*             connection = getMongoConnection();
   auto_ptr<DBClientCursor>  cursor;
 
+  std::string tenant = tenantFromDb(database);
   try
   {
     cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
