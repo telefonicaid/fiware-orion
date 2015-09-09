@@ -44,7 +44,8 @@ with the *registrationId* set:
     ],
     "duration": "P1M",
     "registrationId": "51bf1e0ada053170df590f20"
-}EOF
+}
+EOF
 ```
 This "update registration" replaces the existing registration associated
 to that ID with the new content, including [expiration

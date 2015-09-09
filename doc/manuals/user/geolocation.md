@@ -40,7 +40,8 @@ example, the following updateContext request creates the entity "Madrid"
         }
     ],
     "updateAction": "APPEND"
-} EOF
+} 
+EOF
 ``` 
 
 Additional comments:
@@ -143,7 +144,8 @@ query would be A and B.
             }
         ]
     }
-}EOF
+}
+EOF
 ``` 
 
 Let's consider a query whose scope is the internal area to the rectangle
@@ -193,7 +195,8 @@ The result of the query would be B and C.
             }
         ]
     }
-}EOF
+}
+EOF
 ```
 
 However, if we consider the query to the external area to that
@@ -242,7 +245,8 @@ to "true".
             }
         ]
     }
-}EOF
+}
+EOF
 ```
 
 Let's consider a query whose scope is the internal area to the triangle
@@ -288,7 +292,8 @@ The result of the query would be A.
             }
         ]
     }
-}EOF
+}
+EOF
 ```
 
 However, if we consider the query to the external area to that triangle
@@ -332,7 +337,8 @@ would be B and C.
             }
         ]
     }
-}EOF
+}
+EOF
 ```
 
 Now, in order to illustrate circle areas, let's consider the following
@@ -382,7 +388,8 @@ center), centerLongitude (the longitude of the circle center) and radius
             }
         ]
     }
-}EOF
+}
+EOF
 ```
 
 Let's consider a query whose scope is inside a radius of 15 km (15000
@@ -417,7 +424,8 @@ The result of the query would be Madrid, Leganes and Alcobendas.
             }
         ]
     }
-}EOF
+}
+EOF
 ```
 Let's consider a query whose scope is outside a radius of 13.5 km (13500
 meters) centred in Madrid.
@@ -453,5 +461,6 @@ be Alcobendas.
             }
         ]
     }
-}EOF
+}
+EOF
 ```

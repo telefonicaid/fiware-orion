@@ -54,7 +54,8 @@ The following command creates an entity with the attributes "city_location" and 
             "value": "23.8"
         }
     ]
-}EOF
+}
+EOF
 ``` 
 
 In order to check that the entity is there, you can query it the same way you queried the public sensors:
@@ -72,7 +73,8 @@ And you can, of course, modify the values for the attributes, e.g. to modify the
    --header "X-Auth-Token: $AUTH_TOKEN" -d @- | python -mjson.tool) <<EOF
 {
     "value": "18.4"
-}EOF
+}
+EOF
 ```
 
 If you re-run the query command above, you will see that the temperature has changed to 18.4 ºC.

@@ -57,7 +57,8 @@ Let's illustrate this with an example.
         }
     ],
     "duration": "P1M"
-}EOF
+}
+EOF
 ```
       
       
@@ -80,7 +81,8 @@ Let's illustrate this with an example.
     "attributes": [
         "temperature"
     ]
-}EOF
+}
+EOF
 ``` 
 
 

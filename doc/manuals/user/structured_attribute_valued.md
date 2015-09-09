@@ -63,7 +63,8 @@ initial entity or attribute creation with APPEND).
         }
     ],
     "updateAction": "UPDATE"
-}EOF
+}
+EOF
 ``` 
 
 The value of the attribute is stored internally by Orion Context Broker

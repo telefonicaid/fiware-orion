@@ -302,7 +302,6 @@ respectively.
 (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
-{
     "contextElements": [
         {
             "type": "Room",
@@ -323,7 +322,8 @@ respectively.
         }
     ],
     "updateAction": "APPEND"
-} EOF
+} 
+EOF
 ```
 
 The updateContext request payload contains a list of contextElement
@@ -408,7 +408,8 @@ temperature and pressure to 21 ºC and 711 mmHg respectively).
         }
     ],
     "updateAction": "APPEND"
-}EOF
+}
+EOF
 ```
 
 The response to this request is:
@@ -470,7 +471,8 @@ this case, e.g. to get context information for Room1:
             "id": "Room1"
         }
     ]
-} EOF
+} 
+EOF
 ```
 
 The response includes all the attributes belonging to Room1 and we can
@@ -523,7 +525,8 @@ If you use an empty attributes element in the request, the response will include
     "attributes": [
         "temperature"
     ]
-} EOF
+} 
+EOF
 ```
 
 which response is as follows:
@@ -577,7 +580,8 @@ case, you have to set isPattern to "true" as shown below:
     "attributes": [
         "temperature"
     ]
-} EOF
+} 
+EOF
 ```
 ```
 (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
@@ -593,7 +597,8 @@ case, you have to set isPattern to "true" as shown below:
     "attributes": [
         "temperature"
     ]
-} EOF
+} 
+EOF
 ```
   
 
@@ -656,7 +661,8 @@ non-existing entity or attribute, as shown in the following cases below:
             "id": "Room5"
         }
     ]
-} EOF
+} 
+EOF
 ```
 ```
 (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
@@ -672,7 +678,8 @@ non-existing entity or attribute, as shown in the following cases below:
     "attributes": [
         "humidity"
     ]
-} EOF
+} 
+EOF
 ```
 
 Both requests will produce the same error response:
@@ -755,8 +762,9 @@ given moment wants to set the temperature and pressure of Room1 to 26.5
             ]
         }
     ],
-"updateAction": "UPDATE"
-} EOF
+    "updateAction": "UPDATE"
+} 
+EOF
 ```
 
 As you can see, the structure of the request is exactly the same we used
@@ -837,7 +845,8 @@ attributes maintain their current value).
         }
     ],
     "updateAction": "UPDATE"
-} EOF
+} 
+EOF
 ```
 ```
 (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
@@ -858,7 +867,8 @@ attributes maintain their current value).
         }
     ],
     "updateAction": "UPDATE"
-} EOF 
+} 
+EOF 
 ```
   
 The responses for these requests are respectively:
@@ -1114,7 +1124,8 @@ step) command:
             ]
         }
     ]
-} EOF
+} 
+EOF
 ```
 
 The response is very similar to the one for subscribeContext request:
@@ -1142,7 +1153,8 @@ step):
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-} EOF
+} 
+EOF
 ```
 The response is just an acknowledgement of that the cancellation was
 successful.
@@ -1196,7 +1208,8 @@ consider the following example:
         }
     ],
     "throttling": "PT5S"
-}EOF
+}
+EOF
 ```
 
 Having a look at the payload we can check that it is very similar to the
@@ -1383,7 +1396,8 @@ its initial values)
             "value": "720"
         }
     ]
-} EOF
+} 
+EOF
 ```
 
 the response is:
@@ -1478,7 +1492,8 @@ section](append_and_delete.md#adding-and-removing-attributes-with-append-and-del
     -X POST -d @- | python -mjson.tool) <<EOF
 {
     "value" : "21"
-} EOF
+} 
+EOF
 ```
 
 Compared to [entity creation based on standard
@@ -1518,7 +1533,8 @@ is independent of that fields, as shown below:
             "value": "720"
         }
     ]
-} EOF
+}
+EOF
 ```
 
 Apart from simple values (i.e. strings) for attribute values, you can
@@ -1634,7 +1650,8 @@ types using convenience operations):
         }
     ],
     "updateAction": "APPEND"
-} EOF
+} 
+EOF
 ```
 ```
 (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
@@ -1660,7 +1677,8 @@ types using convenience operations):
         }
     ],
     "updateAction": "APPEND"
-} EOF
+}
+EOF
 ```
 
 Request to get all the attributes:
@@ -1953,7 +1971,8 @@ Let's set the Room1 temperature and pressure values:
             "value": "763"
         }
     ]
-}EOF
+}
+EOF
 ``` 
 
 the response is:
@@ -2002,7 +2021,8 @@ Now, let's do the same with Room2:
             "value": "755"
         }
     ]
-} EOF
+} 
+EOF
 ``` 
  
 which response is:
@@ -2040,7 +2060,8 @@ You can update a single attribute of a given entity in the following way:
     -X PUT -d @- | python -mjson.tool) <<EOF
 {
     "value": "26.3"
-} EOF
+} 
+EOF
 ``` 
 
 Comparing to [standard updateContext
@@ -2162,7 +2183,8 @@ use the following NGSI9 registerContext operation:
         }
     ],
     "duration": "P1M"
-}EOF
+}
+EOF
 ``` 
 
 The payload includes a list of contextRegistration elements, each one
@@ -2246,7 +2268,8 @@ registrations for Room1 using:
             "id": "Room1"
         }
     ]
-} EOF
+} 
+EOF
 ``` 
 
 This would produce the following response:
@@ -2301,7 +2324,8 @@ precise, we can include the name of an attribute to search for:
     "attributes": [
         "temperature"
     ]
-}EOF
+}
+EOF
 ``` 
 
 which produces the following response:
@@ -2350,7 +2374,8 @@ a response telling so. Thus, the following request:
     "attributes": [
         "humidity"
     ]
-}EOF
+}
+EOF
 ``` 
 
 would produce the following response:
@@ -2387,7 +2412,8 @@ in both Room1 and Room2:
     "attributes": [
         "temperature"
     ]
-}EOF
+}
+EOF
 ``` 
 
 which will produce the following response:
@@ -2443,7 +2469,8 @@ case, you have to set isPattern to "true" as shown below:
     "attributes": [
         "temperature"
     ]
-}EOF
+}
+EOF
 ``` 
 
 This will produce the exact same response as the previous example.
@@ -2506,7 +2533,8 @@ subscribeContextAvailability request:
     ],
     "reference": "http://localhost:1028/accumulate",
     "duration": "P1M"
-}EOF
+}
+EOF
 ``` 
 
 
@@ -2660,7 +2688,8 @@ temperature and pressure:
         }
     ],
     "duration": "P1M"
-}EOF
+}
+EOF
 ``` 
 As expected, the accumulator-server.py will be notified of the new
 registration. Again, although Room3 registration includes temperature
@@ -2728,7 +2757,8 @@ subscription only includes temperature in attributeList).
         }
     ],
     "duration": "P1M"
-} EOF
+} 
+EOF
 ``` 
 
 You can now check that no new notification arrives to
@@ -2758,7 +2788,8 @@ subscribeContextAvailability response in the previous step).
     ],
     "duration": "P1M",
     "subscriptionId": "52a745e011f5816465943d59"
-}EOF                                                                                                                                                           EOF
+}
+EOF                                                                                                                                                           EOF
 ```
 The response is very similar to the one for subscribeContextAvailability
 request:
@@ -2798,7 +2829,8 @@ an attribute named speed and Car2 with an attribute named location.
         }
     ],
     "duration": "P1M"
-}EOF
+}
+EOF
 ```
 
 ```
@@ -2913,7 +2945,8 @@ subscribeContextAvailability response in the previous step).
     -d @- | python -mjson.tool) <<EOF
 {
     "subscriptionId": "52a745e011f5816465943d59"
-}EOF
+}
+EOF
 ```
  
 The response is just an acknowledgement that the cancellation was
@@ -3307,7 +3340,8 @@ entities with types using convenience operations):
         }
     ],
     "duration": "P1M"
-}EOF
+}
+EOF
 ``` 
 ``` 
 (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ 
@@ -3333,7 +3367,8 @@ entities with types using convenience operations):
         }
     ],
     "duration": "P1M"
-} EOF
+} 
+EOF
 ```
 
 Request without specifying attributes:

@@ -38,7 +38,8 @@ associate metadata "accuracy" to "temperature":
         }
     ],
     "updateAction": "APPEND"
-}EOF 
+}
+EOF 
 ``` 
   
 Metadata can be updated regardless of the attribute value being updated
@@ -71,7 +72,8 @@ to 0.9 although the value of the temperature iself is still 26.5:
         }
     ],
     "updateAction": "UPDATE"
-}EOF
+}
+EOF
 ``` 
       
 Metadata can be added after attribute creation. For example, if we want
@@ -104,7 +106,8 @@ to add metadata "average" to "temperature" (in addition to the existing
         }
     ],
     "updateAction": "UPDATE"
-}EOF
+}
+EOF
 ```
 We can check that temperature includes both attributes
 
@@ -212,7 +215,8 @@ First, we create the Room1 entity:
         }
     ],
     "updateAction": "APPEND"
-}EOF
+}
+EOF
 ``` 
 
 Now, we can query for temperature to get both instances:
@@ -231,7 +235,8 @@ Now, we can query for temperature to get both instances:
     "attributes": [
         "temperature"
     ]
-}EOF
+}
+EOF
 ``` 
 
 We can update an specific instance (e.g. ground), letting the other
@@ -263,7 +268,8 @@ untouched:
         }
     ],
     "updateAction": "UPDATE"
-}EOF
+}
+EOF
 ``` 
 
 Check it using again queryContext (ground has changed to 30ºC but wall
@@ -303,7 +309,8 @@ ID. The following entity creation will fail:
         }
     ],
     "updateAction": "APPEND"
-}EOF
+}
+EOF
 ``` 
 ```
 {

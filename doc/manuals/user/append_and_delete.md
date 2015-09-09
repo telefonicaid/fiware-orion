@@ -33,7 +33,8 @@ updateContext APPEND with an entityId matching 'E1':
         }
     ],
     "updateAction": "APPEND"
-} EOF
+} 
+EOF
 ``` 
 Now we can check with a query to that entity that both attributes A and
 B are there:
@@ -64,6 +65,7 @@ B are there:
         "reasonPhrase": "OK"
     }
 }
+EOF
 ``` 
 
 
@@ -96,7 +98,8 @@ contextValue element):
         }
     ],
     "updateAction": "DELETE"
-} EOF
+} 
+EOF
 ```
 
 Now, a query to the entity shows attribute B:
@@ -122,6 +125,7 @@ Now, a query to the entity shows attribute B:
         "reasonPhrase": "OK"
     }
 }
+EOF
 ```
         
   
@@ -146,7 +150,8 @@ Add a new attribute 'C' and 'D':
             "value": "4"
         }
     ]
-} EOF
+} 
+EOF
 ```
 
 Remove attribute 'B':
@@ -183,6 +188,7 @@ Query entity (should see 'C' and 'D', but not 'B'):
         "reasonPhrase": "OK"
     }
 }
+EOF
 ``` 
 
 # Deleting entities
@@ -207,7 +213,8 @@ attributeList, as in the following example:
         }
     ],
     "updateAction": "DELETE"
-} EOF
+} 
+EOF
 ``` 
  
 You can also use the following equivalent convenience operation:
