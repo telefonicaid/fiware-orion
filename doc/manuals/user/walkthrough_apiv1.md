@@ -37,7 +37,7 @@
 	  * [Convenience operations for context availability subscriptions](#convenience-operations-for-context-availability-subscriptions)
 	  * [Summary of NGSI9 convenience operations URLs](#summary-of-ngsi9-convenience-operations-urls) 
 
-# Introduction
+## Introduction
 
 This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
