@@ -58,26 +58,27 @@ Orion (in this case "text/plain"). In this case, an HTTP response code
 
 ```
 curl localhost:1026/v1/contextEntities/foo -s -S --header 'Accept: text/plain' -v | xmllint --format -
-    * About to connect() to localhost port 1026 (#0)
-    *   Trying ::1... connected
-    * Connected to localhost (::1) port 1026 (#0)
-    > GET /v1/contextEntities/foo HTTP/1.1
-    > User-Agent: curl/7.19.7 (x86_64-redhat-linux-gnu) libcurl/7.19.7 NSS/3.13.1.0 zlib/1.2.3 libidn/1.18 libssh2/1.2.2
-    > Host: localhost:1026
-    > Accept: text/plain
-    >
-    < HTTP/1.1 406 Not Acceptable
-    < Content-Length: 196
-    < Content-Type: application/xml
-    < Date: Mon, 31 Mar 2014 10:16:16 GMT
-    <
-    { [data not shown]
-    * Connection #0 to host localhost left intact
-    * Closing connection #0
-    <?xml version="1.0"?>
-    <orionError>
-      <code>406</code>
-      <reasonPhrase>Not Acceptable</reasonPhrase>
-      <details>acceptable types: 'application/xml' but Accept header in request was: 'text/plain'</details>
-    </orionError>
+
+  * About to connect() to localhost port 1026 (#0)
+  * Trying ::1... connected
+  * Connected to localhost (::1) port 1026 (#0)
+  GET /v1/contextEntities/foo HTTP/1.1
+  User-Agent: curl/7.19.7 (x86_64-redhat-linux-gnu) libcurl/7.19.7 NSS/3.13.1.0 zlib/1.2.3 libidn/1.18 libssh2/1.2.2
+  Host: localhost:1026
+  Accept: text/plain
+
+  HTTP/1.1 406 Not Acceptable
+  Content-Length: 196
+  Content-Type: application/xml
+  Date: Mon, 31 Mar 2014 10:16:16 GMT
+
+  { [data not shown]
+  * Connection #0 to host localhost left intact
+  * Closing connection #0
+  <?xml version="1.0"?>
+   <orionError>
+    <code>406</code>
+     <reasonPhrase>Not Acceptable</reasonPhrase>
+    <details>acceptable types: 'application/xml' but Accept header in request was: 'text/plain'</details>
+   </orionError>
 ```
