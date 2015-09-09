@@ -1,13 +1,13 @@
 #<a name="top"></a>Filtering results
 
 * [Introduction](#introduction)
-    * [Existence type filter](#existence-type-filter)
-    * [No-Existence type filter](#no-existence-type-filter)
-    * [Entity type filter](#entity-type-filter)
-    * [Geo-location filter](#geo-location-filter)
-    * [String query filter](#string-filter)
+* [Existence type filter](#existence-type-filter)
+* [No-Existence type filter](#no-existence-type-filter)
+* [Entity type filter](#entity-type-filter)
+* [Geo-location filter](#geo-location-filter)
+* [String query filter](#string-filter)
     
-# Introduction
+## Introduction
 
 Orion Context Broker implements several filters
 that can be used to filter the results in NGSI10 query operations. These

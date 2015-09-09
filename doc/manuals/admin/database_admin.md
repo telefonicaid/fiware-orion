@@ -1,19 +1,18 @@
 #<a name="top"></a>Database administration 
 
 * [Introduction](#introduction)
-    * [Backup](#backup)
-    * [Restore](#restore)
-    * [Database authorization](#database-authorization)
-    * [Multiservice/multitenant database separation](#multiservicemultitenant-database-separation)
-    * [Delete complete database](#delete-complete-database)
-    * [Setting indexes](#setting-indexes)
-	  * [Analysis](#analysis)
-    * [Database management scripts](#database-management-scripts)
-	  * [Deleting expired documents](#deleting-expired-documents)
-	  * [Latest updated document](#latest-updated-document)
+* [Backup](#backup)
+* [Restore](#restore)
+* [Database authorization](#database-authorization)
+* [Multiservice/multitenant database separation](#multiservicemultitenant-database-separation)
+* [Delete complete database](#delete-complete-database)
+* [Setting indexes](#setting-indexes)
+    * [Analysis](#analysis)
+* [Database management scripts](#database-management-scripts)
+    * [Deleting expired documents](#deleting-expired-documents)
+    * [Latest updated document](#latest-updated-document)
 	  
-	  
-# Introduction 
+## Introduction
 
 We assume that the system administrator has knowledge of MongoDB (there
 are very good and free courses at [MongoDB education
