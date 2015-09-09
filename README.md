@@ -266,37 +266,39 @@ If broker is not running you will get:
 
 In order to create an entity (Room1) with two attributes (temperature and pressure):
 
-    (curl <orion_host>:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' \ 
-        --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
-    {
-      "attributes" : [
-    {
-      "name" : "temperature",
-      "type" : "float",
-      "value" : "23"
-    },
-    {
-      "name" : "pressure",
-      "type" : "integer",
-      "value" : "720"
-    }
-      ]
-    }
-    EOF
-
+``` 
+(curl <orion_host>:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+{
+    "attributes": [
+        {
+            "name": "temperature",
+            "type": "float",
+            "value": "23"
+        },
+        {
+            "name": "pressure",
+            "type": "integer",
+            "value": "720"
+        }
+    ]
+}
+EOF
+``` 
 In order to query the entity:
 
     curl <orion_host>:1026/v1/contextEntities/Room1 -s -S --header 'Accept: application/json' | python -mjson.tool
 
 In order to update one of the entity atributes (temperature):
-
-    (curl <orion_host>:1026/v1/contextEntities/Room2/attributes/temperature -s -S \ 
-        --header 'Content-Type: application/json' --header 'Accept: application/json' \  
-        -X PUT -d @- | python -mjson.tool) <<EOF
-    {
-       "value" : "26.3"
-    }
-    EOF
+``` 
+(curl <orion_host>:1026/v1/contextEntities/Room2/attributes/temperature -s -S \ 
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \  
+    -X PUT -d @- | python -mjson.tool) <<EOF
+{
+    "value": "26.3"
+}
+EOF
+``` 
 
 Please have a look at the [Quick Start guide](doc/manuals/quick_start_guide.md) if you want to test these operations in an actual public instance of Orion Context Broker. In addition, have a look to the API Walkthrough and API Reference sections below in order to know more details about the API (subscriptions, registrations, etc.).
 

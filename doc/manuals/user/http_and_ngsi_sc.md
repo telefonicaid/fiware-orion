@@ -12,7 +12,8 @@ independence, let's consider a queryContext operation on a non-existing
 entity (e.g. "foo"). Note the -v flag in the curl command, in order to
 print the HTTP response codes and headers:
 
-    # curl localhost:1026/v1/contextEntities/foo -s -S --header 'Content-Type: application/xml' \ -v | xmllint --format -
+```
+curl localhost:1026/v1/contextEntities/foo -s -S --header 'Content-Type: application/xml'  -v | xmllint --format -
     * About to connect() to localhost port 1026 (#0)
     *   Trying ::1... connected
     * Connected to localhost (::1) port 1026 (#0)
@@ -43,7 +44,7 @@ print the HTTP response codes and headers:
         <details>Entity id: 'foo'</details>
       </statusCode>
     </contextElementResponse>
-
+```
 Note that in this case the NGSI response code is "404 No context element
 found" while the HTTP is "200 OK". Thus, in other words, the
 communication at HTTP level was ok, although an error condition (the
@@ -55,7 +56,8 @@ client attempting to get the response in a MIME type not supported by
 Orion (in this case "text/plain"). In this case, an HTTP response code
 "406 Not Acceptable" is generated.
 
-    # curl localhost:1026/v1/contextEntities/foo -s -S --header 'Accept: text/plain' -v | xmllint --format -
+```
+curl localhost:1026/v1/contextEntities/foo -s -S --header 'Accept: text/plain' -v | xmllint --format -
     * About to connect() to localhost port 1026 (#0)
     *   Trying ::1... connected
     * Connected to localhost (::1) port 1026 (#0)
@@ -78,3 +80,4 @@ Orion (in this case "text/plain"). In this case, an HTTP response code
       <reasonPhrase>Not Acceptable</reasonPhrase>
       <details>acceptable types: 'application/xml' but Accept header in request was: 'text/plain'</details>
     </orionError>
+```

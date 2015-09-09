@@ -11,17 +11,17 @@ First of all, you need an account in FIWARE Lab, so register for one in [the fol
 
 Let's assume that the authentication token you got is in the AUTH_TOKEN shell variable. Now, let's start querying some real-time information from the city sensors of Santander (in particular, a sound level meter):
 ``` 
-    # curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/urn:smartsantander:testbed:357 \
-        -X GET -s -S --header 'Content-Type: application/json'  --header 'Accept: application/json' \ 
-        --header  "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
+curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/urn:smartsantander:testbed:357 \
+   -X GET -s -S --header 'Content-Type: application/json'  --header 'Accept: application/json' \ 
+   --header  "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
 ``` 
 You will get a JSON document including the time of the last measure (TimeInstant), sound level (sound), sensor battery charge (batteryCharge) and sensor location (Latitud and Longitud... sorry for the Spanish in these last ones ;) for the sensor identified by "urn:smartsantander:testbed:357".
 
 Let's query another sensor, this time one related to road traffic:
 ``` 
-    # curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/urn:smartsantander:testbed:3332 \
-         -X GET -s -S  --header 'Content-Type: application/json' --header 'Accept: application/json' \
-         --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
+curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/urn:smartsantander:testbed:3332 \
+   -X GET -s -S  --header 'Content-Type: application/json' --header 'Accept: application/json' \
+   --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool
 ``` 
 The data you find in the returned JSON about the "urn:smartsantander:testbed:3332" sensor is:
 
@@ -61,9 +61,9 @@ EOF
 In order to check that the entity is there, you can query it the same way you queried the public sensors:
 
 ``` 
-    # (curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID -X GET -s -S \
-         --header 'Content-Type: application/json' --header 'Accept: application/json'\ 
-         --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool)
+(curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID -X GET -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json'\ 
+    --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool)
 ``` 
 And you can, of course, modify the values for the attributes, e.g. to modify the temperature:
 
@@ -79,4 +79,4 @@ EOF
 
 If you re-run the query command above, you will see that the temperature has changed to 18.4 ºC.
 
-This concludes this small introduction to Orion Context Broker. If you want to know more about this FIWARE enabler (including the API details, how to deploy your own private instances, how to subscribe/receive notifications, geo-localization queries, how to use XML instead of JSON and much more), please go to the [documentation home](http://github.com/telefonicaid/fiware-orion). 
+This concludes this small introduction to Orion Context Broker. If you want to know more about this FIWARE enabler (including the API details, how to deploy your own private instances, how to subscribe/receive notifications, geo-localization queries and much more), please go to the [documentation home](http://github.com/telefonicaid/fiware-orion). 
