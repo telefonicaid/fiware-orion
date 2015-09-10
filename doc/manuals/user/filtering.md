@@ -116,9 +116,6 @@ There is no scope corresponding to this filter, given that you can use
 the usual entity type:
 
 ```
---------------------------------------------------------------------------------------
-  JSON
---------------------------------------------------------------------------------------
 ...
     {
         "type": "Room",
@@ -126,7 +123,6 @@ the usual entity type:
         "id": "..."
     }
 ...
---------------------------------------------------------------------------------------
 ```
 The URL parameter corresponding to this filter is 'entity::type'.
 
