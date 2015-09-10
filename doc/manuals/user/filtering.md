@@ -85,16 +85,16 @@ The scope corresponding to this type is "FIWARE::Filter::Not::Existence".
 
 ... 
 ```
-    {
-	"restriction": {
-	    "scopes": [
-		{
-		    "type": "FIWARE::Filter::Not::Existence",
-		    "value": "entity::type"
-		}
-	    ]
-	}
+{
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Filter::Not::Existence",
+                "value": "entity::type"
+            }
+        ]
     }
+}
 ```
 ...
 
@@ -121,11 +121,11 @@ the usual entity type:
 --------------------------------------------------------------------------------------
 ...
 ```
-    {
-	"type": "Room",
-	"isPattern": "...",
-	"id": "..."
-    }
+{
+    "type": "Room",
+    "isPattern": "...",
+    "id": "..."
+}
 ```
 ...
 --------------------------------------------------------------------------------------
@@ -152,16 +152,16 @@ The scope corresponding to this type is "FIWARE::StringFilter".
 
 ...
 ```
-    {
-	"restriction": {
-	    "scopes": [
-		{
-		    "type": "FIWARE::StringFilter",
-		    "value": "temperature<24;humidity==75..90;status=running"
-		}
-	    ]
-	}
+{
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::StringFilter",
+                "value": "temperature<24;humidity==75..90;status=running"
+            }
+        ]
     }
+}
 ```
 ...
 

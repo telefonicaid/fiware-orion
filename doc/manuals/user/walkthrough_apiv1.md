@@ -1553,9 +1553,10 @@ Finally, let's describe convenience operations for querying context
 information. We can query all the attribute values of a given entity,
 e.g. Room1 attributes:
 
-      curl localhost:1026/v1/contextEntities/Room1 -s -S 
-          --header 'Accept: application/json' | python -mjson.tool
-
+```
+curl localhost:1026/v1/contextEntities/Room1 -s -S 
+    --header 'Accept: application/json' | python -mjson.tool
+```
 which response is:
 ```
 {
@@ -3164,75 +3165,81 @@ example.
 Let's register the "Funny" entity type (note that we are not specifying
 any entity ID):
 
-    (curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \
-        --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
-    <?xml version="1.0"?>
-    <registerProviderRequest>
-       <duration>P1M</duration>
-       <providingApplication>http://mysensors.com/Funny</providingApplication>
-    </registerProviderRequest>
-    EOF
-
+```
+(curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \
+    --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
+<?xml version="1.0"?>
+<registerProviderRequest>
+  <duration>P1M</duration>
+      <providingApplication>http://mysensors.com/Funny</providingApplication>
+</registerProviderRequest>
+EOF
+```
 Now, let's discover on that type:
 
-    curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \
-        --header 'Content-Type: application/xml' | xmllint --format -
+```
+curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \
+    --header 'Content-Type: application/xml' | xmllint --format -
 
-    <discoverContextAvailabilityResponse>
-      <contextRegistrationResponseList>
-        <contextRegistrationResponse>
-          <contextRegistration>
-            <entityIdList>
-              <entityId type="Funny" isPattern="false">
-                <id/>
-              </entityId>
-            </entityIdList>
-            <providingApplication>http://mysensors.com/Funny</providingApplication>
-          </contextRegistration>
-        </contextRegistrationResponse>
-      </contextRegistrationResponseList>
-    </discoverContextAvailabilityResponse>
+<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="Funny" isPattern="false">
+            <id/>
+          </entityId>
+        </entityIdList>
+        <providingApplication>http://mysensors.com/Funny</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+```
 
 As you can see, the ID element is empty (it makes sense, as we didn't
 specify any ID at registration).
 
 Moreover, you can register attributes in these registrations, e.g:
 
-    (curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny/attributes/ATT -s -S \
-        --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
-
-    <?xml version="1.0"?>
-    <registerProviderRequest>
-       <duration>P1M</duration>
-       <providingApplication>http://mysensors.com/Funny</providingApplication>
-    </registerProviderRequest>
-    EOF
-
-    curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny -s -S \
-       --header 'Content-Type: application/xml' | xmllint --format -
-
-    <?xml version="1.0"?>
-    <discoverContextAvailabilityResponse>
-      <contextRegistrationResponseList>
-        <contextRegistrationResponse>
-          <contextRegistration>
-            <entityIdList>
-              <entityId type="MoreFunny" isPattern="false">
-                <id/>
-              </entityId>
-            </entityIdList>
-            <contextRegistrationAttributeList>
-              <contextRegistrationAttribute>
-                <name>ATT</name>
-                <type/>
-                <isDomain>false</isDomain>
-              </contextRegistrationAttribute>
-            </contextRegistrationAttributeList>
-            <providingApplication>http://mysensors.com/Funny</providingApplication>
-          </contextRegistration>
-        </contextRegistrationResponse>
-      </contextRegistrationResponseList>
-    </discoverContextAvailabilityResponse>
+```
+(curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny/attributes/ATT -s -S \
+    --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
+<?xml version="1.0"?>
+<registerProviderRequest>
+   <duration>P1M</duration>
+   <providingApplication>http://mysensors.com/Funny</providingApplication>
+</registerProviderRequest>
+EOF
+```
+```
+curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny -s -S \
+    --header 'Content-Type: application/xml' | xmllint --format -
+```
+```
+<?xml version="1.0"?>
+<discoverContextAvailabilityResponse>
+  <contextRegistrationResponseList>
+    <contextRegistrationResponse>
+      <contextRegistration>
+        <entityIdList>
+          <entityId type="MoreFunny" isPattern="false">
+            <id/>
+          </entityId>
+        </entityIdList>
+        <contextRegistrationAttributeList>
+          <contextRegistrationAttribute>
+            <name>ATT</name>
+            <type/>
+            <isDomain>false</isDomain>
+          </contextRegistrationAttribute>
+        </contextRegistrationAttributeList>
+        <providingApplication>http://mysensors.com/Funny</providingApplication>
+      </contextRegistration>
+    </contextRegistrationResponse>
+  </contextRegistrationResponseList>
+</discoverContextAvailabilityResponse>
+```
 
 [Top](#top)
 
