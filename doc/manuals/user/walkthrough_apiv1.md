@@ -563,7 +563,7 @@ case, you have to set isPattern to "true" as shown below:
 
 ```
 (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
---header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
         {
@@ -2969,9 +2969,9 @@ Content-Type: application/json
         }
     ]
 }
-
 ```
 
+```
 POST http://localhost:1028/accumulate
 Content-Length: 535
 User-Agent: orion/0.9.0
