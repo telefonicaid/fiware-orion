@@ -1,12 +1,12 @@
 #<a name="top"></a>Data model
 
 * [Introduction](#introduction)
-    * [entities collection](#entities-collection)
-    * [registrations collection](#registrations-collection)
-    * [csubs collection](#csubs-collection)
-    * [casubs collection](#casubs-collection)
+* [entities collection](#entities-collection)
+* [registrations collection](#registrations-collection)
+* [csubs collection](#csubs-collection)
+* [casubs collection](#casubs-collection)
 
-# Introduction
+## Introduction
 
 Normally you don't need to access MongoDB directly as Orion Contex
 Broker uses it transparently. However, for some operations (e.g. backup,

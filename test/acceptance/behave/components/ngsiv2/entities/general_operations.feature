@@ -22,6 +22,10 @@
 #
 # author: 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
+#
+#  Note: the "skip" tag is to skip the scenarios that still are not developed or failed
+#        -tg=-skip
+#
 
 Feature: general operations in NGSI v1 and v2 requests
   As a context broker user

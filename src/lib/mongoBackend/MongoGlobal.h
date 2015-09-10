@@ -223,8 +223,17 @@ extern void setDbPrefix(std::string dbPrefix);
 * Note that the DB belonging to the default service is not included in the
 * returned list
 *
+* Function return value is false in the case of problems accessing database,
+* true otherwise.
+*
 */
-extern void getOrionDatabases(std::vector<std::string>& dbs);
+extern bool getOrionDatabases(std::vector<std::string>& dbs);
+
+/*****************************************************************************
+*
+* tenantFromDb -
+*/
+extern std::string tenantFromDb(std::string& database);
 
 /*****************************************************************************
 *

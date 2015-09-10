@@ -16,6 +16,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 - If you are going to use a virtual environment (optional):
   * Create a virtual environment somewhere, e.g. in ~/venv (virtualenv ~/venv) (optional)
   * Activate the virtual environment (source ~/venv/bin/activate) (optional)
+  * Remember to unset the virtual environment when you're done testing, if it has been previously activated (deactivate) (optional)
 - Both if you are using a virtual environment or not:
   * Change to the test/acceptance/behave folder of the project.
   * Install the requirements for the acceptance tests in the virtual environment
@@ -118,12 +119,34 @@ Feature: feature name...
     Check: verify if the service is installed successfully
 ```
 
-### Tests Suites Coverage:
+### Tests Suites Coverage (features):
 
- - entities
-    * base
-    * create_entities
-    * list_entities (pending)
+  - entities
+    * general_operations - 16 testcases
+    * create_entities - 535 testcases
+    * list_all_entities - 200 testcases
+    * list_an_entity_by_id - 209 testcases
+    * list_an_attribute_by_id - 198 testcases
+    * update_append_attribute_by_id (pending)
+    * update_only_by_id (pending)
+    * replace_attributes_by_id (pending)
+    * remove_entity (pending)
+
+ -  alarms (pending)
+
+
+### Hints:
+  - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).
+  - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.
+  - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
+      The number after "=" is the number of chars
+        ex: | attr_name | random=10 |
+  - If entities number is "1", the entity id is without consecutive, ex: `entity_id=room`
+    Else entities number is major than "1" the entities number are prefix plus consecutive, ex:
+        `entity_id=room_0, entity_id=room_1, ..., entity_id=room_N`
+  - If attribute number is "1", the attribute name is without consecutive, ex: `attributes_name=temperature`
+    Else attributes number is major than "1" the attributes name are prefix plus consecutive, ex:
+        `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
 
 
 ### Tags
@@ -133,6 +156,3 @@ You can to use multiples tags in each scenario, possibles tags used:
     - happy_path, skip, errors_40x, only_develop, ISSUE_XXX, BUG_XXX, etc
 
 and to filter scenarios by these tags: see Tests execution section.
-
-
-

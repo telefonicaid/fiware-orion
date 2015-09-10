@@ -1,12 +1,12 @@
 #<a name="top"></a>Logs
 
 * [Introduction](#introduction)
-    * [Log file](#log-file)
-    * [Log format](#log-format)
-    * [Error and warning types](#error-and-warning-types)
-    * [Log rotation](#log-rotation)
+* [Log file](#log-file)
+* [Log format](#log-format)
+* [Error and warning types](#error-and-warning-types)
+* [Log rotation](#log-rotation)
 
-# Introduction
+## Introduction
 
 The log system has been re-worked in deep in release 0.14.1. This
 section describes its main characteristics.

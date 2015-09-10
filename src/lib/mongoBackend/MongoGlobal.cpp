@@ -270,29 +270,78 @@ extern void setDbPrefix(std::string _dbPrefix)
 *
 * getOrionDatabases -
 */
-extern void getOrionDatabases(std::vector<std::string>& dbs)
+extern bool getOrionDatabases(std::vector<std::string>& dbs)
 {
   BSONObj       result;
   DBClientBase* connection = getMongoConnection();
 
-  connection->runCommand("admin", BSON("listDatabases" << 1), result);
-  releaseMongoConnection(connection);
-
-  std::vector<BSONElement> databases = result.getField("databases").Array();
-
-  for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
+  try
   {
-    BSONObj      db      = (*i).Obj();
-    std::string  dbName  = STR_FIELD(db, "name");
-    std::string  prefix  = dbPrefix + "-";
+    connection->runCommand("admin", BSON("listDatabases" << 1), result);
+    releaseMongoConnection(connection);
 
-    if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
+    LM_I(("Database Operation Successful (listDatabases command)"));
+
+    std::vector<BSONElement> databases = result.getField("databases").Array();
+
+    for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
     {
-      LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
-      dbs.push_back(dbName);
-      LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      BSONObj      db      = (*i).Obj();
+      std::string  dbName  = STR_FIELD(db, "name");
+      std::string  prefix  = dbPrefix + "-";
+
+      if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
+      {
+        LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+        dbs.push_back(dbName);
+        LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      }
     }
+
+    return true;
+
   }
+  catch (const DBException &e)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error (%s)", e.what()));
+    return false;
+  }
+  catch (...)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error (generic exception)"));
+    return false;
+  }
+
+}
+
+/*****************************************************************************
+*
+* tenantFromDb -
+*
+* Given a database name as an argument (e.g. orion-myservice1) it returns the
+* corresponding tenant name as result (myservice1) or "" if the string doesn't
+* start with the database prefix
+*/
+std::string tenantFromDb(std::string& database)
+{
+  std::string r;
+  std::string prefix  = dbPrefix + "-";
+  if (strncmp(prefix.c_str(), database.c_str(), strlen(prefix.c_str())) == 0)
+  {
+    char tenant[MAX_SERVICE_NAME_LEN];
+    strcpy(tenant, prefix.c_str() + strlen(prefix.c_str()));
+    r = std::string(tenant);
+  }
+  else
+  {
+    r = "";
+  }
+
+  LM_T(LmtMongo, ("DB -> tenant: <%s> -> <%s>", database.c_str(), r.c_str()));
+  return r;
+
 }
 
 
@@ -2837,12 +2886,13 @@ std::string dbDotDecode(std::string s)
 *
 * Lookup all subscriptions in the database and call a treat function for each
 */
-void subscriptionsTreat(std::string tenant, MongoTreatFunction treatFunction)
+void subscriptionsTreat(std::string database, MongoTreatFunction treatFunction)
 {
   BSONObj                   query;
   DBClientBase*             connection = getMongoConnection();
   auto_ptr<DBClientCursor>  cursor;
 
+  std::string tenant = tenantFromDb(database);
   try
   {
     cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);

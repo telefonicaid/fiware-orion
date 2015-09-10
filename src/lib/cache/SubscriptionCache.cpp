@@ -80,7 +80,7 @@ void subCacheMutexWaitingTimeGet(char* buf, int bufLen)
 */
 SubscriptionCache::SubscriptionCache()
 {
-  tenant = "";
+  dbPrefix = "";
 }
 
 
@@ -89,9 +89,9 @@ SubscriptionCache::SubscriptionCache()
 *
 * SubscriptionCache::SubscriptionCache - 
 */
-SubscriptionCache::SubscriptionCache(std::string _tenant)
+SubscriptionCache::SubscriptionCache(std::string _dbPrefix)
 {
-  tenant = _tenant;
+  dbPrefix = _dbPrefix;
 }
 
 
@@ -246,18 +246,18 @@ void SubscriptionCache::init(void)
 */
 void SubscriptionCache::fillFromDb(void)
 {
-  std::vector<std::string> tenantV;
+  std::vector<std::string> databases;
 
-  getOrionDatabases(tenantV);
+  getOrionDatabases(databases);
 
   //
   // Add the 'default tenant'
   //
-  tenantV.push_back(tenant);
+  databases.push_back(dbPrefix);
 
-  for (unsigned int ix = 0; ix < tenantV.size(); ++ix)
+  for (unsigned int ix = 0; ix < databases.size(); ++ix)
   {
-    subscriptionsTreat(tenantV[ix], subToCache);
+    subscriptionsTreat(databases[ix], subToCache);
   }
 }
 

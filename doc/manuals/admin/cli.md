@@ -12,15 +12,14 @@ Orion Context Broker listens, using the -port option:
 
     contextBroker -port 5057
 
-To know all the possible options, have a look at the [command line
-options](#Command_line_options "wikilink") section.
+To know all the possible options, have a look at the next section.
 
 ## Command line options
 
-Command line options can be used directly (in the case of running [from
-the command line](#From_the_command_line "wikilink")) or indirectly
+Command line options can be used directly (in the case of running from
+the command line) or indirectly
 through the different fields in /etc/sysconfig/contextBroker (in the
-case of running [as a system service](../../../README.md#as-system-service) )
+case of running [as a system service](running.md)).
 To obtain a list of available options, use:
 
     contextBroker -u

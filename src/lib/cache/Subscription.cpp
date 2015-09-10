@@ -269,7 +269,7 @@ bool Subscription::match
   const std::string&  attributeName
 )
 {
-  if (composeDatabaseName(_tenant) != composeDatabaseName(tenant))
+  if (_tenant != tenant)
   {
     return false;
   }
