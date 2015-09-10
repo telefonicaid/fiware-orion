@@ -14,32 +14,35 @@ entity) defines the location, the "location" metadata is used. For
 example, the following updateContext request creates the entity "Madrid"
 (of type "City") with attribute "position" defined as location.
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "City",
-		  "isPattern": "false",
-		  "id": "Madrid",
-		  "attributes": [
-		      {
-			  "name": "position",
-			  "type": "coords",
-			  "value": "40.418889, -3.691944",
-			  "metadatas": [
-			      {
-				  "name": "location",
-				  "type": "string",
-				  "value": "WGS84"
-			      }
-			  ]
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "APPEND"
-      }
-      EOF                                                                                                                      
+``` 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "City",
+            "isPattern": "false",
+            "id": "Madrid",
+            "attributes": [
+                {
+                    "name": "position",
+                    "type": "coords",
+                    "value": "40.418889, -3.691944",
+                    "metadatas": [
+                        {
+                            "name": "location",
+                            "type": "string",
+                            "value": "WGS84"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+} 
+EOF
+``` 
 
 Additional comments:
 
@@ -101,46 +104,49 @@ elements, each one containing a couple of elements (latitude and
 longitude) that provide the coordinates of the vertex. The result of the
 query would be A and B.
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Point",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Location",
-		      "value": {
-			  "polygon": {
-			      "vertices": [
-				  {
-				      "latitude": "0",
-				      "longitude": "0"
-				  },
-				  {
-				      "latitude": "0",
-				      "longitude": "6"
-				  },
-				  {
-				      "latitude": "6",
-				      "longitude": "6"
-				  },
-				  {
-				      "latitude": "6",
-				      "longitude": "0"
-				  }
-			      ]
-			  }
-		      }
-		  }
-	      ]
-	  }
-      }
-	  EOF                                                                                                         
+``` 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Point",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Location",
+                "value": {
+                    "polygon": {
+                        "vertices": [
+                            {
+                                "latitude": "0",
+                                "longitude": "0"
+                            },
+                            {
+                                "latitude": "0",
+                                "longitude": "6"
+                            },
+                            {
+                                "latitude": "6",
+                                "longitude": "6"
+                            },
+                            {
+                                "latitude": "6",
+                                "longitude": "0"
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}
+EOF
+``` 
 
 Let's consider a query whose scope is the internal area to the rectangle
 defined by coordinates (3, 3), (3, 8), (11, 8) and (11, 3).
@@ -149,94 +155,99 @@ defined by coordinates (3, 3), (3, 8), (11, 8) and (11, 3).
 
 The result of the query would be B and C.
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Point",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Location",
-		      "value": {
-			  "polygon": {
-			      "vertices": [
-				  {
-				      "latitude": "3",
-				      "longitude": "3"
-				  },
-				  {
-				      "latitude": "3",
-				      "longitude": "8"
-				  },
-				  {
-				      "latitude": "11",
-				      "longitude": "8"
-				  },
-				  {
-				      "latitude": "11",
-				      "longitude": "3"
-				  }
-			      ]
-			  }
-		      }
-		  }
-	      ]
-	  }
-      }
-      EOF
-                                                                                                                 
+```
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Point",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Location",
+                "value": {
+                    "polygon": {
+                        "vertices": [
+                            {
+                                "latitude": "3",
+                                "longitude": "3"
+                            },
+                            {
+                                "latitude": "3",
+                                "longitude": "8"
+                            },
+                            {
+                                "latitude": "11",
+                                "longitude": "8"
+                            },
+                            {
+                                "latitude": "11",
+                                "longitude": "3"
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}
+EOF
+```
 
 However, if we consider the query to the external area to that
 rectangle, the result of the query would be A. To specify that we refer
 to the area external to the polygon we include the inverted element set
 to "true".
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Point",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Location",
-		      "value": {
-			  "polygon": {
-			      "vertices": [
-				  {
-				      "latitude": "3",
-				      "longitude": "3"
-				  },
-				  {
-				      "latitude": "3",
-				      "longitude": "8"
-				  },
-				  {
-				      "latitude": "11",
-				      "longitude": "8"
-				  },
-				  {
-				      "latitude": "11",
-				      "longitude": "3"
-				  }
-			      ],
-			      "inverted": "true"
-			  }
-		      }
-		  }
-	      ]
-	  }
-      }
-      EOF                                                                                                            
+```
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Point",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Location",
+                "value": {
+                    "polygon": {
+                        "vertices": [
+                            {
+                                "latitude": "3",
+                                "longitude": "3"
+                            },
+                            {
+                                "latitude": "3",
+                                "longitude": "8"
+                            },
+                            {
+                                "latitude": "11",
+                                "longitude": "8"
+                            },
+                            {
+                                "latitude": "11",
+                                "longitude": "3"
+                            }
+                        ],
+                        "inverted": "true"
+                    }
+                }
+            }
+        ]
+    }
+}
+EOF
+```
 
 Let's consider a query whose scope is the internal area to the triangle
 defined by coordinates (0, 0), (0, 6) and (6, 0).
@@ -245,86 +256,90 @@ defined by coordinates (0, 0), (0, 6) and (6, 0).
 
 The result of the query would be A.
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Point",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Location",
-		      "value": {
-			  "polygon": {
-			      "vertices": [
-				  {
-				      "latitude": "0",
-				      "longitude": "0"
-				  },
-				  {
-				      "latitude": "0",
-				      "longitude": "6"
-				  },
-				  {
-				      "latitude": "6",
-				      "longitude": "0"
-				  }
-			      ]
-			  }
-		      }
-		  }
-	      ]
-	  }
-      }
-      EOF
-                                                                                                                     
+```
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Point",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Location",
+                "value": {
+                    "polygon": {
+                        "vertices": [
+                            {
+                                "latitude": "0",
+                                "longitude": "0"
+                            },
+                            {
+                                "latitude": "0",
+                                "longitude": "6"
+                            },
+                            {
+                                "latitude": "6",
+                                "longitude": "0"
+                            }
+                        ]
+                    }
+                }
+            }
+        ]
+    }
+}
+EOF
+```
 
 However, if we consider the query to the external area to that triangle
 (using the inverted element set to "true"), the result of the query
 would be B and C.
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Point",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Location",
-		      "value": {
-			  "polygon": {
-			      "vertices": [
-				  {
-				      "latitude": "0",
-				      "longitude": "0"
-				  },
-				  {
-				      "latitude": "0",
-				      "longitude": "6"
-				  },
-				  {
-				      "latitude": "6",
-				      "longitude": "0"
-				  }
-			      ],
-			      "inverted": "true"
-			  }
-		      }
-		  }
-	      ]
-	  }
-      }
-      EOF
-                                                                                                                    
+```
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Point",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Location",
+                "value": {
+                    "polygon": {
+                        "vertices": [
+                            {
+                                "latitude": "0",
+                                "longitude": "0"
+                            },
+                            {
+                                "latitude": "0",
+                                "longitude": "6"
+                            },
+                            {
+                                "latitude": "6",
+                                "longitude": "0"
+                            }
+                        ],
+                        "inverted": "true"
+                    }
+                }
+            }
+        ]
+    }
+}
+EOF
+```
 
 Now, in order to illustrate circle areas, let's consider the following
 scenario: three entities (representing the cities of Madrid, Alcobendas
@@ -348,31 +363,34 @@ include a three elements: centerLatitude (the latitude of the circle
 center), centerLongitude (the longitude of the circle center) and radius
 (in meters). The result of the query would be Madrid and Leganes.
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "City",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Location",
-		      "value": {
-			  "circle": {
-			      "centerLatitude": "40.418889",
-			      "centerLongitude": "-3.691944",
-			      "radius": "13500"
-			  }
-		      }
-		  }
-	      ]
-	  }
-      }
-      EOF                                                                                                                                                                                                                                     
+```
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "City",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Location",
+                "value": {
+                    "circle": {
+                        "centerLatitude": "40.418889",
+                        "centerLongitude": "-3.691944",
+                        "radius": "13500"
+                    }
+                }
+            }
+        ]
+    }
+}
+EOF
+```
 
 Let's consider a query whose scope is inside a radius of 15 km (15000
 meters) centred in Madrid.
@@ -381,31 +399,34 @@ meters) centred in Madrid.
 
 The result of the query would be Madrid, Leganes and Alcobendas.
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "City",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Location",
-		      "value": {
-			  "circle": {
-			      "centerLatitude": "40.418889",
-			      "centerLongitude": "-3.691944",
-			      "radius": "15000"
-			  }
-		      }
-		  }
-	      ]
-	  }
-      }
-      EOF
+```
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "City",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Location",
+                "value": {
+                    "circle": {
+                        "centerLatitude": "40.418889",
+                        "centerLongitude": "-3.691944",
+                        "radius": "15000"
+                    }
+                }
+            }
+        ]
+    }
+}
+EOF
+```
 Let's consider a query whose scope is outside a radius of 13.5 km (13500
 meters) centred in Madrid.
 
@@ -414,29 +435,32 @@ meters) centred in Madrid.
 We use the inverted element set to "true". The result of the query would
 be Alcobendas.
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "City",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Location",
-		      "value": {
-			  "circle": {
-			      "centerLatitude": "40.418889",
-			      "centerLongitude": "-3.691944",
-			      "radius": "13500",
-			      "inverted": "true"
-			  }
-		      }
-		  }
-	      ]
-	  }
-      }
-      EOF                                                                                                                   
+```
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "City",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Location",
+                "value": {
+                    "circle": {
+                        "centerLatitude": "40.418889",
+                        "centerLongitude": "-3.691944",
+                        "radius": "13500",
+                        "inverted": "true"
+                    }
+                }
+            }
+        ]
+    }
+}
+EOF
+```

@@ -7,9 +7,9 @@ source of the context information for the entities/attributes included
 in that registration. We call that source the "Context Provider" (or
 CPr, for short).
 
-     ...                                                                           
+     ...
      "providingApplication" : "http://mysensors.com/Rooms"
-     ...                                                                           
+     ...
   
 If Orion receives a query or update operation (either in the standard or
 in the convenience family) and it cannot find the targeted context
@@ -33,31 +33,33 @@ Let's illustrate this with an example.
       its API on <http://sensor48.mycity.com/ngsi10>
       
 <!-- -->
-      (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextRegistrations": [
-	      {
-		  "entities": [
-		      {
-			  "type": "Street",
-			  "isPattern": "false",
-			  "id": "Street4"
-		      }
-		  ],
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "isDomain": "false"
-		      }
-		  ],
-		  "providingApplication": "http://sensor48.mycity.com/v1"
-	      }
-	  ],
-	  "duration": "P1M"
-      }
-      EOF
-      
+```
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextRegistrations": [
+        {
+            "entities": [
+                {
+                    "type": "Street",
+                    "isPattern": "false",
+                    "id": "Street4"
+                }
+            ],
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "isDomain": "false"
+                }
+            ],
+            "providingApplication": "http://sensor48.mycity.com/v1"
+        }
+    ],
+    "duration": "P1M"
+}
+EOF
+```
       
       
 -     Next, consider that a client queries the Street4 temperature
@@ -65,21 +67,23 @@ Let's illustrate this with an example.
 
       
 <!-- -->
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Street",
-		  "isPattern": "false",
-		  "id": "Street4"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ]
-      }
-      EOF
-
+``` 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Street",
+            "isPattern": "false",
+            "id": "Street4"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ]
+}
+EOF
+``` 
 
 
 -     Orion doesn't know the Street 4 temperature, but it knows (due to
@@ -92,48 +96,50 @@ Let's illustrate this with an example.
 
 
 <!-- -->
-      {
-	  "entities": [
-	      {
-		  "type": "Street",
-		  "isPattern": "false",
-		  "id": "Street4"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ]
-      }
-
+``` 
+{
+    "entities": [
+        {
+            "type": "Street",
+            "isPattern": "false",
+            "id": "Street4"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ]
+}
+``` 
 
 
 -     The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
       with the data (message number 4).
 
 <!-- -->
-      {
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": "16"
-			  }
-		      ],
-		      "id": "Street4",
-		      "isPattern": "false",
-		      "type": "Street"
-		      },
-		  "statusCode": {
-		      "code": "200",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }
-
+``` 
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "16"
+                    }
+                ],
+                "id": "Street4",
+                "isPattern": "false",
+                "type": "Street"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+``` 
 
 -     Orion fordwars the response to the client (message number 5). Note
       that the response is not exactly the same, as it includes a
@@ -144,29 +150,31 @@ Let's illustrate this with an example.
       Street4 temperature.
  
 <!-- --> 
-      {
-	  "contextResponses": [
-	      {
-		  "contextElement": {
-		      "attributes": [
-			  {
-			      "name": "temperature",
-			      "type": "float",
-			      "value": "16"
-			  }
-		      ],
-		      "id": "Street4",
-		      "isPattern": "false",
-		      "type": "Street"
-		  },
-		  "statusCode": {
-		      "code": "200",
-		      "details": "Redirected to context provider http://sensor48.mycity.com/ngsi10",
-		      "reasonPhrase": "OK"
-		  }
-	      }
-	  ]
-      }
+``` 
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "16"
+                    }
+                ],
+                "id": "Street4",
+                "isPattern": "false",
+                "type": "Street"
+            },
+            "statusCode": {
+                "code": "200",
+                "details": "Redirected to context provider http://sensor48.mycity.com/ngsi10",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+``` 
   
 The Context Providers and request forwarding functionality was developed
 in release 0.15.0. Previous version

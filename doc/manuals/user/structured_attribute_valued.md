@@ -17,53 +17,55 @@ the value of attribute "A" to a vector and the value of attribute B to a
 key-map object (we use UPDATE as actionType, but this can be used at
 initial entity or attribute creation with APPEND).
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "T1",
-		  "isPattern": "false",
-		  "id": "E1",
-		  "attributes": [
-		      {
-			  "name": "A",
-			  "type": "T",
-			  "value": [
-			      "22",
-			      {
-				  "x": [
-				      "x1",
-				      "x2"
-				  ],
-				  "y": "3"
-			      },
-			      [
-				  "z1",
-				  "z2"
-			      ]
-			  ]
-		      },
-		      {
-			  "name": "B",
-			  "type": "T",
-			  "value": {
-			      "x": {
-				  "x1": "a",
-				  "x2": "b"
-			      },
-			      "y": [
-				  "y1",
-				  "y2"
-			      ]
-			  }
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "UPDATE"
-      }
-      EOF
-
+``` 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "T1",
+            "isPattern": "false",
+            "id": "E1",
+            "attributes": [
+                {
+                    "name": "A",
+                    "type": "T",
+                    "value": [
+                        "22",
+                        {
+                            "x": [
+                                "x1",
+                                "x2"
+                            ],
+                            "y": "3"
+                        },
+                        [
+                            "z1",
+                            "z2"
+                        ]
+                    ]
+                },
+                {
+                    "name": "B",
+                    "type": "T",
+                    "value": {
+                        "x": {
+                            "x1": "a",
+                            "x2": "b"
+                        },
+                        "y": [
+                            "y1",
+                            "y2"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+EOF
+``` 
 
 The value of the attribute is stored internally by Orion Context Broker
 in a format-independent representation. 
