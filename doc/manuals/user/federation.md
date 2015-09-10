@@ -33,123 +33,135 @@ Next, let's send a subscribeContext to A (to make B subscribe to updates
 made in A). Note that the URL used in the reference has to be
 "/v1/notifyContext":
 
-    (curl localhost:1030/v1/subscribeContext -s -S --header 'Content-Type: application/xml' \ 
-       -d @- | xmllint --format -) <<EOF
-    <?xml version="1.0"?>
-    <subscribeContextRequest>
-      <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>Room1</id>
-        </entityId>
-      </entityIdList>
-      <reference>http://localhost:1031/v1/notifyContext</reference>
-      <duration>P1M</duration>
-      <notifyConditions>
-        <notifyCondition>
-          <type>ONCHANGE</type>
-          <condValueList>
-            <condValue>temperature</condValue>
-          </condValueList>
-        </notifyCondition>
-      </notifyConditions>
-      <throttling>PT5S</throttling>
-    </subscribeContextRequest>
-    EOF
+```
+(curl localhost:1030/v1/subscribeContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "reference": "http://localhost:1031/v1/notifyContext",
+    "duration": "P1M",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "temperature"
+            ]
+        }
+    ],
+    "throttling": "PT5S"
+}
+EOF
+```
 
 Next, let's send a subscribeContext to B (to make C subscribe to updates
 made in B). The subscription is basically the same, only the port in the
 curl line and reference elements are different.
+
 ```
-(curl localhost:1031/v1/subscribeContext -s -S --header 'Content-Type: application/xml' \ 
-    -d @- | xmllint --format -) <<EOF
-    <?xml version="1.0"?>
-    <subscribeContextRequest>
-      <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>Room1</id>
-        </entityId>
-      </entityIdList>
-      <reference>http://localhost:1032/v1/notifyContext</reference>
-      <duration>P1M</duration>
-      <notifyConditions>
-        <notifyCondition>
-          <type>ONCHANGE</type>
-          <condValueList>
-            <condValue>temperature</condValue>
-          </condValueList>
-        </notifyCondition>
-      </notifyConditions>
-      <throttling>PT5S</throttling>
-    </subscribeContextRequest>
-    EOF
+(curl localhost:1031/v1/subscribeContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "reference": "http://localhost:1032/v1/notifyContext",
+    "duration": "P1M",
+    "notifyConditions": [
+        {
+            "type": "ONCHANGE",
+            "condValues": [
+                "temperature"
+            ]
+        }
+    ],
+    "throttling": "PT5S"
+}
+EOF
 ```
+
 Now, let's create an entity in context broker A.
+
 ```
-(curl localhost:1030/v1/updateContext -s -S --header 'Content-Type: application/xml' \ 
-    -d @- | xmllint --format - ) <<EOF
-    <?xml version="1.0" encoding="UTF-8"?>
-    <updateContextRequest>
-      <contextElementList>
-        <contextElement>
-          <entityId type="Room" isPattern="false">
-            <id>Room1</id>
-          </entityId>
-          <contextAttributeList>
-            <contextAttribute>
-              <name>temperature</name>
-              <type>float</type>
-              <contextValue>23</contextValue>
-            </contextAttribute>
-          </contextAttributeList>
-        </contextElement>
-      </contextElementList>
-      <updateAction>APPEND</updateAction>
-    </updateContextRequest>
-    EOF
+(curl localhost:1030/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "23"
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}
+EOF
 ```
+
 Given the subscriptions in place, a notifyContextRequest is
 automatically sent from A to B. That event at B causes in sequence a
 notifyContextRequest to be sent to C. So, at the end, the creation of an
 entity in A causes the creation of the same entity (with the same
 attribute values) in C. You can check it by doing a queryContext to C:
-```
-(curl localhost:1032/v1/queryContext -s -S --header 'Content-Type: application/xml' \ 
-    -d @- | xmllint --format -) <<EOF
-    <?xml version="1.0" encoding="UTF-8"?>
-    <queryContextRequest>
-      <entityIdList>
-        <entityId type="Room" isPattern="false">
-          <id>Room1</id>
-        </entityId>
-      </entityIdList>
-      <attributeList/>
-    </queryContextRequest>
-    EOF
 
-    <?xml version="1.0"?>
-    <queryContextResponse>
-      <contextResponseList>
-        <contextElementResponse>
-          <contextElement>
-            <entityId type="Room" isPattern="false">
-              <id>Room1</id>
-            </entityId>
-            <contextAttributeList>
-              <contextAttribute>
-                <name>temperature</name>
-                <type>float</type>
-                <contextValue>23</contextValue>
-              </contextAttribute>
-            </contextAttributeList>
-          </contextElement>
-          <statusCode>
-            <code>200</code>
-            <reasonPhrase>OK</reasonPhrase>
-          </statusCode>
-        </contextElementResponse>
-      </contextResponseList>
-    </queryContextResponse>
 ```
+(curl localhost:1032/v1/queryContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ]
+}
+EOF
+```
+
+which response is:
+
+```
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "temperature",
+                        "type": "float",
+                        "value": "23"
+                    }
+                ],
+                "id": "Room1",
+                "isPattern": "false",
+                "type": "Room"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+```
+
 In the current context broker version, the semantics of
 nofityContextRequest are the same that [updateContext
 APPEND  or, if the context element already

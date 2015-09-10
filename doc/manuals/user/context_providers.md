@@ -32,7 +32,6 @@ Let's illustrate this with an example.
       Street4 temperature. Let's assume that the Context Provider exposes
       its API on <http://sensor48.mycity.com/ngsi10>
       
-<!-- -->
 ```
 (curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ 
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
@@ -66,7 +65,6 @@ EOF
       (message number 2).
 
       
-<!-- -->
 ``` 
 (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
@@ -95,7 +93,6 @@ EOF
       "/queryContext" operation).
 
 
-<!-- -->
 ``` 
 {
     "entities": [
@@ -115,7 +112,6 @@ EOF
 -     The Context Provider at <http://sensor48.mycity.com/ngsi10> responds
       with the data (message number 4).
 
-<!-- -->
 ``` 
 {
     "contextResponses": [
@@ -149,7 +145,6 @@ EOF
       (or ignore) that information. Orion doesn't store the
       Street4 temperature.
  
-<!-- --> 
 ``` 
 {
     "contextResponses": [

@@ -15,12 +15,8 @@ allow pagination. The mechanism is based on three URI parameters:
     discoverContextAvailability respectively) (default is 20, maximun
     allowed is 1000).
 
-<!-- -->
-
 -   **offset**, in order to skip a given number of elements at the
     beginning (default is 0)
-
-<!-- -->
 
 -   **details** (allowed values are “on” and “off”, default is “off”),
     in order to get a global errorCode for the response including a
@@ -48,11 +44,11 @@ included, for the sake of completeness).
     which allows the client to know how many entities are in sum and, therefore, the number of 
     subsequence queries to do)
 
-      <errorCode>
-        <code>200</code>
-        <reasonPhrase>OK</reasonPhrase>
-        <details>Count: 322</details>
-      </errorCode>
+      "errorCode": {
+        "code": "200",
+        "reasonPhrase": "OK",
+        "details": "Count: 322"
+      }
 
     POST <orion_host>:1026/v1/queryContext?offset=100&limit=100
     ...
@@ -69,12 +65,14 @@ included, for the sake of completeness).
 Note that if the request uses an “out of bound” offset you will get a
 404 NGSI error, as shown below:
 
-    POST <orion_host>:1026/v1/queryContext?offset=1000&limit=100
-    ...
-    <queryContextResponse>
-      <errorCode>
-        <code>404</code>
-        <reasonPhrase>No context element found</reasonPhrase>
-        <details>Number of matching entities: 5. Offset is 1000</details>
-      </errorCode>
-    </queryContextResponse>
+```
+POST <orion_host>:1026/v1/queryContext?offset=1000&limit=100
+...
+{
+    "errorCode": {
+        "code": "404",
+        "reasonPhrase": "No context element found",
+        "details": "Number of matching entities: 5. Offset is 1000"
+    }
+}
+```

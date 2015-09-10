@@ -50,16 +50,12 @@ Some additional remarks:
         query Fiware-ServicePath header (no more than 1 scope path in
         update Fiware-ServicePath header)
 
-<!-- -->
-
 -   Fiware-ServicePath is an optional header. It is assumed that all the
     entities created without Fiware-ServicePath (or that don't include
     service path information in the database) belongs to a root scope
     "/" implicitely. All the queries without using Fiware-ServicePath
     are on "/\#" implicitely. This behavior ensures backward
     compatibility to pre-0.14.0 versions.
-
-<!-- -->
 
 -   It is possible to have an entity with the same ID and type in
     different Scopes. E.g. we can create entity ID "Tree1" of type
@@ -71,16 +67,10 @@ Some additional remarks:
     queryContextResponse, making hard to distinguish to which scope
     belongs each one)
 
-<!-- -->
-
 -   Entities belongs to one (and only one) scope.
-
-<!-- -->
 
 -   Fiware-ServicePath
     header is included in NGSI10 notifyContext requests sent by Orion.
-
-<!-- -->
 
 -   The scopes entities can be combined orthogonally with the
     [multi-service/multi-tenant
