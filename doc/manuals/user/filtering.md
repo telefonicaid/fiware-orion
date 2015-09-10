@@ -83,8 +83,8 @@ existence is the entity type, corresponding to "entity::type".
 
 The scope corresponding to this type is "FIWARE::Filter::Not::Existence".
 
+... 
 ```
-...                                                                
     {
 	"restriction": {
 	    "scopes": [
@@ -95,8 +95,9 @@ The scope corresponding to this type is "FIWARE::Filter::Not::Existence".
 	    ]
 	}
     }
-...
 ```
+...
+
   
 The URL parameter corresponding to this filter is '!exist'.
 
@@ -114,16 +115,18 @@ that queries without type resolve to "any type", as explained in the
 
 There is no scope corresponding to this filter, given that you can use
 the usual entity type:
-```
+
 --------------------------------------------------------------------------------------
   JSON
 --------------------------------------------------------------------------------------
 ...
+```
     {
 	"type": "Room",
 	"isPattern": "...",
 	"id": "..."
     }
+```
 ...
 --------------------------------------------------------------------------------------
 ```
@@ -147,8 +150,8 @@ operation filter.
 
 The scope corresponding to this type is "FIWARE::StringFilter".
 
-```
 ...
+```
     {
 	"restriction": {
 	    "scopes": [
@@ -159,8 +162,9 @@ The scope corresponding to this type is "FIWARE::StringFilter".
 	    ]
 	}
     }
-...
 ```
+...
+
 
 This scope allows to express filtering conditions such as equality, unequality,
 greater/less than, range or existence.
