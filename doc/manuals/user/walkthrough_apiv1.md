@@ -1050,12 +1050,12 @@ If you look at the accumulator-script.py terminal window, you will see
 that a message resembling the following one is received each 10 seconds:
 
 ```
- POST http://localhost:1028/accumulate
- Content-Length: 492
- User-Agent: orion/0.9.0
- Host: localhost:1028
- Accept: application/xml, application/json
- Content-Type: application/json
+POST http://localhost:1028/accumulate
+Content-Length: 492
+User-Agent: orion/0.9.0
+Host: localhost:1028
+Accept: application/xml, application/json
+Content-Type: application/json
 
 {
     "subscriptionId": "51c04a21d714fb3b37d7d5a7",
@@ -1272,6 +1272,7 @@ User-Agent: orion/0.9.0
 Host: localhost:1028
 Accept: application/xml, application/json
 Content-Type: application/json
+
 {
     "subscriptionId": "51c0ac9ed714fb3b37d7d5a8",
     "originator": "localhost",
@@ -1381,8 +1382,8 @@ first create Room1 entity with temperature and pressure attributes (with
 its initial values)
 
 ```
-(curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' \
-    --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+(curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
+
 {
     "attributes": [
         {
@@ -1449,6 +1450,7 @@ Now, let's do the same with Room2:
         }
     ]
 }
+EOF
 ```
 
 which response is:
@@ -1583,8 +1585,10 @@ which response is:
 We can also query a single attribute of a given entity, e.g. Room2
 temperature:
 
-      curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S \
-         --header 'Accept: application/json' | python -mjson.tool
+```
+curl localhost:1026/v1/contextEntities/Room2/attributes/temperature -s -S \
+    --header 'Accept: application/json' | python -mjson.tool
+```
 
 which response is:
 
@@ -1683,15 +1687,72 @@ EOF
 
 Request to get all the attributes:
 
-      curl localhost:1026/v1/contextEntityTypes/Car -s -S \
-          --header 'Accept: application/json' | python -mjson.tool
+```
+curl localhost:1026/v1/contextEntityTypes/Car -s -S \
+    --header 'Accept: application/json' | python -mjson.tool
+```
 
 Response:
 
+```
+{
+    "contextResponses": [
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "speed",
+                        "type": "integer",
+                        "value": "75"
+                    },
+                    {
+                        "name": "fuel",
+                        "type": "float",
+                        "value": "12.5"
+                    }
+                ],
+                "id": "Car1",
+                "isPattern": "false",
+                "type": "Car"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        },
+        {
+            "contextElement": {
+                "attributes": [
+                    {
+                        "name": "speed",
+                        "type": "integer",
+                        "value": "90"
+                    },
+                    {
+                        "name": "fuel",
+                        "type": "float",
+                        "value": "25.7"
+                    }
+                ],
+                "id": "Car2",
+                "isPattern": "false",
+                "type": "Car"
+            },
+            "statusCode": {
+                "code": "200",
+                "reasonPhrase": "OK"
+            }
+        }
+    ]
+}
+```
+
 Request to get only one attribute (e.g. speed):
 
-      curl localhost:1026/v1/contextEntityTypes/Car/attributes/speed -s -S \ 
-          --header 'Accept: application/json' | python -mjson.tool
+```
+curl localhost:1026/v1/contextEntityTypes/Car/attributes/speed -s -S \
+    --header 'Accept: application/json' | python -mjson.tool
+```
 
 Response:
 
@@ -1885,7 +1946,11 @@ existing at Orion Context Broker in a given moment:
 ``` 
 curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/json' \ 
     --header 'Accept: application/json' | python -mjson.tool
+``` 
 
+The response will be:
+
+``` 
 {
     "statusCode": {
         "code": "200",
@@ -1929,6 +1994,11 @@ of a list of all its attributes):
 ``` 
 curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' \ 
     --header 'Accept: application/json' | python -mjson.tool
+``` 
+
+The response will be:
+
+``` 
 {
     "attributes": [
         "hummidity",
@@ -2235,11 +2305,12 @@ probably enough time to complete this tutorial :).
 
 We will get the following response :
 
-
-      {
-      "duration" : "P1M",
-        "registrationId" : "52a744b011f5816465943d58"
-      }
+``` 
+{
+    "duration": "P1M",
+    "registrationId": "52a744b011f5816465943d58"
+}
+``` 
 
 The registrationId (whose value will be different when you run the
 request, as it is generated using the timestamp of the current time :)
@@ -2580,11 +2651,12 @@ cancelling the subscription - write it down because you will need it in
 later steps of this tutorial) and a duration acknowledgement. Again,
 pretty similar to a subscribeContext.
 
-      {
-      "duration": "P1M",
-        "subscriptionId": "52a745e011f5816465943d59"
-      }
-             
+``` 
+{
+    "duration": "P1M",
+    "subscriptionId": "52a745e011f5816465943d59"
+}
+```             
 
 Looking at accumulator-server.py, we will see the following initial
 notification:
@@ -2857,7 +2929,8 @@ EOF
         }
     ],
     "duration": "P1M"
-}EOF
+}
+EOF
 ```
 As both registrations match the entityIdList and attributeList used in
 the updateContextAvailabilitySubscription, we will get a notification
@@ -2870,33 +2943,32 @@ User-Agent: orion/0.9.0
 Host: localhost:1028
 Accept: application/xml, application/json
 Content-Type: application/json
-```
-```
-      {
-	  "subscriptionId": "52a745e011f5816465943d59",
-	  "contextRegistrationResponses": [
-	      {
-		  "contextRegistration": {
-		      "entities": [
-			  {
-			      "type": "Car",
-			      "isPattern": "false",
-			      "id": "Car1"
-			  }
-		      ],
-		      "attributes": [
-			  {
-			      "name": "speed",
-			      "type": "integer",
-			      "isDomain": "false"
-			  }
-		      ],
-		      "providingApplication": "http://mysensors.com/Cars"
-		  }
-	      }
-	  ]
-      }
-```
+
+{
+    "subscriptionId": "52a745e011f5816465943d59",
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "type": "Car",
+                        "isPattern": "false",
+                        "id": "Car1"
+                    }
+                ],
+                "attributes": [
+                    {
+                        "name": "speed",
+                        "type": "integer",
+                        "isDomain": "false"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Cars"
+            }
+        }
+    ]
+}
+
 ```
 
 POST http://localhost:1028/accumulate
@@ -2905,8 +2977,7 @@ User-Agent: orion/0.9.0
 Host: localhost:1028
 Accept: application/xml, application/json
 Content-Type: application/json
-```
-```
+
 {
     "subscriptionId": "52a745e011f5816465943d59",
     "contextRegistrationResponses": [
@@ -3075,11 +3146,12 @@ The response to each of these requests is the same as the response to a
 standard registerContext (one response for each of the four requests,
 with a different ID):
 
-      {
-      "duration": "P1M",
-        "registrationId": "51c1f5c31612797e4fe6b6b6"
-      }
-                                
+```
+{
+    "duration": "P1M",
+    "registrationId": "51c1f5c31612797e4fe6b6b6"
+}
+```                               
 
 [Top](#top)
 
@@ -3170,8 +3242,10 @@ Using convenience operations you can discover registration information
 for a single entity or for an entity-attribute pair. For example, to
 discover registrations for Room1 (no matter the attributes):
 
-      curl localhost:1026/v1/registry/contextEntities/Room1 -s -S \ 
-          --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+```
+curl localhost:1026/v1/registry/contextEntities/Room1 -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+```
 
 which produces the following response:
 ```
@@ -3220,9 +3294,10 @@ which produces the following response:
 ```
 Now, let's discover registrations for Room2-temperature:
 
-     curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S \ 
-         --header 'Content-Type: application/json' --header 'Accept: application/json' \
-         | python -mjson.tool
+```
+curl localhost:1026/v1/registry/contextEntities/Room2/attributes/temperature -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+```
 
 The response is as follows:
 
@@ -3274,13 +3349,14 @@ The response is as follows:
 Discovery of not registered elements (e.g. Room5 or the humidity of
 Room1) will produce an error. E.g. the following requests:
 
-
-      curl localhost:1026/v1/registry/contextEntities/Room3 -s -S  --header 'Content-Type: application/json' \
-          --header 'Accept: application/json' | python -mjson.tool
-
-      curl localhost:1026/v1/registry/contextEntities/Room2/attributes/humidity -s -S \
-          --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
+```
+curl localhost:1026/v1/registry/contextEntities/Room3 -s -S  \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+```
+```
+curl localhost:1026/v1/registry/contextEntities/Room2/attributes/humidity -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+```
 will produce the following error response:
 
 ```
@@ -3373,9 +3449,10 @@ EOF
 
 Request without specifying attributes:
 
-     curl localhost:1026/v1/registry/contextEntityTypes/Car -s -S \
-         --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
+```
+curl localhost:1026/v1/registry/contextEntityTypes/Car -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+```
 Response:
 
 ``` 
@@ -3426,9 +3503,10 @@ Response:
 
 Request specifying one attribute (e.g. speed):
 
-     curl localhost:1026/v1/registry/contextEntityTypes/Car/attributes/speed -s -S \
-         --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
+```
+curl localhost:1026/v1/registry/contextEntityTypes/Car/attributes/speed -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
+```
 Response:
 
 ``` 

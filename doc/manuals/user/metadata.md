@@ -314,13 +314,15 @@ EOF
 ``` 
 
 ```
-{
-    "statusCode": {
-        "code": "472",
-        "details": "action: APPEND - entity: (Room1, Room) - offending attribute: temperature",
-        "reasonPhrase": "request parameter is invalid/not allowed"
+...
+    {
+	"statusCode": {
+	    "code": "472",
+	    "details": "action: APPEND - entity: (Room1, Room) - offending attribute: temperature",
+	    "reasonPhrase": "request parameter is invalid/not allowed"
+	}
     }
-}
+...
 ```
       
 Finally, you can use also the following convenience operations with
