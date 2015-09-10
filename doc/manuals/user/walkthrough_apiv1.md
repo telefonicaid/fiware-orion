@@ -2862,7 +2862,7 @@ subscribeContextAvailability response in the previous step).
     "duration": "P1M",
     "subscriptionId": "52a745e011f5816465943d59"
 }
-EOF                                                                                                                                                           EOF
+EOF                                                                                   
 ```
 The response is very similar to the one for subscribeContextAvailability
 request:
@@ -3506,7 +3506,6 @@ Response:
     ]
 }
 ``` 
-
 
 Request specifying one attribute (e.g. speed):
 
