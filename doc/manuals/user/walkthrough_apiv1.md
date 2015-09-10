@@ -3033,7 +3033,6 @@ successful.
     "subscriptionId": "52a745e011f5816465943d59"
 }
 ```
-  ---------------------------------------------------------------------------------------------------------------------------------
 
 After cancelling, you can try to register a new car (e.g. Car3) to check
 that no new notification is sent to accumulator-server.py.
