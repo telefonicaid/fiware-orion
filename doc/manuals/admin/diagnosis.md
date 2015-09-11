@@ -1,15 +1,11 @@
 #<a name="top"></a>Problem diagnosis procedures
 
-* [Introduction](#introduction)
-* [Sanity check procedures](#sanity-check-procedures)
-    * [Checking Orion is up and running](#checking-orion-is-up-and-running)
-    * [List of Running Processes](#list-of-running-processes)
-    * [Network interfaces Up & Open](#network-interfaces-up--open)
-    * [Database server](#database-server)
-* [Diagnose database connection problems](#diagnose-database-connection-problems)
-* [Diagnose spontaneous binary corruption problems**](#diagnose-spontaneous-binary-corruption-problems**)
-	  
-## Introduction
+* [Resource Availability](#resource-availability)
+* [Remote Service Access](#remote-service-access)
+* [Resource consumption](#resource-consumption)
+    * [Diagnose spontaneous binary corruption problems](#diagnose-spontaneous-binary-corruption-problems)
+* [I/O Flows](#io-flows)
+    * [Diagnose database connection problems](#diagnose-database-connection-problems)
 
 The Diagnosis Procedures are the first steps that a System Administrator
 will take to locate the source of an error in Orion. Once the nature of
@@ -20,92 +16,161 @@ out of the scope of this section.
 
 Please report any bug or problem with Orion Context Broker by [opening and issue in github.com](https://github.com/telefonicaid/fiware-orion/issues/new).
 
-## Sanity check procedures
+## Resource Availability
 
-The Sanity Check Procedures are the steps that a System Administrator
-will take to verify that an installation is ready to be tested. This is
-therefore a preliminary set of tests to ensure that obvious or basic
-malfunctioning is fixed before proceeding to unit tests, integration
-tests and user validation.
-
-[Top](#top)
-
-### Checking Orion is up and running
-
--   Start context broker in default port (1026)
--   Run the following command
-
-```
-curl --header 'Accept: application/json' localhost:1026/version
-```
-
--   Check that you get the version number as output (along with uptime
-    information and compilation environment information):
-
-```
-{
-  "orion" : {
-    "version" : "0.23.0-next",
-    "uptime" : "0 d, 0 h, 2 m, 30 s",
-    "git_hash" : "c49692a996fb8d23cb2e78992094e26b1ca45dac",
-    "compile_time" : "Tue Sep 8 16:56:16 CEST 2015",
-    "compiled_by" : "fermin",
-    "compiled_in" : "debvm"
-  }
-}
-```
+Although we haven't done yet a precise profiling on Orion Context
+Broker, tests done in our development and testing environment show that
+a host with 2 CPU cores and 4 GB RAM is fine to run the ContextBroker
+and MongoDB server. In fact, this is a rather conservative estimation,
+Orion Context Broker could run fine also in systems with a lower
+resources profile. The critical resource here is RAM memory, as MongoDB
+performance is related to the amount of available RAM to map database
+files into memory.
 
 [Top](#top)
 
-### List of Running Processes
+## Remote Service Access
 
-A process named "contextBroker" should be up and running, e.g.:
+Orion Context Broker can run "standalone", thus context consumer and context producers are
+connected directly to it through its NGSI interface. Thus, it is loosely coupled to other FIWARE GEs.
+However, considering its use in the FIWARE platform, below is a list of the GEs that typically can be
+connected to the broker:
+
+It typically connects to the IoT Broker GE and ConfMan GE (from IoT chapter GEs), other GEs within the
+Data Chapter (such as CEP or BigData) and GEs from the Apps chapter (such as Wirecloud). As an alternative,
+the IoT Broker GE and ConfMan GE could be omitted (if the things-to-device correlation is not needed)
+thus connecting Orion Context Broker directly to the Backend Device Management GE or to the DataHandling GE.
+
+![](Orion-ge-interaction.png "Orion-ge-interaction.png")
+
+[Top](#top)
+
+## Resource consumption
+
+The most usual problems that Orion Context Broker may have are related
+to abnormal consumption of memory due to leaks and disk exhaustion due
+to growing log files.
+
+Regarding abnormal consumption of memory, it can be detected by the the
+following symptoms:
+
+-   The broker crashes with a "Segmentation fault" error
+-   The broker doesn't crash but stops processing requests, i.e. new
+    requests "hang" as they never receive a response. Usually, the Orion
+    Context Broker has only a fix set of permanent connections in use as
+    shown below (several ones with the database server and notification receivers and the listening
+    TCP socket in 1026 or in the port specified by "-port") but in the
+    case of this problem each new request will appear as a new
+    connection in use in the list. The same information can be checked
+    using `ps axo pid,ppid,rss,vsz,nlwp,cmd` and looking to the number
+    of threads (nlwp column), as a new thread is created per request but
+    never released. In addition, you can check the broker log and see
+    that the processing of new requests stops in the access to the
+    MongoDB database (in fact, what is happening is that the MongoDB
+    driver is requesting more dynamic memory to the OS but it doesn't
+    get any and keeps waiting until some memory gets freed, which
+    never happens).
 
 ```
-$ ps ax | grep contextBroker
- 8517 ?        Ssl    8:58 /usr/bin/contextBroker -port 1026 -logDir /var/log/contextBroker -pidpath /var/log/contextBroker/contextBroker.pid -dbhost localhost -db orion
+$ sudo lsof -n -P -i TCP | grep contextBr
+contextBr 7100      orion    6u  IPv4 6749369      0t0  TCP 127.0.0.1:45350->127.0.0.1:27017 (ESTABLISHED)
+[As many connections to "->127.0.0.1:27017" as DB pool size, default value is 10]
+[As many connections as subscriptions using persistent connections for notifications]
+contextBr 7100      orion    7u  IPv4 6749373      0t0  TCP *:1026 (LISTEN)
+```
+
+-   The consumption of memory shown by "top" command for the
+    contextBroker process is abnormally high.
+
+The solution to this problem is restarting the contextBroker, e.g.
+`/etc/init.d/contextBroker restart`.
+
+Regarding disk exhaustion due to growing log files, it can be detected
+by the following symptoms:
+
+-   The disk is full, e.g. `df -h` shows that the space available is 0%
+-   The log file for the broker (usually found in the
+    directory /var/log/contextBroker) is very big
+
+The solutions for this problem are the following:
+
+-   Stop the broker, remove the log file and start the broker again
+-   Configure [log rotation](logs.md)
+-   Reduce the log verbosity level, e.g. if you are using `-t 0-255` the
+    log will grow very fast so, in case of problems, please avoid using
+    unneeded trace levels.
+
+### Diagnose spontaneous binary corruption problems
+
+The symptoms of this problem are:
+
+-   Orion Context Broker send empty responses to REST requests (e.g.
+    with curl the message is typically "empty response from server").
+    Note that it could happen that request on some URLs work
+    normally (e.g. /version) while in others the symptom appears.
+-   The MD5SUM of /usr/bin/contextBroker binary (that can be get with
+    "md5sum /usr/bin/contextBroker" is not the right one (check list for
+    particular versions at the end of this section).
+-   The prelink package is installed (this can be checked running the
+    command "rpm -qa | grep prelink")
+
+The cause of this problem is
+[prelink](http://en.wikipedia.org/wiki/Prelink), a program that modifies
+binaries to make them starting faster (which is not very useful for
+binary implementing long running services as contextBroker is) but that
+is known to be incompatible with some libraries (in particular, it seems
+to be incompatible with some of the libraries used by Context Broker).
+
+The solution fo this problems is:
+
+-   Disable prelink, either implementing one of the following
+    alternatives:
+    -   Remove the prelink software, typically running (as root or using
+        sudo): `rpm -e prelink`
+    -   Disable the prelink processing of contextBroker binary, creating
+        the /etc/prelink.conf.d/contextBroker.conf file with the
+        following content (just one line)
+
+```
+-b /usr/bin/contextBroker
+```
+
+-   Re-install the contextBroker package, typically running (as root or
+    using sudo):
+
+```
+yum remove contextBroker
+yum install contextBroker
 ```
 
 [Top](#top)
 
-### Network interfaces Up & Open
+## I/O Flows
 
-Orion Context Broker uses TCP 1026 as default port, although it can be
-changed using the -port command line option.
+The Orion Context Broker uses the following flows:
 
-[Top](#top)
+-   From NGSI9/10 applications to the broker, using TCP port 1026 by
+    default (this is overridden with "-port" option).
+-   From the broker to subscribed applications, using the port specified
+    by the application in the callback at subscription time.
+-   From the broker to MongoDB database. In the case of running MongoDB
+    in the same host as the broker, this is an internal flow (i.e. using
+    the loopback interface). The standard port in MongoDB is 27017
+    although that can be changed in the configuration. Intra-MongoDB
+    flows (e.g. the synchronization between master and slaves in a
+    replica set) are out of the scope of this section and not shown in
+    the picture.
+-   From the broker to registered Context Providers, to forward query and
+    update requests to them.
 
-### Database server
+Note that the throughput in these flows can not be estimated in advance,
+as it depends completely on the amount of external connections from
+context consumer and producers and the nature of the requests issued by
+consumers/producers.
 
-The Orion Context Broker uses a MongoDB database, whose parameters are
-provided using the command line options `dbhost`, `-dbuser`, `-dbpwd`
-and `-db`. Note that `-dbuser` and `-dbpwd` are only used if MongoDB
-runs using authentication, i.e. with `--auth`.
+![](Orion-ioflows.png "Orion-ioflows.png")
 
-You can check that the database is working using the mongo console:
-
-```
-mongo <dbhost>/<db>
-```
-
-You can check the different collections used by the broker using the
-following commands in the mongo console. However, note that the broker
-creates a collection the first time a document is to be inserted in it,
-so if it is the first time you run the broker (or if database was
-cleaned) and the broker hasn't received any request yet no collection
-exists. Use `show collections` to get the actual collections list in any
-given moment.
-
-```
-> db.registrations.count()
-> db.entities.count()
-> db.csubs.count()
-> db.casubs.count()
-```
-
-[Top](#top)
-
-## Diagnose database connection problems
+### Diagnose database connection problems
 
 The symptoms of a database connection problem are the following ones:
 
@@ -115,7 +180,7 @@ The symptoms of a database connection problem are the following ones:
 ` X@08:04:45 main[313]: MongoDB error`
 
 -   During broker operation. Error message like the following ones
-    appear in the responses sent by the broker.   
+    appear in the responses sent by the broker.
 
 ```
 
@@ -165,49 +230,5 @@ is able to reconnect to the database once it gets ready again. In other
 words, you don't need to restart the broker in order to re-connect to
 the database.
 
-[Top](#top)
-
-## Diagnose spontaneous binary corruption problems**
-
-The symptoms of this problem are:
-
--   Orion Context Broker send empty responses to REST requests (e.g.
-    with curl the message is typically "empty response from server").
-    Note that it could happen that request on some URLs work
-    normally (e.g. /version) while in others the symptom appears.
--   The MD5SUM of /usr/bin/contextBroker binary (that can be get with
-    "md5sum /usr/bin/contextBroker" is not the right one (check list for
-    particular versions at the end of this section).
--   The prelink package is installed (this can be checked running the
-    command "rpm -qa | grep prelink")
-
-The cause of this problem is
-[prelink](http://en.wikipedia.org/wiki/Prelink), a program that modifies
-binaries to make them starting faster (which is not very useful for
-binary implementing long running services as contextBroker is) but that
-is known to be incompatible with some libraries (in particular, it seems
-to be incompatible with some of the libraries used by Context Broker).
-
-The solution fo this problems is:
-
--   Disable prelink, either implementing one of the following
-    alternatives:
-    -   Remove the prelink software, typically running (as root or using
-        sudo): `rpm -e prelink`
-    -   Disable the prelink processing of contextBroker binary, creating
-        the /etc/prelink.conf.d/contextBroker.conf file with the
-        following content (just one line)
-
-```
--b /usr/bin/contextBroker
-```
-
--   Re-install the contextBroker package, typically running (as root or
-    using sudo):
-
-```
-yum remove contextBroker
-yum install contextBroker
-```
 [Top](#top)
 

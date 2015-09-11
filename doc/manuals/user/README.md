@@ -4,7 +4,8 @@
  Orion Context Broker: User & Programmer's Manual
  
 ## Table of Contents
- 
+
+  * [API Walkthrough](walkthrough_apiv1.md)
   * [Pagination](pagination.md)
   * [Geolocation ](geolocation.md)
   * [Structured values for attributes](structured_attribute_valued.md)
