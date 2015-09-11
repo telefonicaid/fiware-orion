@@ -450,7 +450,7 @@ graphical user interface). The NGSI10 queryContext request is used in
 this case, e.g. to get context information for Room1:
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -501,7 +501,7 @@ entity creation with updateContext (23ºC and 720 mmHg).
 If you use an empty attributes element in the request, the response will include all the attributes of the entity. If you include an actual list of attributes (e.g. temperature) only that are retrieved, as shown in the following request:
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -551,7 +551,7 @@ entities which ID starts with "Room" using the regex "Room.\*". In this
 case, you have to set isPattern to "true" as shown below:
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -573,7 +573,7 @@ case, you have to set isPattern to "true" as shown below:
 EOF
 ```
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -640,7 +640,7 @@ Finally, note that you will get an error in case you try to query a
 non-existing entity or attribute, as shown in the following cases below:
 
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -654,7 +654,7 @@ non-existing entity or attribute, as shown in the following cases below:
 EOF
 ```
 ```
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -1100,7 +1100,7 @@ one that you have got in the subscribeContext response in the previous
 step) command:
 
 ```
-(curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContextSubscription -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "subscriptionId": "51c04a21d714fb3b37d7d5a7",
@@ -1477,8 +1477,8 @@ that, as described in [this
 section](append_and_delete.md#adding-and-removing-attributes-with-append-and-delete-in-updatecontext)):
 
 ```
-(curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S \ 
-    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+(curl localhost:1026/v1/contextEntities/Room3/attributes/temperature -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
     -X POST -d @- | python -mjson.tool) <<EOF
 {
     "value" : "21"
@@ -1809,7 +1809,7 @@ Additional comments:
     a vector (default behaviour):
 
 ``` 
-curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S \ 
+curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S \
     --header 'Accept: application/json' | python -mjson.tool
 
 ```
@@ -1850,9 +1850,10 @@ curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S \
 
 You can get all the entities using the following convenience operation:
 
-    curl localhost:1026/v1/contextEntities -s -S --header 'Content-Type: application/json' \
-        --header 'Accept: application/json' | python -mjson.tool
-
+```
+curl localhost:1026/v1/contextEntities -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' | python -mjson.tool
+```
 In our case, it will return both Room1 and Room2:
 
 ``` 
@@ -1931,7 +1932,7 @@ The following operation can be used to get a list of all entity types
 existing at Orion Context Broker in a given moment:
 
 ``` 
-curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/json' \ 
+curl localhost:1026/v1/contextTypes -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' | python -mjson.tool
 ``` 
 
@@ -1979,7 +1980,7 @@ information of a given type (by the time being, that information consits
 of a list of all its attributes):
 
 ``` 
-curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' \ 
+curl localhost:1026/v1/contextTypes/Room -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' | python -mjson.tool
 ``` 
 
@@ -2012,8 +2013,8 @@ In addition, note that this convenience operation doesn't have any standard oper
 Let's set the Room1 temperature and pressure values:
 
 ``` 
-(curl localhost:1026/v1/contextEntities/Room1/attributes -s -S \ 
-    --header 'Content-Type: application/json'  --header 'Accept: application/json' \ 
+(curl localhost:1026/v1/contextEntities/Room1/attributes -s -S \
+    --header 'Content-Type: application/json'  --header 'Accept: application/json' \
     -X PUT -d @- | python -mjson.tool) << EOF
 {
     "attributes": [
@@ -2062,8 +2063,8 @@ the response is:
 Now, let's do the same with Room2:
 
 ``` 
-(curl localhost:1026/v1/contextEntities/Room2/attributes -s -S \ 
-    --header 'Content-Type: application/json'  --header 'Accept: application/json' \ 
+(curl localhost:1026/v1/contextEntities/Room2/attributes -s -S \
+    --header 'Content-Type: application/json'  --header 'Accept: application/json' \
     -X PUT -d @- | python -mjson.tool) << EOF
 {
     "attributes": [
@@ -2369,7 +2370,7 @@ precise, we can include the name of an attribute to search for:
 
 ``` 
 (curl localhost:1026/v1/registry/discoverContextAvailability -s -S \
-    --header  'Content-Type: application/json' --header 'Accept: application/json' \ 
+    --header  'Content-Type: application/json' --header 'Accept: application/json' \
     -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -2418,8 +2419,8 @@ If the broker doesn't have any registration information, it will return
 a response telling so. Thus, the following request:
 
 ``` 
-(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \ 
-    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
     -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -2513,8 +2514,8 @@ entities whose ID starts with "Room" using the regex "Room.\*". In this
 case, you have to set isPattern to "true" as shown below:
 
 ``` 
-(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \ 
-    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+(curl localhost:1026/v1/registry/discoverContextAvailability -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
     -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -2575,8 +2576,8 @@ In order to configure this behavior, we use the following NGSI9
 subscribeContextAvailability request:
 
 ``` 
-(curl localhost:1026/v1/registry/subscribeContextAvailability -s -S \ 
-    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+(curl localhost:1026/v1/registry/subscribeContextAvailability -s -S \
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
     -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -2835,7 +2836,7 @@ subscribeContextAvailability response in the previous step).
 
 ```
 (curl localhost:1026/v1/registry/updateContextAvailabilitySubscription -s -S \
-    --header 'Content-Type: application/json' --header 'Accept: application/json' \ 
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
     -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -3422,7 +3423,7 @@ entities with types using convenience operations):
 EOF
 ``` 
 ``` 
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [

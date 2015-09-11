@@ -53,10 +53,10 @@ rpm -i contextBroker-X.Y.Z-1.x86_64.rpm
 
 ### Optional packages
 
-Apart from the mandatory RPM described above, you can install the contextBroker-test package, which contain utility tools:
+Apart from the mandatory RPM described above, you can install the contextBroker-tests package, which contain utility tools:
 
 ```
-yum install contextBroker-test
+yum install contextBroker-tests
 ```
 
 or

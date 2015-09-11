@@ -17,7 +17,7 @@ As a general rule, filters used in standard operation use a scope
 element:
 
 ``` 
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -43,7 +43,7 @@ while filters in convenience operations are included as parameters in
 the URL:
 
 ``` 
-curl localhost:1026/v1/contextEntities?filter=value -s -S  --header 'Content-Type: application/json'  \ 
+curl localhost:1026/v1/contextEntities?filter=value -s -S  --header 'Content-Type: application/json'  \
     --header 'Accept: application/json' | python -mjson.tool
 ``` 
 Filters are cumulative. In other words, you can use several scopes in
