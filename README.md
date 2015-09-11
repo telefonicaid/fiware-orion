@@ -59,7 +59,7 @@ How to run Orion Context Broker can be found at [the corresponding section of th
 In order to create an entity (Room1) with two attributes (temperature and pressure):
 
 ``` 
-(curl <orion_host>:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' \ 
+(curl <orion_host>:1026/v1/contextEntities/Room1 -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -X POST -d @- | python -mjson.tool) <<EOF
 {
     "attributes": [
