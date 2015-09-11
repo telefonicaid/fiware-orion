@@ -36,22 +36,25 @@ tests and user validation.
 -   Run the following command
 
 ```
-curl localhost:1026/version
+curl --header 'Accept: application/json' localhost:1026/version
 ```
 
 -   Check that you get the version number as output (along with uptime
     information and compilation environment information):
 
 ```
-<orion>
-  <version>0.22.0-next</version>
-  <uptime>0 d, 1 h, 34 m, 25 s</uptime>
-  <git_hash>6e2aca5ebe287083efa306fc84d213fa24309a63</git_hash>
-  <compile_time>Fri Jun 19 10:34:41 CEST 2015</compile_time>
-  <compiled_by>fermin</compiled_by>
-  <compiled_in>debvm</compiled_in>
-</orion>
+{
+  "orion" : {
+    "version" : "0.23.0-next",
+    "uptime" : "0 d, 0 h, 2 m, 30 s",
+    "git_hash" : "c49692a996fb8d23cb2e78992094e26b1ca45dac",
+    "compile_time" : "Tue Sep 8 16:56:16 CEST 2015",
+    "compiled_by" : "fermin",
+    "compiled_in" : "debvm"
+  }
+}
 ```
+
 [Top](#top)
 
 ### List of Running Processes
@@ -112,40 +115,42 @@ The symptoms of a database connection problem are the following ones:
 ` X@08:04:45 main[313]: MongoDB error`
 
 -   During broker operation. Error message like the following ones
-    appear in the responses sent by the broker.
+    appear in the responses sent by the broker.   
 
 ```
-      ...
-      <errorCode>
-        <code>500</code>
-        <reasonPhrase>Database Error</reasonPhrase>
-        <details>collection: ... - exception: Null cursor</details>
-      </errorCode>
-      ...
 
-      ...
-      <errorCode>
-        <code>500</code>
-        <reasonPhrase>Database Error</reasonPhrase>
-        <details>collection: ... - exception: socket exception [CONNECT_ERROR] for localhost:27017</details>
-      </errorCode>
-      ...
+    ...
+    "errorCode": {
+        "code": "500",
+        "reasonPhrase": "Database Error",
+        "details": "collection: ... - exception: Null cursor"
+    }
+    ...
 
-      ...
-      <errorCode>
-        <code>500</code>
-        <reasonPhrase>Database Error</reasonPhrase>
-        <details>collection: ... - exception: socket exception [FAILED_STATE] for localhost:27017</details
-      </errorCode>
-      ...
+    ...
+    "errorCode": {
+        "code": "500",
+        "reasonPhrase": "Database Error",
+        "details": "collection: ... - exception: socket exception [CONNECT_ERROR] for localhost:27017"
+    }
+    ...
 
-      ...
-      <errorCode>
-        <code>500</code>
-        <reasonPhrase>Database Error</reasonPhrase>
-        <details>collection: ... - exception: DBClientBase::findN: transport error: localhost:27017 ns: orion.$cmd query: { .. }</details>
-      </errorCode>
-      ...
+    ...
+    "errorCode": {
+        "code": "500",
+        "reasonPhrase": "Database Error",
+        "details": "collection: ... - exception: socket exception [FAILED_STATE] for localhost:27017"
+    }
+    ...
+
+    ...
+    "errorCode": {
+        "code": "500",
+        "reasonPhrase": "Database Error",
+        "details": "collection: ... - exception: DBClientBase::findN: transport error: localhost:27017 ns: orion.$cmd query: { .. }"
+    }
+    ...
+
 ```
 
 In both cases, check that the connection to MonogDB is correctly

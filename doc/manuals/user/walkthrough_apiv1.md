@@ -6,7 +6,6 @@
     * [Starting the broker for the tutorials](#starting-the-broker-for-the-tutorials)
     * [Starting accumulator server](#starting-accumulator-server)
     * [Issuing commands to the broker](#issuing-commands-to-the-broker)
-    * [Text colour convention](#text-colour-convention)
 * [Context management using NGSI10](#context-management-using-ngsi10)
     * [NGSI10 standard operations](#ngsi10-standard-operations)
 	  * [Entity Creation](#entity-creation)
@@ -176,47 +175,47 @@ following:
 
 -   For POST:
 
-<!-- -->
-
-    curl localhost:1026/<operation_url> -s -S [headers]' -d @- <<EOF
-    [payload]
-    EOF
+```
+curl localhost:1026/<operation_url> -s -S [headers]' -d @- <<EOF
+[payload]
+EOF
+```
 
 -   For PUT:
 
-<!-- -->
-
-    (curl localhost:1026/<operation_url> -s -S [headers] -X PUT -d @- <<EOF
-    [payload]
-    EOF
+```
+(curl localhost:1026/<operation_url> -s -S [headers] -X PUT -d @- <<EOF
+[payload]
+EOF
+```
 
 -   For GET:
 
-<!-- -->
-
-    curl localhost:1026/<operation_url> -s -S [headers]' 
+```
+curl localhost:1026/<operation_url> -s -S [headers]
+```
 
 -   For DELETE:
 
-<!-- -->
-
-    curl localhost:1026/<operation_url> -s -S [headers] -X DELETE
+```
+curl localhost:1026/<operation_url> -s -S [headers] -X DELETE
+```
 
 Regarding \[headers\] you have to include the following ones:
 
 -   Accept header to specify which payload format
     you want to receive in the response. You should explicitly specify JSON.
 
-<!-- -->
-
-    curl ... --header 'Accept: application/json' ...
+```
+curl ... --header 'Accept: application/json' ...
+```
 
 -   Only in the case of using payload in the request (i.e. POST or PUT),
     you have to use Context-Type header to specify the format (JSON).
 
-<!-- -->
-
-    curl ... --header 'Content-Type: application/json' ...
+```
+curl ... --header 'Content-Type: application/json' ...
+```
 
 Some additional remarks:
 
@@ -225,6 +224,7 @@ Some additional remarks:
     (*here-documents*). In
     some cases (GET and DELETE) we omit "-d @-" as they don't
     use payload.
+
 -   In our examples we assume that the broker is listening on port 1026.
     Adjust this in the curl command line if you are using a
     different setting.
@@ -232,28 +232,17 @@ Some additional remarks:
 -   In order to pretty-print JSON in responses, you can use Python with
     msjon.tool (examples along with tutorial are using this style):
 
-<!-- -->
-
-    (curl ... | python -mjson.tool) <<EOF
-    ...
-    EOF
+```
+(curl ... | python -mjson.tool) <<EOF
+...
+EOF
+```
 
 -   Check that curl is installed in your system using:
 
 ```
 # which curl
 ```
-
-[Top](#top)
-
-### Text colour convention
-
-This document assumes the following convention for text colour in JSON
-fragments:
-
--   <span style="color:darkblue">Blue</span>: request messages
--   <span style="color:darkgreen">Green</span>: response messages
--   <span style="color:purple">Purple</span>: notification messages
 
 [Top](#top)
 
@@ -299,7 +288,7 @@ creation time temperature and pressure of Room1 are 23 ºC and 720 mmHg
 respectively.
 
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
@@ -707,7 +696,6 @@ Additional comments:
     to get attributes as a JSON object (i.e. key-values map) instead of
     a vector (default behaviour):
 
-<!-- -->
 ```
 (curl 'localhost:1026/v1/queryContext?attributeFormat=object' -s -S \
     --header  'Content-Type: application/json' --header 'Accept: application/json' \
@@ -1819,8 +1807,6 @@ Additional comments:
 -   You can use the *?attributeFormat=object* URI parameter
     to get attributes as a JSON object (i.e. key-values map) instead of
     a vector (default behaviour):
-
-<!-- -->
 
 ``` 
 curl localhost:1026/v1/contextEntities/Room1?attributeFormat=object -s -S \ 
@@ -3166,34 +3152,41 @@ any entity ID):
 
 ```
 (curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \
-    --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
-<?xml version="1.0"?>
-<registerProviderRequest>
-  <duration>P1M</duration>
-      <providingApplication>http://mysensors.com/Funny</providingApplication>
-</registerProviderRequest>
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
+    -d @- | python -mjson.tool) << EOF
+{
+  "duration": "P1M",
+  "providingApplication": "http://mysensors.com/Funny"
+}
 EOF
 ```
+
 Now, let's discover on that type:
 
 ```
 curl localhost:1026/v1/registry/contextEntityTypes/Funny -s -S \
-    --header 'Content-Type: application/xml' | xmllint --format -
+    --header 'Accept: application/json' | python -mjson.tool
+```
 
-<discoverContextAvailabilityResponse>
-  <contextRegistrationResponseList>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="Funny" isPattern="false">
-            <id/>
-          </entityId>
-        </entityIdList>
-        <providingApplication>http://mysensors.com/Funny</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-  </contextRegistrationResponseList>
-</discoverContextAvailabilityResponse>
+which response is:
+
+```
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "entities": [
+                    {
+                        "id": "",
+                        "isPattern": "false",
+                        "type": "Funny"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Funny"
+            }
+        }
+    ]
+}
 ```
 
 As you can see, the ID element is empty (it makes sense, as we didn't
@@ -3203,41 +3196,44 @@ Moreover, you can register attributes in these registrations, e.g:
 
 ```
 (curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny/attributes/ATT -s -S \
-    --header 'Content-Type: application/xml' -d @- | xmllint --format - ) << EOF
-<?xml version="1.0"?>
-<registerProviderRequest>
-   <duration>P1M</duration>
-   <providingApplication>http://mysensors.com/Funny</providingApplication>
-</registerProviderRequest>
+    --header 'Content-Type: application/json' --header 'Accept: application/json' \
+    -d @- | python -mjson.tool) << EOF
+{
+  "duration": "P1M",
+  "providingApplication": "http://mysensors.com/Funny"
+}
 EOF
 ```
+
 ```
-curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny -s -S \
-    --header 'Content-Type: application/xml' | xmllint --format -
+curl localhost:1026/v1/registry/contextEntityTypes/MoreFunny/attributes/ATT -s -S \
+    --header 'Accept: application/json' | python -mjson.tool
 ```
+
 ```
-<?xml version="1.0"?>
-<discoverContextAvailabilityResponse>
-  <contextRegistrationResponseList>
-    <contextRegistrationResponse>
-      <contextRegistration>
-        <entityIdList>
-          <entityId type="MoreFunny" isPattern="false">
-            <id/>
-          </entityId>
-        </entityIdList>
-        <contextRegistrationAttributeList>
-          <contextRegistrationAttribute>
-            <name>ATT</name>
-            <type/>
-            <isDomain>false</isDomain>
-          </contextRegistrationAttribute>
-        </contextRegistrationAttributeList>
-        <providingApplication>http://mysensors.com/Funny</providingApplication>
-      </contextRegistration>
-    </contextRegistrationResponse>
-  </contextRegistrationResponseList>
-</discoverContextAvailabilityResponse>
+{
+    "contextRegistrationResponses": [
+        {
+            "contextRegistration": {
+                "attributes": [
+                    {
+                        "isDomain": "false",
+                        "name": "ATT",
+                        "type": ""
+                    }
+                ],
+                "entities": [
+                    {
+                        "id": "",
+                        "isPattern": "false",
+                        "type": "MoreFunny"
+                    }
+                ],
+                "providingApplication": "http://mysensors.com/Funny"
+            }
+        }
+    ]
+}
 ```
 
 [Top](#top)
