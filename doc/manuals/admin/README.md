@@ -15,5 +15,5 @@ Orion Context Broker: Administration Guide.
 * [Rush relayer](rush.md)
 * [Management REST inferface](management_api.md)
 * [Data model](database_model.md)
-* [Resources & I/O Flows](resources.md)
-* [Problem diagnosis procedures](diagnosis.md)
+* [Sanity check procedures](sanity_check.md)
+* [Diagnosis procedures](diagnosis.md)
