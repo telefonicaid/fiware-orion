@@ -118,15 +118,15 @@ The functional_test makefile target is used for running end-to-end tests:
 
     make functional_test INSTALL_DIR=~
 
-Please have a look to the section [on building the source code](#from-sources) in order to get more information about how to prepare the environment to run the functional_test target.
+Please have a look to the section [on building the source code](doc/manuals/admin/build_source.md) in order to get more information about how to prepare the environment to run the functional_test target.
 
 ### Unit Tests
 
 The unit_test makefile target is used for running the unit tests:
 
-    make functional_test INSTALL_DIR=~
+    make unit_test
 
-Please have a look to the section [on building the source code](#from-sources) in order to get more information about how to prepare the environment to run the unit_test target.
+Please have a look to the section [on building the source code](doc/manuals/admin/build_source.md) in order to get more information about how to prepare the environment to run the unit_test target.
 
 [Top](#top)
 
