@@ -7,15 +7,15 @@ with an example.
 
 We start creating a simple entity 'E1' with one attribute named 'A':
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-```                                                                                                                    
+```                                                                                                                  
 
 Now, in order to append a new attribute (let's name it 'B') we use
 updateContext APPEND with an entityId matching 'E1':
 
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
@@ -40,7 +40,7 @@ Now we can check with a query to that entity that both attributes A and
 B are there:
 
 ``` 
-(curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' | python -mjson.tool)<<EOF
 {
     "contextElement": {
@@ -135,7 +135,7 @@ add and delete attributes. Try the following:
 Add a new attribute 'C' and 'D':
 
 ```
-(curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "attributes": [
@@ -157,13 +157,13 @@ EOF
 Remove attribute 'B':
 ```
 curl localhost:1026/v1/contextEntities/E1/attribute/B -s -S \
-   --header 'Content-Type: application/json'  -X DELETE  \ 
-   --header 'Accept: application/json'  | python -mjson.tool
+    --header 'Content-Type: application/json'  -X DELETE  \
+    --header 'Accept: application/json'  | python -mjson.tool
 ```
 Query entity (should see 'C' and 'D', but not 'B'):
 
 ```
-(curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/contextEntities/E1 -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' | python -mjson.tool) <<EOF
 {
     "contextElement": {
@@ -202,7 +202,7 @@ operation is used, with DELETE as actionType and with an empty
 attributeList, as in the following example:
 
 ```
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
@@ -219,8 +219,8 @@ EOF
  
 You can also use the following equivalent convenience operation:
 ``` 
-curl localhost:1026/v1/contextEntities/E1 -s -S \ 
-   --header 'Content-Type: application/json' \ 
-   --header 'Accept: application/json' -X DELETE
+curl localhost:1026/v1/contextEntities/E1 -s -S \
+    --header 'Content-Type: application/json' \ 
+    --header 'Accept: application/json' -X DELETE
 ``` 
 

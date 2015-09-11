@@ -20,7 +20,7 @@ operations). The update is done issuing a new registerContextRequest,
 with the *registrationId* set:
 
 ``` 
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [

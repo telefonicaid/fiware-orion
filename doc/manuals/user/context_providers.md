@@ -33,7 +33,7 @@ Let's illustrate this with an example.
       its API on <http://sensor48.mycity.com/ngsi10>
       
 ```
-(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/registry/registerContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextRegistrations": [
@@ -66,7 +66,7 @@ EOF
 
       
 ``` 
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [

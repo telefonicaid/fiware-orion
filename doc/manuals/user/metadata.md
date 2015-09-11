@@ -13,7 +13,7 @@ For example, to create an entity Room1 with attribute "temperature", and
 associate metadata "accuracy" to "temperature":
 
 ``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
@@ -47,7 +47,7 @@ or not. For example, next updateContext shows how "accuracy" is updated
 to 0.9 although the value of the temperature iself is still 26.5:
 
 ``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
@@ -81,7 +81,7 @@ to add metadata "average" to "temperature" (in addition to the existing
 "precision"):
 
 ``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
@@ -112,7 +112,7 @@ EOF
 We can check that temperature includes both attributes
 
 ``` 
-(curl localhost:1026/v1/contextEntities/Room1 -s -S \ 
+(curl localhost:1026/v1/contextEntities/Room1 -s -S \
     --header 'Accept: application/json' | python -mjson.tool) <<EOF
 {
     "contextElements": [
@@ -178,7 +178,7 @@ use the metadata ID for this purpose. Let's illustrate with an example.
 First, we create the Room1 entity:
 
 ``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
@@ -222,7 +222,7 @@ EOF
 Now, we can query for temperature to get both instances:
 
 ``` 
-(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "entities": [
@@ -243,7 +243,7 @@ We can update an specific instance (e.g. ground), letting the other
 untouched:
 
 ``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
@@ -279,7 +279,7 @@ To avoid ambiguities, you cannot mix the same attribute with and without
 ID. The following entity creation will fail:
 
 ``` 
-(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \ 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
     --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
 {
     "contextElements": [
