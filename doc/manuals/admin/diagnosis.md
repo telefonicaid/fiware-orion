@@ -1,15 +1,15 @@
 #<a name="top"></a>Problem diagnosis procedures
 
 * [Introduction](#introduction)
-    * [Sanity check procedures](#sanity-check-procedures)
-	  * [Checking Orion is up and running](#checking-orion-is-up-and-running)
-	  * [List of Running Processes](#list-of-running-processes)
-	  * [Network interfaces Up & Open](#network-interfaces-up--open)
-	  * [Database server](#database-server)
-    * [Diagnose database connection problems](#diagnose-database-connection-problems)
-    * [Diagnose spontaneous binary corruption problems**](#diagnose-spontaneous-binary-corruption-problems**)
+* [Sanity check procedures](#sanity-check-procedures)
+    * [Checking Orion is up and running](#checking-orion-is-up-and-running)
+    * [List of Running Processes](#list-of-running-processes)
+    * [Network interfaces Up & Open](#network-interfaces-up--open)
+    * [Database server](#database-server)
+* [Diagnose database connection problems](#diagnose-database-connection-problems)
+* [Diagnose spontaneous binary corruption problems**](#diagnose-spontaneous-binary-corruption-problems**)
 	  
-# Introduction
+## Introduction
 
 The Diagnosis Procedures are the first steps that a System Administrator
 will take to locate the source of an error in Orion. Once the nature of

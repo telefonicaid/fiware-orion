@@ -237,6 +237,10 @@ Error list (HTTP response code in paranthesis):
   in the request. This typically the case of requesting an entity with not enough information and the
   solution is to enhance entity identification adding more information, e.g. adding entity type
   and/or service path.
+* LengthRequired (411). Zero/No Content-Length in PUT/POST/PATCH request
+* RequestEntityTooLarge (413). Payload too large
+* UnsupportedMediaType (415). Request content type is not supported.
+
 
 # Group NGSIv2
 
@@ -532,7 +536,7 @@ Response:
             }
         }
 
-### Update or append entity attributes [POST /v2/entities/{entityId}?{options}]
+### Update or append entity attributes [POST /v2/entities/{entityId}?{op}]
 
 <table style="width: 100%; margin: 12px 0 0 0;">
 <tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
@@ -549,7 +553,7 @@ the JSON entity representation format (described in a section above), except tha
 are not allowed.
 
 The entity attributes are updated with the ones in the payload. In particular, depending on
-whether `append` option is used or not.
+whether `append` operation option is used or not.
 
 * If `append` is not used: the entity attributes are updated (if they previously exist) or appended
   (in they don't previously exists) with the ones in the payload.
@@ -564,7 +568,7 @@ Response:
 
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
-    + options: append (optional, string) - Strict append.
+    + op: append (optional, string) - Strict append.
 
 + Request (application/json)
 
@@ -692,7 +696,7 @@ Response:
             }
         }
 
-### Update or append entity attributes [POST /v2/entities/type/{entityType}/id/{entityId}?{options}]
+### Update or append entity attributes [POST /v2/entities/type/{entityType}/id/{entityId}?{op}]
 
 <table style="width: 100%; margin: 12px 0 0 0;">
 <tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
@@ -709,7 +713,7 @@ the JSON entity representation format (described in a section above), except tha
 are not allowed.
 
 The entity attributes are updated with the ones in the payload. In particular, depending on
-whether `append` option is used:
+whether `append` operation option is used:
 
 * If `append` is not used: the entity attributes are updated (if they previously exist) or appended
   (in they don't previously exists) with the ones in the payload.
@@ -725,7 +729,7 @@ Response:
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
     + entityType: Room (required, string) - Entity Type
-    + options: append (optional, string) - Strict append.
+    + op: append (optional, string) - Strict append.
 
 + Request (application/json)
 
