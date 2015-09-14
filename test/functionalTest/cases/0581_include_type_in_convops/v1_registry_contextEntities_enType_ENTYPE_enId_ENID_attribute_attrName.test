@@ -222,7 +222,7 @@ Date: REGEX(.*)
 06. GET /statistics
 ===================
 HTTP/1.1 200 OK
-Content-Length: 22REGEX(\d)
+Content-Length: REGEX((249|251))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -233,6 +233,7 @@ Date: REGEX(.*)
         "measuring_interval_in_secs": "REGEX(\d+)", 
         "statisticsRequests": "1", 
         "uptime_in_secs": "REGEX(\d+)", 
+        "versionRequests": "0",
         "xmlRequests": "REGEX((2|3))"
     }
 }

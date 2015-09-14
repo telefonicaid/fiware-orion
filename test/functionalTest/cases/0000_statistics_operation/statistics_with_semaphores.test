@@ -43,13 +43,14 @@ echo
 --REGEXPECT--
 +++++ 1. statistics in XML
 HTTP/1.1 200 OK
-Content-Length: 558
+Content-Length: 597
 Content-Type: application/xml
 Date: REGEX(.*)
 
 <?xml version="1.0"?>
 <orion>
   <xmlRequests>REGEX((1|2))</xmlRequests>
+  <versionRequests>0</versionRequests>
   <statisticsRequests>1</statisticsRequests>
   <requestSemaphoreWaitingTime>REGEX(\d+.\d+)</requestSemaphoreWaitingTime>
   <dbConnectionPoolWaitingTime>REGEX(\d+.\d+)</dbConnectionPoolWaitingTime>
@@ -63,7 +64,7 @@ Date: REGEX(.*)
 
 +++++ 2. statistics in JSON
 HTTP/1.1 200 OK
-Content-Length: 428
+Content-Length: 457
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -78,6 +79,7 @@ Date: REGEX(.*)
         "subCacheMutexWaitingTime": "REGEX(\d+.\d+)", 
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "uptime_in_secs": "REGEX(1?\d)", 
+        "versionRequests": "0", 
         "xmlRequests": "REGEX((1|2))"
     }
 }

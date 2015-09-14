@@ -242,7 +242,7 @@ Date: REGEX(.*)
 04. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: 665
+Content-Length: 704
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -251,6 +251,7 @@ Date: REGEX(.*)
   <xmlRequests>REGEX((1|2))</xmlRequests>
   <jsonRequests>3</jsonRequests>
   <subscriptions>3</subscriptions>
+  <versionRequests>0</versionRequests>
   <statisticsRequests>1</statisticsRequests>
   <subCacheEntries>2</subCacheEntries>
   <requestSemaphoreWaitingTime>REGEX(\d+.\d+)</requestSemaphoreWaitingTime>
@@ -282,7 +283,7 @@ Date: REGEX(.*)
 06. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: 51REGEX((3|5))
+Content-Length: REGEX((542|544))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -300,6 +301,7 @@ Date: REGEX(.*)
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "1", 
         "uptime_in_secs": "REGEX(\d+)",
+        "versionRequests": "0",
         "xmlRequests": "REGEX((1|2))"
     }
 }
@@ -324,7 +326,7 @@ Date: REGEX(.*)
 08. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: 54REGEX((3|5))
+Content-Length: REGEX((572|574))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -343,6 +345,7 @@ Date: REGEX(.*)
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "2", 
         "uptime_in_secs": "REGEX(\d+)",
+        "versionRequests": "0",
         "xmlRequests": "REGEX((1|2))"
     }
 }

@@ -309,7 +309,7 @@ Date: REGEX(.*)
 5. Statistics
 =============
 HTTP/1.1 200 OK
-Content-Length: 31REGEX(\d)
+Content-Length: REGEX((353|355))
 Content-Type: application/xml
 Date: REGEX(.*)
 
@@ -318,6 +318,7 @@ Date: REGEX(.*)
   <xmlRequests>REGEX((6|7))</xmlRequests>
   <updates>3</updates>
   <allContextEntitiesRequests>2</allContextEntitiesRequests>
+  <versionRequests>0</versionRequests>
   <statisticsRequests>1</statisticsRequests>
   <subCacheLookups>3</subCacheLookups>
   <uptime_in_secs>REGEX(\d+)</uptime_in_secs>
