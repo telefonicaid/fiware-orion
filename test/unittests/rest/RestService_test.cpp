@@ -70,11 +70,12 @@ RestService rs2[] =
 */
 TEST(RestService, payloadParse)
 {
-  ConnectionInfo  ci("/ngsi9/registerContext", "POST", "1.1");
-  ParseData       parseData;
-  const char*     infile1  = "ngsi9.registerContext.ok.valid.json";
-  std::string     out;
+  ConnectionInfo            ci("/ngsi9/registerContext", "POST", "1.1");
+  ParseData                 parseData;
+  const char*               infile1  = "ngsi9.registerContext.ok.valid.json";
+  std::string               out;
   std::vector<std::string>  compV;
+  JsonDelayedRelease        jsonRelease;
 
   compV.push_back("ngsi9");
   compV.push_back("registerContext");
@@ -91,7 +92,7 @@ TEST(RestService, payloadParse)
   ci.payload      = testBuf;
   ci.payloadSize  = strlen(testBuf);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, compV);
+  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, &jsonRelease, compV);
   EXPECT_EQ("OK", out);
 
 
@@ -105,7 +106,7 @@ TEST(RestService, payloadParse)
   ci.payload      = (char*) "123";
   ci.payloadSize  = strlen(ci.payload);
 
-  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, compV);  // Call restService?
+  out = payloadParse(&ci, &parseData, &rs[0], NULL, NULL, &jsonRelease, compV);
   EXPECT_EQ("Bad inFormat", out);
 
   utExit();

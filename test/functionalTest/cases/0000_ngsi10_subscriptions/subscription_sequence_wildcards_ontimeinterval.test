@@ -25,7 +25,11 @@ Subscription sequence wildcards ONINTERVAL
 
 --SHELL-INIT--
 dbInit CB
+
+export BROKER_AWAIT_SLEEP_TIME=6
 brokerStart CB
+unset BROKER_AWAIT_SLEEP_TIME
+
 accumulatorStart
 
 --SHELL--
@@ -515,7 +519,7 @@ Content-Type: application/xml
   </contextResponseList>
 </notifyContextRequest>
 =======================================
-TIMES: 0, 2, 4, 6, 8, 10
+TIMES: 0, 2, 4, 6, 8, REGEX((10|11|12|13))
 --TEARDOWN--
 brokerStop CB
 accumulatorStop

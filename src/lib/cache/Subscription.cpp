@@ -417,6 +417,7 @@ void Subscription::release(void)
   }
 
   entityIdInfos.clear();
+  attributes.clear();
 }
 
 
