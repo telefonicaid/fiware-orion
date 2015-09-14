@@ -22,8 +22,7 @@ The Orion Context Broker is an implementation of the Publish/Subscribe Context B
 ## Copyright
 
 This specification is licensed under the
-[FIWARE Open Specification License]
-(http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_%28essential_patents_license%29).
+[FIWARE Open Specification License](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_%28essential_patents_license%29).
 
 ## Status
 
@@ -47,7 +46,7 @@ For example, consider an Orion-based application using the following scopes (sho
 + Madrid, as first level scope
 + Gardens and Districts, as second-level scope (children of Madrid)
 + ParqueNorte, ParqueOeste and ParqueSur (children of Gardens) and Fuencarral and Latina (children of Districts)
-Parterre1 and Parterre2 (children of ParqueNorte)
++ Parterre1 and Parterre2 (children of ParqueNorte)
 
 ![Authentication flow](http://forge.fiware.org/plugins/mediawiki/wiki/fiware/images/c/ce/ServicePathExample.png)
 
@@ -224,9 +223,9 @@ And the response will be;
 </center>
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+                Accept: application/json
         
     + Body
             
@@ -250,9 +249,9 @@ And the response will be;
 
 + Response 200 
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
 
     + Body 
       
@@ -455,9 +454,9 @@ The fields included in the payload will be;
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -480,9 +479,9 @@ The fields included in the payload will be;
 
 + Response 200
     
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
 
     + Body 
     
@@ -699,7 +698,7 @@ So, the response of the Context Broker will be;
     
     + Headers 
     
-            Accept: application/json
+                Accept: application/json
         
     + Body
                
@@ -866,9 +865,9 @@ using the POST method;
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -1028,9 +1027,9 @@ In this case we want to change the temperature of Room1 to 26.3;
 + Request (application/json)
     
                
-    + Headers (application/json)
+    + Headers
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -1295,9 +1294,10 @@ So to change the value of the temperature on the ground of the Room1 we will add
 
 
 + Request (application/json)
-    + Headers (application/json)
+
+    + Headers
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -1867,6 +1867,7 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
 |<b>NotifyConditions</b>           |                |                                 |
 |                                  | Type           | ONTIMEINTERVAL                  |
 |                                  | CondValues     | PT10S                           |
+
 </center>
 
 <center>
@@ -1926,9 +1927,9 @@ Let's examine in detail the different elements included in the payload:
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -2043,9 +2044,10 @@ For example, if we want to change the notification interval to 5 seconds we will
 The ID in the payload must match the ID in the URL.
 
 + Request (application/json)
-    + Headers (application/json)
+
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -2301,15 +2303,16 @@ For example, the following updateContext request creates the entity "Madrid" (of
 | <b>StatusCode</b>                |              |            |            |          |
 |                                  | Code         |            |            | 200      |
 |                                  | ReasonPhrase |            |            | OK       |
+
 </center>
 
         
 
 + Request Entity creation  (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
     + Body   
     
@@ -2371,9 +2374,9 @@ For example, the following updateContext request creates the entity "Madrid" (of
 
 + Request Defining location attribute (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
     + Body
     
@@ -2491,9 +2494,9 @@ Apart from deleting individual attributes from a given entity,  you can also del
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
     + Body
     
@@ -2510,10 +2513,10 @@ Apart from deleting individual attributes from a given entity,  you can also del
 
 + Response 200 (application/json)
 
-        {
-            "code": "200", 
-            "reasonPhrase": "OK"
-        }
+            {
+                "code": "200", 
+                "reasonPhrase": "OK"
+            }
      
 
 
@@ -2640,6 +2643,7 @@ In other case you can use an empty attributes element in the request,the respons
 |                                  | IsPattern      | False      |
 |                                  | Id             | Room1      |
 |<b>Attributes</b>                 |                | Temperature|
+
 </center> 
 
 <center>
@@ -2676,6 +2680,7 @@ The only that changes is the id element of the payload request:
 |                                  | IsPattern      | False      |
 |                                  | Id             | Room.*     |
 |<b>Attributes</b>                 |                | Temperature|
+
 </center> 
 
 Finally, note that you will get an error in case you try to query a non-existing entity or attribute, as shown in the last response.
@@ -2860,12 +2865,12 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
 
 + Request Get Information for Room1 (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
     + Body
-    
+
             {
                 "entities": [
                     {
@@ -2908,11 +2913,12 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
             
 + Request Get Information for Temperature Room1  (application/json)
 
-        + Headers (application/json)
-    
+    + Headers 
+
             Accept: application/json
-        
-        + Body
+    
+    + Body
+    
             {
                 "entities": [
                 {
@@ -2951,16 +2957,16 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
                     }
                 ]
             }
-            
+
 
 + Request Get Information for Temperature all Rooms  (application/json)
 
-        + Headers (application/json)
-    
+    + Headers 
+
             Accept: application/json
-        
-        + Body
-        
+    
+    + Body
+    
             {
                 "entities": [
                 {
@@ -3003,12 +3009,12 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
 
 + Request Get Information for a non-exisiting room  (application/json)
 
-        + Headers (application/json)
-    
+    + Headers 
+
             Accept: application/json
 
-        + Body
-        
+    + Body
+    
             {
                 "entities": [
                 {
@@ -3022,12 +3028,12 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
 
 + Response 404 (application/json)
 
-        + Headers (application/json)
+    + Headers 
     
             Accept: application/json
         
-        + Body 
-        
+    + Body 
+    
             {
                 "errorCode": {
                 "code": "404",
@@ -3037,145 +3043,147 @@ The result of the query would be Madrid, Leganes and Alcobendas.As shown in the 
 
 + Request Defining a polygon (application/json)
 
-        + Headers (application/json)
+    + Headers 
     
             Accept: application/json
-        + Body 
+
+    + Body 
         
-        {
-            "entities": [
             {
-                "type": "Point",
-                "isPattern": "true",
-                "id": ".*"
-            }
-            ],
-            "restriction": {
-                "scopes": [
+                "entities": [
                 {
-                    "type" : "FIWARE::Location",
-                    "value" : {
-                    "polygon": {
-                    "vertices": [
-                        {
-                        "latitude": "0",
-                        "longitude": "0"
-                        },
-                        {
-                        "latitude": "0",
-                        "longitude": "6"
-                        },
-                        {
-                        "latitude": "6",
-                        "longitude": "6"
-                        },
-                        {
-                        "latitude": "6",
-                        "longitude": "0"
-                        }
-                    ]
-                    }
-                    }
+                    "type": "Point",
+                    "isPattern": "true",
+                    "id": ".*"
                 }
-                ]
+                ],
+                "restriction": {
+                    "scopes": [
+                    {
+                        "type" : "FIWARE::Location",
+                        "value" : {
+                        "polygon": {
+                        "vertices": [
+                            {
+                            "latitude": "0",
+                            "longitude": "0"
+                            },
+                            {
+                            "latitude": "0",
+                            "longitude": "6"
+                            },
+                            {
+                            "latitude": "6",
+                            "longitude": "6"
+                            },
+                            {
+                            "latitude": "6",
+                            "longitude": "0"
+                            }
+                        ]
+                        }
+                        }
+                    }
+                    ]
+                }
             }
-        }
 
 + Response 200 (application/json)
 
 + Request Defining a circle (application/json)
 
-        + Headers (application/json)
+    + Headers 
     
             Accept: application/json
-        + Body 
+
+    + Body 
         
-         {
-           "entities": [
-                {
-                "type": "City",
-                "isPattern": "true",
-                "id": ".*"
-                }
-                ],
-            "restriction": {
-                "scopes": [
+            {
+               "entities": [
                     {
-                    "type" : "FIWARE::Location",
-                    "value" : {
-                    "circle": {
-                    "centerLatitude": "40.418889",
-                    "centerLongitude": "-3.691944",
-                    "radius": "15000"
+                    "type": "City",
+                    "isPattern": "true",
+                    "id": ".*"
                     }
+                    ],
+                "restriction": {
+                    "scopes": [
+                        {
+                        "type" : "FIWARE::Location",
+                        "value" : {
+                        "circle": {
+                        "centerLatitude": "40.418889",
+                        "centerLongitude": "-3.691944",
+                        "radius": "15000"
+                        }
+                    }
+                    }
+                    ]
                 }
-                }
-                ]
             }
-        }
         
 
 + Response 200 (application/json)  
 
-        + Headers (application/json)
+    + Headers 
     
             Accept: application/json
         
-        + Body 
-    
-        "contextResponses": [
-            {
-                "contextElement": {
-                    "attributes": [
-                        {
-                            "metadatas": [
-                                {
-                                    "name": "location", 
-                                    "type": "string", 
-                                    "value": "WGS84"
-                                }
-                            ], 
-                            "name": "position", 
-                            "type": "coords", 
-                            "value": "40.418889, -3.691944"
-                        }
-                    ], 
-                    "id": "Madrid", 
-                    "isPattern": "false", 
-                    "type": "City"
-                }, 
-                "statusCode": {
-                    "code": "200", 
-                    "reasonPhrase": "OK"
-                }
-            }, 
-            {
-                "contextElement": {
-                    "attributes": [
-                        {
-                            "metadatas": [
-                                {
-                                    "name": "location", 
-                                    "type": "string", 
-                                    "value": "WGS84"
-                                }
-                            ], 
-                            "name": "position", 
-                            "type": "coords", 
-                            "value": "40.316667, -3.75"
-                        }
-                    ], 
-                    "id": "Leganes", 
-                    "isPattern": "false", 
-                    "type": "City"
-                }, 
-                "statusCode": {
-                    "code": "200", 
-                    "reasonPhrase": "OK"
+    + Body 
+
+            "contextResponses": [
+                {
+                    "contextElement": {
+                        "attributes": [
+                            {
+                                "metadatas": [
+                                    {
+                                        "name": "location", 
+                                        "type": "string", 
+                                        "value": "WGS84"
+                                    }
+                                ], 
+                                "name": "position", 
+                                "type": "coords", 
+                                "value": "40.418889, -3.691944"
+                            }
+                        ], 
+                        "id": "Madrid", 
+                        "isPattern": "false", 
+                        "type": "City"
+                    }, 
+                    "statusCode": {
+                        "code": "200", 
+                        "reasonPhrase": "OK"
                     }
-                }
-            ]
-        }
+                }, 
+                {
+                    "contextElement": {
+                        "attributes": [
+                            {
+                                "metadatas": [
+                                    {
+                                        "name": "location", 
+                                        "type": "string", 
+                                        "value": "WGS84"
+                                    }
+                                ], 
+                                "name": "position", 
+                                "type": "coords", 
+                                "value": "40.316667, -3.75"
+                            }
+                        ], 
+                        "id": "Leganes", 
+                        "isPattern": "false", 
+                        "type": "City"
+                    }, 
+                    "statusCode": {
+                        "code": "200", 
+                        "reasonPhrase": "OK"
+                        }
+                    }
+                ]
+            }
     
 
         
@@ -3246,6 +3254,7 @@ The following is the request corresponding to an ONTIMEINTERVAL subscription:
 |<b>NotifyConditions</b>           |                |                                 |
 |                                  | Type           | ONTIMEINTERVAL                  |
 |                                  | CondValues     | PT10S                           |
+
 </center>
 
 <center>
@@ -3408,9 +3417,9 @@ You may wonder why accumulator-server.py is getting this message if you don't ac
 
 + Request ONTIMEINTERVAL (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -3440,20 +3449,20 @@ You may wonder why accumulator-server.py is getting this message if you don't ac
             
 + Response 200 (application/json)
 
-        {
-            "subscribeResponse": {
-            "duration": "P1M", 
-            "subscriptionId": "552f7481983d79a38fbd5a74"
+            {
+                "subscribeResponse": {
+                "duration": "P1M", 
+                "subscriptionId": "552f7481983d79a38fbd5a74"
+                }
             }
-        }
 
 
 
 + Request ONCHANGE (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -3590,9 +3599,9 @@ The updateContext operation is quite flexible as it allows you to update as many
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -3622,33 +3631,33 @@ The updateContext operation is quite flexible as it allows you to update as many
             
 + Response 200 (application/json)
 
-        {
-            "contextResponses": [
             {
-                "contextElement": {
-                    "attributes": [
-                        {
-                            "name": "temperature",
-                            "type": "float",
-                            "value": ""
+                "contextResponses": [
+                {
+                    "contextElement": {
+                        "attributes": [
+                            {
+                                "name": "temperature",
+                                "type": "float",
+                                "value": ""
+                            },
+                            {
+                                "name": "pressure",
+                                "type": "integer",
+                                "value": ""
+                            }
+                        ],
+                            "id": "Room1",
+                            "isPattern": "false",
+                            "type": "Room"
                         },
-                        {
-                            "name": "pressure",
-                            "type": "integer",
-                            "value": ""
-                        }
-                    ],
-                        "id": "Room1",
-                        "isPattern": "false",
-                        "type": "Room"
-                    },
-                        "statusCode": {
-                            "code": "200",
-                            "reasonPhrase": "OK"
-                        }
-                }
-            ]
-        }
+                            "statusCode": {
+                                "code": "200",
+                                "reasonPhrase": "OK"
+                            }
+                    }
+                ]
+            }
         
 
 ## /v1/unsubscribeContext
@@ -3699,15 +3708,16 @@ Finally, you can cancel a subscription using the NGSI10 unsubscribeContext opera
 |                                  | Code            | 200                      | 
 |                                  | ReasonPhrase    | Ok                       |              
 |<b>SubscriptionId</b>             |                 | 552f7481983d79a38fbd5a74 |   
+
 </center>
 
 
 
 + Request (application/json)
 
-    + Headers (application/json)
+    + Headers 
     
-        Accept: application/json
+            Accept: application/json
         
 
     + Body
@@ -3718,10 +3728,10 @@ Finally, you can cancel a subscription using the NGSI10 unsubscribeContext opera
         
 + Response 200 (application/json)
 
-         {
-            "statusCode": {
-                "code": "200",
-                "reasonPhrase": "OK"
-            },
-            "subscriptionId": "51c04a21d714fb3b37d7d5a7"
-         }
+            {
+                "statusCode": {
+                    "code": "200",
+                    "reasonPhrase": "OK"
+                },
+                "subscriptionId": "51c04a21d714fb3b37d7d5a7"
+            }
