@@ -46,7 +46,7 @@ echo
 
 echo "02. Update entity with attr A1 using an invalid type for A1 - POST /v2/entities/E1 A1/<TA1>/a1"
 echo "=============================================================================================="
-payload='{ "A1": { "type": "T<A1>", "value" : "a2" } }'
+payload='{ "A1": { "type": "<TA1>", "value" : "a2" } }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --json
 echo
 echo
