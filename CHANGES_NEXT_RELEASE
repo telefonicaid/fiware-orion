@@ -32,4 +32,4 @@ Fix:  Removed the check of forbidden characters for the values of the URI parame
 Add:  GET /v2/types (Issue #1027)
 Fix:  Made broker respond with 400 Bad Request on encountering invalid items in URI parameter 'options' (Issue #1169)
 Add:  text/plain encoding for GET /v2/entities/<entityId>/attrs/<attrName>/value operation (both Accept header and ?options=text) (Issue #1179)
-Fix:  Fixed a bug about HTTP Content-Length required (Issue #1203)
+Fix:  Detail message for HTTP Content-Lenght required error (Issue #1203)
