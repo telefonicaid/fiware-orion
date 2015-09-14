@@ -62,7 +62,7 @@ In order to check that the entity is there, you can query it the same way you qu
 
 ``` 
 (curl orion.lab.fi-ware.org:1026/ngsi10/contextEntities/$ID -X GET -s -S \
-    --header 'Content-Type: application/json' --header 'Accept: application/json'\ 
+    --header 'Content-Type: application/json' --header 'Accept: application/json'\
     --header "X-Auth-Token: $AUTH_TOKEN" | python -mjson.tool)
 ``` 
 And you can, of course, modify the values for the attributes, e.g. to modify the temperature:
