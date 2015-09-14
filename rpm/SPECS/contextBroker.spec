@@ -164,6 +164,43 @@ if [ "$1" == "0" ]; then
 fi
 
 %changelog
+* Mon Sep 14 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.24.0-1
+- Add:  FIWARE::StringQuery scope, implementing filtering capabilities (equal, unqual, greater/less than, ranges, existence) (Issue #864)
+- Add:  APPEND_STRICT action type for POST /v1/updateContext operation
+- Add:  REPLACE action type for POST /v1/updateContext operation
+- Add:  Implemented a RAM-cache for patterned ngsi10 subscriptions (Issue #1048)
+- Add:  API version 2 only supports JSON so we can now distinguish between STRINGS, NUMBERS (all treated as floats for now),
+        and BOOLEANS (true, false), for the VALUE for ContextAttribute and Metadata (No Issue)
+- Add:  POST /v2/entities - entity creation for API version 2 (Issue #970)
+- Add:  POST /v2/entities/{entityId} - append or update attributes (by entity ID) for API version 2 (Issue #981)
+- Add:  URI parameter "op=append", for POST /v2/entities/{entityId} (Issue #983)
+- Add:  DELETE /v2/entities/{id} - delete an entity (Issue #985)
+- Add:  Number and boolean rendering for attribute simple values (not compounds) in /v1 operations for JSON encoding
+- Add:  URI parameter "attrs=a1,a2,a3..." for GET /v2/entities/{entityId} (Issue #971)
+- Add:  PUT /v2/entities/{entityId} - replace attributes (by entity ID) for API version 2 (Issue #987)
+- Add:  GET /v2/entities/{entityId}/attrs/{attrName}/value - get a single attribute value (Issue #997)
+- Add:  URI parameters id, idPattern and type for GET /v2/entities (Issues #952 #953 #969)
+- Add:  PATCH /v2/entities/{entityId} - modify an entity (Issue #979)
+- Add:  URI parameter 'q' for GET /v2/entities (Issue #967)
+- Add:  PUT /v2/entities/{entityId}/attrs/{attrName}/value (Issue #999)
+- Add:  DELETE /v2/entities/{entityId}/attrs/{attrName} (Issue #993)
+- Add:  PUT /v2/entities/{entityId}/attrs/{attrName} (Issue #991)
+- Add:  GET /v2/types/{type} (Issue #1028)
+- Add:  GET /v2/types (Issue #1027)
+- Add:  text/plain encoding for GET /v2/entities/{entityId}/attrs/{attrName}/value operation (both Accept header and ?options=text) (Issue #1179)
+- Add:  monit_log_processing.py script to contextBroker RPM (Issue #1083) 
+- Add:  httpsPrepare.sh script to contextBroker-tests RPM (Issue #2)
+- Fix:  Fixed a bug about generic error handling for API version 2 (Issue #1087)
+- Fix:  Fixed a bug about error handling of invalid Service-Path for API version 2 (Issue #1092)
+- Fix:  Check for illegal characters in URI parameters (name and value) (Issue #1141)
+- Fix:  Checking for forbidden chars in many fields of JSON payload for API version 2 (Issue #1093)
+- Fix:  Bug fix for receiving compound metadata values (which is not supported) (Issue #1110)
+- Fix:  Error handling for non-string entity::id/type (Issue #1108), attribute::type, and metadata::type/value
+- Fix:  Metadata updates involving boolean/number values were not correctly processed (Issue #1113)
+- Fix:  Removed the check of forbidden characters for the values of the URI parameter 'idPattern'
+- Fix:  Made broker respond with 400 Bad Request on encountering invalid items in URI parameter 'options' (Issue #1169)
+- Fix:  Several older memory leaks has been fixed thanks to improvements in leak-detecting tool
+
 * Fri Jul 10 2015 Fermin Galan <fermin.galanmarquez@telefonica.com> 0.23.0-1
 - Add: Reuse curl context for outgoing notifications, so now connections are persistent if the HTTP server doesn't close them
 - Add: CLI paramter -cprForwardLimit to cap the number of forwarding request for a single client request. (Issue #1016).
