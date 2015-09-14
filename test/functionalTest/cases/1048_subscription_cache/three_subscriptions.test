@@ -144,7 +144,7 @@ echo
 
 echo "04. Statistics"
 echo "=============="
-orionCurl --url /statistics
+orionCurl --url /statistics --json
 echo
 echo
 
@@ -242,26 +242,26 @@ Date: REGEX(.*)
 04. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: 704
-Content-Type: application/xml
+Content-Length: REGEX((488|450))
+Content-Type: application/json
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orion>
-  <xmlRequests>REGEX((1|2))</xmlRequests>
-  <jsonRequests>3</jsonRequests>
-  <subscriptions>3</subscriptions>
-  <versionRequests>0</versionRequests>
-  <statisticsRequests>1</statisticsRequests>
-  <subCacheEntries>2</subCacheEntries>
-  <requestSemaphoreWaitingTime>REGEX(\d+.\d+)</requestSemaphoreWaitingTime>
-  <dbConnectionPoolWaitingTime>REGEX(\d+.\d+)</dbConnectionPoolWaitingTime>
-  <transactionSemaphoreWaitingTime>REGEX(\d+.\d+)</transactionSemaphoreWaitingTime>
-  <curlContextMutexWaitingTime>REGEX(\d+.\d+)</curlContextMutexWaitingTime>
-  <subCacheMutexWaitingTime>REGEX(\d+.\d+)</subCacheMutexWaitingTime>
-  <uptime_in_secs>REGEX(\d+)</uptime_in_secs>
-  <measuring_interval_in_secs>REGEX(\d+)</measuring_interval_in_secs>
-</orion>
+{
+    "orion": {
+        "curlContextMutexWaitingTime": "REGEX(\d+.\d+)",
+        "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)",
+        "jsonRequests": "REGEX((4|5))",
+        "measuring_interval_in_secs": "REGEX(\d+)",
+        "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+        "statisticsRequests": "1",
+        "subCacheEntries": "2",
+        "subCacheMutexWaitingTime": "REGEX(\d+.\d+)",
+        "subscriptions": "3",
+        "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
+        "uptime_in_secs": "REGEX(\d+)",
+        "versionRequests": "0"
+    }
+}
 
 
 05. Remove first subscription (uncached SUB1)
@@ -283,7 +283,7 @@ Date: REGEX(.*)
 06. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: REGEX((542|544))
+Content-Length: REGEX((517|519))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -291,7 +291,7 @@ Date: REGEX(.*)
     "orion": {
         "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
         "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
-        "jsonRequests": "5", 
+        "jsonRequests": "REGEX((6|7))", 
         "measuring_interval_in_secs": "REGEX(\d+)", 
         "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "statisticsRequests": "2", 
@@ -301,8 +301,7 @@ Date: REGEX(.*)
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "1", 
         "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0",
-        "xmlRequests": "REGEX((1|2))"
+        "versionRequests": "0"
     }
 }
 
@@ -326,7 +325,7 @@ Date: REGEX(.*)
 08. Statistics
 ==============
 HTTP/1.1 200 OK
-Content-Length: REGEX((572|574))
+Content-Length: REGEX((547|549))
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -334,7 +333,7 @@ Date: REGEX(.*)
     "orion": {
         "curlContextMutexWaitingTime": "REGEX(\d+.\d+)", 
         "dbConnectionPoolWaitingTime": "REGEX(\d+.\d+)", 
-        "jsonRequests": "7", 
+        "jsonRequests": "REGEX((8|9))", 
         "measuring_interval_in_secs": "REGEX(\d+)", 
         "requestSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "statisticsRequests": "3", 
@@ -345,8 +344,7 @@ Date: REGEX(.*)
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "2", 
         "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0",
-        "xmlRequests": "REGEX((1|2))"
+        "versionRequests": "0"
     }
 }
 

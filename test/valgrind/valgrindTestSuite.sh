@@ -276,8 +276,8 @@ function brokerStart()
       loopNo=$loopNo+1
     done
 
-    # Check CB started fine
-    curl -s localhost:${CB_TEST_PORT}/version | grep version > /dev/null
+    # Check that CB responds
+    curl -s localhost:${CB_TEST_PORT}/version -H "Accept: application/json" | grep version > /dev/null
     result=$?
 
     # Reset statistics, so that functional tests will work
