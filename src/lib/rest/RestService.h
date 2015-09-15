@@ -33,6 +33,7 @@
 #include "ngsi/Request.h"
 #include "xmlParse/xmlRequest.h"
 #include "jsonParse/jsonRequest.h"
+#include "jsonParseV2/jsonRequestTreat.h"
 
 
 
@@ -80,6 +81,7 @@ extern std::string payloadParse
   RestService*               service,
   XmlRequest**               reqPP,
   JsonRequest**              jsonPP,
+  JsonDelayedRelease*        jsonReleaseP,
   std::vector<std::string>&  compV
 );
 

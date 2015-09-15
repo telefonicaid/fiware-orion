@@ -51,7 +51,7 @@ typedef struct EntityIdVector
   std::string  render(Format format, const std::string& indent, bool comma = false);
   void         present(const std::string& indent);
   void         push_back(EntityId* item);
-  void         push_back_if_absent(EntityId* item);
+  bool         push_back_if_absent(EntityId* item);
   unsigned int size(void);
   EntityId*    get(int ix);
   EntityId*    lookup(const std::string& name, const std::string& type, const std::string& isPattern);

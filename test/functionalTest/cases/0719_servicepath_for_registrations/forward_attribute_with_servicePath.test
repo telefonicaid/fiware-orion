@@ -26,8 +26,11 @@ Forward non-existing attribute in existing entity for update in context provider
 --SHELL-INIT--
 dbInit CB
 dbInit CP1
+
+export BROKER_AWAIT_SLEEP_TIME=6
 brokerStart CB 0
 brokerStart CP1 0
+unset BROKER_AWAIT_SLEEP_TIME
 
 --SHELL--
 

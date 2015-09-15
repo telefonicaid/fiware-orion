@@ -167,13 +167,20 @@ void EntityIdVector::push_back(EntityId* item)
 /* ****************************************************************************
 *
 * EntityIdVector::push_back_if_absent -
+*
+* RETURN VALUE
+*   - true:  on successful push_back
+*   - false: if no push_back was made
 */
-void EntityIdVector::push_back_if_absent(EntityId* item)
+bool EntityIdVector::push_back_if_absent(EntityId* item)
 {
   if (lookup(item->id, item->type, item->isPattern) == NULL)
   {
     vec.push_back(item);
+    return true;
   }
+
+  return false;
 }
 
 

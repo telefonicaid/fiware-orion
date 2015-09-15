@@ -25,7 +25,10 @@ Plain local query that fails
 
 --SHELL-INIT--
 dbInit CB
+
+export BROKER_AWAIT_SLEEP_TIME=6
 brokerStart CB
+unset BROKER_AWAIT_SLEEP_TIME
 
 --SHELL--
 

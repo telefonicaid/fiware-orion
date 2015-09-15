@@ -18,7 +18,7 @@ building from sources, check [this document](build_source.md).
 
 ## Requirements
 
-* System resources: see [these recommendations](resources.md#resources-recommendations)
+* System resources: see [these recommendations](diagnosis.md##resource-availability)
 * Operating system: CentOS/RedHat. The reference operating system is CentOS 6.3
 but it should work also in any later CentOS/RedHat 6.x version.
 * Database: MongoDB is required to run either in the same host where Orion Context Broker is to be installed or in a different host accessible through the network. The recommended MongoDB version is 2.6.9 (although it should work with later MongoDB 2.6.x and 3.0.x versions). It is not recommended using MongoDB 2.4.x., as some [geolocated queries](../user/geolocation.md) may not work.
@@ -53,10 +53,10 @@ rpm -i contextBroker-X.Y.Z-1.x86_64.rpm
 
 ### Optional packages
 
-Apart from the mandatory RPM described above, you can install the contextBroker-test package, which contain utility tools:
+Apart from the mandatory RPM described above, you can install the contextBroker-tests package, which contain utility tools:
 
 ```
-yum install contextBroker-test
+yum install contextBroker-tests
 ```
 
 or

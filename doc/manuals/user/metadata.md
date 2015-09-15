@@ -12,131 +12,141 @@ queryContext or notifyContext.
 For example, to create an entity Room1 with attribute "temperature", and
 associate metadata "accuracy" to "temperature":
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "26.5",
-			  "metadatas": [
-			      {
-				  "name": "accuracy",
-				  "type": "float",
-				  "value": "0.8"
-			      }
-			  ]
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "APPEND"
-      }
-      EOF                                                                                                                     
+``` 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "26.5",
+                    "metadatas": [
+                        {
+                            "name": "accuracy",
+                            "type": "float",
+                            "value": "0.8"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}
+EOF 
+``` 
   
 Metadata can be updated regardless of the attribute value being updated
 or not. For example, next updateContext shows how "accuracy" is updated
 to 0.9 although the value of the temperature iself is still 26.5:
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "26.5",
-			  "metadatas": [
-			      {
-				  "name": "accuracy",
-				  "type": "float",
-				  "value": "0.9"
-			      }
-			  ]
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "UPDATE"
-      }
-      EOF                                                                                                                     
-  
+``` 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "26.5",
+                    "metadatas": [
+                        {
+                            "name": "accuracy",
+                            "type": "float",
+                            "value": "0.9"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+EOF
+``` 
+      
 Metadata can be added after attribute creation. For example, if we want
 to add metadata "average" to "temperature" (in addition to the existing
 "precision"):
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "26.5",
-			  "metadatas": [
-			      {
-				  "name": "average",
-				  "type": "float",
-				  "value": "22.4"
-			      }
-			  ]
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "UPDATE"
-      }
-      EOF                                                                                                                      
-  
+``` 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "26.5",
+                    "metadatas": [
+                        {
+                            "name": "average",
+                            "type": "float",
+                            "value": "22.4"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+EOF
+```
 We can check that temperature includes both attributes
 
-      curl localhost:1026/v1/contextEntities/Room1 -s -S --header 'Accept: application/json' | python -mjson.tool
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "26.5",
-			  "metadatas": [
-			      {
-				  "name": "average",
-				  "type": "float",
-				  "value": "22.4"
-			      },
-			      {
-				  "name": "accuracy",
-				  "type": "float",
-				  "value": "0.9"
-			      }
-			  ]
-		      }
-		  ]
-	      }
-	  ],
-	  "statusCode": {
-	      "code": "200",
-	      "reasonPhrase": "OK"
-	  }
-      }
-
+``` 
+(curl localhost:1026/v1/contextEntities/Room1 -s -S \
+    --header 'Accept: application/json' | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "26.5",
+                    "metadatas": [
+                        {
+                            "name": "average",
+                            "type": "float",
+                            "value": "22.4"
+                        },
+                        {
+                            "name": "accuracy",
+                            "type": "float",
+                            "value": "0.9"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "statusCode": {
+        "code": "200",
+        "reasonPhrase": "OK"
+    }
+}
+``` 
       
 Note that, from the point of view of [ONCHANGE
 subscription](walkthrough_apiv1.md#onchange), changing the metadata of a given
@@ -167,139 +177,153 @@ use the metadata ID for this purpose. Let's illustrate with an example.
 
 First, we create the Room1 entity:
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "23.5",
-			  "metadatas": [
-			      {
-				  "name": "ID",
-				  "type": "string",
-				  "value": "ground"
-			      }
-			  ]
-		      },
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "23.8",
-			  "metadatas": [
-			      {
-				  "name": "ID",
-				  "type": "string",
-				  "value": "wall"
-			      }
-			  ]
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "APPEND"
-      }
-      EOF                                                                                                                      
-  
+``` 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "23.5",
+                    "metadatas": [
+                        {
+                            "name": "ID",
+                            "type": "string",
+                            "value": "ground"
+                        }
+                    ]
+                },
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "23.8",
+                    "metadatas": [
+                        {
+                            "name": "ID",
+                            "type": "string",
+                            "value": "wall"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}
+EOF
+``` 
+
 Now, we can query for temperature to get both instances:
 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1"
-	      }
-	  ],
-	  "attributes": [
-	      "temperature"
-	  ]
-      }
-      EOF
-  
+``` 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1"
+        }
+    ],
+    "attributes": [
+        "temperature"
+    ]
+}
+EOF
+``` 
+
 We can update an specific instance (e.g. ground), letting the other
 untouched:
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "30",
-			  "metadatas": [
-			      {
-				  "name": "ID",
-				  "type": "string",
-				  "value": "ground"
-			      }
-			  ]
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "UPDATE"
-      }
-      EOF                                                                                                                     
- 
+``` 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "30",
+                    "metadatas": [
+                        {
+                            "name": "ID",
+                            "type": "string",
+                            "value": "ground"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "updateAction": "UPDATE"
+}
+EOF
+``` 
+
 Check it using again queryContext (ground has changed to 30ºC but wall
 has its initial value of 23.8º C).
 
 To avoid ambiguities, you cannot mix the same attribute with and without
 ID. The following entity creation will fail:
 
-      (curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "contextElements": [
-	      {
-		  "type": "Room",
-		  "isPattern": "false",
-		  "id": "Room1",
-		  "attributes": [
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "23.5",
-			  "metadatas": [
-			      {
-				  "name": "ID",
-				  "type": "string",
-				  "value": "ground"
-			      }
-			  ]
-		      },
-		      {
-			  "name": "temperature",
-			  "type": "float",
-			  "value": "23.8"
-		      }
-		  ]
-	      }
-	  ],
-	  "updateAction": "APPEND"
-      }
-      EOF                                                                                                                     
+``` 
+(curl localhost:1026/v1/updateContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "contextElements": [
+        {
+            "type": "Room",
+            "isPattern": "false",
+            "id": "Room1",
+            "attributes": [
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "23.5",
+                    "metadatas": [
+                        {
+                            "name": "ID",
+                            "type": "string",
+                            "value": "ground"
+                        }
+                    ]
+                },
+                {
+                    "name": "temperature",
+                    "type": "float",
+                    "value": "23.8"
+                }
+            ]
+        }
+    ],
+    "updateAction": "APPEND"
+}
+EOF
+``` 
 
-      ...                                                                                                 
-      {
-	  "statusCode": {
-	      "code": "472",
-	      "details": "action: APPEND - entity: (Room1, Room) - offending attribute: temperature",
-	      "reasonPhrase": "request parameter is invalid/not allowed"
-	  }
-      }
-      ...    
+```
+...
+    {
+	"statusCode": {
+	    "code": "472",
+	    "details": "action: APPEND - entity: (Room1, Room) - offending attribute: temperature",
+	    "reasonPhrase": "request parameter is invalid/not allowed"
+	}
+    }
+...
+```
       
 Finally, you can use also the following convenience operations with
 attributes using ID metadata:

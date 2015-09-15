@@ -21,13 +21,17 @@ Context Broker:
 
 A discoveryContextAvailability/querycontext using:
 
-        ...
-        <entityIdList>
-          <entityId type="" isPattern="false">
-            <id>Room1</id>
-          </entityId>
-        </entityIdList>
-        ...
+```
+  ...
+  "entities": [
+      {
+          "type": "",
+          "isPattern": "false",
+          "id": "Room1"
+      }
+  ]
+  ...
+```
 
 will match both Entity 1 and Entity 2.
 

@@ -1735,9 +1735,9 @@ bool entitiesQuery
       BSONObj           queryAttr  = queryAttrs.getField(attrName).embeddedObject();
       ContextAttribute  ca;
 
-      ca.name = dbDotDecode(basePart(attrName));
+      ca.name          = dbDotDecode(basePart(attrName));
       std::string mdId = idPart(attrName);
-      ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
+      ca.type          = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
 
       /* Note that includedAttribute decision is based on name and type. Value is set only if
        * decision is positive
@@ -1756,24 +1756,29 @@ bool entitiesQuery
           }
           caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
           break;
+
         case NumberDouble:
           ca.numberValue = queryAttr.getField(ENT_ATTRS_VALUE).Number();
           caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
           break;
+
         case Bool:
           ca.boolValue = queryAttr.getBoolField(ENT_ATTRS_VALUE);
           caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
           break;
+
         case Object:
           caP = new ContextAttribute(ca.name, ca.type, "");
           caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
           compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
           break;
+
         case Array:
           caP = new ContextAttribute(ca.name, ca.type, "");
           caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
           compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
           break;
+
         default:
           LM_E(("Runtime Error (unknown attribute value type in DB: %d)", queryAttr.getField(ENT_ATTRS_VALUE).type()));
           continue;

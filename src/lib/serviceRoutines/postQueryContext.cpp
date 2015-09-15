@@ -464,8 +464,17 @@ std::string postQueryContext
       }
       else
       {
+        EntityId* entityP = new EntityId(eP);
+        bool      pushed;
+
         requestP->attributeList.push_back_if_absent(aP->name);
-        requestP->entityIdVector.push_back_if_absent(new EntityId(eP));
+
+        pushed = requestP->entityIdVector.push_back_if_absent(entityP);
+        if (pushed == false)
+        {
+          entityP->release();
+          delete entityP;
+        }
       }
     }
   }

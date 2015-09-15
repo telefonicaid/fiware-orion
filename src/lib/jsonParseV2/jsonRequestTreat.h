@@ -34,9 +34,26 @@
 
 
 /* ****************************************************************************
+ *
+* JsonDelayedRelease - 
+*/
+typedef struct JsonDelayedRelease
+{
+  Entity*            entity;
+  ContextAttribute*  attribute;
+
+  JsonDelayedRelease()
+  {
+    entity    = NULL;
+    attribute = NULL;
+  }
+} JsonDelayedRelease;
+
+
+/* ****************************************************************************
 *
 * jsonRequestTreat - 
 */
-extern std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType);
+extern std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType, JsonDelayedRelease* releaseP);
 
 #endif  // SRC_LIB_JSONPARSEV2_JSONREQUESTTREAT_H_

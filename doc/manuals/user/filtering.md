@@ -16,32 +16,36 @@ filters are typically used with [queryContext with patterns](walkthrough_apiv1.m
 As a general rule, filters used in standard operation use a scope
 element:
 
- 
-      (curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
-      {
-	  "entities": [
-	      {
-		  "type": "myEntityType",
-		  "isPattern": "true",
-		  "id": ".*"
-	      }
-	  ],
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Filter::foobar",
-		      "value": ""
-		  }
-	      ]
-	  }
-      }
-      EOF                                                                                                                 
+``` 
+(curl localhost:1026/v1/queryContext -s -S --header 'Content-Type: application/json' \
+    --header 'Accept: application/json' -d @- | python -mjson.tool) <<EOF
+{
+    "entities": [
+        {
+            "type": "myEntityType",
+            "isPattern": "true",
+            "id": ".*"
+        }
+    ],
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Filter::foobar",
+                "value": ""
+            }
+        ]
+    }
+}
+EOF
+``` 
 
 while filters in convenience operations are included as parameters in
 the URL:
 
-    curl localhost:1026/v1/contextEntities?filter=value -s -S --header 'Content-Type: application/json' --header 'Accept: application/json' | python -mjson.tool
-
+``` 
+curl localhost:1026/v1/contextEntities?filter=value -s -S  --header 'Content-Type: application/json'  \
+    --header 'Accept: application/json' | python -mjson.tool
+``` 
 Filters are cumulative. In other words, you can use several scopes in
 the same restriction (in the case of standard operations) or several URL
 argument separated by '&' in order to specify several filters. The
@@ -53,18 +57,18 @@ result is a logic "and" between all of them.
 
 The scope correspoding to this type is "FIWARE::Filter::Existence". 
 
-      ...                                                           
-      {
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Filter::Existence",
-		      "value": "entity::type"
-		  }
-	      ]
-	  }
-      }
-      ...                                                           
+```
+{
+    "restriction": {
+        "scopes": [
+            {
+                "type": "FIWARE::Filter::Existence",
+                "value": "entity::type"
+            }
+        ]
+    }
+}
+```
   
 The URL parameter corresponding to this filter is 'exist'.
 
@@ -79,19 +83,21 @@ existence is the entity type, corresponding to "entity::type".
 
 The scope corresponding to this type is "FIWARE::Filter::Not::Existence".
 
-      ...                                                                
-      {
-	  "restriction": {
-	      "scopes": [
-		  {
-		      "type": "FIWARE::Filter::Not::Existence",
-		      "value": "entity::type"
-		  }
-	      ]
-	  }
-      }
-      ...                                                                
-  
+```
+... 
+    {
+        "restriction": {
+            "scopes": [
+                {
+                    "type": "FIWARE::Filter::Not::Existence",
+                    "value": "entity::type"
+                }
+            ]
+        }
+    }
+...
+```
+ 
 The URL parameter corresponding to this filter is '!exist'.
 
     curl localhost:1026/v1/contextEntities?!exist=entity::type ...
@@ -109,18 +115,15 @@ that queries without type resolve to "any type", as explained in the
 There is no scope corresponding to this filter, given that you can use
 the usual entity type:
 
-  --------------------------------------------------------------------------------------
-  JSON
-  --------------------------------------------------------------------------------------
-      ...                                            
-      {
-	  "type": "Room",
-	  "isPattern": "...",
-	  "id": "..."
-      }
-      ...
-  --------------------------------------------------------------------------------------
-
+```
+...
+    {
+        "type": "Room",
+        "isPattern": "...",
+        "id": "..."
+    }
+...
+```
 The URL parameter corresponding to this filter is 'entity::type'.
 
     curl localhost:1026/v1/contextEntities?entity::type=Room ...
@@ -141,18 +144,20 @@ operation filter.
 
 The scope corresponding to this type is "FIWARE::StringFilter".
 
-      ...
-      {
-          "restriction": {
-              "scopes": [
-                  {
-                      "type": "FIWARE::StringFilter",
-                      "value": "temperature<24;humidity==75..90;status=running"
-                  }
-              ]
-          }
-      }
-      ...
+```
+...
+    {
+        "restriction": {
+            "scopes": [
+                {
+                    "type": "FIWARE::StringFilter",
+                    "value": "temperature<24;humidity==75..90;status=running"
+                }
+            ]
+        }
+    }
+...
+```
 
 This scope allows to express filtering conditions such as equality, unequality,
 greater/less than, range or existence.

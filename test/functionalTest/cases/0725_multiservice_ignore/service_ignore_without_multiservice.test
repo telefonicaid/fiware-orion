@@ -63,6 +63,10 @@ echo "====================================================="
 # multiline in a general case
 echo "show dbs" | mongo | grep ${CB_DATABASE_NAME} | wc -l
 echo "show dbs" | mongo | grep ${CB_DATABASE_NAME}-foo | wc -l
+# Next line was added in PR https://github.com/telefonicaid/fiware-orion/pull/1184/files#r37738638
+# in order to help us to detect where the ftest-ftest-ftest-... problem is. It could happen that
+# after fixing #1186 this is no longer needed, but let's keep it for a while as a "quarentine" measure...
+echo "show dbs" | mongo | grep ftest | awk '{ print $1 }'
 
 --REGEXPECT--
 1. Create an entity using foo as tenant
@@ -101,10 +105,11 @@ Date: REGEX(.*)
 =====================================================
 1
 0
+ftest
 --TEARDOWN--
 
 brokerStop CB
 dbDrop CB
 
-# The following drop is to prevent the case in which the test failed and two databases were created
+# The following drop is in case the test failed and two databases were actually created
 dbDrop ${CB_DATABASE_NAME}-foo

@@ -40,13 +40,14 @@
 *
 * jsonRequestTreat - 
 */
-std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
+std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType, JsonDelayedRelease* releaseP)
 {
   std::string answer;
 
   switch (requestType)
   {
   case EntitiesRequest:  // POST /v2/entities
+    releaseP->entity = &parseDataP->ent.res;
     answer = parseEntity(ciP, &parseDataP->ent.res, false);
     if (answer != "OK")
     {
@@ -61,6 +62,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
 
   case EntityRequest:  // POST /v2/entities/<eid>
+    releaseP->entity = &parseDataP->ent.res;
     answer = parseEntity(ciP, &parseDataP->ent.res, true);
     if (answer != "OK")
     {
@@ -75,6 +77,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
 
   case EntityAttributeRequest:
+    releaseP->attribute = &parseDataP->attr.attribute;
     answer = parseContextAttribute(ciP, &parseDataP->attr.attribute);
     parseDataP->attr.attribute.present("Parsed Attribute: ", 0);
     if (answer != "OK")
@@ -84,6 +87,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
     break;
 
   case EntityAttributeValueRequest:
+    releaseP->attribute = &parseDataP->av.attribute;
     answer = parseAttributeValue(ciP, &parseDataP->av.attribute);
     if (answer != "OK")
     {

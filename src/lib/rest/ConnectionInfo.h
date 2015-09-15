@@ -126,6 +126,8 @@ public:
   {
     if (compoundValueRoot != NULL)
       delete compoundValueRoot;
+
+    servicePathV.clear();
   }
 
   MHD_Connection*            connection;

@@ -439,6 +439,8 @@ void SubscriptionCache::insert(const std::string& tenant, BSONObj bobj)
                                         format);
   
   subCache->insert(subP);
+
+  notifyConditionVector.release();  // Subscription constructor makes a copy
 }
 
 
@@ -457,7 +459,9 @@ int SubscriptionCache::remove(Subscription* subP)
     {
       semTake();
 
-      free(subP);
+      subP->release();
+      delete(subP);
+
       subs.erase(subs.begin() + ix);
       
       semGive();
