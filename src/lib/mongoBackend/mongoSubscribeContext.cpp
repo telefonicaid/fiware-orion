@@ -211,7 +211,9 @@ HttpStatusCode mongoSubscribeContext
     // 3. Create Subscription for the cache
     if (patternBased && onchange)
     {
-      subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oid.toString(), expiration, notifyFormat));
+      std::string oidString = oid.toString();
+
+      subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oidString, expiration, notifyFormat));
     }
 
 

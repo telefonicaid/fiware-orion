@@ -10,7 +10,7 @@ a registerContext:
       {
       "duration": "PT24H",
          "registrationId": "52f38a64261c371af12b8565"
-      }                             
+      }
 
 ## Extending duration
 

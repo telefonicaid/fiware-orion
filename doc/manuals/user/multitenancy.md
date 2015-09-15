@@ -30,11 +30,11 @@ which case the header is not present), e.g.:
     Host: 127.0.0.1:9977
     Accept: application/xml, application/json
     Fiware-Service: t_02
-    Content-Type: application/xml
+    Content-Type: application/json
 
-    <notifyContextRequest>
+    {
     ...
-    <notifyContextRequest>
+    }
 
 Regarding service/tenant name syntax, it must be a string of
 alphanumeric characters (and the "\_" symbol). Maximum length is 50

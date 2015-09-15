@@ -612,8 +612,9 @@ int servicePathSplit(ConnectionInfo* ciP)
 
   for (int ix = 0; ix < servicePaths; ++ix)
   {
-    ciP->servicePathV[ix] = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));    
-    ciP->servicePathV[ix] = removeTrailingSlash(ciP->servicePathV[ix]);
+    std::string stripped = std::string(wsStrip((char*) ciP->servicePathV[ix].c_str()));
+
+    ciP->servicePathV[ix] = removeTrailingSlash(stripped);
 
     LM_T(LmtServicePath, ("Service Path %d: '%s'", ix, ciP->servicePathV[ix].c_str()));
   }
@@ -858,6 +859,7 @@ static int connectionTreat
 {
   ConnectionInfo*        ciP         = (ConnectionInfo*) *con_cls;
   size_t                 dataLen     = *upload_data_size;
+  static int             reqNo       = 1;
 
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
@@ -895,10 +897,12 @@ static int connectionTreat
       return MHD_NO;
     }
 
-    *con_cls = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
-    ciP->port = port;
-    ciP->ip   = ip;
+    *con_cls     = (void*) ciP; // Pointer to ConnectionInfo for subsequent calls
+    ciP->port    = port;
+    ciP->ip      = ip;
+    ciP->callNo  = reqNo;
 
+    ++reqNo;
 
     //
     // Transaction starts here
@@ -937,6 +941,7 @@ static int connectionTreat
     }
 
     ciP->servicePath = ciP->httpHeaders.servicePath;
+
     if (servicePathSplit(ciP) != 0)
     {
       LM_W(("Bad Input (error in ServicePath http-header)"));
@@ -1025,7 +1030,7 @@ static int connectionTreat
   // 3. Finally, serve the request (unless an error has occurred)
   if (((ciP->verb == POST) || (ciP->verb == PUT)) && (ciP->httpHeaders.contentLength == 0) && (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0))
   {
-    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST request");
+    std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
     ciP->httpStatusCode = SccLengthRequired;
     restReply(ciP, errorMsg);
   }

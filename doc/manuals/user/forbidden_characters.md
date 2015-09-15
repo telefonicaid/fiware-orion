@@ -1,7 +1,5 @@
 ### Forbidden characters
 
-<span style="color:red">**Since 0.17.0**</span>
-
 In order to avoid script injections attack in some circustances (e.g.
 cross domain to co-located web servers in the same hot that CB) the
 following characters are forbidden in any request:

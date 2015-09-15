@@ -270,29 +270,50 @@ extern void setDbPrefix(std::string _dbPrefix)
 *
 * getOrionDatabases -
 */
-extern void getOrionDatabases(std::vector<std::string>& dbs)
+extern bool getOrionDatabases(std::vector<std::string>& dbs)
 {
   BSONObj       result;
   DBClientBase* connection = getMongoConnection();
 
-  connection->runCommand("admin", BSON("listDatabases" << 1), result);
-  releaseMongoConnection(connection);
-
-  std::vector<BSONElement> databases = result.getField("databases").Array();
-
-  for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
+  try
   {
-    BSONObj      db      = (*i).Obj();
-    std::string  dbName  = STR_FIELD(db, "name");
-    std::string  prefix  = dbPrefix + "-";
+    connection->runCommand("admin", BSON("listDatabases" << 1), result);
+    releaseMongoConnection(connection);
 
-    if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
+    LM_I(("Database Operation Successful (listDatabases command)"));
+
+    std::vector<BSONElement> databases = result.getField("databases").Array();
+
+    for (std::vector<BSONElement>::iterator i = databases.begin(); i != databases.end(); ++i)
     {
-      LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
-      dbs.push_back(dbName);
-      LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      BSONObj      db      = (*i).Obj();
+      std::string  dbName  = STR_FIELD(db, "name");
+      std::string  prefix  = dbPrefix + "-";
+
+      if (strncmp(prefix.c_str(), dbName.c_str(), strlen(prefix.c_str())) == 0)
+      {
+        LM_T(LmtMongo, ("Orion database found: %s", dbName.c_str()));
+        dbs.push_back(dbName);
+        LM_T(LmtBug, ("Pushed back db name '%s'", dbName.c_str()));
+      }
     }
+
+    return true;
+
   }
+  catch (const DBException &e)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error (%s)", e.what()));
+    return false;
+  }
+  catch (...)
+  {
+    releaseMongoConnection(connection);
+    LM_E(("Database Error (generic exception)"));
+    return false;
+  }
+
 }
 
 /*****************************************************************************
@@ -1714,9 +1735,9 @@ bool entitiesQuery
       BSONObj           queryAttr  = queryAttrs.getField(attrName).embeddedObject();
       ContextAttribute  ca;
 
-      ca.name = dbDotDecode(basePart(attrName));
+      ca.name          = dbDotDecode(basePart(attrName));
       std::string mdId = idPart(attrName);
-      ca.type = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
+      ca.type          = STR_FIELD(queryAttr, ENT_ATTRS_TYPE);
 
       /* Note that includedAttribute decision is based on name and type. Value is set only if
        * decision is positive
@@ -1735,24 +1756,29 @@ bool entitiesQuery
           }
           caP = new ContextAttribute(ca.name, ca.type, ca.stringValue);
           break;
+
         case NumberDouble:
           ca.numberValue = queryAttr.getField(ENT_ATTRS_VALUE).Number();
           caP = new ContextAttribute(ca.name, ca.type, ca.numberValue);
           break;
+
         case Bool:
           ca.boolValue = queryAttr.getBoolField(ENT_ATTRS_VALUE);
           caP = new ContextAttribute(ca.name, ca.type, ca.boolValue);
           break;
+
         case Object:
           caP = new ContextAttribute(ca.name, ca.type, "");
           caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeObject);
           compoundObjectResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
           break;
+
         case Array:
           caP = new ContextAttribute(ca.name, ca.type, "");
           caP->compoundValueP = new orion::CompoundValueNode(orion::ValueTypeVector);
           compoundVectorResponse(caP->compoundValueP, queryAttr.getField(ENT_ATTRS_VALUE));
           break;
+
         default:
           LM_E(("Runtime Error (unknown attribute value type in DB: %d)", queryAttr.getField(ENT_ATTRS_VALUE).type()));
           continue;

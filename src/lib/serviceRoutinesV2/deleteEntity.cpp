@@ -112,6 +112,7 @@ std::string deleteEntity
       answer = oe.render(ciP, "");
 
       eP->release();
+      delete eP;
       return answer;
     }
   }
@@ -125,6 +126,7 @@ std::string deleteEntity
 
   // Cleanup and return result
   eP->release();
+  delete eP;
 
   return "";
 }

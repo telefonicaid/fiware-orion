@@ -27,7 +27,10 @@ HTTPS simple test
 dbInit CB
 ${SCRIPT_HOME}/httpsPrepare.sh --keyFileName /tmp/harnessTest.key --certFileName /tmp/harnessTest.pem
 extraParams="-https -key /tmp/harnessTest.key -cert /tmp/harnessTest.pem"
+
+export BROKER_AWAIT_SLEEP_TIME=6
 brokerStart CB 0-255 IPV4 "$extraParams"
+unset BROKER_AWAIT_SLEEP_TIME
 
 --SHELL--
 #

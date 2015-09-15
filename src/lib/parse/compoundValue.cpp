@@ -68,7 +68,7 @@ void compoundValueStart
 
   if (fatherIsVector)
   {
-    ciP->compoundValueP->valueType =orion::ValueTypeVector;
+    ciP->compoundValueP->valueType = orion::ValueTypeVector;
   }
 
   //
@@ -85,7 +85,7 @@ void compoundValueStart
 
   if (ciP->parseDataP->lastContextAttribute->typeFromXmlAttribute == "vector")
   {
-    ciP->compoundValueP->valueType =orion::ValueTypeVector;
+    ciP->compoundValueP->valueType = orion::ValueTypeVector;
   }
 
   ciP->compoundValueVector.push_back(ciP->compoundValueP);

@@ -35,11 +35,11 @@ notifications. In order to do so:
     element in subscribeContext or subscribeContextAvailability
     subscriptions, e.g.
 
-<!-- -->
-
-    ...
-        <reference>https://mymachime.example.com:1028/notify</reference>
-    ...
+```
+  ...
+  "reference": "https://mymachime.example.com:1028/notify"
+  ...
+```
 
 -   You have to use Rush as relayer (as the HTTPS encoding is
     implemented in Rush). See [how to run Orion using

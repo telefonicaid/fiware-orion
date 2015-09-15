@@ -5,7 +5,9 @@ Orion Context Broker: Administration Guide.
 
 ## Table of Contents
 
+* [Installing Orion](install.md)
 * [Building from sources](build_source.md)
+* [Running Orion as system service](running.md)
 * [Running Orion from command line](cli.md)
 * [Database administration](database_admin.md)
 * [Logs](logs.md)
@@ -13,5 +15,5 @@ Orion Context Broker: Administration Guide.
 * [Rush relayer](rush.md)
 * [Management REST inferface](management_api.md)
 * [Data model](database_model.md)
-* [Resources & I/O Flows](resources.md)
-* [Problem diagnosis procedures](diagnosis.md)
+* [Sanity check procedures](sanity_check.md)
+* [Diagnosis procedures](diagnosis.md)

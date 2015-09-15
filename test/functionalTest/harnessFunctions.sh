@@ -158,6 +158,24 @@ function dbDrop()
 
 
 
+# -----------------------------------------------------------------------------
+#
+# dbList
+#
+function dbList
+{
+  name="$1"
+
+  if [ "$name" != "" ]
+  then
+    echo show dbs | mongo --quiet | grep "$name" | awk '{ print $1 }'
+  else
+    echo show dbs | mongo --quiet | awk '{ print $1 }'
+  fi
+}
+
+
+
 # ------------------------------------------------------------------------------
 #
 # dbResetAll - 
@@ -181,6 +199,93 @@ function dbResetAll()
   do
     dbDrop $db
   done
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# brokerStopAwait
+#
+function brokerStopAwait
+{
+  port=$1
+
+  typeset -i loopNo
+  typeset -i loops
+  loopNo=0
+  loops=50
+
+  while [ $loopNo -lt $loops ]
+  do
+    nc -z localhost $port > /dev/null
+    if [ "$?" != "0" ]
+    then
+      vMsg The orion context broker on port $port has stopped
+      sleep 1
+      break;
+    fi
+
+    vMsg Awaiting orion context broker to fully stop '('$loopNo')' ...
+    sleep .2
+    loopNo=$loopNo+1
+  done
+
+  sleep .5
+
+  # Check CB NOT running fine
+  curl -s localhost:${port}/version | grep version > /dev/null
+  result=$?
+  if [ "$result" == "0" ]
+  then
+    result=1  # ERROR - the broker is still running
+  else
+    result=0
+  fi
+}
+
+
+
+# ------------------------------------------------------------------------------
+#
+# brokerStartAwait
+#
+function brokerStartAwait
+{
+  if [ "$BROKER_AWAIT_SLEEP_TIME" != "" ]
+  then
+    sleep $BROKER_AWAIT_SLEEP_TIME
+    result=0
+    return
+  fi
+
+  port=$1
+
+  typeset -i loopNo
+  typeset -i loops
+  loopNo=0
+  loops=50
+
+  while [ $loopNo -lt $loops ]
+  do
+    nc -z localhost $port > /dev/null
+    if [ "$?" == "0" ]
+    then
+      vMsg The orion context broker has started, listening on port $port
+      sleep 1
+      break;
+    fi
+
+    vMsg Awaiting valgrind to fully start the orion context broker '('$loopNo')' ...
+    sleep .2
+    loopNo=$loopNo+1
+  done
+
+  sleep .5
+
+  # Check that CB started fine
+  curl -s localhost:${port}/version | grep version > /dev/null
+  result=$?
 }
 
 
@@ -263,14 +368,34 @@ function localBrokerStart()
     CB_START_CMD="contextBroker -harakiri -port $CP5_PORT -pidpath $CP5_PID_FILE -dbhost $dbHost:$dbPort -db $CP5_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CP5_LOG_DIR $extraParams"
   fi
 
-  if [ "$VALGRIND" == "" ]; then
+
+  #  
+  # Start broker under valgrind if VALGRIND set to 1 and if it's the 'main' broker
+  # 
+  # This is IMPORTANT
+  # In test cases involving more than **one** broker - valgrind is run only for the CB, not CP1 etc.
+  # Having valgrind run for *every broker* destroys the result of the main broker (the 'CB' broker).
+  # The 'other' brokers mess up the output file from valgrind, i.e. the result of the main broker 
+  # is destroyed.
+  # So, now ONLY the broker started as 'CB' is started under VALGRIND
+  # 
+  # [ A *number* of old leaks were discovered when this modification was made. ]
+  #
+  if [ "$VALGRIND" == "" ] || [ "$port" != "$CB_PORT" ]; then
     $CB_START_CMD
     # Wait some time so that the contextBroker is able to do its initial steps (reset database, start HTTP server, etc.)
     sleep 1
+    # FIXME: brokerStartAwait $port  instead of sleep 1?
   else
     valgrind $CB_START_CMD > /tmp/valgrind.out 2>&1 &
-    # Waiting for valgrind to start (sleep 10)
-    sleep 10s
+
+    # Waiting for valgrind to start (sleep a maximum of 10 secs)
+    brokerStartAwait $port
+    if [ "$result" != 0 ]
+    then
+      echo "Unable to start contextBroker"
+      exit 1
+    fi
   fi
 
   # Test to see whether we have a broker running on $port. If not raise an error
@@ -434,8 +559,9 @@ function brokerStop
     fi
   else
     curl localhost:${port}/exit/harakiri 2> /dev/null >> ${TEST_BASENAME}.valgrind.stop.out
-    # Waiting for valgrind to terminate (sleep 10)
-    sleep 10
+    # Waiting for valgrind to terminate (sleep a max of 10)
+    brokerStopAwait $port  # FIXME
+    # sleep 4
   fi
 }
 
@@ -1085,6 +1211,7 @@ function coapCurl()
 
 
 export -f dbInit
+export -f dbList
 export -f dbDrop
 export -f dbResetAll
 export -f brokerStart
@@ -1107,3 +1234,5 @@ export -f coapCurl
 export -f vMsg
 export -f dMsg
 export -f valgrindSleep
+export -f brokerStartAwait
+export -f brokerStopAwait

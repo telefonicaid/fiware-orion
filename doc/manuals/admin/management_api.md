@@ -7,14 +7,15 @@ API for management that allows to change the trace and verbosity levels
 In order to manage the trace level:
 
 ```
-curl --request DELETE <host>:<port>/log/trace
-curl --request DELETE <host>:<port>/log/trace/t1
-curl --request DELETE <host>:<port>/log/trace/t1-t2
-curl --request DELETE <host>:<port>/log/trace/t1-t2,t3-t4
-curl --request GET <host>:<port>/log/trace
-curl --request PUT <host>:<port>/log/trace/t1
-curl --request PUT <host>:<port>/log/trace/t1-t2
-curl --request PUT <host>:<port>/log/trace/t1-t2,t3-t4
+curl --request DELETE <host>:<port>/log/trace
+curl --request DELETE <host>:<port>/log/trace/t1
+curl --request DELETE <host>:<port>/log/trace/t1-t2
+curl --request DELETE <host>:<port>/log/trace/t1-t2,t3-t4
+curl --request GET <host>:<port>/log/trace
+curl --request PUT <host>:<port>/log/trace/t1
+curl --request PUT <host>:<port>/log/trace/t1-t2
+curl --request PUT <host>:<port>/log/trace/t1-t2,t3-t4
+```
 
 'PUT-requests' overwrites the previous log settings. So, in order to ADD
 a trace level, a GET /log/trace must be issued first and after that the
@@ -25,31 +26,40 @@ complete trace string to be sent in the PUT request can be assembled.
 The Orion context broker maintains a set of counters for the incoming
 messages and such. The information is accessed via REST, of course:
 
-` curl `<host>`:`<port>`/statistics`
+```
+curl --header 'Accept: application/json' <host>:<port>/statistics
+```
 
-A sample <i>statistics</i> response:
+A sample *statistics* response:
 
 ```
- <orion>
-   <jsonRequests>1</jsonRequests>
-   <registrations>5</registrations>
-   <discoveries>10</discoveries>
-   <statisticsRequests>2</statisticsRequests>
- </orion>
+{
+  "orion" : {
+    "jsonRequests" : "13",
+    "updates" : "13",
+    "versionRequests" : "1",
+    "statisticsRequests" : "2",
+    "subCacheLookups" : "1",
+    "uptime_in_secs" : "14470",
+    "measuring_interval_in_secs" : "14470"
+  }
+}
 ```
 
 To reset the statistics, the verb DELETE is used:
 
 ```
-curl -X DELETE `<host>`:`<port>`/statistics
+curl -X DELETE --header 'Accept: application/json' <host>:<port>/statistics
 ```
 
 Resetting the statistics counters yields the following response:
 
 ```
-<orion>
-  <message>All statistics counter reset</message>
-</orion>
+{
+  "orion" : {
+    "message" : "All statistics counter reset"
+  }
+}
 ```
 
 There are a lot of counters, but only those that have been used since
@@ -59,7 +69,14 @@ REST request.
 The `-mutexTimeStat` CLI parameter activates recording of waiting time in the different internal semaphores, e.g:
 
 ```
-      <requestSemaphoreWaitingTime>0.000000000</requestSemaphoreWaitingTime>
-      <dbConnectionPoolWaitingTime>0.000000230</dbConnectionPoolWaitingTime>
-      <transactionSemaphoreWaitingTime>0.000001050</transactionSemaphoreWaitingTime>
+{
+  "orion" : {
+    ...
+    "requestSemaphoreWaitingTime" : "0.000000000",
+    "dbConnectionPoolWaitingTime" : "0.000000611",
+    "transactionSemaphoreWaitingTime" : "0.000000930",
+    "curlContextMutexWaitingTime" : "0.000000000",
+    ...
+  }
+}
 ```

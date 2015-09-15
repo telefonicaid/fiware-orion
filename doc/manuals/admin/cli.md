@@ -12,15 +12,14 @@ Orion Context Broker listens, using the -port option:
 
     contextBroker -port 5057
 
-To know all the possible options, have a look at the [command line
-options](#Command_line_options "wikilink") section.
+To know all the possible options, have a look at the next section.
 
 ## Command line options
 
-Command line options can be used directly (in the case of running [from
-the command line](#From_the_command_line "wikilink")) or indirectly
+Command line options can be used directly (in the case of running from
+the command line) or indirectly
 through the different fields in /etc/sysconfig/contextBroker (in the
-case of running [as a system service](../../../README.md#as-system-service) )
+case of running [as a system service](running.md)).
 To obtain a list of available options, use:
 
     contextBroker -u
@@ -43,8 +42,8 @@ The list of available options is the following:
 -   **-ipv6**. Runs broker in IPv6 only mode (by default, the broker
     runs in both IPv4 and IPv6). Cannot be used at the same time
     that -ipv4.
--   **-rush <host:port>**. Use <b>rush</b> in <i>host</i> and
-    <i>port</i>. Default behavior is to <i>not</i> use Rush. See section
+-   **-rush <host:port>**. Use **rush** in *host* and
+    *port*. Default behavior is to *not* use Rush. See section
     on [using Rush relayer](rush.md).
 -   **-multiservice**. Enables multiservice/multitenant mode (see [multi
     service tenant section](../user/multitenancy.md)).
