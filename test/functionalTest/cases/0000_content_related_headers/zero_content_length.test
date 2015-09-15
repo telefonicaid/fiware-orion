@@ -38,7 +38,7 @@ curl localhost:${CB_PORT}/v1/registry/registerContext --header "Content-Length: 
   <errorCode>
     <code>411</code>
     <reasonPhrase>Length Required</reasonPhrase>
-    <details>Zero/No Content-Length in PUT/POST request</details>
+    <details>Zero/No Content-Length in PUT/POST/PATCH request</details>
   </errorCode>
 </registerContextResponse>
 --TEARDOWN--
