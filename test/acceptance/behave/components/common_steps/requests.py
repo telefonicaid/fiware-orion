@@ -49,6 +49,7 @@ status_codes = {'OK': 200,
                 'Bad Method': 405,
                 'Not Acceptable': 406,
                 'Conflict': 409,
+                'Length Required': 411,
                 'Request Entity Too Large': 413,
                 'Unsupported Media Type': 415,
                 'Internal Server Error': 500}
@@ -80,7 +81,7 @@ def send_a_base_request(context):
 def send_a_version_request(context):
     """
     send a version request
-    :param context:
+
     """
     global cb, resp, props_cb_env
     __logger__.debug("Sending a version request...")
@@ -161,18 +162,21 @@ def delete_database_in_mongo(context):
     """
     fiware_service_header = u'Fiware-Service'
     orion_prefix = u'orion'
+    database_name = EMPTY
     global cb
+
     properties_class = Properties()
     props_mongo = properties_class.read_properties()["mongo_env"]  # mongo properties dict
     m = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
               password=props_mongo["MONGO_PASS"])
     headers = cb.get_headers()
-    if fiware_service_header in headers and (headers[fiware_service_header].find(".") < 0):
-        __logger__.debug("Deleting database in mongo...")
-        if fiware_service_header in headers:
+    __logger__.debug("Deleting database in mongo...")
+    if fiware_service_header in headers:
+        if headers[fiware_service_header].find(".") < 0:
             database_name = "%s-%s" % (orion_prefix, headers[fiware_service_header])
-        else:
-            database_name = orion_prefix
+    else:
+        database_name = orion_prefix
+    if database_name != EMPTY:
         m.connect(database_name.lower())
         m.drop_database()
         m.disconnect()
@@ -193,18 +197,18 @@ def get_all_entities(context):
 
 
 @step(u'get an entity by ID "([^"]*)"')
-def get_an_entity_by_ID(context, entity_id):
+def get_an_entity_by_id(context, entity_id):
     """
     get an entity by ID
     """
     global cb, resp
     __logger__.debug("getting an entity by id...")
     resp = cb.list_an_entity_by_ID(context, entity_id)
-    __logger__.debug("returned an entity by id...")
+    __logger__.debug("...returned an entity by id...")
 
 
 @step(u'get an attribute "([^"]*)" by ID "([^"]*)"')
-def get_an_attribute_by_ID(context, attribute_name, entity_id):
+def get_an_attribute_by_id(context, attribute_name, entity_id):
     """
     get an attribute by ID
     :param context:
@@ -214,7 +218,37 @@ def get_an_attribute_by_ID(context, attribute_name, entity_id):
     global cb, resp
     __logger__.debug("getting an attribute by id...")
     resp = cb.list_an_attribute_by_ID(attribute_name, entity_id)
-    __logger__.debug("returned an attribute by id...")
+    __logger__.debug("...returned an attribute by id...")
+
+
+# ------------------------ update and append -----------------------------------------------
+
+
+@step(u'update or append an attribute by ID "([^"]*)"')
+def update_or_append_an_attribute_by_id(context, entity_id):
+    """
+    update or append an attribute by ID
+    :param context:
+    :param entity_id:
+    """
+    global cb, resp
+    __logger__.debug("updating or appending an attribute by id...")
+    resp = cb.update_or_append_an_attribute_by_id(context, entity_id)
+    __logger__.debug("...updated or appended an attribute by id...")
+
+
+@step(u'update or append an attribute by ID "([^"]*)" in raw mode')
+def update_or_append_an_attribute_by_ID_in_raw_mode(context, entity_id):
+    """
+    update or append an attribute by ID in raw mode
+    :param context:
+    :param entity_id:
+    """
+    global cb, resp
+    __logger__.debug("updating or appending an attribute by id in raw mode...")
+    resp = cb.update_or_append_an_attribute_in_raw_by_id(context, entity_id)
+    __logger__.debug("...updated or appended an attribute by id in raw mode...")
+
 
 # ------------------------------------- validations ----------------------------------------------
 
@@ -345,7 +379,7 @@ def verify_that_receive_several_http_codes(context, http_code):
     __logger__.info("...Verified that http code returned in all entities are %s" % http_code)
 
 
-@step(u'verify that entities are stored in default mongo')
+@step(u'verify that entities are stored in default tenant at mongo')
 @step(u'verify that entities are stored in mongo')
 def entities_are_stored_in_mongo(context):
     """
@@ -405,6 +439,7 @@ def verify_error_message(context):
         ngsi.verify_error_response(context, resp_list[i])
     __logger__.info("...Verified that error message is the expected in all entities ")
 
+
 @step(u'verify that all entities are returned')
 def verify_get_all_entities(context):
     """
@@ -419,8 +454,21 @@ def verify_get_all_entities(context):
     __logger__.info("...Verified all entities are returned in get request...")
 
 
+@step(u'verify an entity in raw mode with type "([^"]*)" in attribute value from http response')
+def verify_http_response_in_raw_mode_witn_type(context, field_type):
+    """
+    verify http response in raw mode and type in attribute value from http response
+    """
+    global cb, resp
+    __logger__.debug("Verifying http response in raw mode from http response...")
+    entities_context = cb.get_entity_context()
+    ngsi = NGSI()
+    ngsi.verify_entity_raw_mode_http_response(entities_context, resp, field_type)
+    __logger__.info("...Verified http response in raw mode from http response...")
+
+
 @step(u'verify that the entity by ID is returned')
-def verify_that_the_entity_by_ID_is_returned(context):
+def verify_that_the_entity_by_id_is_returned(context):
     """
     verify that the entity by ID is returned
     """
@@ -433,8 +481,9 @@ def verify_that_the_entity_by_ID_is_returned(context):
     ngsi.verify_an_entity_by_id(queries_parameters, entities_context, resp, entity_id_to_request)
     __logger__.info("...Verified an entity by ID returned from a request...")
 
+
 @step(u'verify that the attribute by ID is returned')
-def verify_that_the_attribute_by_ID_is_returned(context):
+def verify_that_the_attribute_by_id_is_returned(context):
     """
     verify that the attribute by ID is returned
     """
@@ -445,3 +494,20 @@ def verify_that_the_attribute_by_ID_is_returned(context):
     ngsi = NGSI()
     ngsi.verify_an_attribute_by_id(entities_context, resp, attribute_name_to_request)
     __logger__.info("...Verified an attribute by ID returned from a request...")
+
+
+@step(u'verify an attribute by ID in raw mode with type "([^"]*)" in attribute value from http response')
+def verify_an_attribute_by_id_in_raw_mode_from_http_response(context, field_type):
+    """
+    verify an attribute by ID in raw mode with type in attribute value from http response
+    :param context:
+    :param field_type:
+    :return:
+    """
+    global cb, resp
+    __logger__.debug("Verifying an attribute by ID returned in raw mode from http response...")
+    entities_context = cb.get_entity_context()
+    attribute_name_to_request = cb.get_attribute_name_to_request()
+    ngsi = NGSI()
+    ngsi.verify_an_attribute_by_id_in_raw_mode_http_response(entities_context, resp, attribute_name_to_request, field_type)
+    __logger__.info("...Verified an attribute by ID returned in raw mode from http response...")

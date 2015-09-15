@@ -17,17 +17,19 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
   * Create a virtual environment somewhere, e.g. in ~/venv (virtualenv ~/venv) (optional)
   * Activate the virtual environment (source ~/venv/bin/activate) (optional)
   * Remember to unset the virtual environment when you're done testing, if it has been previously activated (deactivate) (optional)
+- You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
 - Both if you are using a virtual environment or not:
   * Change to the test/acceptance/behave folder of the project.
   * Install the requirements for the acceptance tests in the virtual environment
-     ```
+```
      pip install -r requirements.txt --allow-all-external
-     ```
+```
 
-#### Requirements to fabric
-    ```
+#### Requirements to fabric (http://www.fabfile.org/)
+```
      yum install gcc python-devel
-    ```
+```
+   Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
 
 #### Folders/Files Structure
 
@@ -35,7 +37,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
         --> common_steps/:               folder with common steps used in several features
               -->  *.py                  files with common steps associated to previous scenarios
         --> functionality/               sub-folder to save all features in each functionality area
-              --> environment.py:        may define code to run before and after certain events during your testing.
+              --> environment.py:        may define code to run before and after certain events during your testing. (recommend use generic in root path)
               --> *.feature              files used to define scenarios
               --> steps/                 folder of steps associated to features in the functionality
                    -->  *.py             files with steps associated to previous scenarios
@@ -46,10 +48,17 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
     behave.ini:                          configuration files for behave are called either ”.behaverc” or “behave.ini”
     logging.ini                          log configuration with several loggers (environment, steps and utils)
     configuration.json:                  initial configuration, before of execution
+    environment.py                       (generic environment) may define code to run before and after certain events during your testing
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
     README.md:                           this file, a brief explication about this framework to test
     requirement.txt:                     external library, necessary install before to execute test (see Test execution section)
 
+   Note:
+```
+       The “environment.py” file (optional), if present, must be in the same directory that contains the “steps” directory 
+       (not in the “steps” directory). We recommend use a generic environment.py and import it in the environment.py 
+       file in the same directory that contains the “steps” directory.
+```
 ### Tests execution:
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
@@ -127,7 +136,7 @@ Feature: feature name...
     * list_all_entities - 200 testcases
     * list_an_entity_by_id - 209 testcases
     * list_an_attribute_by_id - 198 testcases
-    * update_append_attribute_by_id (pending)
+    * update_append_attribute_by_id - 729 testcases
     * update_only_by_id (pending)
     * replace_attributes_by_id (pending)
     * remove_entity (pending)
@@ -147,6 +156,8 @@ Feature: feature name...
   - If attribute number is "1", the attribute name is without consecutive, ex: `attributes_name=temperature`
     Else attributes number is major than "1" the attributes name are prefix plus consecutive, ex:
         `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
+  - If would like a wrong query parameter name, use `qp_` prefix       
+        
 
 
 ### Tags
