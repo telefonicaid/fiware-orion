@@ -318,7 +318,7 @@ Date: REGEX(.*)
   <xmlRequests>REGEX((6|7))</xmlRequests>
   <updates>3</updates>
   <allContextEntitiesRequests>2</allContextEntitiesRequests>
-  <versionRequests>0</versionRequests>
+  <versionRequests>REGEX((0|1))</versionRequests>
   <statisticsRequests>1</statisticsRequests>
   <subCacheLookups>3</subCacheLookups>
   <uptime_in_secs>REGEX(\d+)</uptime_in_secs>

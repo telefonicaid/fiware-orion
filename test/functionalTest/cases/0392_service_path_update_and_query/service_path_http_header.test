@@ -68,7 +68,7 @@ echo "+++++ 5: four service paths"
 orionCurl --url /v1/queryContext --payload "$payload" --servicePath '/home/kz/1, /home/kz/2, /home/kz/3, /home/kz/4'
 echo
 echo "+++++ 6: service paths from log file"
-grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }'
+grep servicePathSplit /tmp/contextBroker.log | awk -F\| '{ print $6 }' | awk -F: '{ printf "%s:%s\n", $2, $3 }' | grep -v '/#'
 echo
 
 
