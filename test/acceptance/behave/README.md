@@ -141,7 +141,7 @@ Feature: feature name...
     * replace_attributes_by_id (pending)
     * remove_entity (pending)
 
- -  alarms (pending)
+  -  alarms (pending)
 
 
 ### Hints:

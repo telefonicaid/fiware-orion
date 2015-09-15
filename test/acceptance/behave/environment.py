@@ -31,7 +31,7 @@ __logger__ = logging.getLogger("environment")
 def before_all(context):
     """
     actions before all
-    :param context:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
     context.config.setup_logging(configfile="logging.ini")
 
@@ -40,7 +40,7 @@ def before_feature(context, feature):
     """
     actions before each feature
     in case of backgroundFeature, re-throw steps defined in the feature descriptions
-    :param context:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param feature:
     """
     __logger__.info("\n\n\n\n")
@@ -60,8 +60,8 @@ def before_feature(context, feature):
 def after_feature(context, feature):
     """
     actions executed after each feature
-    :param context:
-    :param feature:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param feature: feature properties
     """
     __logger__.info("AFTER FEATURE")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
@@ -71,8 +71,8 @@ def after_feature(context, feature):
 def before_scenario(context, scenario):
     """
     actions executed before each scenario
-    :param context:
-    :param scenario:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param scenario: scenario properties
     """
     __logger__.info("==>>")
     __logger__.info("BEFORE SCENARIO: %s " % scenario)
@@ -82,8 +82,8 @@ def after_scenario(context, scenario):
     """
     actions executed after each scenario
        - database used is deleted
-    :param context:
-    :param scenario:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param scenario: scenario properties
     """
     __logger__.info("AFTER SCENARIO")
     context.execute_steps(u'Given delete database in mongo')
@@ -93,8 +93,8 @@ def after_scenario(context, scenario):
 def before_step(context, step):
     """
    actions executed before each step
-    :param context:
-    :param step:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param step: step properties
     """
     __logger__.info("BEFORE STEP: %s" % step)
 
@@ -102,7 +102,7 @@ def before_step(context, step):
 def after_step(context, step):
     """
    actions executed after each step
-    :param context:
-    :param step:
+    :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
+    :param step: step properties
     """
     __logger__.info("AFTER STEP")
