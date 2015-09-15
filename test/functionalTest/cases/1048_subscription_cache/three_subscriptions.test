@@ -32,6 +32,7 @@ accumulatorStart
 
 #
 # 00. Making sure only ONE ftest database exists
+# 00. Making sure counters are RESET
 # 01. Subscribe to E1/A1 (no pattern)
 # 02. Subscribe to E2.*/A1
 # 03. Subscribe to E3.*/A1
@@ -46,6 +47,13 @@ accumulatorStart
 echo "00. Making sure only ONE ftest database exists"
 echo "=============================================="
 dbList ftest*
+echo
+echo
+
+
+echo "00. Making sure counters are RESET"
+echo "=================================="
+orionCurl --url /statistics -X DELETE --json
 echo
 echo
 
@@ -191,6 +199,20 @@ echo
 ftest
 
 
+00. Making sure counters are RESET
+==================================
+HTTP/1.1 200 OK
+Content-Length: 69
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "orion": {
+        "message": "All statistics counter reset"
+    }
+}
+
+
 01. Subscribe to E1/A1 (no pattern)
 ===================================
 HTTP/1.1 200 OK
@@ -259,7 +281,7 @@ Date: REGEX(.*)
         "subscriptions": "3",
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)",
         "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
+        "versionRequests": "REGEX((0|1))"
     }
 }
 
@@ -301,7 +323,7 @@ Date: REGEX(.*)
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "1", 
         "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
+        "versionRequests": "REGEX((0|1))"
     }
 }
 
@@ -344,7 +366,7 @@ Date: REGEX(.*)
         "transactionSemaphoreWaitingTime": "REGEX(\d+.\d+)", 
         "unsubscriptions": "2", 
         "uptime_in_secs": "REGEX(\d+)",
-        "versionRequests": "0"
+        "versionRequests": "REGEX((0|1))"
     }
 }
 
