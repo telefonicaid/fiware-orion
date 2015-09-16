@@ -29,7 +29,17 @@
 #include "ngsi10/UpdateContextResponse.h"
 #include "mongo/client/dbclient.h"
 
+#include <stdexcept>
+
 using namespace mongo;
+
+class OrionCreateException : public std::runtime_error
+{
+public:
+    OrionCreateException(const std::string &what)
+        : std::runtime_error(what)
+    {}
+};
 
 /* ****************************************************************************
 *

@@ -2308,6 +2308,26 @@ void processContextElement
                     getEntitiesCollectionName(tenant).c_str(),
                     query.toString().c_str()));
 
+    std::map<std::string, std::string>::iterator it = uriParams.find("op");
+
+    // if is an append and uri has not possibility of options
+    if (strcasecmp(action.c_str(), "append") == 0 && it == uriParams.end())
+    {
+        EntityIdVector vec;
+        vec.push_back(enP);
+
+        AttributeList attList;
+        Restriction res;
+        ContextElementResponseVector rsp;
+        std::string err;
+        entitiesQuery(vec, attList, res, &rsp, &err, true, tenant, servicePathV);
+
+        if (rsp.size() && !rsp.get(0)->prune)
+        {
+            throw OrionCreateException("Entity already exists");
+        }
+    }
+
     connection = getMongoConnection();
     cursor     = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
 
@@ -2334,6 +2354,12 @@ void processContextElement
                               " - exception: " + e.what());
     LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
     return;  // Error already in responseP
+  }
+  // This is a little bit hacking but with this avoid the last catch(...)
+  catch (const OrionCreateException &e)
+  {
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccUnprocessableEntity, e.what());
+      throw OrionCreateException(e.what());
   }
   catch (...)
   {

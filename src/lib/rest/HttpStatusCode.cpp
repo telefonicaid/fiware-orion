@@ -40,6 +40,7 @@ std::string httpStatusCodeString(HttpStatusCode code)
   case SccRequestEntityTooLarge:             return "Request Entity Too Large";
   case SccUnsupportedMediaType:              return "Unsupported Media Type";
   case SccSubscriptionIdNotFound:            return "subscriptionId does not correspond to an active subscription"; // FI-WARE
+  case SccUnprocessableEntity:               return "Unprocessable Entity";
   case SccMissingParameter:                  return "parameter missing in the request";                             // FI-WARE
   case SccInvalidParameter:                  return "request parameter is invalid/not allowed";                     // FI-WARE
   case SccErrorInMetadata:                   return "Generic error in metadata";

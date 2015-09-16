@@ -29,6 +29,7 @@
 #include "ngsi/ParseData.h"
 #include "apiTypesV2/Entities.h"
 #include "rest/EntityTypeInfo.h"
+#include "rest/OrionError.h"
 #include "serviceRoutinesV2/postEntities.h"
 #include "serviceRoutines/postUpdateContext.h"
 
@@ -61,13 +62,13 @@ std::string postEntities
 {
   Entity*  eP = &parseDataP->ent.res;
 
+  std::string answer;
+
   // 01. Fill in UpdateContextRequest
   parseDataP->upcr.res.fill(eP, "APPEND");
-  
 
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
-
 
   // 03. Prepare HTTP headers
   if ((ciP->httpStatusCode == SccOk) || (ciP->httpStatusCode == SccNone))
@@ -78,10 +79,20 @@ std::string postEntities
     ciP->httpHeaderValue.push_back(location);
     ciP->httpStatusCode = SccCreated;
   }
+  else
+  {
+    OrionError oe;
+    oe.code = ciP->httpStatusCode;
+    oe.reasonPhrase = "AlreadyExists";
+    oe.details = "An entity with the same id and type "
+                 "already exists. You can use POST /entities/{entityId} "
+                 "to update it";
 
+    answer = oe.render(ciP, "");
+  }
 
   // 04. Cleanup and return result
   eP->release();
 
-  return "";
+  return answer;
 }
