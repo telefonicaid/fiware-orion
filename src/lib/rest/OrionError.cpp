@@ -107,6 +107,19 @@ std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
   {
     return "BadRequest";
   }
+  else if (_reasonPhrase == "Length Required")
+  {
+    return "LengthRequired";
+  }
+  else if (_reasonPhrase == "Request Entity Too Large")
+  {
+    return "RequestEntityTooLarge";
+  }
+  else if (_reasonPhrase == "Unsupported Media Type")
+  {
+    return "UnsupportedMediaType";
+  }
+ 
 
   return _reasonPhrase;
 }
