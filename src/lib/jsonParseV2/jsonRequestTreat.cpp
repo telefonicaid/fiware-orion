@@ -56,7 +56,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 
     if ((answer = parseDataP->ent.res.check(ciP, EntitiesRequest)) != "OK")
     {
-      OrionError error(SccBadRequest, "Parse Error (" + answer + ")");
+      OrionError error(SccBadRequest, answer);
       return error.render(ciP, "");
     }
     break;
@@ -71,7 +71,7 @@ std::string jsonRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, Request
 
     if ((answer = parseDataP->ent.res.check(ciP, EntityRequest)) != "OK")
     {
-      OrionError error(SccBadRequest, "Parse Error (" + answer + ")");
+      OrionError error(SccBadRequest, answer);
       return error.render(ciP, "");
     }
     break;
