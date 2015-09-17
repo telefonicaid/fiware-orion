@@ -7,23 +7,25 @@ Folder for acceptance tests of context broker NGSI v2.In this framework we are u
 ### Prerequisites:
 
 - Python 2.7.x (One way would be SCL - The Software Collections Repository)
-- pip installed (http://docs.python-guide.org/en/latest/starting/install/linux/)
-- virtualenv installed (pip install virtualenv) (optional).
+- pip installed 1.4.1 or higher (http://docs.python-guide.org/en/latest/starting/install/linux/)
+- virtualenv installed 1.10.1 or higher (pip install virtualenv) (optional).
 Note: We recommend the use of virtualenv, because is an isolated working copy of Python which allows you to work on a specific project without worry of affecting other projects.
 
 
 # Requirements to fabric (http://www.fabfile.org/)
+Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
+Some requirements are neccesary verify before to install `Fabric` library, mainly to pycripto library (Fabric dependency). 
+This libraries will be install into `requirements.txt`
 ```
      yum install gcc python-devel
 ```
-   Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
-
+   
 
 ##### Environment preparation:
 
 - If you are going to use a virtual environment (optional):
-  * Create a virtual environment somewhere, e.g. in ~/venv (virtualenv ~/venv) (optional)
-  * Activate the virtual environment (source ~/venv/bin/activate) (optional)
+  * Create a virtual environment somewhere, (virtualenv <venv_name>) (optional)
+  * Activate the virtual environment (source <venv_name>/bin/activate) (optional)
   * Remember to unset the virtual environment when you're done testing, if it has been previously activated (deactivate) (optional)
 - You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
 - Both if you are using a virtual environment or not:
@@ -63,12 +65,35 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
        (not in the “steps” directory). We recommend use a generic environment.py and import it in the environment.py 
        file in the same directory that contains the “steps” directory.
 ```
+
+
 ### Tests execution:
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
 - We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to `properties.json` and `configuration.json` files.
-  The settings folder path could be changed in the `configuration.json`.
-  This file initially will overwrite properties.json in each feature.
+    - we can use several configurations, create a file (with ssh commands) to each configuration (this file can to have whatever name and extension), 
+      each configuration file is used in the initial configuration (see `BackgroundFeature` in *.feature). This option is valid with `UPDATE_PROPERTIES_JSON` equal to `true`
+      each file will be composed of lines with ssh commands, that will be executed.
+         Example of configuration file into `PATH_TO_SETTING_FOLDER`:
+         ```
+            # replace values in configuration.json
+            sed -i "s/\"CB_RUNNING_MODE\".*/\"CB_RUNNING_MODE\": \"RPM\"/" configuration.json
+            
+            # copy properties.json.base to properties.json
+            cp -R properties.json.base properties.json
+            
+            # replace values in properties.py
+            sed -i "s/\"CB_HOST\".*/\"CB_HOST\":\"localhost\",/" properties.json
+            sed -i "s/\"CB_VERSION\".*/\"CB_VERSION\":\"0.24.0\",/" properties.json
+            sed -i "s/\"CB_VERIFY_VERSION\".*/\"CB_VERIFY_VERSION\":\"true\",/" properties.json
+            sed -i "s/\"CB_FABRIC_USER\".*/\"CB_FABRIC_USER\":\"username\",/" properties.json
+            sed -i "s/\"CB_FABRIC_PASS\".*/\"CB_FABRIC_PASS\":\"password\",/" properties.json
+            sed -i "s/\"MONGO_HOST\".*/\"MONGO_HOST\":\"mongo_host\",/" properties.json
+            sed -i "s/\"MONGO_VERSION\".*/\"MONGO_VERSION\":\"2.6.10\",/" properties.json
+            sed -i "s/\"MONGO_VERIFY_VERSION\".*/\"MONGO_VERIFY_VERSION\":\"true\",/" properties.json
+         ```
+    - Other option is `UPDATE_PROPERTIES_JSON` equal to `false` but in this case `properties.json` will be create manually from `properties.json.base` in root path (used in Jenkins)     
+  The settings folder path could be changed in `PATH_TO_SETTING_FOLDER` in the `configuration.json` file. 
 - modify in `configuration.json`:
        * PATH_TO_SETTING_FOLDER: folder where are the different configurations
        * UPDATE_PROPERTIES_JSON: determine whether you are create/update `properties.json` automatically or manually (used to jenkins).
@@ -82,10 +107,10 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 - Run behave (see available params with the -h option).
 ```
     Some examples:
-       behave .../example.feature                      -- run only one feature
-       behave .../example.feature -t test              -- run scenarios tagged with "test" in a feature
-       behave .../example.feature -t=-skip             -- run all scenarios except tagged with "skip" in a feature
-       behave .../example.feature -t ~@skip            -- run all scenarios except tagged with "skip" in a feature
+       behave component/<path>/example.feature                      -- run only one feature
+       behave component/<path>/example.feature -t test              -- run scenarios tagged with "test" in a feature
+       behave component/<path>/example.feature -t=-skip             -- run all scenarios except tagged with "skip" in a feature
+       behave component/<path>/example.feature -t ~@skip            -- run all scenarios except tagged with "skip" in a feature
 ```
 
 ### Properties.json
@@ -135,6 +160,11 @@ Feature: feature name...
     Setup: restart service
     Check: verify if the service is installed successfully
 ```
+
+### Logs
+
+The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
+
 
 ### Tests Suites Coverage (features):
 
