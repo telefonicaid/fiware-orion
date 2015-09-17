@@ -123,7 +123,10 @@ std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
   {
     return "InvalidModification";
   }
-
+  else if (_reasonPhrase == "Too Many Results")
+  {
+    return "TooManyResults";
+  }
  
 
   return _reasonPhrase;

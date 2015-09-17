@@ -36,6 +36,7 @@ std::string httpStatusCodeString(HttpStatusCode code)
   case SccContextElementNotFound:            return "No context element found"; // Standard HTTP for 404: "Not Found"
   case SccBadVerb:                           return "Method Not Allowed";
   case SccNotAcceptable:                     return "Not Acceptable";
+  case SccConflict:                          return "Too Many Results";
   case SccLengthRequired:                    return "Length Required";
   case SccRequestEntityTooLarge:             return "Request Entity Too Large";
   case SccUnsupportedMediaType:              return "Unsupported Media Type";

@@ -2209,7 +2209,7 @@ void processContextElement
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
-  const std::string&                   caller
+  const std::string&                   apiVersion
 )
 {
   DBClientBase* connection                  = NULL;
@@ -2303,13 +2303,76 @@ void processContextElement
 
   auto_ptr<DBClientCursor> cursor;
 
-  try
+  // This block is to avoid that several entities with the same ID get updated at the same time, which is
+  // not allowed in NGSIv2. The if is needed, as multiple update has been allowed in NGSIv1 (maybe without
+  // thinking too much about it, but NGSIv1 behaviour now will break backward compatibility)
+  if (apiVersion == "v2")
   {
-    LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
+    int entitiesNumber;
+
+    LM_T(LmtMongo, ("count() in '%s' collection: '%s'",
                     getEntitiesCollectionName(tenant).c_str(),
                     query.toString().c_str()));
 
     connection = getMongoConnection();
+    if (connection == NULL)
+    {
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, "null DB connection");
+      LM_E(("Fatal Error (null DB connection)"));
+      return;
+    }
+
+    try
+    {
+      entitiesNumber = connection->count(getEntitiesCollectionName(tenant).c_str(), query);
+      releaseMongoConnection(connection);
+      LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
+    }
+    catch (const DBException &e)
+    {
+      releaseMongoConnection(connection);
+
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,
+                                std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
+                                " - count(): " + query.toString() +
+                                " - exception: " + e.what());
+      LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
+      return;  // Error already in responseP
+    }
+    catch (...)
+    {
+      releaseMongoConnection(connection);
+
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError,
+                                std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
+                                " - count(): " + query.toString() +
+                                " - exception: " + "generic");
+      LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
+      return;  // Error already in responseP
+    }
+
+    if (entitiesNumber > 1)
+    {
+      buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, "There is more than one entity that match the update. Please refine your query.");
+      return;
+    }
+
+  }
+
+  LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
+                  getEntitiesCollectionName(tenant).c_str(),
+                  query.toString().c_str()));
+
+  connection = getMongoConnection();
+  if (connection == NULL)
+  {
+    buildGeneralErrorResponse(ceP, NULL, responseP, SccReceiverInternalError, "null DB connection");
+    LM_E(("Fatal Error (null DB connection)"));
+    return;
+  }
+
+  try
+  {
     cursor     = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
 
     /*
