@@ -119,6 +119,11 @@ std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
   {
     return "UnsupportedMediaType";
   }
+  else if (_reasonPhrase == "Invalid Modification")
+  {
+    return "InvalidModification";
+  }
+
  
 
   return _reasonPhrase;

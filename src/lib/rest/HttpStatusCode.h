@@ -47,6 +47,7 @@ typedef enum HttpStatusCode
   SccLengthRequired         = 411,   // Content-Length header missing
   SccRequestEntityTooLarge  = 413,   // Request Entity Too Large - over 1Mb of payload
   SccUnsupportedMediaType   = 415,   // Unsupported Media Type (only support application/xml and application/json)
+  SccInvalidModification    = 422,   // InvalidModification (unprocessable entity)
   SccSubscriptionIdNotFound = 470,   // The subscriptionId does not correspond to an active subscription
   SccMissingParameter       = 471,   // A parameter is missing in the request
   SccInvalidParameter       = 472,   // A parameter of the request is invalid/not allowed
