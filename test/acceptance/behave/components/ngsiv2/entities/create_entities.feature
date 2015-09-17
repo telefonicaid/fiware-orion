@@ -65,7 +65,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @maximum_size @BUG_1199 @skip
+  @maximum_size @BUG_1199
     # 8972 is a way of generating a request longer than 1MB (in fact, 1048645 bytes)
   Scenario:  try to create a new entity NGSI v2 with maximum size in payload (8972 attributes = 1048645 bytes)
     Given  a definition of headers
@@ -91,7 +91,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | description | payload size: 1048645, max size supported: 1048576 |
     And verify that entities are not stored in mongo
 
-  @content_type_without @BUG_1199 @skip
+  @content_type_without @BUG_1199
   Scenario:  try to create entities in NGSI v2 without content-type header
     Given  a definition of headers
       | parameter          | value             |
@@ -109,7 +109,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | error       | UnsupportedMediaType                                                            |
       | description | Content-Type header not used, default application/octet-stream is not supported |
 
-  @content_type_error @BUG_1199 @skip
+  @content_type_error @BUG_1199
   Scenario Outline:  try to create entities in NGSI v2 with wrong content-type header
     Given  a definition of headers
       | parameter          | value             |
@@ -138,7 +138,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | <sdsd>                            |
       | (eeqweqwe)                        |
 
-  @length_required @BUG_1199 @BUG_1203 @skip
+  @length_required @BUG_1199 @BUG_1203
   Scenario:  try to create several entities in NGSI v2 wihout payload
     Given  a definition of headers
       | parameter          | value                |
@@ -151,7 +151,6 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | parameter   | value                                            |
       | error       | LengthRequired                                   |
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
-
 
   # ---------- Services --------------------------------
   @service_without
@@ -467,7 +466,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @entities_type_error @BUG_1093 @BUG_1200 @skip
+  @entities_type_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong entities type values
     Given  a definition of headers
       | parameter          | value                    |
@@ -591,7 +590,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Then verify that receive several "Bad Request" http code
     And verify that entities are not stored in mongo
 
-  @entities_id_error @BUG_1093 @BUG_1200 @skip
+  @entities_id_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong entities id values
     Given  a definition of headers
       | parameter          | value                  |
@@ -756,7 +755,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000    |
       | random=100000   |
 
-  @attributes_name_error @BUG1093 @BUG_1200 @skip
+  @attributes_name_error @BUG1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes names
     Given  a definition of headers
       | parameter          | value                      |
@@ -884,7 +883,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000     |
       | random=100000    |
 
-  @attributes_value_error @BUG_1093 @BUG_1200 @skip
+  @attributes_value_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes values
     Given  a definition of headers
       | parameter          | value                       |
@@ -1321,7 +1320,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @attributes_type_error @BUG_1093 @BUG_1200 @skip
+  @attributes_type_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes types
     Given  a definition of headers
       | parameter          | value                      |
@@ -1479,7 +1478,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000  |
       | random=100000 |
 
-  @attributes_metadata_name_error @BUG_1093 @BUG_1200 @skip
+  @attributes_metadata_name_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata name without metadata type
     Given  a definition of headers
       | parameter          | value                    |
@@ -1510,7 +1509,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_6      | house;flat    |
       | room_8      | house(flat)   |
 
-  @attributes_metadata_name_with_type_error @BUG_1093 @BUG_1200 @skip
+  @attributes_metadata_name_with_type_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata name with metadata type
     Given  a definition of headers
       | parameter          | value                                 |
@@ -1680,7 +1679,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000   |
       | random=100000  |
 
-  @attributes_metadata_value_without_and_with_type @BUG_1200 @skip
+  @attributes_metadata_value_without_and_with_type @BUG_1200
   Scenario:  try to create entities in NGSI v2 without attributes metadata value with metadata type
     Given  a definition of headers
       | parameter          | value                         |
@@ -1759,7 +1758,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room16"  | "2017-06-17T07:21:24.238Z" |
       | "room17"  | null                       |
 
-  @attributes_metadata_value_error @BUG_1093 @BUG_1200 @skip
+  @attributes_metadata_value_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata value without metadata type
     Given  a definition of headers
       | parameter          | value                     |
@@ -1790,7 +1789,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_6      | house;flat     |
       | room_8      | house(flat)    |
 
-  @attributes_metadata_value_error_with_type @BUG_1093 @BUG_1200 @skip
+  @attributes_metadata_value_error_with_type @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata value with metadata type
     Given  a definition of headers
       | parameter          | value                               |
@@ -1999,7 +1998,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=10000  |
       | random=100000 |
 
-  @attributes_metadata_type_error @BUG_1093 @BUG_1200 @skip
+  @attributes_metadata_type_error @BUG_1093 @BUG_1200
   Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata type
     Given  a definition of headers
       | parameter          | value                    |

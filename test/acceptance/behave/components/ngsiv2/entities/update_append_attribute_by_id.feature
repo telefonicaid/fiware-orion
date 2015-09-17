@@ -71,7 +71,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     Then verify that receive an "Created" http code
     And verify that entities are stored in mongo
 
-  @more_entities_update @BUG_1198 @skip
+  @more_entities_update @BUG_1198
   Scenario:  try to update an attribute by entity ID in NGSI v2 with more than one entity with the same id
     Given  a definition of headers
       | parameter          | value                     |
@@ -98,11 +98,11 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | attributes_value | 80            |
     Then verify that receive an "Conflict" http code
     And verify an error response
-      | parameter   | value                                                          |
-      | error       | TooManyResults                                                 |
-      | description | There is more than one entity with that id. Refine your query. |
+      | parameter   | value                                                                          |
+      | error       | TooManyResults                                                                 |
+      | description | There is more than one entity that match the update. Please refine your query. |
 
-  @more_entities_append @BUG_1198 @skip
+  @more_entities_append @BUG_1198
   Scenario:  try to append an attribute by entity ID in NGSI v2 with more than one entity with the same id
     Given  a definition of headers
       | parameter          | value                     |
@@ -129,11 +129,11 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | attributes_value | 98       |
     Then verify that receive an "Conflict" http code
     And verify an error response
-      | parameter   | value                                                          |
-      | error       | TooManyResults                                                 |
-      | description | There is more than one entity with that id. Refine your query. |
+      | parameter   | value                                                                          |
+      | error       | TooManyResults                                                                 |
+      | description | There is more than one entity that match the update. Please refine your query. |
 
-  @length_required @BUG_1199 @BUG_1203 @skip
+  @length_required @BUG_1199 @BUG_1203
   Scenario:  try to update or append an attribute by entity ID in NGSI v2 without payload
     Given  a definition of headers
       | parameter          | value                       |
@@ -143,11 +143,11 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     When update or append an attribute by ID "room"
     Then verify that receive an "Length Required" http code
     And verify an error response
-      | parameter   | value                                      |
-      | error       | LengthRequired                             |
-      | description | Zero/No Content-Length in PUT/POST request |
+      | parameter   | value                                            |
+      | error       | LengthRequired                                   |
+      | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
-  @maximum_size @BUG_1199 @skip
+  @maximum_size @BUG_1199
     # 8972 is a way of generating a request longer than 1MB (in fact, 1048697 bytes)
   Scenario:  try to update or append attributes in NGSI v2 with maximum size in payload (5023 attributes = 1048697 bytes)
     Given  a definition of headers
@@ -180,7 +180,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     Then verify that receive an "Request Entity Too Large" http code
     And verify an error response
       | parameter   | value                                              |
-      | error       | RequestEntity Too Large                            |
+      | error       | RequestEntityTooLarge                              |
       | description | payload size: 1048697, max size supported: 1048576 |
 
   # ------------------------ Service ----------------------------------------------
@@ -783,7 +783,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=10000    |
       | random=100000   |
 
-  @attribute_name_update_append_invalid @BUG_1200 @skip
+  @attribute_name_update_append_invalid @BUG_1200
   Scenario Outline:  try to append attributes by entity ID in NGSI v2 with invalid attribute names
     Given  a definition of headers
       | parameter          | value                            |
@@ -1450,7 +1450,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | error       | ParseError                             |
       | description | invalid JSON type for ContextAttribute |
 
-  @attribute_value_invalid @BUG_1200 @skip
+  @attribute_value_invalid @BUG_1200
   Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 without invalid attribute values in update request
     Given  a definition of headers
       | parameter          | value                        |
@@ -2870,14 +2870,14 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
     When update or append an attribute by ID "room"
-      | parameter         | value       |
-      | attributes_name   | temperature |
-      | attributes_value  | 80          |
-      | attributes_type   | Fahrenheit  |
-      | metadatas_number  | 3           |
-      | metadatas_name    | very_hot    |
-      | metadatas_type    | alarm       |
-      | metadatas_value   | cold        |
+      | parameter            | value       |
+      | attributes_name      | temperature |
+      | attributes_value     | 80          |
+      | attributes_type      | Fahrenheit  |
+      | metadatas_number     | 3           |
+      | metadatas_name       | very_hot    |
+      | metadatas_type       | alarm       |
+      | metadatas_value      | cold        |
       # query parameter
       | qp_<query_parameter> | append      |
     Then verify that receive an "Bad Request" http code
