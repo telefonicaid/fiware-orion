@@ -52,7 +52,7 @@ HttpStatusCode mongoUpdateContext
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams,    // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                    xauthToken,
-  const std::string&                    caller
+  const std::string&                    apiVersion
 )
 {
     bool reqSemTaken;
@@ -77,7 +77,7 @@ HttpStatusCode mongoUpdateContext
                                 servicePathV,
                                 uriParams,
                                 xauthToken,
-                                caller);
+                                apiVersion);
         }
 
         /* Note that although individual processContextElements() invocations return ConnectionError, this
