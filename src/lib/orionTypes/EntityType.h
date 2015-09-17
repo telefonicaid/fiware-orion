@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_TYPEENTITYVECTOR_H_
-#define SRC_LIB_UTILITY_TYPEENTITYVECTOR_H_
+#ifndef SRC_LIB_UTILITY_ENTITYTYPE_H_
+#define SRC_LIB_UTILITY_ENTITYTYPE_H_
 
 /*
 *
@@ -26,40 +26,31 @@
 * Author: Ken Zangelin
 */
 #include <string>
-#include <vector>
 
-#include "orionTypes/TypeEntity.h"
+#include "ngsi/ContextAttributeVector.h"
+#include "rest/ConnectionInfo.h"
 
 
 
 /* ****************************************************************************
 *
-* TypeEntityVector - 
+* EntityType -
 */
-class TypeEntityVector
+class EntityType
 {
  public:
-  std::vector<TypeEntity*> vec;
+  std::string              type;
+  ContextAttributeVector   contextAttributeVector;
+  long long                count;
 
-  TypeEntityVector();
+  EntityType();
+  explicit EntityType(std::string _type);
 
-  void          present(const std::string& indent);
-  void          push_back(TypeEntity* item);
-  unsigned int  size(void);
-  TypeEntity*   get(unsigned int ix);
-  void          release(void);
   std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
-  std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false);  
-
-  TypeEntity*   operator[](unsigned int ix)
-  {
-    if (ix < vec.size())
-    {
-      return vec[ix];
-    }
-
-    return NULL;
-  }
+  std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool typeNameBefore = false);  
+  void          present(const std::string& indent);
+  void          release(void);
+  std::string   toJson(ConnectionInfo* ciP);
 };
 
-#endif  // SRC_LIB_UTILITY_TYPEENTITYVECTOR_H_
+#endif  // SRC_LIB_UTILITY_ENTITYTYPE_H_

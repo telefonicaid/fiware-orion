@@ -85,7 +85,7 @@
 #include "common/Timer.h"
 #include "common/compileInfo.h"
 
-#include "orionTypes/EntityTypesResponse.h"
+#include "orionTypes/EntityTypeVectorResponse.h"
 #include "ngsi/ParseData.h"
 #include "ngsiNotify/onTimeIntervalThread.h"
 #include "serviceRoutines/logTraceTreat.h"

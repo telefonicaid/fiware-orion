@@ -39,7 +39,7 @@
 * GET /v2/type/<entityType>
 *
 * Payload In:  None
-* Payload Out: EntityTypeAttributesResponse
+* Payload Out: EntityTypeResponse
 */
 std::string getEntityType
 (
@@ -49,9 +49,9 @@ std::string getEntityType
   ParseData*                 parseDataP
 )
 {
-  EntityTypeAttributesResponse  response;
-  std::string                   entityTypeName = compV[2];
-  std::string                   answer;
+  EntityTypeResponse  response;
+  std::string         entityTypeName = compV[2];
+  std::string         answer;
 
   mongoAttributesForEntityType(entityTypeName, &response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
 

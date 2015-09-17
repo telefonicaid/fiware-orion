@@ -27,7 +27,7 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "orionTypes/EntityTypeAttributesResponse.h"
+#include "orionTypes/EntityTypeResponse.h"
 #include "rest/uriParamNames.h"
 #include "serviceRoutines/getAttributesForEntityType.h"
 
@@ -41,7 +41,7 @@
 * GET /v1/contextTypes/{entity::type}
 *
 * Payload In:  None
-* Payload Out: EntityTypeAttributesResponse
+* Payload Out: EntityTypeResponse
 *
 * URI parameters:
 *   - attributesFormat=object
@@ -55,7 +55,7 @@ std::string getAttributesForEntityType
   ParseData*                 parseDataP
 )
 {
-  EntityTypeAttributesResponse  response;
+  EntityTypeResponse  response;
   std::string                   entityTypeName = compV[2];
 
   response.statusCode.fill(SccOk);

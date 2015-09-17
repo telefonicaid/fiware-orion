@@ -27,7 +27,7 @@
 
 #include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-#include "orionTypes/EntityTypesResponse.h"
+#include "orionTypes/EntityTypeVectorResponse.h"
 #include "serviceRoutines/getEntityTypes.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
@@ -40,7 +40,7 @@
 * GET /v1/contextTypes
 *
 * Payload In:  None
-* Payload Out: EntityTypesResponse
+* Payload Out: EntityTypeVectorResponse
 *
 * URI parameters:
 *   - attributesFormat=object
@@ -54,7 +54,7 @@ std::string getEntityTypes
   ParseData*                 parseDataP
 )
 {
-  EntityTypesResponse response;
+  EntityTypeVectorResponse response;
 
   response.statusCode.fill(SccOk);
   mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);

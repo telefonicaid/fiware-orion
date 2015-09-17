@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_TYPEENTITY_H_
-#define SRC_LIB_UTILITY_TYPEENTITY_H_
+#ifndef SRC_LIB_UTILITY_ENTITYTYPERESPONSE_H_
+#define SRC_LIB_UTILITY_ENTITYTYPERESPONSE_H_
 
 /*
 *
@@ -26,31 +26,30 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <vector>
 
-#include "ngsi/ContextAttributeVector.h"
-#include "rest/ConnectionInfo.h"
+#include "common/Format.h"
+#include "ngsi/Request.h"
+#include "ngsi/StatusCode.h"
+#include "orionTypes/EntityType.h"
 
 
 
 /* ****************************************************************************
 *
-* TypeEntity - 
+* EntityTypeResponse -
 */
-class TypeEntity
+class EntityTypeResponse
 {
  public:
-  std::string              type;
-  ContextAttributeVector   contextAttributeVector;
-  long long                count;
+  EntityType    entityType;
+  StatusCode    statusCode;
 
-  TypeEntity();
-  explicit TypeEntity(std::string _type);
-
+  std::string   render(ConnectionInfo* ciP, const std::string& indent);
+  std::string   toJson(ConnectionInfo* ciP);
   std::string   check(ConnectionInfo* ciP, const std::string& indent, const std::string& predetectedError);
-  std::string   render(ConnectionInfo* ciP, const std::string& indent, bool comma = false, bool typeNameBefore = false);  
   void          present(const std::string& indent);
   void          release(void);
-  std::string   toJson(ConnectionInfo* ciP);
 };
 
-#endif  // SRC_LIB_UTILITY_TYPEENTITY_H_
+#endif  // SRC_LIB_UTILITY_ENTITYTYPERESPONSE_H_

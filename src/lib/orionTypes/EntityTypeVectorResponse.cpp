@@ -32,22 +32,22 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
-#include "orionTypes/EntityTypesResponse.h"
+#include "orionTypes/EntityTypeVectorResponse.h"
 
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::render -
+* EntityTypeVectorResponse::render -
 */
-std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& indent)
+std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string out                 = "";
-  std::string tag                 = "entityTypesResponse";
+  std::string tag                 = "entityTypeVectorResponse";
 
   out += startTag(indent, tag, ciP->outFormat, false);
 
-  if (typeEntityVector.size() > 0)
-    out += typeEntityVector.render(ciP, indent + "  ", true);
+  if (entityTypeVector.size() > 0)
+    out += entityTypeVector.render(ciP, indent + "  ", true);
 
   out += statusCode.render(ciP->outFormat, indent + "  ");
 
@@ -60,9 +60,9 @@ std::string EntityTypesResponse::render(ConnectionInfo* ciP, const std::string& 
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::check -
+* EntityTypeVectorResponse::check -
 */
-std::string EntityTypesResponse::check
+std::string EntityTypeVectorResponse::check
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
@@ -75,7 +75,7 @@ std::string EntityTypesResponse::check
   {
     statusCode.fill(SccBadRequest, predetectedError);
   }
-  else if ((res = typeEntityVector.check(ciP, indent, predetectedError)) != "OK")
+  else if ((res = entityTypeVector.check(ciP, indent, predetectedError)) != "OK")
   {
     LM_W(("Bad Input (%s)", res.c_str()));
     statusCode.fill(SccBadRequest, res);
@@ -90,13 +90,13 @@ std::string EntityTypesResponse::check
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::present -
+* EntityTypeVectorResponse::present -
 */
-void EntityTypesResponse::present(const std::string& indent)
+void EntityTypeVectorResponse::present(const std::string& indent)
 {
-  LM_F(("%s%d EntityTypesResponses:\n", indent.c_str(), typeEntityVector.size()));
+  LM_F(("%s%d items in EntityTypeVectorResponse:\n", indent.c_str(), entityTypeVector.size()));
 
-  typeEntityVector.present(indent + "  ");
+  entityTypeVector.present(indent + "  ");
   statusCode.present(indent + "  ");
 }
 
@@ -104,29 +104,29 @@ void EntityTypesResponse::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::release -
+* EntityTypeVectorResponse::release -
 */
-void EntityTypesResponse::release(void)
+void EntityTypeVectorResponse::release(void)
 {
-  typeEntityVector.release();
+  entityTypeVector.release();
   statusCode.release();
 }
 
 
 /* ****************************************************************************
 *
-* EntityTypesResponse::toJson - 
+* EntityTypeVectorResponse::toJson - 
 */
-std::string EntityTypesResponse::toJson(ConnectionInfo* ciP)
+std::string EntityTypeVectorResponse::toJson(ConnectionInfo* ciP)
 {
   std::string  out = "{";
 
-  for (unsigned int ix = 0; ix < typeEntityVector.vec.size(); ++ix)
+  for (unsigned int ix = 0; ix < entityTypeVector.vec.size(); ++ix)
   {
-    out += JSON_STR(typeEntityVector.vec[ix]->type) + ":";
-    out += typeEntityVector.vec[ix]->toJson(ciP);
+    out += JSON_STR(entityTypeVector.vec[ix]->type) + ":";
+    out += entityTypeVector.vec[ix]->toJson(ciP);
 
-    if (ix != typeEntityVector.vec.size() - 1)
+    if (ix != entityTypeVector.vec.size() - 1)
     {
       out += ",";
     }
