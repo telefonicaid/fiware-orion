@@ -19,20 +19,20 @@
 # For those usages not covered by this license please contact with
 # iot_support at tid dot es
 
-# This script remove all the crap files that testHarness or valgrind suite 
-# use to produce in some cases (e.g. failing tests)
+# This script removes all the crap files that testHarness or valgrind suite 
+# produce in some cases (e.g. failing tests)
 
-find -name *.out -exec rm {} \;
-find -name *.diff -exec rm {} \;
-find -name *.regexpect -exec rm {} \;
-find -name *.shell -exec rm {} \;
-find -name *.shell.stdout -exec rm {} \;
-find -name *.shell.stderr -exec rm {} \;
-find -name *.shellInit -exec rm {} \;
-find -name *.shellInit.stderr -exec rm {} \;
-find -name *.shellInit.stdout -exec rm {} \;
-find -name *.teardown -exec rm {} \;
-find -name *.teardown.stderr -exec rm {} \;
-find -name *.teardown.stdout -exec rm {} \;
-find -name *.log -exec rm {} \;
-find . -type d -empty -exec rmdir {} \;
+find cases/ -name *.out -exec rm {} \;
+find cases/ -name *.diff -exec rm {} \;
+find cases/ -name *.regexpect -exec rm {} \;
+find cases/ -name *.shell -exec rm {} \;
+find cases/ -name *.shell.stdout -exec rm {} \;
+find cases/ -name *.shell.stderr -exec rm {} \;
+find cases/ -name *.shellInit -exec rm {} \;
+find cases/ -name *.shellInit.stderr -exec rm {} \;
+find cases/ -name *.shellInit.stdout -exec rm {} \;
+find cases/ -name *.teardown -exec rm {} \;
+find cases/ -name *.teardown.stderr -exec rm {} \;
+find cases/ -name *.teardown.stdout -exec rm {} \;
+find cases/ -name *.log -exec rm {} \;
+find cases/ -type d -empty -exec rmdir {} \;
