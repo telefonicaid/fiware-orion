@@ -25,10 +25,10 @@ __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 import behave
 from behave import step
 
-from iotqautils.fabric_utils import FabricSupport
-from iotqautils.mongo_utils import Mongo
-from iotqautils.CB_v2_utils import CB
-from iotqautils.helpers_utils import *
+from iotqatools.fabric_utils import FabricSupport
+from iotqatools.mongo_utils import Mongo
+from iotqatools.cb_v2_utils import CB
+from iotqatools.helpers_utils import *
 
 from tools.properties_config import Properties  # methods in properties class
 
@@ -56,20 +56,46 @@ def update_context_broker_config_file_and_restart_service(context):
     updating /etc/sysconfig/contextBroker file an restarting service
     :param context:
     """
-    global properties_class, props_cb, props_mongo
+    global properties_class, props_cb, props_mongo, my_fab, configuration
     __logger__.debug(" >> updating /etc/sysconfig/contextBroker file")
     props = properties_class.read_properties()  # properties dict
     props_cb = props["context_broker_env"]  # context broker properties dict
     props_mongo = props["mongo_env"]  # mongo properties dict
-    __logger__.debug("properties dict: %s " % str(props))
     my_fab = FabricSupport(host=props_cb["CB_HOST"], user=props_cb["CB_FABRIC_USER"],
                            password=props_cb["CB_FABRIC_PASS"], cert_file=props_cb["CB_FABRIC_CERT"],
                            retry=props_cb["CB_FABRIC_RETRY"], hide=True, sudo=props_cb["CB_FABRIC_SUDO"])
-    properties_class.update_context_broker_file(my_fab)
-    __logger__.info(" >> updated /etc/sysconfig/contextBroker file")
-    __logger__.debug(" >> restarting contextBroker service")
-    my_fab.run("service contextBroker restart")
-    __logger__.info(" >> restarted contextBroker service")
+    configuration = properties_class.read_configuration_json()
+
+    if configuration["CB_RUNNING_MODE"].upper() == "RPM":
+        properties_class.update_context_broker_file(my_fab)
+        __logger__.info(" >> updated /etc/sysconfig/contextBroker file")
+        __logger__.debug(" >> restarting contextBroker service")
+        my_fab.run("service contextBroker restart")
+        __logger__.info(" >> restarted contextBroker service")
+    else:
+        __logger__.debug(" >> restarting contextBroker per command line interface")
+        # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
+        my_fab.run("contextBroker -port %s -logDir %s -pidpath /var/run/contextBroker/contextBroker.pid -dbhost %s -db %s %s -harakiri" %
+                   (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+        __logger__.info(" >> restarted contextBroker command line interface")
+
+
+@step(u'stop service')
+def stop_service(context):
+    """
+    stop ContextBroker service
+    :param context:
+    """
+    global my_fab, configuration
+    if configuration["CB_RUNNING_MODE"].upper() == "RPM":
+        __logger__.debug("Stopping contextBroker service...")
+        my_fab.run("service contextBroker stop")
+        __logger__.info("...Stopped contextBroker service")
+    else:
+        __logger__.debug("Stopping contextBroker per harakiri...")
+        cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
+        cb.harakiri()
+        __logger__.info("...Stopped contextBroker per harakiri")
 
 
 @step(u'verify contextBroker is installed successfully')

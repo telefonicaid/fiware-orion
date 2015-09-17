@@ -6,10 +6,18 @@ Folder for acceptance tests of context broker NGSI v2.In this framework we are u
 
 ### Prerequisites:
 
-- Python 2.6 or newer
+- Python 2.7.x (One way would be SCL - The Software Collections Repository)
 - pip installed (http://docs.python-guide.org/en/latest/starting/install/linux/)
 - virtualenv installed (pip install virtualenv) (optional).
 Note: We recommend the use of virtualenv, because is an isolated working copy of Python which allows you to work on a specific project without worry of affecting other projects.
+
+
+# Requirements to fabric (http://www.fabfile.org/)
+```
+     yum install gcc python-devel
+```
+   Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
+
 
 ##### Environment preparation:
 
@@ -21,15 +29,11 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 - Both if you are using a virtual environment or not:
   * Change to the test/acceptance/behave folder of the project.
   * Install the requirements for the acceptance tests in the virtual environment
+  * You should add "--upgrade" (if you have a previous installed version of this library)
 ```
-     pip install -r requirements.txt --allow-all-external
+     pip install [--upgrade] -r requirements.txt --allow-all-external
 ```
 
-#### Requirements to fabric (http://www.fabfile.org/)
-```
-     yum install gcc python-devel
-```
-   Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
 
 #### Folders/Files Structure
 
@@ -62,15 +66,19 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
 ### Tests execution:
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
-- You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
-- You should add "--upgrade" (if you have a previous installed version of this library)
-- We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to referenced by `properties.json` files.
+- We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to `properties.json` and `configuration.json` files.
   The settings folder path could be changed in the `configuration.json`.
   This file initially will overwrite properties.json in each feature.
 - modify in `configuration.json`:
-       * JENKINS: determine whether you are in jenkins or not.
        * PATH_TO_SETTING_FOLDER: folder where are the different configurations
-- `properties.json` will be update automatically from settings folder (see configuration.json)
+       * UPDATE_PROPERTIES_JSON: determine whether you are create/update `properties.json` automatically or manually (used to jenkins).
+           - true: read external file (the file is mandatory) in `PATH_TO_SETTING_FOLDER` (with ssh commands) and execute these automatically (used to create `properties.json`) 
+           - false: it does nothing and the creation of `properties.json` will be by user in jenkins console.
+       * CB_RUNNING_MODE: is used to determine how is compiled ContextBroker.
+           ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.org/en/develop/admin/build_source/index.html`.        
+           - RPM: CB is installed as RPM, so service tooling will be used to start and stop
+           - CLI: plain CB command line interface will be used to start contextBroker (must be compiled from source in DEBUG mode)               
+- `properties.json` (MANDATORY) will be create/update automatically from settings folder (see `configuration.json`) or manually.
 - Run behave (see available params with the -h option).
 ```
     Some examples:
@@ -156,7 +164,8 @@ Feature: feature name...
   - If attribute number is "1", the attribute name is without consecutive, ex: `attributes_name=temperature`
     Else attributes number is major than "1" the attributes name are prefix plus consecutive, ex:
         `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
-  - If would like a wrong query parameter name, use `qp_` prefix       
+  - If would like a wrong query parameter name, use `qp_` prefix   
+  - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
         
 
 

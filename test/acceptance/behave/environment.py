@@ -63,6 +63,7 @@ def after_feature(context, feature):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param feature: feature properties
     """
+    context.execute_steps(u'Given stop service')
     __logger__.info("AFTER FEATURE")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
@@ -85,8 +86,8 @@ def after_scenario(context, scenario):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param scenario: scenario properties
     """
-    __logger__.info("AFTER SCENARIO")
     context.execute_steps(u'Given delete database in mongo')
+    __logger__.info("AFTER SCENARIO")
     __logger__.info("<<==")
 
 
@@ -106,3 +107,4 @@ def after_step(context, step):
     :param step: step properties
     """
     __logger__.info("AFTER STEP")
+

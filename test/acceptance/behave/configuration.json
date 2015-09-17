@@ -1,4 +1,5 @@
 {
     "PATH_TO_SETTINGS_FOLDER":"settings",
-    "JENKINS": "false"
+    "UPDATE_PROPERTIES_JSON": "true",
+    "CB_RUNNING_MODE": "RPM"
 }

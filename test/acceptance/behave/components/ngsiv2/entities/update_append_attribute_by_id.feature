@@ -368,7 +368,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | max length allowed and ten levels                             |
 
   @service_path_append
-  Scenario Outline:  apend attributes by entity ID in NGSI v2 with several service header values
+  Scenario Outline:  append attributes by entity ID in NGSI v2 with several service header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -425,7 +425,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     When update or append an attribute by ID "room"
 
   @service_path_append_without
-  Scenario:  apend attributes by entity ID in NGSI v2 without service header
+  Scenario:  append attributes by entity ID in NGSI v2 without service header
     Given  a definition of headers
       | parameter      | value                    |
       | Fiware-Service | test_update_service_path |

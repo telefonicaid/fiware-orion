@@ -26,9 +26,9 @@ import behave
 from behave import step
 
 
-from iotqautils.helpers_utils import *
-from iotqautils.CB_v2_utils import CB
-from iotqautils.mongo_utils import Mongo
+from iotqatools.helpers_utils import *
+from iotqatools.cb_v2_utils import CB
+from iotqatools.mongo_utils import Mongo
 
 from tools.properties_config import Properties  # methods in properties class
 from tools.NGSI_v2 import NGSI
