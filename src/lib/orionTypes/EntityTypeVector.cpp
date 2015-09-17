@@ -34,16 +34,16 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/ConnectionInfo.h"
-#include "orionTypes/TypeEntity.h"
-#include "orionTypes/TypeEntityVector.h"
+#include "orionTypes/EntityType.h"
+#include "orionTypes/EntityTypeVector.h"
 
 
 
 /* ****************************************************************************
 *
-* TypeEntityVector::TypeEntityVector -
+* EntityTypeVector::EntityTypeVector -
 */
-TypeEntityVector::TypeEntityVector()
+EntityTypeVector::EntityTypeVector()
 {
   vec.clear();
 }
@@ -51,9 +51,9 @@ TypeEntityVector::TypeEntityVector()
 
 /* ****************************************************************************
 *
-* TypeEntityVector::render -
+* EntityTypeVector::render -
 */
-std::string TypeEntityVector::render
+std::string EntityTypeVector::render
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
@@ -84,9 +84,9 @@ std::string TypeEntityVector::render
 
 /* ****************************************************************************
 *
-* TypeEntityVector::check -
+* EntityTypeVector::check -
 */
-std::string TypeEntityVector::check
+std::string EntityTypeVector::check
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
@@ -110,11 +110,11 @@ std::string TypeEntityVector::check
 
 /* ****************************************************************************
 *
-* TypeEntityVector::present -
+* EntityTypeVector::present -
 */
-void TypeEntityVector::present(const std::string& indent)
+void EntityTypeVector::present(const std::string& indent)
 {
-  LM_F(("%lu TypeEntitys", (uint64_t) vec.size()));
+  LM_F(("%lu items in entityTypeVector", (uint64_t) vec.size()));
 
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
@@ -126,9 +126,9 @@ void TypeEntityVector::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* TypeEntityVector::push_back -
+* EntityTypeVector::push_back -
 */
-void TypeEntityVector::push_back(TypeEntity* item)
+void EntityTypeVector::push_back(EntityType* item)
 {
   vec.push_back(item);
 }
@@ -137,9 +137,9 @@ void TypeEntityVector::push_back(TypeEntity* item)
 
 /* ****************************************************************************
 *
-* TypeEntityVector::get -
+* EntityTypeVector::get -
 */
-TypeEntity* TypeEntityVector::get(unsigned int ix)
+EntityType* EntityTypeVector::get(unsigned int ix)
 {
   if (ix < vec.size())
     return vec[ix];
@@ -150,9 +150,9 @@ TypeEntity* TypeEntityVector::get(unsigned int ix)
 
 /* ****************************************************************************
 *
-* TypeEntityVector::size -
+* EntityTypeVector::size -
 */
-unsigned int TypeEntityVector::size(void)
+unsigned int EntityTypeVector::size(void)
 {
   return vec.size();
 }
@@ -161,9 +161,9 @@ unsigned int TypeEntityVector::size(void)
 
 /* ****************************************************************************
 *
-* TypeEntityVector::release -
+* EntityTypeVector::release -
 */
-void TypeEntityVector::release(void)
+void EntityTypeVector::release(void)
 {
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {

@@ -156,7 +156,7 @@ static long long countEntities(const std::string& tenant, const std::vector<std:
 */
 HttpStatusCode mongoEntityTypes
 (
-  EntityTypesResponse*                  responseP,
+  EntityTypeVectorResponse*                  responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams
@@ -300,7 +300,7 @@ HttpStatusCode mongoEntityTypes
   for (unsigned int ix = offset; ix < MIN(resultsArray.size(), offset + limit); ++ix)
   {
     BSONObj                   resultItem  = resultsArray[ix].embeddedObject();
-    TypeEntity*               entityType  = new TypeEntity(resultItem.getStringField("_id"));
+    EntityType*               entityType  = new EntityType(resultItem.getStringField("_id"));
     std::vector<BSONElement>  attrsArray  = resultItem.getField("attrs").Array();
 
     entityType->count = countEntities(tenant, servicePathV, entityType->type);
@@ -324,11 +324,11 @@ HttpStatusCode mongoEntityTypes
       }
     }
 
-    responseP->typeEntityVector.push_back(entityType);
+    responseP->entityTypeVector.push_back(entityType);
   }
 
   char detailsMsg[256];
-  if (responseP->typeEntityVector.size() > 0)
+  if (responseP->entityTypeVector.size() > 0)
   {
     if (details)
     {
@@ -367,7 +367,7 @@ HttpStatusCode mongoEntityTypes
 HttpStatusCode mongoAttributesForEntityType
 (
   std::string                           entityType,
-  EntityTypeAttributesResponse*         responseP,
+  EntityTypeResponse*         responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams

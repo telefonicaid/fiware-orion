@@ -29,8 +29,8 @@
 #include <string>
 #include <map>
 
-#include "orionTypes/EntityTypesResponse.h"
-#include "orionTypes/EntityTypeAttributesResponse.h"
+#include "orionTypes/EntityTypeVectorResponse.h"
+#include "orionTypes/EntityTypeResponse.h"
 
 #include "mongoBackend/MongoGlobal.h"
 
@@ -50,7 +50,7 @@ const std::string S_ATTRNAMES      = std::string("$") + ENT_ATTRNAMES;
 */
 extern HttpStatusCode mongoEntityTypes
 (
-  EntityTypesResponse*                  responseP,
+  EntityTypeVectorResponse*                  responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams
@@ -63,7 +63,7 @@ extern HttpStatusCode mongoEntityTypes
 extern HttpStatusCode mongoAttributesForEntityType
 (
   std::string                           entityType,
-  EntityTypeAttributesResponse*         responseP,
+  EntityTypeResponse*         responseP,
   const std::string&                    tenant,
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams

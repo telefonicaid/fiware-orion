@@ -22,10 +22,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET (SOURCES
     areas.cpp
-    TypeEntity.cpp
-    TypeEntityVector.cpp
-    EntityTypesResponse.cpp
-    EntityTypeAttributesResponse.cpp
+    EntityType.cpp
+    EntityTypeVector.cpp
+    EntityTypeVectorResponse.cpp
+    EntityTypeResponse.cpp
     QueryContextRequestVector.cpp
     QueryContextResponseVector.cpp
     UpdateContextRequestVector.cpp
@@ -34,10 +34,10 @@ SET (SOURCES
 
 SET (HEADERS
     areas.h
-    TypeEntity.h
-    TypeEntityVector.h
-    EntityTypesResponse.h
-    EntityTypeAttributesResponse.h
+    EntityType.h
+    EntityTypeVector.h
+    EntityTypeVectorResponse.h
+    EntityTypeResponse.h
     QueryContextRequestVector.h
     QueryContextResponseVector.h
     UpdateContextRequestVector.h
