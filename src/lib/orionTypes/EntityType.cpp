@@ -30,15 +30,15 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
-#include "orionTypes/TypeEntity.h"
+#include "orionTypes/EntityType.h"
 
 
 
 /* ****************************************************************************
 *
-* TypeEntity::TypeEntity -
+* EntityType::EntityType -
 */
-TypeEntity::TypeEntity()
+EntityType::EntityType()
 {
   type = "";
 }
@@ -47,9 +47,9 @@ TypeEntity::TypeEntity()
 
 /* ****************************************************************************
 *
-* TypeEntity::TypeEntity -
+* EntityType::EntityType -
 */
-TypeEntity::TypeEntity(std::string  _type)
+EntityType::EntityType(std::string  _type)
 {
   type = _type;
 }
@@ -57,15 +57,15 @@ TypeEntity::TypeEntity(std::string  _type)
 
 /* ****************************************************************************
 *
-* TypeEntity::render -
+* EntityType::render -
 *
 * This method is used by:
-*   o TypeEntityVector
-*   o EntityTypeAttributesResponse
+*   o EntityTypeVector
+*   o EntityTypeResponse
 *
-* 'typeNameBefore' is set to TRUE when called from EntityTypeAttributesResponse
+* 'typeNameBefore' is set to TRUE when called from EntityTypeResponse
 */
-std::string TypeEntity::render
+std::string EntityType::render
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
@@ -106,9 +106,9 @@ std::string TypeEntity::render
 
 /* ****************************************************************************
 *
-* TypeEntity::check -
+* EntityType::check -
 */
-std::string TypeEntity::check
+std::string EntityType::check
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
@@ -131,9 +131,9 @@ std::string TypeEntity::check
 
 /* ****************************************************************************
 *
-* TypeEntity::present -
+* EntityType::present -
 */
-void TypeEntity::present(const std::string& indent)
+void EntityType::present(const std::string& indent)
 {
   LM_F(("%stype:   %s", indent.c_str(), type.c_str()));
   contextAttributeVector.present(indent);
@@ -143,9 +143,9 @@ void TypeEntity::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* TypeEntity::release -
+* EntityType::release -
 */
-void TypeEntity::release(void)
+void EntityType::release(void)
 {
   contextAttributeVector.release();
 }
@@ -154,9 +154,9 @@ void TypeEntity::release(void)
 
 /* ****************************************************************************
 *
-* TypeEntity::toJson -
+* EntityType::toJson -
 */
-std::string TypeEntity::toJson(ConnectionInfo* ciP)
+std::string EntityType::toJson(ConnectionInfo* ciP)
 {
   std::string  out = "{";
   char         countV[16];

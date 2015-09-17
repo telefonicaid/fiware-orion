@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
-#define SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
+#ifndef SRC_LIB_UTILITY_ENTITYTYPEVECTORRESPONSE_H_
+#define SRC_LIB_UTILITY_ENTITYTYPEVECTORRESPONSE_H_
 
 /*
 *
@@ -31,18 +31,18 @@
 #include "common/Format.h"
 #include "ngsi/Request.h"
 #include "ngsi/StatusCode.h"
-#include "orionTypes/TypeEntityVector.h"
+#include "orionTypes/EntityTypeVector.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityTypesResponse - 
+* EntityTypeVectorResponse -
 */
-class EntityTypesResponse
+class EntityTypeVectorResponse
 {
  public:
-  TypeEntityVector  typeEntityVector;
+  EntityTypeVector  entityTypeVector;
   StatusCode        statusCode;
 
   std::string       render(ConnectionInfo* ciP, const std::string& indent);  
@@ -52,4 +52,4 @@ class EntityTypesResponse
   std::string       toJson(ConnectionInfo* ciP);
 };
 
-#endif  // SRC_LIB_UTILITY_ENTITYTYPESRESPONSE_H_
+#endif  // SRC_LIB_UTILITY_ENTITYTYPEVECTORRESPONSE_H_

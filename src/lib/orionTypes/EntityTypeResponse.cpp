@@ -32,18 +32,18 @@
 #include "common/tag.h"
 #include "ngsi/Request.h"
 #include "rest/uriParamNames.h"
-#include "orionTypes/EntityTypeAttributesResponse.h"
+#include "orionTypes/EntityTypeResponse.h"
 
 
 
 /* ****************************************************************************
 *
-* EntityTypeAttributesResponse::render -
+* EntityTypeResponse::render -
 */
-std::string EntityTypeAttributesResponse::render(ConnectionInfo* ciP, const std::string& indent)
+std::string EntityTypeResponse::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string out                 = "";
-  std::string tag                 = "entityTypeAttributesResponse";
+  std::string tag                 = "entityTypeResponse";
 
   out += startTag(indent, tag, ciP->outFormat, false);
 
@@ -59,9 +59,9 @@ std::string EntityTypeAttributesResponse::render(ConnectionInfo* ciP, const std:
 
 /* ****************************************************************************
 *
-* EntityTypeAttributesResponse::check -
+* EntityTypeResponse::check -
 */
-std::string EntityTypeAttributesResponse::check
+std::string EntityTypeResponse::check
 (
   ConnectionInfo*     ciP,
   const std::string&  indent,
@@ -89,11 +89,11 @@ std::string EntityTypeAttributesResponse::check
 
 /* ****************************************************************************
 *
-* EntityTypeAttributesResponse::present -
+* EntityTypeResponse::present -
 */
-void EntityTypeAttributesResponse::present(const std::string& indent)
+void EntityTypeResponse::present(const std::string& indent)
 {
-  LM_F(("%sEntityTypeAttributesResponse:\n", indent.c_str()));
+  LM_F(("%EntityTypeResponse:\n", indent.c_str()));
   entityType.present(indent + "  ");
   statusCode.present(indent + "  ");
 }
@@ -102,9 +102,9 @@ void EntityTypeAttributesResponse::present(const std::string& indent)
 
 /* ****************************************************************************
 *
-* EntityTypeAttributesResponse::release -
+* EntityTypeResponse::release -
 */
-void EntityTypeAttributesResponse::release(void)
+void EntityTypeResponse::release(void)
 {
   entityType.release();
   statusCode.release();
@@ -114,9 +114,9 @@ void EntityTypeAttributesResponse::release(void)
 
 /* ****************************************************************************
 *
-* EntityTypeAttributesResponse::toJson -
+* EntityTypeResponse::toJson -
 */
-std::string EntityTypeAttributesResponse::toJson(ConnectionInfo* ciP)
+std::string EntityTypeResponse::toJson(ConnectionInfo* ciP)
 {
   std::string  out = "{";
   char         countV[16];
