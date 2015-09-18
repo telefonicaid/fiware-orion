@@ -44,10 +44,8 @@ def update_properties_file(context, properties_file, sudo_run):
     :param properties_file: file to get data to update properties.py
     """
     global properties_class
-    __logger__.info(" >> config file used: '%s'", properties_file)
     properties_class = Properties()
     properties_class.update_properties_json_file(properties_file, sudo_run)
-    __logger__.info(" >> properties.json is updated")
 
 
 @step(u'update contextBroker config file and restart service')
@@ -60,12 +58,19 @@ def update_context_broker_config_file_and_restart_service(context):
     __logger__.debug(" >> updating /etc/sysconfig/contextBroker file")
     props = properties_class.read_properties()  # properties dict
     props_cb = props["context_broker_env"]  # context broker properties dict
+    __logger__.debug(" Context Broker parameters:")
+    for param in props_cb:
+        __logger__.debug("   %s: %s" % (param, props_cb[param]))
     props_mongo = props["mongo_env"]  # mongo properties dict
+    __logger__.debug(" Mongo parameters:")
+    for param in props_mongo:
+        __logger__.debug("   %s: %s" % (param, props_mongo[param]))
+
     my_fab = FabricSupport(host=props_cb["CB_HOST"], user=props_cb["CB_FABRIC_USER"],
                            password=props_cb["CB_FABRIC_PASS"], cert_file=props_cb["CB_FABRIC_CERT"],
                            retry=props_cb["CB_FABRIC_RETRY"], hide=True, sudo=props_cb["CB_FABRIC_SUDO"])
     configuration = properties_class.read_configuration_json()
-
+    __logger__.debug("CB_RUNNING_MODE: %s" % configuration["CB_RUNNING_MODE"])
     if configuration["CB_RUNNING_MODE"].upper() == "RPM":
         properties_class.update_context_broker_file(my_fab)
         __logger__.info(" >> updated /etc/sysconfig/contextBroker file")
@@ -75,6 +80,8 @@ def update_context_broker_config_file_and_restart_service(context):
     else:
         __logger__.debug(" >> restarting contextBroker per command line interface")
         # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
+        __logger__.debug("contextBroker -port %s -logDir %s -pidpath /var/run/contextBroker/contextBroker.pid -dbhost %s -db %s %s -harakiri" %
+                   (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
         my_fab.run("contextBroker -port %s -logDir %s -pidpath /var/run/contextBroker/contextBroker.pid -dbhost %s -db %s %s -harakiri" %
                    (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
         __logger__.info(" >> restarted contextBroker command line interface")
@@ -106,11 +113,12 @@ def verify_context_broker_is_installed_successfully(context):
     """
     global props_cb
     __logger__.debug(" >> verify if contextBroker is installed successfully")
-    __logger__.debug("Sending a version request...")
 
-    cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
-    resp = cb.get_version_request()
+    __logger__.debug("CB_VERIFY_VERSION: %s" % props_cb["CB_VERIFY_VERSION"])
     if props_cb["CB_VERIFY_VERSION"].lower() == "true":
+        cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
+        resp = cb.get_version_request()
+        __logger__.debug("Verifying Context Broker version: %s" % props_cb["CB_VERSION"])
         resp_dict = convert_str_to_dict(str(resp.text), "JSON")
         assert resp_dict["orion"]["version"].find(
             props_cb["CB_VERSION"]) >= 0, " ERROR in context broker version  value, \n " \

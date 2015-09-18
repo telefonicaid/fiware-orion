@@ -4,7 +4,7 @@ Folder for acceptance tests of context broker NGSI v2.In this framework we are u
 
 ## How to Run the Acceptance Tests
 
-### Prerequisites:
+#### Prerequisites:
 
 - Python 2.7.x (One way would be SCL - The Software Collections Repository)
 - pip installed 1.4.1 or higher (http://docs.python-guide.org/en/latest/starting/install/linux/)
@@ -12,7 +12,7 @@ Folder for acceptance tests of context broker NGSI v2.In this framework we are u
 Note: We recommend the use of virtualenv, because is an isolated working copy of Python which allows you to work on a specific project without worry of affecting other projects.
 
 
-# Requirements to fabric (http://www.fabfile.org/)
+#### Requirements to fabric (http://www.fabfile.org/)
 Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
 Some requirements are neccesary verify before to install `Fabric` library, mainly to pycripto library (Fabric dependency). 
 This libraries will be install into `requirements.txt`
@@ -21,7 +21,7 @@ This libraries will be install into `requirements.txt`
 ```
    
 
-##### Environment preparation:
+#### Environment preparation:
 
 - If you are going to use a virtual environment (optional):
   * Create a virtual environment somewhere, (virtualenv <venv_name>) (optional)
@@ -67,7 +67,7 @@ This libraries will be install into `requirements.txt`
 ```
 
 
-### Tests execution:
+### Executing Tests:
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
 - We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to `properties.json` and `configuration.json` files.
@@ -103,7 +103,7 @@ This libraries will be install into `requirements.txt`
            ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.org/en/develop/admin/build_source/index.html`.        
            - RPM: CB is installed as RPM, so service tooling will be used to start and stop
            - CLI: plain CB command line interface will be used to start contextBroker (must be compiled from source in DEBUG mode)               
-- `properties.json` (MANDATORY) will be create/update automatically from settings folder (see `configuration.json`) or manually.
+- `properties.json` (MANDATORY) will be create/update in `root path` automatically from settings folder (see `configuration.json`) or manually.
 - Run behave (see available params with the -h option).
 ```
     Some examples:
@@ -161,6 +161,7 @@ Feature: feature name...
     Check: verify if the service is installed successfully
 ```
 
+
 ### Logs
 
 The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
@@ -196,8 +197,7 @@ The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
         `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
   - If would like a wrong query parameter name, use `qp_` prefix   
   - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
-        
-
+     
 
 ### Tags
 

@@ -59,6 +59,7 @@ class Properties:
         configuration = self.read_configuration_json()
         __logger__.info("configuration.json: %s" % str(configuration))
         if configuration["UPDATE_PROPERTIES_JSON"].lower() == "true":
+            __logger__.info(" >> config file used: '%s'", file_name)
             with open("%s/%s" % (configuration["PATH_TO_SETTINGS_FOLDER"], file_name)) as config_file:
                 for line in config_file.readlines():
                     __logger__.info("-- properties.json lines: %s %s" % (sudo_run, str(line)))
@@ -67,6 +68,9 @@ class Properties:
                     stdout = p.stdout.readlines()
                     assert stdout == [], "ERROR - modifying config files from %s/%s in setting folder. \n " \
                                          "        %s" % (configuration.PATH_TO_SETTING_FOLDER, file_name, stdout)
+            __logger__.info(" >> properties.json is created or updated")
+        else:
+            __logger__.info("properties.json is not updated")
 
     def read_properties(self):
         """

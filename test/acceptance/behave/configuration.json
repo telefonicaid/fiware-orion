@@ -1,5 +1,5 @@
 {
     "PATH_TO_SETTINGS_FOLDER":"settings",
-    "UPDATE_PROPERTIES_JSON": "true",
-    "CB_RUNNING_MODE": "RPM"
+    "UPDATE_PROPERTIES_JSON": "false",
+    "CB_RUNNING_MODE": "CLI"
 }
