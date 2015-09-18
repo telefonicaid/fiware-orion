@@ -380,15 +380,23 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 
 /* ****************************************************************************
 *
-* emptyAttributeValue -
+* attributeValueAbsent -
 *
-* Check that the attribute doesn't have any value, taking into account its multi-valuated
-* nature
+* Check that the attribute doesn't have any value, taking into account its multi-valuated nature.
+*
+* NOTE
+*   1. ValueTypeNumber and ValueTypeBoolean are always non-empty.
+*   2. In API version 2, the value of a ContextAttribute CANNOT be left out
+*
 */
-bool emptyAttributeValue(ContextAttribute* caP)
+bool attributeValueAbsent(ContextAttribute* caP, const std::string& apiVersion)
 {
-  /* Note that ValueTypeNumber and ValueTypeBoolean are always non-empty */
-  return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
+  if (apiVersion == "v1")
+  {
+    return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
+  }
+
+  return false;  // FIXME P7: Very soon this will change and we cannot simply return false anymore
 }
 
 
@@ -477,14 +485,14 @@ void appendMetadata(BSONArrayBuilder* mdVBuilder, Metadata* mdP)
 * request (caP), and merged them producing the mergedAttr output. The function returns
 * true if it was an actual update, false otherwise.
 */
-static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr)
+static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedAttr, const std::string& apiVersion)
 {
   BSONObjBuilder ab;
 
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
-  if (!emptyAttributeValue(caP))
+  if (!attributeValueAbsent(caP, apiVersion))
   {
     valueBson(caP, ab);
   }
@@ -690,7 +698,16 @@ static bool contextAttributeCustomMetadataToBson(BSONObj& mdV, ContextAttribute*
 * touched).
 *
 */
-static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuilder* toPush, ContextAttribute* caP, bool& actualUpdate, bool isReplace)
+static bool updateAttribute
+(
+  BSONObj&            attrs,
+  BSONObjBuilder*     toSet,
+  BSONArrayBuilder*   toPush,
+  ContextAttribute*   caP,
+  bool&               actualUpdate,
+  bool                isReplace,
+  const std::string&  apiVersion
+)
 {
   actualUpdate = false;
 
@@ -731,7 +748,7 @@ static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuil
 
     BSONObj newAttr;
     BSONObj attr = attrs.getField(effectiveName).embeddedObject();
-    actualUpdate = mergeAttrInfo(attr, caP, &newAttr);
+    actualUpdate = mergeAttrInfo(attr, caP, &newAttr, apiVersion);
 
     if (actualUpdate)
     {
@@ -759,7 +776,15 @@ static bool updateAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuil
 *
 * Attributes with metadata ID are stored as <attrName>_<ID> in the attributes embedded document
 */
-static void appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuilder* toPush, ContextAttribute* caP, bool& actualUpdate)
+static void appendAttribute
+(
+  BSONObj&            attrs,
+  BSONObjBuilder*     toSet,
+  BSONArrayBuilder*   toPush,
+  ContextAttribute*   caP,
+  bool&               actualUpdate,
+  const std::string&  apiVersion
+)
 {
   std::string effectiveName = dbDotEncode(caP->name);
 
@@ -771,7 +796,7 @@ static void appendAttribute(BSONObj& attrs, BSONObjBuilder* toSet, BSONArrayBuil
   /* APPEND with existing attribute equals to UPDATE */
   if (attrs.hasField(effectiveName.c_str()))
   {
-    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false);
+    updateAttribute(attrs, toSet, toPush, caP, actualUpdate, false, apiVersion);
     return;
   }
 
@@ -1488,11 +1513,12 @@ static bool updateContextAttributeItem
   std::string&              locAttr,
   double&                   coordLat,
   double&                   coordLong,
-  bool                      isReplace
+  bool                      isReplace,
+  const std::string&        apiVersion
 )
 {
 
-  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace))
+  if (updateAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, isReplace, apiVersion))
   {
     entityModified = actualUpdate || entityModified;
   }
@@ -1571,12 +1597,13 @@ static bool appendContextAttributeItem
   bool&                     entityModified,
   std::string&              locAttr,
   double&                   coordLat,
-  double&                   coordLong
+  double&                   coordLong,
+  const std::string&        apiVersion
 )
 {
   if (legalIdUsage(attrs, targetAttr))
   {
-    appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate);
+    appendAttribute(attrs, toSet, toPush, targetAttr, actualUpdate, apiVersion);
     entityModified = actualUpdate || entityModified;
 
     /* Check aspects related with location */
@@ -1726,7 +1753,8 @@ static bool processContextAttributeVector
   double&                                    coordLat,
   double&                                    coordLong,
   std::string                                tenant,
-  const std::vector<std::string>&            servicePathV
+  const std::vector<std::string>&            servicePathV,
+  const std::string&                         apiVersion
 )
 {
   EntityId*                            eP              = &cerP->contextElement.entityId;
@@ -1767,14 +1795,15 @@ static bool processContextAttributeVector
                                       locAttr,
                                       coordLat,
                                       coordLong,
-                                      strcasecmp(action.c_str(), "replace") == 0))
+                                      strcasecmp(action.c_str(), "replace") == 0,
+                                      apiVersion))
       {
         return false;
       }
     }
     else if ((strcasecmp(action.c_str(), "append") == 0) || (strcasecmp(action.c_str(), "append_strict") == 0))
     {
-      if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong))
+      if (!appendContextAttributeItem(cerP, ca, attrs, targetAttr, eP, toSet, toPush, actualUpdate, entityModified, locAttr, coordLat, coordLong, apiVersion))
       {
         return false;
       }
@@ -2235,7 +2264,7 @@ void processContextElement
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
 
-      if (emptyAttributeValue(aP) && (aP->metadataVector.size() == 0))
+      if (attributeValueAbsent(aP, apiVersion) && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
@@ -2538,7 +2567,8 @@ void processContextElement
                                        coordLat,
                                        coordLong,
                                        tenant,
-                                       servicePathV))
+                                       servicePathV,
+                                       apiVersion))
     {
       /* The entity wasn't actually modified, so we don't need to update it and we can continue with next one */
       // FIXME P8: the same three statements are at the end of the while loop. Refactor the code to have this
