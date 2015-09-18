@@ -86,7 +86,12 @@ def update_context_broker_config_file_and_restart_service(context):
             (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
         __logger__.debug("output: %s" % str(resp))
         __logger__.info(" >> restarted contextBroker command line interface")
-
+        cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
+        c = 0
+        while not cb.is_cb_installed():
+            time.sleep(1)
+            c += 1
+            __logger__.debug("WARN - Retry in verification if context broker is installed. No: (%s)" % str(c))
 
 @step(u'stop service')
 def stop_service(context):
