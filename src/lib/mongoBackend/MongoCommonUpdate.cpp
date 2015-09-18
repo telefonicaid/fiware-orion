@@ -380,7 +380,7 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 
 /* ****************************************************************************
 *
-* emptyAttributeValue -
+* attributeValueAbsent -
 *
 * Check that the attribute doesn't have any value, taking into account its multi-valuated nature.
 *
@@ -389,14 +389,14 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 *   2. In API version 2, the value of a ContextAttribute CANNOT be left out
 *
 */
-bool emptyAttributeValue(ContextAttribute* caP, const std::string& apiVersion)
+bool attributeValueAbsent(ContextAttribute* caP, const std::string& apiVersion)
 {
   if (apiVersion == "v1")
   {
     return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
   }
 
-  return false;
+  return false;  // FIXME P7: Very soon this will change and we cannot simply return false anymore
 }
 
 
@@ -492,7 +492,7 @@ static bool mergeAttrInfo(BSONObj& attr, ContextAttribute* caP, BSONObj* mergedA
   /* 1. Add value, if present in the request (it could be omitted in the case of updating only metadata).
    *    When the value of the attribute is empty (no update needed/wanted), then the value of the attribute is
    *    'copied' from DB to the variable 'ab' and sent back to mongo, to not destroy the value  */
-  if (!emptyAttributeValue(caP, apiVersion))
+  if (!attributeValueAbsent(caP, apiVersion))
   {
     valueBson(caP, ab);
   }
@@ -2264,7 +2264,7 @@ void processContextElement
     {
       ContextAttribute* aP = ceP->contextAttributeVector[ix];
 
-      if (emptyAttributeValue(aP, apiVersion) && (aP->metadataVector.size() == 0))
+      if (attributeValueAbsent(aP, apiVersion) && (aP->metadataVector.size() == 0))
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
