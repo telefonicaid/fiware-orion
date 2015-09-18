@@ -78,7 +78,7 @@ def after_feature(context, feature):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param feature: feature properties
     """
-    #context.execute_steps(u'Given stop service')
+    context.execute_steps(u'Given stop service')
     __logger__.info("AFTER FEATURE")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

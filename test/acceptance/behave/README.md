@@ -26,7 +26,7 @@ This libraries will be install into `requirements.txt`
 - If you are going to use a virtual environment (optional):
   * Create a virtual environment somewhere, `virtualenv venv_name` (optional)
   * Activate the virtual environment `source venv_name/bin/activate` (optional)
-  * Remember to unset the virtual environment when you're done testing, if it has been previously activated (deactivate) (optional)
+  * Remember to unset the virtual environment when you're done testing, if it has been previously activated `deactivate` (optional)
 - You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
 - Both if you are using a virtual environment or not:
   * Change to the test/acceptance/behave folder of the project.
