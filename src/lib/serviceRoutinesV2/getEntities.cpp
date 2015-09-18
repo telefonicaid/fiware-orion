@@ -70,6 +70,11 @@ std::string getEntities
   string    idPattern  = ciP->uriParam["idPattern"];
   string    q          = ciP->uriParam["q"];
 
+  if (ciP->uriParam["options"] == "count")
+  {
+    ciP->uriParam["count"] = "true";
+  }
+
   if ((idPattern != "") && (id != ""))
   {
     OrionError oe(SccBadRequest, "Incompatible parameters: id, IdPattern");
