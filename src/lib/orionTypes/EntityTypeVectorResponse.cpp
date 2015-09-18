@@ -42,7 +42,7 @@
 std::string EntityTypeVectorResponse::render(ConnectionInfo* ciP, const std::string& indent)
 {
   std::string out                 = "";
-  std::string tag                 = "entityTypeVectorResponse";
+  std::string tag                 = "entityTypesResponse";
 
   out += startTag(indent, tag, ciP->outFormat, false);
 
