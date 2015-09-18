@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PUT Individual Entity Attribute with empty value
+Create Individual Entity Attribute with empty value
 
 --SHELL-INIT--
 dbInit CB
