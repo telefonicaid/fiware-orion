@@ -32,8 +32,9 @@ brokerStart CB
 #
 # 01. POST /v2/entities to create E1/A1=""
 # 02. GET /v2/entities/E1 to see A1==""
+# 03. POST /v2/entities to create E1/A2="", using json object
+# 04. 04. GET /v2/entities/E1 to see A2==""
 #
-
 
 echo '01. POST /v2/entities to create E1/A1=""'
 echo "========================================"
@@ -50,8 +51,8 @@ echo
 echo
 
 
-echo '03. POST /v2/entities to create E1/A2=""'
-echo "========================================"
+echo '03. POST /v2/entities to create E1/A2="", using json object'
+echo "==========================================================="
 payload='{ "id": "E1", "type": "T1", "A2": { "value": "" }}'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -89,8 +90,8 @@ Date: REGEX(.*)
 }
 
 
-03. POST /v2/entities to create E1/A2=""
-========================================
+03. POST /v2/entities to create E1/A2="", using json object
+===========================================================
 HTTP/1.1 201 Created
 Content-Length: 0
 Location: /v2/entities/E1
