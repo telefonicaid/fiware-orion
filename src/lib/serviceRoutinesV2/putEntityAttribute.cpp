@@ -30,6 +30,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutines/postUpdateContext.h"
 #include "serviceRoutinesV2/putEntityAttribute.h"
+#include "rest/OrionError.h"
 
 
 
@@ -90,6 +91,13 @@ std::string putEntityAttribute
   // 05. Cleanup and return result
   parseDataP->upcr.res.release();
   parseDataP->upcrs.res.release();
+
+  if (ciP->httpStatusCode == SccInvalidModification)
+  {
+      std::string details = "Request payload is missing some piece of information. Please, check Orion documentation."; 
+      OrionError orionError(SccInvalidModification, details);     
+      answer = orionError.render(ciP, "");
+  }
 
   return answer;
 }

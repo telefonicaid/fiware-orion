@@ -1431,6 +1431,7 @@ static void buildGeneralErrorResponse
 }
 
 
+
 /* ****************************************************************************
 *
 * setResponseMetadata -
@@ -2268,7 +2269,7 @@ void processContextElement
       {
         ContextAttribute* ca = new ContextAttribute(aP);
 
-        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidParameter,
+        buildGeneralErrorResponse(ceP, ca, responseP, SccInvalidModification,
                                   std::string("action: ") + action +
                                   " - entity: [" + enP->toString(true) + "]" +
                                   " - offending attribute: " + aP->toString() +
