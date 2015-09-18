@@ -81,9 +81,10 @@ def update_context_broker_config_file_and_restart_service(context):
         __logger__.debug(" >> restarting contextBroker per command line interface")
         # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
         __logger__.debug("contextBroker -port %s -logDir %s -pidpath /var/run/contextBroker/contextBroker.pid -dbhost %s -db %s %s -harakiri" %
-                   (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
-        my_fab.run("contextBroker -port %s -logDir %s -pidpath /var/run/contextBroker/contextBroker.pid -dbhost %s -db %s %s -harakiri" %
-                   (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+        resp = my_fab.run("contextBroker -port %s -logDir %s -pidpath /var/run/contextBroker/contextBroker.pid -dbhost %s -db %s %s -harakiri" %
+            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+        __logger__.debug("output: %s" % str(resp))
         __logger__.info(" >> restarted contextBroker command line interface")
 
 
@@ -120,10 +121,10 @@ def verify_context_broker_is_installed_successfully(context):
         resp = cb.get_version_request()
         __logger__.debug("Verifying Context Broker version: %s" % props_cb["CB_VERSION"])
         resp_dict = convert_str_to_dict(str(resp.text), "JSON")
-        assert resp_dict["orion"]["version"].find(
-            props_cb["CB_VERSION"]) >= 0, " ERROR in context broker version  value, \n " \
-                                          " expected: %s \n" \
-                                          " installed: %s" % (props_cb["CB_VERSION"], resp_dict["orion"]["version"])
+        assert resp_dict["orion"]["version"].find(props_cb["CB_VERSION"]) >= 0, \
+            " ERROR in context broker version value, \n " \
+            " expected: %s \n " \
+            " installed: %s" % (props_cb["CB_VERSION"], resp_dict["orion"]["version"])
         __logger__.debug("-- version %s is correct in base request v2" % props_cb["CB_VERSION"])
     __logger__.info(" >> verified that contextBroker is installed successfully")
 

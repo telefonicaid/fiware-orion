@@ -22,17 +22,32 @@
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
+import os
+
 from components.common_steps.initial_steps import *
 from components.common_steps.requests import *
 
 __logger__ = logging.getLogger("environment")
 
 
+def __create_log_folder(name):
+    """
+    verify if the folder exists and it does not exists, it is created
+    :param name: log folder name
+    """
+    try:
+        if not os.path.exists(name):
+            os.makedirs(name)
+            __logger__.info("log folder has been created with name: %s" % name)
+    except Exception, e:
+        assert False, "ERROR  - creating logs folder \n       - %s" % str(e)
+
 def before_all(context):
     """
     actions before all
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     """
+    __create_log_folder("logs")
     context.config.setup_logging(configfile="logging.ini")
 
 
@@ -63,7 +78,7 @@ def after_feature(context, feature):
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
     :param feature: feature properties
     """
-    context.execute_steps(u'Given stop service')
+    #context.execute_steps(u'Given stop service')
     __logger__.info("AFTER FEATURE")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")

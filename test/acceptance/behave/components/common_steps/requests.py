@@ -348,14 +348,12 @@ def verify_if_version_is_the_expected(context):
     verify if version is the expected
     """
     global resp, props_cb_env
-
     if props_cb_env["CB_VERIFY_VERSION"].lower() == "true":
         resp_dict = convert_str_to_dict(str(resp.text), "JSON")
-        assert resp_dict["orion"]["version"].find(
-            props_cb_env["CB_VERSION"]) >= 0, " ERROR in context broker version  value, \n" \
-                                              " expected: %s \n" \
-                                              " installed: %s" % (
-                                              props_cb_env["CB_VERSION"], resp_dict["orion"]["version"])
+        assert resp_dict["orion"]["version"].find(props_cb_env["CB_VERSION"]) >= 0, \
+            " ERROR in context broker version value, \n" \
+            " expected: %s \n" \
+            " installed: %s" % (props_cb_env["CB_VERSION"], resp_dict["orion"]["version"])
         __logger__.debug("-- version %s is correct in version request" % props_cb_env["CB_VERSION"])
 
 
