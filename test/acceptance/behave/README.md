@@ -24,14 +24,14 @@ This libraries will be install into `requirements.txt`
 #### Environment preparation:
 
 - If you are going to use a virtual environment (optional):
-  * Create a virtual environment somewhere, (virtualenv <venv_name>) (optional)
-  * Activate the virtual environment (source <venv_name>/bin/activate) (optional)
+  * Create a virtual environment somewhere, `virtualenv venv_name` (optional)
+  * Activate the virtual environment `source venv_name/bin/activate` (optional)
   * Remember to unset the virtual environment when you're done testing, if it has been previously activated (deactivate) (optional)
 - You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
 - Both if you are using a virtual environment or not:
   * Change to the test/acceptance/behave folder of the project.
   * Install the requirements for the acceptance tests in the virtual environment
-  * You should add "--upgrade" (if you have a previous installed version of this library)
+  * You should add `--upgrade` (if you have a previous installed version of this library)
 ```
      pip install [--upgrade] -r requirements.txt --allow-all-external
 ```
@@ -102,7 +102,8 @@ This libraries will be install into `requirements.txt`
        * CB_RUNNING_MODE: is used to determine how is compiled ContextBroker.
            ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.org/en/develop/admin/build_source/index.html`.        
            - RPM: CB is installed as RPM, so service tooling will be used to start and stop
-           - CLI: plain CB command line interface will be used to start contextBroker (must be compiled from source in DEBUG mode)               
+           - CLI: plain CB command line interface will be used to start contextBroker, the contextBroker binary (compiled in DEBUG mode) 
+             must be available in the system PATH.   
 - `properties.json` (MANDATORY) will be create/update in `root path` automatically from settings folder (see `configuration.json`) or manually.
 - Run behave (see available params with the -h option).
 ```
