@@ -3,3 +3,4 @@ Fix:  Changed the description text for parse errors in v2 json requests (Issue #
 Fix:  Remove leftover whitespaces in error messages (Issue #1199) 
 Fix:  Avoid updating several matching entities associated to the same ID, returning TooManyResults error in that case (Issue #1198)
 Fix:  Permitting attribute values to be empty in API v2 (Issue #1188)
+Fix:  URI params 'geometry' and 'coords' for GET /v2/entities (Issue #1177)

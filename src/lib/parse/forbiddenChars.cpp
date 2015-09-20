@@ -61,3 +61,36 @@ bool forbiddenChars(const char* s)
 
   return false;
 }
+
+
+
+/* ****************************************************************************
+*
+* forbiddenCharsInUriParam - 
+*/
+bool forbiddenCharsInUriParam(const char* s)
+{
+  if (s == (void*) 0)
+  {
+    return false;
+  }
+
+  while (*s != 0)
+  {
+    switch (*s)
+    {
+    case '<':
+    case '>':
+    case '"':
+    case '\'':
+    case '(':
+    case ')':
+      LM_E(("Bad Input (character '%c')", *s));
+      return true;
+    }
+
+    ++s;
+  }
+
+  return false;
+}

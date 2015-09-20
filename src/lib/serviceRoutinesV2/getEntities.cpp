@@ -47,6 +47,11 @@
 *   - limit=NUMBER
 *   - offset=NUMBER
 *   - count=true/false
+*   - id
+*   - idPattern
+*   - q
+*   - geometry
+*   - coords
 *
 * 01. Fill in QueryContextRequest
 * 02. Call standard op postQueryContext
@@ -61,14 +66,15 @@ std::string getEntities
   ParseData*                 parseDataP
 )
 {
-  using namespace std;
+  Entities     entities;
+  std::string  answer;
+  std::string  pattern    = ".*"; // all entities, default value
+  std::string  id         = ciP->uriParam["id"];
+  std::string  idPattern  = ciP->uriParam["idPattern"];
+  std::string  q          = ciP->uriParam["q"];
+  std::string  geometry   = ciP->uriParam["geometry"];
+  std::string  coords     = ciP->uriParam["coords"];
 
-  Entities  entities;
-  string    answer;
-  string    pattern    = ".*"; // all entities, default value
-  string    id         = ciP->uriParam["id"];
-  string    idPattern  = ciP->uriParam["idPattern"];
-  string    q          = ciP->uriParam["q"];
 
   if ((idPattern != "") && (id != ""))
   {
@@ -79,11 +85,11 @@ std::string getEntities
   else if (id != "")
   {
     // FIXME: a more efficient query could be possible ...
-    vector<string> idsV;
+    std::vector<std::string> idsV;
 
     stringSplit(id, ',', idsV);
-    vector<string>::size_type sz = idsV.size();
-    for (vector<string>::size_type ix = 0; ix != sz; ++ix)
+
+    for (unsigned int ix = 0; ix != idsV.size(); ++ix)
     {
       if (ix != 0)
       {
@@ -98,6 +104,63 @@ std::string getEntities
   }
 
 
+  // Making sure geometry and coords are not used individually
+  if ((coords != "") && (geometry == ""))
+  {
+    OrionError oe(SccBadRequest, "URI param /coords/ used without /geometry/");
+    return oe.render(ciP, "");
+  }
+  else if ((geometry != "") && (coords == ""))
+  {
+    OrionError oe(SccBadRequest, "URI param /geometry/ used without /coords/");
+    return oe.render(ciP, "");
+  }
+
+  // Making sure geometry is valid (if present)
+  orion::Geometry           geo;
+  std::vector<std::string>  coordsV;
+
+  if (geometry != "")
+  {
+    std::string      errorString;
+
+    if (geo.parse(geometry.c_str(), &errorString) != 0)
+    {
+      OrionError oe(SccBadRequest, std::string("error parsing geometry: ") + errorString);
+      return oe.render(ciP, "");
+    }
+
+    if ((geo.areaType != "polygon") && (geo.areaType != "circle"))
+    {
+      OrionError oe(SccBadRequest, "URI param /geometry/ must be either /polygon/ or /circle/");
+      return oe.render(ciP, "");
+    }
+
+    //
+    // As 'geometry' is present, so is 'coords' - checking coords
+    //
+    int noOfCoords = stringSplit(coords, ';', coordsV);
+
+    if (noOfCoords == 0)
+    {
+      OrionError oe(SccBadRequest, "URI param /coords/ has no coordinates");
+      return oe.render(ciP, "");
+    }
+
+    if ((geo.areaType == "circle") && (noOfCoords != 1))
+    {
+      OrionError oe(SccBadRequest, "Too many coordinates for circle");
+      return oe.render(ciP, "");
+    }
+
+    if ((geo.areaType == "polygon") && (noOfCoords < 3))
+    {
+      OrionError oe(SccBadRequest, "Too few coordinates for polygon");
+      return oe.render(ciP, "");
+    }
+  }
+
+
   //
   // 01. Fill in QueryContextRequest - type "" is valid for all types
   //
@@ -107,6 +170,22 @@ std::string getEntities
   if (q != "")
   {
     Scope* scopeP = new Scope(SCOPE_TYPE_SIMPLE_QUERY, q);
+
+    parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
+  }
+
+
+  // If URI params 'geometry' and 'coords' are given, another scope is to be created for this
+  if ((coords != "") && (geometry != ""))
+  {
+    Scope*       scopeP = new Scope(SCOPE_TYPE_LOCATION, "");
+    std::string  errorString;
+
+    if (scopeP->fill(&geo, coordsV, &errorString) != 0)
+    {
+      OrionError oe(SccBadRequest, errorString);
+      return oe.render(ciP, "");
+    }
 
     parseDataP->qcr.res.restriction.scopeVector.push_back(scopeP);
   }

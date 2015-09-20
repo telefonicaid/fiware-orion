@@ -34,4 +34,12 @@
 */
 extern bool forbiddenChars(const char* s);
 
+
+
+/* ****************************************************************************
+*
+* forbiddenCharsInUriParam - 
+*/
+extern bool forbiddenCharsInUriParam(const char* s);
+
 #endif  // SRC_LIB_PARSE_FORBIDDENCHARS_H_

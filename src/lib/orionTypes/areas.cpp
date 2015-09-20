@@ -22,14 +22,56 @@
 *
 * Author: Ken Zangelin
 */
+#include <stdio.h>
+#include <string.h>
+
 #include <string>
 #include <vector>
 
+#include "logMsg/logMsg.h"
+
+#include "common/string.h"
 #include "orionTypes/areas.h"
 
 
 namespace orion
 {
+
+
+/* ****************************************************************************
+*
+* Point::Point - 
+*/
+Point::Point()
+{
+}
+
+
+
+/* ****************************************************************************
+*
+* Point::Point - 
+*/
+Point::Point(::std::string latitude, ::std::string longitude)
+{
+  _latitude  = latitude;
+  _longitude = longitude;
+}
+
+
+
+/* ****************************************************************************
+*
+* Point::fill - 
+*/
+void Point::fill(Point* p)
+{
+  _latitude  = p->_latitude;
+  _longitude = p->_longitude;
+}
+
+
+
 /* ****************************************************************************
 *
 * Point::latitude -
@@ -157,11 +199,47 @@ void Circle::radiusSet(::std::string radius)
 
 /* ****************************************************************************
 *
+* Circle::radiusSet -
+*/
+void Circle::radiusSet(float radius)
+{
+  char buffer[64];
+
+  snprintf(buffer, sizeof(buffer), "%f", radius);
+  _radius   = buffer;
+}
+
+
+
+/* ****************************************************************************
+*
 * Circle::invertedSet -
 */
 void Circle::invertedSet(::std::string inverted)
 {
   _inverted = inverted;
+}
+
+
+
+/* ****************************************************************************
+*
+* Circle::invertedSet -
+*/
+void Circle::invertedSet(bool inverted)
+{
+  _inverted = (inverted == true)? "true" : "false";
+}
+
+
+
+/* ****************************************************************************
+*
+* Circle::centerSet -
+*/
+void Circle::centerSet(Point* _center)
+{
+  center.fill(_center);
 }
 
 
@@ -189,6 +267,18 @@ bool Polygon::inverted(void)
 void Polygon::invertedSet(::std::string inverted)
 {
   _inverted = inverted;
+}
+
+
+
+/* ****************************************************************************
+*
+* Polygon::invertedSet -
+*/
+void Polygon::invertedSet(bool inverted)
+{
+  
+  _inverted = (inverted == true)? "true" : "false";
 }
 
 
@@ -227,6 +317,83 @@ void Polygon::release(void)
   }
 
   vertexList.clear();
+}
+
+
+
+/* ****************************************************************************
+*
+* Geometry::Geometry - 
+*/
+Geometry::Geometry()
+{
+  areaType  = "";
+  radius    = -1;
+  external  = false;
+}
+
+
+
+/* ****************************************************************************
+*
+* Geometry::parse - 
+*/
+int Geometry::parse(const char* in, std::string* errorString)
+{
+  std::vector<std::string> items;
+
+  if (stringSplit(in, ';', items) == 0)
+  {
+    *errorString = "empty geometry";
+    return -1;
+  }
+
+  for (unsigned int ix = 0; ix < items.size(); ++ix)
+  {
+    if ((items[ix] == "polygon") || (items[ix] == "circle"))
+    {
+      if (areaType != "")
+      {
+        *errorString = "polygon/circle present more than once";
+        return -1;
+      }
+
+      areaType = items[ix];
+    }
+    else if (strncmp(items[ix].c_str(), "radius", 6) == 0)
+    {
+      radius = atoi((char*) &items[ix].c_str()[7]);
+
+      if (radius == 0)
+      {
+        *errorString = "Invalid value of /radius/";
+        return -1;
+      }
+    }
+    else if (items[ix] == "external")
+    {
+      external = true;
+    }
+    else
+    {
+      *errorString = "Invalid selector in geometry specification";
+      return -1;
+    }
+  }
+
+  if ((areaType == "circle") && (radius == -1))
+  {
+    *errorString = "no radius for circle";
+    return -1;
+  }
+
+  if ((areaType == "polygon") && (radius != -1))
+  {
+    *errorString = "radius set for polygon";
+    return -1;
+  }
+
+  return 0;
 }
 
 }  // namespace orion

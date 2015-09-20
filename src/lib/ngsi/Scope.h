@@ -51,6 +51,7 @@ using namespace orion;
 #define SCOPE_FILTER_NOT_EXISTENCE   SCOPE_FILTER "::" SCOPE_OPERATOR_NOT "::" "Existence"
 
 #define SCOPE_TYPE_SIMPLE_QUERY      "FIWARE::StringQuery"
+#define SCOPE_TYPE_LOCATION          FIWARE_LOCATION
 
 #define SCOPE_VALUE_ENTITY_TYPE      "entity::type"
 
@@ -72,17 +73,18 @@ typedef struct Scope
   orion::Polygon      polygon;
 
   Scope();
-  Scope(const std::string& _type, const std::string& _value, const std::string& _oper = "");
+  Scope(const std::string& _type, const std::string& _value,  const std::string& _oper = "");
 
-  std::string render(Format format, const std::string& indent, bool notLastInVector);
-  void        present(const std::string& indent, int ix);
-  void        release(void);
+  int          fill(orion::Geometry* geometry,  const std::vector<std::string>& coordsV, std::string* errorString);
+  std::string  render(Format format, const std::string& indent, bool notLastInVector);
+  void         present(const std::string& indent, int ix);
+  void         release(void);
 
-  std::string check(RequestType         requestType,
-                    Format              format,
-                    const std::string&  indent,
-                    const std::string&  predetectedError,
-                    int                 counter);
+  std::string  check(RequestType         requestType,
+                     Format              format,
+                     const std::string&  indent,
+                     const std::string&  predetectedError,
+                     int                 counter);
 } Scope;
 
 #endif  // SRC_LIB_NGSI_SCOPE_H_

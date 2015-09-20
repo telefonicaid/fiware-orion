@@ -211,7 +211,7 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   //
   if ((key != "q") && (key != "idPattern"))
   {
-    if (forbiddenChars(ckey) || forbiddenChars(val))
+    if (forbiddenCharsInUriParam(ckey) || forbiddenCharsInUriParam(val))
     {
       OrionError error(SccBadRequest, "invalid character in URI parameter");
 
