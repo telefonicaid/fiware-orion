@@ -180,8 +180,8 @@ The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
     * list_all_entities - 200 testcases
     * list_an_entity_by_id - 209 testcases
     * list_an_attribute_by_id - 198 testcases
-    * update_append_attribute_by_id - 729 testcases
-    * update_only_by_id (pending)
+    * update_append_attribute_by_id - 731 testcases
+    * update_attribute_by_id (pending) 
     * replace_attributes_by_id (pending)
     * remove_entity (pending)
 
