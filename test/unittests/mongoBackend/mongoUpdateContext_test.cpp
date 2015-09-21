@@ -5220,8 +5220,8 @@ TEST(mongoUpdateContextRequest, updateEmptyValueFail)
     EXPECT_EQ("TA1", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(SccInvalidModification, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Invalid Modification", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: UPDATE - entity: [E1, T1, false] - offending attribute: A1 - empty attribute not allowed in APPEND or UPDATE", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
@@ -5377,8 +5377,8 @@ TEST(mongoUpdateContextRequest, appendEmptyValueFail)
     EXPECT_EQ("TA8", RES_CER_ATTR(0, 0)->type);
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->stringValue.size());
     EXPECT_EQ(0, RES_CER_ATTR(0, 0)->metadataVector.size());
-    EXPECT_EQ(SccInvalidParameter, RES_CER_STATUS(0).code);
-    EXPECT_EQ("request parameter is invalid/not allowed", RES_CER_STATUS(0).reasonPhrase);
+    EXPECT_EQ(SccInvalidModification, RES_CER_STATUS(0).code);
+    EXPECT_EQ("Invalid Modification", RES_CER_STATUS(0).reasonPhrase);
     EXPECT_EQ("action: APPEND - entity: [E1, T1, false] - offending attribute: A8 - empty attribute not allowed in APPEND or UPDATE", RES_CER_STATUS(0).details);
 
     /* Check that every involved collection at MongoDB is as expected */
