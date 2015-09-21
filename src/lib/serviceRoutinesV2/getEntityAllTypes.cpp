@@ -56,7 +56,7 @@ std::string getEntityAllTypes
   mongoEntityTypes(&response, ciP->tenant, ciP->servicePathV, ciP->uriParam);
   answer = response.toJson(ciP);
 
-  if (ciP->uriParam["options"] == "count")
+  if (ciP->uriParamOptions["count"])
   {
     long long  acc = 0;
     char       cVec[64];
