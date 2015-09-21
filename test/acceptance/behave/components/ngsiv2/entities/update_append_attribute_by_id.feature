@@ -2893,5 +2893,5 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | house'flat'     |
       | house;flat      |
       | house(flat)     |
-    #  | {"a":34}        |
-    #  | ["34", "a", 45] |
+      | {"a":34}        |
+      | ["34", "a", 45] |
