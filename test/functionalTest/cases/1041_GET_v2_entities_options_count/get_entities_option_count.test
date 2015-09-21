@@ -1,0 +1,212 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Entities V2 options=count
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET /v2/entities?options=count
+# 02. POST /v2/entities (E1)
+# 03. GET /v2/entities?options=count
+# 04. POST /v2/entities (E2)
+# 05. POST /v2/entities (E3)
+# 06. POST /v2/entities (E4)
+# 07. GET /v2/entities?options=count
+#
+
+
+echo "01. GET /v2/entities"
+echo "===================="
+orionCurl --url /v2/entities?options=count --json
+echo
+echo
+
+echo "02. POST /v2/entities (E1)"
+echo "=========================="
+payload='{
+    
+      "id":   "E1",
+      "type": "Car",
+      "model" : {
+           "type": "myString",
+           "value" : "Klasse C"
+        }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+echo "03. GET /v2/entities"
+echo "===================="
+orionCurl --url /v2/entities?options=count --json
+echo
+echo
+
+echo "04. POST /v2/entities (E2)"
+echo "=========================="
+payload='{
+
+      "id":   "E2",
+      "type": "Car"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+echo "05. POST /v2/entities (E3)"
+echo "=========================="
+payload='{
+
+      "id":   "E3",
+      "type": "Car"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+echo "06. POST /v2/entities (E4)"
+echo "=========================="
+payload='{
+
+      "id":   "E4",
+      "type": "Car"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+echo "07. GET /v2/entities"
+echo "===================="
+orionCurl --url /v2/entities?options=count --json
+echo
+echo
+
+--REGEXPECT--
+01. GET /v2/entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 2
+Content-Type: application/json
+X-Total-Count: 0
+Date: REGEX(.*)
+
+[]
+
+
+02. POST /v2/entities (E1)
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E1
+Date: REGEX(.*)
+
+
+
+03. GET /v2/entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 73
+Content-Type: application/json
+X-Total-Count: 1
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "model": {
+            "type": "myString",
+            "value": "Klasse C"
+        },
+        "type": "Car"
+    }
+]
+
+
+04. POST /v2/entities (E2)
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E2
+Date: REGEX(.*)
+
+
+
+05. POST /v2/entities (E3)
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E3
+Date: REGEX(.*)
+
+
+
+06. POST /v2/entities (E4)
+==========================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/E4
+Date: REGEX(.*)
+
+
+
+07. GET /v2/entities
+====================
+HTTP/1.1 200 OK
+Content-Length: 148
+Content-Type: application/json
+X-Total-Count: 4
+Date: REGEX(.*)
+
+[
+    {
+        "id": "E1",
+        "model": {
+            "type": "myString",
+            "value": "Klasse C"
+        },
+        "type": "Car"
+    },
+    {
+        "id": "E2",
+        "type": "Car"
+    },
+    {
+        "id": "E3",
+        "type": "Car"
+    },
+    {
+        "id": "E4",
+        "type": "Car"
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
+

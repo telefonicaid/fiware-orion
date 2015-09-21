@@ -70,9 +70,9 @@ echo
 echo
 
 
-echo "04. GET /v2/entities?idPattern=E1&count=true"
-echo "============================================"
-orionCurl --url '/v2/entities?idPattern=E1&count=true' --json
+echo "04. GET /v2/entities?idPattern=E1&options=count,normalized"
+echo "=========================================================="
+orionCurl --url '/v2/entities?idPattern=E1&options=count,normalized' --json
 echo
 echo
 
@@ -147,8 +147,8 @@ Date: REGEX(.*)
 ]
 
 
-04. GET /v2/entities?idPattern=E1&count=true
-============================================
+04. GET /v2/entities?idPattern=E1&options=count,normalized
+==========================================================
 HTTP/1.1 200 OK
 Content-Length: 96
 Content-Type: application/json
