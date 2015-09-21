@@ -209,15 +209,30 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   // Now check the URI param has no invalid characters
   // Except for the URI params 'q' and 'idPattern' that are not to be checked for invalid characters
   //
-  if ((key != "q") && (key != "idPattern"))
-  {
-    if (forbiddenChars(ckey) || forbiddenChars(val))
-    {
-      OrionError error(SccBadRequest, "invalid character in URI parameter");
+  // Another exception: 'geometry' and 'coords' has a relaxed check for forbidden characters that
+  // doesn't check for '=' and ';' as those characters are part of the syntaxis for the parameters.
+  //
+  bool containsForbiddenChars = false;
 
-      ciP->httpStatusCode = SccBadRequest;
-      ciP->answer         = error.render(ciP, "");
-    }
+  if (key == "geometry")
+  {
+    containsForbiddenChars = forbiddenChars(val, "=;");
+  }
+  else if (key == "coords")
+  {
+    containsForbiddenChars = forbiddenChars(val, ";");
+  }
+  else if ((key != "q") && (key != "idPattern"))
+  {
+    containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
+  }
+
+  if (containsForbiddenChars == true)
+  {
+    OrionError error(SccBadRequest, "invalid character in URI parameter");
+
+    ciP->httpStatusCode = SccBadRequest;
+    ciP->answer         = error.render(ciP, "");
   }
 
   return MHD_YES;

@@ -29,8 +29,9 @@
 
 #include "common/globals.h"
 #include "common/tag.h"
-#include "ngsi/Scope.h"
 #include "common/Format.h"
+#include "common/string.h"
+#include "ngsi/Scope.h"
 #include "parse/forbiddenChars.h"
 
 
@@ -55,9 +56,83 @@ Scope::Scope()
 */
 Scope::Scope(const std::string& _type, const std::string& _value, const std::string& _oper)
 {
-  type  = _type;
-  value = _value;
-  oper  = _oper;
+  type     = _type;
+  value    = _value;
+  oper     = _oper;
+  areaType = orion::NoArea;
+}
+
+
+
+/* ****************************************************************************
+*
+* Scope::fill - 
+*/
+int Scope::fill
+(
+  orion::Geometry*                 geometry,
+  const std::vector<std::string>&  coordsV,
+  std::string*                     errorString
+)
+{
+  if (geometry->areaType == "circle")
+  {
+    areaType = orion::CircleType;
+
+    circle.radiusSet(geometry->radius);
+    circle.invertedSet(geometry->external);
+
+    std::vector<std::string>  coords;
+
+    if (stringSplit(coordsV[0], ',', coords) == 2)
+    {
+      std::string latitude  = coords[0];
+      std::string longitude = coords[1];
+
+      Point p(latitude, longitude);
+      circle.centerSet(&p);
+    }
+    else
+    {
+      *errorString = "invalid coordinate-set for circle";
+      return -1;
+    }
+  }
+  else if (geometry->areaType == "polygon")
+  {
+    areaType = orion::PolygonType;
+    
+    polygon.invertedSet(geometry->external);
+
+    for (unsigned int ix = 0; ix < coordsV.size(); ++ix)
+    {
+      std::vector<std::string>  coords;
+
+      if (stringSplit(coordsV[ix], ',', coords) == 2)
+      {
+        std::string latitude  = coords[0];
+        std::string longitude = coords[1];
+
+        // FIXME P1:  we should check 'valid number' of coords[0] and coords[1]
+        Point* p = new Point(latitude, longitude);
+        polygon.vertexAdd(p);
+      }
+      else
+      {
+        *errorString = "invalid coordinate-set for polygon";
+        return -1;
+      }
+    }
+  }
+  else
+  {
+    areaType = orion::NoArea;
+    
+    *errorString = "invalid area-type";
+    return -1;
+  }
+
+  return 0;
 }
 
 

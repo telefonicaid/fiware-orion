@@ -1008,7 +1008,7 @@ static bool processAreaScope(Scope* scoP, BSONObj &areaQuery)
 
     inverted  = scoP->circle.inverted();
   }
-  else if (scoP->areaType== orion::PolygonType)
+  else if (scoP->areaType == orion::PolygonType)
   {
     BSONArrayBuilder  vertex;
     double            lat0 = 0;

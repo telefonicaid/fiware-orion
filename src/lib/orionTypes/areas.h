@@ -57,6 +57,10 @@ class Point
   ::std::string _longitude;
 
  public:
+  Point();
+  Point(::std::string latitude, ::std::string longitude);
+
+  void   fill(Point* p);
   double latitude(void);
   double longitude(void);
   void   latitudeSet(::std::string latitude);
@@ -85,7 +89,10 @@ class Circle
   ::std::string  radiusString(void);
   ::std::string  invertedString(void);
   void           radiusSet(::std::string radius);
+  void           radiusSet(float _radius);
   void           invertedSet(::std::string inverted);
+  void           invertedSet(bool _inverted);
+  void           centerSet(Point* _center);
 };
 
 
@@ -103,10 +110,29 @@ class Polygon
   ::std::vector<Point*> vertexList;
   bool                  inverted(void);
   void                  invertedSet(::std::string inverted);
+  void                  invertedSet(bool inverted);
   ::std::string         invertedString(void);
   void                  vertexAdd(Point* p);
   void                  release(void);
 };
+
+
+
+/* ****************************************************************************
+*
+* Geometry - 
+*/
+class Geometry
+{
+public:
+  Geometry();
+  int          parse(const char* in, std::string* errorString);
+
+  std::string  areaType;
+  float        radius;
+  bool         external;
+};
+
 }
 
 #endif  // SRC_LIB_ORIONTYPES_AREAS_H_

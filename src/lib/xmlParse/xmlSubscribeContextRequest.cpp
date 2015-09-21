@@ -250,7 +250,7 @@ static int circleInverted(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a circleInverted: %s", node->value()));
 
-  parseDataP->scr.scopeP->circle.invertedSet(node->value());
+  parseDataP->scr.scopeP->circle.invertedSet(std::string(node->value()));
 
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
@@ -284,7 +284,7 @@ static int polygonInverted(xml_node<>* node, ParseData* parseDataP)
 {
   LM_T(LmtParse, ("Got a polygonInverted: %s", node->value()));
 
-  parseDataP->scr.scopeP->polygon.invertedSet(node->value());
+  parseDataP->scr.scopeP->polygon.invertedSet(std::string(node->value()));
 
   if (!isTrue(node->value()) && !isFalse(node->value()))
   {
