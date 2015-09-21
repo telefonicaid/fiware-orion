@@ -86,12 +86,7 @@ def update_context_broker_config_file_and_restart_service(context):
             (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
         __logger__.debug("output: %s" % str(resp))
         __logger__.info(" >> restarted contextBroker command line interface")
-        cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
-        c = 0
-        while not cb.is_cb_installed():
-            time.sleep(1)
-            c += 1
-            __logger__.debug("WARN - Retry in verification if context broker is installed. No: (%s)" % str(c))
+
 
 @step(u'stop service')
 def stop_service(context):
@@ -114,24 +109,19 @@ def stop_service(context):
 @step(u'verify contextBroker is installed successfully')
 def verify_context_broker_is_installed_successfully(context):
     """
-    verify contextBroker is installed successfully
+    verify contextBroker is started successfully
     :param context:
     """
     global props_cb
-    __logger__.debug(" >> verify if contextBroker is installed successfully")
-
-    __logger__.debug("CB_VERIFY_VERSION: %s" % props_cb["CB_VERIFY_VERSION"])
-    if props_cb["CB_VERIFY_VERSION"].lower() == "true":
-        cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
-        resp = cb.get_version_request()
-        __logger__.debug("Verifying Context Broker version: %s" % props_cb["CB_VERSION"])
-        resp_dict = convert_str_to_dict(str(resp.text), "JSON")
-        assert resp_dict["orion"]["version"].find(props_cb["CB_VERSION"]) >= 0, \
-            " ERROR in context broker version value, \n " \
-            " expected: %s \n " \
-            " installed: %s" % (props_cb["CB_VERSION"], resp_dict["orion"]["version"])
-        __logger__.debug("-- version %s is correct in base request v2" % props_cb["CB_VERSION"])
-    __logger__.info(" >> verified that contextBroker is installed successfully")
+    __logger__.debug(" >> verify if contextBroker is started successfully")
+    cb = CB(protocol=props_cb["CB_PROTOCOL"], host=props_cb["CB_HOST"], port=props_cb["CB_PORT"])
+    c = 0
+    while (not cb.is_cb_started()) and (int(props_cb["CB_RETRIES"]) > c):
+        time.sleep(int(props_cb["CB_DELAY_TO_RETRY"]))
+        c += 1
+        __logger__.debug("WARN - Retry in verification if context broker is started. No: (%s)" % str(c))
+    assert (props_cb["CB_RETRIES"]) > c, "ERROR - context Broker is not started after of %s verification retries" % str(c)
+    __logger__.info(" >> verified that contextBroker is started successfully")
 
 
 @step(u'verify mongo is installed successfully')

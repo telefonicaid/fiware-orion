@@ -56,6 +56,7 @@ This libraries will be install into `requirements.txt`
     configuration.json:                  initial configuration, before of execution
     environment.py                       (generic environment) may define code to run before and after certain events during your testing
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
+    properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see properties.json.base)
     README.md:                           this file, a brief explication about this framework to test
     requirement.txt:                     external library, necessary install before to execute test (see Test execution section)
 
@@ -132,6 +133,8 @@ This libraries will be install into `requirements.txt`
     * CB_LOG_OWNER: owner and group log used by context broker
     * CB_LOG_MOD: mod file used by context broker
     * CB_EXTRA_OPS:  Use the following variable if you need extra ops
+    * CB_RETRIES: number of retries for verification of starting the context broker
+    * CB_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
  Properties used by mongo verifications
 - mongo_env
@@ -143,7 +146,7 @@ This libraries will be install into `requirements.txt`
     * MONGO_VERIFY_VERSION: determine whether the version is verified or not (True or False).
     * MONGO_DATABASE: mongo database (sth by default).
     * MONGO_RETRIES: number of retries for data verification.
-    * MONGO_DELAY_TO_RETRY: time to delay in each retry.
+    * MONGO_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
 
 ### BackgroundFeature
