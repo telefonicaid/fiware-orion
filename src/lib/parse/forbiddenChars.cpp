@@ -22,6 +22,8 @@
 *
 * Author: Ken Zangelin
 */
+#include <string.h>
+
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -33,7 +35,7 @@
 *
 * forbiddenChars - 
 */
-bool forbiddenChars(const char* s)
+bool forbiddenChars(const char* s, const char* exceptions)
 {
   if (s == (void*) 0)
   {
@@ -42,6 +44,12 @@ bool forbiddenChars(const char* s)
 
   while (*s != 0)
   {
+    if ((exceptions != NULL) && (strchr(exceptions, *s) != NULL))
+    {
+      ++s;
+      continue;
+    }
+
     switch (*s)
     {
     case '<':
@@ -50,39 +58,6 @@ bool forbiddenChars(const char* s)
     case '\'':
     case '=':
     case ';':
-    case '(':
-    case ')':
-      LM_E(("Bad Input (character '%c')", *s));
-      return true;
-    }
-
-    ++s;
-  }
-
-  return false;
-}
-
-
-
-/* ****************************************************************************
-*
-* forbiddenCharsInUriParam - 
-*/
-bool forbiddenCharsInUriParam(const char* s)
-{
-  if (s == (void*) 0)
-  {
-    return false;
-  }
-
-  while (*s != 0)
-  {
-    switch (*s)
-    {
-    case '<':
-    case '>':
-    case '"':
-    case '\'':
     case '(':
     case ')':
       LM_E(("Bad Input (character '%c')", *s));

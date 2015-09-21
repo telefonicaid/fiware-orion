@@ -212,26 +212,27 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   // Another exception: 'geometry' and 'coords' has a relaxed check for forbidden characters that
   // doesn't check for '=' and ';' as those characters are part of the syntaxis for the parameters.
   //
-  if ((key != "q") && (key != "idPattern"))
+  bool containsForbiddenChars = false;
+
+  if (key == "geometry")
   {
-    bool containsForbiddenChars = false;
+    containsForbiddenChars = forbiddenChars(val, "=;");
+  }
+  else if (key == "coords")
+  {
+    containsForbiddenChars = forbiddenChars(val, ";");
+  }
+  else if ((key != "q") && (key != "idPattern"))
+  {
+    containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
+  }
 
-    if ((key == "geometry") || (key == "coords"))
-    {
-      containsForbiddenChars = forbiddenCharsInUriParam(val);
-    }
-    else
-    {
-      containsForbiddenChars = forbiddenChars(ckey) || forbiddenChars(val);
-    }
+  if (containsForbiddenChars == true)
+  {
+    OrionError error(SccBadRequest, "invalid character in URI parameter");
 
-    if (containsForbiddenChars == true)
-    {
-      OrionError error(SccBadRequest, "invalid character in URI parameter");
-
-      ciP->httpStatusCode = SccBadRequest;
-      ciP->answer         = error.render(ciP, "");
-    }
+    ciP->httpStatusCode = SccBadRequest;
+    ciP->answer         = error.render(ciP, "");
   }
 
   return MHD_YES;
