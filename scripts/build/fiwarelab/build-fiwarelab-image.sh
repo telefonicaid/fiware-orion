@@ -78,7 +78,7 @@ the lastest version of them, it is strongly recommended you run the following co
  yum install contextBroker
  yum install cygnus
  
-Orion Context Broker and Cygnus run as service by default (in port 1026 and 5050 respectively).
+Orion Context Broker and Cygnus run as service by default (in port 1026, and 5050 and 8081 respectively).
 You need to have these ports allowed in this VM security group in order to allow external access.
 In addition, note that both ports have been enabled in iptables configuration (you can disable
 iptables flushing out all its rules with 'sudo iptables -F', relying exclusively in VM security
@@ -148,11 +148,12 @@ sudo /etc/init.d/contextBroker start
 sudo yum install -y cygnus
 
 # CentOS seems to have a quite restrictive iptables configuration in the base image. Thus,
-# we need to explictely set an rule for incoming traffic on ports 1026 and 5050. Alternativelly, 
+# we need to explictely set an rule for incoming traffic on ports 1026, 5050 and 8081. Alternativelly, 
 # we could flush out all the rules (iptables -F) and rely in the FIWARE Lab cloud security (based
 # on security groups)
 sudo iptables -I INPUT 1 -p tcp -m state --state NEW -m tcp --dport 1026 -j ACCEPT
 sudo iptables -I INPUT 2 -p tcp -m state --state NEW -m tcp --dport 5050 -j ACCEPT
+sudo iptables -I INPUT 3 -p tcp -m state --state NEW -m tcp --dport 8081 -j ACCEPT
 sudo /etc/init.d/iptables save
 
 # --------------- Context Broker ---------------
