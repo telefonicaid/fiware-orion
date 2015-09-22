@@ -119,6 +119,7 @@ public:
     else if (_method == "PUT")     verb = PUT;
     else if (_method == "GET")     verb = GET;
     else if (_method == "DELETE")  verb = DELETE;
+    else if (_method == "PATCH")  verb = PATCH;
     else                           verb = NOVERB;
   }
 
