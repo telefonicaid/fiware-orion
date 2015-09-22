@@ -4,32 +4,38 @@ Folder for acceptance tests of context broker NGSI v2.In this framework we are u
 
 ## How to Run the Acceptance Tests
 
-### Prerequisites:
+#### Prerequisites:
 
-- Python 2.6 or newer
-- pip installed (http://docs.python-guide.org/en/latest/starting/install/linux/)
-- virtualenv installed (pip install virtualenv) (optional).
+- Python 2.7.x (One way would be SCL - The Software Collections Repository)
+- pip installed 1.4.1 or higher (http://docs.python-guide.org/en/latest/starting/install/linux/)
+- virtualenv installed 1.10.1 or higher (pip install virtualenv) (optional).
 Note: We recommend the use of virtualenv, because is an isolated working copy of Python which allows you to work on a specific project without worry of affecting other projects.
 
-##### Environment preparation:
+
+#### Requirements to fabric (http://www.fabfile.org/)
+Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
+Some requirements are neccesary verify before to install `Fabric` library, mainly to pycripto library (Fabric dependency). 
+This libraries will be install into `requirements.txt`
+```
+     yum install gcc python-devel
+```
+   
+
+#### Environment preparation:
 
 - If you are going to use a virtual environment (optional):
-  * Create a virtual environment somewhere, e.g. in ~/venv (virtualenv ~/venv) (optional)
-  * Activate the virtual environment (source ~/venv/bin/activate) (optional)
-  * Remember to unset the virtual environment when you're done testing, if it has been previously activated (deactivate) (optional)
+  * Create a virtual environment somewhere, `virtualenv venv_name` (optional)
+  * Activate the virtual environment `source venv_name/bin/activate` (optional)
+  * Remember to unset the virtual environment when you're done testing, if it has been previously activated `deactivate` (optional)
 - You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
 - Both if you are using a virtual environment or not:
   * Change to the test/acceptance/behave folder of the project.
   * Install the requirements for the acceptance tests in the virtual environment
+  * You should add `--upgrade` (if you have a previous installed version of this library)
 ```
-     pip install -r requirements.txt --allow-all-external
+     pip install [--upgrade] -r requirements.txt --allow-all-external
 ```
 
-#### Requirements to fabric (http://www.fabfile.org/)
-```
-     yum install gcc python-devel
-```
-   Fabric is a Python (2.5-2.7) library and command-line tool for streamlining the use of SSH for application deployment or systems administration tasks.
 
 #### Folders/Files Structure
 
@@ -50,6 +56,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
     configuration.json:                  initial configuration, before of execution
     environment.py                       (generic environment) may define code to run before and after certain events during your testing
     properties.json.base:                reference file with parameters (properties) used in tests (after is copied to properties.json)
+    properties.json:                     initially does not exists. This has parameters necessary to execute the tests (see properties.json.base)
     README.md:                           this file, a brief explication about this framework to test
     requirement.txt:                     external library, necessary install before to execute test (see Test execution section)
 
@@ -59,25 +66,53 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
        (not in the “steps” directory). We recommend use a generic environment.py and import it in the environment.py 
        file in the same directory that contains the “steps” directory.
 ```
-### Tests execution:
+
+
+### Executing Tests:
 
 - Change to the test/acceptance/behave folder of the project if not already on it.
-- You may need to set `export GIT_SSL_NO_VERIFY=true` environment variable in your machine
-- You should add "--upgrade" (if you have a previous installed version of this library)
-- We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to referenced by `properties.json` files.
-  The settings folder path could be changed in the `configuration.json`.
-  This file initially will overwrite properties.json in each feature.
+- We recommend to create `settings` folder in  behave root directory if it does not exists and store all configurations to `properties.json` and `configuration.json` files.
+    - we can use several configurations, create a file (with ssh commands) to each configuration (this file can to have whatever name and extension), 
+      each configuration file is used in the initial configuration (see `BackgroundFeature` in *.feature). This option is valid with `UPDATE_PROPERTIES_JSON` equal to `true`
+      each file will be composed of lines with ssh commands, that will be executed.
+         Example of configuration file into `PATH_TO_SETTING_FOLDER`:
+         ```
+            # replace values in configuration.json
+            sed -i "s/\"CB_RUNNING_MODE\".*/\"CB_RUNNING_MODE\": \"RPM\"/" configuration.json
+            
+            # copy properties.json.base to properties.json
+            cp -R properties.json.base properties.json
+            
+            # replace values in properties.py
+            sed -i "s/\"CB_HOST\".*/\"CB_HOST\":\"localhost\",/" properties.json
+            sed -i "s/\"CB_VERSION\".*/\"CB_VERSION\":\"0.24.0\",/" properties.json
+            sed -i "s/\"CB_VERIFY_VERSION\".*/\"CB_VERIFY_VERSION\":\"true\",/" properties.json
+            sed -i "s/\"CB_FABRIC_USER\".*/\"CB_FABRIC_USER\":\"username\",/" properties.json
+            sed -i "s/\"CB_FABRIC_PASS\".*/\"CB_FABRIC_PASS\":\"password\",/" properties.json
+            sed -i "s/\"MONGO_HOST\".*/\"MONGO_HOST\":\"mongo_host\",/" properties.json
+            sed -i "s/\"MONGO_VERSION\".*/\"MONGO_VERSION\":\"2.6.10\",/" properties.json
+            sed -i "s/\"MONGO_VERIFY_VERSION\".*/\"MONGO_VERIFY_VERSION\":\"true\",/" properties.json
+         ```
+    - Other option is `UPDATE_PROPERTIES_JSON` equal to `false` but in this case `properties.json` will be create manually from `properties.json.base` in root path (used in Jenkins)     
+  The settings folder path could be changed in `PATH_TO_SETTING_FOLDER` in the `configuration.json` file. 
 - modify in `configuration.json`:
-       * JENKINS: determine whether you are in jenkins or not.
        * PATH_TO_SETTING_FOLDER: folder where are the different configurations
-- `properties.json` will be update automatically from settings folder (see configuration.json)
+       * UPDATE_PROPERTIES_JSON: determine whether you are create/update `properties.json` automatically or manually (used to jenkins).
+           - true: read external file (the file is mandatory) in `PATH_TO_SETTING_FOLDER` (with ssh commands) and execute these automatically (used to create `properties.json`) 
+           - false: it does nothing and the creation of `properties.json` will be by user in jenkins console.
+       * CB_RUNNING_MODE: is used to determine how is compiled ContextBroker.
+           ContextBroker will be compiled and installed previously by user, `http://fiware-orion.readthedocs.org/en/develop/admin/build_source/index.html`.        
+           - RPM: CB is installed as RPM, so service tooling will be used to start and stop
+           - CLI: plain CB command line interface will be used to start contextBroker, the contextBroker binary (compiled in DEBUG mode) 
+             must be available in the system PATH.   
+- `properties.json` (MANDATORY) will be create/update in `root path` automatically from settings folder (see `configuration.json`) or manually.
 - Run behave (see available params with the -h option).
 ```
     Some examples:
-       behave .../example.feature                      -- run only one feature
-       behave .../example.feature -t test              -- run scenarios tagged with "test" in a feature
-       behave .../example.feature -t=-skip             -- run all scenarios except tagged with "skip" in a feature
-       behave .../example.feature -t ~@skip            -- run all scenarios except tagged with "skip" in a feature
+       behave component/<path>/example.feature                      -- run only one feature
+       behave component/<path>/example.feature -t test              -- run scenarios tagged with "test" in a feature
+       behave component/<path>/example.feature -t=-skip             -- run all scenarios except tagged with "skip" in a feature
+       behave component/<path>/example.feature -t ~@skip            -- run all scenarios except tagged with "skip" in a feature
 ```
 
 ### Properties.json
@@ -93,10 +128,14 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
     * CB_FABRIC_PASS: password used to connect by Fabric, if use password, cert_file must be None.
     * CB_FABRIC_CERT: cert_file used to connect by Fabric, if use cert file, password must be None.
     * CB_FABRIC_RETRY: Number of times Fabric will attempt to connect when connecting to a new server
+    * CB_FABRIC_SUDO: determine whether with superuser privileges or not (True | False)
     * CB_LOG_FILE: log file used by context broker
+    * CB_PID_FILE: where to store the pid for context broker
     * CB_LOG_OWNER: owner and group log used by context broker
     * CB_LOG_MOD: mod file used by context broker
     * CB_EXTRA_OPS:  Use the following variable if you need extra ops
+    * CB_RETRIES: number of retries for verification of starting the context broker
+    * CB_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
  Properties used by mongo verifications
 - mongo_env
@@ -108,7 +147,7 @@ Note: We recommend the use of virtualenv, because is an isolated working copy of
     * MONGO_VERIFY_VERSION: determine whether the version is verified or not (True or False).
     * MONGO_DATABASE: mongo database (sth by default).
     * MONGO_RETRIES: number of retries for data verification.
-    * MONGO_DELAY_TO_RETRY: time to delay in each retry.
+    * MONGO_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
 
 ### BackgroundFeature
@@ -128,6 +167,12 @@ Feature: feature name...
     Check: verify if the service is installed successfully
 ```
 
+
+### Logs
+
+The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
+
+
 ### Tests Suites Coverage (features):
 
   - entities
@@ -136,8 +181,8 @@ Feature: feature name...
     * list_all_entities - 200 testcases
     * list_an_entity_by_id - 209 testcases
     * list_an_attribute_by_id - 198 testcases
-    * update_append_attribute_by_id - 729 testcases
-    * update_only_by_id (pending)
+    * update_append_attribute_by_id - 731 testcases
+    * update_attribute_by_id (pending) 
     * replace_attributes_by_id (pending)
     * remove_entity (pending)
 
@@ -156,9 +201,9 @@ Feature: feature name...
   - If attribute number is "1", the attribute name is without consecutive, ex: `attributes_name=temperature`
     Else attributes number is major than "1" the attributes name are prefix plus consecutive, ex:
         `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
-  - If would like a wrong query parameter name, use `qp_` prefix       
-        
-
+  - If would like a wrong query parameter name, use `qp_` prefix   
+  - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
+     
 
 ### Tags
 

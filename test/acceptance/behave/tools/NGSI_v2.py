@@ -22,7 +22,7 @@
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
-from iotqautils.helpers_utils import *
+from iotqatools.helpers_utils import *
 
 # constants
 EMPTY = u''
@@ -48,8 +48,8 @@ class NGSI:
     def verify_entities_stored_in_mongo(self, mongo_driver, entities_contexts, headers, stored=True):
         """
         verify that entities are stored in mongo
-        :param entities_contexts:  entities context (see constructor in CB_v2_utils.py)
-        :param headers: headers used (see "definition_headers" method in CB_v2_utils.py)
+        :param entities_contexts:  entities context (see constructor in cb_v2_utils.py)
+        :param headers: headers used (see "definition_headers" method in cb_v2_utils.py)
         :param stored: flag to verify if the entities is stored in mongo or not
         :param mongo_driver: mongo driver from steps
             ex: mongo document
