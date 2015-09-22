@@ -69,6 +69,7 @@
 #include "parseArgs/parseArgs.h"
 #include "parseArgs/paConfig.h"
 #include "parseArgs/paBuiltin.h"
+#include "parseArgs/paIsSet.h"
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
@@ -1481,14 +1482,22 @@ int main(int argC, char* argV[])
   paConfig("man description",               (void*) description);
   paConfig("man author",                    (void*) "Telefonica I+D");
   paConfig("man version",                   (void*) ORION_VERSION);
-  paConfig("log to screen",                 (void*) true);
   paConfig("log to file",                   (void*) true);
   paConfig("log file line format",          (void*) LOG_FILE_LINE_FORMAT);
-  paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+  paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
   paConfig("builtin prefix",                (void*) "ORION_");
   paConfig("usage and exit on any warning", (void*) true);
   paConfig("no preamble",                   NULL);
-  paConfig("log file time format",          (void*) "%Y-%m-%dT%H:%M:%S");
+
+
+  //
+  // If option '-fg' is set, print traces to stdout as well, otherwise, only to file
+  //
+  if (paIsSet(argC, argV, "-fg"))
+  {
+    paConfig("log to screen",                 (void*) true);
+    paConfig("screen line format",            (void*) "TYPE@TIME  FILE[LINE]: TEXT");
+  }
 
   paParse(paArgs, argC, (char**) argV, 1, false);
   lmTimeFormat(0, (char*) "%Y-%m-%dT%H:%M:%S");
