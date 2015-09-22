@@ -130,6 +130,7 @@ This libraries will be install into `requirements.txt`
     * CB_FABRIC_RETRY: Number of times Fabric will attempt to connect when connecting to a new server
     * CB_FABRIC_SUDO: determine whether with superuser privileges or not (True | False)
     * CB_LOG_FILE: log file used by context broker
+    * CB_PID_FILE: where to store the pid for context broker
     * CB_LOG_OWNER: owner and group log used by context broker
     * CB_LOG_MOD: mod file used by context broker
     * CB_EXTRA_OPS:  Use the following variable if you need extra ops

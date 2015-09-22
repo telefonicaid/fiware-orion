@@ -80,10 +80,12 @@ def update_context_broker_config_file_and_restart_service(context):
     else:
         __logger__.debug(" >> restarting contextBroker per command line interface")
         # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
-        __logger__.debug("contextBroker -port %s -logDir %s -pidpath /var/run/contextBroker/contextBroker.pid -dbhost %s -db %s %s -harakiri" %
-            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
-        resp = my_fab.run("contextBroker -port %s -logDir %s -pidpath /var/run/contextBroker/contextBroker.pid -dbhost %s -db %s %s -harakiri" %
-            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_mongo["MONGO_HOST"], props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+        __logger__.debug("contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %
+            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
+             props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
+        resp = my_fab.run("contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %
+            (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
+             props_mongo["MONGO_DATABASE"], props_cb["CB_EXTRA_OPS"]))
         __logger__.debug("output: %s" % str(resp))
         __logger__.info(" >> restarted contextBroker command line interface")
 
