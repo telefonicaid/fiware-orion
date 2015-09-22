@@ -120,20 +120,99 @@ echo
 --REGEXPECT--
 01. POST /v2/entities/E1 complete
 =================================
-HTTP/1.1 201 
+HTTP/1.1 201 Created
 Content-Length: 0
+Location: /v2/entities/E1
 Date: REGEX(.*)
 
 
 
 02. GET /v2/entities/E1
 =======================
-HTTP/1.1 201 
-Content-Length: 0
-Location: /v2/entities/E1
+HTTP/1.1 200 OK
+Content-Length: 912
+Content-Type: application/json
 Date: REGEX(.*)
 
 {
+    "compound_object": {
+        "a": 1.0,
+        "b": 2.0
+    },
+    "compound_vector": [
+        1.0,
+        2.0,
+        3.0
+    ],
+    "false": false,
+    "false_object": {
+        "type": "TA1",
+        "value": false
+    },
+    "float": 3.14,
+    "float_object": {
+        "type": "TA1",
+        "value": 22.1
+    },
+    "id": "E1",
+    "int": 19.0,
+    "int_object": {
+        "type": "TA1",
+        "value": 21.0
+    },
+    "object_object": {
+        "type": "TA1",
+        "value": {
+            "a": 1.0,
+            "b": 2.0
+        }
+    },
+    "string": "a1",
+    "string_object": {
+        "type": "TA1",
+        "value": "a1"
+    },
+    "true": true,
+    "true_object": {
+        "type": "TA1",
+        "value": true
+    },
+    "vector_object": {
+        "type": "TA1",
+        "value": [
+            "a",
+            "b"
+        ]
+    },
+    "with_metadata01": {
+        "md_false": false,
+        "md_float:": 2.01,
+        "md_int": 1.0,
+        "md_object_false": {
+            "type": "MDBOOL",
+            "value": false
+        },
+        "md_object_float": {
+            "type": "MDFLOAT",
+            "value": 2.01
+        },
+        "md_object_int": {
+            "type": "MDINT",
+            "value": 1.0
+        },
+        "md_object_string": {
+            "type": "MDSTRING",
+            "value": "3"
+        },
+        "md_object_true": {
+            "type": "MDBOOL",
+            "value": true
+        },
+        "md_string": "STRING",
+        "md_true": true,
+        "type": "MT1",
+        "value": 0.0
+    }
 }
 
 

@@ -81,7 +81,7 @@ echo "======================================================="
 payload='{
   "type": "room",
   "id": "E1",
-  "temperature": { "type": "AT", "value": 25, "meta": { "type": false, "value": "STRING" } }
+  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": false, "value": "STRING" } } }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -93,7 +93,7 @@ echo "========================================================="
 payload='{
   "type": "room",
   "id": "E1",
-  "temperature": { "type": "AT", "value": 25, "meta": { "type": "md", "value": [ 1, 2, 3 ] } }
+  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": "md", "value": [ 1, 2, 3 ] } } }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -105,7 +105,7 @@ echo "===================================================="
 payload='{
   "type": "room",
   "id": "E1",
-  "temperature": { "type": "AT", "value": 25, "meta": { "type": "md", "value": 3, "invalid": true } }
+  "temperature": { "type": "AT", "value": 25, "metadata": { "meta": { "type": "md", "value": 3, "invalid": true } } }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo

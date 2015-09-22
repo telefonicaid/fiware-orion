@@ -58,7 +58,7 @@ payload='{
   {
     "type":     "coords",
     "value":    "40.418889, -3.691944",
-    "location": "WGS84" 
+    "metadata": { "location": "WGS84" }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -75,7 +75,7 @@ payload='{
   {
     "type":     "coords",
     "value":    "40.316667, -3.75",
-    "location": "WGS84" 
+    "metadata": { "location": "WGS84" }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
@@ -92,7 +92,7 @@ payload='{
   {
     "type":     "coords",
     "value":    "40.533333, -3.633333",
-    "location": "WGS84" 
+    "metadata": { "location": "WGS84" }
   }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
