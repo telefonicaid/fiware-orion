@@ -118,5 +118,5 @@ RUN \
     build-locale-archive
 
 WORKDIR /
-ENTRYPOINT ["/usr/bin/contextBroker","-fg"]
+ENTRYPOINT ["/usr/bin/contextBroker","-fg", "-multiservice"]
 EXPOSE 1026
