@@ -85,6 +85,26 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
   }
 
 
+  if (eidInURL == true)
+  {
+    if (document.HasMember("id"))
+    {
+      LM_W(("Bad Input (entity id specified in payload"));
+      eP->errorCode.fill("ParseError", "entity id specified in payload");
+      ciP->httpStatusCode = SccBadRequest;;
+      return eP->render(ciP, EntitiesRequest);
+    }
+
+    if (document.HasMember("type"))
+    {
+      LM_W(("Bad Input (entity type specified in payload"));
+      eP->errorCode.fill("ParseError", "entity type specified in payload");
+      ciP->httpStatusCode = SccBadRequest;;
+      return eP->render(ciP, EntitiesRequest);
+    }
+  }
+
+
   for (Value::ConstMemberIterator iter = document.MemberBegin(); iter != document.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
