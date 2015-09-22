@@ -66,6 +66,7 @@ ContextAttribute::ContextAttribute()
   typeFromXmlAttribute  = "";
   found                 = false;
   skip                  = false;
+  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -90,6 +91,7 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   found                 = caP->found;
   typeFromXmlAttribute  = "";
   skip                  = false;
+  valueGiven            = caP->valueGiven;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setFormat(caP->providingApplication.getFormat());
@@ -134,6 +136,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
+  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -165,6 +168,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
+  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -196,6 +200,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
+  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -227,6 +232,7 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
+  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -255,6 +261,7 @@ ContextAttribute::ContextAttribute
   found                 = false;
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
+  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);

@@ -57,7 +57,7 @@ typedef struct ContextAttribute
   std::string                stringValue;  // "value" as a String
   double                     numberValue;  // "value" as a Number
   bool                       boolValue;    // "value" as a Boolean
-
+  bool                       valueGiven;   // Set to true if the value is part of the incoming payload
 
   ProvidingApplication       providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
   bool                       found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)
