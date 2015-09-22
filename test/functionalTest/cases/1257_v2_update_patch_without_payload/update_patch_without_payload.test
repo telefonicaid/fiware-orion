@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PUT empty Entity Attribute
+Update Patch Without Payload
 
 --SHELL-INIT--
 dbInit CB
