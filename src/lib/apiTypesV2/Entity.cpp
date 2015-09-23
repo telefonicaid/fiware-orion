@@ -63,12 +63,8 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
     std::string out = "{";
 
     out += JSON_VALUE("id", id);
-
-    if (type != "")
-    {
-      out += ",";
-      out += JSON_VALUE("type", type);
-    }
+    out += ",";
+    out += JSON_STR("type") + ":" + ((type != "")? JSON_STR(type) : "null");
 
     if (attributeVector.size() != 0)
     {

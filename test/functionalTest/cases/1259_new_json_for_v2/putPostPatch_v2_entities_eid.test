@@ -130,7 +130,7 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 912
+Content-Length: 924
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -177,6 +177,7 @@ Date: REGEX(.*)
         "type": "TA1",
         "value": true
     },
+    "type": null,
     "vector_object": {
         "type": "TA1",
         "value": [

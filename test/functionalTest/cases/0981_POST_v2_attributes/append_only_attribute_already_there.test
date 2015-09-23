@@ -84,13 +84,14 @@ Date: REGEX(.*)
 03. Make sure E1 exists - and that attr1 == 1, not 2
 ====================================================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 40
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": 1.0, 
-    "id": "E1"
+    "id": "E1",
+    "type": null
 }
 
 

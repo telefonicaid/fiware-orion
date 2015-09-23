@@ -96,13 +96,14 @@ Date: REGEX(.*)
 02. Make sure E1 exists
 =======================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 40
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": 1.0, 
-    "id": "E1"
+    "id": "E1",
+    "type": null
 }
 
 
@@ -122,13 +123,14 @@ Date: REGEX(.*)
 04. Make sure it didn't work
 ============================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 40
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": 1.0, 
-    "id": "E1"
+    "id": "E1",
+    "type": null
 }
 
 
@@ -144,13 +146,14 @@ Date: REGEX(.*)
 06. Make sure it worked
 =======================
 HTTP/1.1 200 OK
-Content-Length: 28
+Content-Length: 40
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr1": 5.0, 
-    "id": "E1"
+    "id": "E1",
+    "type": null
 }
 
 
