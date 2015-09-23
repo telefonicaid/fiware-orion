@@ -42,7 +42,8 @@ typedef enum ValueType
   ValueTypeNumber,
   ValueTypeBoolean,
   ValueTypeVector,
-  ValueTypeObject
+  ValueTypeObject,
+  ValueTypeNone
 } ValueType;
 
 

@@ -45,6 +45,10 @@ using namespace rapidjson;
 */
 static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP)
 {
+
+  // valueTypeNone will be overriden inside the for block in the case the attribute has an actual value
+  caP->valueType = orion::ValueTypeNone;
+
   for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)
   {
     std::string name   = iter->name.GetString();
@@ -62,7 +66,6 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     }
     else if (name == "value")
     {
-      caP->valueGiven = true;
 
       if (type == "String")
       {
@@ -145,33 +148,28 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     caP->type        = "";
     caP->stringValue = iter->value.GetString();
     caP->valueType   = orion::ValueTypeString;
-    caP->valueGiven  = true;
   }
   else if (type == "Number")
   {
     caP->type        = "";
     caP->valueType   = orion::ValueTypeNumber;
     caP->numberValue = iter->value.GetDouble();
-    caP->valueGiven  = true;
   }
   else if (type == "True")
   {
     caP->type        = "";
     caP->valueType   = orion::ValueTypeBoolean;
     caP->boolValue   = true;
-    caP->valueGiven  = true;
   }
   else if (type == "False")
   {
     caP->type        = "";
     caP->valueType   = orion::ValueTypeBoolean;
     caP->boolValue   = false;
-    caP->valueGiven  = true;
   }
   else if (type == "Array")
   {
     caP->valueType   = orion::ValueTypeObject;
-    caP->valueGiven  = true;
 
     std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
     if (r != "OK")
@@ -192,7 +190,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     //
     if (iter->value.HasMember("value"))
     {
-      caP->valueGiven  = true;
 
       r = parseContextAttributeObject(iter->value, caP);
       if (r != "OK")
@@ -206,7 +203,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     {
       parseContextAttributeCompoundValue(iter, caP, NULL);
       caP->valueType   = orion::ValueTypeObject;
-      caP->valueGiven  = true;
     }
   }
   else

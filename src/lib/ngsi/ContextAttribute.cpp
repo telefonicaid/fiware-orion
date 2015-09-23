@@ -61,12 +61,11 @@ ContextAttribute::ContextAttribute()
   name                  = "";
   type                  = "";
   stringValue           = "";
-  valueType             = orion::ValueTypeString;
+  valueType             = orion::ValueTypeString;  // FIXME: NoValue?
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   found                 = false;
-  skip                  = false;
-  valueGiven            = false;
+  skip                  = false;  
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -91,7 +90,6 @@ ContextAttribute::ContextAttribute(ContextAttribute* caP)
   found                 = caP->found;
   typeFromXmlAttribute  = "";
   skip                  = false;
-  valueGiven            = caP->valueGiven;
 
   providingApplication.set(caP->providingApplication.get());
   providingApplication.setFormat(caP->providingApplication.getFormat());
@@ -136,7 +134,6 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
-  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -168,7 +165,6 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
-  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -200,7 +196,6 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
-  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -232,7 +227,6 @@ ContextAttribute::ContextAttribute
   compoundValueP        = NULL;
   found                 = _found;
   skip                  = false;
-  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -261,7 +255,6 @@ ContextAttribute::ContextAttribute
   found                 = false;
   valueType             = orion::ValueTypeObject;  // FIXME P6: Could be ValueTypeVector ...
   skip                  = false;
-  valueGiven            = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
@@ -686,6 +679,10 @@ void ContextAttribute::present(const std::string& indent, int ix)
     else if (valueType == orion::ValueTypeBoolean)
     {
       LM_F(("%s  Boolean Value:      %s", indent.c_str(), (boolValue == false)? "false" : "true"));
+    }
+    else if (valueType == orion::ValueTypeNone)
+    {
+      LM_F(("%s  No Value", indent.c_str()));
     }
     else
     {
