@@ -22,7 +22,7 @@ values, i.e. compound attribute values or metadata values always use string-base
 
 # Filtering
 
-You can use the filtering capabilities developed for NGSIv2 (`GET /v1/entities?q=<query>`) also 
+You can use the filtering capabilities developed for NGSIv2 (`GET /v2/entities?q=<query>`) also 
 in NGSIv1 using a Scope element in the payload of `POST /v1/queryContext`. See 
 [the following section](filtering.md#string-filter) for details.
 

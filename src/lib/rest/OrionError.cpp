@@ -127,6 +127,11 @@ std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
   {
     return "TooManyResults";
   }
+  else if (_reasonPhrase == "No context element found")
+  {
+    return "NotFound";
+  }
+
  
 
   return _reasonPhrase;

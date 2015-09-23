@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PUT empty Entity Attribute
+Update Patch Without Payload
 
 --SHELL-INIT--
 dbInit CB
@@ -31,7 +31,7 @@ brokerStart CB
 
 #
 ## 01. POST /v2/entities to create E1/A1=0
-## 02. PUT /v2/entities/E1/attrs/A1/value (empty)
+## 02. PATCH /v2/entities/E1/attrs (without payload)
 
 
 echo "01. POST /v2/entities to create E1/A1=0"
@@ -41,10 +41,10 @@ orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
-echo "02. PUT /v2/entities/E1/attrs/A1 (empty)"
-echo "==============================================="
-payload='{ }'
-orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
+echo "02. PATCH /v2/entities/E1 (without payload)"
+echo "==========================================="
+payload=''
+orionCurl --url /v2/entities/E1 --payload "$payload" --json -X PATCH 
 echo
 echo
 
@@ -60,16 +60,16 @@ Date: REGEX(.*)
 
 
 
-02. PUT /v2/entities/E1/attrs/A1 (empty)
-===============================================
-HTTP/1.1 422 Unprocessable Entity
-Content-Length: 136 
+02. PATCH /v2/entities/E1 (without payload)
+===========================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
 Content-Type: application/json
-Date: REGEX(.*) 
+Date: REGEX(.*)
 
 {
-    "description": "Request payload is missing some piece of information. Please, check Orion documentation.",
-    "error": "InvalidModification"
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
 }
 
 

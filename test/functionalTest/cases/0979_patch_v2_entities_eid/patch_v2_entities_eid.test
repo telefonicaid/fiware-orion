@@ -88,9 +88,14 @@ echo
 01. Intent to patch a non-existing entity - error, of course
 ============================================================
 HTTP/1.1 404 Not Found
-Content-Length: 0
+Content-Length: 61 
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "description": "No context element found",
+    "error": "NotFound"
+}
 
 
 02. Create E1/attr1+attr2

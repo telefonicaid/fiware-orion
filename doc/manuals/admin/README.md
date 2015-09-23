@@ -1,7 +1,7 @@
 
 # Administration Guide
 
-Orion Context Broker: Administration Guide. 
+Orion Context Broker: Installation & Administration Manual. 
 
 ## Table of Contents
 

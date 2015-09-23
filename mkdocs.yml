@@ -34,7 +34,7 @@ pages:
       - 'Forbidden characters': 'user/forbidden_characters.md'
       - 'Docker': 'user/docker.md'
       - 'Considerations on NGSIv1 and NGSIv2 coexistence': 'user/v1_v2_coexistence.md'
-  - 'Admin Guide':
+  - 'Installation & Administration Manual':
       - 'Introduction': 'admin/index.md'
       - 'Installing Orion': 'admin/install.md'
       - 'Building from Sources': 'admin/build_source.md'
