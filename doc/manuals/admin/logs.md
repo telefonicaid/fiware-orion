@@ -1,15 +1,9 @@
 #<a name="top"></a>Logs
 
-* [Introduction](#introduction)
 * [Log file](#log-file)
 * [Log format](#log-format)
 * [Error and warning types](#error-and-warning-types)
 * [Log rotation](#log-rotation)
-
-## Introduction
-
-The log system has been re-worked in deep in release 0.14.1. This
-section describes its main characteristics.
 
 ## Log file
 
@@ -21,6 +15,9 @@ When starting the Orion context broker, if a previous log file exist:
     existing file.
 -   If **-logAppend** is not used, then the existing file is renamed,
     appending the text ".old" to its name.
+
+When Orion runs in foreground (i.e. with the `-fg` [CLI argument](cli.md)), it also prints the same log traces
+(but in a simplified way) on the standard output.
 
 [Top](#top)
 
