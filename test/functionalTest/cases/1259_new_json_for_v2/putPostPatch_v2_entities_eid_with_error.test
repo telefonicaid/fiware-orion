@@ -37,6 +37,7 @@ brokerStart CB
 # 05. PATCH  /v2/entities/E1 with id in payload
 # 06. PATCH  /v2/entities/E1 with type in payload
 # 07. POST /v2/entities/E1 with 'bad_tag' for attribute
+# 08. POST /v2/entities without id in payload
 #
 
 echo "01. POST /v2/entities/E1 with id in payload"
@@ -118,6 +119,20 @@ orionCurl --url /v2/entities/E1 --payload "$payload" --json
 echo
 echo
 
+
+
+echo "08. POST /v2/entities without id in payload"
+echo "==========================================="
+payload='{
+  "type": "T1",
+  "a1": {
+    "value": 12,
+    "type": "int"
+  }
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
 
 
 --REGEXPECT--
@@ -208,6 +223,19 @@ Date: REGEX(.*)
 
 {
     "description": "unrecognized property for context attribute",
+    "error": "ParseError"
+}
+
+
+08. POST /v2/entities without id in payload
+===========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 61
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "no entity id specified",
     "error": "ParseError"
 }
 
