@@ -36,6 +36,7 @@ deleteEntity.cpp
 getEntityType.cpp
 getEntityAllTypes.cpp
 badVerbGetPutOnly.cpp
+getAllSubscriptions.cpp
 )
 
 SET (HEADERS
@@ -54,6 +55,7 @@ deleteEntity.h
 getEntityType.h
 getEntityAllTypes.h
 badVerbGetPutOnly.h
+getAllSubscriptions.h
 )
 
 

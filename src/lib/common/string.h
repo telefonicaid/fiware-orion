@@ -26,6 +26,7 @@
 * Author: Ken Zangelin
 */
 #include <string>
+#include <sstream>
 #include <vector>
 
 
@@ -158,5 +159,18 @@ extern void strReplace
 * servicePathCheck - 
 */
 extern std::string servicePathCheck(const char* servicePath);
+
+
+/* ****************************************************************************
+*
+* toString -
+*/
+template <typename T>
+std::string toString(T t) {
+  std::ostringstream ss;
+  ss << t;
+  return ss.str();
+}
+
 
 #endif  // SRC_LIB_COMMON_STRING_H_

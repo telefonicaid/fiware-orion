@@ -183,6 +183,7 @@
 #include "serviceRoutinesV2/getEntityType.h"
 #include "serviceRoutinesV2/getEntityAllTypes.h"
 #include "serviceRoutinesV2/patchEntity.h"
+#include "serviceRoutinesV2/getAllSubscriptions.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -376,6 +377,9 @@ PaArgument paArgs[] =
 #define ETT_COMPS_V2            2, { "v2", "types" }
 #define ETT_COMPS_WORD          ""
 
+#define GAS                     GetAllSubscriptionsRequest
+#define GAS_COMPS_V2            2, { "v2", "subscriptions" }
+#define GAS_COMPS_WORD          ""
 
 //
 // NGSI9
@@ -650,7 +654,11 @@ PaArgument paArgs[] =
   { "*",      ENTT,         ENTT_COMPS_V2,        ENTT_COMPS_WORD,         badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          getEntityAllTypes        }, \
-  { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }
+  { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }, \
+                                                                                                       \
+  { "GET",    GAS,          GAS_COMPS_V2,         GAS_COMPS_WORD,          getAllSubscriptions      }, \
+  { "*",      GAS,          GAS_COMPS_V2,         GAS_COMPS_WORD,          badVerbGetOnly           }
+
 
 
 

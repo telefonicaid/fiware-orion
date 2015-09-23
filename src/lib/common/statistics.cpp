@@ -138,7 +138,7 @@ int noOfSubCacheRemovals                                 = -1;
 int noOfSubCacheRemovalFailures                          = -1;
 int noOfEntityTypeRequest                                = -1;
 int noOfEntityAllTypesRequest                            = -1;
-
+int noOfGetAllSubscriptionsRequest                       = -1;
 
 
 /* ****************************************************************************
@@ -245,5 +245,6 @@ void statisticsUpdate(RequestType request, Format inFormat)
 
   case EntityTypeRequest:                                ++noOfEntityTypeRequest; break;
   case EntityAllTypesRequest:                            ++noOfEntityAllTypesRequest; break;
+  case GetAllSubscriptionsRequest:                       ++noOfGetAllSubscriptionsRequest; break;
   }
 }

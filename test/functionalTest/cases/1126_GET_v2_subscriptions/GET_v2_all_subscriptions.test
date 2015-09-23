@@ -1,0 +1,112 @@
+# Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+#
+# This file is part of Orion Context Broker.
+#
+# Orion Context Broker is free software: you can redistribute it and/or
+# modify it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# Orion Context Broker is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+# General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Orion Context Broker. If not, see http://www.gnu.org/licenses/.
+#
+# For those usages not covered by this license please contact with
+# iot_support at tid dot es
+
+# VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
+
+--NAME--
+GET Subscriptions V2
+
+--SHELL-INIT--
+dbInit CB
+brokerStart CB
+
+--SHELL--
+
+#
+# 01. GET /v2/subscriptions
+#
+
+echo "01. GET /v2/subscriptions"
+echo "========================="
+orionCurl --url /v2/subscriptions?options=count --in json --out json
+echo
+echo
+
+--REGEXPECT--
+01. GET /v2/subscriptions
+=========================
+HTTP/1.1 200 OK
+Content-Length: 575
+Content-Type: application/json
+X-Total-Count: 2
+Date: REGEX(.*)
+
+[
+    {
+        "id": "s1",
+        "notification": {
+            "attributes": [
+                "notification attributes 1",
+                "notification attributes 2"
+            ],
+            "callback": ""
+        },
+        "subject": {
+            "condition": {
+                "attributes": [
+                    "A \nsc sub 1",
+                    "B \tsc sub 1",
+                    "Z \fsc sub 2"
+                ],
+                "expression": {
+                    "coords": "",
+                    "geometry": "",
+                    "q": ""
+                }
+            },
+            "entities": [
+                {
+                    "id": "ID1",
+                    "idPattern": "",
+                    "type": ""
+                }
+            ]
+        }
+    },
+    {
+        "id": "s2",
+        "notification": {
+            "attributes": [],
+            "callback": ""
+        },
+        "subject": {
+            "condition": {
+                "attributes": [],
+                "expression": {
+                    "coords": "C",
+                    "geometry": "G",
+                    "q": "Q"
+                }
+            },
+            "entities": [
+                {
+                    "id": "",
+                    "idPattern": "IDP2",
+                    "type": "FENOTIPO"
+                }
+            ]
+        }
+    }
+]
+
+
+--TEARDOWN--
+brokerStop CB
+dbDrop CB
