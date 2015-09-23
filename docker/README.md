@@ -83,7 +83,9 @@ As a result of this command, there is a context broker listening on port 1026 on
 A few points to consider:
 
 * The name `orion1` can be anything and doesn't have to be related to the name given to the docker image in the previous section.
-* `--link mongodb:mongodb` assumes there is a docker container running a MongoDB image in your system, whose name is `mongodb`. In case you need one type `sudo docker run --name mongodb -d mongo:2.6`.
-* In `-p 1026:1026` the first value represents the port to listen in on localhost. If you wanted to run a second context broker on your machine you should change this value to something else, for example `-p 1027:1026`.
+* `--link mongodb:mongodb` assumes there is a docker container running a MongoDB image in your system,
+whose name is `mongodb`. In case you need one type `sudo docker run --name mongodb -d mongo:2.6`.
+* In `-p 1026:1026` the first value represents the port to listen on localhost. If you want to run a second context broker
+on your machine you should change this value to something else, for example `-p 1027:1026`.
 * Anything after the name of the container image (in this case `orion`) is interpreted as a parameter for the Orion Context Broker. In this case we are telling the broker where the MongoDB host is, represented by the name of our other MongoDB container. Take a look at the [documentation](https://github.com/telefonicaid/fiware-orion) for other command-line options.
-
+* Orion will be running on [multi-tenant](http://fiware-orion.readthedocs.org/en/develop/user/multitenancy/index.html) mode.
