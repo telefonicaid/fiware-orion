@@ -56,8 +56,7 @@ typedef struct ContextAttribute
   orion::ValueType           valueType;    // Type of value: taken from JSON parse
   std::string                stringValue;  // "value" as a String
   double                     numberValue;  // "value" as a Number
-  bool                       boolValue;    // "value" as a Boolean
-
+  bool                       boolValue;    // "value" as a Boolean  
 
   ProvidingApplication       providingApplication;    // Not part of NGSI, used internally for CPr forwarding functionality
   bool                       found;                   // Not part of NGSI, used internally for CPr forwarding functionality (update case)

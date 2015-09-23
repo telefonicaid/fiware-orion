@@ -395,8 +395,10 @@ bool attributeValueAbsent(ContextAttribute* caP, const std::string& apiVersion)
   {
     return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
   }
-
-  return false;  // FIXME P7: Very soon this will change and we cannot simply return false anymore
+  else // NGSIv2
+  {
+    return caP->valueType == ValueTypeNone;
+  }
 }
 
 

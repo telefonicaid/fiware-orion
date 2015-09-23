@@ -680,6 +680,10 @@ void ContextAttribute::present(const std::string& indent, int ix)
     {
       LM_F(("%s  Boolean Value:      %s", indent.c_str(), (boolValue == false)? "false" : "true"));
     }
+    else if (valueType == orion::ValueTypeNone)
+    {
+      LM_F(("%s  No Value", indent.c_str()));
+    }
     else
     {
       LM_F(("%s  Unknown value type (%d)", indent.c_str(), valueType));
