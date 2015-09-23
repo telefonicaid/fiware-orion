@@ -66,9 +66,11 @@ payload='{
     "A3" : {
           "type": "a",
           "value": "E1/T1/A3/M1",
-          "m1": 
-            {
-              "value": "M1"
+          "metadata": {
+            "m1": 
+              {
+                "value": "M1"
+              }
             }
         }
 

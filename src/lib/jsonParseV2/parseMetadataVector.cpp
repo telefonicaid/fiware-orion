@@ -1,6 +1,3 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSEMETADATA_H_
-#define SRC_LIB_JSONPARSEV2_PARSEMETADATA_H_
-
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -25,18 +22,47 @@
 *
 * Author: Ken Zangelin
 */
+#include <string>
+
 #include "rapidjson/document.h"
 
-#include "ngsi/Metadata.h"
+#include "logMsg/logMsg.h"
 
-using namespace rapidjson;
+#include "ngsi/ContextAttribute.h"
+
+#include "jsonParseV2/jsonParseTypeNames.h"
+#include "jsonParseV2/parseMetadata.h"
+#include "jsonParseV2/parseMetadataVector.h"
 
 
 
 /* ****************************************************************************
 *
-* parseMetadata - 
+* parseMetadataVector - 
 */
-extern std::string parseMetadata(const Value& iter, Metadata* caP);
+std::string parseMetadataVector(const Value::ConstMemberIterator& node, ContextAttribute* caP)
+{
+  std::string type   = jsonParseTypeNames[node->value.GetType()];
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSEMETADATA_H_
+  if (type != "Object")
+  {
+    return "metadata not a JSON object";
+  }
+
+  for (Value::ConstMemberIterator iter = node->value.MemberBegin(); iter != node->value.MemberEnd(); ++iter)
+  {
+    std::string  r;
+    Metadata*    mP = new Metadata();
+
+    mP->name = iter->name.GetString();
+    caP->metadataVector.push_back(mP);
+
+    r = parseMetadata(iter->value, mP);
+    if (r != "OK")
+    {
+      return r;
+    }
+  }
+
+  return "OK";
+}

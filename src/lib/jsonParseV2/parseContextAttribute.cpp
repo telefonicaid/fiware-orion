@@ -30,7 +30,7 @@
 #include "parse/CompoundValueNode.h"
 #include "jsonParseV2/jsonParseTypeNames.h"
 #include "jsonParseV2/parseContextAttribute.h"
-#include "jsonParseV2/parseMetadata.h"
+#include "jsonParseV2/parseMetadataVector.h"
 #include "jsonParseV2/parseContextAttributeCompoundValue.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
@@ -105,20 +105,20 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         }
       }
     }
-    else  // Metadata
+    else if (name == "metadata")
     {
-      Metadata*   mP = new Metadata();
-
-      mP->name       = iter->name.GetString();
-      std::string r  = parseMetadata(iter->value, mP);
-
-      caP->metadataVector.push_back(mP);
+      std::string r  = parseMetadataVector(iter, caP);
 
       if (r != "OK")
       {
         LM_W(("Bad Input (error parsing Metadata): %s", r.c_str()));
         return r;
       }
+    }
+    else  // ERROR
+    {
+      LM_W(("Bad Input (unrecognized property for ContextAttribute - '%s')", name.c_str()));
+      return "unrecognized property for context attribute";
     }
   }
 
@@ -232,7 +232,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
 
     LM_W(("Bad Input (JSON parse error)"));
-    ciP->httpStatusCode = SccBadRequest;;
+    ciP->httpStatusCode = SccBadRequest;
     return oe.render(ciP, "");
   }
 

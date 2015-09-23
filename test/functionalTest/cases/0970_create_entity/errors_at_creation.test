@@ -157,7 +157,7 @@ Date: REGEX(.*)
 
 {
     "description": "no entity id specified", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -170,7 +170,7 @@ Date: REGEX(.*)
 
 {
     "description": "empty entity id", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -183,7 +183,7 @@ Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity id", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -196,7 +196,7 @@ Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity id", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -209,7 +209,7 @@ Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity type", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -222,7 +222,7 @@ Date: REGEX(.*)
 
 {
     "description": "invalid JSON type for entity type", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 
@@ -235,7 +235,7 @@ Date: REGEX(.*)
 
 {
     "description": "no 'name' for ContextAttribute", 
-    "error": "ParseError"
+    "error": "BadRequest"
 }
 
 

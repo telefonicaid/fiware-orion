@@ -1,5 +1,5 @@
-#ifndef SRC_LIB_JSONPARSEV2_PARSEMETADATA_H_
-#define SRC_LIB_JSONPARSEV2_PARSEMETADATA_H_
+#ifndef SRC_LIB_JSONPARSEV2_PARSEMETADATAVECTOR_H_
+#define SRC_LIB_JSONPARSEV2_PARSEMETADATAVECTOR_H_
 
 /*
 *
@@ -27,7 +27,7 @@
 */
 #include "rapidjson/document.h"
 
-#include "ngsi/Metadata.h"
+#include "ngsi/ContextAttribute.h"
 
 using namespace rapidjson;
 
@@ -35,8 +35,12 @@ using namespace rapidjson;
 
 /* ****************************************************************************
 *
-* parseMetadata - 
+* parseMetadataVector - 
 */
-extern std::string parseMetadata(const Value& iter, Metadata* caP);
+extern std::string parseMetadataVector
+(
+  const Value::ConstMemberIterator&  node,
+  ContextAttribute*                  caP
+);
 
-#endif  // SRC_LIB_JSONPARSEV2_PARSEMETADATA_H_
+#endif  // SRC_LIB_JSONPARSEV2_PARSEMETADATAVECTOR_H_
