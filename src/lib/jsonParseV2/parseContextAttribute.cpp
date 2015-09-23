@@ -66,7 +66,6 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
     }
     else if (name == "value")
     {
-
       if (type == "String")
       {
         caP->stringValue  = iter->value.GetString();
@@ -169,8 +168,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
   }
   else if (type == "Array")
   {
-    caP->valueType   = orion::ValueTypeObject;
-
+    caP->valueType = orion::ValueTypeObject;
     std::string r = parseContextAttributeCompoundValue(iter, caP, NULL);
     if (r != "OK")
     {
@@ -190,7 +188,6 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     //
     if (iter->value.HasMember("value"))
     {
-
       r = parseContextAttributeObject(iter->value, caP);
       if (r != "OK")
       {
@@ -202,7 +199,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, const Value::ConstMemberI
     else
     {
       parseContextAttributeCompoundValue(iter, caP, NULL);
-      caP->valueType   = orion::ValueTypeObject;
+      caP->valueType = orion::ValueTypeObject;
     }
   }
   else

@@ -61,11 +61,11 @@ ContextAttribute::ContextAttribute()
   name                  = "";
   type                  = "";
   stringValue           = "";
-  valueType             = orion::ValueTypeString;  // FIXME: NoValue?
+  valueType             = orion::ValueTypeString;
   compoundValueP        = NULL;
   typeFromXmlAttribute  = "";
   found                 = false;
-  skip                  = false;  
+  skip                  = false;
 
   providingApplication.set("");
   providingApplication.setFormat(NOFORMAT);
