@@ -31,6 +31,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/patchEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
+#include "rest/OrionError.h"
 
 
 
@@ -60,6 +61,9 @@ std::string patchEntity
   ParseData*                 parseDataP
 )
 {
+
+  std::string answer = "";
+
   Entity*  eP = &parseDataP->ent.res;
 
   eP->id = compV[2];
@@ -78,6 +82,17 @@ std::string patchEntity
     if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code != SccOk)
     {
       ciP->httpStatusCode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
+
+      if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code == SccContextElementNotFound)
+      {
+        OrionError orionError(SccContextElementNotFound, "No context element found");
+        answer = orionError.render(ciP, "");
+      } 
+      else if (parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code == SccConflict)
+      {
+        OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
+        answer = orionError.render(ciP, "");
+      } 
     }
   }
 
@@ -92,5 +107,5 @@ std::string patchEntity
   // 05. Cleanup and return result
   eP->release();
 
-  return "";
+  return answer;
 }
