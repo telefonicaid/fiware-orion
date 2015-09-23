@@ -58,7 +58,8 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         return "invalid JSON type for attribute type";
       }
 
-      caP->type = iter->value.GetString();
+      caP->type      = iter->value.GetString();
+      caP->typeGiven = true;
     }
     else if (name == "value")
     {

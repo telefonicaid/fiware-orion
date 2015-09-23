@@ -66,6 +66,7 @@ typedef struct ContextAttribute
   bool                       skip;                    // For internal use in mongoBackend - in case of 'op=append' and the attribute already exists
   std::string                typeFromXmlAttribute;
   orion::CompoundValueNode*  compoundValueP;
+  bool                       typeGiven;               // Was 'type' part of the incoming payload?
 
   ~ContextAttribute();
   ContextAttribute();

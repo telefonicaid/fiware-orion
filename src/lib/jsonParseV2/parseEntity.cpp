@@ -142,7 +142,8 @@ std::string parseEntity(ConnectionInfo* ciP, Entity* eP, bool eidInURL)
         return eP->render(ciP, EntitiesRequest);
       }
 
-      eP->type = iter->value.GetString();
+      eP->type      = iter->value.GetString();
+      eP->typeGiven = true;
     }
     else
     {
