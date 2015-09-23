@@ -97,7 +97,8 @@ The list of available options is the following:
     available tracelevels and its numbers can be found
     [here](https://github.com/telefonicaid/fiware-orion/blob/develop/src/lib/logMsg/traceLevels.h)
     (as a C struct).
--   **-fg**. Runs broker in foreground (useful for debugging)
+-   **-fg**. Runs broker in foreground (useful for debugging). Log output is printed on standard output
+    (in addition to the log file, but using a simplified format).
 -   **-localIp <ip>**. Specifies in which IP interface the broker
     listens to. By default it listens to all the interfaces.
 -   **-pidpath <pid_file>**. Specifies the file to store the PID of the
