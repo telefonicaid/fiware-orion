@@ -46,7 +46,7 @@ using namespace rapidjson;
 static std::string parseContextAttributeObject(const Value& start, ContextAttribute* caP)
 {
 
-  // valueTypeNone will be overriden inside the for block in the case the attribute has an actual value
+  // valueTypeNone will be overriden inside the 'for' block in the case the attribute has an actual value
   caP->valueType = orion::ValueTypeNone;
 
   for (Value::ConstMemberIterator iter = start.MemberBegin(); iter != start.MemberEnd(); ++iter)

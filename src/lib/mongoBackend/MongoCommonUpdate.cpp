@@ -391,7 +391,6 @@ static bool equalMetadataVectors(BSONObj& mdV1, BSONObj& mdV2)
 */
 bool attributeValueAbsent(ContextAttribute* caP, const std::string& apiVersion)
 {
-
   if (apiVersion == "v1")
   {
     return (caP->valueType == ValueTypeString) && (caP->stringValue == "") && (caP->compoundValueP == NULL);
