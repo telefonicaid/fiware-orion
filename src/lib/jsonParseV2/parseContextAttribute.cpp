@@ -232,7 +232,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
 
     LM_W(("Bad Input (JSON parse error)"));
-    ciP->httpStatusCode = SccBadRequest;;
+    ciP->httpStatusCode = SccBadRequest;
     return oe.render(ciP, "");
   }
 
