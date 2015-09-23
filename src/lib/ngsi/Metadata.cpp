@@ -46,6 +46,7 @@ Metadata::Metadata()
   type         = "";
   stringValue  = "";
   valueType    = orion::ValueTypeString;
+  typeGiven    = false;
 }
 
 
@@ -65,6 +66,7 @@ Metadata::Metadata(Metadata* mP)
   stringValue  = mP->stringValue;
   numberValue  = mP->numberValue;
   boolValue    = mP->boolValue;
+  typeGiven    = false;
 }
 
 
@@ -79,6 +81,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const cha
   type         = _type;
   valueType    = orion::ValueTypeString;
   stringValue  = std::string(_value);
+  typeGiven    = false;
 }
 
 
@@ -93,6 +96,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, const std
   type         = _type;
   valueType    = orion::ValueTypeString;
   stringValue  = _value;
+  typeGiven    = false;
 }
 
 
@@ -107,6 +111,7 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
   type         = _type;
   valueType    = orion::ValueTypeNumber;
   numberValue  = _value;
+  typeGiven    = false;
 }
 
 
@@ -117,10 +122,11 @@ Metadata::Metadata(const std::string& _name, const std::string& _type, double _v
 */
 Metadata::Metadata(const std::string& _name, const std::string& _type, bool _value)
 {
-  name       = _name;
-  type       = _type;
-  valueType  = orion::ValueTypeBoolean;
-  boolValue  = _value;
+  name         = _name;
+  type         = _type;
+  valueType    = orion::ValueTypeBoolean;
+  boolValue    = _value;
+  typeGiven    = false;
 }
 
 
