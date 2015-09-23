@@ -273,57 +273,33 @@ std::string Metadata::toJson(bool isLastElement)
 {
   std::string  out;
 
-  if (type == "")
+  out = JSON_STR(name) + ":{";
+
+  out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":" + "null";
+  out += ",";
+
+  if (valueType == orion::ValueTypeString)
   {
-    if (valueType == orion::ValueTypeNumber)
-    {
-      char num[32];
-    
-      snprintf(num, sizeof(num), "%f", numberValue);
-      out = JSON_VALUE_NUMBER(name, num);
-    }
-    else if (valueType == orion::ValueTypeBoolean)
-    {
-      out = JSON_VALUE_BOOL(name, boolValue);
-    }
-    else if (valueType == orion::ValueTypeString)
-    {
-      out = JSON_VALUE(name, stringValue);
-    }
-    else
-    {
-      LM_E(("Runtime Error (invalid type for metadata %s)", name.c_str()));
-      out = JSON_VALUE(name, stringValue);
-    }
+    out += JSON_VALUE("value", stringValue);
+  }
+  else if (valueType == orion::ValueTypeNumber)
+  {
+    char num[32];
+
+    snprintf(num, sizeof(num), "%f", numberValue);
+    out += JSON_VALUE_NUMBER("value", num);
+  }
+  else if (valueType == orion::ValueTypeBoolean)
+  {
+    out += JSON_VALUE_BOOL("value", boolValue);
   }
   else
   {
-    out = JSON_STR(name) + ":{";
-    out += JSON_VALUE("type", type) + ",";
-
-    if (valueType == orion::ValueTypeString)
-    {
-      out += JSON_VALUE("value", stringValue);
-    }
-    else if (valueType == orion::ValueTypeNumber)
-    {
-      char num[32];
-
-      snprintf(num, sizeof(num), "%f", numberValue);
-      out += JSON_VALUE_NUMBER("value", num);
-    }
-    else if (valueType == orion::ValueTypeBoolean)
-    {
-      out += JSON_VALUE_BOOL("value", boolValue);
-    }
-    else
-    {
-      LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
-      out += JSON_VALUE("value", stringValue);
-    }
-
-    out += "}";
+    LM_E(("Runtime Error (invalid value type for metadata %s)", name.c_str()));
+    out += JSON_VALUE("value", stringValue);
   }
+
+  out += "}";
 
   if (!isLastElement)
   {

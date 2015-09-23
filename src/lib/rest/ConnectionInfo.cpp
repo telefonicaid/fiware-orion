@@ -39,6 +39,7 @@ static const char* validOptions[] =
   "count",
   "normalized",
   "values",
+  "keyValues",
   "text"
 };
 
@@ -85,6 +86,7 @@ int uriParamOptionsParse(ConnectionInfo* ciP, const char* value)
     }
 
     ciP->uriParamOptions[vec[ix]] = true;
+    LM_M(("KZ: uriParamOptions '%s' is set", vec[ix].c_str()));
   }
 
   return 0;
