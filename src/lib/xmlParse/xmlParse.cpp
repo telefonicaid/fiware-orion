@@ -40,6 +40,7 @@
 #include "xmlParse/XmlNode.h"
 #include "xmlParse/xmlParse.h"
 
+using namespace orion;
 
 /* ****************************************************************************
 *

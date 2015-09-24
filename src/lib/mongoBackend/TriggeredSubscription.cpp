@@ -33,12 +33,12 @@
 */
 TriggeredSubscription::TriggeredSubscription
 (
-  long long          _throttling,
-  long long          _lastNotification,
-  Format             _format,
-  const std::string& _reference,
-  AttributeList      _attrL,
-  Subscription*      _cacheSubReference
+  long long            _throttling,
+  long long            _lastNotification,
+  Format               _format,
+  const std::string&   _reference,
+  AttributeList        _attrL,
+  orion::Subscription* _cacheSubReference
 )
 {
   throttling        = _throttling;

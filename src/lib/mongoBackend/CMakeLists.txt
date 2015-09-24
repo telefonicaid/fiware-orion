@@ -42,6 +42,7 @@ SET (SOURCES
     TriggeredSubscription.cpp
     mongoConnectionPool.cpp
     mongoListSubscriptions.cpp
+    collectionOperations.cpp
 )
 
 SET (HEADERS
@@ -66,6 +67,7 @@ SET (HEADERS
     TriggeredSubscription.h
     mongoConnectionPool.h
     mongoListSubscriptions.h
+    collectionOperations.h
 )
 
 

@@ -156,7 +156,7 @@ static int contextAttributeValue(xml_node<>* node, ParseData* parseDataP)
 
   LM_T(LmtParse, ("Got an attribute value: '%s'", node->value()));
   parseDataP->upcr.attributeP->stringValue = node->value();
-  parseDataP->upcr.attributeP->valueType   = ValueTypeString;
+  parseDataP->upcr.attributeP->valueType   = orion::ValueTypeString;
 
   if (parseDataP->upcr.attributeP->stringValue == " ")
   {

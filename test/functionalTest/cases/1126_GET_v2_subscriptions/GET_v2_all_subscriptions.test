@@ -30,40 +30,140 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. GET /v2/subscriptions
+# 01. Create 2 subscriptions
+# 02. GET /v2/subscriptions
 #
 
-echo "01. GET /v2/subscriptions"
+echo "01. Create 2 subscriptions"
+echo "=========================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
+  "reference": "127.0.0.1",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "temperature",
+        "timestamp"
+      ]
+    }
+  ],
+  "throttling": "P5Y"
+}'
+orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+echo
+echo
+
+payload='{
+  "entities": [
+    {
+      "type": "Car",
+      "isPattern": "false",
+      "id": "MyCar"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OtherCar"
+    }
+  ],
+  "attributes": [
+    "speed",
+    "location"
+  ],
+  "reference": "localhost",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "speed"
+      ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+echo
+echo
+
+echo "02. GET /v2/subscriptions"
 echo "========================="
-orionCurl --url /v2/subscriptions?options=count --json
+orionCurl --url /v2/subscriptions --json
 echo
 echo
 
 --REGEXPECT--
-01. GET /v2/subscriptions
+01. Create 2 subscriptions
+==========================
+HTTP/1.1 200 OK
+Content-Length: 134
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "P5Y"
+    }
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. GET /v2/subscriptions
 =========================
 HTTP/1.1 200 OK
-Content-Length: 513
+Content-Length: 733
 Content-Type: application/json
-X-Total-Count: 2
 Date: REGEX(.*)
 
 [
     {
-        "id": "s1",
+        "duration: ": "FIXME",
+        "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attributes": [
-                "notification attributes 1",
-                "notification attributes 2"
+                "temperature",
+                "occupancy",
+                "lightstatus"
             ],
-            "callback": ""
+            "callback": "127.0.0.1",
+            "throttling": "FIXME"
         },
         "subject": {
             "condition": {
                 "attributes": [
-                    "A \nsc sub 1",
-                    "B \tsc sub 1",
-                    "Z \fsc sub 2"
+                    "temperature",
+                    "timestamp"
                 ],
                 "expression": {
                     "coords": "",
@@ -73,33 +173,49 @@ Date: REGEX(.*)
             },
             "entities": [
                 {
-                    "id": "ID1",
+                    "id": "ConferenceRoom",
                     "idPattern": "",
-                    "type": ""
+                    "type": "Room"
+                },
+                {
+                    "id": "OfficeRoom",
+                    "idPattern": "",
+                    "type": "Room"
                 }
             ]
         }
     },
     {
-        "id": "s2",
+        "duration: ": "FIXME",
+        "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [],
-            "callback": ""
+            "attributes": [
+                "speed",
+                "location"
+            ],
+            "callback": "localhost"
         },
         "subject": {
             "condition": {
-                "attributes": [],
+                "attributes": [
+                    "speed"
+                ],
                 "expression": {
-                    "coords": "C",
-                    "geometry": "G",
-                    "q": "Q"
+                    "coords": "",
+                    "geometry": "",
+                    "q": ""
                 }
             },
             "entities": [
                 {
-                    "id": "",
-                    "idPattern": "IDP2",
-                    "type": "FENOTIPO"
+                    "id": "MyCar",
+                    "idPattern": "",
+                    "type": "Car"
+                },
+                {
+                    "id": "OtherCar",
+                    "idPattern": "",
+                    "type": "Room"
                 }
             ]
         }

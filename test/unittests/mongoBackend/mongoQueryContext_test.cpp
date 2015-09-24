@@ -37,6 +37,8 @@
 
 #include "mongo/client/dbclient.h"
 
+using namespace orion;
+
 extern void setMongoConnectionForUnitTest(DBClientBase*);
 
 /* ****************************************************************************
