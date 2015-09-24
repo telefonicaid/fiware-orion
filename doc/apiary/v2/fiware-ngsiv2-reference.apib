@@ -286,76 +286,65 @@ The Simple Query Language provides a simplified syntax to retrieve entities whic
 A query is composed by a list of statements separated by the ';' character. Each statement express a matching condition.
 The query will return all the entities which match all the matching conditions (AND logical operator). 
 
-There are two kind of statements: <em>unary statements</em> and <em>binary staments</em>.</p>
+There are two kind of statements: *unary statements* and *binary statements*.
 
-<p>Binary statements are composed by an attribute name (e.g. "temperature"), operator and value (which format
-depends on the operator), e.g.:</p>
+Binary statements are composed by an attribute name (e.g. "temperature"), operator and value (which format
+depends on the operator), e.g.:
 
-<p><code>
-temperature==50<br/>
+```
+temperature==50
 temperature<=20
-</code></p>
+```
 
-<p>The list of operators (and the format of the values they use) is as follows:</p>
+The list of operators (and the format of the values they use) is as follows:
 
-<ul>
-  <li>Equal: <code>==</code>. It accepts the following values:
-    <ul>
-      <li>Single element, e.g. <code>temperature==40</code>. It matches entities whose attribute value
-      that exact value.</li>
-      <li>A list of comma-separated values, e.g. <code>color==black,red</code>. It matches entities whose
-      attribute value is one of the values (OR clause). Eg. entities which <code>color</code> is set to
-      <code>black</code> will match, while entities which <code>color</code> is set to <code>white</code>
-      will not match.</li>
-      <li>A range, specified as a minimum and maximum separated by <code>..</code>. It match if
++ **Equal**: `==`. It accepts the following values:
+    + Single element, e.g. `temperature==40`. It matches entities whose attribute value
+      that exact value.
+    + A list of comma-separated values, e.g. `color==black,red`. It matches entities whose
+      attribute value is one of the values (OR clause). Eg. entities which `color` is set to
+      `black` will match, while entities which `color` is set to `white` will not match.
+    + A range, specified as a minimum and maximum separated by `..`. It matches if
       the value is in the interval between the minimum and the maximum (both included). It can only be used
-      with attributes which contain dates or numbers. E.g. <code>temperature==10..20</code> matchs if the
-      temperature is greater or equal than 10 and lower or equal than 20.</li>
-    </ul>
-  </li>
-  <li>Unequal: <code>!=</code>. It accepts the following values:
-    <ul>
-      <li>The value is a single element, e.g. <code>temperature!=40</code>. It matches entities whose attribute
-      value is not that exact value.</li>
-      <li>A list of comma-separated values, e.g. <code>color!=black,red</code>. It matches entities whose
-      attribute value is not any of the values (AND clause). Eg. entities whose <code>color</code> is set
-      to <code>black</code> will not match, while entities whose <code>color</code> is set to
-      <code>white</code> match.</li>
-      <li>A range, specified as a minimum and maximum separated by <code>..</code>. It match
+      with attributes which contain dates or numbers. E.g. `temperature==10..20` matchs if the
+      temperature is greater or equal than 10 and lower or equal than 20.
++ **Unequal**: `!=`. It accepts the following values:
+      + The value is a single element, e.g. `temperature!=40`. It matches entities whose attribute
+      value is not that exact value.
+      + A list of comma-separated values, e.g. `color!=black,red`. It matches entities whose
+      attribute value is not any of the values (AND clause). Eg. entities whose `color` is set
+      to `black` will not match, while entities whose `color` is set to `white`will match.
+      + A range, specified as a minimum and maximum separated by `..`. It matches
       if the value is not in the interval between the minimum and the maximum (both included). It can only
-      be used with attributes which contain dates or numbers. E.g. <code>temperature!=10..20</code>matchs if
+      be used with attributes which contain dates or numbers. E.g. `temperature!=10..20` matches if
       the temperature is lower than 10 or greater than 20 (it will not match if the tempeature is 10 or the
-      temperature is 20).</li>
-    </ul>
-  </li>
-  <li>Greater than: <code>&gt;</code>. The value is a single element, e.g. <code>temperature&gt;40</code>. It
+      temperature is 20).
++ **Greater than**: `&gt;`. The value is a single element, e.g. `temperature&gt;40`. It
   matches entities which attribute value is strictly greater than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
-  unexpected results).</li>
-  <li>Lesser than: <code>&lt;</code>. The value is a single element, e.g. <code>temperature&lt;40</code>. It
+  unexpected results).
++ **Lesser than**: `&lt`. The value is a single element, e.g. `temperature&lt;40`. It
   matches entities which attribute value is strictly lesser than that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
-  unexpected results).</li>
-  <li>Greater or equal than: <code>&gt;=</code>. The value is a single element, e.g. <code>temperature&gt;=40</code>.
+  unexpected results).
++ **Greater or equal than**: `&gt;=`. The value is a single element, e.g. `temperature&gt;=40`.
   It matches entities which attribute value is greater than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
-  unexpected results).</li>
-  <li>Lesser or equal than: <code>&lt;=</code>. The value is a single element, e.g. <code>temperature&lt;=40</code>. It
+  unexpected results).
++ **Lesser or equal than**: `&lt;=`. The value is a single element, e.g. `temperature&lt;=40`. It
   matches entities which attribute value is lesser than or equal to that value. It only makes sense when
   used with attributes which contain dates or numbers (using with attributes of other type might lead to
-  unexpected results).</li>
-</ul>
+  unexpected results).
 
-<p>In the case of equal or inequal, if the value to match include a <code>,</code>, you can use simple quote
-(<code>'</code>), e.g: <code>color=='light,green','deep,blue'</code>.</p>
+In the case of equal or inequal, if the value to match include a `,`, you can use simple quote
+(`'`), e.g: `color=='light,green','deep,blue'`.
 
-<p>Unary statements are composed of a unary operator (either <code>+</code>or <code>-</code>) and are used in two situations:</p>
+Unary statements are composed of a unary operator (either `+`or `-`) and are used in two situations:
 
-+ To check for attribute existence. E.g. <code>+temperature</code>matches entities which have
-  a temperature attribute (no matter its value), while <code>-temperature</code>matches entities which don't have
++ To check for attribute existence. E.g. `+temperature`matches entities which have
+  a temperature attribute (no matter its value), while `-temperature` matches entities which do not have
   a temperature attribute.
-+ To check for entity type existence, with the <code>type</code>keyword. E.g, <code>-type</code>
-  matches entities which don't have a type.
++ To check for entity type existence, with the `type`keyword. E.g, `-type`   matches entities which do not have a type.
   
  
 ## Geographical Queries
@@ -439,7 +428,7 @@ Response code:
     + idPattern (optional, string) - A correctly formated regular expression.
     Retrieve entities which ID matches the regular expression.
     
-    + q (optional, string) - A query expression, composed of a list of statements separated by <code>;</code>,
+    + q (optional, string) - A query expression, composed of a list of statements separated by `;`,
     i.e. q=statement;statements;statement. See [Simple Query Language specification](#simple_query_language). 
     
     + geometry (optional, string) - Geografical area to which the query is restricted.
@@ -457,7 +446,7 @@ Response code:
     
     + options (optional, string) - Options dictionary
       + Members
-          + count - when used, the total number of entities is returned in the response as a HTTP header named <code>X-Total-Count</code>.
+          + count - when used, the total number of entities is returned in the response as a HTTP header named `X-Total-Count`.
           + canonical - when used, the response payload uses the "canonical form". See JSON entity representation format section for details.
 
 + Response 200 (application/json)
@@ -660,170 +649,6 @@ Response:
 
 + Response 204
 
-<!--
-
-## Entity by type and ID [/v2/entities/type/{entityType}/id/{entityId}{?attrs,options}]
-
-### Retrieve entity [GET /v2/entities/type/{entityType}/id/{entityId}?{attrs}]
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">attrs</td>
-  <td>Comma-separated list of attribute names which data will be included in the response. If this parameter is not
-  included, all the attributes are retrieved.</td>
-</tr>
-</table>
-
-The response is an object representing the entity identified by the type and ID. The object
-follows the JSON entity representation format (described in a section above).
-
-This operation must return only one entity element, but it may happen that there are more
-than one entity with the same ID and type (e.g. entities with same ID and type in different
-service paths). In those cases  an error mesage is returned, specifying in the description the
-URL that could be used to get the list of conflicting entities, i.e. all the entities with such type and ID.
-
-Response:
-
-* Successful operation uses 20O OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrs: temperature, humidity (optional, string) - Attributes to be retrieved. Coma separated list.
-
-+ Response 200 (application/json)
-
-        {
-            "type": "Room",
-            "id": "Bcn_Welt",
-            "temperature": 21.7,
-            "humidity": 60,
-            "location": {
-                "value":  "41.3763726, 2.1864475",
-                "type": "geo:point",
-                "crs": "WGS84"
-            }
-        }
-
-### Update or append entity attributes [POST /v2/entities/type/{entityType}/id/{entityId}?{op}]
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">op</td>
-  <td>Operation options. Allowed values: <code>append</code>.</td>
-</tr>
-</table>
-
-The request payload is an object representing the attributes to append or update. The object follows
-the JSON entity representation format (described in a section above), except that `id` and `type`
-are not allowed.
-
-The entity attributes are updated with the ones in the payload. In particular, depending on
-whether `append` operation option is used:
-
-* If `append` is not used: the entity attributes are updated (if they previously exist) or appended
-  (in they don't previously exists) with the ones in the payload.
-* If `append` is used (i.e. strict append semantics): all the attributes in the payload not previously
-  existing in the entity are appended. In addition to that, in the case some of the attributes in the
-  payload already exist in the entity, an error if returned.
-
-Response:
-
-* Successful operation uses 204 No Content.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + op: append (optional, string) - Strict append.
-
-+ Request (application/json)
-
-    + Body
-
-            {
-                "ambientNoise": 31.5
-            }
-
-+ Response 204
-
-### Update existing entity attributes [PATCH /v2/entities/type/{entityType}/id/{entityId}]
-
-The request payload is an object representing the attributes to update. The object follows
-the JSON entity representation format (described in a section above), except that `id` and `type`
-are not allowed.
-
-The entity attributes are updated with the ones in the payload. In addition to that, if one or more
-attributes in the payload doesn't exist in the entity, an error if returned.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-
-+ Request (application/json)
-
-        {
-            "temperature": 25.5,
-            "seatsNumber": 6
-        }
-
-+ Response 204
-
-### Replace all entity attributes [PUT /v2/entities/type/{entityType}/id/{entityId}]
-
-The request payload is an object representing the new entity attributes. The object follows
-the JSON entity representation format (described in a section above), except that `id` and `type`
-are not allowed.
-
-The attributes previously existing in the entity are removed and replaced by the ones in the
-request.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-
-+ Request (application/json)
-
-        {
-            "temperature": 25.5,
-            "seatsNumber": 6
-        }
-
-+ Response 204
-
-### Remove entity attributes [DELETE /v2/entities/type/{entityType}/id/{entityId}?{attrs}]
-
-Delete the entity.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-
-+ Response 204
-
--->
 
 ## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}]
 
@@ -887,88 +712,10 @@ Response:
 
 + Response 204
 
-<!--
-
-## Attribute by Entity Type and ID [/v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
-
-### Get attribute data [GET /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
-
-Returns a JSON object with the attribute data of the attribute. The object follows the JSON representation for attributes
-(described in a section above).
-
-Response:
-
-* Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute to be retrieved.
-
-+ Response 200 (application/json)
-
-        {
-            "value": 21.7
-        }
-
-### Update attribute data [PUT /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
-
-The request payload is an object representing the new attributes data. Previous attribute data is replaced
-by the one in the request. The object follows the JSON representation for attributes
-(described in a section above).
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute name
-
-+ Request (application/json)
-
-        {
-            "value": 25.0,
-            "unitCode": "CEL"
-        }
-
-+ Response 200
-
-
-### Remove a single attribute [DELETE /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
-
-Removes the attribute from the entity.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute name
-
-+ Response 204
-
--->
 
 ## Attribute Value by Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value{?options}]
 
 ### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}/value{?options}]
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">options</td>
-  <td>Operation opations. Allowed values: <code>text</code>.</td>
-</tr>
-</table>
 
 It returns a JSON object with a `value` propierty with the value of the attribute. The `text` option
 indicates that the attribute value must be provided as plain text (text/plain).
@@ -981,6 +728,7 @@ Response:
 + Parameters
     + entityId: Bcn_Welt (required, string) - Entity ID
     + attrName: temperature (required, string) - Attribute to be retrieved.
+    + options: (optional, string) - Options dictionary
 
 + Response 200 (application/json)
 
@@ -1010,92 +758,16 @@ Response:
 
 + Response 200
 
-<!--
-
-## Attribute Value by Entity type and ID [/v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}/value{?options}]
-
-### Get attribute data [GET /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}/value{?options}]
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">options</td>
-  <td>Operation opations. Allowed values: <code>text</code>.</td>
-</tr>
-</table>
-
-If the `text` option is not used, returns a JSON object which the `value` of the attribute. If the
-`text` option is used returns the attribute value in plain text.
-
-Response:
-
-* Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute to be retrieved.
-
-+ Response 200 (application/json)
-
-        {
-            "value": 21.7
-        }
-
-### Update attribute value [PUT /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}/value]
-
-The request payload is the new attribute value. It can be represented as a JSON object (application/json),
-with a `value` property, or as plain text (text/plain).
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute name
-
-+ Request (application/json)
-
-        {
-            "value": 25.0
-        }
-
-+ Response 200
-
--->
 
 ## Entity types [/v2/types{?limit,offset,options}]
 
 ### Retrieve entity types [GET /v2/types/{?limit,offset,options}]
 
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">limit</td><td>Limit the number of types to be retrieved</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">offset</td><td>Skip a number of records</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">options</td><td>
-This operation supports two options:
-
-<ul>
-  <li><code>count</code>: when used, the total types number is returned as a HTTP in the
-  response name <code>X-Total-Count</code>.</li>
-  <li><code>values</code>: when used, the response payload is a JSON array with a
-  list of entity types.</li>
-</td></tr>
-</table>
-
-If `values` option is not use, the operation returns a JSON object which properties are entity types. The properties
+If `values` option is not in use, the operation returns a JSON object which properties are entity types. The properties
 value is a JSON object with information about the type: `attrs` (the union set of attribute names along all the entities
 of such type) and `count` (the number of entities belonging to that type).
 
-If `values` option is used, the operation returns a JSON array with the list of entity types names as strings.
+If `values` option is used, the operation returns a JSON array with the list of entity type names as strings.
 
 Response code:
 
@@ -1103,8 +775,12 @@ Response code:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
-    + limit: 20 (optional, number)
-    + offset: 20 (optional, number)
+    + limit: 10 (optional, number) - Limit the number of types to be retrieved
+    + offset: 20 (optional, number) - Skip a number of records
+    + options (optional, string) - Options dictionary
+      + Members
+          + count - when used, the total types number is returned as a HTTP in the response named `X-Total-Count`
+          + values - when used, the response payload is a JSON array with a list of entity types
 
 + Response 200 (application/json)
 
@@ -1547,23 +1223,7 @@ Response:
 + Response 200
 
 
-### Query [POST /v2/op/query]
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">limit</td><td>Limit the number of entities to be retrieved</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">offset</td><td>Skip a number of records</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">options</td><td>
-This operation supports two options:
-
-<ul>
-  <li><code>count</code>: when used, the total number of entities is returned in the response as a HTTP header named <code>X-Total-Count</code>.</li>
-  <li><code>canonical</code>: when used, the response payload uses the "canonical form". See JSON entity representation format section
-  for details.</li>
-</td></tr>
-</table>
+### Query [POST /v2/op/query{?limit,offset,options}]
 
 The response payload is an Array which contains one object per matching entity. Each entity follows
 the JSON entity representation format (described in a section above).
@@ -1587,8 +1247,15 @@ Response code:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
-    + limit: 20 (optional, number)
-    + offset: 20 (optional, number)
+    + limit: 10 (optional, number) - Limit the number of entities to be retrieved
+    + offset: 20 (optional, number) - Skip a number of records
+    + options (optional, string) - Options dictionary
+      + Members
+          + count - the total number of entities is returned in the response as an
+          HTTP header named `X-Total-Count`.
+          + canonical - when used, the response payload uses the "canonical form".
+          See JSON entity representation format section for details.
+
 
 + Request (application/json)
 
@@ -1642,6 +1309,7 @@ Response code:
             }
          }
         ]
+
 
 ### Register [POST /v2/op/register]
 
@@ -1702,21 +1370,8 @@ Response:
           "efgh"
         ]
 
-### Discover [POST /v2/op/discover]
 
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">limit</td><td>Limit the number of registrations to be retrieved</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">offset</td><td>Skip a number of registrations</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">options</td><td>
-This operation supports two options:
-
-<ul>
-  <li><code>count</code>: when used, the total number of registrations is returned in the response as a HTTP header named <code>X-Total-Count</code>.</li>
-</td></tr>
-</table>
+### Discover [POST /v2/op/discover/{?limit,offset,options}]
 
 The response payload is an Array which contains one object per matching registration. Each registration follows
 the JSON registration representation format (described in a section above).
@@ -1740,8 +1395,12 @@ Response code:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
-    + limit: 20 (optional, number)
-    + offset: 20 (optional, number)
+    + limit: 10 (optional, number) - Limit the number of registrations to be retrieved
+    + offset: 22 (optional, number) - Skip a number of registrations
+    + options (optional, string) - Options dictionary
+        + Members
+          + count - when used, the total number of registrations is returned in the response as a HTTP header named `X-Total-Count`
+
 
 + Request (application/json)
 
