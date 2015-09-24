@@ -31,10 +31,11 @@
 
 #include "common/JsonHelper.h"
 
-using std::string;
-using std::vector;
-
-string Subscription::toJson()
+/* ****************************************************************************
+*
+* Subscription::toJson -
+*/
+std::string Subscription::toJson()
 {
   JsonHelper jh;
 
@@ -49,7 +50,12 @@ string Subscription::toJson()
   return jh.str();
 }
 
-string Notification::toJson()
+
+/* ****************************************************************************
+*
+* Notification::toJson -
+*/
+std::string Notification::toJson()
 {
   JsonHelper jh;
 
@@ -63,7 +69,12 @@ string Notification::toJson()
   return jh.str();
 }
 
-string Subject::toJson()
+
+/* ****************************************************************************
+*
+* Subject::toJson -
+*/
+std::string Subject::toJson()
 {
   JsonHelper jh;
 
@@ -73,7 +84,7 @@ string Subject::toJson()
   return jh.str();
 }
 
-string Condition::toJson()
+std::string Condition::toJson()
 {
   JsonHelper jh;
 
@@ -92,7 +103,12 @@ string Condition::toJson()
   return jh.str();
 }
 
-string EntID::toJson()
+
+/* ****************************************************************************
+*
+* EntID::toJson -
+*/
+std::string EntID::toJson()
 {
   JsonHelper jh;
 

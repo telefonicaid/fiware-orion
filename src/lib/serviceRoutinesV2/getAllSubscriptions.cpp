@@ -51,12 +51,9 @@ std::string getAllSubscriptions
     ParseData*                 parseDataP
 )
 {
-  using std::string;
-  using std::vector;
 
-  vector<Subscription> subs;
-
-  OrionError oe = mongoListSubscriptions(subs, ciP->uriParam, ciP->tenant, ciP->servicePathV);
+  std::vector<Subscription> subs;
+  OrionError                oe = mongoListSubscriptions(subs, ciP->uriParam, ciP->tenant, ciP->servicePathV);
 
   if (oe.code != SccOk)
   {
