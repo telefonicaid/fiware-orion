@@ -38,6 +38,7 @@
 */
 Entity::Entity()
 {
+  typeGiven = false;
 }
 
 

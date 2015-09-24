@@ -47,6 +47,7 @@ public:
   ErrorCode               errorCode;        // Optional - mandatory if not 200-OK
 
   std::string             servicePath;      // Not part of payload, just an internal field
+  bool                    typeGiven;        // Was 'type' part of the incoming payload?
 
   Entity();
   ~Entity();
