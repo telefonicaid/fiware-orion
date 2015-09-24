@@ -41,7 +41,7 @@ string Subscription::toJson()
   jh.addString("id", this->id);
   if (!this->duration.isEmpty())
   {
-    jh.addRaw("duration: ",this->duration.render(JSON,"", false)); // render puede no escapar bien!!
+    jh.addRaw("duration: ",this->duration.render(JSON,"", false));
   }
   jh.addRaw("subject", this->subject.toJson());
   jh.addRaw("notification", this->notification.toJson());
@@ -56,7 +56,7 @@ string Notification::toJson()
   jh.addString("callback", this->callback);
   if (!this->throttling.isEmpty())
   {
-    jh.addRaw("throttling", this->throttling.render(JSON,"",false)); // render puede no escapar bien
+    jh.addRaw("throttling", this->throttling.render(JSON,"",false));
   }
   jh.addRaw("attributes", vectorToJson(this->attributes));
 

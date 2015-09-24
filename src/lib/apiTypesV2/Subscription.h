@@ -29,8 +29,8 @@
 #include <string>
 #include <vector>
 
-#include "../ngsi/Duration.h"
-#include "../ngsi/Throttling.h"
+#include "ngsi/Duration.h"
+#include "ngsi/Throttling.h"
 
 struct EntID
 {
