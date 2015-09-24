@@ -660,172 +660,13 @@ Response:
 
 + Response 204
 
-<!--
-
-## Entity by type and ID [/v2/entities/type/{entityType}/id/{entityId}{?attrs,options}]
-
-### Retrieve entity [GET /v2/entities/type/{entityType}/id/{entityId}?{attrs}]
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">attrs</td>
-  <td>Comma-separated list of attribute names which data will be included in the response. If this parameter is not
-  included, all the attributes are retrieved.</td>
-</tr>
-</table>
-
-The response is an object representing the entity identified by the type and ID. The object
-follows the JSON entity representation format (described in a section above).
-
-This operation must return only one entity element, but it may happen that there are more
-than one entity with the same ID and type (e.g. entities with same ID and type in different
-service paths). In those cases  an error mesage is returned, specifying in the description the
-URL that could be used to get the list of conflicting entities, i.e. all the entities with such type and ID.
-
-Response:
-
-* Successful operation uses 20O OK
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrs: temperature, humidity (optional, string) - Attributes to be retrieved. Coma separated list.
-
-+ Response 200 (application/json)
-
-        {
-            "type": "Room",
-            "id": "Bcn_Welt",
-            "temperature": 21.7,
-            "humidity": 60,
-            "location": {
-                "value":  "41.3763726, 2.1864475",
-                "type": "geo:point",
-                "crs": "WGS84"
-            }
-        }
-
-### Update or append entity attributes [POST /v2/entities/type/{entityType}/id/{entityId}?{op}]
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">op</td>
-  <td>Operation options. Allowed values: <code>append</code>.</td>
-</tr>
-</table>
-
-The request payload is an object representing the attributes to append or update. The object follows
-the JSON entity representation format (described in a section above), except that `id` and `type`
-are not allowed.
-
-The entity attributes are updated with the ones in the payload. In particular, depending on
-whether `append` operation option is used:
-
-* If `append` is not used: the entity attributes are updated (if they previously exist) or appended
-  (in they don't previously exists) with the ones in the payload.
-* If `append` is used (i.e. strict append semantics): all the attributes in the payload not previously
-  existing in the entity are appended. In addition to that, in the case some of the attributes in the
-  payload already exist in the entity, an error if returned.
-
-Response:
-
-* Successful operation uses 204 No Content.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + op: append (optional, string) - Strict append.
-
-+ Request (application/json)
-
-    + Body
-
-            {
-                "ambientNoise": 31.5
-            }
-
-+ Response 204
-
-### Update existing entity attributes [PATCH /v2/entities/type/{entityType}/id/{entityId}]
-
-The request payload is an object representing the attributes to update. The object follows
-the JSON entity representation format (described in a section above), except that `id` and `type`
-are not allowed.
-
-The entity attributes are updated with the ones in the payload. In addition to that, if one or more
-attributes in the payload doesn't exist in the entity, an error if returned.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-
-+ Request (application/json)
-
-        {
-            "temperature": 25.5,
-            "seatsNumber": 6
-        }
-
-+ Response 204
-
-### Replace all entity attributes [PUT /v2/entities/type/{entityType}/id/{entityId}]
-
-The request payload is an object representing the new entity attributes. The object follows
-the JSON entity representation format (described in a section above), except that `id` and `type`
-are not allowed.
-
-The attributes previously existing in the entity are removed and replaced by the ones in the
-request.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-
-+ Request (application/json)
-
-        {
-            "temperature": 25.5,
-            "seatsNumber": 6
-        }
-
-+ Response 204
-
-### Remove entity attributes [DELETE /v2/entities/type/{entityType}/id/{entityId}?{attrs}]
-
-Delete the entity.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-
-+ Response 204
-
--->
+# Group Attributes
 
 ## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}]
+
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute to be retrieved.
 
 ### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]
 
@@ -836,10 +677,6 @@ Response:
 
 * Successful operation uses 20O OK.
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute to be retrieved.
 
 + Response 200 (application/json)
 
@@ -857,10 +694,6 @@ Response:
 
 * Successful operation uses 204 No Content
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute name
 
 + Request (application/json)
 
@@ -881,106 +714,27 @@ Response:
 * Successful operation uses 204 No Content
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute name
-
 + Response 204
 
-<!--
-
-## Attribute by Entity Type and ID [/v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
-
-### Get attribute data [GET /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
-
-Returns a JSON object with the attribute data of the attribute. The object follows the JSON representation for attributes
-(described in a section above).
-
-Response:
-
-* Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute to be retrieved.
-
-+ Response 200 (application/json)
-
-        {
-            "value": 21.7
-        }
-
-### Update attribute data [PUT /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
-
-The request payload is an object representing the new attributes data. Previous attribute data is replaced
-by the one in the request. The object follows the JSON representation for attributes
-(described in a section above).
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute name
-
-+ Request (application/json)
-
-        {
-            "value": 25.0,
-            "unitCode": "CEL"
-        }
-
-+ Response 200
-
-
-### Remove a single attribute [DELETE /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}]
-
-Removes the attribute from the entity.
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute name
-
-+ Response 204
-
--->
 
 ## Attribute Value by Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value{?options}]
 
++ Parameters
+    + entityId: Bcn_Welt (required, string) - Entity ID
+    + attrName: temperature (required, string) - Attribute to be retrieved.
+    + options (optional, string) - Options dictionary
+        + Members
+            + text - indicates that the attribute value must be returned as plain text
+
 ### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}/value{?options}]
 
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">options</td>
-  <td>Operation opations. Allowed values: <code>text</code>.</td>
-</tr>
-</table>
-
-It returns a JSON object with a `value` propierty with the value of the attribute. The `text` option
+It returns a JSON object with a `value` property with the value of the attribute. The `text` option
 indicates that the attribute value must be provided as plain text (text/plain).
 
 Response:
 
 * Successful operation uses 20O OK.
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute to be retrieved.
 
 + Response 200 (application/json)
 
@@ -998,10 +752,6 @@ Response:
 * Successful operation uses 204 No Content
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + attrName: temperature (required, string) - Attribute name
-
 + Request (application/json)
 
         {
@@ -1010,65 +760,6 @@ Response:
 
 + Response 200
 
-<!--
-
-## Attribute Value by Entity type and ID [/v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}/value{?options}]
-
-### Get attribute data [GET /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}/value{?options}]
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">options</td>
-  <td>Operation opations. Allowed values: <code>text</code>.</td>
-</tr>
-</table>
-
-If the `text` option is not used, returns a JSON object which the `value` of the attribute. If the
-`text` option is used returns the attribute value in plain text.
-
-Response:
-
-* Successful operation uses 20O OK.
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute to be retrieved.
-
-+ Response 200 (application/json)
-
-        {
-            "value": 21.7
-        }
-
-### Update attribute value [PUT /v2/entities/type/{entityType}/id/{entityId}/attrs/{attrName}/value]
-
-The request payload is the new attribute value. It can be represented as a JSON object (application/json),
-with a `value` property, or as plain text (text/plain).
-
-Response:
-
-* Successful operation uses 204 No Content
-* Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + entityType: Room (required, string) - Entity Type
-    + attrName: temperature (required, string) - Attribute name
-
-+ Request (application/json)
-
-        {
-            "value": 25.0
-        }
-
-+ Response 200
-
--->
 
 ## Entity types [/v2/types{?limit,offset,options}]
 
