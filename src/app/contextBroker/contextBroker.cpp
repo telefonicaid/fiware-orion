@@ -377,9 +377,9 @@ PaArgument paArgs[] =
 #define ETT_COMPS_V2            2, { "v2", "types" }
 #define ETT_COMPS_WORD          ""
 
-#define GAS                     GetAllSubscriptionsRequest
-#define GAS_COMPS_V2            2, { "v2", "subscriptions" }
-#define GAS_COMPS_WORD          ""
+#define SSR                     SubscriptionsRequest
+#define SSR_COMPS_V2            2, { "v2", "subscriptions" }
+#define SSR_COMPS_WORD          ""
 
 //
 // NGSI9
@@ -656,8 +656,8 @@ PaArgument paArgs[] =
   { "GET",    ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          getEntityAllTypes        }, \
   { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
-  { "GET",    GAS,          GAS_COMPS_V2,         GAS_COMPS_WORD,          getAllSubscriptions      }, \
-  { "*",      GAS,          GAS_COMPS_V2,         GAS_COMPS_WORD,          badVerbGetOnly           }
+  { "GET",    SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          getAllSubscriptions      }, \
+  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetOnly           }
 
 
 
