@@ -84,6 +84,10 @@ std::string Subject::toJson()
   return jh.str();
 }
 
+/* ****************************************************************************
+*
+* Condition::toJson -
+*/
 std::string Condition::toJson()
 {
   JsonHelper jh;
