@@ -112,14 +112,12 @@ echo
 echo "05. POST /v2/entities with compound attribute value"
 echo "==================================================="
 payload='{
-      "id":   "E2",
-      "type": "T1",
-      "A0" : 
-        {
-          "value" : { "i1": "1", "s1": "s" }
-        }
-      
-
+  "id":   "E2",
+  "type": "T1",
+  "A0": 
+  {
+    "value" : { "i1": "1", "s1": "s" }
+  }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
@@ -156,7 +154,7 @@ Date: REGEX(.*)
 03. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 418
+Content-Length: 422
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -244,7 +242,7 @@ Date: REGEX(.*)
 06. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 503
+Content-Length: 507
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -268,7 +266,7 @@ Date: REGEX(.*)
         "A3": {
             "metadata": {
                 "m1": {
-                    "type": "",
+                    "type": null,
                     "value": "M1"
                 }
             },
@@ -298,8 +296,12 @@ Date: REGEX(.*)
     },
     {
         "A0": {
-            "i1": "1",
-            "s1": "s"
+            "metadata": {},
+            "type": null,
+            "value": {
+                "i1": "1",
+                "s1": "s"
+            }
         },
         "id": "E2",
         "type": "T1"

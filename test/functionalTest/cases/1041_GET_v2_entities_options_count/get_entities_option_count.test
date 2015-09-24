@@ -130,7 +130,7 @@ Date: REGEX(.*)
 03. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 73
+Content-Length: 87
 Content-Type: application/json
 X-Total-Count: 1
 Date: REGEX(.*)
@@ -139,6 +139,7 @@ Date: REGEX(.*)
     {
         "id": "E1",
         "model": {
+            "metadata": {},
             "type": "myString",
             "value": "Klasse C"
         },
@@ -177,7 +178,7 @@ Date: REGEX(.*)
 07. GET /v2/entities
 ====================
 HTTP/1.1 200 OK
-Content-Length: 148
+Content-Length: 162
 Content-Type: application/json
 X-Total-Count: 4
 Date: REGEX(.*)
@@ -186,6 +187,7 @@ Date: REGEX(.*)
     {
         "id": "E1",
         "model": {
+            "metadata": {},
             "type": "myString",
             "value": "Klasse C"
         },

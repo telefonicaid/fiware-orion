@@ -37,40 +37,39 @@ brokerStart CB
 echo "01. POST /v2/entities to create 8787GHY entity"
 echo "==================================================="
 payload='{
-
-    "id": "8787GHY",
-    "type": "Car",
-    "brand":{
-    
-            "type": "string",
-            "value": "Mercedes Benz"
-        },
-    "speed":{
-    
-            "type": "number",
-            "value" : "150"
-        },
-    "plateCountry": {
-          "value" : "ES"
-        },
-    "madeInCountry": {
-          "value" : "DE",
-          "type" : ""
-        },
-    "model" : {
-          "type": "myString",
-          "value" : "Klasse C"
-        }
+  "id": "8787GHY",
+  "type": "Car",
+  "brand":{
+    "type": "string",
+    "value": "Mercedes Benz"
+  },
+  "speed":{
+    "type": "number",
+    "value" : "150"
+  },
+  "plateCountry": {
+    "value" : "ES"
+  },
+  "madeInCountry": {
+    "value" : "DE",
+    "type" : ""
+  },
+  "model" : {
+    "type": "myString",
+    "value" : "Klasse C"
+  }
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
+
 
 echo "02. GET /v2/entities/8787GHY"
 echo "============================"
 orionCurl --url /v2/entities/8787GHY --json
 echo
 echo
+
 
 --REGEXPECT--
 01. POST /v2/entities to create 8787GHY entity
@@ -85,26 +84,37 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY
 ============================
 HTTP/1.1 200 OK
-Content-Length: 207
+Content-Length: 321
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "brand": {
-        "type": "string", 
+        "metadata": {},
+        "type": "string",
         "value": "Mercedes Benz"
-    }, 
-    "id": "8787GHY", 
-    "madeInCountry": "DE", 
+    },
+    "id": "8787GHY",
+    "madeInCountry": {
+        "metadata": {},
+        "type": null,
+        "value": "DE"
+    },
     "model": {
-        "type": "myString", 
+        "metadata": {},
+        "type": "myString",
         "value": "Klasse C"
-    }, 
-    "plateCountry": "ES", 
+    },
+    "plateCountry": {
+        "metadata": {},
+        "type": null,
+        "value": "ES"
+    },
     "speed": {
-        "type": "number", 
+        "metadata": {},
+        "type": "number",
         "value": "150"
-    }, 
+    },
     "type": "Car"
 }
 

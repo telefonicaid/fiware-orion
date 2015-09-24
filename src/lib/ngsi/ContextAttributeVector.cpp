@@ -117,6 +117,12 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
   //
   std::string  out;
   int          renderedAttributes = 0;
+
+  if (renderMode == "values")
+  {
+    out = JSON_STR("attributeValues") + ":" + "[";
+  }
+  
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
@@ -126,6 +132,11 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const
 
     ++renderedAttributes;
     out += vec[ix]->toJson(renderedAttributes == validAttributes, types, renderMode);
+  }
+
+  if (renderMode == "values")
+  {
+    out += "]";
   }
 
   return out;

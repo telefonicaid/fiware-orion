@@ -523,7 +523,6 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
 {
   std::string  out;
 
-  LM_M(("KZ: renderMode: %s", renderMode.c_str()));
   if (types == true)
   {
     out = JSON_STR(name) + ":{" + JSON_STR("type") + ":" + JSON_STR(type) + "}"; 
@@ -532,7 +531,18 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
   {
     out = (renderMode == "keyValues")? JSON_STR(name) + ":" : "";
 
-    if (valueType == orion::ValueTypeNumber)
+    if (compoundValueP != NULL)
+    {
+      if (compoundValueP->isObject())
+      {
+        out += "{" + compoundValueP->toJson(true) + "}";
+      }
+      else if (compoundValueP->isVector())
+      {
+        out += "[" + compoundValueP->toJson(true) + "]";
+      }
+    }
+    else if (valueType == orion::ValueTypeNumber)
     {
       char num[32];
       snprintf(num, sizeof(num), "%f", numberValue);
@@ -545,17 +555,6 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
     else if (valueType == orion::ValueTypeBoolean)
     {
       out += (boolValue == true)? "true" : "false";
-    }
-    else if (compoundValueP != NULL)
-    {
-      if (compoundValueP->isObject())
-      {
-        out += "{" + compoundValueP->toJson(true) + "}";
-      }
-      else if (compoundValueP->isVector())
-      {
-        out += "[" + compoundValueP->toJson(true) + "]";
-      }
     }
   }
   else  // Render mode: normalized 

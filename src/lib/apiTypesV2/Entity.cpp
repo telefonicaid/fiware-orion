@@ -75,8 +75,6 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
     renderMode = "values";
   }
 
-  LM_M(("KZ: renderMode == %s", renderMode.c_str()));
-
   if ((errorCode.description == "") && ((errorCode.error == "OK") || (errorCode.error == "")))
   {
     std::string out = "{";
@@ -99,6 +97,7 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       out += ",";
     }
 
+    LM_M(("KZ: Done: '%s'", out.c_str()));
     return out;
   }
 
