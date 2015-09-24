@@ -46,4 +46,3 @@ extern std::string getAllSubscriptions
 );
 
 #endif  // SRC_LIB_SERVICEROUTINESv2_GETALLSUBCRIPTIONS_H_
-
