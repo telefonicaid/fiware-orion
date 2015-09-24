@@ -1,9 +1,30 @@
 FORMAT: 1A
-HOST: http://orion.lab.fiware.org/
+HOST: http://orion.lab.fiware.org
+TITLE: FIWARE-NGSI v2 Specification
+DATE: 30 September 2015
+VERSION: 2.0-wip1
+PREVIOUS_VERSION: <placeholder>
+APIARY_PROJECT: fiware-ngsi-v2
+SPEC_URL: https://telefonicaid.github.io/fiware-orion/api/v2/
+GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
 
-# FIWARE-NGSI-Simple
+# FIWARE-NGSI v2 Specification
 
-FIWARE-NGSI Simple API (v2) Specification.
+This specification defines the FIWARE-NGSI version 2 API. FIWARE-NGSI v2 is intended to manage all the whole lifecycle of
+context information including updates, queries, registrations and subscriptions.
+
+## Editors
+
+  + José Manuel Cantera Fonseca, Telefónica I+D
+  + Fermín Galán, Telefónica I+D. 
+  + Tobias Jacobs, NEC
+  
+## Acknowledgements
+
+The editors would like to express their gratitude to the following people who actively contributed to this specification:
+Juan José Hierro, Marcos Reyes, Ken Gunnar, Antonio López, ... 
+  
+## Status
 
 This is a work in progress and is changing on a daily basis.
 Please send your comments to fiware-ngsi@lists.fiware.org. You can
@@ -17,11 +38,19 @@ In addition, note that a list of currently open discussions is available at
 * https://github.com/telefonicaid/fiware-orion/issues/1034
 * https://github.com/telefonicaid/fiware-orion/issues/1035
 
+## Copyright
+
 This specification is licensed under the
 [FIWARE Open Specification License]
 (http://forge.fiware.org/plugins/mediawiki/wiki/fiware/index.php/FI-WARE_Open_Specification_Legal_Notice_%28essential_patents_license%29).
 
-## FIWARE NGSI information and data model introduction
+## Conformance
+
+All the interfaces described by this specification are mandatory and must be implemented in order to be compliant with. 
+
+# Specification
+
+## Introduction
 
 The FIWARE NGSI (Next Generation Service Interface) API defines 
 
@@ -30,6 +59,8 @@ The FIWARE NGSI (Next Generation Service Interface) API defines
 * a **context availability interface** for exchanging information on how to obtain context information
 (whether to separate the two interfaces is currently under discussion).
 * a set of typical **roles** played by NGSI-compliant components
+
+## Terminology
 
 ### Context data modelling and exchange
 
@@ -63,7 +94,8 @@ attributes** section below).
 
 It is important to understand that the relationship of entity and context element is one-to-many. This means that 
 * each context element refers to exactly one entity
-* there can be several context elements  referring to the same entity. The context elements can for example contain different pieces of information about the entity
+* there can be several context elements  referring to the same entity. The context elements can for example contain
+different pieces of information about the entity
 
 #### Context Attributes 
 
@@ -74,7 +106,8 @@ attribute *current_speed* of entity *car-104*.
 In the NGSI data model, attributes have an *attribute name*,
 an *attribute type*, an *attribute value* and *metadata*. 
  * The attribute name describes which kind of property of the entity the attribute value represents, for example *current_speed*.
- * The attribute type represents the NGSI value type of the attribute value. Note that FIWARE NGSI has its own type system for attribute values, so NGSI value types are not the same as JSON types.
+ * The attribute type represents the NGSI value type of the attribute value.
+ Note that FIWARE NGSI has its own type system for attribute values, so NGSI value types are not the same as JSON types.
  * The attribute value finally contains
   * the actual data
   * optional **metadata** describing properties of the attribute value like e.g. accuracy, provider, or a timestamp
@@ -158,24 +191,29 @@ Generally speaking, user-defined attribute types are informative, they are proce
 an opaque way. Nonetheless, the types described below are used to convey an special meaning
 
 * `date`:  identifies dates, in ISO8601 format. These attributes can be used with the
-  greater than, lesser than, greater or equal, lesser or equal and range query operators. Eg:
+  greater than, lesser than, greater or equal, lesser or equal and range query operators. For instance
+  (only the referred entity attribute is shown) :
 
 ```
+{
   "timestamp": {
     "value": "2017-06-17T07:21:24.238Z",
     "type: "date"
   }
+}
 ```
 
 * `geo:point`: identifies the location of the entity in geo-location queries. If an entity have several attributes
   of this type all them define a possible location for the entity from a geo-location query point of view. (TBD:
-  check feasibility).
+  check feasibility). An example can be found below (only the referred entity attribute is shown). 
 
 ```
+{
   "location": {
     "value": "41.3763726, 2.1864475,14",
     "type": "geo:point"
   }
+}
 ```
 
 ### Canonical format description
@@ -242,65 +280,13 @@ Error list (HTTP response code in paranthesis):
 * UnsupportedMediaType (415). Request content type is not supported.
 * InvalidModification (422). Some piece of information is missing in payload.
 
+## Simple Query Language
 
-# Group NGSIv2
+The Simple Query Language provides a simplified syntax to retrieve entities which match a set of conditions.
+A query is composed by a list of statements separated by the ';' character. Each statement express a matching condition.
+The query will return all the entities which match all the matching conditions (AND logical operator). 
 
-## API Entry Point [/v2]
-
-### Retrieve Entry Points [GET /v2]
-
-This resource does not have any attributes. Instead it offers the initial
-API affordances in the form of the links in the JSON body.
-
-It is recommended to follow the “url” link values,
-[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
-applicable to retrieve resources. Instead of constructing your own URLs,
-to keep your client decoupled from implementation details.
-
-+ Response 200 (application/json)
-
-        {
-            "entities_url":      "/v2/entities",
-            "types_url":         "/v2/types",
-            "subscriptions_url": "/v2/subscriptions",
-            "registrations_url": "/v2/registrations"
-        }
-
-## Entities [/v2/entities{?limit,offset,options,type,id,idPattern,q,geometry,coords,attrs}]
-
-### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,geometry,coords,attrs}]
-
-Retrieves a list of entities which match criteria defined by the following parameters: `id`, `type`, `idPattern`, `q`,
-`geometry` and `coords` attribute (see below for a detailed description of these parameters). A given entity
-have to match all the criteria to be retrieved (i.e. criteria are combined in a logical AND way).
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">id</td><td>A comma separated list of elements.
-  Retrieve entities which ID match one of the elements in the list.</td>
-</tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">type</td><td>A comma separated list of elements.
-  Retrieve entities which type match one of the elements in the list.</td>
-</tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">idPattern</td><td>A correctly formated regular
-  expression. Retrieve entities which ID matches the regular expression.</td>
-</tr>
-<tr><td style="padding-right: 40px; width: 140px;">q</td><td>
-
-<p>A query expression, composed of a list of statements separated by <code>;</code>, i.e.</p>
-
-<p><code>
-q=statement;statements;statement
-</code></p>
-
-<p>Each statement express a matching condition. The result of the query is the match on each one of the statements, e.g. a
-AND logical condition among the different statements. There are two kind of statements: <em>unary statements</em> and
-<em>binary staments</em>.</p>
+There are two kind of statements: <em>unary statements</em> and <em>binary staments</em>.</p>
 
 <p>Binary statements are composed by an attribute name (e.g. "temperature"), operator and value (which format
 depends on the operator), e.g.:</p>
@@ -365,56 +351,75 @@ temperature<=20
 
 <p>Unary statements are composed of a unary operator (either <code>+</code>or <code>-</code>) and are used in two situations:</p>
 
-<ul>
-  <li>To check for attribute existence. E.g. <code>+temperature</code>matches entities which have
++ To check for attribute existence. E.g. <code>+temperature</code>matches entities which have
   a temperature attribute (no matter its value), while <code>-temperature</code>matches entities which don't have
-  a temperature attribute.</li>
-  <li>To check for entity type existence, with the <code>type</code>keyword. E.g, <code>-type</code>
-  matches entities which don't have a type.</li>
-</ul>
+  a temperature attribute.
++ To check for entity type existence, with the <code>type</code>keyword. E.g, <code>-type</code>
+  matches entities which don't have a type.
+  
+ 
+## Geographical Queries
 
-</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">geometry</td><td>
+Geographical queries are specified by means of the `geometry` and `coords` parameters.
 
-<p>Defines a geografical area so only the entities located in that area matches the query. It is composed of a tokens list
-separated by <code>;</code>. The first token is the shape of the geometry, the rest of the tokens (if any) depends
-on the shape. In particular, the following geometries can be defined so far:</p>
+**geometry** defines a geografical area so that only those entities located in such area match the query.
+It is composed of a token list separated by ';'. The first token is the shape of the geometry,
+the rest of tokens (if any) depends on the shape. 
 
-<ul>
-  <li><code>geometry=circle;radius:4000</code>, inside a circle (radius is in meters).</li>
-  <li><code>geometry=circle;radius:4000;external</code>, outside a circle (radius is in meters).</li>
-  <li><code>geometry=polygon</code>, inside a polygon.</li>
-  <li><code>geometry=polygon;external</code>, outside a polygon.</li>
-</ul>
+In particular, the following geometries are supported:
 
-</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">coords</td><td>
++ `geometry=circle;radius:4000`, inside a circle (radius is in meters).
++ `geometry=circle;radius:4000;external`, outside a circle (radius is in meters).
++ `geometry=polygon`, inside a polygon.
++ `geometry=polygon;external`, outside a polygon.
 
-<p>List of coordinates (separated by <code>;</code>) are interpreted depending on the geometry parameter as follows:</p>
+**coords** represents a a list of pairs of geographical coordinates (latitude, longitude) separated by ','.
+Every pair of coordinates represent a geographical point. The list length and its semantics depend on the shape
+specified by the **geometry** parameter:
 
-<ul>
-  <li>In the case of <code>circle</code>geometry, the parameter includes just one element, which
-  is the center of the circle.</li>
-  <li>In the case of <code>polygon</code>includes a list of elements, which are the vertices of
-  the polygon.</li>
-</ul>
++ In the case of `circle` geometry, the parameter includes just one element, which
+  is the center of the circle.
++ In the case of `polygon` includes a list of elements, which are the vertices of the polygon.
 
-</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">attrs</td>
-    <td>Comma-separated list of attribute names which data will be included in the response. If this parameter is not
-    included, all the attributes are retrieved.</td>
-</tr>
-<tr><td style="padding-right: 40px; width: 140px;">limit</td><td>Limit the number of entities to be retrieved</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">offset</td><td>Skip a number of records</td></tr>
-<tr><td style="padding-right: 40px; width: 140px;">options</td><td>
-This operation supports two options:
+# REST API
 
-<ul>
-  <li><code>count</code>: when used, the total number of entities is returned in the response as a HTTP header named <code>X-Total-Count</code>.</li>
-  <li><code>canonical</code>: when used, the response payload uses the "canonical form". See JSON entity representation format section
-  for details.</li>
-</td></tr>
-</table>
+# Group NGSIv2
+
+## API Entry Point [/v2]
+
+### Retrieve Entry Points [GET /v2]
+
+This resource does not have any attributes. Instead it offers the initial
+API affordances in the form of the links in the JSON body.
+
+It is recommended to follow the “url” link values,
+[Link](https://tools.ietf.org/html/rfc5988) or Location headers where
+applicable to retrieve resources. Instead of constructing your own URLs,
+to keep your client decoupled from implementation details.
+
++ Attributes(object)
+    + entities_url (required, string) - URL which points to the entities resource
+    + types_url (required, string) - URL which points to the types resource
+    + subscriptions_url (required, string) - URL which points to the subscriptions resource
+    + registrations_url (required, string) - URL which points to the registrations resource
+
++ Response 200 (application/json)
+
+        {
+            "entities_url":      "/v2/entities",
+            "types_url":         "/v2/types",
+            "subscriptions_url": "/v2/subscriptions",
+            "registrations_url": "/v2/registrations"
+        }
+
+## Entities [/v2/entities{?limit,offset,options,type,id,idPattern,q,geometry,coords,attrs}]
+
+### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,geometry,coords,attrs}]
+
+Retrieves a list of entities which match different criteria (by id, idPattern, type or those which match
+a query or geographical query). A given entity have to match all the criteria to be retrieved
+(i.e. criteria are combined in a logical AND way).
+See [Simple Query Language](#simple_query_language) and [Geographical Queries](#geographical_queries). 
 
 The response payload is an Array which contains one object per matching entity. Each entity follows
 the JSON entity representation format (described in a section above).
@@ -425,11 +430,35 @@ Response code:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
-    + limit: 20 (optional, number)
-    + offset: 20 (optional, number)
-    + type: Room (optional, string)
-    + id: Bcn_Welt (optional, string)
-    + idPattern: (optional, string)
+    + id: Boe_Idearium (optional, string) - A comma separated list of elements.
+    Retrieve entities which ID match one of the elements in the list.
+    
+    + type: Room (optional, string) -  comma separated list of elements.
+    Retrieve entities which type match one of the elements in the list.
+
+    + idPattern (optional, string) - A correctly formated regular expression.
+    Retrieve entities which ID matches the regular expression.
+    
+    + q (optional, string) - A query expression, composed of a list of statements separated by <code>;</code>,
+    i.e. q=statement;statements;statement. See [Simple Query Language specification](#simple_query_language). 
+    
+    + geometry (optional, string) - Geografical area to which the query is restricted.
+    It is composed of a token list separated by ';'. See [Geographical Queries](#geographical_queries).
+    
+    + coords (optional, string) - List of pairs of coordinates (latitude, longitude) separated by ','.
+    See [Geographical Queries](#geographical_queries).
+    
+    + limit: 20 (optional, number) - Limits the number of entities to be retrieved
+    
+    + offset: 20 (optional, number) - Establishes the offset from which entities will be returned
+    
+    + attrs: seatNumber (optional, string) - Comma-separated list of attribute names which data will be included in the response.
+    If this parameter is not included, all the attributes are retrieved.
+    
+    + options (optional, string) - Options dictionary
+      + Members
+          + count - when used, the total number of entities is returned in the response as a HTTP header named <code>X-Total-Count</code>.
+          + canonical - when used, the response payload uses the "canonical form". See JSON entity representation format section for details.
 
 + Response 200 (application/json)
 
@@ -495,17 +524,6 @@ Response:
 
 ### Retrieve entity [GET /v2/entities/{entityId}{?attrs}]
 
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">attrs</td>
-  <td>Comma-separated list of attribute names which data will be included in the response. If this parameter is not
-  included, all the attributes are retrieved.</td>
-</tr>
-</table>
-
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in a section above).
 
@@ -514,15 +532,15 @@ than one entity with the same ID (e.g. entities with same ID but different type)
 an error mesage is returned, specifying in the description the URL that could be used to get
 the list of conflicting entities, i.e. all the entities with such an ID.
 
-
 Response:
 
 * Successful operation uses 200 OK
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity Id.
-    + attrs: temperature,humidity (optional, string) - Attributes to be retrieved. Coma separated list.
+    + entityId (required, string) - Entity id to be retrieved
+    + attrs: temperature,humidity (optional, string) - Comma-separated list of attribute names which
+    data will be included in the response. If this parameter is not included, all the attributes are retrieved.
 
 + Response 200 (application/json)
 
@@ -538,17 +556,7 @@ Response:
             }
         }
 
-### Update or append entity attributes [POST /v2/entities/{entityId}?{op}]
-
-<table style="width: 100%; margin: 12px 0 0 0;">
-<tr><td colspan="2"><strong>Required Parameters</strong></td></tr>
-<tr><td colspan="2">none</td></tr>
-<tr><td colspan="2"><strong>Optional Parameters</strong></td></tr>
-<tr>
-  <td style="padding-right: 40px; width: 140px;">op</td>
-  <td>Operation options. Allowed values: <code>append</code>.</td>
-</tr>
-</table>
+### Update or append entity attributes [POST /v2/entities/{entityId}?{options}]
 
 The request payload is an object representing the attributes to append or update. The object follows
 the JSON entity representation format (described in a section above), except that `id` and `type`
@@ -561,7 +569,7 @@ whether `append` operation option is used or not.
   (in they don't previously exists) with the ones in the payload.
 * If `append` is used (i.e. strict append semantics): all the attributes in the payload not previously
   existing in the entity are appended. In addition to that, in the case some of the attributes in the
-  payload already exist in the entity, an error if returned.
+  payload already exist in the entity, an error is returned.
 
 If the entity doesn't previously exist, it is created.
 
@@ -571,8 +579,10 @@ Response:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
-    + op: append (optional, string) - Strict append.
+    + entityId (required, string) - Entity id to be updated
+    + options (optional, string) - Operations options
+        + Members
+            + append - Force an append operation
 
 + Request (application/json)
 
@@ -598,9 +608,8 @@ Response:
 * Successful operation uses 204 No Content
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
-
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
++ Parameters 
+    + entityId (required, string) - Entity id to be updated
 
 + Request (application/json)
 
@@ -625,8 +634,8 @@ Response:
 * Successful operation uses 204 No Content
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
-+ Parameters
-    + entityId: Bcn_Welt (required, string) - Entity ID
++ Parameters 
+    + entityId (required, string) - Entity id
 
 + Request (application/json)
 
@@ -637,7 +646,7 @@ Response:
 
 + Response 204
 
-### Remove entity atributes [DELETE /v2/entities/{entityId}]
+### Remove entity [DELETE /v2/entities/{entityId}]
 
 Delete the entity.
 
@@ -646,8 +655,8 @@ Response:
 * Successful operation uses 204 No Content
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
-+ Parameters
-    + entityId: Boe_Idearium (required, string) - Entity ID
++ Parameters 
+    + entityId (required, string) - Entity id to be deleted
 
 + Response 204
 
