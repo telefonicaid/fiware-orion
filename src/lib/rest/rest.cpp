@@ -880,8 +880,6 @@ static int connectionTreat
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
   {
-    LM_M(("In connectionTreat 1: path: %s", url));
-
     //
     // IP Address and port of caller
     //

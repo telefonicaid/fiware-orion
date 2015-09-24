@@ -97,7 +97,6 @@ std::string Entity::render(ConnectionInfo* ciP, RequestType requestType, bool co
       out += ",";
     }
 
-    LM_M(("KZ: Done: '%s'", out.c_str()));
     return out;
   }
 
