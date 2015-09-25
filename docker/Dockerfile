@@ -54,7 +54,6 @@ RUN \
     make install && \
     # reduce size of installed binaries
     strip /usr/bin/contextBroker && \
-    strip /usr/bin/proxyCoap && \
     # create needed log and run paths
     mkdir -p /var/log/contextBroker && \
     mkdir -p /var/run/contextBroker && \
