@@ -25,12 +25,7 @@
 *
 * Author: Ken Zangelin
 */
-
-#include <algorithm>
-#include <iterator>
-#include <sstream>
 #include <string>
-#include <vector>
 
 #include "common/Format.h"
 
@@ -48,6 +43,8 @@
 #define JSON_VALUE(name, value)        std::string(JSON_PROP(name) + JSON_STR(value))
 #define JSON_VALUE_NUMBER(name, value) std::string(JSON_PROP(name) + JSON_NUMBER(value))
 #define JSON_VALUE_BOOL(name, value)   std::string(JSON_PROP(name) + ((value == true)? "true" : "false"))
+
+
 
 /* ****************************************************************************
 *
@@ -158,7 +155,5 @@ extern std::string startArray
 * endArray -
 */
 extern std::string endArray(const std::string& indent, const std::string& tagName, Format format);
-
-
 
 #endif  // SRC_LIB_COMMON_TAG_H_
