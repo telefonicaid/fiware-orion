@@ -957,12 +957,6 @@ static int connectionTreat
 
     ciP->servicePath = ciP->httpHeaders.servicePath;
 
-    if (servicePathSplit(ciP) != 0)
-    {
-      LM_W(("Bad Input (error in ServicePath http-header)"));
-      restReply(ciP, ciP->answer);
-    }
-
     if (contentTypeCheck(ciP) != 0)
     {
       LM_W(("Bad Input (invalid mime-type in Content-Type http-header)"));
@@ -1002,7 +996,6 @@ static int connectionTreat
   }
 
 
-  //
   // 2. Data gathering calls
   //
   // 2-1. Data gathering calls, just wait
@@ -1042,6 +1035,15 @@ static int connectionTreat
   }
 
   // 3. Finally, serve the request (unless an error has occurred)
+  
+  // ServicePath check is delayed to third MHD call 
+  if (servicePathSplit(ciP) != 0)
+  {
+    LM_W(("Bad Input (error in ServicePath http-header)"));
+    restReply(ciP, ciP->answer);
+    return MHD_YES;
+  }
+
   if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && (ciP->httpHeaders.contentLength == 0) && (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0))
   {
     std::string errorMsg = restErrorReplyGet(ciP, ciP->outFormat, "", url, SccLengthRequired, "Zero/No Content-Length in PUT/POST/PATCH request");
