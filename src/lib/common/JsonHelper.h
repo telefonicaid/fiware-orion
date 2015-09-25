@@ -34,29 +34,47 @@ class JsonHelper
 {
 public:
   JsonHelper();
-  void addString(const std::string& key, const std::string& value);
-  void addRaw(const std::string& key, const std::string& value);
+
+  void        addString(const std::string& key, const std::string& value);
+  void        addRaw(const std::string& key, const std::string& value);
   std::string str();
+
 private:
  std::ostringstream ss;
- bool empty;
+ bool               empty;
 };
 
+
+
+
+/* ****************************************************************************
+*
+* toJsonString -
+*/
 std::string toJsonString(const std::string& input);
 
+
+
+/* ****************************************************************************
+*
+* vectorToJson -
+*/
 template <class T>
 std::string vectorToJson(std::vector<T> &list)
 {
   typedef typename std::vector<T>::size_type size_type;
+
   if (list.empty())
   {
-      return "[]";
+    return "[]";
   }
+
   std::ostringstream ss;
+
   ss << "[ " << list[0].toJson();
-  for(size_type i = 1; i != list.size(); ++i)
+  for (size_type i = 1; i != list.size(); ++i)
   {
-      ss << ", " << list[i].toJson();
+    ss << ", " << list[i].toJson();
   }
   ss << " ]";
   return ss.str();

@@ -23,58 +23,86 @@
 *
 * Author: Orion dev team
 */
+
 #include "common/JsonHelper.h"
 
+/* ****************************************************************************
+*
+* toJsonString -
+*/
 std::string toJsonString(const std::string& input)
 {
   std::ostringstream ss;
+
   ss << '"';
   for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
     {
       switch (*iter)
-        {
-        case '\\': ss << "\\\\"; break;
-        case '"': ss << "\\\""; break;
-        case '/': ss << "\\/"; break;
-        case '\b': ss << "\\b"; break;
-        case '\f': ss << "\\f"; break;
-        case '\n': ss << "\\n"; break;
-        case '\r': ss << "\\r"; break;
-        case '\t': ss << "\\t"; break;
-        default: ss << *iter; break;
-        }
+      {
+      case '\\': ss << "\\\\"; break;
+      case '"': ss << "\\\""; break;
+      case '/': ss << "\\/"; break;
+      case '\b': ss << "\\b"; break;
+      case '\f': ss << "\\f"; break;
+      case '\n': ss << "\\n"; break;
+      case '\r': ss << "\\r"; break;
+      case '\t': ss << "\\t"; break;
+      default: ss << *iter; break;
+      }
     }
   ss << '"';
   return ss.str();
 }
 
+
+
+/* ****************************************************************************
+*
+* vectorToJson -
+*/
 template <>
 std::string vectorToJson(std::vector<std::string> &list)
 {
   switch (list.size())
+  {
+  case 0:
+    return "[]";
+
+  case 1:
+    return "[ " + toJsonString(list[0]) + " ]";
+
+  default:
+    std::ostringstream os;
+    os << "[ ";
+    os << toJsonString(list[0]);
+    for (std::vector<std::string>::size_type i = 1; i != list.size(); ++i)
     {
-    case 0:
-      return "[]";
-    case 1:
-      return "[ " + toJsonString(list[0]) + " ]";
-    default:
-      std::ostringstream os;
-      os << "[ ";
-      os << toJsonString(list[0]);
-      for(std::vector<std::string>::size_type i = 1; i != list.size(); ++i)
-      {
-          os << ", " << toJsonString(list[i]);
-      }
-      os << " ]";
-      return os.str();
+      os << ", " << toJsonString(list[i]);
     }
+    os << " ]";
+    return os.str();
+  }
 }
 
-JsonHelper::JsonHelper(): empty(true) {}
 
+/* ****************************************************************************
+*
+* JsonHelper -
+*/
+JsonHelper::JsonHelper(): empty(true)
+{
+
+}
+
+
+
+/* ****************************************************************************
+*
+* JsonHelper::addString -
+*/
 void JsonHelper::addString(const std::string& key, const std::string& value)
 {
-  if(!empty)
+  if (!empty)
   {
     ss << ", ";
   }
@@ -83,9 +111,15 @@ void JsonHelper::addString(const std::string& key, const std::string& value)
   empty = false;
 }
 
+
+
+/* ****************************************************************************
+*
+* JsonHelper::addRaw -
+*/
 void JsonHelper::addRaw(const std::string& key, const std::string& value)
 {
-  if(!empty)
+  if (!empty)
   {
     ss << ", ";
   }
@@ -94,6 +128,12 @@ void JsonHelper::addRaw(const std::string& key, const std::string& value)
   empty = false;
 }
 
+
+
+/* ****************************************************************************
+*
+* JsonHelper::str -
+*/
 std::string JsonHelper::str()
 {
   ss << "}";

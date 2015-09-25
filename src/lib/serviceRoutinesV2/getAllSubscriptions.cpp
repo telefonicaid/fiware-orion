@@ -66,5 +66,4 @@ std::string getAllSubscriptions
     ciP->httpHeaderValue.push_back(toString(subs.size()));
   }
   return  vectorToJson(subs);
-
 }

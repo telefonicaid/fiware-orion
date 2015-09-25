@@ -28,9 +28,8 @@
 #include <string>
 #include <vector>
 
-#include "rest/ConnectionInfo.h"
 #include "ngsi/ParseData.h"
-
+#include "rest/ConnectionInfo.h"
 
 
 /* ****************************************************************************

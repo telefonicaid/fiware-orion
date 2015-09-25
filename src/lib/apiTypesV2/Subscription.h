@@ -40,13 +40,17 @@ struct EntID
   std::string toJson();
 };
 
+
+
 struct Notification
 {
   std::vector<std::string> attributes;
-  std::string callback;
-  Throttling throttling;
-  std::string toJson();
+  std::string              callback;
+  Throttling               throttling;
+  std::string              toJson();
 };
+
+
 
 struct Condition
 {
@@ -55,24 +59,28 @@ struct Condition
     std::string q;
     std::string geometry;
     std::string coords;
-  } expression;
+  }                        expression;
   std::string toJson();
 };
+
+
 
 struct Subject
 {
   std::vector<EntID> entities;
-  Condition condition;
-  std::string toJson();
+  Condition          condition;
+  std::string        toJson();
 };
+
+
 
 struct Subscription
 {
-  std::string id;
-  Subject subject;
-  Duration duration;
+  std::string  id;
+  Subject      subject;
+  Duration     duration;
   Notification notification;
-  std::string toJson();
+  std::string  toJson();
 };
 
 #endif // SRC_LIB_APITYPESV2_SUBSCRIPTION_H
