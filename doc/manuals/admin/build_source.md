@@ -2,20 +2,6 @@
 
 Orion Context Broker reference distribution is CentOS 6.x. This doesn't mean that the broker cannot be built in other distributions (actually, it can). This section also includes indications on how to build in other distributions, just in the case it may help people that don't use CentOS. However, note that the only "officially supported" procedure is the one for CentOS 6.x; the others are provided "as is" and can get obsolete from time to time.
 
-**Note:** the build includes both contextBroker binary and proxyCoap. If you are not interested in proxyCoap at all, you can disable it just commenting out the following line in the CMakeList.txt file:
-
-
-    ADD_SUBDIRECTORY(src/app/proxyCoap)
-
-and removing the following files:
-
-    test/functionalTest/cases/coap_basic.test
-    test/functionalTest/cases/coap_command_line_options.test
-    test/functionalTest/cases/coap_version.test
-
-
-In that case, you can also ignore all the steps in the building process marked as "(Optional proxyCoap)"
-
 ## CentOS 6.x. (officially supported)
 
 The Orion Context Broker uses the following libraries as build dependencies:
@@ -27,7 +13,6 @@ The Orion Context Broker uses the following libraries as build dependencies:
 * rapidjson: 1.0.2
 * gtest (only for `make unit_test` building target): 1.5 (from sources)
 * gmock (only for `make unit_test` building target): 1.5 (from sources)
-* cantcoap (for proxyCoap)
 
 We assume that EPEL6 repository is configured in yum, given that many RPM packages are installed from there
 (check the procedure at http://fedoraproject.org/wiki/EPEL#How_can_I_use_these_extra_packages.3F):
@@ -67,20 +52,6 @@ commands that require root privilege):
         sudo make install  # installation puts .h files in /usr/local/include and library in /usr/local/lib
         sudo ldconfig      # just in case... it doesn't hurt :)
 
-* (Optional proxyCoap) Install cantcoap (with dependencies). Note that we are using a particular snapshot of the code (corresponding to around July 21st, 2014) given that cantcoap repository doesn't provide any releasing mechanism.
-
-
-        sudo yum install clang CUnit-devel
-
-        git clone https://github.com/staropram/cantcoap
-        cd cantcoap
-        git checkout 749e22376664dd3adae17492090e58882d3b28a7
-        make
-        sudo cp cantcoap.h /usr/local/include
-        sudo cp dbg.h /usr/local/include
-        sudo cp nethelper.h /usr/local/include
-        sudo cp libcantcoap.a /usr/local/lib
-
 * Get the code (alternatively you can download it using a zipped version or a different URL pattern, e.g `git clone git@github.com:telefonicaid/fiware-orion.git`):
 
         sudo yum install git
@@ -112,16 +83,6 @@ The Orion Context Broker comes with a suite of valgrind and end-to-end tests tha
 * Install the required tools:
 
         sudo yum install python python-flask python-jinja2 curl libxml2 nc mongodb valgrind libxslt
-
-* (Optional proxyCoap) Install COAP client (an example application included in the libcoap sources).
-
-        wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
-        mv download libcoap-4.1.1.tar.gz
-        tar xvzf libcoap-4.1.1.tar.gz
-        cd libcoap-4.1.1
-        ./configure
-        make
-        sudo cp examples/coap-client /usr/local/bin
 
 * Run valgrind tests (it takes some time, please be patient):
 
