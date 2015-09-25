@@ -73,13 +73,13 @@ std::string vectorToJson(std::vector<std::string> &list)
 
   default:
     std::ostringstream os;
-    os << "[ ";
+    os << '[';
     os << toJsonString(list[0]);
     for (std::vector<std::string>::size_type i = 1; i != list.size(); ++i)
     {
-      os << ", " << toJsonString(list[i]);
+      os << ',' << toJsonString(list[i]);
     }
-    os << " ]";
+    os << ']';
     return os.str();
   }
 }
@@ -91,7 +91,7 @@ std::string vectorToJson(std::vector<std::string> &list)
 */
 JsonHelper::JsonHelper(): empty(true)
 {
-
+  ss << '{';
 }
 
 
@@ -104,9 +104,9 @@ void JsonHelper::addString(const std::string& key, const std::string& value)
 {
   if (!empty)
   {
-    ss << ", ";
+    ss << ',';
   }
-  ss << toJsonString(key) << ": " << toJsonString(value);
+  ss << toJsonString(key) << ':' << toJsonString(value);
 
   empty = false;
 }
@@ -121,9 +121,9 @@ void JsonHelper::addRaw(const std::string& key, const std::string& value)
 {
   if (!empty)
   {
-    ss << ", ";
+    ss << ',';
   }
-  ss << toJsonString(key) << ": " << value;
+  ss << toJsonString(key) << ':' << value;
 
   empty = false;
 }
@@ -136,6 +136,6 @@ void JsonHelper::addRaw(const std::string& key, const std::string& value)
 */
 std::string JsonHelper::str()
 {
-  ss << "}";
-  return "{" + ss.str();
+  ss << '}';
+  return ss.str();
 }

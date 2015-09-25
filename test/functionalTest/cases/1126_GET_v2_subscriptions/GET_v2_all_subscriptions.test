@@ -35,7 +35,7 @@ brokerStart CB
 
 echo "01. GET /v2/subscriptions"
 echo "========================="
-orionCurl --url /v2/subscriptions?options=count --json
+orionCurl --url /v2/subscriptions?options=count --in json --out any
 echo
 echo
 
@@ -43,68 +43,12 @@ echo
 01. GET /v2/subscriptions
 =========================
 HTTP/1.1 200 OK
-Content-Length: 575
+Content-Length: 513
 Content-Type: application/json
 X-Total-Count: 2
 Date: REGEX(.*)
 
-[
-    {
-        "id": "s1",
-        "notification": {
-            "attributes": [
-                "notification attributes 1",
-                "notification attributes 2"
-            ],
-            "callback": ""
-        },
-        "subject": {
-            "condition": {
-                "attributes": [
-                    "A \nsc sub 1",
-                    "B \tsc sub 1",
-                    "Z \fsc sub 2"
-                ],
-                "expression": {
-                    "coords": "",
-                    "geometry": "",
-                    "q": ""
-                }
-            },
-            "entities": [
-                {
-                    "id": "ID1",
-                    "idPattern": "",
-                    "type": ""
-                }
-            ]
-        }
-    },
-    {
-        "id": "s2",
-        "notification": {
-            "attributes": [],
-            "callback": ""
-        },
-        "subject": {
-            "condition": {
-                "attributes": [],
-                "expression": {
-                    "coords": "C",
-                    "geometry": "G",
-                    "q": "Q"
-                }
-            },
-            "entities": [
-                {
-                    "id": "",
-                    "idPattern": "IDP2",
-                    "type": "FENOTIPO"
-                }
-            ]
-        }
-    }
-]
+[{"id":"s1","subject":{"entities":[{"id":"ID1","idPattern":"","type":""}],"condition":{"attributes":["A \nsc sub 1","B \tsc sub 1","Z \fsc sub 2"],"expression":{"q":"","geometry":"","coords":""}}},"notification":{"callback":"","attributes":["notification attributes 1","notification attributes 2"]}},{"id":"s2","subject":{"entities":[{"id":"","idPattern":"IDP2","type":"FENOTIPO"}],"condition":{"attributes":[],"expression":{"q":"Q","geometry":"G","coords":"C"}}},"notification":{"callback":"","attributes":[]}}]
 
 
 --TEARDOWN--

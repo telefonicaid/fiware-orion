@@ -71,12 +71,12 @@ std::string vectorToJson(std::vector<T> &list)
 
   std::ostringstream ss;
 
-  ss << "[ " << list[0].toJson();
+  ss << '[' << list[0].toJson();
   for (size_type i = 1; i != list.size(); ++i)
   {
-    ss << ", " << list[i].toJson();
+    ss << ',' << list[i].toJson();
   }
-  ss << " ]";
+  ss << ']';
   return ss.str();
 }
 
