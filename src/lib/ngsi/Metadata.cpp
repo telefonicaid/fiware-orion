@@ -138,13 +138,7 @@ std::string Metadata::render(Format format, const std::string& indent, bool comm
   out += startTag(indent, tag, tag, format, false, false);
   out += valueTag(indent + "  ", "name", name, format, true);
   out += valueTag(indent + "  ", "type", type, format, true);
-
-  if (type == "Association")
-  {
-    xValue = std::string("\n") + association.render(format, indent + "  ", false);
-  }
-
-  out += valueTag(indent + "  ", "value", xValue, format, false, (type == "Association"));
+  out += valueTag(indent + "  ", "value", xValue, format, false);
   out += endTag(indent, tag, format, comma);
 
   return out;
@@ -180,16 +174,10 @@ std::string Metadata::check
       return "Invalid characters in metadata value";
     }
 
-    if ((stringValue == "") && (type != "Association"))
+    if (stringValue == "")
     {
       return "missing metadata value";
     }
-  }
-
-
-  if (type == "Association")
-  {
-     return association.check(requestType, format, indent, predetectedError, counter);
   }
 
   return "OK";
@@ -217,7 +205,6 @@ void Metadata::present(const std::string& metadataType, int ix, const std::strin
 */
 void Metadata::release(void)
 {
-  association.release();
 }
 
 
@@ -231,7 +218,6 @@ void Metadata::fill(const struct Metadata& md)
   name         = md.name;
   type         = md.type;
   stringValue  = md.stringValue;
-  association  = md.association;
 }
 
 /* ****************************************************************************

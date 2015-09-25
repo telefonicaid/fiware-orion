@@ -31,7 +31,6 @@
 #include "common/Format.h"
 #include "orionTypes/OrionValueType.h"
 #include "ngsi/Request.h"
-#include "ngsi/Association.h"
 
 
 
@@ -52,16 +51,11 @@
 *
 * Metadata -
 *
-* FIXME
-*   The Association field should be added not in this class but in a class that inherits
-*   from Metadata.
-*    Once we start the next refactoring ...
 */
 typedef struct Metadata
 {
   std::string  name;         // Mandatory
-  std::string  type;         // Optional  
-  Association  association;  // Optional (used if type == 'Association')
+  std::string  type;         // Optional
 
   // Mandatory
   orion::ValueType   valueType;    // Type of value: taken from JSON parse

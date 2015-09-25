@@ -96,8 +96,7 @@ std::string EntityId::render
   Format              format,
   const std::string&  indent,
   bool                comma,
-  bool                isInVector,
-  const std::string&  assocTag
+  bool                isInVector
 )
 {
   std::string  out              = "";
@@ -112,8 +111,7 @@ std::string EntityId::render
     out += indent + "</" + tag + ">\n";
   }
   else
-  {
-    bool        isAssoc = !assocTag.empty();
+  {    
     std::string indent2 = indent;
 
     if (isInVector)
@@ -121,7 +119,7 @@ std::string EntityId::render
        indent2 += "  ";
     }
 
-    out += (isInVector? indent + (isAssoc? "\"" + assocTag + "\" : ": "") + "{\n": "");
+    out += (isInVector? indent + "{\n" : "");
     out += indent2 + "\"type\" : \""      + typeEscaped      + "\","  + "\n";
     out += indent2 + "\"isPattern\" : \"" + isPatternEscaped + "\","  + "\n";
     out += indent2 + "\"id\" : \""        + idEscaped        + "\"";

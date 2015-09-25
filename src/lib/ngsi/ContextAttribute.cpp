@@ -479,6 +479,7 @@ std::string ContextAttribute::render
       }
 
       out += valueTag(indent + "  ", ((ciP->outFormat == XML)? "contextValue" : "value"),
+                        "value",
                         (request != RtUpdateContextResponse)? effectiveValue : "",
                         ciP->outFormat, commaAfterContextValue, valueIsNumberOrBool);
 

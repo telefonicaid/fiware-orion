@@ -108,7 +108,6 @@ extern std::string valueTag
   const std::string&  value,
   Format              format,
   bool                showComma           = false,
-  bool                isAssociation       = false,
   bool                isVectorElement     = false
 );
 
@@ -118,8 +117,7 @@ extern std::string valueTag
   const std::string&  tagName,
   int                 value,
   Format              format,
-  bool                showComma     = false,
-  bool                isAssociation = false
+  bool                showComma     = false
 );
 
 extern std::string valueTag
@@ -130,7 +128,6 @@ extern std::string valueTag
   const std::string&  value,
   Format              format,
   bool                showComma           = false,
-  bool                isAssociation       = false,
   bool                valueIsNumberOrBool = false
 );
 

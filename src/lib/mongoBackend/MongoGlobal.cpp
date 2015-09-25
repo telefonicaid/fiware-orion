@@ -69,7 +69,6 @@ static std::string          entitiesCollectionName;
 static std::string          registrationsCollectionName;
 static std::string          subscribeContextCollectionName;
 static std::string          subscribeContextAvailabilityCollectionName;
-static std::string          assocationsCollectionName;
 static Notifier*            notifier;
 static bool                 multitenant;
 
@@ -387,16 +386,6 @@ void setSubscribeContextAvailabilityCollectionName(std::string name)
 
 /*****************************************************************************
 *
-* setAssociationsCollectionName -
-*/
-void setAssociationsCollectionName(std::string name)
-{
-  assocationsCollectionName = name;
-}
-
-
-/*****************************************************************************
-*
 * composeCollectionName -
 *
 * Common helper function for composing collection names
@@ -470,16 +459,6 @@ std::string getSubscribeContextCollectionName(std::string tenant)
 std::string getSubscribeContextAvailabilityCollectionName(std::string tenant)
 {
   return composeCollectionName(tenant, subscribeContextAvailabilityCollectionName);
-}
-
-
-/*****************************************************************************
-*
-* getAssociationsCollectionName -
-*/
-std::string getAssociationsCollectionName(std::string tenant)
-{
-  return composeCollectionName(tenant, assocationsCollectionName);
 }
 
 
