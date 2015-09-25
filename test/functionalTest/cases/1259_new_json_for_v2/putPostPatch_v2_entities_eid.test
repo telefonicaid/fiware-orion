@@ -130,54 +130,90 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 912
+Content-Length: 1397
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "compound_object": {
-        "a": 1.0,
-        "b": 2.0
+        "metadata": {},
+        "type": null,
+        "value": {
+            "a": 1.0,
+            "b": 2.0
+        }
     },
-    "compound_vector": [
-        1.0,
-        2.0,
-        3.0
-    ],
-    "false": false,
+    "compound_vector": {
+        "metadata": {},
+        "type": null,
+        "value": [
+            1.0,
+            2.0,
+            3.0
+        ]
+    },
+    "false": {
+        "metadata": {},
+        "type": null,
+        "value": false
+    },
     "false_object": {
+        "metadata": {},
         "type": "TA1",
         "value": false
     },
-    "float": 3.14,
+    "float": {
+        "metadata": {},
+        "type": null,
+        "value": 3.14
+    },
     "float_object": {
+        "metadata": {},
         "type": "TA1",
         "value": 22.1
     },
     "id": "E1",
-    "int": 19.0,
+    "int": {
+        "metadata": {},
+        "type": null,
+        "value": 19.0
+    },
     "int_object": {
+        "metadata": {},
         "type": "TA1",
         "value": 21.0
     },
     "object_object": {
+        "metadata": {},
         "type": "TA1",
         "value": {
             "a": 1.0,
             "b": 2.0
         }
     },
-    "string": "a1",
+    "string": {
+        "metadata": {},
+        "type": null,
+        "value": "a1"
+    },
     "string_object": {
+        "metadata": {},
         "type": "TA1",
         "value": "a1"
     },
-    "true": true,
+    "true": {
+        "metadata": {},
+        "type": null,
+        "value": true
+    },
     "true_object": {
+        "metadata": {},
         "type": "TA1",
         "value": true
     },
+    "type": null,
     "vector_object": {
+        "metadata": {},
         "type": "TA1",
         "value": [
             "a",
@@ -185,31 +221,48 @@ Date: REGEX(.*)
         ]
     },
     "with_metadata01": {
-        "md_false": false,
-        "md_float:": 2.01,
-        "md_int": 1.0,
-        "md_object_false": {
-            "type": "MDBOOL",
-            "value": false
+        "metadata": {
+            "md_false": {
+                "type": null,
+                "value": false
+            },
+            "md_float:": {
+                "type": null,
+                "value": 2.01
+            },
+            "md_int": {
+                "type": null,
+                "value": 1.0
+            },
+            "md_object_false": {
+                "type": "MDBOOL",
+                "value": false
+            },
+            "md_object_float": {
+                "type": "MDFLOAT",
+                "value": 2.01
+            },
+            "md_object_int": {
+                "type": "MDINT",
+                "value": 1.0
+            },
+            "md_object_string": {
+                "type": "MDSTRING",
+                "value": "3"
+            },
+            "md_object_true": {
+                "type": "MDBOOL",
+                "value": true
+            },
+            "md_string": {
+                "type": null,
+                "value": "STRING"
+            },
+            "md_true": {
+                "type": null,
+                "value": true
+            }
         },
-        "md_object_float": {
-            "type": "MDFLOAT",
-            "value": 2.01
-        },
-        "md_object_int": {
-            "type": "MDINT",
-            "value": 1.0
-        },
-        "md_object_string": {
-            "type": "MDSTRING",
-            "value": "3"
-        },
-        "md_object_true": {
-            "type": "MDBOOL",
-            "value": true
-        },
-        "md_string": "STRING",
-        "md_true": true,
         "type": "MT1",
         "value": 0.0
     }

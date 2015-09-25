@@ -876,6 +876,7 @@ static int connectionTreat
   size_t                 dataLen     = *upload_data_size;
   static int             reqNo       = 1;
 
+
   // 1. First call - setup ConnectionInfo and get/check HTTP headers
   if (ciP == NULL)
   {

@@ -526,7 +526,7 @@ std::string ContextAttribute::render
 *        the code paths of the rendering process
 *
 */
-std::string ContextAttribute::toJson(bool isLastElement, bool types)
+std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::string& renderMode)
 {
   std::string  out;
 
@@ -534,44 +534,50 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types)
   {
     out = JSON_STR(name) + ":{" + JSON_STR("type") + ":" + JSON_STR(type) + "}"; 
   }
-  else if ((type == "") && (metadataVector.size() == 0))
+  else if ((renderMode == "values") || (renderMode == "keyValues"))
   {
+    out = (renderMode == "keyValues")? JSON_STR(name) + ":" : "";
+
     if (compoundValueP != NULL)
     {
       if (compoundValueP->isObject())
       {
-        out = JSON_STR(name) + ":{" + compoundValueP->toJson(true) + "}";
+        out += "{" + compoundValueP->toJson(true) + "}";
       }
       else if (compoundValueP->isVector())
       {
-        out = JSON_STR(name) + ":[" + compoundValueP->toJson(true) + "]";
+        out += "[" + compoundValueP->toJson(true) + "]";
       }
     }
     else if (valueType == orion::ValueTypeNumber)
     {
       char num[32];
-
       snprintf(num, sizeof(num), "%f", numberValue);
-      out = JSON_VALUE_NUMBER(name, num);
+      out += num;
     }
     else if (valueType == orion::ValueTypeString)
     {
-      out = JSON_VALUE(name, stringValue);
+      out += JSON_STR(stringValue);
     }
     else if (valueType == orion::ValueTypeBoolean)
     {
-      out = JSON_VALUE_BOOL(name, boolValue);
+      out += (boolValue == true)? "true" : "false";
     }
   }
-  else
+  else  // Render mode: normalized 
   {
     out = JSON_STR(name) + ":{";
 
-    if (type != "")
-    {
-      out += JSON_VALUE("type", type) + ",";
-    }
+    //
+    // type
+    //
+    out += (type != "")? JSON_VALUE("type", type) : JSON_STR("type") + ":" + "null";
+    out += ",";
 
+
+    //
+    // value
+    //
     if (compoundValueP != NULL)
     {
       if (compoundValueP->isObject())
@@ -603,11 +609,12 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types)
     {
       out += JSON_VALUE("value", stringValue);
     }
+    out += ",";
 
-    if (metadataVector.size() > 0)
-    {
-      out += "," + metadataVector.toJson(true);
-    }
+    //
+    // metadata
+    //
+    out += JSON_STR("metadata") + ":" + "{" + metadataVector.toJson(true) + "}";
 
     out += "}";
   }

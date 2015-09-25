@@ -180,48 +180,64 @@ Date: REGEX(.*)
 02. GET /v2/entities/8787GHY/attrs/brand/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 25
+Content-Length: 61
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "value": "Mercedes Benz"
+    "value": {
+        "metadata": {},
+        "type": null,
+        "value": "Mercedes Benz"
+    }
 }
 
 
 03. GET /v2/entities/8787GHY/attrs/model/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 20
+Content-Length: 56
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "value": "Klasse C"
+    "value": {
+        "metadata": {},
+        "type": null,
+        "value": "Klasse C"
+    }
 }
 
 
 04. GET /v2/entities/8787GHY/attrs/speed/value
 ==============================================
 HTTP/1.1 200 OK
-Content-Length: 15
+Content-Length: 51
 Content-Type: application/json
 Date: REGEX(.*)
 
-{ 
-    "value": "150"
+{
+    "value": {
+        "metadata": {},
+        "type": null,
+        "value": "150"
+    }
 }
 
 
 05. GET /v2/entities/8787GHY/attrs/A3/value
 ===========================================
 HTTP/1.1 200 OK
-Content-Length: 23
+Content-Length: 59
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "value": "E1/T1/A3/M1"
+    "value": {
+        "metadata": {},
+        "type": null,
+        "value": "E1/T1/A3/M1"
+    }
 }
 
 

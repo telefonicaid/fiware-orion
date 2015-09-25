@@ -80,7 +80,7 @@ static std::string addedLookup(const std::vector<std::string>& added, std::strin
 * If anybody needs an attribute named 'id' or 'type', then API v1
 * will have to be used to retrieve that information.
 */
-std::string ContextAttributeVector::toJson(bool isLastElement, bool types)
+std::string ContextAttributeVector::toJson(bool isLastElement, bool types, const std::string& renderMode)
 {
   if (vec.size() == 0)
   {
@@ -117,6 +117,12 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types)
   //
   std::string  out;
   int          renderedAttributes = 0;
+
+  if (renderMode == "values")
+  {
+    out = JSON_STR("attributeValues") + ":" + "[";
+  }
+  
   for (unsigned int ix = 0; ix < vec.size(); ++ix)
   {
     if ((vec[ix]->name == "id") || (vec[ix]->name == "type"))
@@ -125,7 +131,12 @@ std::string ContextAttributeVector::toJson(bool isLastElement, bool types)
     }
 
     ++renderedAttributes;
-    out += vec[ix]->toJson(renderedAttributes == validAttributes, types);
+    out += vec[ix]->toJson(renderedAttributes == validAttributes, types, renderMode);
+  }
+
+  if (renderMode == "values")
+  {
+    out += "]";
   }
 
   return out;

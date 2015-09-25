@@ -86,43 +86,51 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1
 =======================
 HTTP/1.1 200 OK
-Content-Length: 255
+Content-Length: 327
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
     "attr01": {
-        "objAndVecInVec": [
-            {
-                "a": 1.0, 
-                "b": "2", 
-                "c": true
-            }, 
-            [
-                1.0, 
-                2.0, 
-                3.0, 
-                4.0, 
-                5.0
-            ]
-        ]
-    }, 
-    "attr2": {
-        "objAndVecInObj": {
-            "nestedObj": {
-                "noa": 1.0, 
-                "nob": "2", 
-                "noc": true, 
-                "nod": false
-            }, 
-            "nestedVec": [
-                "nva", 
-                "nvb", 
-                "nvc"
+        "metadata": {},
+        "type": null,
+        "value": {
+            "objAndVecInVec": [
+                {
+                    "a": 1.0,
+                    "b": "2",
+                    "c": true
+                },
+                [
+                    1.0,
+                    2.0,
+                    3.0,
+                    4.0,
+                    5.0
+                ]
             ]
         }
-    }, 
-    "id": "E1", 
+    },
+    "attr2": {
+        "metadata": {},
+        "type": null,
+        "value": {
+            "objAndVecInObj": {
+                "nestedObj": {
+                    "noa": 1.0,
+                    "nob": "2",
+                    "noc": true,
+                    "nod": false
+                },
+                "nestedVec": [
+                    "nva",
+                    "nvb",
+                    "nvc"
+                ]
+            }
+        }
+    },
+    "id": "E1",
     "type": "T1"
 }
 
