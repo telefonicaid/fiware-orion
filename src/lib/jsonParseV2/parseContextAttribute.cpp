@@ -58,7 +58,8 @@ static std::string parseContextAttributeObject(const Value& start, ContextAttrib
         return "invalid JSON type for attribute type";
       }
 
-      caP->type = iter->value.GetString();
+      caP->type      = iter->value.GetString();
+      caP->typeGiven = true;
     }
     else if (name == "value")
     {
@@ -232,7 +233,7 @@ std::string parseContextAttribute(ConnectionInfo* ciP, ContextAttribute* caP)
     OrionError oe(SccBadRequest, "Errors found in incoming JSON buffer");
 
     LM_W(("Bad Input (JSON parse error)"));
-    ciP->httpStatusCode = SccBadRequest;;
+    ciP->httpStatusCode = SccBadRequest;
     return oe.render(ciP, "");
   }
 
