@@ -30,18 +30,10 @@ brokerStart CB
 --SHELL--
 
 #
-## 01. POST /v2/entities to create E1/T1/A1=0
-## 02. PATCH /v2/entities/E1 (incorrect service path)
+## 01. PATCH /v2/entities/E1 (incorrect service path)
 
 
-echo "01. POST /v2/entities to create E1/T1/A1=0"
-echo "=========================================="
-payload='{ "id": "E1", "type": "T1", "A1": 0 }'
-orionCurl --url /v2/entities --payload "$payload" --json
-echo
-echo
-
-echo "02. PATCH /v2/entities/E1 (incorrect service path)"
+echo "01. PATCH /v2/entities/E1 (incorrect service path)"
 echo "=================================================="
 payload='{ "A1": 1 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --servicePath "/service.sr" --json -X PATCH 
@@ -50,16 +42,7 @@ echo
 
 
 --REGEXPECT--
-01. POST /v2/entities to create E1/T1/A1=0
-==========================================
-HTTP/1.1 201 Created
-Content-Length: 0
-Location: /v2/entities/E1
-Date: REGEX(.*)
-
-
-
-02. PATCH /v2/entities/E1 (incorrect service path)
+01. PATCH /v2/entities/E1 (incorrect service path)
 ==================================================
 HTTP/1.1 400 Bad Request
 Content-Length: 95 
