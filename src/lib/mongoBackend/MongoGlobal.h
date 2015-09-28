@@ -54,11 +54,10 @@ using namespace mongo;
 #define COL_REGISTRATIONS  "registrations"
 #define COL_CSUBS          "csubs"
 #define COL_CASUBS         "casubs"
-#define COL_ASSOCIATIONS   "associations"
 
 /*****************************************************************************
 * Constant string for field names in collection (first characters
-* are the code name: REG_, ENT_, ASUB_, CSUB_, ASSOC_ */
+* are the code name: REG_, ENT_, ASUB_, CSUB */
 
 #define REG_FWS_REGID               "fwdRegId"
 #define REG_CONTEXT_REGISTRATION    "contextRegistration"
@@ -119,14 +118,6 @@ using namespace mongo;
 #define CASUB_LASTNOTIFICATION  "lastNotification"
 #define CASUB_COUNT             "count"
 #define CASUB_FORMAT            "format"
-
-#define ASSOC_SOURCE_ENT        "srcEnt"
-#define ASSOC_TARGET_ENT        "tgtEnt"
-#define ASSOC_ENT_ID            "id"
-#define ASSOC_ENT_TYPE          "type"
-#define ASSOC_ATTRS             "attrs"
-#define ASSOC_ATTRS_SOURCE      "src"
-#define ASSOC_ATTRS_TARGET      "tgt"
 
 #define EARTH_RADIUS_METERS     6371000
 
@@ -261,12 +252,6 @@ extern void setSubscribeContextAvailabilityCollectionName(std::string name);
 
 /*****************************************************************************
 *
-* setAssociationsCollectionName -
-*/
-extern void setAssociationsCollectionName(std::string name);
-
-/*****************************************************************************
-*
 * composeDatabaseName -
 *
 */
@@ -295,12 +280,6 @@ extern std::string getSubscribeContextCollectionName(std::string tenant);
 * getSubscribeContextAvailabilityCollectionName -
 */
 extern std::string getSubscribeContextAvailabilityCollectionName(std::string tenant);
-
-/*****************************************************************************
-*
-* getAssociationsCollectionName -
-*/
-extern std::string getAssociationsCollectionName(std::string tenant);
 
 /*****************************************************************************
 *

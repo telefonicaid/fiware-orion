@@ -115,9 +115,6 @@ function dbInit()
   if [ "$role" == "CB" ]
   then
     echo 'db.dropDatabase()' | mongo $host:$port/${CB_DATABASE_NAME} --quiet
-  elif [ "$role" == "CM" ]
-  then
-    echo 'db.dropDatabase()' | mongo $host:$port/${CM_DATABASE_NAME} --quiet
   elif [ "$role" == "CP1" ]
   then
     echo 'db.dropDatabase()' | mongo $host:$port/${CP1_DATABASE_NAME} --quiet
@@ -336,11 +333,6 @@ function localBrokerStart()
   then
     port=$CB_PORT
     CB_START_CMD="contextBroker -harakiri -port $CB_PORT  -pidpath $CB_PID_FILE  -dbhost $dbHost:$dbPort -db $CB_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption $extraParams"
-  elif [ "$role" == "CM" ]
-  then
-    mkdir -p $CM_LOG_DIR
-    port=$CM_PORT
-    CB_START_CMD="contextBroker -harakiri -port $CM_PORT  -pidpath $CM_PID_FILE -dbhost $dbHost:$dbPort  -db $CM_DATABASE_NAME -dbPoolSize $POOL_SIZE -t $traceLevels $IPvOption -logDir $CM_LOG_DIR -fwdPort $CB_PORT -ngsi9 $extraParams"
   elif [ "$role" == "CP1" ]
   then
     mkdir -p $CP1_LOG_DIR
@@ -422,9 +414,6 @@ function localBrokerStop
   if [ "$role" == "CB" ]
   then
     port=$CB_PORT
-  elif [ "$role" == "CM" ]
-  then
-    port=$CM_PORT
   elif [ "$role" == "CP1" ]
   then
     port=$CP1_PORT
@@ -523,10 +512,6 @@ function brokerStop
     port=$CB_PORT
     vMsg pidFile: $pidFile
     vMsg port: $port
-  elif [ "$role" == "CM" ]
-  then
-    pidFile=$CM_PID_FILE
-    port=$CM_PORT
   elif [ "$role" == "CP1" ]
   then
     pidFile=$CP1_PID_FILE

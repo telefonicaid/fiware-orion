@@ -29,7 +29,6 @@
 
 #include "common/Format.h"
 #include "orionTypes/areas.h"
-#include "ngsi/AttributeAssociation.h"
 #include "ngsi/EntityId.h"
 #include "ngsi/ContextRegistrationAttribute.h"
 #include "ngsi/ContextElementResponse.h"
@@ -70,7 +69,6 @@ typedef struct RegisterContextData
   ContextRegistrationAttribute*  attributeP;
   Metadata*                      attributeMetadataP;
   Metadata*                      registrationMetadataP;
-  AttributeAssociation*          attributeAssociationP;
 } RegisterContextData;
 
 

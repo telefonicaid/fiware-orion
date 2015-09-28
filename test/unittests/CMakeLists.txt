@@ -155,9 +155,6 @@ SET (SOURCES
     ngsi/ContextAttribute_test.cpp
     ngsi/ContextElement_test.cpp
     ngsi/NotifyCondition_test.cpp
-    ngsi/AttributeAssociation_test.cpp
-    ngsi/Association_test.cpp
-    ngsi/AttributeAssociationList_test.cpp
     ngsi/AttributeDomainName_test.cpp
     ngsi/AttributeList_test.cpp
     ngsi/ConditionValueList_test.cpp
@@ -223,7 +220,6 @@ SET (SOURCES
     jsonParse/jsonRequest_test.cpp
 
     xmlParse/xmlAppendContextElementRequest_test.cpp
-    xmlParse/xmlRegisterContextRequest_test.cpp
     xmlParse/xmlRegisterContextResponse_test.cpp
     xmlParse/xmlRequest_test.cpp
     xmlParse/xmlUpdateContextElementRequest_test.cpp

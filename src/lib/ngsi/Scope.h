@@ -39,11 +39,6 @@ using namespace orion;
 *
 * Defined scopes so far
 */
-#define SCOPE_TYPE_ASSOC           "IncludeAssociations"
-#define SCOPE_VALUE_ASSOC_SOURCE   "SOURCES"
-#define SCOPE_VALUE_ASSOC_TARGET   "TARGETS"
-#define SCOPE_VALUE_ASSOC_ALL      "ALL"
-
 #define SCOPE_OPERATOR_NOT           "Not"
 
 #define SCOPE_FILTER                 "FIWARE" "::" "Filter"

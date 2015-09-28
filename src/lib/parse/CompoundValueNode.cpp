@@ -581,7 +581,7 @@ std::string CompoundValueNode::render(ConnectionInfo* ciP, Format format, const 
   if (valueType == orion::ValueTypeString)
   {
     LM_T(LmtCompoundValueRender, ("I am a String (%s)", name.c_str()));
-    out = valueTag(indent, tagName, stringValue, format, jsonComma, false, container->valueType == orion::ValueTypeVector);
+    out = valueTag(indent, tagName, stringValue, format, jsonComma, container->valueType == orion::ValueTypeVector);
   }
   else if ((valueType == orion::ValueTypeVector) && (container != this))
   {

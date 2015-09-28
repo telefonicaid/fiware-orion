@@ -14,11 +14,11 @@ not mantained or evolved any longer. In particular:
 A list of deprecated features and the version in which they were deprecated follows:
 
 * XML is deprecated since Orion 0.23.0.
-* Deprecated command line arguments in Orion 0.21.0:
+* Deprecated command line arguments in Orion 0.21.0 (removed in 0.25.0):
 	* **-ngsi9**. The broker runs only NGSI9 (NGSI10 is not used).
 	* **-fwdHost <host>**. Forwarding host for NGIS9 registerContext when
     the broker runs in "ConfMan mode".
 	* **-fwdPort <port>**. Forwarding port for NGIS9 registerContext when
     the broker runs in "ConfMan mode".
-* Configuration Manager role (deprecated in 0.21.0)
-* Associations (deprecated in 0.21.0).
+* Configuration Manager role (deprecated in 0.21.0, removed in 0.25.0)
+* Associations (deprecated in 0.21.0, removed in 0.25.0).

@@ -66,8 +66,7 @@ class EntityId
   std::string  render(Format              format,
                       const std::string&  indent,
                       bool                comma      = false,
-                      bool                isInVector = false,
-                      const std::string&  assocTag   = "");
+                      bool                isInVector = false);
 
   std::string  check(RequestType          requestType,
                      Format               format,
