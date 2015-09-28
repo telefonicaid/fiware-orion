@@ -36,20 +36,32 @@ std::string toJsonString(const std::string& input)
 
   ss << '"';
   for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
+  {
+    switch (char ch = *iter)
     {
-      switch (*iter)
+    case '\\': ss << "\\\\"; break;
+    case '"': ss << "\\\""; break;
+    case '/': ss << "\\/"; break;
+    case '\b': ss << "\\b"; break;
+    case '\f': ss << "\\f"; break;
+    case '\n': ss << "\\n"; break;
+    case '\r': ss << "\\r"; break;
+    case '\t': ss << "\\t"; break;
+    default:
+      if (ch >= 0 && ch <= 0x1F)
       {
-      case '\\': ss << "\\\\"; break;
-      case '"': ss << "\\\""; break;
-      case '/': ss << "\\/"; break;
-      case '\b': ss << "\\b"; break;
-      case '\f': ss << "\\f"; break;
-      case '\n': ss << "\\n"; break;
-      case '\r': ss << "\\r"; break;
-      case '\t': ss << "\\t"; break;
-      default: ss << *iter; break;
+        static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' } ;
+
+        ss << "\\u00" << intToHex[(ch & 0xF0) >> 4] << intToHex[ch & 0x0F];
       }
-    }
+      else
+      {
+        ss << ch;
+      }
+      break;
+    } //end-switch
+
+  } //end-for
   ss << '"';
   return ss.str();
 }
