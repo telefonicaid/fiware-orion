@@ -13,6 +13,8 @@ GITHUB_SOURCE: http://github.com/telefonicaid/fiware-orion.git
 This specification defines the FIWARE-NGSI version 2 API. FIWARE-NGSI v2 is intended to manage all the whole lifecycle of
 context information including updates, queries, registrations and subscriptions.
 
+# Preface
+
 ## Editors
 
   + José Manuel Cantera Fonseca, Telefónica I+D
@@ -261,9 +263,9 @@ and attributes, that can be used in the operations that support the `canonical` 
 
 In the case of being present, the error payload is JSON object including the following fields:
 
-* `error` (mandatory): a textual description of the error.
-* `description` (optional): additional information about the error.
-* `affectedItems` (optional): a list of elements affected by the error. Depending on the operation, it may
++ `error` (required, string): a textual description of the error.
++ `description` (optional, string): additional information about the error.
++ `affectedItems` (optional, array[string]): a list of elements affected by the error. Depending on the operation, it may
   refer to entities, registrations or subscriptions.
 
 Error list (HTTP response code in paranthesis):
@@ -370,13 +372,10 @@ specified by the **geometry** parameter:
   is the center of the circle.
 + In the case of `polygon` includes a list of elements, which are the vertices of the polygon.
 
-# REST API
 
-# Group NGSIv2
+## Group API Entry Point
 
-## API Entry Point [/v2]
-
-### Retrieve Entry Points [GET /v2]
+### Retrieve API Resources [GET /v2]
 
 This resource does not have any attributes. Instead it offers the initial
 API affordances in the form of the links in the JSON body.
@@ -386,22 +385,16 @@ It is recommended to follow the “url” link values,
 applicable to retrieve resources. Instead of constructing your own URLs,
 to keep your client decoupled from implementation details.
 
-+ Attributes(object)
-    + entities_url (required, string) - URL which points to the entities resource
-    + types_url (required, string) - URL which points to the types resource
-    + subscriptions_url (required, string) - URL which points to the subscriptions resource
-    + registrations_url (required, string) - URL which points to the registrations resource
 
 + Response 200 (application/json)
 
-        {
-            "entities_url":      "/v2/entities",
-            "types_url":         "/v2/types",
-            "subscriptions_url": "/v2/subscriptions",
-            "registrations_url": "/v2/registrations"
-        }
+    + Attributes (object)
+        + entities_url: /v2/entities (required, string) - URL which points to the entities resource
+        + types_url: /v2/types (required, string) - URL which points to the types resource
+        + subscriptions_url: /v2/subscriptions (required, string) - URL which points to the subscriptions resource
+        + registrations_url: /v2/registrations (required, string) - URL which points to the registrations resource
 
-## Entities [/v2/entities{?limit,offset,options,type,id,idPattern,q,geometry,coords,attrs}]
+# Group Entities
 
 ### List entities [GET /v2/entities{?limit,offset,options,type,id,idPattern,q,geometry,coords,attrs}]
 
@@ -511,7 +504,7 @@ Response:
 
 ## Entity by ID [/v2/entities/{entityId}{?attrs,options}]
 
-### Retrieve entity [GET /v2/entities/{entityId}{?attrs}]
+### Retrieve entity [GET /v2/entities/{entityId}{?attrs,options}]
 
 The response is an object representing the entity identified by the ID. The object follows
 the JSON entity representation format (described in a section above).
@@ -650,6 +643,8 @@ Response:
 + Response 204
 
 
+# Group Attributes
+
 ## Attribute by Entity ID [/v2/entities/{entityId}/attrs/{attrName}]
 
 ### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}]
@@ -713,7 +708,9 @@ Response:
 + Response 204
 
 
-## Attribute Value by Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value{?options}]
+# Group Attribute Value
+
+## By Entity ID [/v2/entities/{entityId}/attrs/{attrName}/value{?options}]
 
 ### Get attribute data [GET /v2/entities/{entityId}/attrs/{attrName}/value{?options}]
 
@@ -758,6 +755,7 @@ Response:
 
 + Response 200
 
+# Group Types
 
 ## Entity types [/v2/types{?limit,offset,options}]
 
@@ -850,32 +848,32 @@ Response code:
             "count": 7
           }
 
-## Context Subscriptions [/v2/entities/{entityId}/subscriptions]
+# Group Subscriptions
 
 A subscription is represented by a JSON object with the following fields:
 
-* `id`: Subscription unique identifier. Automatically created at creation time.
-* `subject`: It is an object that describes the subject of the subscription.
-* `notification`: It is an object that describes the notification received by the subscriber.
-* `duration`: Duration of the subscription in ISO8601 format. Infinite if not specified.
++ `id`: Subscription unique identifier. Automatically created at creation time.
++ `subject`: It is an object that describes the subject of the subscription.
++ `notification`: It is an object that describes the notification received by the subscriber.
++ `duration`: Duration of the subscription in ISO8601 format. Infinite if not specified.
 
 A `subject` contains the following subfields:
 
-* `entities`: A list of objects, each one composed of the following subfields (`id`/`idPattern` or `type` must be present):
- * `id` or `idPattern`: Id or pattern of the affected entities (optional). Both cannot be used at the same time.
- * `type`: Type of the affected entities (optional).
-* `condition`: Condition that will trigger the notification. It can have two optional properties:
- * `attributes`: array of attribute names
- * `expression`: an expression composed of `q`, `geometry` and `coords` (see "List entities" operation above
++ `entities`: A list of objects, each one composed of the following subfields (`id`/`idPattern` or `type` must be present):
+    + `id` or `idPattern`: Id or pattern of the affected entities (optional). Both cannot be used at the same time.
+    + `type`: Type of the affected entities (optional).
++ `condition`: Condition that will trigger the notification. It can have two optional properties:
+    + `attributes`: array of attribute names
+    + `expression`: an expression composed of `q`, `geometry` and `coords` (see "List entities" operation above
    about this field).
 
 A `notification` object contains the following subfields:
 
-* `attributes`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
++ `attributes`: List of attributes to be included in the notification message. If not specified (or empty), all attributes are included
   in the notification
-* `callback` : URL pointing to the service which will be invoked when a notification is generated. A NGSIv2
++ `callback` : URL pointing to the service which will be invoked when a notification is generated. A NGSIv2
   compliant server must support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
-* `throttling`: Minimal period of time (in ISO8601 format) which must elapse between two consecutive notifications. It
++ `throttling`: Minimal period of time (in ISO8601 format) which must elapse between two consecutive notifications. It
   is optional.
 
 Notification rules are as follow:
@@ -887,8 +885,9 @@ Notification rules are as follow:
   at the same time `expression` matches.
 * If neither `attributes` or `expression` are used, a notification is sent whenever any of the attributes of the entity changes.
 
+## Subscription List [/v2/subscriptions]
 
-### List subscriptions [GET /v2/subscriptions]
+### Retrieve subscriptions [GET /v2/subscriptions]
 
 Returns a list of all the subscriptions present in the system
 
@@ -924,6 +923,7 @@ Response:
                 "duration": "PT1M"
             }
         ]
+
 
 ### Create a new subscription [POST /v2/subscriptions]
 
@@ -965,7 +965,10 @@ Response:
 
             Location: /v2/subscriptions/abcde98765
 
-### Get subscription [GET /v2/subscriptions/{subscriptionId}]
+
+## Subscription By ID [/v2/subscriptions/{subscriptionId}]
+
+### Retrieve subscription [GET /v2/subscriptions/{subscriptionId}]
 
 The response is the subscription represented by a JSON object as described at the beginning of this section.
 
@@ -1002,6 +1005,7 @@ Response:
             "duration": "PT1M"
         }
 
+
 ### Update subscription [PATCH /v2/subscriptions/{subscriptionId}]
 
 Only the fields included in the request are updated in the subscription.
@@ -1036,27 +1040,29 @@ Response:
 
 + Response 204
 
-## Context Provider Registration [/v2/registrations]
+# Group Registrations
 
 Context Registration allows to associate external services to context data. One of the main
 use cases of this functionality is the association of Context Providers.
 
 A context registration is represented by a JSON object with the following fields:
 
-* `id`: Unique identifier assigned to the registration. Automatically created at creation time.
-* `subject` : It s an object that describes the subject of the registration.
-* `callback` : URL pointing to the service which is registered. In the case of a Context Provider
++ `id`: Unique identifier assigned to the registration. Automatically created at creation time.
++ `subject` : It s an object that describes the subject of the registration.
++ `callback` : URL pointing to the service which is registered. In the case of a Context Provider
 corresponds to the URL of the provider service.
-* `duration`: Duration of the registration in ISO8601 format. Default duration is infinite.
++ `duration`: Duration of the registration in ISO8601 format. Default duration is infinite.
 
 A `subject` contains the following subfields:
 
-* `entities`: A list of objects, each one composed of the following subfields (`id`/`idPattern` or type must be present):
- * `id` or `idPattern`: Id or pattern of the affected entities (optional). Both cannot be used at the same time.
- * `type`: Type of the affected entities (optional).
-* `attributes`: List of attributes to be provided (if not specified it would mean all).
++ `entities`: A list of objects, each one composed of the following subfields (`id`/`idPattern` or type must be present):
+    + `id` or `idPattern`: Id or pattern of the affected entities (optional). Both cannot be used at the same time.
+    + `type`: Type of the affected entities (optional).
++ `attributes`: List of attributes to be provided (if not specified it would mean all).
 
-### List registrations [GET /v2/registrations]
+## Registration list [/v2/registrations]
+
+### Retrieve registrations [GET /v2/registrations]
 
 Lists all the registrations present in the system.
 
@@ -1120,7 +1126,9 @@ Response:
 
             Location: /v2/registrations/abcde98765
 
-### Get context provider registration [GET /v2/registrations/{registrationId}]
+## Registration By ID [/v2/registrations/{registrationId}]
+
+### Retrieve context provider registration [GET /v2/registrations/{registrationId}]
 
 The response is the registration represented by a JSON object as described at the beginning of this section.
 
@@ -1160,7 +1168,7 @@ Response:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
-    + redId: abcdef (required, string) - registration Id.
+    + registrationId: abcdef (required, string) - registration Id.
 
 + Request (application/json)
 
@@ -1180,19 +1188,19 @@ Response:
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
 
 + Parameters
-    + redId: abcdef (required, string) - registration Id.
+    + registrationId: abcdef (required, string) - registration Id.
 
 + Response 204
 
-## POJ RPC Operations [/v2/op]
+# Group POJ RPC Operations
 
 ### Update [POST /v2/op/update]
 
 This operation allows to create, update and/or delete several entities in a single batch operation.
 The payload is an object with two properties:
 
-* `actionType`, to specify the kind of update action to do: either APPEND, APPEND_STRICT, UPDATE, DELETE.
-* `entities`, an array of entities, each one specified using the JSON entity representation format (described
++ `actionType`, to specify the kind of update action to do: either APPEND, APPEND_STRICT, UPDATE, DELETE.
++ `entities`, an array of entities, each one specified using the JSON entity representation format (described
   in a section above).
 
 Response:
@@ -1230,14 +1238,14 @@ the JSON entity representation format (described in a section above).
 
 The payload may contain the following elements (all of them optional):
 
-* `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
++ `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
   elements:
-   * `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
+    + `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
      or pattern (in the case of `idPattern`) of the entities to search for. If omitted, it means "any entity
      ID".
-   * `type`: specifies the type of the entities to search for. If omitted, it means "any entity type".
-* `attributes`: a list of attributes names to search for. If omitted, it means "any attribute".
-* `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
+    + `type`: specifies the type of the entities to search for. If omitted, it means "any entity type".
++ `attributes`: a list of attributes names to search for. If omitted, it means "any attribute".
++ `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
    object with a `type` (a JSON string) and `value` (whose type depends on the `type` property). The
    different available scopes are described elsewhere.
 
@@ -1316,8 +1324,8 @@ Response code:
 This operation allows to create, update and/or delete several registrations in a single batch operation.
 The payload is an object with two properties:
 
-* `actionType`, to specify the kind of register action to do: either CREATE, UPDATE, DELETE.
-* `registrations`, an array of registration, each one specified using the JSON registration representation
++ `actionType`, to specify the kind of register action to do: either CREATE, UPDATE, DELETE.
++ `registrations`, an array of registration, each one specified using the JSON registration representation
   format (described in a section above). In the case of CREATE operation, the registration `id` must not be
   included.
 
@@ -1378,14 +1386,14 @@ the JSON registration representation format (described in a section above).
 
 The payload may contain the following elements (all of them optional):
 
-* `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
++ `entities`: a list of entites to search for. Each entity is represented by a JSON object with the following
   elements:
-   * `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
+    + `id` or `idPattern` (both cannot be used at the same time): specifies the exact ID (in the case of `id`)
      or pattern (in the case of `idPattern`) of the entities to search for. If omitted, it means "any entity
      ID".
-   * `type`: specifies the type of the entities to search for. If omitted, it means "any entity type".
-* `attributes`: a list of attributes names to search for. If omitted, it means "any attribute".
-* `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
+    + `type`: specifies the type of the entities to search for. If omitted, it means "any entity type".
++ `attributes`: a list of attributes names to search for. If omitted, it means "any attribute".
++ `scopes`: a list of scopes to restrict the results of the query. Each scope is represented by a JSON
    object with a `type` (a JSON string) and `value` (whose type depends on the `type` property). The
    different available scopes are described elsewhere.
 
@@ -1460,7 +1468,7 @@ Response code:
           }
         ]
 
-## OMA-NGSI Operations [/v2/subscribeContext]
+# Group OMA-NGSI Operations
 
 (The need/usefulness of these operations is currently under discussion)
 
