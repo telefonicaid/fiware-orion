@@ -948,49 +948,7 @@ static int connectionTreat
     if (ciP->outFormat == NOFORMAT)
       ciP->outFormat = XML; // XML is default output format
 
-    if (urlCheck(ciP, ciP->url) == false)
-    {
-      LM_W(("Bad Input (error in URI path)"));
-      restReply(ciP, ciP->answer);
-      return MHD_YES;
-    }
-
-    ciP->servicePath = ciP->httpHeaders.servicePath;
-
-    if (contentTypeCheck(ciP) != 0)
-    {
-      LM_W(("Bad Input (invalid mime-type in Content-Type http-header)"));
-      restReply(ciP, ciP->answer);
-    }
-    else if (outFormatCheck(ciP) != 0)
-    {
-      LM_W(("Bad Input (invalid mime-type in Accept http-header)"));
-      restReply(ciP, ciP->answer);
-    }
-    else
-      ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
-
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
-    if (ciP->httpStatusCode != SccOk)
-    {
-      LM_W(("Bad Input (error in URI parameters)"));
-      restReply(ciP, ciP->answer);
-      return MHD_YES;
-    }
-    LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
-
-    // Set default mime-type for notifications
-    if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
-    {
-      if (ciP->outFormat == XML)
-        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
-      else if (ciP->outFormat == JSON)
-        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
-      else
-        ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = DEFAULT_FORMAT_AS_STRING;
-
-      LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
-    }
 
     return MHD_YES;
   }
@@ -1035,13 +993,56 @@ static int connectionTreat
   }
 
   // 3. Finally, serve the request (unless an error has occurred)
+  // 
+  // URL and headers checks are delayed to third MHD call 
+  //
   
-  // ServicePath check is delayed to third MHD call 
+  if (urlCheck(ciP, ciP->url) == false)
+  {
+    LM_W(("Bad Input (error in URI path)"));
+    restReply(ciP, ciP->answer);
+  }
+
+  ciP->servicePath = ciP->httpHeaders.servicePath;
+
   if (servicePathSplit(ciP) != 0)
   {
     LM_W(("Bad Input (error in ServicePath http-header)"));
     restReply(ciP, ciP->answer);
+  }
+
+  if (contentTypeCheck(ciP) != 0)
+  {
+    LM_W(("Bad Input (invalid mime-type in Content-Type http-header)"));
+    restReply(ciP, ciP->answer);
+  }
+  else if (outFormatCheck(ciP) != 0)
+  {
+    LM_W(("Bad Input (invalid mime-type in Accept http-header)"));
+    restReply(ciP, ciP->answer);
+  }
+  else
+    ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
+
+  if (ciP->httpStatusCode != SccOk)
+  {
+    LM_W(("Bad Input (error in URI parameters)"));
+    restReply(ciP, ciP->answer);
     return MHD_YES;
+  }
+  LM_T(LmtUriParams, ("notifyFormat: '%s'", ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
+
+  // Set default mime-type for notifications
+  if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
+  {
+    if (ciP->outFormat == XML)
+      ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+    else if (ciP->outFormat == JSON)
+      ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
+    else
+      ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = DEFAULT_FORMAT_AS_STRING;
+    
+    LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
   }
 
   if (((ciP->verb == POST) || (ciP->verb == PUT) || (ciP->verb == PATCH )) && (ciP->httpHeaders.contentLength == 0) && (strncasecmp(ciP->url.c_str(), "/log/", 5) != 0))

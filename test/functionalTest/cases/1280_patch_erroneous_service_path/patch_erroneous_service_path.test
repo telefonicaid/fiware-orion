@@ -30,10 +30,20 @@ brokerStart CB
 --SHELL--
 
 #
-## 01. PATCH /v2/entities/E1 (incorrect service path)
+## 01. PATCH /v2/ent=ities/E1 (invalid URI)
+## 02. PATCH /v2/entities/E1 (incorrect service path)
+## 03. PATCH //v2/entities/E1 (service path without /) 
+## 04. PATCH //v2/entities/E1 (unrecognized content type)
 
 
-echo "01. PATCH /v2/entities/E1 (incorrect service path)"
+echo "01. PATCH /v2/ent=ities/E1 (invalid URI)"
+echo "========================================"
+payload='{ "A1": 1 }'
+orionCurl --url /v2/ent=ities/E1 --payload "$payload" --json -X PATCH 
+echo
+echo
+
+echo "02. PATCH /v2/entities/E1 (incorrect service path)"
 echo "=================================================="
 payload='{ "A1": 1 }'
 orionCurl --url /v2/entities/E1 --payload "$payload" --servicePath "/service.sr" --json -X PATCH 
@@ -41,11 +51,38 @@ echo
 echo
 
 
+echo "03. PATCH /v2/entities/E1 (service path without /)"
+echo "=================================================="
+payload='{ "A1": 1 }'
+orionCurl --url /v2/entities/E1 --payload "$payload" --servicePath "miservice" --json -X PATCH
+echo
+echo
+
+
+echo "04. PATCH /v2/entities/E1 (unrecognized content type)"
+echo "====================================================="
+payload='<?xml version="1.0" encoding="UTF-8"?>'
+orionCurl --url /v2/entities/E1 --payload "${payload}" --in "text/plain" --out "application/json" -X PATCH 
+echo
+
 --REGEXPECT--
-01. PATCH /v2/entities/E1 (incorrect service path)
+01. PATCH /v2/ent=ities/E1 (invalid URI)
+========================================
+HTTP/1.1 400 Bad Request
+Content-Length: 63 
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "invalid character in URI",
+    "error": "BadRequest"
+}
+
+
+02. PATCH /v2/entities/E1 (incorrect service path)
 ==================================================
 HTTP/1.1 400 Bad Request
-Content-Length: 95 
+Content-Length: 95
 Content-Type: application/json
 Date: REGEX(.*)
 
@@ -54,6 +91,31 @@ Date: REGEX(.*)
     "error": "BadRequest"
 }
 
+
+03. PATCH /v2/entities/E1 (service path without /)
+==================================================
+HTTP/1.1 400 Bad Request
+Content-Length: 111
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Only /absolute/ Service Paths allowed [a service path must begin with /]",
+    "error": "BadRequest"
+}
+
+
+04. PATCH /v2/entities/E1 (unrecognized content type)
+=====================================================
+HTTP/1.1 415 Unsupported Media Type
+Content-Length: 87
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "not supported content type: text/plain",
+    "error": "UnsupportedMediaType"
+}
 
 --TEARDOWN--
 brokerStop CB
