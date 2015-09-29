@@ -56,8 +56,8 @@ echo
 
 echo '03. PUT /v2/entities/E1/attrs/A1/value (="")'
 echo "============================================"
-payload='{ "value": "" }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='""'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -71,8 +71,8 @@ echo
 
 echo "05. PUT /v2/entities/E1/attrs/A1/value (=5)"
 echo "==========================================="
-payload='{ "value": 5 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='5'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -86,8 +86,8 @@ echo
 
 echo '07. PUT /v2/entities/E1/attrs/A1/value (="")'
 echo "============================================"
-payload='{ "value": "" }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='""'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 

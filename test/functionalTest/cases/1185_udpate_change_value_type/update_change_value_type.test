@@ -64,8 +64,8 @@ echo
 
 echo "03. PUT /v2/entities/E1/attrs/A1/value (=false)"
 echo "==============================================="
-payload='{ "value": false }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='false'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -79,8 +79,8 @@ echo
 
 echo "05. PUT /v2/entities/E1/attrs/A1/value (=0)"
 echo "==========================================="
-payload='{ "value": 0 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='0'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -94,8 +94,8 @@ echo
 
 echo '07. PUT /v2/entities/E1/attrs/A1/value (="x")'
 echo "============================================="
-payload='{ "value": "x" }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='"x"'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -106,10 +106,11 @@ orionCurl --url /v2/entities/E1 --json
 echo
 echo
 
+
 echo '09. PUT /v2/entities/E1/attrs/A1/value (=false)'
 echo "==============================================="
-payload='{ "value": false }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='false'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -123,8 +124,8 @@ echo
 
 echo '11. PUT /v2/entities/E1/attrs/A1/value (="x")'
 echo "============================================="
-payload='{ "value": "x" }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='"x"'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
@@ -138,8 +139,8 @@ echo
 
 echo '13. PUT /v2/entities/E1/attrs/A1/value (=0)'
 echo "==========================================="
-payload='{ "value":  0 }'
-orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --json -X PUT
+payload='0'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" --in text/plain --out json -X PUT
 echo
 echo
 
