@@ -102,9 +102,13 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
   if (key == URI_PARAM_NOTIFY_FORMAT)
   {
     if (strcasecmp(val, "xml") == 0)
+    {
       value = "XML";
+    }
     else if (strcasecmp(val, "json") == 0)
+    {
       value = "JSON";
+    }
     else
     {
       OrionError error(SccBadRequest, std::string("Bad notification format: /") + value + "/. Valid values: /XML/ and /JSON/");
@@ -199,9 +203,13 @@ static int uriArgumentGet(void* cbDataP, MHD_ValueKind kind, const char* ckey, c
     LM_T(LmtUriParams, ("Received unrecognized URI parameter: '%s'", key.c_str()));
 
   if (val != NULL)
+  {
     ciP->uriParam[key] = value;
+  }
   else
+  {
     ciP->uriParam[key] = "SET";
+  }
 
   LM_T(LmtUriParams, ("URI parameter:   %s: %s", key.c_str(), ciP->uriParam[key].c_str()));
 
@@ -449,7 +457,9 @@ static void requestCompleted
   ConnectionInfo* ciP      = (ConnectionInfo*) *con_cls;
 
   if ((ciP->payload != NULL) && (ciP->payload != static_buffer))
+  {
     free(ciP->payload);
+  }
 
   delete(ciP);
   *con_cls = NULL;
@@ -946,7 +956,9 @@ static int connectionTreat
     ciP->tenantFromHttpHeader = strToLower(tenant, ciP->httpHeaders.tenant.c_str(), sizeof(tenant));
     ciP->outFormat            = wantedOutputSupported(ciP->apiVersion, ciP->httpHeaders.accept, &ciP->charset);
     if (ciP->outFormat == NOFORMAT)
+    {
       ciP->outFormat = XML; // XML is default output format
+    }
 
     MHD_get_connection_values(connection, MHD_GET_ARGUMENT_KIND, uriArgumentGet, ciP);
 
@@ -966,9 +978,13 @@ static int connectionTreat
       if (ciP->httpHeaders.contentLength <= PAYLOAD_MAX_SIZE)
       {
         if (ciP->httpHeaders.contentLength > STATIC_BUFFER_SIZE)
+        {
           ciP->payload = (char*) malloc(ciP->httpHeaders.contentLength + 1);
+        }
         else
+        {
           ciP->payload = static_buffer;
+        }
 
         ciP->payloadSize = dataLen;
         memcpy(ciP->payload, upload_data, dataLen);
@@ -987,7 +1003,9 @@ static int connectionTreat
       *upload_data_size = 0;
     }
     else
+    {
       LM_T(LmtPartialPayload, ("Got %d of payload of %d bytes", dataLen, ciP->httpHeaders.contentLength));
+    }
 
     return MHD_YES;
   }
@@ -1022,7 +1040,9 @@ static int connectionTreat
     restReply(ciP, ciP->answer);
   }
   else
+  {
     ciP->inFormat = formatParse(ciP->httpHeaders.contentType, NULL);
+  }
 
   if (ciP->httpStatusCode != SccOk)
   {
@@ -1036,11 +1056,17 @@ static int connectionTreat
   if (ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] == "")
   {
     if (ciP->outFormat == XML)
+    {
       ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "XML";
+    }
     else if (ciP->outFormat == JSON)
+    {
       ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = "JSON";
+    }
     else
+    {
       ciP->uriParam[URI_PARAM_NOTIFY_FORMAT] = DEFAULT_FORMAT_AS_STRING;
+    }
     
     LM_T(LmtUriParams, ("'default' value for notifyFormat (ciP->outFormat == %d)): '%s'", ciP->outFormat, ciP->uriParam[URI_PARAM_NOTIFY_FORMAT].c_str()));
   }
@@ -1225,15 +1251,23 @@ void restInit
   strncpy(bindIPv6, LOCAL_IP_V6, MAX_LEN_IP - 1);
 
   if (isIPv6(std::string(_bindAddress)))
+  {
     strncpy(bindIPv6, _bindAddress, MAX_LEN_IP - 1);
+  }
   else
+  {
     strncpy(bindIp, _bindAddress, MAX_LEN_IP - 1);
+  }
 
   if ((_ipVersion == IPV4) || (_ipVersion == IPDUAL))
+  {
      strncpy(bindIp, bindIp, MAX_LEN_IP - 1);
+  }
 
   if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
+  {
      strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
+  }
 
   // Starting REST interface
   int r;

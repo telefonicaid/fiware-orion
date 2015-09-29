@@ -30,10 +30,10 @@ brokerStart CB
 --SHELL--
 
 #
-## 01. PATCH /v2/ent=ities/E1 (invalid URI)
-## 02. PATCH /v2/entities/E1 (incorrect service path)
-## 03. PATCH //v2/entities/E1 (service path without /) 
-## 04. PATCH //v2/entities/E1 (unrecognized content type)
+# 01. PATCH /v2/ent=ities/E1 (invalid URI)
+# 02. PATCH /v2/entities/E1 (incorrect service path)
+# 03. PATCH /v2/entities/E1 (service path without /) 
+# 04. PATCH /v2/entities/E1 (unrecognized content type)
 
 
 echo "01. PATCH /v2/ent=ities/E1 (invalid URI)"
@@ -63,6 +63,7 @@ echo "04. PATCH /v2/entities/E1 (unrecognized content type)"
 echo "====================================================="
 payload='<?xml version="1.0" encoding="UTF-8"?>'
 orionCurl --url /v2/entities/E1 --payload "${payload}" --in "text/plain" --out "application/json" -X PATCH 
+echo
 echo
 
 --REGEXPECT--
@@ -117,7 +118,7 @@ Date: REGEX(.*)
     "error": "UnsupportedMediaType"
 }
 
+
 --TEARDOWN--
 brokerStop CB
 dbDrop CB
-
