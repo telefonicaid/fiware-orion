@@ -60,14 +60,11 @@ TEST(Metadata, render)
   std::string  out;
   Metadata     m1;
   Metadata     m2("Name", "Integer", "19");
-  Metadata     m3("Name", "Association", "27");
 
   const char*  outfile1 = "ngsi.metdata.render1.middle.xml";
   const char*  outfile2 = "ngsi.metdata.render1.middle.json";
   const char*  outfile3 = "ngsi.metdata.render2.middle.xml";
   const char*  outfile4 = "ngsi.metdata.render2.middle.json";
-  const char*  outfile5 = "ngsi.metdata.render3.middle.xml";
-  const char*  outfile6 = "ngsi.metdata.render3.middle.json";
 
   utInit();
 
@@ -86,13 +83,6 @@ TEST(Metadata, render)
   EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile4)) << "Error getting test data from '" << outfile4 << "'";
   EXPECT_STREQ(expectedBuf, out.c_str());
 
-  out = m3.render(XML, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile5)) << "Error getting test data from '" << outfile5 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-  out = m3.render(JSON, "");
-  EXPECT_EQ("OK", testDataFromFile(expectedBuf, sizeof(expectedBuf), outfile6)) << "Error getting test data from '" << outfile6 << "'";
-  EXPECT_STREQ(expectedBuf, out.c_str());
-
   utExit();
 }
 
@@ -106,8 +96,7 @@ TEST(Metadata, check)
 {
   Metadata     m1("", "Type", "Value");
   Metadata     m2("Name", "Type", "");
-  Metadata     m3("Name", "Association", "XXX");
-  Metadata     m4("Name", "Type", "Value");
+  Metadata     m3("Name", "Type", "Value");
   std::string  checked;
 
   utInit();
@@ -117,11 +106,8 @@ TEST(Metadata, check)
 
   checked = m2.check(RegisterContext, JSON, "", "", 0);
   EXPECT_STREQ("missing metadata value", checked.c_str());
-
-  checked = m3.check(RegisterContext, XML, "", "", 0);
-  EXPECT_STREQ("", checked.c_str());
   
-  checked = m4.check(RegisterContext, XML, "", "", 0);
+  checked = m3.check(RegisterContext, XML, "", "", 0);
   EXPECT_STREQ("OK", checked.c_str());
 
   utExit();

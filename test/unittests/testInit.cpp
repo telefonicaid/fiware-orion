@@ -63,7 +63,6 @@ void setupDatabase(void)
     connection->dropCollection(ENTITIES_COLL);
     connection->dropCollection(SUBSCRIBECONTEXT_COLL);
     connection->dropCollection(SUBSCRIBECONTEXTAVAIL_COLL);
-    connection->dropCollection(ASSOCIATIONS_COLL);
 
     releaseMongoConnection(connection);
 
@@ -71,8 +70,7 @@ void setupDatabase(void)
     setRegistrationsCollectionName("registrations");
     setEntitiesCollectionName("entities");
     setSubscribeContextCollectionName("csubs");
-    setSubscribeContextAvailabilityCollectionName("casubs");
-    setAssociationsCollectionName("associations");
+    setSubscribeContextAvailabilityCollectionName("casubs");    
 }
 
 /* ****************************************************************************

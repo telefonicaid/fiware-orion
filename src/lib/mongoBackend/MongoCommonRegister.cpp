@@ -45,109 +45,6 @@ using std::map;
 using std::auto_ptr;
 
 
-/*****************************************************************************
-*
-* processAssociations -
-*
-* FIXME: first version of associations doesn't support association update
-*/
-static bool processAssociations(MetadataVector mdV, std::string* err, std::string tenant)
-{
-  DBClientBase* connection = NULL;
-
-  for (unsigned int ix = 0; ix < mdV.size(); ++ix)
-  {
-    Metadata* md = mdV.get(ix);
-
-    if (md->type != "Association")
-    {
-      continue;
-    }
-
-    LM_T(LmtMongo, ("Processing association metadata"));
-
-    std::string name      = md->name;
-    std::string srcEnId   = md->association.entityAssociation.source.id;
-    std::string srcEnType = md->association.entityAssociation.source.type;
-    std::string tgtEnId   = md->association.entityAssociation.target.id;
-    std::string tgtEnType = md->association.entityAssociation.target.type;
-
-    BSONObj srcEn;
-    if (srcEnType == "")
-    {
-      srcEn = BSON(ASSOC_ENT_ID << srcEnId);
-    }
-    else
-    {
-      srcEn = BSON(ASSOC_ENT_ID << srcEnId << ASSOC_ENT_TYPE << srcEnType);
-    }
-
-    BSONObj tgtEn;
-    if (tgtEnType == "")
-    {
-      tgtEn = BSON(ASSOC_ENT_ID << tgtEnId);
-    }
-    else
-    {
-      tgtEn = BSON(ASSOC_ENT_ID << tgtEnId << ASSOC_ENT_TYPE << tgtEnType);
-    }
-
-    BSONArrayBuilder attrs;
-    for (unsigned int jx = 0; jx < md->association.attributeAssociationList.size(); ++jx)
-    {
-      std::string srcAtt = md->association.attributeAssociationList.get(jx)->source;
-      std::string tgtAtt = md->association.attributeAssociationList.get(jx)->target;
-      attrs.append(BSON(ASSOC_ATTRS_SOURCE << srcAtt << ASSOC_ATTRS_TARGET << tgtAtt));
-    }
-
-    BSONObj doc = BSON("_id" << name <<
-                       ASSOC_SOURCE_ENT << srcEn <<
-                       ASSOC_TARGET_ENT << tgtEn <<
-                       ASSOC_ATTRS << attrs.arr());
-
-    LM_T(LmtMongo, ("insert() in '%s' collection: '%s'",
-                    getAssociationsCollectionName(tenant).c_str(),
-                    doc.toString().c_str()));
-
-    try
-    {
-      connection = getMongoConnection();
-      connection->insert(getAssociationsCollectionName(tenant).c_str(), doc);
-      releaseMongoConnection(connection);
-
-      LM_I(("Database Operation Successful (%s)", doc.toString().c_str()));
-    }
-    catch (const DBException &e)
-    {
-      releaseMongoConnection(connection);
-
-      *err = e.what();
-      LM_E(("Database Error ('insert \"%s\" in %s', '%s')",
-            doc.toString().c_str(),
-            getAssociationsCollectionName(tenant).c_str(),
-            e.what()));
-
-      return false;
-    }
-    catch (...)
-    {
-      releaseMongoConnection(connection);
-
-      *err = "Generic Exception from mongo";
-
-      LM_E(("Database Error ('insert \"%s\" in %s', '%s')",
-            doc.toString().c_str(),
-            getAssociationsCollectionName(tenant).c_str(),
-            "generic error"));
-
-      return false;
-    }
-  }
-
-  return true;
-}
-
-
 /* ****************************************************************************
 *
 * processSubscriptions -
@@ -521,11 +418,6 @@ HttpStatusCode processRegisterContext
                     requestP->contextRegistrationVector.get(ix)->providingApplication.c_str()));
 
     std::string err;
-    if (!processAssociations(cr->registrationMetadataVector, &err, tenant))
-    {
-      responseP->errorCode.fill(SccReceiverInternalError);
-      return SccOk;
-    }
 
     if (!addTriggeredSubscriptions(*cr, subsToNotify, err, tenant))
     {

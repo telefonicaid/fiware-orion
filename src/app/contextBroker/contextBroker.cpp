@@ -213,9 +213,6 @@ char            dbName[64];
 char            user[64];
 char            pwd[64];
 char            pidPath[256];
-char            fwdHost[64];
-int             fwdPort;
-bool            ngsi9Only;
 bool            harakiri;
 bool            useOnlyIPv4;
 bool            useOnlyIPv6;
@@ -254,9 +251,6 @@ int             subCacheInterval;
 #define DBPASSWORD_DESC     "database password"
 #define DB_DESC             "database name"
 #define DB_TMO_DESC         "timeout in milliseconds for connections to the replica set (ignored in the case of not using replica set)"
-#define FWDHOST_DESC        "host for forwarding NGSI9 regs"
-#define FWDPORT_DESC        "port for forwarding NGSI9 regs"
-#define NGSI9_DESC          "run as Configuration Manager"
 #define USEIPV4_DESC        "use ip v4 only"
 #define USEIPV6_DESC        "use ip v6 only"
 #define HARAKIRI_DESC       "commits harakiri on request"
@@ -296,9 +290,6 @@ PaArgument paArgs[] =
   { "-dbTimeout",     &dbTimeout,    "DB_TIMEOUT",     PaDouble, PaOpt, 10000,      PaNL,   PaNL,  DB_TMO_DESC        },
   { "-dbPoolSize",    &dbPoolSize,   "DB_POOL_SIZE",   PaInt,    PaOpt, 10,         1,      10000, DBPS_DESC          },
 
-  { "-fwdHost",       fwdHost,       "FWD_HOST",       PaString, PaOpt, LOCALHOST,  PaNL,   PaNL,  FWDHOST_DESC       },
-  { "-fwdPort",       &fwdPort,      "FWD_PORT",       PaInt,    PaOpt, 0,          0,      65000, FWDPORT_DESC       },
-  { "-ngsi9",         &ngsi9Only,    "CONFMAN",        PaBool,   PaOpt, false,      false,  true,  NGSI9_DESC         },
   { "-ipv4",          &useOnlyIPv4,  "USEIPV4",        PaBool,   PaOpt, false,      false,  true,  USEIPV4_DESC       },
   { "-ipv6",          &useOnlyIPv6,  "USEIPV6",        PaBool,   PaOpt, false,      false,  true,  USEIPV6_DESC       },
   { "-harakiri",      &harakiri,     "HARAKIRI",       PaBool,   PaHid, false,      false,  true,  HARAKIRI_DESC      },
@@ -1016,37 +1007,6 @@ RestService restServiceV[] =
 
 /* ****************************************************************************
 *
-* restServiceNgsi9 - services for CONF MAN
-*
-* This service vector (configuration) is used if the broker is started as
-* CONFIGURATION MANAGER (using the -ngsi9 option) and without using the
-* -multiservice option.
-*/
-RestService restServiceNgsi9[] =
-{
-  REGISTRY_STANDARD_REQUESTS_V0,   // FIXME P10:  NCAR is added here, is that OK?
-  REGISTRY_STANDARD_REQUESTS_V1,
-  REGISTRY_CONVENIENCE_OPERATIONS_V0,
-  REGISTRY_CONVENIENCE_OPERATIONS_V1,
-  LOG_REQUESTS_V0,
-  LOG_REQUESTS_V1,
-  STAT_REQUESTS_V0,
-  STAT_REQUESTS_V1,
-  VERSION_REQUESTS,
-
-#ifdef DEBUG
-  EXIT_REQUESTS,
-  LEAK_REQUESTS,
-#endif
-
-  INVALID_REQUESTS,
-  END_REQUEST
-};
-
-
-
-/* ****************************************************************************
-*
 * pidFile -
 */
 int pidFile(void)
@@ -1221,7 +1181,7 @@ const char* description =
 *
 * contextBrokerInit -
 */
-static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multitenant)
+static void contextBrokerInit(std::string dbPrefix, bool multitenant)
 {
   /* Set notifier object (singleton) */
   setNotifier(new Notifier());
@@ -1229,27 +1189,19 @@ static void contextBrokerInit(bool ngsi9Only, std::string dbPrefix, bool multite
   /* Create the subscription cache object */
   subscriptionCacheInit(dbName);
 
-  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database (unless ngsi9 only mode) */
-  if (!ngsi9Only)
+  /* Launch threads corresponding to ONTIMEINTERVAL subscriptions in the database */
+  recoverOntimeIntervalThreads("");
+  if (multitenant)
   {
-    recoverOntimeIntervalThreads("");
-
-    if (multitenant)
+    /* We get tenant database names and recover ontime interval threads on each one */
+    std::vector<std::string> orionDbs;
+    getOrionDatabases(orionDbs);
+    for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
     {
-      /* We get tenant database names and recover ontime interval threads on each one */
-      std::vector<std::string> orionDbs;
-      getOrionDatabases(orionDbs);
-      for (unsigned int ix = 0; ix < orionDbs.size(); ++ix)
-      {
-        std::string orionDb = orionDbs[ix];
-        std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
-        recoverOntimeIntervalThreads(tenant);
-      }
+      std::string orionDb = orionDbs[ix];
+      std::string tenant = orionDb.substr(dbPrefix.length() + 1);   // + 1 for the "_" in "orion_tenantA"
+      recoverOntimeIntervalThreads(tenant);
     }
-  }
-  else
-  {
-    LM_I(("Running in NGSI9 only mode"));
   }
 
   httpRequestInit(httpTimeout);
@@ -1294,8 +1246,7 @@ static void mongoInit
   setEntitiesCollectionName(COL_ENTITIES);
   setRegistrationsCollectionName(COL_REGISTRATIONS);
   setSubscribeContextCollectionName(COL_CSUBS);
-  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);
-  setAssociationsCollectionName(COL_ASSOCIATIONS);
+  setSubscribeContextAvailabilityCollectionName(COL_CASUBS);  
 
   //
   // Note that index creation operation is idempotent.
@@ -1551,7 +1502,7 @@ int main(int argC, char* argV[])
   LM_M(("x: '%s'", x));  // Outdeffed
 #endif
 
-  RestService* rsP       = (ngsi9Only == true)? restServiceNgsi9 : restServiceV;
+  RestService* rsP       = restServiceV;
   IpVersion    ipVersion = IPDUAL;
 
   if (useOnlyIPv4)
@@ -1567,7 +1518,7 @@ int main(int argC, char* argV[])
   SemRequestType policy = policyGet(reqMutexPolicy);
   orionInit(orionExit, ORION_VERSION, policy, mutexTimeStat);
   mongoInit(dbHost, rplSet, dbName, user, pwd, dbTimeout, writeConcern, dbPoolSize, mutexTimeStat);
-  contextBrokerInit(ngsi9Only, dbName, mtenant);
+  contextBrokerInit(dbName, mtenant);
   curl_global_init(CURL_GLOBAL_NOTHING);
 
   if (rush[0] != 0)

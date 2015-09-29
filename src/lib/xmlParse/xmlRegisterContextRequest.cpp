@@ -317,127 +317,6 @@ static int registrationId(xml_node<>* node, ParseData* parseDataP)
 
 /* ****************************************************************************
 *
-* sourceEntityId -
-*/
-static int sourceEntityId(xml_node<>* node, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("got a sourceEntityId"));
-
-  LM_T(LmtParse, ("calling entityIdParse"));
-  std::string es = entityIdParse(RegisterContext,
-                                 node,
-                                 &parseDataP->rcr.registrationMetadataP->association.entityAssociation.source);
-
-  LM_T(LmtParse, ("back from  entityIdParse"));
-
-  if (es != "OK")
-  {
-    parseDataP->errorString = es;
-    LM_W(("Bad Input (error parsing entity: %s)", es.c_str()));
-  }
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* sourceEntityIdId -
-*/
-static int sourceEntityIdId(xml_node<>* node, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("got a source entityId:id: '%s'", node->value()));
-  parseDataP->rcr.registrationMetadataP->association.entityAssociation.source.id = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* targetEntityId -
-*/
-static int targetEntityId(xml_node<>* node, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("got a targetEntityId"));
-
-  std::string es = entityIdParse(RegisterContext,
-                                 node,
-                                 &parseDataP->rcr.registrationMetadataP->association.entityAssociation.target);
-
-  if (es != "OK")
-  {
-    parseDataP->errorString = es;
-  }
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* targetEntityIdId -
-*/
-static int targetEntityIdId(xml_node<>* node, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("got a target entityId:id: '%s'", node->value()));
-  parseDataP->rcr.registrationMetadataP->association.entityAssociation.target.id = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* attributeAssociation -
-*/
-static int attributeAssociation(xml_node<>* node, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("got an attribute association"));
-
-  parseDataP->rcr.attributeAssociationP = new AttributeAssociation();
-  parseDataP->rcr.registrationMetadataP->association.attributeAssociationList.push_back(
-    parseDataP->rcr.attributeAssociationP);
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* sourceAttribute -
-*/
-static int sourceAttribute(xml_node<>* node, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("got a source attribute association"));
-  parseDataP->rcr.attributeAssociationP->source = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
-* targetAttribute -
-*/
-static int targetAttribute(xml_node<>* node, ParseData* parseDataP)
-{
-  LM_T(LmtParse, ("got a target attribute association"));
-  parseDataP->rcr.attributeAssociationP->target = node->value();
-
-  return 0;
-}
-
-
-
-/* ****************************************************************************
-*
 * entityIdList -
 */
 static int entityIdList(xml_node<>* node, ParseData* parseDataP)
@@ -528,11 +407,6 @@ void rcrPresent(ParseData* parseDataP)
 #define MD    "/contextMetadata"
 #define RMDL  "/registrationMetadata"
 #define VAL   "/value"
-#define EA    "/entityAssociation"
-#define SEI   "/sourceEntityId"
-#define TEI   "/targetEntityId"
-#define AAL   "/attributeAssociationList"
-#define AA    "/attributeAssociation"
 
 XmlNode rcrParseVector[] =
 {
@@ -563,17 +437,6 @@ XmlNode rcrParseVector[] =
   { RCR CRL CR RMDL MD "/name",                        regMetadataName      },
   { RCR CRL CR RMDL MD "/type",                        regMetadataType      },
   { RCR CRL CR RMDL MD "/value",                       regMetadataValue     },
-
-  { RCR CRL CR RMDL MD VAL EA "",                      nullTreat            },
-  { RCR CRL CR RMDL MD VAL EA SEI "",                  sourceEntityId       },
-  { RCR CRL CR RMDL MD VAL EA SEI "/id",               sourceEntityIdId     },
-  { RCR CRL CR RMDL MD VAL EA TEI "",                  targetEntityId       },
-  { RCR CRL CR RMDL MD VAL EA TEI "/id",               targetEntityIdId     },
-
-  { RCR CRL CR RMDL MD VAL AAL "",                     nullTreat            },
-  { RCR CRL CR RMDL MD VAL AAL AA "",                  attributeAssociation },
-  { RCR CRL CR RMDL MD VAL AAL AA "/sourceAttribute",  sourceAttribute      },
-  { RCR CRL CR RMDL MD VAL AAL AA "/targetAttribute",  targetAttribute      },
 
   { RCR CRL CR "/providingApplication",                providingApplication },
 

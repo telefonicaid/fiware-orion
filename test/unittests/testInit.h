@@ -35,7 +35,6 @@
 #define ENTITIES_COLL               DBPREFIX ".entities"
 #define SUBSCRIBECONTEXT_COLL       DBPREFIX ".csubs"
 #define SUBSCRIBECONTEXTAVAIL_COLL  DBPREFIX ".casubs"
-#define ASSOCIATIONS_COLL           DBPREFIX ".associations"
 
 /* Some useful macros to avoid to long and verbose lines in asserts */
 #define RES_CNTX_REG(i)         res.responseVector.get(i)->contextRegistration
