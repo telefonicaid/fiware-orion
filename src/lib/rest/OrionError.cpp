@@ -131,6 +131,11 @@ std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
   {
     return "NotFound";
   }
+  else if (_reasonPhrase == "request parameter is invalid/not allowed")
+  {
+    return "InvalidParameter";
+  }
+
 
  
 
