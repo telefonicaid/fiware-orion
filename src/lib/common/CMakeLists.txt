@@ -31,6 +31,7 @@ SET (SOURCES
     wsStrip.cpp
     statistics.cpp
     clockFunctions.cpp
+    JsonHelper.cpp
 )
 
 SET (HEADERS
@@ -43,6 +44,7 @@ SET (HEADERS
     wsStrip.h
     statistics.h
     clockFunctions.h
+    JsonHelper.h
 )
 
 

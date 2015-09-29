@@ -117,6 +117,7 @@ typedef enum RequestType
   DeleteEntity,
   EntityTypeRequest,
   EntityAllTypesRequest,
+  SubscriptionsRequest,
 
   InvalidRequest = 100
 } RequestType;
