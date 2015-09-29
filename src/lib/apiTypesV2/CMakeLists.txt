@@ -26,6 +26,7 @@ SET (SOURCES
     Entities.cpp
     ErrorCode.cpp
     Attribute.cpp
+    Subscription.cpp
 )
 
 SET (HEADERS
@@ -34,6 +35,7 @@ SET (HEADERS
     Entities.h
     ErrorCode.h
     Attribute.h
+    Subscription.h
 )
 
 
