@@ -37,6 +37,13 @@ std::string toJsonString(const std::string& input)
   ss << '"';
   for (std::string::const_iterator iter = input.begin(); iter != input.end(); ++iter)
   {
+    /* FIXME P3: This function ensures that if the DB holds special characters (which are
+     * not supported in JSON according to its specification), they are converted to their escaped
+     * representations. The process wouldn't be necessary if the DB couldn't hold such special characters, 
+     * but as long as we support NGSIv1, it is better to have the check (e.g. a newline could be 
+     * used in an attribute value using XML). Even removing NGSIv1, we have to ensure that the 
+     * input parser (rapidjson) doesn't inject not supported JSON characters in the DB (this needs to be
+     * investigated in the rapidjson documentation) */
     switch (char ch = *iter)
     {
     case '\\': ss << "\\\\"; break;
@@ -48,6 +55,8 @@ std::string toJsonString(const std::string& input)
     case '\r': ss << "\\r"; break;
     case '\t': ss << "\\t"; break;
     default:
+      /* Converting the rest of special chars 0-31 to \u00xx. Note that 0x80 - 0xFF are untouched as they
+       * correspond to UTF-8 multi-byte characters */
       if (ch >= 0 && ch <= 0x1F)
       {
         static const char intToHex[16] =  { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' } ;
