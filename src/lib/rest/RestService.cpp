@@ -35,6 +35,7 @@
 #include "common/string.h"
 #include "ngsi/ParseData.h"
 #include "jsonParseV2/jsonRequestTreat.h"
+#include "parse/textParse.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/OrionError.h"
 #include "rest/RestService.h"
@@ -50,108 +51,6 @@
 */
 #define MAX_TENANT_NAME_LEN            50
 #define MAX_TENANT_NAME_LEN_STRING    "50"
-
-
-static std::string textParseAttributeValue(ConnectionInfo* ciP, ContextAttribute* caP)
-{
-  double d;
-
-  // 1. Starts and ends with citation marks?
-  if (ciP->payload[0] == '"')
-  {
-    char* end = &ciP->payload[strlen(ciP->payload) - 1];
-
-    if (*end == '"')
-    {
-      *end = 0;
-      caP->stringValue = &ciP->payload[1];
-      caP->valueType   = orion::ValueTypeString;
-    }
-    else
-    {
-      OrionError oe(SccBadRequest, "Missing citation-mark at end of string");
-
-      return oe.render(ciP, "");
-    }
-  }
-
-  // 2. True or false?
-  else if ((strlen(ciP->payload) == 4) && ((strcmp(ciP->payload, "true") == 0) || (strcmp(ciP->payload, "True") == 0) || (strcmp(ciP->payload, "TRUE") == 0)))
-  {
-    caP->boolValue   = true;
-    caP->valueType   = orion::ValueTypeBoolean;
-  }
-  else if ((strlen(ciP->payload) == 5) && ((strcmp(ciP->payload, "false") == 0) || (strcmp(ciP->payload, "False") == 0) || (strcmp(ciP->payload, "FALSE") == 0)))
-  {
-    caP->boolValue   = false;
-    caP->valueType   = orion::ValueTypeBoolean;
-  }
-
-  // 3. Null ?
-  else if ((strlen(ciP->payload) == 4) && ((strcmp(ciP->payload, "null") == 0) || (strcmp(ciP->payload, "Null") == 0) || (strcmp(ciP->payload, "NULL") == 0)))
-  {
-    caP->valueType   = orion::ValueTypeNull;
-  }
-
-  //
-  // 4. Valid Double?
-  // FIXME P4: this is much more complex than just (atof(string) != 0 || string == "0")
-  //           0.000 also is a valid float and it given 0 - 0.0000000000, and 0e0 also ...
-  //           And, even worse, 123K gives 123.0 back, we would need to analyze the string to try to
-  //           find garbage bytes after it if we want to detect this error.
-  //           However, all of this is not so extremely important and for now, (atof(string) != 0 || string== "0") is good enough
-  //
-  else if (((d = strtod(ciP->payload, NULL)) != 0) || ((ciP->payload[0] == '0') || (ciP->payload[1] == 0)))
-  {
-    caP->valueType   = orion::ValueTypeNumber;
-    caP->numberValue = d;
-  }
-
-  // 5. None of the above - it's an error
-  else
-  {
-    OrionError oe(SccBadRequest, "attribute value type not recognized");
-    return oe.render(ciP, "");
-  }
-
-  return "OK";
-}
-
-
-
-/* ****************************************************************************
-*
-* textRequestTreat - to be moved to ... own library?
-*
-* FIXME P10: Where do we put this function?
-*/
-static std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType)
-{
-  std::string answer;
-
-  switch (requestType)
-  {
-  case EntityAttributeValueRequest:
-    answer = textParseAttributeValue(ciP, &parseDataP->av.attribute);
-    if (answer != "OK")
-    {
-      return answer;
-    }
-
-    if ((answer = parseDataP->av.attribute.check(EntityAttributeValueRequest, ciP->outFormat, "", "", 0)) != "OK")
-    {
-      OrionError error(SccBadRequest, answer);
-      return error.render(ciP, "");
-    }
-    break;
-
-  default:
-    answer = "Request Treat function not implemented";
-    break;
-  }
-  
-  return answer;
-}
 
 
 

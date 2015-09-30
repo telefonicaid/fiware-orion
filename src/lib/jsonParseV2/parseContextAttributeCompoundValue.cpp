@@ -376,7 +376,7 @@ std::string parseContextAttributeCompoundValueStandAlone
 
       if (nodeType == "String")
       {
-        cvnP->stringValue       = iter->GetString();
+        cvnP->stringValue = iter->GetString();
       }
       else if (nodeType == "Number")
       {
@@ -429,7 +429,7 @@ std::string parseContextAttributeCompoundValueStandAlone
 
       if (nodeType == "String")
       {
-        cvnP->stringValue       = iter->value.GetString();
+        cvnP->stringValue = iter->value.GetString();
       }
       else if (nodeType == "Number")
       {

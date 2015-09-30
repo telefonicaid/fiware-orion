@@ -56,6 +56,10 @@ brokerStart CB 0-255
 # 24. Check that A1 == 3.14
 # 25. PUT /v2/entities/E1/attrs/A1/value with TEXT payload a.14 - see error
 # 26. Check that A1 == 3.14 still
+# 27. PUT /v2/entities/E1/attrs/A1/value with TEXT payload -12.1
+# 28. Check that A1 == -12.1
+# 29. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.2e2
+# 30. Check that A1 == 3.2e2
 #
 
 echo '01. POST /v2/entities/E1 creating A1=1'
@@ -249,6 +253,36 @@ echo
 
 echo '26. Check that A1 == 3.14 still'
 echo '==============================='
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo "27. PUT /v2/entities/E1/attrs/A1/value with TEXT payload -12.1"
+echo "=============================================================="
+payload='-12.1'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo "28. Check that A1 == -12.1"
+echo "=========================="
+orionCurl --url /v2/entities/E1/attrs/A1 --json
+echo
+echo
+
+
+echo "29. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.2e2"
+echo "=============================================================="
+payload='3.2e2'
+orionCurl --url /v2/entities/E1/attrs/A1/value --payload "$payload" -X PUT --in text/plain --out application/json
+echo
+echo
+
+
+echo "30. Check that A1 == 3.2e2"
+echo "=========================="
 orionCurl --url /v2/entities/E1/attrs/A1 --json
 echo
 echo
@@ -573,6 +607,54 @@ Date: REGEX(.*)
         "metadata": {},
         "type": null,
         "value": 3.14
+    }
+}
+
+
+27. PUT /v2/entities/E1/attrs/A1/value with TEXT payload -12.1
+==============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+28. Check that A1 == -12.1
+==========================
+HTTP/1.1 200 OK
+Content-Length: 53
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": -12.1
+    }
+}
+
+
+29. PUT /v2/entities/E1/attrs/A1/value with TEXT payload 3.2e2
+==============================================================
+HTTP/1.1 204 No Content
+Content-Length: 0
+Date: REGEX(.*)
+
+
+
+30. Check that A1 == 3.2e2
+==========================
+HTTP/1.1 200 OK
+Content-Length: 53
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "A1": {
+        "metadata": {},
+        "type": null,
+        "value": 320.0
     }
 }
 
