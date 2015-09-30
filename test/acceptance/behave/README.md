@@ -9,6 +9,7 @@ Folder for acceptance tests of context broker NGSI v2.In this framework we are u
 - Python 2.7.x (One way would be SCL - The Software Collections Repository)
 - pip installed 1.4.1 or higher (http://docs.python-guide.org/en/latest/starting/install/linux/)
 - virtualenv installed 1.10.1 or higher (pip install virtualenv) (optional).
+
 Note: We recommend the use of virtualenv, because is an isolated working copy of Python which allows you to work on a specific project without worry of affecting other projects.
 
 
@@ -177,12 +178,12 @@ The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
 
   - entities
     * general_operations - 16 testcases
-    * create_entities - 535 testcases
-    * list_all_entities - 200 testcases
-    * list_an_entity_by_id - 209 testcases
-    * list_an_attribute_by_id - 198 testcases
-    * update_append_attribute_by_id - 731 testcases
-    * update_attribute_by_id (pending) 
+    * create_entities - 559 testcases                   POST - /v2/entities/ plus payload
+    * list_all_entities - 200 testcases                 GET - /v2/entities/
+    * list_an_entity_by_id - 209 testcases              GET - /v2/entities/<entity_id>
+    * list_an_attribute_by_id - 198 testcases           GET - /v2/entities/<entity_id>/attrs/<attr_name>
+    * update_append_attribute_by_id - 766 testcases     POST - /v2/entities/<entity_id> plus payload
+    * update_attribute_by_id - 654 testcases            PATCH - /v2/entities/<entity_id> plus payload  
     * replace_attributes_by_id (pending)
     * remove_entity (pending)
 
@@ -203,6 +204,7 @@ The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
         `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
   - If would like a wrong query parameter name, use `qp_` prefix   
   - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
+  - It is possible to use the same value of the previous request in another request using this string `the same value of the previous request`.
      
 
 ### Tags

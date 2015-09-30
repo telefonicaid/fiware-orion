@@ -67,7 +67,7 @@ class Properties:
                                          stderr=subprocess.STDOUT)
                     stdout = p.stdout.readlines()
                     assert stdout == [], "ERROR - modifying config files from %s/%s in setting folder. \n " \
-                                         "        %s" % (configuration.PATH_TO_SETTING_FOLDER, file_name, stdout)
+                                         "        %s" % (configuration["PATH_TO_SETTINGS_FOLDER"], file_name, stdout)
             __logger__.info(" >> properties.json is created or updated")
         else:
             __logger__.info("properties.json is not updated")
@@ -85,9 +85,9 @@ class Properties:
         updating /etc/sysconfig/contextBroker
         note: if values have "/" chars are replaced by "\/". Ex: BROKER_LOG_DIR variable
         """
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_USER", "BROKER_USER", self.config["context_broker_env"]["CB_LOG_OWNER"]), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_PORT", "BROKER_PORT", self.config["context_broker_env"]["CB_PORT"]), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_LOG_DIR", "BROKER_LOG_DIR", self.config["context_broker_env"]["CB_LOG_FILE"].replace("/", "\/")), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_DATABASE_HOST", "BROKER_DATABASE_HOST", self.config["mongo_env"]["MONGO_HOST"]), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_DATABASE_NAME", "BROKER_DATABASE_NAME", self.config["mongo_env"]["MONGO_DATABASE"]), sudo=True)
-        fabric.run('sed -i "s/%s.*/%s=%s/" /etc/sysconfig/contextBroker' % ("BROKER_EXTRA_OPS", "BROKER_EXTRA_OPS", self.config["context_broker_env"]["CB_EXTRA_OPS"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_USER", "BROKER_USER", self.config["context_broker_env"]["CB_LOG_OWNER"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_PORT", "BROKER_PORT", self.config["context_broker_env"]["CB_PORT"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_LOG_DIR", "BROKER_LOG_DIR", self.config["context_broker_env"]["CB_LOG_FILE"].replace("/", "\/")), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_DATABASE_HOST", "BROKER_DATABASE_HOST", self.config["mongo_env"]["MONGO_HOST"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_DATABASE_NAME", "BROKER_DATABASE_NAME", self.config["mongo_env"]["MONGO_DATABASE"]), sudo=True)
+        fabric.run("sed -i 's/%s.*/%s=%s/' /etc/sysconfig/contextBroker" % ("BROKER_EXTRA_OPS", "BROKER_EXTRA_OPS", self.config["context_broker_env"]["CB_EXTRA_OPS"]), sudo=True)

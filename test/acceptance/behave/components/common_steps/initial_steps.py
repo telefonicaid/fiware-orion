@@ -25,10 +25,12 @@ __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 import behave
 from behave import step
 
+from components.common_steps.requests import *
 from iotqatools.fabric_utils import FabricSupport
 from iotqatools.mongo_utils import Mongo
 from iotqatools.cb_v2_utils import CB
 from iotqatools.helpers_utils import *
+
 
 from tools.properties_config import Properties  # methods in properties class
 
@@ -79,6 +81,7 @@ def update_context_broker_config_file_and_restart_service(context):
         __logger__.info(" >> restarted contextBroker service")
     else:
         __logger__.debug(" >> restarting contextBroker per command line interface")
+        props_cb["CB_EXTRA_OPS"] = props_cb["CB_EXTRA_OPS"].replace('"', "")
         # hint: the -harakiri option is used to kill contextBroker (must be compiled in DEBUG mode)
         __logger__.debug("contextBroker -port %s -logDir %s -pidpath %s -dbhost %s -db %s %s -harakiri" %
             (props_cb["CB_PORT"], props_cb["CB_LOG_FILE"], props_cb["CB_PID_FILE"], props_mongo["MONGO_HOST"],
@@ -123,6 +126,11 @@ def verify_context_broker_is_installed_successfully(context):
         c += 1
         __logger__.debug("WARN - Retry in verification if context broker is started. No: (%s)" % str(c))
     assert (props_cb["CB_RETRIES"]) > c, "ERROR - context Broker is not started after of %s verification retries" % str(c)
+    if props_cb["CB_VERIFY_VERSION"].lower() == "true":
+        context.execute_steps(u'Given send a version request')
+        context.execute_steps(u'Given verify if version is the expected')
+    else:
+        __logger__.info("Current version is not verified...")
     __logger__.info(" >> verified that contextBroker is started successfully")
 
 

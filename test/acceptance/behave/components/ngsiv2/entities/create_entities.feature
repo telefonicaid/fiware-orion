@@ -431,25 +431,48 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     When create "1" entities with "1" attributes
       | parameter        | value           |
       | entities_type    | <entities_type> |
-      | entities_id      | room2           |
+      | entities_id      | <entities_id>   |
       | attributes_name  | temperature     |
       | attributes_value | 34              |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
     Examples:
-      | entities_type |
-      | room          |
-      | HOUSE         |
-      | HOUSE34       |
-      | HOUSE_34      |
-      | HouSE_34      |
-      | house_flat    |
-      | house.flat    |
-      | house-flat    |
-      | house@flat    |
-      | habitación    |
-      | españa        |
-      | barça         |
+      | entities_id | entities_type |
+      | room_1      | room          |
+      | room_2      | 34            |
+      | room_3      | false         |
+      | room_4      | true          |
+      | room_5      | 34.4E-34      |
+      | room_6      | temp.34       |
+      | room_7      | temp_34       |
+      | room_8      | temp-34       |
+      | room_9      | TEMP34        |
+      | room_10     | house_flat    |
+      | room_11     | house.flat    |
+      | room_12     | house-flat    |
+      | room_13     | house@flat    |
+      | room_14     | habitación    |
+      | room_15     | españa        |
+      | room_16     | barça         |
+      | room_17     | random=10     |
+      | room_18     | random=100    |
+      | room_19     | random=960    |
+
+  @key_Limit @BUG_1289 @skip
+  Scenario:  try to create entities in NGSI v2 with overcome index key limit in mongo
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_entities_type |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    When create "1" entities with "1" attributes
+      | parameter        | value       |
+      | entities_type    | random=1024 |
+      | entities_id      | room_1      |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    Then verify that receive several "Created" http code
+    And verify that entities are stored in mongo
 
   @entities_type_without
   Scenario:  create entities in NGSI v2 without entities type values
@@ -553,27 +576,50 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | Fiware-ServicePath | /test            |
       | Content-Type       | application/json |
     When create "1" entities with "1" attributes
-      | parameter        | value         |
-      | entities_type    | room          |
-      | entities_id      | <entities_id> |
-      | attributes_name  | temperature   |
-      | attributes_value | 34            |
+      | parameter        | value           |
+      | entities_type    | <entities_type> |
+      | entities_id      | <entities_id>   |
+      | attributes_name  | temperature     |
+      | attributes_value | 34              |
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
     Examples:
-      | entities_id |
-      | room        |
-      | HOUSE       |
-      | HOUSE34     |
-      | HOUSE_34    |
-      | HouSE_34    |
-      | house_flat  |
-      | house.flat  |
-      | house-flat  |
-      | house@flat  |
-      | habitación  |
-      | españa      |
-      | barça       |
+      | entities_type | entities_id |
+      | room_1        | room        |
+      | room_2        | 34          |
+      | room_3        | false       |
+      | room_4        | true        |
+      | room_5        | 34.4E-34    |
+      | room_6        | temp.34     |
+      | room_7        | temp_34     |
+      | room_8        | temp-34     |
+      | room_9        | TEMP34      |
+      | room_10       | house_flat  |
+      | room_11       | house.flat  |
+      | room_12       | house-flat  |
+      | room_13       | house@flat  |
+      | room_14       | habitación  |
+      | room_15       | españa      |
+      | room_16       | barça       |
+      | room_17       | random=10   |
+      | room_18       | random=100  |
+      | room_19       | random=960  |
+
+  @key_Limit @BUG_1289 @skip
+  Scenario:  try to create entities in NGSI v2 with overcome index key limit in mongo
+    Given  a definition of headers
+      | parameter          | value              |
+      | Fiware-Service     | test_entities_type |
+      | Fiware-ServicePath | /test              |
+      | Content-Type       | application/json   |
+    When create "1" entities with "1" attributes
+      | parameter        | value       |
+      | entities_type    | room        |
+      | entities_id      | random=1024 |
+      | attributes_name  | temperature |
+      | attributes_value | 34          |
+    Then verify that receive several "Created" http code
+    And verify that entities are stored in mongo
 
   @entities_id_without
   Scenario:  try to create entities in NGSI v2 without entities id values
@@ -739,10 +785,14 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Examples:
       | attributes_name |
       | temperature     |
-      | temp.48         |
-      | temp_49         |
-      | temp-50         |
-      | TEMP51          |
+      | 34              |
+      | false           |
+      | true            |
+      | 34.4E-34        |
+      | temp.34         |
+      | temp_34         |
+      | temp-34         |
+      | TEMP34          |
       | house_flat      |
       | house.flat      |
       | house-flat      |
@@ -752,6 +802,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | barça           |
       | random=10       |
       | random=100      |
+      | random=1000     |
       | random=10000    |
       | random=100000   |
 
@@ -844,7 +895,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | parameter   | value                          |
       | error       | ParseError                     |
       | description | no 'name' for ContextAttribute |
-    And verify that entities are stored in mongo
+    And verify that entities are not stored in mongo
 
   # ---------- attribute value --------------------------------
   @attributes_value
@@ -864,6 +915,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are stored in mongo
     Examples:
       | attributes_value |
+      | fsdfsd           |
       | 34               |
       | 34.4E-34         |
       | temp.34          |
@@ -1287,6 +1339,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Examples:
       | attributes_type |
       | dgdgdfgd        |
+      | 34              |
       | temp.34         |
       | temp_34         |
       | temp-34         |
@@ -1422,6 +1475,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Examples:
       | metadata_name |
       | dgdgdfgd      |
+      | 34            |
       | temp.34       |
       | temp_34       |
       | temp-34       |
@@ -1461,6 +1515,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Examples:
       | metadata_name |
       | dgdgdfgd      |
+      | 34            |
       | temp.34       |
       | temp_34       |
       | temp-34       |
@@ -1623,6 +1678,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Examples:
       | metadata_value |
       | dgdgdfgd       |
+      | 34             |
       | temp.34        |
       | temp_34        |
       | temp-34        |
@@ -1661,6 +1717,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are stored in mongo
     Examples:
       | metadata_value |
+      | 34             |
       | dgdgdfgd       |
       | temp.34        |
       | temp_34        |
@@ -1981,6 +2038,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     Examples:
       | metadata_type |
       | dgdgdfgd      |
+      | 34            |
       | temp.34       |
       | temp_34       |
       | temp-34       |
