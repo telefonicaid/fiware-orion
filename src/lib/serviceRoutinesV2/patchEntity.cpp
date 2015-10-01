@@ -104,7 +104,8 @@ std::string patchEntity
   }
   else if (ciP->httpStatusCode == SccInvalidParameter)
   {
-    OrionError orionError(SccInvalidParameter, "request parameter is invalid/not allowed");
+    ciP->httpStatusCode = SccContextElementNotFound;
+    OrionError orionError(SccContextElementNotFound, "No context element found");
     answer = orionError.render(ciP, "");
   }
 
