@@ -132,8 +132,6 @@ std::string OrionError::errorStringForV2(const std::string& _reasonPhrase)
     return "NotFound";
   }
 
- 
-
   return _reasonPhrase;
 }
 
