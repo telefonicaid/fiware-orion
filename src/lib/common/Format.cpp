@@ -71,6 +71,8 @@ Format stringToFormat(const std::string& s)
   return NOFORMAT;
 }
 
+
+
 /* ****************************************************************************
 *
 * isFloat -
@@ -87,6 +89,7 @@ bool isFloat(const std::string& s)
   iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
   return iss.eof() && !iss.fail();
 }
+
 
 
 /* ****************************************************************************

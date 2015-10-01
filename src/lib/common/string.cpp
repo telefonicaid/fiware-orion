@@ -718,3 +718,80 @@ std::string servicePathCheck(const char* servicePath)
 
   return "OK";
 }
+
+
+
+/* ****************************************************************************
+*
+* isDouble - is there a double value in the string 's' ?
+*
+* From the manual page of strtod:
+*   double strtod(const char *nptr, char **endptr);
+*
+*   If endptr is not NULL, a pointer to the character after the last character
+*   used in the conversion is stored in the location referenced by endptr.
+*
+*   If no conversion is performed, zero is returned and the value of nptr is stored 
+*   in the location referenced by endptr.
+*
+* Now, this is just perfect. It is just what we need to assure that a string is
+* in fact 'expressing' a double.
+* All we need to do is to check that endptr only contains whitespace (or nothing at all)
+* after the call to 'strtod'. And also, that a covervsion has actually been performed.
+* If so, the string sent to isDouble is indeed a valid 'double'.
+*
+* More from the man page:
+*   If the correct value would cause overflow, plus or minus HUGE_VAL (HUGE_VALF, HUGE_VALL)
+*   is returned (according to the sign of the value), and ERANGE is stored in errno.
+*   If the correct value would cause underflow, zero is returned and ERANGE is stored in errno.
+*
+* So, we will need to check errno for ERANGE also.
+*
+* This in turn will make a 'HUGE_VAL double' 12e999999 (is that enough? :-)) be treated as an error.
+* It IS a double, but this function will say it is not, as it actually is not a valid double for
+* this computer as the computer cannot represent it as the C builtin type 'double' ... OK!
+*/
+bool isDouble(const char* s)
+{
+  char* rest = (char*) s;
+  
+  strtod(s, &rest);
+
+  if ((rest == s) || (errno == ERANGE))
+  {
+    return false;
+  }
+
+  // If all WS after the last char used in the conversion, then all is OK
+  while ((*rest == ' ') || (*rest == '\t') || (*rest == '\n'))
+    ++rest;
+
+  return (*rest == 0);
+}
+
+
+
+/* ****************************************************************************
+*
+* stringToDouble - convert a string to a double and return TRUE if successful
+*
+* See description of isDouble. The functions are equal, except that the converted
+* double number (the output from strtod) is returned from this function.
+*/
+bool stringToDouble(const char* s, double* dP)
+{
+  char* rest = (char*) s;
+  
+  *dP = strtod(s, &rest);
+
+  if ((rest == s) || (errno == ERANGE))
+  {
+    return false;
+  }
+
+  // If all WS after the last char used in the conversion, then all is OK
+  while ((*rest == ' ') || (*rest == '\t') || (*rest == '\n'))
+    ++rest;
+
+  return (*rest == 0);
+}

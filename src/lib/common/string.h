@@ -161,14 +161,33 @@ extern void strReplace
 extern std::string servicePathCheck(const char* servicePath);
 
 
+
+/* ****************************************************************************
+*
+* isDouble - 
+*/
+extern bool isDouble(const char* s);
+
+
+
+/* ****************************************************************************
+*
+* stringToDouble - 
+*/
+extern bool stringToDouble(const char* s, double* dP);
+
+
+
 /* ****************************************************************************
 *
 * toString -
 */
-template <typename T>
-std::string toString(T t) {
+template <typename T> std::string toString(T t)
+{
   std::ostringstream ss;
+
   ss << t;
+
   return ss.str();
 }
 
