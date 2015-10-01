@@ -1,6 +1,9 @@
+#ifndef SRC_LIB_PARSE_TEXTPARSE_H_
+#define SRC_LIB_PARSE_TEXTPARSE_H_
+
 /*
 *
-* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2014 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -22,32 +25,19 @@
 *
 * Author: Ken Zangelin
 */
-#include "orionTypes/OrionValueType.h"
+#include <string>
 
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+#include "ngsi/Request.h"
 
-namespace orion
-{
 
 
 
 /* ****************************************************************************
 *
-* valueTypeName - 
+* textRequestTreat -
 */
-const char* valueTypeName(const orion::ValueType _type)
-{
-  switch (_type)
-  {
-  case ValueTypeString:       return "String";
-  case ValueTypeNumber:       return "Number";
-  case ValueTypeBoolean:      return "Boolean";
-  case ValueTypeObject:       return "Object";
-  case ValueTypeVector:       return "Vector";
-  case ValueTypeNull:         return "Null";
-  case ValueTypeUnknown:      return "Unknown";
-  }
+extern std::string textRequestTreat(ConnectionInfo* ciP, ParseData* parseDataP, RequestType requestType);
 
-  return "Invalid";
-}
-
-}
+#endif  // SRC_LIB_PARSE_TEXTPARSE_H_

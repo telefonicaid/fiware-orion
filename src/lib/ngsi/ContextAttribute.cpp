@@ -642,7 +642,7 @@ std::string ContextAttribute::check
   int                 counter
 )
 {
-  if (name == "")
+  if ((name == "") && (requestType != EntityAttributeValueRequest))
   {
     return "missing attribute name";
   }
@@ -661,6 +661,7 @@ std::string ContextAttribute::check
   {
     if (forbiddenChars(stringValue.c_str()))
     {
+      LM_W(("Bad Input (Invalid characters in attribute value: '%s')", stringValue.c_str()));
       return "Invalid characters in attribute value";
     }
   }
