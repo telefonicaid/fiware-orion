@@ -834,7 +834,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=10000     |
       | random=100000    |
 
-  @attribute_value_append @BUG_1278 @skip
+  @attribute_value_append @BUG_1278
   Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with several attribute values
     Given  a definition of headers
       | parameter          | value                       |
@@ -859,9 +859,9 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | attributes_value | <attributes_value> |
     Then verify that receive an "Not Found" http code
     And verify an error response
-      | parameter   | value                                 |
-      | error       | BadRequest                            |
-      | description | Invalid characters in attribute value |
+      | parameter   | value                    |
+      | error       | NotFound                 |
+      | description | No context element found |
     Examples:
       | attributes_value |
       | 34               |
@@ -1026,7 +1026,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
     Then verify that receive an "Not Found" http code
     And verify an error response
       | parameter   | value                    |
-      | error       | Not Found                |
+      | error       | NotFound                 |
       | description | No context element found |
     Examples:
       | entity_id | attributes_value                                                              |
@@ -1218,7 +1218,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room16    | "2017-06-17T07:21:24.238Z"                                                    |
       | room17    | null                                                                          |
 
-  @attribute_value_append_special_with_metadata_in_update @BUG_1106  @BUG_1260 @BUG_1278 @skip
+  @attribute_value_append_special_with_metadata_in_update @BUG_1106  @BUG_1260 @BUG_1278
   Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc) without attribute type not metadata but with metadatas in update
     Given  a definition of headers
       | parameter          | value                               |
@@ -1436,7 +1436,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=10000    |
       | random=100000   |
 
-  @attribute_type_append @BUG_1212 @BUG_1260 @BUG_1278 @skip
+  @attribute_type_append @BUG_1212 @BUG_1260 @BUG_1278
   Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with several attributes type
     Given  a definition of headers
       | parameter          | value                 |
@@ -1460,10 +1460,10 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | attributes_name | humidity          |
       | attributes_type | <attributes_type> |
     Then verify that receive an "Not Found" http code
-    And verify several error responses
-      | parameter   | value                                |
-      | error       | NotFound                             |
-      | description | Invalid characters in attribute type |
+    And verify an error response
+      | parameter   | value                    |
+      | error       | NotFound                 |
+      | description | No context element found |
     Examples:
       | attributes_type |
       | 34              |
