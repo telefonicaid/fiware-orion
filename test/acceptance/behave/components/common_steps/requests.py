@@ -52,6 +52,7 @@ status_codes = {'OK': 200,
                 'Length Required': 411,
                 'Request Entity Too Large': 413,
                 'Unsupported Media Type': 415,
+                'Unprocessable Entity': 422,
                 'Internal Server Error': 500}
 
 
@@ -172,7 +173,9 @@ def delete_database_in_mongo(context):
     headers = cb.get_headers()
     __logger__.debug("Deleting database in mongo...")
     if fiware_service_header in headers:
-        if headers[fiware_service_header].find(".") < 0:
+        if headers[fiware_service_header] == EMPTY:
+            database_name = orion_prefix
+        elif headers[fiware_service_header].find(".") < 0:
             database_name = "%s-%s" % (orion_prefix, headers[fiware_service_header])
     else:
         database_name = orion_prefix
@@ -224,31 +227,56 @@ def get_an_attribute_by_id(context, attribute_name, entity_id):
 # ------------------------ update and append -----------------------------------------------
 
 
-@step(u'update or append an attribute by ID "([^"]*)"')
+@step(u'update or append attributes by ID "([^"]*)"')
 def update_or_append_an_attribute_by_id(context, entity_id):
     """
-    update or append an attribute by ID
+    update or append attributes by ID
     :param context:
     :param entity_id:
     """
     global cb, resp
     __logger__.debug("updating or appending an attribute by id...")
-    resp = cb.update_or_append_an_attribute_by_id(context, entity_id)
+    resp = cb.update_or_append_an_attribute_by_id("POST", context, entity_id)
     __logger__.debug("...updated or appended an attribute by id...")
 
 
-@step(u'update or append an attribute by ID "([^"]*)" in raw mode')
+@step(u'update or append attributes by ID "([^"]*)" in raw mode')
 def update_or_append_an_attribute_by_ID_in_raw_mode(context, entity_id):
     """
-    update or append an attribute by ID in raw mode
+    update or append attributes by ID in raw mode
     :param context:
     :param entity_id:
     """
     global cb, resp
     __logger__.debug("updating or appending an attribute by id in raw mode...")
-    resp = cb.update_or_append_an_attribute_in_raw_by_id(context, entity_id)
+    resp = cb.update_or_append_an_attribute_in_raw_by_id("POST", context, entity_id)
     __logger__.debug("...updated or appended an attribute by id in raw mode...")
 
+
+@step(u'update an attribute by ID "([^"]*)" if it exists')
+def update_an_attribute_by_ID_if_it_exists(context, entity_id):
+    """
+    update an attribute by ID if it exists
+    :param context:
+    :param entity_id: id name
+    """
+    global cb, resp
+    __logger__.debug("updating or appending an attribute by id if it exists...")
+    resp = cb.update_or_append_an_attribute_by_id("PATCH", context, entity_id)
+    __logger__.debug("...updated or appended an attribute by id if it exists...")
+
+
+@step(u'update an attribute by ID "([^"]*)" if it exists in raw mode')
+def update_an_attribute_by_ID_if_it_exists_in_raw_mode(context, entity_id):
+    """
+    update or append attributes by ID in raw mode
+    :param context:
+    :param entity_id:
+    """
+    global cb, resp
+    __logger__.debug("updating or appending an attribute by id in raw mode if it exists...")
+    resp = cb.update_or_append_an_attribute_in_raw_by_id("PATCH", context, entity_id)
+    __logger__.debug("...updated or appended an attribute by id in raw mode if it exists...")
 
 # ------------------------------------- validations ----------------------------------------------
 
@@ -348,13 +376,12 @@ def verify_if_version_is_the_expected(context):
     verify if version is the expected
     """
     global resp, props_cb_env
-    if props_cb_env["CB_VERIFY_VERSION"].lower() == "true":
-        resp_dict = convert_str_to_dict(str(resp.text), "JSON")
-        assert resp_dict["orion"]["version"].find(props_cb_env["CB_VERSION"]) >= 0, \
-            " ERROR in context broker version value, \n" \
-            " expected: %s \n" \
-            " installed: %s" % (props_cb_env["CB_VERSION"], resp_dict["orion"]["version"])
-        __logger__.debug("-- version %s is correct in version request" % props_cb_env["CB_VERSION"])
+    resp_dict = convert_str_to_dict(str(resp.text), "JSON")
+    assert resp_dict["orion"]["version"].find(props_cb_env["CB_VERSION"]) >= 0, \
+        " ERROR in context broker version value, \n" \
+        " expected: %s \n" \
+        " installed: %s" % (props_cb_env["CB_VERSION"], resp_dict["orion"]["version"])
+    __logger__.debug("-- version %s is correct in version request" % props_cb_env["CB_VERSION"])
 
 
 @step(u'verify that receive several "([^"]*)" http code')
@@ -387,10 +414,10 @@ def entities_are_stored_in_mongo(context):
     properties_class = Properties()
     props_mongo = properties_class.read_properties()["mongo_env"]  # mongo properties dict
     __logger__.debug(" >> verifying entities are stored in mongo")
-    m = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
+    mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
               password=props_mongo["MONGO_PASS"])
     ngsi = NGSI()
-    ngsi.verify_entities_stored_in_mongo(m, cb.get_entity_context(), cb.get_headers())
+    ngsi.verify_entities_stored_in_mongo(mongo, cb.get_entity_context(), cb.get_headers())
     __logger__.info(" >> verified entities are stored in mongo")
 
 
@@ -403,12 +430,27 @@ def entities_are_not_stored_in_mongo(context):
     properties_class = Properties()
     props_mongo = properties_class.read_properties()["mongo_env"]  # mongo properties dict
     __logger__.debug(" >> verifying entities are not stored in mongo")
-    m = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
+    mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
               password=props_mongo["MONGO_PASS"])
     ngsi = NGSI()
-    ngsi.verify_entities_stored_in_mongo(m, cb.get_entity_context(), cb.get_headers(), False)
+    ngsi.verify_entities_stored_in_mongo(mongo, cb.get_entity_context(), cb.get_headers(), False)
     __logger__.info(" >> verified entities are not stored in mongo")
 
+
+@step(u'verify that an entity is updated in mongo')
+def verify_that_an_entity_is_updated_in_mongo(context):
+    """
+    verify that an entity is updated in mongo
+    """
+    global cb
+    properties_class = Properties()
+    props_mongo = properties_class.read_properties()["mongo_env"]  # mongo properties dict
+    __logger__.debug(" >> verifying that an entity is updating in mongo")
+    mongo = Mongo(host=props_mongo["MONGO_HOST"], port=props_mongo["MONGO_PORT"], user=props_mongo["MONGO_USER"],
+              password=props_mongo["MONGO_PASS"])
+    ngsi = NGSI()
+    ngsi.verify_entity_updated_in_mongo(mongo, cb.get_entity_context(), cb.get_headers())
+    __logger__.info(" >> verified that an entity is updated in mongo")
 
 @step(u'verify an error response')
 def verify_error_message(context):

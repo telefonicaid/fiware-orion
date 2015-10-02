@@ -24,6 +24,8 @@ __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
 import os
 
+from termcolor import colored
+
 from components.common_steps.initial_steps import *
 from components.common_steps.requests import *
 
@@ -41,6 +43,7 @@ def __create_log_folder(name):
             __logger__.info("log folder has been created with name: %s" % name)
     except Exception, e:
         assert False, "ERROR  - creating logs folder \n       - %s" % str(e)
+
 
 def before_all(context):
     """
@@ -79,6 +82,7 @@ def after_feature(context, feature):
     :param feature: feature properties
     """
     context.execute_steps(u'Given stop service')
+    print colored('    And stop context Broker', 'green')
     __logger__.info("AFTER FEATURE")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     __logger__.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
@@ -102,6 +106,7 @@ def after_scenario(context, scenario):
     :param scenario: scenario properties
     """
     context.execute_steps(u'Given delete database in mongo')
+    print colored('    And delete database in mongo', 'green')
     __logger__.info("AFTER SCENARIO")
     __logger__.info("<<==")
 
@@ -122,4 +127,3 @@ def after_step(context, step):
     :param step: step properties
     """
     __logger__.info("AFTER STEP")
-

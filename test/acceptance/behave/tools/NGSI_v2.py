@@ -43,8 +43,111 @@ class NGSI:
         """
         constructor
         """
-
     # ------------------------------------ validations ------------------------------------------
+    def __get_mongo_cursor(self, mongo_driver, entities_contexts, headers, operation):
+        """
+        return a cursor with a entities list
+        :param entities_contexts:
+        :param headers:
+        :param mongo_driver: mongo driver from steps
+        :param operation:
+        :return: list
+        """
+        if FIWARE_SERVICE_HEADER in headers:
+            __logger__.debug("service header: %s" % headers[FIWARE_SERVICE_HEADER])
+            if headers[FIWARE_SERVICE_HEADER] == EMPTY:
+                database_name = ORION_PREFIX
+            else:
+                database_name = "%s-%s" % (ORION_PREFIX, headers[FIWARE_SERVICE_HEADER])
+        else:
+            database_name = ORION_PREFIX
+        # Orion Context Broker interprets the tentant name (service) in lowercase, thus,
+        # although you can use tenants such as in updateContext "MyService" it is not advisable
+        mongo_driver.connect(database_name.lower())
+        mongo_driver.choice_collection("entities")
+
+        if FIWARE_SERVICE_PATH_HEADER in headers:
+            if headers[FIWARE_SERVICE_PATH_HEADER] == EMPTY:
+                service_path = "/"
+            else:
+                service_path = headers[FIWARE_SERVICE_PATH_HEADER]
+        else:
+            service_path = "/"
+        if "entities_type" in entities_contexts:
+            type = entities_contexts["entities_type"]
+        else:
+            type = ""
+        __logger__.info("Database verified: %s" % database_name)
+        __logger__.info("collection verified: entities")
+        __logger__.info("service path verified: %s" % service_path)
+        curs_list = []
+        if operation.lower() == "create":
+            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.type": type,
+                     "_id.servicePath": service_path}
+        elif operation.lower() == "update":
+            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path}
+
+        __logger__.info("query: %s" % str(query))
+        curs = mongo_driver.find_data(query)
+        curs_list = mongo_driver.get_cursor_value(curs)
+        __logger__.debug("documents stored in mongo:  %s" % str(curs_list))
+        return curs_list
+
+    def __verify_attributes(self, entity, entities_contexts):
+        """
+        verify attributes from mongo
+        :return:
+        """
+        # verify attributes
+        __logger__.debug("entity stored in mongo:  %s" % str(entity))
+        for a in range(int(entities_contexts["attributes_number"])):    # manages N attributes
+            if int(entities_contexts["attributes_number"]) == 1:
+                attr_name = entities_contexts["attributes_name"]
+            else:
+                # prefix plus _<consecutive>. ex: room1_2
+                attr_name = "%s_%s" % (entities_contexts["attributes_name"], str(a))
+
+            if entities_contexts["attributes_name"] is not None:
+                assert attr_name in entity[u'attrNames'], \
+                    " ERROR -- attribute name: %s is not stored in attrNames list" % attr_name
+
+                # '.' char is forbidden in MongoDB keys, so it needs to be replaced in attribute name.
+                # (we chose '=' as it is a forbidden character in the API). When returning information to user,
+                # the '=' is translated back to '.', thus from user perspective all works fine.
+                if attr_name.find(".") >= 0:
+                    attr_name = attr_name.replace(".", "=")
+                    __logger__.debug("attribute name: %s is changed by \".\" is forbidden in MongoDB keys" % attr_name)
+                __logger__.info("attribute full: %s" % str(entity))
+
+                assert attr_name in entity[u'attrs'], \
+                    " ERROR -- attribute: %s is not stored in mongo" % attr_name
+                assert entities_contexts["attributes_value"] == entity[u'attrs'][attr_name][u'value'], \
+                    " ERROR -- attribute value: %s is not stored successful in mongo" % str(entities_contexts["attributes_value"])
+                if entities_contexts["attributes_type"] is None:
+                    entities_contexts["attributes_type"] = EMPTY
+                assert entities_contexts["attributes_type"] == entity[u'attrs'][attr_name][u'type'], \
+                    " ERROR -- attribute type: %s is not stored successful in mongo" % entities_contexts["attributes_type"]
+                # verify metadatas
+                if entities_contexts["metadatas_number"] > 0:
+                    md = entity[u'attrs'][attr_name][u'md']
+                    for m in range(int(entities_contexts["metadatas_number"])):    # manages N metadatas
+                        assert entities_contexts["metadatas_value"] == md[m][u'value'], \
+                            " ERROR -- metadata value: %s is not stored successful in mongo" % entities_contexts["metadatas_value"]
+                        if entities_contexts["metadatas_type"] is not None:
+                            assert entities_contexts["metadatas_type"] == md[m][u'type'], \
+                                " ERROR -- metadata type: %s is not stored successful in mongo" % entities_contexts["metadatas_type"]
+                assert u'creDate' in entity[u'attrs'][attr_name],\
+                    " ERROR -- creDate field into attribute does not exists in document"
+                assert u'modDate' in entity[u'attrs'][attr_name],\
+                    " ERROR -- modDate field into attribute does not exists in document"
+
+            assert u'creDate' in entity,\
+                " ERROR -- creDate field does not exists in document"
+            assert u'modDate' in entity,\
+                " ERROR -- modDate field does not exists in document"
+        __logger__.debug(" Entity id: \"%s\" is successful stored in mongo" % entities_contexts["entities_id"])
+
+
     def verify_entities_stored_in_mongo(self, mongo_driver, entities_contexts, headers, stored=True):
         """
         verify that entities are stored in mongo
@@ -82,88 +185,39 @@ class NGSI:
                         "modDate": 1437379556
                     }
         """
-        if FIWARE_SERVICE_HEADER in headers:
-            database_name = "%s-%s" % (ORION_PREFIX, headers[FIWARE_SERVICE_HEADER])
-        else:
-            database_name = ORION_PREFIX
-        # Orion Context Broker interprets the tentant name (service) in lowercase, thus,
-        # although you can use tenants such as in updateContext "MyService" it is not advisable
-        mongo_driver.connect(database_name.lower())
-        mongo_driver.choice_collection("entities")
+        curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers, "create")
 
-        if FIWARE_SERVICE_PATH_HEADER in headers:
-            service_path = headers[FIWARE_SERVICE_PATH_HEADER]
-        else:
-            service_path = "/"
-        if "entities_type" in entities_contexts:
-            type = entities_contexts["entities_type"]
-        else:
-            type = ""
-
-        curs_list = []
-        curs = mongo_driver.find_data({"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]},
-                                       "_id.type": type,
-                                       "_id.servicePath": service_path})
-        curs_list = mongo_driver.get_cursor_value(curs)
         # verify entities
+        __logger__.debug("number of entities: %s" % str(entities_contexts["entities_number"]))
         for i in range(int(entities_contexts["entities_number"])):
             # verify if the entity is stored in mongo
             if stored:
-                for entity in curs_list:  # manages N entities
-                    # verify attributes
-                    for a in range(int(entities_contexts["attributes_number"])):    # manages N attributes
-                        if int(entities_contexts["attributes_number"]) == 1:
-                            attr_name = entities_contexts["attributes_name"]
-                        else:
-                            # prefix plus _<consecutive>. ex: room1_2
-                            attr_name = "%s_%s" % (entities_contexts["attributes_name"], str(a))
-
-                        if entities_contexts["attributes_name"] is not None:
-                            assert attr_name in entity[u'attrNames'], \
-                                " ERROR -- attribute name: %s is not stored in attrNames list" % attr_name
-
-                            # '.' char is forbidden in MongoDB keys, so it needs to be replaced in attribute name.
-                            # (we chose '=' as it is a forbidden character in the API). When returning information to user,
-                            # the '=' is translated back to '.', thus from user perspective all works fine.
-                            if attr_name.find(".") >= 0:
-                                attr_name = attr_name.replace(".", "=")
-                                __logger__.debug("attribute name: %s is changed by \".\" is forbidden in MongoDB keys" % attr_name)
-                            __logger__.info("attribute full: %s" % str(entity))
-
-                            assert attr_name in entity[u'attrs'], \
-                                " ERROR -- attribute: %s is not stored in mongo" % attr_name
-
-                            assert entities_contexts["attributes_value"] == entity[u'attrs'][attr_name][u'value'], \
-                                " ERROR -- attribute value: %s is not stored successful in mongo" % attr_name
-                            if entities_contexts["attributes_type"] is None:
-                                entities_contexts["attributes_type"] = EMPTY
-                            assert entities_contexts["attributes_type"] == entity[u'attrs'][attr_name][u'type'], \
-                                " ERROR -- attribute type: %s is not stored successful in mongo" % entities_contexts["attributes_type"]
-                            # verify metadatas
-                            if entities_contexts["metadatas_number"] > 0:
-                                md = entity[u'attrs'][attr_name][u'md']
-                                for m in range(int(entities_contexts["metadatas_number"])):    # manages N metadatas
-                                    assert entities_contexts["metadatas_value"] == md[m][u'value'], \
-                                        " ERROR -- metadata value: %s is not stored successful in mongo" % entities_contexts["metadatas_value"]
-                                    if entities_contexts["metadatas_type"] is not None:
-                                        assert entities_contexts["metadatas_type"] == md[m][u'type'], \
-                                            " ERROR -- metadata type: %s is not stored successful in mongo" % entities_contexts["metadatas_type"]
-                            assert u'creDate' in entity[u'attrs'][attr_name],\
-                                " ERROR -- creDate field into attribute does not exists in document"
-                            assert u'modDate' in entity[u'attrs'][attr_name],\
-                                " ERROR -- modDate field into attribute does not exists in document"
-
-                    assert u'creDate' in entity,\
-                        " ERROR -- creDate field does not exists in document"
-                    assert u'modDate' in entity,\
-                        " ERROR -- modDate field does not exists in document"
-                __logger__.debug(" Entity id: \"%s\" is successful stored in database: \"%s\"" % (entities_contexts["entities_id"], database_name))
+                #for entity in curs_list:  # manages N entities
+                __logger__.debug("Number of docs read from mongo: %s" % str(len(curs_list)))
+                assert i < len(curs_list), " ERROR - the entity \"%s\" is not stored" % str(i)
+                entity = curs_list[i]  # manages N entities
+                # verify attributes
+                self.__verify_attributes(entity, entities_contexts)
             # verify if the entity is not stored in mongo
             else:
                 assert len(curs_list) == 0, "  ERROR - the entities should not have been saved in mongo"
-                __logger__.debug(" Entity id: \"%s\" is stored in database: \"%s\", not as expected" % (entities_contexts["entities_id"], database_name))
-
+                __logger__.debug(" Entity id: \"%s\" is stored in mongo not as expected" % entities_contexts["entities_id"])
         mongo_driver.disconnect()
+
+    def verify_entity_updated_in_mongo(self, mongo_driver, entities_contexts, headers):
+        """
+        verify that entities are not stored in mongo
+        :param entities_contexts:  entities context (see constructor in cb_v2_utils.py)
+        :param headers: headers used (see "definition_headers" method in cb_v2_utils.py)
+        """
+
+        entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers, "update")
+        assert  len(entity_list) > 0, " ERROR - notihing is returned from mongo, review the query in behave log"
+        entity = entity_list[0]
+        # verify attributes
+        self.__verify_attributes(entity, entities_contexts)
+        mongo_driver.disconnect()
+
 
     def verify_error_response(self, context, resp):
         """
@@ -307,8 +361,7 @@ class NGSI:
         verify an entity in raw mode with type in attribute value from http response
         :param entities_context:
         :param resp:
-        :param field_type:
-        :return:
+        :param field_type: data type
         """
         assert resp.text != "[]", "ERROR - It has not returned any entity"
         entity = convert_str_to_dict(resp.text, JSON)[0]   # in raw mode is used only one entity
@@ -327,16 +380,11 @@ class NGSI:
                 'ERROR - in attribute type "%s" in raw mode' % self.__remove_quote(entities_context["attributes_type"])
 
             attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-            __logger__.debug("type:  %s" % field_type)
-            __logger__.debug('field type: %s' % str(type(attribute)))
             assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                 'ERROR - in attribute value "%s" with type "%s" does not match' % (str(entities_context["attributes_value"]), field_type)
         else:
             if entities_context["metadatas_number"] > 0:
                 attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-                __logger__.debug("type:  %s" % (field_type))
-                __logger__.debug('field type: %s' % str(type(attribute)))
-
                 assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type but with metadatas' % (str(attribute["value"]), field_type)
             else:
@@ -488,16 +536,11 @@ class NGSI:
                 'ERROR - in attribute type "%s" in raw mode' % (self.__remove_quote(entities_context["attributes_type"]))
 
             attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-            __logger__.debug("type:  %s" % (field_type))
-            __logger__.debug('field type: %s' % str(type(attribute)))
             assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                 'ERROR - in attribute value "%s" with type "%s" does not match' % (str(entities_context["attributes_value"]), field_type)
         else:
             if entities_context["metadatas_number"] > 0:
                 attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
-                __logger__.debug("type:  %s" % field_type)
-                __logger__.debug('field type: %s' % str(type(attribute)))
-
                 assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type but with metadatas' % (str(attribute["value"]), field_type)
             else:
