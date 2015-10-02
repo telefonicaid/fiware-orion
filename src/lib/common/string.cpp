@@ -723,7 +723,7 @@ std::string servicePathCheck(const char* servicePath)
 
 /* ****************************************************************************
 *
-* isDouble - is there a double value in the string 's' ?
+* isFloat - is there a float value in the string 's' ?
 *
 * From the manual page of strtod:
 *   double strtod(const char *nptr, char **endptr);
@@ -751,7 +751,7 @@ std::string servicePathCheck(const char* servicePath)
 * It IS a double, but this function will say it is not, as it actually is not a valid double for
 * this computer as the computer cannot represent it as the C builtin type 'double' ... OK!
 */
-bool isDouble(const char* s)
+bool isFloat(const char* s)
 {
   char* rest = (char*) s;
   
@@ -763,7 +763,7 @@ bool isDouble(const char* s)
   }
 
   // If all WS after the last char used in the conversion, then all is OK
-  while ((*rest == ' ') || (*rest == '\t') || (*rest == '\n'))
+  while (isspace(*rest))
     ++rest;
 
   return (*rest == 0);
