@@ -147,10 +147,15 @@ Date: REGEX(.*)
 
 06. PATCH /v2/entities/E1 attr3=6 - error, as attr3 doesn't exist
 =================================================================
-HTTP/1.1 472 Unknown
-Content-Length: 0
+HTTP/1.1 404 Not Found
+Content-Length: 61
+Content-Type: application/json
 Date: REGEX(.*)
 
+{
+    "description": "No context element found",
+    "error": "NotFound"
+}
 
 
 --TEARDOWN--

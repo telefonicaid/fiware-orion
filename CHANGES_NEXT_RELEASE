@@ -16,3 +16,4 @@ Fix:  proxyCoap binary has been removed from RPM (#1202)
 Remove: deprecated command line arguments -ngsi9, -fwdHost and -fwdPort
 Remove: deprecated functionality related with associations
 Fix:  Update PATCH request with invalid service-path never return a response (#1280)
+Fix:  Error must be Not Found, when updating an unknown attribute of an existing entity on NGSIv2 update PATCH (#1278)
