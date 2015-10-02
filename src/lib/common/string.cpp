@@ -751,11 +751,12 @@ std::string servicePathCheck(const char* servicePath)
 * It IS a double, but this function will say it is not, as it actually is not a valid double for
 * this computer as the computer cannot represent it as the C builtin type 'double' ... OK!
 */
-bool isFloat(const char* s)
+bool isFloat(char* s, double* dP)
 {
-  char* rest = (char*) s;
-  
-  strtod(s, &rest);
+  char*   rest = s;
+  double  d;
+
+  d = strtod(s, &rest);
 
   if ((rest == s) || (errno == ERANGE))
   {
@@ -764,34 +765,19 @@ bool isFloat(const char* s)
 
   // If all WS after the last char used in the conversion, then all is OK
   while (isspace(*rest))
+  {
     ++rest;
+  }
 
-  return (*rest == 0);
-}
-
-
-
-/* ****************************************************************************
-*
-* stringToDouble - convert a string to a double and return TRUE if successful
-*
-* See description of isDouble. The functions are equal, except that the converted
-* double number (the output from strtod) is returned from this function.
-*/
-bool stringToDouble(const char* s, double* dP)
-{
-  char* rest = (char*) s;
-  
-  *dP = strtod(s, &rest);
-
-  if ((rest == s) || (errno == ERANGE))
+  if (*rest != 0)
   {
     return false;
   }
 
-  // If all WS after the last char used in the conversion, then all is OK
-  while ((*rest == ' ') || (*rest == '\t') || (*rest == '\n'))
-    ++rest;
+  if (dP != NULL)
+  {
+    *dP = d;
+  }
 
-  return (*rest == 0);
+  return true;
 }

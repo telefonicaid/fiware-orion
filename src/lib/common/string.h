@@ -166,15 +166,7 @@ extern std::string servicePathCheck(const char* servicePath);
 *
 * isFloat - is the string a correct float (double)?
 */
-extern bool isFloat(const char* s);
-
-
-
-/* ****************************************************************************
-*
-* stringToDouble - 
-*/
-extern bool stringToDouble(const char* s, double* dP);
+extern bool isFloat(char* s, double* dP = NULL);
 
 
 
