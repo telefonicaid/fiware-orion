@@ -71,7 +71,6 @@ std::string postEntities
 
   HttpStatusCode rcode = parseDataP->upcrs.res.contextElementResponseVector[0]->statusCode.code;
 
-  // Operation answer
   std::string answer;
 
   // 03. Prepare HTTP headers
@@ -85,10 +84,7 @@ std::string postEntities
   }
   else if (rcode == SccInvalidModification)
   {
-    OrionError oe;
-    oe.code = SccContextElementNotFound;
-    oe.reasonPhrase ="AlredyExists";
-    oe.details = "Entity alredy exists";
+    OrionError oe(SccInvalidModification, "Entity alredy exists");
     ciP->httpStatusCode = SccInvalidModification;
     answer = oe.render(ciP, "");
   }
