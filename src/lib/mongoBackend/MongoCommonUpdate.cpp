@@ -2450,9 +2450,8 @@ void processContextElement
   //
   // FIXME P6: Once we allow for ServicePath to be modified, this loop must be looked at.
   //
-  int docs = 0;
-  // to check updates
-  bool isUpdate = false;
+  int docs      = 0;
+  bool isUpdate = false; // to check updates
 
   while (cursor->more())
   {
