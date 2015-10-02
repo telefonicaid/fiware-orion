@@ -191,7 +191,7 @@
 #include "cache/subCache.h"
 #include "cache/SubscriptionCache.h"
 
-
+using namespace orion;
 
 /* ****************************************************************************
 *

@@ -55,7 +55,7 @@
 #include "jsonParse/jsonParse.h"
 
 using boost::property_tree::ptree;
-
+using namespace orion;
 
 
 /* ****************************************************************************
@@ -262,7 +262,7 @@ void eatCompound
   if (containerP == NULL)
   {
     LM_T(LmtCompoundValue, ("COMPOUND: '%s'", nodeName.c_str()));
-    containerP = new CompoundValueNode(orion::ValueTypeObject);
+    containerP = new CompoundValueNode(ValueTypeObject);
     ciP->compoundValueRoot = containerP;
   }
   else
@@ -291,17 +291,17 @@ void eatCompound
     else if ((nodeName != "") && (nodeValue == ""))  // Named Container
     {
       LM_T(LmtCompoundValue, ("Adding container '%s' under '%s'", nodeName.c_str(), containerP->cpath()));
-      containerP = containerP->add(orion::ValueTypeObject, nodeName, "");
+      containerP = containerP->add(ValueTypeObject, nodeName, "");
     }
     else if ((nodeName == "") && (nodeValue == ""))  // Name-Less container
     {
       LM_T(LmtCompoundValue, ("Adding name-less container under '%s' (parent may be a Vector!)", containerP->cpath()));
-      containerP->valueType = orion::ValueTypeVector;
-      containerP = containerP->add(orion::ValueTypeObject, "item", "");
+      containerP->valueType = ValueTypeVector;
+      containerP = containerP->add(ValueTypeObject, "item", "");
     }
     else if ((nodeName == "") && (nodeValue != ""))  // Name-Less String + its container is a vector
     {
-      containerP->valueType = orion::ValueTypeVector;
+      containerP->valueType = ValueTypeVector;
       LM_T(LmtCompoundValue, ("Set '%s' to be a vector", containerP->cpath()));
       containerP->add(orion::ValueTypeString, "item", nodeValue);
       LM_T(LmtCompoundValue, ("Added a name-less string (value: '%s') under '%s'",

@@ -41,6 +41,8 @@
 // libraries which need it)
 #define FT(x) (x == true)? "true" : "false"
 
+using namespace orion;
+
 /* ****************************************************************************
 *
 * ContextAttribute::~ContextAttribute - 

@@ -288,16 +288,16 @@ HttpStatusCode mongoUpdateContextSubscription
   std::string servicePath;
 
   servicePath = (servicePathV.size() == 0)? "" : servicePathV[0];
-  Subscription* subP = subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
+  orion::Subscription* subP = orion::subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
 
   // 1. Remove 'sub' from sub-cache (if present)
   if (subP)
   {
-    subCache->remove(subP);
+    orion::subCache->remove(subP);
   }
 
   // 2. Create 'newSub' in sub-cache (if applicable)
-  subCache->insert(tenant, newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
+  orion::subCache->insert(tenant, newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
 
   return SccOk;
 }

@@ -32,6 +32,8 @@
 #include "ngsi/Duration.h"
 #include "ngsi/Throttling.h"
 
+namespace ngsiv2 {
+
 struct EntID
 {
   std::string id;
@@ -81,6 +83,8 @@ struct Subscription
   Duration     duration;
   Notification notification;
   std::string  toJson();
+};
+
 };
 
 #endif // SRC_LIB_APITYPESV2_SUBSCRIPTION_H

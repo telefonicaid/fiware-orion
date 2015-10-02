@@ -1,3 +1,6 @@
+#ifndef SRC_LIB_MONGOBACKEND_COLLECTIONOPERATIONS_H_
+#define SRC_LIB_MONGOBACKEND_COLLECTIONOPERATIONS_H_
+
 /*
 *
 * Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
@@ -20,50 +23,26 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Orion dev team
+* Author: Fermín Galán
 */
 
-#include "serviceRoutinesV2/getAllSubscriptions.h"
+#include "mongo/client/dbclient.h"
 
-#include <string>
-#include <vector>
-
-#include "apiTypesV2/Subscription.h"
-#include "common/JsonHelper.h"
-#include "common/string.h"
-#include "mongoBackend/mongoListSubscriptions.h"
-#include "ngsi/ParseData.h"
-#include "rest/ConnectionInfo.h"
-#include "rest/OrionError.h"
+using namespace mongo;
 
 /* ****************************************************************************
 *
-* getAllSubscriptions -
-*
-* GET /v2/subscriptions
+* query -
 *
 */
-std::string getAllSubscriptions
+extern bool query
 (
-    ConnectionInfo*            ciP,
-    int                        components,
-    std::vector<std::string>&  compV,
-    ParseData*                 parseDataP
-)
-{
+    const std::string&             col,
+    const BSONObj&                 q,
+    std::auto_ptr<DBClientCursor>* cursor,
+    std::string*                   err
+);
 
-  std::vector<ngsiv2::Subscription> subs;
-  OrionError                oe = mongoListSubscriptions(subs, ciP->uriParam, ciP->tenant);
 
-  if (oe.code != SccOk)
-  {
-    return oe.render(ciP,"");
-  }
 
-  if ((ciP->uriParamOptions["count"]))
-  {
-    ciP->httpHeader.push_back("X-Total-Count");
-    ciP->httpHeaderValue.push_back(toString(subs.size()));
-  }
-  return  vectorToJson(subs);
-}
+#endif // SRC_LIB_MONGOBACKEND_COLLECTIONOPERATIONS_H_

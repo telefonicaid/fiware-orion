@@ -213,7 +213,7 @@ HttpStatusCode mongoSubscribeContext
     {
       std::string oidString = oid.toString();
 
-      subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oidString, expiration, notifyFormat));
+      orion::subCache->insert(new orion::Subscription(tenant, servicePath, requestP, oidString, expiration, notifyFormat));
     }
 
 

@@ -35,6 +35,7 @@
 
 #include "unittest.h"
 
+using namespace orion;
 
 extern void setMongoConnectionForUnitTest(DBClientBase* _connection);
 

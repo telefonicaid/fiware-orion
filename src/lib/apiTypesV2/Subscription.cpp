@@ -31,6 +31,9 @@
 
 #include "common/JsonHelper.h"
 
+namespace ngsiv2
+{
+
 /* ****************************************************************************
 *
 * Subscription::toJson -
@@ -41,8 +44,8 @@ std::string Subscription::toJson()
 
   jh.addString("id", this->id);
   if (!this->duration.isEmpty())
-  {
-    jh.addRaw("duration: ",this->duration.render(JSON,"", false));
+  {    
+    jh.addRaw("duration: ", "\"" + this->duration.get() + "\"");
   }
   jh.addRaw("subject", this->subject.toJson());
   jh.addRaw("notification", this->notification.toJson());
@@ -62,8 +65,8 @@ std::string Notification::toJson()
 
   jh.addString("callback", this->callback);
   if (!this->throttling.isEmpty())
-  {
-    jh.addRaw("throttling", this->throttling.render(JSON,"",false));
+  {    
+    jh.addRaw("throttling", "\"" + this->throttling.get() + "\"");
   }
   jh.addRaw("attributes", vectorToJson(this->attributes));
 
@@ -126,4 +129,6 @@ std::string EntID::toJson()
   jh.addString("type", this->type);
 
   return jh.str();
+}
+
 }

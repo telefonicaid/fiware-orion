@@ -293,7 +293,7 @@ static void prepareDatabase(bool initializeCache = true) {
   /* Given that preparation including csubs, we have to init cache */
   if (initializeCache == true)
   {
-    subscriptionCacheInit("");
+    orion::subscriptionCacheInit("");
   }
 }
 
@@ -375,7 +375,7 @@ static void prepareDatabaseWithNoTypeSubscriptions(void) {
     connection->insert(SUBSCRIBECONTEXT_COLL, sub5);
 
     /* Given that preparation including csubs, we have to init cache */
-    subscriptionCacheInit("");
+    orion::subscriptionCacheInit("");
 }
 
 /* ****************************************************************************

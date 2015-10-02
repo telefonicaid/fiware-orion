@@ -31,9 +31,6 @@
 #include "common/Format.h"
 #include "orionTypes/areas.h"
 
-using namespace orion;
-
-
 
 /* ****************************************************************************
 *

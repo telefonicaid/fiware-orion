@@ -458,7 +458,7 @@ std::string statisticsTreat
     out += TAG_ADD_STRING("curlContextMutexWaitingTime", ccMutexWaitingTime);
 
     char subCacheMutexWaitingTime[64];
-    subCacheMutexWaitingTimeGet(subCacheMutexWaitingTime, sizeof(subCacheMutexWaitingTime));
+    orion::subCacheMutexWaitingTimeGet(subCacheMutexWaitingTime, sizeof(subCacheMutexWaitingTime));
     out += TAG_ADD_STRING("subCacheMutexWaitingTime", subCacheMutexWaitingTime);
   }
 
