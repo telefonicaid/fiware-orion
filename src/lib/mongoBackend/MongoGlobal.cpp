@@ -1247,10 +1247,11 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         BSONArrayBuilder ba;
         for (unsigned int ix = 0; ix < valVector.size(); ++ix)
         {
-          if (isFloat(valVector[ix]))
+          double d;
+          if (str2double(valVector[ix], &d))
           {
             // number
-            ba.append(atof(valVector[ix]));
+            ba.append(d);
           }
           else
           {
@@ -1262,11 +1263,13 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
       }
       else
       {
+        double d;
+
         // Single value
-        if (isFloat(right))
+        if (str2double(right, &d))
         {
           // number
-          f = BSON(k << BSON("$in" << BSON_ARRAY(atof(right))));
+          f = BSON(k << BSON("$in" << BSON_ARRAY(d)));
         }
         else
         {
@@ -1286,10 +1289,12 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
         BSONArrayBuilder ba;
         for (unsigned int ix = 0; ix < valVector.size(); ++ix)
         {
-          if (isFloat(valVector[ix]))
+          double d;
+
+          if (str2double(valVector[ix], &d))
           {
             // number
-            ba.append(atof(valVector[ix]));
+            ba.append(d);
           }
           else
           {
@@ -1301,11 +1306,13 @@ static void qStringFilters(std::string& in, std::vector<BSONObj> &filters)
       }
       else
       {
+        double d;
+
         // Single value
-        if (isFloat(right))
+        if (str2double(right, &d))
         {
           // number
-          f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(atof(right))));
+          f = BSON(k << BSON("$exists" << true << "$nin" << BSON_ARRAY(d)));
         }
         else
         {
