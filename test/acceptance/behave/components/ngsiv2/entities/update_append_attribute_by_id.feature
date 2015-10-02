@@ -148,7 +148,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | description | Zero/No Content-Length in PUT/POST/PATCH request |
 
   @maximum_size @BUG_1199
-    # 8972 is a way of generating a request longer than 1MB (in fact, 1048697 bytes)
+    # 5023 attributes is a way of generating a request longer than 1MB (in fact, 1048697 bytes)
   Scenario:  try to update or append attributes in NGSI v2 with maximum size in payload (5023 attributes = 1048697 bytes)
     Given  a definition of headers
       | parameter          | value             |
@@ -1810,7 +1810,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=10000         |
       | random=100000        |
 
-  @attribute_metadata_name_append @BUG_1220 @skip
+  @attribute_metadata_name_append @BUG_1220 @BUG_1217 @skip
   Scenario Outline:  append an attribute by entity ID in NGSI v2 with several attribute metadata name
     Given  a definition of headers
       | parameter          | value                               |

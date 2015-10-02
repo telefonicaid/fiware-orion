@@ -465,8 +465,8 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room_18     | random=100 |
       | room_19     | random=960 |
 
-  @entity_id_append @BUG_1260
-  Scenario Outline:  try to append attributes by entity ID in NGSI v2 with several entity id values
+  @entity_id_no_exists @BUG_1260
+  Scenario Outline:  try to update attribute that doesn't previously exists in the entity using NGSI v2 API with several entity id values
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_update_entity_id |
@@ -607,8 +607,8 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=10000    |
       | random=100000   |
 
-  @attribute_name_append_invalid
-  Scenario Outline:  try to append attributes by entity ID in NGSI v2 with invalid attribute names
+  @attribute_name_invalid
+  Scenario Outline:  try to update attribute that doesn't previously exists in the entity using NGSI v2 API with invalid attribute names
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_attribute_name_update_error |
@@ -671,8 +671,8 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | ["34", "a", 45] |
       | null            |
 
-  @attribute_name_append_empty
-  Scenario:  try to append attributes by entity ID in NGSI v2 with empty attribute name
+  @attribute_name_empty
+  Scenario:  try to update attribute that doesn't previously exists in the entity using NGSI v2 API with empty attribute name
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_attribute_name_update_error |
@@ -699,7 +699,6 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | parameter   | value                          |
       | error       | ParseError                     |
       | description | no 'name' for ContextAttribute |
-
 
   # --------------------- attribute value  ------------------------------------
 
@@ -834,8 +833,8 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=10000     |
       | random=100000    |
 
-  @attribute_value_append @BUG_1278
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with several attribute values
+  @attribute_value_not_exists @BUG_1278
+  Scenario Outline:  try to update attribute that doesn't previously exists in the entity using NGSI v2 API with several attribute values
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_update_attribute_value |
@@ -1005,8 +1004,8 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room16    | "2017-06-17T07:21:24.238Z"                                                    |
       | room17    | null                                                                          |
 
-  @attribute_value_append_special @BUG_1106 @BUG_1260 @BUG_1278 @skip
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc)
+  @attribute_value_not_exists_special @BUG_1106 @BUG_1260 @BUG_1278 @skip
+  Scenario Outline:  try to update attribute that doesn't previously exists in the entity using NGSI v2 API with special attribute values (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1218,8 +1217,8 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room16    | "2017-06-17T07:21:24.238Z"                                                    |
       | room17    | null                                                                          |
 
-  @attribute_value_append_special_with_metadata_in_update @BUG_1106  @BUG_1260 @BUG_1278
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc) without attribute type not metadata but with metadatas in update
+  @attribute_value_not_exists_special_with_metadata_in_update @BUG_1106  @BUG_1260 @BUG_1278
+  Scenario Outline:  try to update attribute that doesn't previously exists in the entity using NGSI v2 API with special attribute values (compound, vector, boolean, etc) without attribute type not metadata but with metadatas in update
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1436,13 +1435,13 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=10000    |
       | random=100000   |
 
-  @attribute_type_append @BUG_1212 @BUG_1260 @BUG_1278
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with several attributes type
+  @attribute_type_not_exists @BUG_1212 @BUG_1260 @BUG_1278
+  Scenario Outline:  try to update attribute that doesn't previously exists in the entity using NGSI v2 API with several attributes type
     Given  a definition of headers
-      | parameter          | value                 |
-      | Fiware-Service     | attribute_type_append |
-      | Fiware-ServicePath | /test                 |
-      | Content-Type       | application/json      |
+      | parameter          | value                          |
+      | Fiware-Service     | attribute_type_sttr_not_exists |
+      | Fiware-ServicePath | /test                          |
+      | Content-Type       | application/json               |
     And create "1" entities with "3" attributes
       | parameter        | value       |
       | entities_type    | house       |
@@ -1628,13 +1627,13 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=10000         |
       | random=100000        |
 
-  @attribute_metadata_name_append @BUG_1220 @skip
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with several attribute metadata name
+  @attribute_metadata_name_update @BUG_1220 @skip
+  Scenario Outline:  update an existent attribute by entity ID using NGSI v2 API with a new attribute metadata name
     Given  a definition of headers
-      | parameter          | value                               |
-      | Fiware-Service     | test_attribute_metadata_name_append |
-      | Fiware-ServicePath | /test                               |
-      | Content-Type       | application/json                    |
+      | parameter          | value                            |
+      | Fiware-Service     | test_attribute_metadata_name_new |
+      | Fiware-ServicePath | /test                            |
+      | Content-Type       | application/json                 |
     And create "1" entities with "1" attributes
       | parameter        | value       |
       | entities_type    | house       |
@@ -1919,13 +1918,13 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=10000          |
       | random=100000         |
 
-  @attribute_metadata_value_append @BUG_1220 @skip
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with several attribute metadata values without attribute metadata type
+  @attribute_metadata_value_new_without_meta_type @BUG_1220 @skip
+  Scenario Outline:  update an existent attribute by entity ID using NGSI v2 API with a new attribute metadata, without attribute metadata type and several metadata values
     Given  a definition of headers
-      | parameter          | value                           |
-      | Fiware-Service     | attribute_metadata_value_append |
-      | Fiware-ServicePath | /test                           |
-      | Content-Type       | application/json                |
+      | parameter          | value                        |
+      | Fiware-Service     | attribute_metadata_value_new |
+      | Fiware-ServicePath | /test                        |
+      | Content-Type       | application/json             |
     And create "1" entities with "3" attributes
       | parameter        | value       |
       | entities_type    | house       |
@@ -1969,13 +1968,13 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=10000          |
       | random=100000         |
 
-  @attribute_metadata_value_append @BUG_1220 @skip
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with several attribute metadata values with attribute metadata type
+  @attribute_metadata_value_new_with_meta_type @BUG_1220 @skip
+  Scenario Outline: update an existent attribute by entity ID using NGSI v2 API with a new attribute metadata, with attribute metadata type and several metadata values
     Given  a definition of headers
-      | parameter          | value                           |
-      | Fiware-Service     | attribute_metadata_value_append |
-      | Fiware-ServicePath | /test                           |
-      | Content-Type       | application/json                |
+      | parameter          | value                        |
+      | Fiware-Service     | attribute_metadata_value_new |
+      | Fiware-ServicePath | /test                        |
+      | Content-Type       | application/json             |
     And create "1" entities with "3" attributes
       | parameter        | value       |
       | entities_type    | house       |
@@ -2021,7 +2020,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=100000         |
 
   # compound metadatas values are pending
-  @attribute_metadata_value_update_special_without_meta_type
+  @attribute_metadata_value_update_special_without_meta_type @BUG_1220 @skip
   Scenario Outline:  update an attribute by entity ID in NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type
     Given  a definition of headers
       | parameter          | value                               |
@@ -2054,7 +2053,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room5     | 5.00002               |
       | room6     | -5.00002              |
 
-  @attribute_metadata_value_update_special_with_meta_type
+  @attribute_metadata_value_update_special_with_meta_type @BUG_1220 @skip
   Scenario Outline:  update an attribute by entity ID in NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and with attribute metadata type
     Given  a definition of headers
       | parameter          | value                               |
@@ -2088,8 +2087,8 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room5     | 5.00002               |
       | room6     | -5.00002              |
 
-  @attribute_metadata_value_append_special_without_meta_type
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type
+  @attribute_metadata_value_new_special_without_meta_type @BUG_1220 @skip
+  Scenario Outline:  update an existent attribute by entity ID using NGSI v2 API with a new attribute metadata, without attribute metadata type and special metadata values (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -2121,8 +2120,8 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room5     | 5.00002               |
       | room6     | -5.00002              |
 
-  @attribute_metadata_value_append_special_with_meta_type
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and with attribute metadata type
+  @attribute_metadata_value_special_new_with_meta_type
+  Scenario Outline:  update an existent attribute by entity ID using NGSI v2 API with a new attribute metadata, with attribute metadata type and special metadata values (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -2156,7 +2155,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room6     | -5.00002              |
 
   @attribute_metadata_value_update_error @BUG_1216 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with forbidden attributes metadata values without attribute metadata type
+  Scenario Outline:  try to update an attribute by entity ID in NGSI v2 with forbidden attributes metadata values without attribute metadata type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | attribute_metadata_value_update_error |
@@ -2183,7 +2182,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room_8    | house(flat)           |
 
   @attribute_metadata_value_update_error @BUG_1216 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with forbidden attributes metadata values with attribute metadata type
+  Scenario Outline:  try to update an attribute by entity ID in NGSI v2 with forbidden attributes metadata values with attribute metadata type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | attribute_metadata_value_update_error |
@@ -2210,7 +2209,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room_8    | house(flat)           |
 
   @attribute_metadata_value_update_error
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attributes metadata values without attribute metadata type
+  Scenario Outline:  try to update an attribute by entity ID in NGSI v2 with wrong attributes metadata values without attribute metadata type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | attribute_metadata_value_update_error |
@@ -2244,7 +2243,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room_14   | "a": "b"}             |
 
   @attribute_metadata_value_update_error
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attributes metadata values with attribute metadata type
+  Scenario Outline:  try to update an attribute by entity ID in NGSI v2 with wrong attributes metadata values with attribute metadata type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | attribute_metadata_value_update_error |
@@ -2298,7 +2297,7 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | metadatas_type   | alarm       |
       | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When update or append attributes by ID "room"
+    When update an attribute by ID "room" if it exists
       | parameter       | value                  |
       | attributes_name | temperature            |
       | metadatas_name  | very_hot_0             |
@@ -2327,8 +2326,8 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=10000         |
       | random=100000        |
 
-  @attribute_metadata_type_append @BUG_1216 @skip
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with several attribute metadata type
+  @attribute_metadata_type_new @BUG_1216 @skip
+  Scenario Outline:  update an existent attribute by entity ID using NGSI v2 API with a new attribute metadata and different attribute metadata type
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | attribute_metadata_type_update |
@@ -2345,13 +2344,13 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | metadatas_type   | alarm       |
       | metadatas_value  | hot         |
     And verify that receive several "Created" http code
-    When update or append attributes by ID "room"
+    When update an attribute by ID "room" if it exists
       | parameter       | value                  |
       | attributes_name | temperature            |
       | metadatas_name  | very_hot_0             |
       | metadatas_value | 678                    |
       | metadatas_type  | <attributes_meta_type> |
-    Then verify that receive an "Created" http code
+    Then verify that receive an "No content" http code
     And verify that an entity is updated in mongo
     Examples:
       | attributes_meta_type |
@@ -2375,13 +2374,13 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | random=100000        |
 
   @attribute_metadata_type_update_error @BUG_1232 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with forbidden attribute metadata type
+  Scenario Outline:  try to update an attribute by entity ID in NGSI v2 with forbidden attribute metadata type
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | attribute_metadata_type_update |
       | Fiware-ServicePath | /test                          |
       | Content-Type       | application/json               |
-    When update or append attributes by ID "<entity_id>"
+    When update an attribute by ID "<entity_id>" if it exists   "
       | parameter       | value                  |
       | attributes_name | temperature            |
       | metadatas_name  | very_hot_0             |
@@ -2403,13 +2402,13 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room_8    | house(flat)          |
 
   @attribute_metadata_type_update_wrong
-  Scenario Outline:  try to append or update an attribute by entity ID in NGSI v2 with wrong metadata attribute types
+  Scenario Outline:  try to update an attribute by entity ID in NGSI v2 with wrong metadata attribute types
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_update_attribute_type_error |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    When update or append attributes by ID "<entity_id>" in raw mode
+    When update an attribute by ID "<entity_id>" if it exists in raw mode
       | parameter       | value                  |
       | attributes_name | "temperature"          |
       | metadatas_name  | "very_cold"            |
@@ -2425,14 +2424,14 @@ Feature: update an attribute by entity ID if it exists in NGSI v2. "PATCH" - /v2
       | room1     | rewrewr              |
       | room2     | SDFSDFSDF            |
 
-  @attribute_metadata_type_update_wrong_ii @BUG_1232 @skip
-  Scenario Outline:  try to append or update an attribute by entity ID in NGSI v2 with wrong metadata attribute types
+  @attribute_metadata_type_update_wrong @BUG_1232 @skip
+  Scenario Outline:  try to update an attribute by entity ID in NGSI v2 with wrong metadata attribute types
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_update_attribute_type_error |
       | Fiware-ServicePath | /test                            |
       | Content-Type       | application/json                 |
-    When update or append attributes by ID "<entity_id>" in raw mode
+    When update an attribute by ID "<entity_id>" if it exists in raw mode
       | parameter       | value                  |
       | attributes_name | "temperature"          |
       | metadatas_name  | "very_cold"            |
