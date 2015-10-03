@@ -287,7 +287,9 @@ TEST(mongoOntimeintervalOperations, mongoGetContextSubscriptionInfo_dbfail)
 
     /* Check results */
     EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("boom!!", err);
+    EXPECT_EQ("Database Error (collection: utest.csubs "
+              "- findOne(): { _id: ObjectId('51307b66f481db11bf860001') } "
+              "- exception: boom!!)", err);
 
     /* Release mock */
     setMongoConnectionForUnitTest(NULL);
@@ -515,10 +517,10 @@ TEST(mongoOntimeintervalOperations, mongoGetContextElementResponses_dbfail)
 
     /* Check results */
     EXPECT_EQ(SccOk, ms);
-    EXPECT_EQ("collection: utest.entities - "
+    EXPECT_EQ("Database Error (collection: utest.entities - "
               "query(): { query: { $or: [ { _id.id: \"E1\", _id.type: \"T\" }, { _id.id: \"E2\", _id.type: \"T\" } ], _id.servicePath: { $in: [ /^/.*/, null ] }, "
               "attrNames: { $in: [ \"A1\", \"A2\", \"A3\", \"A4\" ] } }, orderby: { creDate: 1 } } - "
-              "exception: boom!!", err);    
+              "exception: boom!!)", err);
 
     /* Release mock */
     setMongoConnectionForUnitTest(NULL);
@@ -639,7 +641,9 @@ TEST(mongoOntimeintervalOperations, mongoUpdateCsubNewNotification_dbfail)
 
     /* Check results */
     EXPECT_EQ(SccReceiverInternalError, ms);
-    EXPECT_EQ("boom!!", err);
+    EXPECT_EQ("Database Error (collection: utest.csubs "
+              "- update(): <{ _id: ObjectId('51307b66f481db11bf860001') },{ $set: { lastNotification: 1360232700 }, $inc: { count: 1 } }> "
+              "- exception: boom!!)", err);
 
     /* Check that database is as expected (untouched) */   
 

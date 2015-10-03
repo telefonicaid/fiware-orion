@@ -32,6 +32,7 @@
 #include "common/defaultValues.h"
 #include "mongoBackend/mongoRegisterContext.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/MongoCommonRegister.h"
 #include "ngsi/StatusCode.h"
 #include "ngsi9/RegisterContextRequest.h"
@@ -54,7 +55,6 @@ HttpStatusCode mongoRegisterContext
   const std::string&                   servicePath
 )
 {
-    DBClientBase*      connection    = NULL;
     std::string        sPath         = servicePath;
     const std::string  notifyFormat  = uriParam[URI_PARAM_NOTIFY_FORMAT];
     bool               reqSemTaken;
@@ -78,57 +78,33 @@ HttpStatusCode mongoRegisterContext
     }
 
     /* It is not a new registration, so it should be an update */
-    BSONObj reg;
-    OID     id;
+    BSONObj     reg;
+    std::string err;
+    OID         id;
+
     try
     {
-        id = OID(requestP->registrationId.get());
-
-        connection = getMongoConnection();
-        reg = connection->findOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id << "servicePath" << sPath));
-        releaseMongoConnection(connection);
-
-        LM_I(("Database Operation Successful (findOne _id: %s)", id.toString().c_str()));
+      id = OID(requestP->registrationId.get());
     }
     catch (const AssertionException &e)
     {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
-
-        /* This happens when OID format is wrong */
-        // FIXME: this checking should be done at parsing stage, without progressing to
-        // mongoBackend. By the moment we can live this here, but we should remove in the future
-        responseP->errorCode.fill(SccContextElementNotFound);
-        responseP->registrationId = requestP->registrationId;
-        ++noOfRegistrationUpdateErrors;
-        LM_W(("Bad Input (invalid OID format)"));
-        return SccOk;
+      reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
+      /* This happens when OID format is wrong */
+      // FIXME: this checking should be done at parsing stage, without progressing to
+      // mongoBackend. By the moment we can live this here, but we should remove in the future
+      responseP->errorCode.fill(SccContextElementNotFound);
+      responseP->registrationId = requestP->registrationId;
+      ++noOfRegistrationUpdateErrors;
+      LM_W(("Bad Input (invalid OID format)"));
+      return SccOk;
     }
-    catch (const DBException &e)
-    {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
 
-        responseP->errorCode.fill(SccReceiverInternalError,
-                                  std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
-                                  " - findOne() _id: " + requestP->registrationId.get() +
-                                  " - exception: " + e.what());
-        ++noOfRegistrationUpdateErrors;
-        LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
-        return SccOk;
-    }
-    catch (...)
+    if (!collectionFindOne(getRegistrationsCollectionName(tenant).c_str(), BSON("_id" << id << REG_SERVICE_PATH << sPath), &reg, &err))
     {
-        releaseMongoConnection(connection);
-        reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
-
-        responseP->errorCode.fill(SccReceiverInternalError,
-                                  std::string("collection: ") + getRegistrationsCollectionName(tenant).c_str() +
-                                  " - findOne() _id: " + requestP->registrationId.get() +
-                                  " - exception: " + "generic");
-        ++noOfRegistrationUpdateErrors;
-        LM_E(("Database Error (%s)", responseP->errorCode.details.c_str()));
-        return SccOk;
+      reqSemGive(__FUNCTION__, "ngsi9 register request", reqSemTaken);
+      responseP->errorCode.fill(SccReceiverInternalError, err);
+      ++noOfRegistrationUpdateErrors;
+      return SccOk;
     }
 
     if (reg.isEmpty())

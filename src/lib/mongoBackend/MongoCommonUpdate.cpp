@@ -42,6 +42,7 @@
 #include "cache/subCache.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
 #include "ngsi/Scope.h"
@@ -2059,9 +2060,7 @@ static bool removeEntity
   const std::string    idString          = "_id." ENT_ENTITY_ID;
   const std::string    typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string    servicePathString = "_id." ENT_SERVICE_PATH;
-  DBClientBase*        connection        = NULL;
   BSONObjBuilder       bob;
-  BSONObj              query;
 
   bob.append(idString, entityId);
   if (entityType == "")
@@ -2082,41 +2081,10 @@ static bool removeEntity
     bob.append(servicePathString, servicePath);
   }
 
-  query = bob.obj();
-
-  try
+  std::string err;
+  if (!collectionRemove(getEntitiesCollectionName(tenant), bob.obj(), &err))
   {
-    LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", getEntitiesCollectionName(tenant).c_str(),
-                    query.toString().c_str()));
-
-    connection = getMongoConnection();
-    connection->remove(getEntitiesCollectionName(tenant).c_str(), query);
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (remove %s)", query.toString().c_str()));
-  }
-  catch (const DBException &e)
-  {
-    releaseMongoConnection(connection);
-
-    cerP->statusCode.fill(SccReceiverInternalError,
-                          std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                          " - remove() query: " + query.toString() +
-                          " - exception: " + e.what());
-
-    LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
-    return false;
-  }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-
-    cerP->statusCode.fill(SccReceiverInternalError,
-                          std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                          " - remove() query: " + query.toString() +
-                          " - exception: " + "generic");
-
-    LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
+    cerP->statusCode.fill(SccReceiverInternalError, err);
     return false;
   }
 

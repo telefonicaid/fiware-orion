@@ -29,7 +29,8 @@
 #include <sstream>
 #include <vector>
 
-
+// the same macro in parseArg library
+#define FT(x) (x == true)? "true" : "false"
 
 /* ****************************************************************************
 *
