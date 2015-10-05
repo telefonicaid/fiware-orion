@@ -28,9 +28,9 @@
 #
 
 
-Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
+Feature: get an entity by ID using NGSI v2. "GET" - /v2/entities/<entity_id>
   As a context broker user
-  I would like to get an entity by ID in NGSI v2
+  I would like to get an entity by ID using NGSI v2
   So that I can manage and use them in my scripts
 
   BackgroundFeature:
@@ -40,7 +40,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
   Check: verify mongo is installed successfully
 
   @happy_path
-  Scenario:  get an entity by ID in NGSI v2
+  Scenario:  get an entity by ID using NGSI v2
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_id_happy_path |
@@ -65,7 +65,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
     And verify that the entity by ID is returned
 
   @more_entities
-  Scenario:  try get an entity by ID in NGSI v2 with more than one entity with the same id
+  Scenario:  try get an entity by ID using NGSI v2 with more than one entity with the same id
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_id_more_entities |
@@ -97,7 +97,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
     # ------------------------ Service ----------------------------------------------
 
   @service
-  Scenario Outline:  get an entity by ID in NGSI v2 with several services headers
+  Scenario Outline:  get an entity by ID using NGSI v2 with several services headers
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
@@ -125,7 +125,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | max length allowed |
 
   @service_without
-  Scenario:  get an entity by ID in NGSI v2 without services headers
+  Scenario:  get an entity by ID using NGSI v2 without services headers
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
@@ -144,7 +144,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
     And verify that the entity by ID is returned
 
   @service_error
-  Scenario Outline:  try to get an entity by ID in NGSI v2 with several wrong services headers
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value     |
       | Fiware-Service     | <service> |
@@ -170,7 +170,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
    # ------------------------ Service path ----------------------------------------------
 
   @service_path
-  Scenario Outline:  get an entity by ID in NGSI v2 with several service paths headers
+  Scenario Outline:  get an entity by ID using NGSI v2 with several service paths headers
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_id_service_path |
@@ -201,7 +201,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | max length allowed and ten levels                             |
 
   @service_path_without
-  Scenario:  get an entity by ID in NGSI v2 without service paths headers
+  Scenario:  get an entity by ID using NGSI v2 without service paths headers
     Given  a definition of headers
       | parameter      | value                        |
       | Fiware-Service | test_id_service_path_without |
@@ -220,7 +220,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
     And verify that the entity by ID is returned
 
   @service_path_error
-  Scenario Outline:  try to get an entity by ID in NGSI v2 with several wrong service paths headers
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_id_service_path_error |
@@ -244,7 +244,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | /serv(45)    |
 
   @service_path_error
-  Scenario Outline:  try to get an entity by ID in NGSI v2 with several wrong service paths headers
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_id_service_path_error |
@@ -264,7 +264,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | /service,sr  |
 
   @service_path_error
-  Scenario Outline:  try to get an entity by ID in NGSI v2 with several wrong service paths headers
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_id_service_pat:error |
@@ -284,7 +284,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | greater than max length allowed and ten levels |
 
   @service_path_error
-  Scenario:  try to get an entity by ID in NGSI v2 with several wrong service paths headers
+  Scenario:  try to get an entity by ID using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
       | parameter          | value                                |
       | Fiware-Service     | test_id_service_path_error           |
@@ -302,7 +302,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
   # -------------- with/without attribute type or metadatas -----------------------
 
   @without_attribute_type
-  Scenario Outline:  get an entity by ID in NGSI v2 without attribute type
+  Scenario Outline:  get an entity by ID using NGSI v2 without attribute type
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_id_without_attribute_type |
@@ -343,7 +343,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | random=100000           |
 
   @compound_without_attribute_type @BUG_1106 @skip
-  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and without attribute type (compound, vector, boolean, etc)
+  Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and without attribute type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_id_without_attribute_type |
@@ -380,7 +380,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | "room17"  | null                                                                          | NoneType |
 
   @with_attribute_type
-  Scenario Outline:  get an entity by ID in NGSI v2 with attribute type
+  Scenario Outline:  get an entity by ID using NGSI v2 with attribute type
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_id_without_attribute_type |
@@ -422,7 +422,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | random=100000           |
 
   @compound_with_attribute_type @BUG_1106 @skip
-  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and with attribute type (compound, vector, boolean, etc)
+  Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and with attribute type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_id_with_attribute_type |
@@ -460,7 +460,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | "room17"  | null                                                                          | NoneType |
 
   @with_metadata
-  Scenario Outline:  get an entity by ID in NGSI v2 with metadata
+  Scenario Outline:  get an entity by ID using NGSI v2 with metadata
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_id_metadata |
@@ -505,7 +505,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | random=100000           |
 
   @compound_with_metadata @BUG_1106 @skip
-  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and with metadatas (compound, vector, boolean, etc)
+  Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and with metadatas (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_id_with_attribute_type |
@@ -547,7 +547,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | "room17"  | null                                                                          | NoneType |
 
   @without_metadata_type
-  Scenario Outline:  get an entity by ID in NGSI v2 without metadata type
+  Scenario Outline:  get an entity by ID using NGSI v2 without metadata type
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_id_metadata |
@@ -592,7 +592,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | random=100000           |
 
   @compound_with_metadata_without_meta_type @BUG_1106 @skip
-  Scenario Outline: get an entity by ID in NGSI v2 with special attribute values and with metadatas but without
+  Scenario Outline: get an entity by ID using NGSI v2 with special attribute values and with metadatas but without
                     metadata type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
@@ -636,7 +636,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
  # --------------------- entity ID ----------------------------------------------
 
   @entity_id
-  Scenario Outline:  get an entity by ID in NGSI v2 with several entity id values
+  Scenario Outline:  get an entity by ID using NGSI v2 with several entity id values
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_id_entity_id |
@@ -666,7 +666,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | room_2    |
 
   @entity_id_unknown
-  Scenario:  try to get an entity by ID in NGSI v2 with unknown entity id
+  Scenario:  try to get an entity by ID using NGSI v2 with unknown entity id
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_id_entity_id_unknown |
@@ -694,7 +694,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | description | The requested entity has not been found. Check type and id |
 
   @entity_id_invalid
-  Scenario Outline:  try to get an entity by ID in NGSI v2 with invalid entity id
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with invalid entity id
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_id_entity_id_invalid |
@@ -722,7 +722,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
   # --------------------- queries parameters -----------------------------
 
   @query_parameter_without
-  Scenario:  get an entity by ID in NGSI v2 without query parameter
+  Scenario:  get an entity by ID using NGSI v2 without query parameter
     Given  a definition of headers
       | parameter          | value                   |
       | Fiware-Service     | test_id_q_param_without |
@@ -745,7 +745,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
     And verify that the entity by ID is returned
 
   @query_parameter_without_attribute_type
-  Scenario:  get an entity by ID in NGSI v2 with query parameter without attribute type
+  Scenario:  get an entity by ID using NGSI v2 with query parameter without attribute type
     Given  a definition of headers
       | parameter          | value                             |
       | Fiware-Service     | test_id_q_param_without_attr_type |
@@ -765,7 +765,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
     And verify that the entity by ID is returned
 
   @query_parameter_with_metadatas
-  Scenario:  get an entity by ID in NGSI v2 with query parameter and metadatas
+  Scenario:  get an entity by ID using NGSI v2 with query parameter and metadatas
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_id_q_param_with_metadatas |
@@ -789,7 +789,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
     And verify that the entity by ID is returned
 
   @query_parameter_without_metadata_type
-  Scenario:  get an entity by ID in NGSI v2 with query parameter and without metadata type
+  Scenario:  get an entity by ID using NGSI v2 with query parameter and without metadata type
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_id_q_param_with_metadatas |
@@ -812,7 +812,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
     And verify that the entity by ID is returned
 
   @query_parameter_multiples_attributes
-  Scenario Outline:  get an entity by ID in NGSI v2 with query parameter and multiples attributes
+  Scenario Outline:  get an entity by ID using NGSI v2 with query parameter and multiples attributes
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_id_q_param_with_metadatas |
@@ -837,7 +837,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | temperature_0,temperature_5,temperature_8 |
 
   @query_parameter_error
-  Scenario:  try to get an entity by ID in NGSI v2 with wrong query parameter
+  Scenario:  try to get an entity by ID using NGSI v2 with wrong query parameter
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_id_q_param_with_metadatas |
@@ -860,7 +860,7 @@ Feature: get an entity by ID in NGSI v2. "GET" - /v2/entities/<entity_id>
       | description | The requested entity has not been found. Check type and id |
 
   @query_parameter_invalid
-  Scenario Outline:  try to get an entity by ID in NGSI v2 with invalid query parameter
+  Scenario Outline:  try to get an entity by ID using NGSI v2 with invalid query parameter
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | test_id_q_param_with_metadatas |

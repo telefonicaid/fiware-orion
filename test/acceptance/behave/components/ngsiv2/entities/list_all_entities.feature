@@ -28,9 +28,9 @@
 #
 
 
-Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
+Feature: list all entities with requests using NGSI v2. "GET" - /v2/entities/
   As a context broker user
-  I would like to list all entities with get requests in NGSI v2
+  I would like to list all entities with get requests using NGSI v2
   So that I can manage and use them in my scripts
 
   BackgroundFeature:
@@ -40,7 +40,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
   Check: verify mongo is installed successfully
 
   @happy_path
-  Scenario:  list all entities in NGSI v2
+  Scenario:  list all entities using NGSI v2
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_list_happy_path |
@@ -67,7 +67,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
 
   # ------------------------ Service ----------------------------------------------
   @service
-  Scenario Outline:  list all entities in NGSI v2 with several services headers
+  Scenario Outline:  list all entities using NGSI v2 with several services headers
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
@@ -96,7 +96,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | max length allowed |
 
   @service_without
-  Scenario:  list all entities in NGSI v2 without service header
+  Scenario:  list all entities using NGSI v2 without service header
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
@@ -116,7 +116,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
     And verify that all entities are returned
 
   @service_error
-  Scenario Outline:  try to list all entities in NGSI v2 with several wrong services headers
+  Scenario Outline:  try to list all entities using NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value     |
       | Fiware-Service     | <service> |
@@ -139,7 +139,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
 
  # ------------------------ Service path ----------------------------------------------
   @service_path
-  Scenario Outline:  list all entities in NGSI v2 with several service paths headers
+  Scenario Outline:  list all entities using NGSI v2 with several service paths headers
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_service_path |
@@ -171,7 +171,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | max length allowed and ten levels                             |
 
   @service_path_without
-  Scenario:  list all entities in NGSI v2 without service path header
+  Scenario:  list all entities using NGSI v2 without service path header
     Given  a definition of headers
       | parameter      | value                     |
       | Fiware-Service | test_service_path_without |
@@ -191,7 +191,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
     And verify that all entities are returned
 
   @service_path_error
-  Scenario Outline:  try to list all entities in NGSI v2 with wrong service path header
+  Scenario Outline:  try to list all entities using NGSI v2 with wrong service path header
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_list_service_path_error |
@@ -215,7 +215,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | /serv(45)    |
 
   @service_path_error
-  Scenario Outline:  try to list all entities in NGSI v2 with wrong service path header
+  Scenario Outline:  try to list all entities using NGSI v2 with wrong service path header
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_list_service_path_error |
@@ -235,7 +235,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | /service,sr  |
 
   @service_path_error
-  Scenario Outline: try to list all entities in NGSI v2 with wrong service path header
+  Scenario Outline: try to list all entities using NGSI v2 with wrong service path header
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_list_service_path_error |
@@ -255,7 +255,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | greater than max length allowed and ten levels |
 
   @service_path_error
-  Scenario: try to list all entities in NGSI v2 with wrong service path header
+  Scenario: try to list all entities using NGSI v2 with wrong service path header
     Given  a definition of headers
       | parameter          | value                                |
       | Fiware-Service     | test_list_service_path_error         |
@@ -273,7 +273,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
   # -------------- with/without attribute type or metadatas -----------------------
 
   @without_attribute_type
-  Scenario Outline:  list all entities in NGSI v2 with several attribute values and without attribute type
+  Scenario Outline:  list all entities using NGSI v2 with several attribute values and without attribute type
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_list_without_attribute_type |
@@ -315,7 +315,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | random=100000           |
 
   @compound_without_attribute_type @BUG_1106 @skip
-  Scenario Outline:  list all entities in NGSI v2 with special attribute values and without attribute type (compound, vector, boolean, etc)
+  Scenario Outline:  list all entities using NGSI v2 with special attribute values and without attribute type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_list_without_attribute_type |
@@ -352,7 +352,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | "room17"  | null                                                                          | NoneType |
 
   @with_attribute_type
-  Scenario Outline:  list all entities in NGSI v2 with several attribute values and attribute type
+  Scenario Outline:  list all entities using NGSI v2 with several attribute values and attribute type
     Given  a definition of headers
       | parameter          | value                         |
       | Fiware-Service     | test_list_with_attribute_type |
@@ -395,7 +395,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | random=100000           |
 
   @compound_with_attribute_type @BUG_1106 @skip
-  Scenario Outline:  list all entities in NGSI v2 with special attribute values and attribute type (compound, vector, boolean, etc)
+  Scenario Outline:  list all entities using NGSI v2 with special attribute values and attribute type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_list_without_attribute_type |
@@ -433,7 +433,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | "room17"  | null                                                                          | NoneType |
 
   @with_metadatas
-  Scenario Outline:  list all entities in NGSI v2 with several attribute values and with metadatas
+  Scenario Outline:  list all entities using NGSI v2 with several attribute values and with metadatas
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_list_happy_path |
@@ -479,7 +479,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | random=100000           |
 
   @compound_with_metadata @BUG_1106 @skip
-  Scenario Outline:  list all entities in NGSI v2 with special attribute values and metadatas (compound, vector, boolean, etc)
+  Scenario Outline:  list all entities using NGSI v2 with special attribute values and metadatas (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_list_without_attribute_type |
@@ -520,7 +520,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | "room17"  | null                                                                          | NoneType |
 
   @without_metadata_type
-  Scenario Outline:  list all entities in NGSI v2 without metadata type
+  Scenario Outline:  list all entities using NGSI v2 without metadata type
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | test_list_without_metadata_type |
@@ -565,7 +565,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | random=100000           |
 
   @compound_with_metadata_without_meta_type @BUG_1106 @skip
-  Scenario Outline:  list all entities in NGSI v2 with special attribute values and metatadas but without metadata type (compound, vector, boolean, etc)
+  Scenario Outline:  list all entities using NGSI v2 with special attribute values and metatadas but without metadata type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_list_without_attribute_type |
@@ -606,7 +606,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
   # ------------------ queries parameters -------------------------------
 
   @only_limit
-  Scenario Outline:  list all entities in NGSI v2 with only limit query parameter
+  Scenario Outline:  list all entities using NGSI v2 with only limit query parameter
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_list_only_limit |
@@ -635,7 +635,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | 20    |
 
   @only_limit_error
-  Scenario Outline:  try to list all entities in NGSI v2 with only wrong limit query parameter
+  Scenario Outline:  try to list all entities using NGSI v2 with only wrong limit query parameter
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_list_only_limit_error |
@@ -670,7 +670,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | %@#   |
 
   @only_limit_error
-  Scenario:  try to list all entities in NGSI v2 with only wrong limit query parameter
+  Scenario:  try to list all entities using NGSI v2 with only wrong limit query parameter
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_list_only_limit_error |
@@ -698,7 +698,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | description | Bad pagination limit: /0/ [a value of ZERO is unacceptable] |
 
   @only_offset
-  Scenario Outline:  list all entities in NGSI v2 with only offset query parameter
+  Scenario Outline:  list all entities using NGSI v2 with only offset query parameter
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_list_only_offset |
@@ -728,7 +728,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | 20     |
 
   @only_offset_error
-  Scenario Outline:  try to list all entities in NGSI v2 with only wrong offset query parameter
+  Scenario Outline:  try to list all entities using NGSI v2 with only wrong offset query parameter
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_list_only_offset_error |
@@ -763,7 +763,7 @@ Feature: list all entities with get requests in NGSI v2. "GET" - /v2/entities/
       | %@#    |
 
   @limit_offset
-  Scenario Outline:  list all entities in NGSI v2 with limit and offset queries parameters
+  Scenario Outline:  list all entities using NGSI v2 with limit and offset queries parameters
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_list_limit_offset |

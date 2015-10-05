@@ -27,25 +27,25 @@
 #        -tg=-skip
 #
 
-Feature: general operations in NGSI v1 and v2 requests
+Feature: general operations in Context Broker using NGSI API v1 and v2
   As a context broker user
-  I would like to verify general operations in NGSI v1 and v2 requests
+  I would like to verify general operations in Context Broker using NGSI v1 and v2 requests
   So that I can manage and use them in my scripts
 
   BackgroundFeature:
   Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-  Setup: update contextBroker config file and restart service
+  Setup: update contextBroker config file and restart servicegit diff 
   Check: verify contextBroker is installed successfully
   Check: verify mongo is installed successfully
 
   @version
-  Scenario: verify NGSI version request
+  Scenario: launch Context broker version request
     When send a version request
     Then verify that receive an "OK" http code
     And verify if version is the expected
 
   @version_fields
-  Scenario Outline: verify fields in NGSI version request
+  Scenario Outline: verifying fields in Context Broker version request
     When send a version request
     Then verify that receive an "OK" http code
     And verify version "<field>" field does exists
@@ -59,7 +59,7 @@ Feature: general operations in NGSI v1 and v2 requests
     | compiled_in  |
 
   @statistics
-  Scenario Outline: verify fields in NGSI statistics request
+  Scenario Outline: verifying fields in Context Broker statistics request
     When send a statistics request
     Then verify that receive an "OK" http code
     And verify statistics "<field>" field does exists
@@ -72,7 +72,7 @@ Feature: general operations in NGSI v1 and v2 requests
     | measuring_interval_in_secs |
 
   @api_entry_point
-  Scenario Outline: verify NGSI v2 API entry point request
+  Scenario Outline: launch API entry point request using NGSI v2
     When send a API entry point request
     Then verify that receive an "OK" http code
     And verify "<url>" url with "<value>" value in response
