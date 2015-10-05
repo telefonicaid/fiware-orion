@@ -41,8 +41,14 @@ orionCurl --url /v2/entities --payload "$payload" --json
 echo
 echo
 
-echo "02. PUT /v2/entities/E1/attrs/A1 (empty)"
-echo "==============================================="
+echo "02. GET /v2/entities/E1/attrs/A1 (without payload)"  
+echo "=================================================="  
+orionCurl --url /v2/entities/E1/attrs/A1 --json -X PUT 
+echo  
+echo  
+
+echo "03. PUT /v2/entities/E1/attrs/A1 (empty JSON object)"
+echo "===================================================="
 payload='{ }'
 orionCurl --url /v2/entities/E1/attrs/A1 --payload "$payload" --json -X PUT
 echo
@@ -60,8 +66,21 @@ Date: REGEX(.*)
 
 
 
-02. PUT /v2/entities/E1/attrs/A1 (empty)
-===============================================
+02. GET /v2/entities/E1/attrs/A1 (without payload)
+==================================================
+HTTP/1.1 411 Length Required
+Content-Length: 91
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "description": "Zero/No Content-Length in PUT/POST/PATCH request",
+    "error": "LengthRequired"
+}
+
+
+03. PUT /v2/entities/E1/attrs/A1 (empty JSON object)
+====================================================
 HTTP/1.1 422 Unprocessable Entity
 Content-Length: 136 
 Content-Type: application/json
