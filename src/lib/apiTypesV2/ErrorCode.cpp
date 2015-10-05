@@ -105,7 +105,7 @@ std::string ErrorCode::toJson(bool isLastElement)
 
   if (!isLastElement)
   {
-    out += ",";
+    // out += ",";
   }
 
   return out;

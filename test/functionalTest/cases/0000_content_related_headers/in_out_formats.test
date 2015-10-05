@@ -86,12 +86,12 @@ echo '================================================================='
 echo
 
 echo "1.4: Unrecognized Content-Type, Accepts text/plain: 415, response in XML"
-orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "text/plain"
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "text/plain" --payloadCheck xml
 echo '================================================================='
 echo
 
 echo "1.5: Unrecognized Content-Type, Accepts NOTHING: 415, response in XML"
-orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out " "
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out " " --payloadCheck xml
 echo '================================================================='
 echo
 
@@ -222,12 +222,7 @@ Content-Length: 160
 Content-Type: application/xml
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>415</code>
-  <reasonPhrase>Unsupported Media Type</reasonPhrase>
-  <details>not supported content type: text/plain</details>
-</orionError>
+<orionError> <code>415</code> <reasonPhrase>Unsupported Media Type</reasonPhrase> <details>not supported content type: text/plain</details> </orionError>
 =================================================================
 
 1.5: Unrecognized Content-Type, Accepts NOTHING: 415, response in XML
@@ -342,12 +337,7 @@ Content-Length: 208
 Content-Type: application/xml
 Date: REGEX(.*)
 
-<?xml version="1.0"?>
-<orionError>
-  <code>406</code>
-  <reasonPhrase>Not Acceptable</reasonPhrase>
-  <details>acceptable MIME types: application/xml, application/json. Accept header in request: text/plain</details>
-</orionError>
+<orionError> <code>406</code> <reasonPhrase>Not Acceptable</reasonPhrase> <details>acceptable MIME types: application/xml, application/json. Accept header in request: text/plain</details> </orionError>
 =================================================================
 
 --TEARDOWN--

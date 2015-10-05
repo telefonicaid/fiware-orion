@@ -126,12 +126,12 @@ Date: REGEX(.*)
 02. GET /v2/entities/E1/attrs/A0/value
 ======================================
 HTTP/1.1 409 Conflict
-Content-Length: 105
+Content-Length: 112
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "There is more than one entity with that id. Refine your query.",
+    "description": "There is more than one entity with that id - please refine your query",
     "error": "TooManyResults"
 }
 
