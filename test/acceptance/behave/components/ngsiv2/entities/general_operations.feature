@@ -29,12 +29,12 @@
 
 Feature: general operations in Context Broker using NGSI API v1 and v2
   As a context broker user
-  I would like to verify general operations in Context Broker using NGSI v1 and v2 requests
+  I would like to verify general operations in Context Broker using NGSI API v1 and v2
   So that I can manage and use them in my scripts
 
   BackgroundFeature:
   Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-  Setup: update contextBroker config file and restart servicegit diff 
+  Setup: update contextBroker config file and restart service
   Check: verify contextBroker is installed successfully
   Check: verify mongo is installed successfully
 
