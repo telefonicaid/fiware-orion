@@ -33,9 +33,9 @@
 #
 
 
-Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus payload
+Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ plus payload
   As a context broker user
-  I would like to  create entities requests in NGSI v2
+  I would like to  create entities requests using NGSI v2
   So that I can manage and use them in my scripts
 
   BackgroundFeature:
@@ -45,7 +45,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
   Check: verify mongo is installed successfully
 
   @happy_path
-  Scenario:  create several entities in NGSI v2
+  Scenario:  create several entities using NGSI v2
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_happy_path  |
@@ -92,7 +92,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are not stored in mongo
 
   @content_type_without @BUG_1199
-  Scenario:  try to create entities in NGSI v2 without content-type header
+  Scenario:  try to create entities using NGSI v2 without content-type header
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_content_type |
@@ -110,7 +110,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | description | Content-Type header not used, default application/octet-stream is not supported |
 
   @content_type_error @BUG_1199
-  Scenario Outline:  try to create entities in NGSI v2 with wrong content-type header
+  Scenario Outline:  try to create entities using NGSI v2 with wrong content-type header
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_content_type |
@@ -139,7 +139,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | (eeqweqwe)                        |
 
   @length_required @BUG_1199 @BUG_1203
-  Scenario:  try to create several entities in NGSI v2 wihout payload
+  Scenario:  try to create several entities using NGSI v2 wihout payload
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_length_required |
@@ -154,7 +154,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
 
   # ---------- Services --------------------------------
   @service_without
-  Scenario: create entities in NGSI v2 without service header
+  Scenario: create entities using NGSI v2 without service header
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
@@ -169,7 +169,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are stored in default tenant at mongo
 
   @service
-  Scenario Outline:  create entities in NGSI v2 with several services headers
+  Scenario Outline:  create entities using NGSI v2 with several services headers
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
@@ -194,7 +194,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | max length allowed |
 
   @service_error @BUG_1087
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong services headers
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong services headers
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
@@ -224,7 +224,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
 
   # ---------- Services path --------------------------------
   @service_path
-  Scenario Outline:  create entities in NGSI v2 with several service paths headers
+  Scenario Outline:  create entities using NGSI v2 with several service paths headers
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_service_path |
@@ -251,7 +251,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | max length allowed and ten levels                             |
 
   @service_path_without
-  Scenario:  create entities in NGSI v2 without service path header
+  Scenario:  create entities using NGSI v2 without service path header
     Given  a definition of headers
       | parameter      | value                     |
       | Fiware-Service | test_service_path_without |
@@ -266,7 +266,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are stored in mongo
 
   @service_path_error @BUG_1092
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong service paths headers
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
       | parameter          | value                   |
       | Fiware-Service     | test_service_path_error |
@@ -294,7 +294,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | /serv(45)    |
 
   @service_path_error @BUG_1092
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong service paths headers
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
       | parameter          | value                   |
       | Fiware-Service     | test_service_path_error |
@@ -318,7 +318,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | /service,sr  |
 
   @service_path_error @BUG_1092
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong service paths headers
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
       | parameter          | value                   |
       | Fiware-Service     | test_service_path_error |
@@ -342,7 +342,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | greater than max length allowed and ten levels |
 
   @service_path_error @BUG_1092
-  Scenario:  try to create entities in NGSI v2 with several wrong service paths headers
+  Scenario:  try to create entities using NGSI v2 with several wrong service paths headers
     Given  a definition of headers
       | parameter          | value                                |
       | Fiware-Service     | test_service_path_error              |
@@ -363,7 +363,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
 
   # ---------- entities and attributes number --------------------------------
   @entities_number
-  Scenario Outline:  create several entities in NGSI v2
+  Scenario Outline:  create several entities using NGSI v2
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_entities    |
@@ -385,7 +385,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | 100      |
 
   @attributes_number
-  Scenario Outline:  create entities in NGSI v2 with several attributes
+  Scenario Outline:  create entities using NGSI v2 with several attributes
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_attributes  |
@@ -407,7 +407,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | 100        |
 
   @attributes_number_error
-  Scenario:  create entities in NGSI v2 without any attributes
+  Scenario:  create entities using NGSI v2 without any attributes
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_attributes_error |
@@ -422,7 +422,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
 
   # ---------- entity type "type" --------------------------------
   @entities_type
-  Scenario Outline:  create entities in NGSI v2 with several entities type values
+  Scenario Outline:  create entities using NGSI v2 with several entities type values
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_entities_type |
@@ -459,7 +459,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_19     | random=960    |
 
   @key_Limit @BUG_1289 @skip
-  Scenario:  try to create entities in NGSI v2 with overcome index key limit in mongo
+  Scenario:  try to create entities using NGSI v2 with overcome index key limit in mongo
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_entities_type |
@@ -475,7 +475,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are stored in mongo
 
   @entities_type_without
-  Scenario:  create entities in NGSI v2 without entities type values
+  Scenario:  create entities using NGSI v2 without entities type values
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_entities_type_without |
@@ -490,7 +490,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are stored in mongo
 
   @entities_type_error @BUG_1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong entities type values
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong entities type values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_entities_type_error |
@@ -518,7 +518,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | house(flat)   |
 
   @entities_type_no_string_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with wrong json in entities_type
+  Scenario Outline:  try to create an entity using NGSI v2 with wrong json in entities_type
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_entities_type_error_2 |
@@ -541,7 +541,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | SDFSDFSDF   |
 
   @entities_type_no_string_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with invalid entities_type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with invalid entities_type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_entities_type_error_2 |
@@ -569,7 +569,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
 
     # ---------- entity id "id" --------------------------------
   @entities_id
-  Scenario Outline:  create entities in NGSI v2 with several entities id values
+  Scenario Outline:  create entities using NGSI v2 with several entities id values
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_entities_id |
@@ -606,7 +606,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_19       | random=960  |
 
   @key_Limit @BUG_1289 @skip
-  Scenario:  try to create entities in NGSI v2 with overcome index key limit in mongo
+  Scenario:  try to create entities using NGSI v2 with overcome index key limit in mongo
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_entities_type |
@@ -622,7 +622,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are stored in mongo
 
   @entities_id_without
-  Scenario:  try to create entities in NGSI v2 without entities id values
+  Scenario:  try to create entities using NGSI v2 without entities id values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_entities_id_without |
@@ -637,7 +637,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are not stored in mongo
 
   @entities_id_error @BUG_1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong entities id values
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong entities id values
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_entities_id_error |
@@ -665,7 +665,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | house(flat) |
 
   @entities_id_no_string_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with several invalid entities id without attribute type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several invalid entities id without attribute type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_entities_type_error_2 |
@@ -688,7 +688,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | SDFSDFSDF |
 
   @entities_id_no_string_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with several not allowed entities id without attribute type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several not allowed entities id without attribute type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_entities_type_error_2 |
@@ -715,7 +715,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | null            |
 
   @entities_id_no_string_with_type_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with several invalid entities id with attribute type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several invalid entities id with attribute type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_entities_type_error_2 |
@@ -739,7 +739,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | SDFSDFSDF |
 
   @entities_id_no_string_with_type_error @BUG_1108
-  Scenario Outline:  try to create an entity in NGSI v2 with several not allowed entities id with attribute type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several not allowed entities id with attribute type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_entities_type_error_2 |
@@ -768,7 +768,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
 
   # ---------- attribute name --------------------------------
   @attributes_name @ISSUE_1090
-  Scenario Outline:  create entities in NGSI v2 with several attributes names
+  Scenario Outline:  create entities using NGSI v2 with several attributes names
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_attributes_name |
@@ -807,7 +807,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=100000   |
 
   @attributes_name_error @BUG1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes names
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes names
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_attributes_name_error |
@@ -835,7 +835,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_8      | house(flat)     |
 
   @attributes_name_no_string_error
-  Scenario Outline:  try to create an entity in NGSI v2 with several wrong attributes name (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several wrong attributes name (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_attributes_name_error_ |
@@ -864,7 +864,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room8"   | null            |
 
   @attributes_name_without
-  Scenario:  create entities in NGSI v2 without attributes names
+  Scenario:  create entities using NGSI v2 without attributes names
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_attributes_name_without |
@@ -878,7 +878,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are stored in mongo
 
   @attributes_name_empty
-  Scenario:  try to create entities in NGSI v2 with empty attributes names
+  Scenario:  try to create entities using NGSI v2 with empty attributes names
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_attributes_name_empty |
@@ -899,7 +899,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
 
   # ---------- attribute value --------------------------------
   @attributes_value
-  Scenario Outline:  create entities in NGSI v2 with several attributes values
+  Scenario Outline:  create entities using NGSI v2 with several attributes values
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_attributes_value |
@@ -936,7 +936,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=100000    |
 
   @attributes_value_error @BUG_1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes values
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes values
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_attributes_value_error |
@@ -964,7 +964,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_8      | house(flat)      |
 
   @attributes_value_without
-  Scenario:  try to create entities in NGSI v2 without attributes values
+  Scenario:  try to create entities using NGSI v2 without attributes values
     Given  a definition of headers
       | parameter          | value                         |
       | Fiware-Service     | test_attributes_value_without |
@@ -983,7 +983,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are not stored in mongo
 
   @attributes_value_without_with_type @BUG_1195 @skip
-  Scenario:  try to create entities in NGSI v2 without attributes values but with attribute type
+  Scenario:  try to create entities using NGSI v2 without attributes values but with attribute type
     Given  a definition of headers
       | parameter          | value                         |
       | Fiware-Service     | test_attributes_value_without |
@@ -1003,7 +1003,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are not stored in mongo
 
   @attributes_value_without_with_metadata @BUG_1195 @skip
-  Scenario:  try to create entities in NGSI v2 without attributes values but with metadata
+  Scenario:  try to create entities using NGSI v2 without attributes values but with metadata
     Given  a definition of headers
       | parameter          | value                         |
       | Fiware-Service     | test_attributes_value_without |
@@ -1026,7 +1026,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are not stored in mongo
 
   @attributes_value_special @BUG_1106 @skip
-  Scenario Outline:  create an entity NGSI v2 with several attributes special values without type (compound, vector, boolean, etc)
+  Scenario Outline:  create an entity using NGSI v2 with several attributes special values without type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                   |
       | Fiware-Service     | test_attributes_special |
@@ -1060,7 +1060,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room17"  | null                                                                          |
 
   @attributes_value_special_type @BUG_1106 @skip
-  Scenario Outline:  create an entity NGSI v2 with several attributes special values with type (compound, vector, boolean, etc)
+  Scenario Outline:  create an entity using NGSI v2 with several attributes special values with type (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                             |
       | Fiware-Service     | test_attributes_special_with_type |
@@ -1095,7 +1095,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room17"  | null                                                                          |
 
   @attributes_value_special_metadata @BUG_1106 @skip
-  Scenario Outline:  create an entity NGSI v2 with several attributes special values with metadata (compound, vector, boolean, etc)
+  Scenario Outline:  create an entity using NGSI v2 with several attributes special values with metadata (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                             |
       | Fiware-Service     | test_attributes_special_with_meta |
@@ -1132,7 +1132,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room17"  | null                                                                          |
 
   @attributes_value_special_type_and_metadata @BUG_1106 @skip
-  Scenario Outline:  create an entity NGSI v2 with several attributes special values with type and metadata (compound, vector, boolean, etc)
+  Scenario Outline:  create an entity using NGSI v2 with several attributes special values with type and metadata (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                                      |
       | Fiware-Service     | test_attributes_special_with_type_and_meta |
@@ -1170,7 +1170,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room17"  | null                                                                          |
 
   @attributes_value_special_error
-  Scenario Outline:  try to create an entity NGSI v2 with several wrong attributes special values without type
+  Scenario Outline:  try to create an entity using NGSI v2 with several wrong attributes special values without type
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_attributes_value_error |
@@ -1205,7 +1205,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room_14" | "a": "b"}        |
 
   @attributes_value_special_type_error
-  Scenario Outline:  try to create an entity NGSI v2 with several wrong attributes special values with type
+  Scenario Outline:  try to create an entity using NGSI v2 with several wrong attributes special values with type
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_attributes_value_type_error |
@@ -1241,7 +1241,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_14   | "a": "b"}        |
 
   @attributes_value_special_metadata_error
-  Scenario Outline:  try to create an entity NGSI v2 with several wrong attributes special values with metadata
+  Scenario Outline:  try to create an entity using NGSI v2 with several wrong attributes special values with metadata
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_attributes_value_type_error |
@@ -1280,7 +1280,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_14   | "a": "b"}        |
 
   @attributes_value_special_type_and_metadata_error
-  Scenario Outline:  try to create an entity NGSI v2 with several wrong attributes special values with type and metadata
+  Scenario Outline:  try to create an entity using NGSI v2 with several wrong attributes special values with type and metadata
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_attributes_value_type_error |
@@ -1321,7 +1321,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
 
   # ---------- attribute type --------------------------------
   @attributes_type
-  Scenario Outline:  create entities in NGSI v2 with several attributes type
+  Scenario Outline:  create entities using NGSI v2 with several attributes type
     Given  a definition of headers
       | parameter          | value                |
       | Fiware-Service     | test_attributes_type |
@@ -1358,7 +1358,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=100000   |
 
   @attributes_type_without
-  Scenario:  create entities in NGSI v2 without attributes type
+  Scenario:  create entities using NGSI v2 without attributes type
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_attributes_type_without |
@@ -1374,7 +1374,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
     And verify that entities are stored in mongo
 
   @attributes_type_error @BUG_1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes types
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes types
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_attributes_type_error |
@@ -1403,7 +1403,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_8      | house(flat)     |
 
   @attributes_type_no_string_error @BUG_1109
-  Scenario Outline:  try to create an entity in NGSI v2 with several invalid attributes type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several invalid attributes type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_attributes_name_error_ |
@@ -1427,7 +1427,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room2"   | SDFSDFSDF       |
 
   @attributes_type_no_string_error @BUG_1109
-  Scenario Outline:  try to create an entity in NGSI v2 with several not allowed attributes type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several not allowed attributes type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_attributes_name_error_ |
@@ -1455,7 +1455,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
 
   # ---------- attribute metadata --------------------------------
   @attributes_metadata_name
-  Scenario Outline:  create entities in NGSI v2 with several attributes metadata name without metadata type
+  Scenario Outline:  create entities using NGSI v2 with several attributes metadata name without metadata type
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_metadata_name |
@@ -1494,7 +1494,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=100000 |
 
   @attributes_metadata_name_with_type
-  Scenario Outline:  create entities in NGSI v2 with several attributes metadata name with metadata type
+  Scenario Outline:  create entities using NGSI v2 with several attributes metadata name with metadata type
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_metadata_name_with_type |
@@ -1534,7 +1534,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=100000 |
 
   @attributes_metadata_name_error @BUG_1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata name without metadata type
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata name without metadata type
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_metadata_name_error |
@@ -1565,7 +1565,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_8      | house(flat)   |
 
   @attributes_metadata_name_with_type_error @BUG_1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata name with metadata type
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata name with metadata type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | test_metadata_name_without_type_error |
@@ -1597,7 +1597,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_8      | house(flat)   |
 
   @attributes_metadata_name_no_string_error
-  Scenario Outline:  try to create an entity in NGSI v2 with several wrong attributes metadata name without metadata type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several wrong attributes metadata name without metadata type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_attributes_name_error_ |
@@ -1627,7 +1627,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room7"   | ["34", "a", 45] |
 
   @attributes_metadata_name_with_type_no_string_error
-  Scenario Outline:  try to create an entity in NGSI v2 with several wrong attributes metadata name with metadata type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several wrong attributes metadata name with metadata type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_attributes_name_error_ |
@@ -1658,7 +1658,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room7"   | ["34", "a", 45] |
 
   @attributes_metadata_value
-  Scenario Outline:  create entities in NGSI v2 with several attributes metadata value without metadata type
+  Scenario Outline:  create entities using NGSI v2 with several attributes metadata value without metadata type
     Given  a definition of headers
       | parameter          | value               |
       | Fiware-Service     | test_metadata_value |
@@ -1697,7 +1697,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=100000  |
 
   @attributes_metadata_value_with_type
-  Scenario Outline:  create entities in NGSI v2 with several attributes metadata value with metadata type
+  Scenario Outline:  create entities using NGSI v2 with several attributes metadata value with metadata type
     Given  a definition of headers
       | parameter          | value                         |
       | Fiware-Service     | test_metadata_value_with_type |
@@ -1737,7 +1737,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=100000  |
 
   @attributes_metadata_value_without_and_with_type @BUG_1200
-  Scenario:  try to create entities in NGSI v2 without attributes metadata value with metadata type
+  Scenario:  try to create entities using NGSI v2 without attributes metadata value with metadata type
     Given  a definition of headers
       | parameter          | value                         |
       | Fiware-Service     | test_metadata_value_with_type |
@@ -1759,7 +1759,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | description | missing metadata value |
 
   @attributes_metadata_value_special @BUG_1106 @skip
-  Scenario Outline:  create an entity NGSI v2 with several attributes metadata special values without metadata type (null, boolean, etc)
+  Scenario Outline:  create an entity using NGSI v2 with several attributes metadata special values without metadata type (null, boolean, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_metadata_value_special |
@@ -1787,7 +1787,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room17"  | null                       |
 
   @attributes_metadata_value_with_type_special @BUG_1106 @skip
-  Scenario Outline:  create an entity NGSI v2 with several attributes metadata special values with metadata type (null, boolean, etc)
+  Scenario Outline:  create an entity using NGSI v2 with several attributes metadata special values with metadata type (null, boolean, etc)
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | test_metadata_value_with_type_special |
@@ -1816,7 +1816,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room17"  | null                       |
 
   @attributes_metadata_value_error @BUG_1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata value without metadata type
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata value without metadata type
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_metadata_value_error |
@@ -1847,7 +1847,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_8      | house(flat)    |
 
   @attributes_metadata_value_error_with_type @BUG_1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata value with metadata type
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata value with metadata type
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_metadata_value_with_type_error |
@@ -1879,7 +1879,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_8      | house(flat)    |
 
   @attributes_metadata_value_special_error @BUG_1110
-  Scenario Outline:  try to create an entity NGSI v2 with several wrong special attributes metadata values without metadata type
+  Scenario Outline:  try to create an entity using NGSI v2 with several wrong special attributes metadata values without metadata type
     Given  a definition of headers
       | parameter          | value                             |
       | Fiware-Service     | test_metadata_value_special_error |
@@ -1916,7 +1916,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room_14" | "a": "b"}      |
 
   @attributes_metadata_value_special_error @BUG_1110 @skip
-  Scenario Outline:  try to create an entity NGSI v2 with several compound special attributes metadata values without metadata type
+  Scenario Outline:  try to create an entity using NGSI v2 with several compound special attributes metadata values without metadata type
     Given  a definition of headers
       | parameter          | value                             |
       | Fiware-Service     | test_metadata_value_special_error |
@@ -1947,7 +1947,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room22"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
   @attributes_metadata_value_special_with_type_error @BUG_1110
-  Scenario Outline:  try to create an entity NGSI v2 with several wrong special attributes metadata values with metadata type
+  Scenario Outline:  try to create an entity using NGSI v2 with several wrong special attributes metadata values with metadata type
     Given  a definition of headers
       | parameter          | value                             |
       | Fiware-Service     | test_metadata_value_special_error |
@@ -1985,7 +1985,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room_14" | "a": "b"}      |
 
   @attributes_metadata_value_special_with_type_error @BUG_1110
-  Scenario Outline:  try to create an entity NGSI v2 with several compound attributes metadata values with metadata type
+  Scenario Outline:  try to create an entity using NGSI v2 with several compound attributes metadata values with metadata type
     Given  a definition of headers
       | parameter          | value                             |
       | Fiware-Service     | test_metadata_value_special_error |
@@ -2017,7 +2017,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room22"  | {"x": [{"a":78, "b":"r"}, 45, "rt"],"x2": "b"}                                |
 
   @attributes_metadata_type
-  Scenario Outline:  create entities in NGSI v2 with several attributes with metadata types
+  Scenario Outline:  create entities using NGSI v2 with several attributes with metadata types
     Given  a definition of headers
       | parameter          | value              |
       | Fiware-Service     | test_metadata_type |
@@ -2057,7 +2057,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | random=100000 |
 
   @attributes_metadata_type_error @BUG_1093 @BUG_1200
-  Scenario Outline:  try to create entities in NGSI v2 with several wrong attributes metadata type
+  Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes metadata type
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_metadata_type_error |
@@ -2089,7 +2089,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | room_8      | house(flat)   |
 
   @attributes_metadata_type_no_string_error @BUG_1109
-  Scenario Outline:  try to create an entity in NGSI v2 with several invalid attributes metadata type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several invalid attributes metadata type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_attributes_name_error_ |
@@ -2115,7 +2115,7 @@ Feature: create entities requests (POST) in NGSI v2. "POST" - /v2/entities/ plus
       | "room2"   | SDFSDFSDF     |
 
   @attributes_metadata_type_no_string_error @BUG_1109
-  Scenario Outline:  try to create an entity in NGSI v2 with several not allowed attributes metadata type (integer, boolean, no-string, etc)
+  Scenario Outline:  try to create an entity using NGSI v2 with several not allowed attributes metadata type (integer, boolean, no-string, etc)
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_attributes_name_error_ |

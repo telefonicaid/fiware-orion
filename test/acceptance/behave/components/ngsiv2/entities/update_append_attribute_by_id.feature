@@ -28,7 +28,7 @@
 #
 
 
-Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/entities/<entity_id> plus payload
+Feature: update or append an attribute by entity ID using NGSI v2. "POST" - /v2/entities/<entity_id> plus payload
   As a context broker user
   I would like to update or append an attribute by entity ID
   So that I can manage and use them in my scripts
@@ -40,7 +40,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
   Check: verify mongo is installed successfully
 
   @happy_path
-  Scenario:  update and append attributes by entity ID in NGSI v2
+  Scenario:  update and append attributes by entity ID using NGSI v2
     Given  a definition of headers
       | parameter          | value                  |
       | Fiware-Service     | test_update_happy_path |
@@ -72,7 +72,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     And verify that an entity is updated in mongo
 
   @more_entities_update @BUG_1198
-  Scenario:  try to update an attribute by entity ID in NGSI v2 with more than one entity with the same id
+  Scenario:  try to update an attribute by entity ID using NGSI v2 with more than one entity with the same id
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_update_more_entities |
@@ -103,7 +103,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | description | There is more than one entity that match the update. Please refine your query. |
 
   @more_entities_append @BUG_1198
-  Scenario:  try to append an attribute by entity ID in NGSI v2 with more than one entity with the same id
+  Scenario:  try to append an attribute by entity ID using NGSI v2 with more than one entity with the same id
     Given  a definition of headers
       | parameter          | value                     |
       | Fiware-Service     | test_update_more_entities |
@@ -134,7 +134,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | description | There is more than one entity that match the update. Please refine your query. |
 
   @length_required @BUG_1199 @BUG_1203
-  Scenario:  try to update or append an attribute by entity ID in NGSI v2 without payload
+  Scenario:  try to update or append an attribute by entity ID using NGSI v2 without payload
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_update_length_required |
@@ -149,7 +149,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
 
   @maximum_size @BUG_1199
     # 5023 attributes is a way of generating a request longer than 1MB (in fact, 1048697 bytes)
-  Scenario:  try to update or append attributes in NGSI v2 with maximum size in payload (5023 attributes = 1048697 bytes)
+  Scenario:  try to update or append attributes using NGSI v2 with maximum size in payload (5023 attributes = 1048697 bytes)
     Given  a definition of headers
       | parameter          | value             |
       | Fiware-Service     | test_maximum_size |
@@ -173,7 +173,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
 
   # ------------------------ Service ----------------------------------------------
   @service_update
-  Scenario Outline:  update attributes by entity ID in NGSI v2 with several service header values
+  Scenario Outline:  update attributes by entity ID using NGSI v2 with several service header values
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
@@ -207,7 +207,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | max length allowed |
 
   @service_append
-  Scenario Outline:  append attributes by entity ID in NGSI v2 with several service header values
+  Scenario Outline:  append attributes by entity ID using NGSI v2 with several service header values
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
@@ -241,7 +241,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | max length allowed |
 
   @service_update_without
-  Scenario:  update attributes by entity ID in NGSI v2 without service header
+  Scenario:  update attributes by entity ID using NGSI v2 without service header
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
@@ -266,7 +266,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     And verify that an entity is updated in mongo
 
   @service_append_without
-  Scenario:  append attributes by entity ID in NGSI v2 without service header
+  Scenario:  append attributes by entity ID using NGSI v2 without service header
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-ServicePath | /test            |
@@ -291,7 +291,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     And verify that an entity is updated in mongo
 
   @service_update_append_error
-  Scenario Outline:  try to update or append attributes by entity ID in NGSI v2 with wrong service header values
+  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | <service>        |
@@ -319,7 +319,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
      # ------------------------ Service path ----------------------------------------------
 
   @service_path_update
-  Scenario Outline:  update attributes by entity ID in NGSI v2 with several service header values
+  Scenario Outline:  update attributes by entity ID using NGSI v2 with several service header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -356,7 +356,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | max length allowed and ten levels                             |
 
   @service_path_append
-  Scenario Outline:  append attributes by entity ID in NGSI v2 with several service header values
+  Scenario Outline:  append attributes by entity ID using NGSI v2 with several service header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -393,7 +393,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | max length allowed and ten levels                             |
 
   @service_path_update_without
-  Scenario:  update attributes by entity ID in NGSI v2 without service header
+  Scenario:  update attributes by entity ID using NGSI v2 without service header
     Given  a definition of headers
       | parameter      | value                    |
       | Fiware-Service | test_update_service_path |
@@ -417,7 +417,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     And verify that an entity is updated in mongo
 
   @service_path_append_without
-  Scenario:  append attributes by entity ID in NGSI v2 without service header
+  Scenario:  append attributes by entity ID using NGSI v2 without service header
     Given  a definition of headers
       | parameter      | value                    |
       | Fiware-Service | test_update_service_path |
@@ -442,7 +442,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     And verify that an entity is updated in mongo
 
   @service_path_update_append_error
-  Scenario Outline:  try to update or append attributes by entity ID in NGSI v2 with wrong service header values
+  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -467,7 +467,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | /serv(45)    |
 
   @service_path_update_append_error
-  Scenario Outline:  try to update or append attributes by entity ID in NGSI v2 with wrong service header values
+  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -488,7 +488,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | /service,sr  |
 
   @service_path_update_append_error
-  Scenario Outline:  try to update or append attributes by entity ID in NGSI v2 with wrong service header values
+  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value                    |
       | Fiware-Service     | test_update_service_path |
@@ -509,7 +509,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | greater than max length allowed and ten levels |
 
   @service_path_update_append_error
-  Scenario:  try to update or append attributes by entity ID in NGSI v2 with wrong service header values
+  Scenario:  try to update or append attributes by entity ID using NGSI v2 with wrong service header values
     Given  a definition of headers
       | parameter          | value                                |
       | Fiware-Service     | test_update_service_path             |
@@ -528,7 +528,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
   #  -------------------------- entity id --------------------------------------------------
 
   @entity_id_update
-  Scenario Outline:  update attributes by entity ID in NGSI v2 with several entity id values
+  Scenario Outline:  update attributes by entity ID using NGSI v2 with several entity id values
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_update_entity_id |
@@ -575,7 +575,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=900 |
 
   @entity_id_append
-  Scenario Outline:  append attributes by entity ID in NGSI v2 with several entity id values
+  Scenario Outline:  append attributes by entity ID using NGSI v2 with several entity id values
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_update_entity_id |
@@ -628,7 +628,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=900 |
 
   @entity_id_unknown @BUG_1206
-  Scenario:  append entity and attributes by entity ID in NGSI v2 with unknown entity
+  Scenario:  append entity and attributes by entity ID using NGSI v2 with unknown entity
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_update_entity_id_uknown |
@@ -654,7 +654,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     And verify that an entity is updated in mongo
 
   @entity_id_update_invalid
-  Scenario Outline:  try to update or append attributes by entity ID in NGSI v2 with invalid entity id values
+  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with invalid entity id values
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | test_update_entity_id |
@@ -683,7 +683,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
   # ----------------------- attributes ---------------------------------------
 
   @attribute_multiples
-  Scenario Outline:  append multiples attributes by entity ID in NGSI v2
+  Scenario Outline:  append multiples attributes by entity ID using NGSI v2
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_update_attribute_value |
@@ -719,7 +719,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
 
   # --------------------- attribute name  ------------------------------------
   @attribute_name_update
-  Scenario Outline:  update attributes by entity ID in NGSI v2 with several attribute names
+  Scenario Outline:  update attributes by entity ID using NGSI v2 with several attribute names
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_attribute_name_update |
@@ -763,7 +763,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000   |
 
   @attribute_name_append
-  Scenario Outline:  append attributes by entity ID in NGSI v2 with several attribute names
+  Scenario Outline:  append attributes by entity ID using NGSI v2 with several attribute names
     Given  a definition of headers
       | parameter          | value                      |
       | Fiware-Service     | test_attribute_name_update |
@@ -807,7 +807,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000   |
 
   @attribute_name_update_append_invalid @BUG_1200
-  Scenario Outline:  try to append attributes by entity ID in NGSI v2 with invalid attribute names
+  Scenario Outline:  try to append attributes by entity ID using NGSI v2 with invalid attribute names
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_attribute_name_update_error |
@@ -844,7 +844,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_8    | house(flat)     |
 
   @attribute_name_update_append_error
-  Scenario Outline:  try to update or append attributes by entity ID in NGSI v2 with invalid attribute names
+  Scenario Outline:  try to update or append attributes by entity ID using NGSI v2 with invalid attribute names
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_attribute_name_update_error |
@@ -871,7 +871,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | null            |
 
   @attribute_name_update_append_empty
-  Scenario:  try to append attributes by entity ID in NGSI v2 with empty attribute name
+  Scenario:  try to append attributes by entity ID using NGSI v2 with empty attribute name
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_attribute_name_update_error |
@@ -902,7 +902,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
   # --------------------- attribute value  ------------------------------------
 
   @attribute_value_update_without_attribute_type
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attribute values and without attribute type nor metadatas
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute values and without attribute type nor metadatas
     Given  a definition of headers
       | parameter          | value                                    |
       | Fiware-Service     | test_update_attr_value_without_attr_type |
@@ -943,7 +943,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000    |
 
   @attribute_value_update_with_attribute_type
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attribute values and with attribute type
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute values and with attribute type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | test_update_attr_value_with_attr_type |
@@ -985,7 +985,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000    |
 
   @attribute_value_update_with_metadatas
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attribute values and with metadatas
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute values and with metadatas
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | test_update_attr_value_with_attr_type |
@@ -1030,7 +1030,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000    |
 
   @attribute_value_append
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with several attribute values
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with several attribute values
     Given  a definition of headers
       | parameter          | value                       |
       | Fiware-Service     | test_update_attribute_value |
@@ -1076,7 +1076,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000    |
 
   @attribute_value_update_without_attribute_type_special @BUG_1106 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc) and without attribute type nor metadatas
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with special attribute values (compound, vector, boolean, etc) and without attribute type nor metadatas
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1115,7 +1115,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room17    | null                                                                          |
 
   @attribute_value_update_with_attribute_type_special @BUG_1106 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc) and with attribute type
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with special attribute values (compound, vector, boolean, etc) and with attribute type
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1155,7 +1155,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room17    | null                                                                          |
 
   @attribute_value_update_with_metadata_special @BUG_1106 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc) and with metadatas
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with special attribute values (compound, vector, boolean, etc) and with metadatas
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1198,7 +1198,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room17    | null                                                                          |
 
   @attribute_value_append_special @BUG_1106 @skip
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc)
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with special attribute values (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1237,7 +1237,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room17    | null                                                                          |
 
   @attribute_value_update_with_attribute_type_in_update
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attribute values and without attribute type nor metadatas, but with attribute type in update
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute values and without attribute type nor metadatas, but with attribute type in update
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | test_update_attr_value_with_attr_type |
@@ -1279,7 +1279,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000    |
 
   @attribute_value_append_special_with_attr_type_in_update @BUG_1106 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc) without attribute type not metadata but with attribute type in update
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with special attribute values (compound, vector, boolean, etc) without attribute type not metadata but with attribute type in update
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1319,7 +1319,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room17    | null                                                                          |
 
   @attribute_value_update_with_metadata_in_update
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attribute values and without attribute type nor metadatas, but with metadatas in update
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute values and without attribute type nor metadatas, but with metadatas in update
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_update_attr_value_with_meta |
@@ -1364,7 +1364,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000    |
 
   @attribute_value_update_special_with_metadata_in_update @BUG_1106 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc) without attribute type not metadata but with metadatas in update
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with special attribute values (compound, vector, boolean, etc) without attribute type not metadata but with metadatas in update
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1407,7 +1407,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room17    | null                                                                          |
 
   @attribute_value_append_special_with_metadata_in_update @BUG_1106 @skip
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with special attribute values (compound, vector, boolean, etc) without attribute type not metadata but with metadatas in update
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with special attribute values (compound, vector, boolean, etc) without attribute type not metadata but with metadatas in update
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1451,7 +1451,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room17    | null                                                                          |
 
   @attribute_value_error_without
-  Scenario:  try to update or append an attribute by entity ID in NGSI v2 without attribute values
+  Scenario:  try to update or append an attribute by entity ID using NGSI v2 without attribute values
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_update_attr_value_error |
@@ -1474,7 +1474,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | description | invalid JSON type for ContextAttribute |
 
   @attribute_value_invalid @BUG_1200
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 without invalid attribute values in update request
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 without invalid attribute values in update request
     Given  a definition of headers
       | parameter          | value                        |
       | Fiware-Service     | test_update_attr_value_error |
@@ -1506,7 +1506,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_8    | house(flat)      |
 
   @attribute_value_error_special
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attribute values in update request (compound, vector, boolean, etc)
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with wrong attribute values in update request (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1546,7 +1546,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_14   | "a": "b"}        |
 
   @attribute_value_error_special @BUG_1217 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with a dot in attribute values as dict in update request (compound, vector, boolean, etc)
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with a dot in attribute values as dict in update request (compound, vector, boolean, etc)
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -1575,7 +1575,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
    # --------------------- attribute type  ------------------------------------
 
   @attribute_type_update @BUG_1212 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attributes type
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attributes type
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | attribute_type_update |
@@ -1621,7 +1621,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000   |
 
   @attribute_type_append @BUG_1212 @skip
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with several attributes type
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with several attributes type
     Given  a definition of headers
       | parameter          | value                 |
       | Fiware-Service     | attribute_type_append |
@@ -1667,7 +1667,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000   |
 
   @attribute_type_update_error @BUG_1212 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with forbidden attributes type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with forbidden attributes type
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_update_attribute_type_error |
@@ -1700,7 +1700,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_8    | house(flat)     |
 
   @attribute_type_update_error
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attributes type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with wrong attributes type
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_type_error_II |
@@ -1729,7 +1729,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room2     | SDFSDFSDF       |
 
   @attribute_type_update_error @BUG_1212 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with invalid attributes type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with invalid attributes type
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_update_attribute_type_error |
@@ -1764,7 +1764,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
   # --------------------- attribute metadata name  ------------------------------------
 
   @attribute_metadata_name_update @BUG_1217 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attribute metadata name
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata name
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_attribute_metadata_name_update |
@@ -1811,7 +1811,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000        |
 
   @attribute_metadata_name_append @BUG_1220 @BUG_1217 @skip
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with several attribute metadata name
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with several attribute metadata name
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_attribute_metadata_name_append |
@@ -1858,7 +1858,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000        |
 
   @attribute_metadata_name_update_error @BUG_1220 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attribute metadata name without attribute metadata type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with wrong attribute metadata name without attribute metadata type
     Given  a definition of headers
       | parameter          | value                                     |
       | Fiware-Service     | test_attribute_metadata_name_update_error |
@@ -1884,7 +1884,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_8    | house(flat)          |
 
   @attribute_metadata_name_update_error @BUG_1220 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attribute metadata name with attribute metadata type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with wrong attribute metadata name with attribute metadata type
     Given  a definition of headers
       | parameter          | value                                     |
       | Fiware-Service     | test_attribute_metadata_name_update_error |
@@ -1911,7 +1911,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_8    | house(flat)          |
 
   @attribute_metadata_name_update_error @BUG_1220 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attribute metadata name without attribute metadata type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with wrong attribute metadata name without attribute metadata type
     Given  a definition of headers
       | parameter          | value                                     |
       | Fiware-Service     | test_attribute_metadata_name_update_error |
@@ -1939,7 +1939,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | null                 |
 
   @attribute_metadata_name_update_error @BUG_1220 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attribute metadata name with attribute metadata type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with wrong attribute metadata name with attribute metadata type
     Given  a definition of headers
       | parameter          | value                                     |
       | Fiware-Service     | test_attribute_metadata_name_update_error |
@@ -1968,7 +1968,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | null                 |
 
   @attribute_metadata_name_update_error @BUG_1220 @skip
-  Scenario:  try to update or append an attribute by entity ID in NGSI v2 with empty attribute metadata name without attribute metadata type
+  Scenario:  try to update or append an attribute by entity ID using NGSI v2 with empty attribute metadata name without attribute metadata type
     Given  a definition of headers
       | parameter          | value                                     |
       | Fiware-Service     | test_attribute_metadata_name_update_error |
@@ -1986,7 +1986,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | description | no 'name' for ContextAttribute |
 
   @attribute_metadata_name_update_error @BUG_1220 @skip
-  Scenario:  try to update or append an attribute by entity ID in NGSI v2 with empty attribute metadata name with attribute metadata type
+  Scenario:  try to update or append an attribute by entity ID using NGSI v2 with empty attribute metadata name with attribute metadata type
     Given  a definition of headers
       | parameter          | value                                     |
       | Fiware-Service     | test_attribute_metadata_name_update_error |
@@ -2007,7 +2007,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
   # --------------------- attribute metadata value  ------------------------------------
 
   @attribute_metadata_value_update @BUG_1220 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attribute metadata values without attribute metadata type
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata values without attribute metadata type
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | attribute_metadata_value_update |
@@ -2054,7 +2054,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000         |
 
   @attribute_metadata_value_update @BUG_1232 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attribute metadata values with attribute metadata type
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata values with attribute metadata type
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | attribute_metadata_value_update |
@@ -2102,7 +2102,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000         |
 
   @attribute_metadata_value_append @BUG_1220 @skip
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with several attribute metadata values without attribute metadata type
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with several attribute metadata values without attribute metadata type
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | attribute_metadata_value_append |
@@ -2149,7 +2149,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000         |
 
   @attribute_metadata_value_append @BUG_1220 @skip
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with several attribute metadata values with attribute metadata type
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with several attribute metadata values with attribute metadata type
     Given  a definition of headers
       | parameter          | value                           |
       | Fiware-Service     | attribute_metadata_value_append |
@@ -2198,7 +2198,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
 
   # compound metadatas values are pending
   @attribute_metadata_value_update_special_with_meta_type
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -2231,7 +2231,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room6     | -5.00002              |
 
   @attribute_metadata_value_update_special_with_meta_type
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and with attribute metadata type
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and with attribute metadata type
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -2265,7 +2265,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room6     | -5.00002              |
 
   @attribute_metadata_value_append_special
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -2298,7 +2298,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room6     | -5.00002              |
 
   @attribute_metadata_value_append_special
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with special metadata attribute values (compound, vector, boolean, etc) and without attribute metadata type
     Given  a definition of headers
       | parameter          | value                               |
       | Fiware-Service     | test_update_attribute_value_special |
@@ -2332,7 +2332,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room6     | -5.00002              |
 
   @attribute_metadata_value_update_error @BUG_1216 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with forbidden attributes metadata values without attribute metadata type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with forbidden attributes metadata values without attribute metadata type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | attribute_metadata_value_update_error |
@@ -2358,7 +2358,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_8    | house(flat)           |
 
   @attribute_metadata_value_update_error @BUG_1216 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with forbidden attributes metadata values with attribute metadata type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with forbidden attributes metadata values with attribute metadata type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | attribute_metadata_value_update_error |
@@ -2385,7 +2385,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_8    | house(flat)           |
 
   @attribute_metadata_value_update_error
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attributes metadata values without attribute metadata type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with wrong attributes metadata values without attribute metadata type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | attribute_metadata_value_update_error |
@@ -2419,7 +2419,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_14   | "a": "b"}             |
 
   @attribute_metadata_value_update_error
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with wrong attributes metadata values with attribute metadata type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with wrong attributes metadata values with attribute metadata type
     Given  a definition of headers
       | parameter          | value                                 |
       | Fiware-Service     | attribute_metadata_value_update_error |
@@ -2455,7 +2455,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
 
   # --------------------- attribute metadata type  ------------------------------------
   @attribute_metadata_type_update @BUG_1216 @skip
-  Scenario Outline:  update an attribute by entity ID in NGSI v2 with several attribute metadata type
+  Scenario Outline:  update an attribute by entity ID using NGSI v2 with several attribute metadata type
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | attribute_metadata_type_update |
@@ -2503,7 +2503,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000        |
 
   @attribute_metadata_type_append @BUG_1216 @skip
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with several attribute metadata type
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with several attribute metadata type
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | attribute_metadata_type_update |
@@ -2550,7 +2550,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000        |
 
   @attribute_metadata_type_update_error @BUG_1232 @skip
-  Scenario Outline:  try to update or append an attribute by entity ID in NGSI v2 with forbidden attribute metadata type
+  Scenario Outline:  try to update or append an attribute by entity ID using NGSI v2 with forbidden attribute metadata type
     Given  a definition of headers
       | parameter          | value                          |
       | Fiware-Service     | attribute_metadata_type_update |
@@ -2578,7 +2578,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room_8    | house(flat)          |
 
   @attribute_metadata_type_update_wrong
-  Scenario Outline:  try to append or update an attribute by entity ID in NGSI v2 with wrong metadata attribute types
+  Scenario Outline:  try to append or update an attribute by entity ID using NGSI v2 with wrong metadata attribute types
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_update_attribute_type_error |
@@ -2601,7 +2601,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | room2     | SDFSDFSDF            |
 
   @attribute_metadata_type_update_wrong_ii @BUG_1232 @skip
-  Scenario Outline:  try to append or update an attribute by entity ID in NGSI v2 with wrong metadata attribute types
+  Scenario Outline:  try to append or update an attribute by entity ID using NGSI v2 with wrong metadata attribute types
     Given  a definition of headers
       | parameter          | value                            |
       | Fiware-Service     | test_update_attribute_type_error |
@@ -2629,7 +2629,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
   # ----------------------------- op query parameter -----------------------------
 
   @op_qp_append
-  Scenario:  append an attribute by entity ID in NGSI v2 with "op" query parameter
+  Scenario:  append an attribute by entity ID using NGSI v2 with "op" query parameter
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |
@@ -2662,7 +2662,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     And verify that an entity is updated in mongo
 
   @op_qp_update
-  Scenario:  try to update an attribute by entity ID in NGSI v2 with "op" query parameter
+  Scenario:  try to update an attribute by entity ID using NGSI v2 with "op" query parameter
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |
@@ -2698,7 +2698,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | description | one or more of the attributes in the request already exist: [ temperature_0 ] |
 
   @op_qp_append_in_blank
-  Scenario:  append an attribute by entity ID in NGSI v2 with "op" query parameter in blank
+  Scenario:  append an attribute by entity ID using NGSI v2 with "op" query parameter in blank
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |
@@ -2731,7 +2731,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     And verify that an entity is updated in mongo
 
   @op_qp_update_in_blank
-  Scenario: update an attribute by entity ID in NGSI v2 with "op" query parameter in blank
+  Scenario: update an attribute by entity ID using NGSI v2 with "op" query parameter in blank
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |
@@ -2764,7 +2764,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
     And verify that an entity is updated in mongo
 
   @op_qp_append_unknown
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with unkwnown "op" query parameter
+  Scenario Outline:  try to append an attribute by entity ID using NGSI v2 with unkwnown "op" query parameter
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |
@@ -2810,7 +2810,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000   |
 
   @op_qp_append_unknown
-  Scenario Outline:  append an attribute by entity ID in NGSI v2 with unkwnown query parameter
+  Scenario Outline:  append an attribute by entity ID using NGSI v2 with unkwnown query parameter
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |
@@ -2853,7 +2853,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | random=100000   |
 
   @op_qp_append_invalid
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with invalid "op" query parameter
+  Scenario Outline:  try to append an attribute by entity ID using NGSI v2 with invalid "op" query parameter
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |
@@ -2887,7 +2887,7 @@ Feature: update or append an attribute by entity ID in NGSI v2. "POST" - /v2/ent
       | ["34", "a", 45] |
 
   @op_qp_append_invalid
-  Scenario Outline:  try to append an attribute by entity ID in NGSI v2 with invalid query parameter
+  Scenario Outline:  try to append an attribute by entity ID using NGSI v2 with invalid query parameter
     Given  a definition of headers
       | parameter          | value            |
       | Fiware-Service     | test_update_op   |
