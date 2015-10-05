@@ -161,16 +161,26 @@ extern void strReplace
 extern std::string servicePathCheck(const char* servicePath);
 
 
+
+/* ****************************************************************************
+*
+* str2double - is the string a correct float (double)?
+*/
+extern bool str2double(char* s, double* dP = NULL);
+
+
+
 /* ****************************************************************************
 *
 * toString -
 */
-template <typename T>
-std::string toString(T t) {
+template <typename T> std::string toString(T t)
+{
   std::ostringstream ss;
+
   ss << t;
+
   return ss.str();
 }
-
 
 #endif  // SRC_LIB_COMMON_STRING_H_
