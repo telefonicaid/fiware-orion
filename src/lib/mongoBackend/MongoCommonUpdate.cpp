@@ -2451,7 +2451,6 @@ void processContextElement
   // FIXME P6: Once we allow for ServicePath to be modified, this loop must be looked at.
   //
   int docs      = 0;
-  bool isUpdate = false; // to check updates
 
   while (cursor->more())
   {
@@ -2687,8 +2686,6 @@ void processContextElement
       connection->update(getEntitiesCollectionName(tenant).c_str(), query, updatedEntityObj);
       releaseMongoConnection(connection);
 
-      // update is successful
-      isUpdate = true;
       LM_I(("Database Operation Successful (update %s)", query.toString().c_str()));
     }
     catch (const DBException &e)
@@ -2836,11 +2833,6 @@ void processContextElement
 
       responseP->contextElementResponseVector.push_back(cerP);
     }
-  }
-  else if (apiVersion == "v2" && action == "APPEND" && !isUpdate)
-  {
-    responseP->contextElementResponseVector[0]->statusCode.fill(SccInvalidModification, "Entity already exists");
-    return;
   }
 
   if (attributeAlreadyExistsError == true)
