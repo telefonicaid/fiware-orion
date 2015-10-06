@@ -185,6 +185,7 @@
 #include "serviceRoutinesV2/getEntityAllTypes.h"
 #include "serviceRoutinesV2/patchEntity.h"
 #include "serviceRoutinesV2/getAllSubscriptions.h"
+#include "serviceRoutinesV2/getSubscription.h"
 
 #include "contextBroker/version.h"
 #include "common/string.h"
@@ -372,6 +373,10 @@ PaArgument paArgs[] =
 #define SSR                     SubscriptionsRequest
 #define SSR_COMPS_V2            2, { "v2", "subscriptions" }
 #define SSR_COMPS_WORD          ""
+
+#define ISR                     IndividualSubscriptionRequest
+#define ISR_COMPS_V2            3, { "v2", "subscriptions", "*" }
+#define ISR_COMPS_WORD          ""
 
 //
 // NGSI9
@@ -649,8 +654,10 @@ PaArgument paArgs[] =
   { "*",      ETT,          ETT_COMPS_V2,         ETT_COMPS_WORD,          badVerbGetOnly           }, \
                                                                                                        \
   { "GET",    SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          getAllSubscriptions      }, \
-  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetOnly           }
-
+  { "*",      SSR,          SSR_COMPS_V2,         SSR_COMPS_WORD,          badVerbGetOnly           }, \
+                                                                                                       \
+  { "GET",    ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          getSubscription          }, \
+  { "*",      ISR,          ISR_COMPS_V2,         ISR_COMPS_WORD,          badVerbGetOnly           }
 
 
 
