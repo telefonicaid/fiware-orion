@@ -894,7 +894,7 @@ function orionCurl()
     elif [ "$1" == "-X" ]; then                _method="-X $2"; shift;
     elif [ "$1" == "--payload" ]; then         _payload=$2; shift;
     elif [ "$1" == "--noPayloadCheck" ]; then  _noPayloadCheck='on';
-    elif [ "$1" == "--payloadCheck" ]; then    _payloadCheck=$2; shift;
+    elif [ "$1" == "--payloadCheck" ]; then    _payloadCheck=$2; _noPayloadCheck='off'; shift;
     elif [ "$1" == "--servicePath" ]; then     _servicePath='--header "Fiware-ServicePath: '${2}'"'; shift;
     elif [ "$1" == "--tenant" ]; then          _tenant='--header "Fiware-Service: '${2}'"'; shift;
     elif [ "$1" == "--origin" ]; then          _origin='--header "Origin: '${2}'"'; shift;
@@ -960,6 +960,7 @@ function orionCurl()
   if [ "$_payloadCheck" != "" ]
   then
     payloadCheckFormat=$_payloadCheck
+    _noPayloadCheck='off'
   fi
 
   dMsg $_in: $_in
