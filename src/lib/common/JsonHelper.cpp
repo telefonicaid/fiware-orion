@@ -25,6 +25,11 @@
 
 #include "common/JsonHelper.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+
 /* ****************************************************************************
 *
 * toJsonString -
@@ -144,6 +149,46 @@ void JsonHelper::addRaw(const std::string& key, const std::string& value)
     ss << ',';
   }
   ss << toJsonString(key) << ':' << value;
+
+  empty = false;
+}
+
+
+/* ****************************************************************************
+*
+* JsonHelper::addNumber -
+*/
+void JsonHelper::addNumber(const std::string& key, long long value)
+{
+  if (!empty)
+  {
+    ss << ',';
+  }
+  ss << toJsonString(key) << ':' << value;
+
+  empty = false;
+}
+
+
+/* ****************************************************************************
+*
+* JsonHelper::addDate -
+*/
+void JsonHelper::addDate(const std::string& key, long long timestamp)
+{
+  if (!empty)
+  {
+    ss << ',';
+  }
+
+  // 80 bytes are large enough to store any ISO8601 string safely
+  // We use gmtime() to get UTC strings, otherwise we would use localtime()
+  // Date pattern: 1970-04-26T17:46:40.00Z
+  char   buffer[80];
+  time_t rawtime = (time_t) timestamp;
+  strftime(buffer, sizeof(buffer),"%Y-%m-%dT%H:%M:%S.00Z", gmtime(&rawtime));
+
+  ss << toJsonString(key) << ':' << toJsonString(std::string(buffer));
 
   empty = false;
 }

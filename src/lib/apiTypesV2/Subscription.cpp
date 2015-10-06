@@ -43,10 +43,11 @@ std::string Subscription::toJson()
   JsonHelper jh;
 
   jh.addString("id", this->id);
-  if (!this->duration.isEmpty())
+  if (this->expires > 0)
   {    
-    jh.addRaw("duration: ", "\"" + this->duration.get() + "\"");
+    jh.addDate("expires", this->expires);
   }
+  jh.addString("status", this->status);
   jh.addRaw("subject", this->subject.toJson());
   jh.addRaw("notification", this->notification.toJson());
 
@@ -63,10 +64,18 @@ std::string Notification::toJson()
 {
   JsonHelper jh;
 
-  jh.addString("callback", this->callback);
-  if (!this->throttling.isEmpty())
-  {    
-    jh.addRaw("throttling", "\"" + this->throttling.get() + "\"");
+  jh.addString("callback", this->callback);  
+  if (this->throttling > 0)
+  {
+    jh.addNumber("throttling", this->throttling);
+  }
+  if (this->timesSent > 0)
+  {
+    jh.addNumber("timesSent", this->timesSent);
+  }
+  if (this->lastNotification > 0)
+  {
+    jh.addDate("lastNotification", this->lastNotification);
   }
   jh.addRaw("attributes", vectorToJson(this->attributes));
 

@@ -37,6 +37,8 @@ public:
 
   void        addString(const std::string& key, const std::string& value);
   void        addRaw(const std::string& key, const std::string& value);
+  void        addNumber(const std::string& key, long long value);
+  void        addDate(const std::string& key, long long timestamp);
   std::string str();
 
 private:

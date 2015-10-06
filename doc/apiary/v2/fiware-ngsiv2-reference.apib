@@ -855,7 +855,10 @@ A subscription is represented by a JSON object with the following fields:
 + `id`: Subscription unique identifier. Automatically created at creation time.
 + `subject`: It is an object that describes the subject of the subscription.
 + `notification`: It is an object that describes the notification received by the subscriber.
-+ `duration`: Duration of the subscription in ISO8601 format. Infinite if not specified.
++ `expires`: Subscription expiration date in ISO8601 format. Permanent subscriptions must omit
+   this field.
++ `status` (not editable, only in GET operations): Either `active` (for permanent subscriptions or if
+   the subscription has not expired yet) or `expired` (for expired subscriptions).
 
 A `subject` contains the following subfields:
 
@@ -873,8 +876,10 @@ A `notification` object contains the following subfields:
   in the notification
 + `callback` : URL pointing to the service which will be invoked when a notification is generated. A NGSIv2
   compliant server must support `http` URL schema, other schemas (e.g. schemas for web sockets) could also be supported.
-+ `throttling`: Minimal period of time (in ISO8601 format) which must elapse between two consecutive notifications. It
++ `throttling`: Minimal period of time in seconds which must elapse between two consecutive notifications. It
   is optional.
++ `timesSent` (not editable, only in GET operations): Number of notifications sent due to this subscription.
++ `lastNotification`: Last notification date in ISO8601 format.
 
 Notification rules are as follow:
 
@@ -895,6 +900,13 @@ Response:
 
 * Successful operation uses 200 OK
 * Errors use a non-200 and (optionally) an error payload. See subsection on Error Responses for more details.
+
++ Parameters
+    + limit: 10 (optional, number) - Limit the number of types to be retrieved
+    + offset: 20 (optional, number) - Skip a number of records
+    + options (optional, string) - Options dictionary
+      + Members
+          + count - when used, the total subscriptions number is returned as a HTTP in the response named `X-Total-Count`
 
 + Response 200
 
@@ -918,9 +930,12 @@ Response:
                 "notification": {
                     "callback": "http://localhost:1234",
                     "attributes": ["temperature", "humidity"],
-                    "throttling": "PT5S"
+                    "throttling": 5,
+                    "count": 12,
+                    "lastNotification": "2015-10-05T16:00:00.00Z"
                 },
-                "duration": "PT1M"
+                "expires": "2016-04-05T14:00:00.00Z",
+                "status": "active"
             }
         ]
 
@@ -954,9 +969,9 @@ Response:
             "notification": {
                 "callback": "http://localhost:1234",
                 "attributes": ["temperature", "humidity"],
-                "throttling": "PT5S"
+                "throttling": 5,
             },            
-            "duration": "PT1M"
+            "expires": "2016-04-05T14:00:00.00Z"
         }
 
 + Response 201
@@ -1000,9 +1015,12 @@ Response:
             "notification": {
                 "callback": "http://localhost:1234",
                 "attributes": ["temperature", "humidity"],
-                "throttling": "PT5S"
+                "throttling": 5,
+                "count": 12,
+                "lastNotification": "2015-10-05T16:00:00.00Z"
             },
-            "duration": "PT1M"
+            "expires": "2016-04-05T14:00:00.00Z",
+            "status": "active"
         }
 
 
@@ -1021,7 +1039,7 @@ Response:
 + Request (application/json)
 
         {
-            "duration": "PT1M"
+            "expires": "2016-04-05T14:00:00.00Z"
         }
 
 + Response 204
