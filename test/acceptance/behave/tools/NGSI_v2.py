@@ -44,13 +44,12 @@ class NGSI:
         constructor
         """
     # ------------------------------------ validations ------------------------------------------
-    def __get_mongo_cursor(self, mongo_driver, entities_contexts, headers, operation):
+    def __get_mongo_cursor(self, mongo_driver, entities_contexts, headers):
         """
         return a cursor with a entities list
-        :param entities_contexts:
-        :param headers:
+        :param entities_contexts: entities context (attr_name, attr_value, attr_type, id, type, metadatas, etc)
+        :param headers: headers dict (service, service_path, etc)
         :param mongo_driver: mongo driver from steps
-        :param operation:
         :return: list
         """
         if FIWARE_SERVICE_HEADER in headers:
@@ -81,13 +80,20 @@ class NGSI:
         __logger__.info("collection verified: entities")
         __logger__.info("service path verified: %s" % service_path)
         curs_list = []
+        '''
         if operation.lower() == "create":
             query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.type": type,
                      "_id.servicePath": service_path}
         elif operation.lower() == "update":
             query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path}
-
+        '''
+        if type is not None:
+            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path,
+                     "_id.type": type}
+        else:
+            query = {"_id.id": {'$regex': '%s.*' % entities_contexts["entities_id"]}, "_id.servicePath": service_path}
         __logger__.info("query: %s" % str(query))
+
         curs = mongo_driver.find_data(query)
         curs_list = mongo_driver.get_cursor_value(curs)
         __logger__.debug("documents stored in mongo:  %s" % str(curs_list))
@@ -99,7 +105,6 @@ class NGSI:
         :return:
         """
         # verify attributes
-        __logger__.debug("entity stored in mongo:  %s" % str(entity))
         for a in range(int(entities_contexts["attributes_number"])):    # manages N attributes
             if int(entities_contexts["attributes_number"]) == 1:
                 attr_name = entities_contexts["attributes_name"]
@@ -116,8 +121,7 @@ class NGSI:
                 # the '=' is translated back to '.', thus from user perspective all works fine.
                 if attr_name.find(".") >= 0:
                     attr_name = attr_name.replace(".", "=")
-                    __logger__.debug("attribute name: %s is changed by \".\" is forbidden in MongoDB keys" % attr_name)
-                __logger__.info("attribute full: %s" % str(entity))
+                    __logger__.debug("attribute name: %s is changed by \"=\" because \".\" is forbidden in MongoDB keys" % attr_name)
 
                 assert attr_name in entity[u'attrs'], \
                     " ERROR -- attribute: %s is not stored in mongo" % attr_name
@@ -185,7 +189,7 @@ class NGSI:
                         "modDate": 1437379556
                     }
         """
-        curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers, "create")
+        curs_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
 
         # verify entities
         __logger__.debug("number of entities: %s" % str(entities_contexts["entities_number"]))
@@ -210,8 +214,7 @@ class NGSI:
         :param entities_contexts:  entities context (see constructor in cb_v2_utils.py)
         :param headers: headers used (see "definition_headers" method in cb_v2_utils.py)
         """
-
-        entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers, "update")
+        entity_list = self.__get_mongo_cursor(mongo_driver, entities_contexts, headers)
         assert  len(entity_list) > 0, " ERROR - notihing is returned from mongo, review the query in behave log"
         entity = entity_list[0]
         # verify attributes
@@ -361,7 +364,8 @@ class NGSI:
         verify an entity in raw mode with type in attribute value from http response
         :param entities_context:
         :param resp:
-        :param field_type: data type
+        :param field_type:
+        :return:
         """
         assert resp.text != "[]", "ERROR - It has not returned any entity"
         entity = convert_str_to_dict(resp.text, JSON)[0]   # in raw mode is used only one entity
@@ -380,11 +384,16 @@ class NGSI:
                 'ERROR - in attribute type "%s" in raw mode' % self.__remove_quote(entities_context["attributes_type"])
 
             attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
+            __logger__.debug("type:  %s" % field_type)
+            __logger__.debug('field type: %s' % str(type(attribute)))
             assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                 'ERROR - in attribute value "%s" with type "%s" does not match' % (str(entities_context["attributes_value"]), field_type)
         else:
             if entities_context["metadatas_number"] > 0:
                 attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
+                __logger__.debug("type:  %s" % (field_type))
+                __logger__.debug('field type: %s' % str(type(attribute)))
+
                 assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type but with metadatas' % (str(attribute["value"]), field_type)
             else:
@@ -536,11 +545,16 @@ class NGSI:
                 'ERROR - in attribute type "%s" in raw mode' % (self.__remove_quote(entities_context["attributes_type"]))
 
             attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
+            __logger__.debug("type:  %s" % (field_type))
+            __logger__.debug('field type: %s' % str(type(attribute)))
             assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                 'ERROR - in attribute value "%s" with type "%s" does not match' % (str(entities_context["attributes_value"]), field_type)
         else:
             if entities_context["metadatas_number"] > 0:
                 attribute["value"] = self.__verify_if_is_int_or_str(attribute["value"])
+                __logger__.debug("type:  %s" % field_type)
+                __logger__.debug('field type: %s' % str(type(attribute)))
+
                 assert str(type(attribute["value"])) == "<type '%s'>" % field_type, \
                     'ERROR - in attribute value "%s" with type "%s" does not match without attribute type but with metadatas' % (str(attribute["value"]), field_type)
             else:
