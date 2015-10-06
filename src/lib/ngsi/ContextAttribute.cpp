@@ -32,6 +32,7 @@
 #include "common/tag.h"
 #include "orionTypes/OrionValueType.h"
 #include "parse/forbiddenChars.h"
+#include "apiTypesV2/ErrorCode.h"
 #include "ngsi/ContextAttribute.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
@@ -622,6 +623,80 @@ std::string ContextAttribute::toJson(bool isLastElement, bool types, const std::
   if (!isLastElement)
   {
     out += ",";
+  }
+
+  return out;
+}
+
+
+
+/* ****************************************************************************
+*
+* toJsonAsValue -
+*/
+std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
+{
+  std::string  out;
+
+  if (ciP->outFormat == JSON)
+  {
+    if (compoundValueP != NULL)
+    {
+      if (compoundValueP->isVector())
+      {
+        out = "[" + compoundValueP->toJson(true) + "]";
+      }
+      else  // Object
+      {
+        out = "{" + compoundValueP->toJson(false) + "}";
+      }
+    }
+    else
+    {
+      ErrorCode ec("NotAcceptable", "accepted MIME types: text/plain");
+      ciP->httpStatusCode = SccNotAcceptable;
+
+      out = ec.toJson(true);
+    }
+  }
+  else  // TEXT
+  {
+    if (compoundValueP != NULL)
+    {
+      if (compoundValueP->isVector())
+      {
+        out = "[" + compoundValueP->toJson(false) + "]";
+      }
+      else  // Object
+      {
+        out = "{" + compoundValueP->toJson(false) + "}";
+      }
+    }
+    else
+    {
+      char buf[64];
+
+      switch (valueType)
+      {
+      case orion::ValueTypeString:
+        out = stringValue;
+        break;
+
+      case orion::ValueTypeNumber:
+        snprintf(buf, sizeof(buf), "%f", numberValue);
+        out = buf;
+        break;
+
+      case orion::ValueTypeBoolean:
+        snprintf(buf, sizeof(buf), "%s", boolValue? "true" : "false");
+        out = buf;
+        break;
+
+      default:
+        out = "ERROR";
+        break;
+      }
+    }
   }
 
   return out;

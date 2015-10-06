@@ -103,7 +103,7 @@ std::string ErrorCode::toJson(bool isLastElement)
 
   out += "}";
 
-  if (!isLastElement)
+  if (isLastElement == false)
   {
     out += ",";
   }

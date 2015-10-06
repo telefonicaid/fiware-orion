@@ -86,12 +86,12 @@ echo '================================================================='
 echo
 
 echo "1.4: Unrecognized Content-Type, Accepts text/plain: 415, response in XML"
-orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "text/plain"
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out "text/plain" --payloadCheck xml
 echo '================================================================='
 echo
 
 echo "1.5: Unrecognized Content-Type, Accepts NOTHING: 415, response in XML"
-orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out " "
+orionCurl --url "$url" --payload "${payload}" --in "text/plain" --out " " --payloadCheck xml
 echo '================================================================='
 echo
 
@@ -111,7 +111,7 @@ echo '================================================================='
 echo
 
 echo "2.4: Content-Type OK, Accepts text/plain: 406, Response in XML"
-orionCurl --url "$url" --payload "${payload}" --in "application/xml" --out "text/plain"
+orionCurl --url "$url" --payload "${payload}" --in "application/xml" --out "text/plain" --payloadCheck xml
 echo '================================================================='
 echo
 
