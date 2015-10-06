@@ -37,7 +37,7 @@
 *
 * mongoGetSubscription -
 */
-void mongoGetSubscription
+extern void mongoGetSubscription
 (
   ngsiv2::Subscription                *sub,
   OrionError                          *oe,
