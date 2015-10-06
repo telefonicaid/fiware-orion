@@ -62,7 +62,7 @@ std::string putEntity
 )
 {
   std::string answer = "";
-  Entity*  eP = &parseDataP->ent.res;
+  Entity*     eP     = &parseDataP->ent.res;
 
   eP->id = compV[2];
 
