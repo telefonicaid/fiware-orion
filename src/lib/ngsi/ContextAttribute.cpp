@@ -656,7 +656,7 @@ std::string ContextAttribute::toJsonAsValue(ConnectionInfo* ciP)
       ErrorCode ec("NotAcceptable", "accepted MIME types: text/plain");
       ciP->httpStatusCode = SccNotAcceptable;
 
-      out = ec.toJson(false);
+      out = ec.toJson(true);
     }
   }
   else  // TEXT
