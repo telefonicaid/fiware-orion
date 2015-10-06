@@ -41,10 +41,11 @@ using namespace ngsiv2;
 *
 * mongoGetSubscription -
 */
-OrionError mongoGetSubscription
+void mongoGetSubscription
 (
-  ngsiv2::Subscription&  sub,
-  const std::string& idSub,
+  ngsiv2::Subscription                *sub,
+  OrionError                          *oe,
+  const std::string&                  idSub,
   std::map<std::string, std::string>& uriParam,
   const std::string&                  tenant
 )
@@ -61,8 +62,9 @@ OrionError mongoGetSubscription
   s1.notification.attributes.push_back("notification attributes  1");
   s1.notification.attributes.push_back("notification attributes 2");
 
-  sub = s1;
+  *sub = s1;
 
-  return OrionError(SccOk);
+  oe->code  = SccOk;
+  return;
 }
 

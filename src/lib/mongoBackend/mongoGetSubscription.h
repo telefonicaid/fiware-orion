@@ -1,5 +1,5 @@
-#ifndef MONGOGETSUBSCRIPTIONS_H
-#define MONGOGETSUBSCRIPTIONS_H
+#ifndef SRC_LIB_MONGOBACKEND_MONGOGETSUBSCRIPTIONS_H
+#define SRC_LIB_MONGOBACKEND_MONGOGETSUBSCRIPTIONS_H
 
 /*
 *
@@ -37,13 +37,14 @@
 *
 * mongoGetSubscription -
 */
-OrionError mongoGetSubscription
+void mongoGetSubscription
 (
-  ngsiv2::Subscription&  sub,
-  const std::string& idSub,
+  ngsiv2::Subscription                *sub,
+  OrionError                          *oe,
+  const std::string&                  idSub,
   std::map<std::string, std::string>& uriParam,
   const std::string&                  tenant
 );
 
-#endif // MONGOLISTSUBSCRIPTIONS_H
+#endif // SRC_LIB_MONGOBACKEND_MONGOGETSUBSCRIPTIONS_H
 

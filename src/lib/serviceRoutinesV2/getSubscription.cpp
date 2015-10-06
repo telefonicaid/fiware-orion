@@ -54,7 +54,9 @@ std::string getSubscription
 
   ngsiv2::Subscription sub;
   std::string          idSub = compV[2];
-  OrionError           oe    = mongoGetSubscription(sub, idSub , ciP->uriParam, ciP->tenant);
+  OrionError           oe;
+
+  mongoGetSubscription(&sub, &oe,  idSub , ciP->uriParam, ciP->tenant);
 
   if (oe.code != SccOk)
   {
