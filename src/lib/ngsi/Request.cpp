@@ -115,7 +115,7 @@ const char* requestType(RequestType rt)
   case EntityTypeRequest:                                return "EntityTypeRequest";
   case EntityAllTypesRequest:                            return "EntityAllTypesRequest";
   case SubscriptionsRequest:                             return "SubscriptionsRequest";
-  case SubscriptionRequest:                              return "SubscriptionRequest";
+  case IndividualSubscriptionRequest:                    return "IndividualSubscriptionRequest";
   }
 
   return "";

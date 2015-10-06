@@ -374,7 +374,7 @@ PaArgument paArgs[] =
 #define SSR_COMPS_V2            2, { "v2", "subscriptions" }
 #define SSR_COMPS_WORD          ""
 
-#define ISR                     SubscriptionRequest
+#define ISR                     IndividualSubscriptionRequest
 #define ISR_COMPS_V2            3, { "v2", "subscriptions", "*" }
 #define ISR_COMPS_WORD          ""
 
