@@ -31,6 +31,7 @@
 #include "rest/EntityTypeInfo.h"
 #include "serviceRoutinesV2/putEntity.h"
 #include "serviceRoutines/postUpdateContext.h"
+#include "rest/OrionError.h"
 
 
 
@@ -60,6 +61,7 @@ std::string putEntity
   ParseData*                 parseDataP
 )
 {
+  std::string answer = "";
   Entity*  eP = &parseDataP->ent.res;
 
   eP->id = compV[2];
@@ -87,10 +89,16 @@ std::string putEntity
   {
     ciP->httpStatusCode = SccNoContent;
   }
+  else if (ciP->httpStatusCode == SccConflict)
+  {
+    OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
+    answer = orionError.render(ciP, "");
+   }
+
 
 
   // 05. Cleanup and return result
   eP->release();
 
-  return "";
+  return answer;
 }
