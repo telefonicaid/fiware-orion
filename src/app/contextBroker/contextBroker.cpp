@@ -689,7 +689,7 @@ PaArgument paArgs[] =
 
 
 #define STANDARD_REQUESTS_V0                                                                             \
-  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
   { "*",      UPCR,  UPCR_COMPS_V0,        UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V0,         QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -705,7 +705,7 @@ PaArgument paArgs[] =
 
 
 #define STANDARD_REQUESTS_V1                                                                               \
-  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  postUpdateContext                         }, \
+  { "POST",   UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  (RestTreat)postUpdateContext                         }, \
   { "*",      UPCR,  UPCR_COMPS_V1,          UPCR_POST_WORD,  badVerbPostOnly                           }, \
   { "POST",   QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   postQueryContext                          }, \
   { "*",      QCR,   QCR_COMPS_V1,           QCR_POST_WORD,   badVerbPostOnly                           }, \
@@ -984,6 +984,8 @@ PaArgument paArgs[] =
 *
 * This is the default service vector, that is used if the broker is started without the -ngsi9 option
 */
+
+
 RestService restServiceV[] =
 {
   API_V2,
