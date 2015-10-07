@@ -71,12 +71,12 @@ Date: REGEX(.*)
 02. POST /v2/entities (Room1-Room)
 ==================================
 HTTP/1.1 422 Unprocessable Entity
-Content-Length: 68
+Content-Length: 69
 Content-Type: application/json
 Date: REGEX(.*)
 
 {
-    "description": "Entity alredy exists",
+    "description": "Entity already exists",
     "error": "InvalidModification"
 }
 

@@ -84,7 +84,7 @@ std::string postEntities
   }
   else if (rcode == SccInvalidModification)
   {
-    OrionError oe(SccInvalidModification, "Entity alredy exists");
+    OrionError oe(SccInvalidModification, "Entity already exists");
     ciP->httpStatusCode = SccInvalidModification;
     answer = oe.render(ciP, "");
   }
