@@ -148,9 +148,10 @@ static void setExpires(Subscription* s, const BSONObj& r)
 *
 * mongoListSubscriptions -
 */
-OrionError mongoListSubscriptions
+void mongoListSubscriptions
 (
-  std::vector<Subscription>&           subs,
+  std::vector<Subscription>            *subs,
+  OrionError                           *oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant
 )
@@ -175,7 +176,8 @@ OrionError mongoListSubscriptions
   if (!query(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
   {
     reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
-    return OrionError(SccReceiverInternalError, err);
+    *oe = OrionError(SccReceiverInternalError, err);
+    return;
   }
 
   /* Process query result */
@@ -189,9 +191,10 @@ OrionError mongoListSubscriptions
     setSubject(&s, r);
     setNotification(&s, r);
     setExpires(&s, r);
-    subs.push_back(s);
+    subs->push_back(s);
   }
 
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
-  return OrionError(SccOk);
+  *oe = OrionError(SccOk);
+  return;
 }
