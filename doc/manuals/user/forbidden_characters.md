@@ -28,3 +28,18 @@ If your aplication needs to use these characteres, you should encode it
 using a scheme not including forbidden characters before sending the
 request to Orion (e.g. [URL
 encoding](http://www.degraeve.com/reference/urlencoding.php)).
+
+There is another set of characters that requires special care from the 
+user persepective. Are those in the following list:
+
+-   #
+-   ?
+-   /
+-   %
+-   &
+
+These characters have special meaning in the URL interpretation, and, 
+considering there are convenience operations that use entity, type and
+attribute identifiers as part of the URL, its use should be avoided. 
+The use of this characters is perfectly safe when only standard operations
+are concerned, anyway. 
