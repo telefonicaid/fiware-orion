@@ -23,7 +23,7 @@ VERSION=$1
 ############################### SONAR_RUNNER ###############################
 ################################ COMMON PROPERTIES:BEGIN
 ### PROJECT PROPERTIES ###
-echo sonar.projectName=context-broker
+echo sonar.projectName=fiware-orion
 echo sonar.projectKey=com.telefonica.iot:orion
 echo sonar.projectVersion=$VERSION
 ### SOURCES
