@@ -48,7 +48,9 @@ struct Notification
 {
   std::vector<std::string> attributes;
   std::string              callback;
-  Throttling               throttling;
+  long long                throttling;
+  long long                timesSent;
+  long long                lastNotification;
   std::string              toJson();
 };
 
@@ -80,7 +82,8 @@ struct Subscription
 {
   std::string  id;
   Subject      subject;
-  Duration     duration;
+  long long    expires;
+  std::string  status;
   Notification notification;
   std::string  toJson();
 };
