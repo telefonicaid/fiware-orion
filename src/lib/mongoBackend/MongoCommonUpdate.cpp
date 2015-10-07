@@ -740,7 +740,7 @@ static bool updateAttribute
     }
 
     toSet->append(effectiveName, newAttr.obj());
-    toPush->append(effectiveName);
+    toPush->append(caP->name);
   }
   else
   {
