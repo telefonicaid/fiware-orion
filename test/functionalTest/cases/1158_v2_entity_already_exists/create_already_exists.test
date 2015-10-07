@@ -51,9 +51,16 @@ echo "=================================="
 payload='{
   "id": "Room1",
   "type": "Room",
-  "temp": "29"
+  "temp": "30"
 }'
 orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "03. GET /v2/entities/Room1"
+echo "=========================="
+orionCurl --url /v2/entities/Room1 --json
 echo
 echo
 
@@ -78,6 +85,20 @@ Date: REGEX(.*)
 {
     "description": "Entity already exists",
     "error": "InvalidModification"
+}
+
+
+03. GET /v2/entities/Room1
+==========================
+HTTP/1.1 200 OK
+Content-Length: 40
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "id": "Room1",
+    "temp": "29",
+    "type": "Room"
 }
 
 
