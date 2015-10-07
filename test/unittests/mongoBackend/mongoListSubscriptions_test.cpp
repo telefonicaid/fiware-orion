@@ -121,7 +121,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 
   /* Invoke the function in mongoBackend library */
   std::vector<Subscription> subs;
-  oe = mongoListSubscriptions(subs, uriParams, "");
+  mongoListSubscriptions(&subs, &oe, uriParams, "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, oe.code);
