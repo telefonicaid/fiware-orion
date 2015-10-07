@@ -20,4 +20,4 @@ Fix:  Error must be Not Found, when updating an unknown attribute of an existing
 Add:  NGSIv2 operation GET /v2/subscriptions (#1126)
 Add:  NGSIv2 operation GET /v2/subscription/<id> (#1317)
 Fix:  Fix Conv op to std op mapping wrongly using patterns in some GET operations (Issue #1322)
-Fix:  Fix escaping dots in attrNames Issue #1323)
+Fix:  Fix escaping dots in attrNames (Issue #1323)
