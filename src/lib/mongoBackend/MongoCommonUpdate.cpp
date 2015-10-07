@@ -2240,7 +2240,8 @@ void processContextElement
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
-  const std::string&                   apiVersion
+  const std::string&                   apiVersion,
+  bool                                 checkEntityExistance
 )
 {
   DBClientBase* connection                  = NULL;
@@ -2382,7 +2383,12 @@ void processContextElement
       return;  // Error already in responseP
     }
 
-    if (entitiesNumber > 1)
+    if (entitiesNumber > 0 && checkEntityExistance && action == "APPEND_STRICT")
+    {
+        buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
+        return;
+    }
+    else if (entitiesNumber > 1)
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, "There is more than one entity that match the update. Please refine your query.");
       return;

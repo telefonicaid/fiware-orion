@@ -457,7 +457,8 @@ std::string postUpdateContext
   ConnectionInfo*            ciP,
   int                        components,
   std::vector<std::string>&  compV,
-  ParseData*                 parseDataP
+  ParseData*                 parseDataP,
+  bool                       checkEntityExistance
 )
 {
   UpdateContextResponse*  upcrsP = &parseDataP->upcrs.res;
@@ -497,7 +498,7 @@ std::string postUpdateContext
   //
   upcrsP->errorCode.fill(SccOk);
   attributesToNotFound(upcrP);
-  HttpStatusCode httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion);
+  HttpStatusCode httpStatusCode = mongoUpdateContext(upcrP, upcrsP, ciP->tenant, ciP->servicePathV, ciP->uriParam, ciP->httpHeaders.xauthToken, ciP->apiVersion, checkEntityExistance);
   if (ciP->httpStatusCode != SccCreated)
   {
     ciP->httpStatusCode = httpStatusCode;
