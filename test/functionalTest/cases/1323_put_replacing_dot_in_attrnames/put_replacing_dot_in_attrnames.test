@@ -36,6 +36,7 @@ brokerStart CB
 # 04. Make sure E1 is as modified
 # 05. GET attribute A2..y
 # 06. GET attribute A3.Z
+# 07. Check attributes in DB
 #
 
 echo "01. Create E1/A1+A2"
