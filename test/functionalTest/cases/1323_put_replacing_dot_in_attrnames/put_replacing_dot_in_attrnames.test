@@ -21,7 +21,7 @@
 # VALGRIND_READY - to mark the test ready for valgrindTestSuite.sh
 
 --NAME--
-PUT /v2/entities/E1 replacing some attributes
+PUT /v2/entities/E1 making sure that dots in attribute names are preserved
 
 --SHELL-INIT--
 dbInit CB
