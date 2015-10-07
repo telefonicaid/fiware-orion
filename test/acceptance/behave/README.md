@@ -171,7 +171,7 @@ Feature: feature name...
 
 ### Logs
 
-The log is stored in `logs` folder (if this folder does not exists it is created) and is called `behave.log` see `logging.ini`.
+The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
 
 
 ### Tests Suites Coverage (features):
