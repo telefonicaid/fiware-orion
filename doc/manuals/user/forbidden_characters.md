@@ -42,4 +42,4 @@ These characters have special meaning in the URL interpretation, and,
 considering there are convenience operations that use entity, type and
 attribute identifiers as part of the URL, its use should be avoided. 
 The use of this characters is perfectly safe when only standard operations
-are concerned, anyway. 
+are involved, anyway. 
