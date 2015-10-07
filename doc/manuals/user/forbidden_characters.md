@@ -30,7 +30,7 @@ request to Orion (e.g. [URL
 encoding](http://www.degraeve.com/reference/urlencoding.php)).
 
 There is another set of characters that requires special care from the 
-user persepective. Are those in the following list:
+user perspective. Are those in the following list:
 
 -   #
 -   ?
