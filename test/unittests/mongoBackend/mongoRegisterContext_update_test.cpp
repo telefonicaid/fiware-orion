@@ -1046,9 +1046,9 @@ TEST(mongoRegisterContext_update, MongoDbFindOneFail)
     EXPECT_TRUE(res.registrationId.isEmpty());
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
-    EXPECT_EQ("collection: utest.registrations "
-              "- findOne() _id: 51307b66f481db11bf860001 "
-              "- exception: boom!!", res.errorCode.details);
+    EXPECT_EQ("Database Error (collection: utest.registrations "
+              "- findOne(): { _id: ObjectId('51307b66f481db11bf860001'), servicePath: \"/\" } "
+              "- exception: boom!!)", res.errorCode.details);
 
     /* Release mock */
     setMongoConnectionForUnitTest(NULL);

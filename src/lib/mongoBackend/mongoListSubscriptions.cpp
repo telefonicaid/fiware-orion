@@ -30,7 +30,7 @@
 
 #include "mongoBackend/mongoListSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/collectionOperations.h"
+#include "mongoBackend/connectionOperations.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -173,7 +173,7 @@ void mongoListSubscriptions
   std::string                    conds = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
   BSONObj                        q     = BSON(conds << "ONCHANGE");
 
-  if (!query(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
   {
     reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
     *oe = OrionError(SccReceiverInternalError, err);

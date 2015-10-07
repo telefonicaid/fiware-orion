@@ -245,9 +245,9 @@ TEST(mongoUnsubscribeContext, MongoDbFindOneFail)
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
     EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-    EXPECT_EQ("collection: utest.csubs "
-              "- findOne() _id: 51307b66f481db11bf860001 "
-              "- exception: boom!!", res.statusCode.details);
+    EXPECT_EQ("Database Error (collection: utest.csubs "
+              "- findOne(): { _id: ObjectId('51307b66f481db11bf860001') } "
+              "- exception: boom!!)", res.statusCode.details);
 
     // Sleeping a little to "give mongod time to process its input".
     // Without this sleep, this tests fails around 10% of the times (in Ubuntu 13.04)
@@ -315,9 +315,9 @@ TEST(mongoUnsubscribeContext, MongoDbRemoveFail)
     EXPECT_EQ("51307b66f481db11bf860001", res.subscriptionId.get());
     EXPECT_EQ(SccReceiverInternalError, res.statusCode.code);
     EXPECT_EQ("Internal Server Error", res.statusCode.reasonPhrase);
-    EXPECT_EQ("collection: utest.csubs "
-              "- remove() _id: 51307b66f481db11bf860001 "
-              "- exception: boom!!", res.statusCode.details);
+    EXPECT_EQ("Database Error (collection: utest.csubs "
+              "- remove(): { _id: ObjectId('51307b66f481db11bf860001') } "
+              "- exception: boom!!)", res.statusCode.details);
 
     // Sleeping a little to "give mongod time to process its input".
     usleep(1000);
