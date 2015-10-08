@@ -35,7 +35,6 @@ CONTEXT_BROKER_ENV = u'context_broker_env'
 MONGO_ENV = u'mongo_env'
 
 
-# ------------- general_operations.feature -----------------------------------------
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
 

@@ -40,7 +40,7 @@ MONGO_ENV = u'mongo_env'
 properties_class = Properties()
 props_mongo = properties_class.read_properties()[MONGO_ENV]  # mongo properties dict
 
-# ------------- general_operations.feature -----------------------------------------
+
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
 

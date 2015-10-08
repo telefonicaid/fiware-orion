@@ -56,7 +56,6 @@ status_codes = {'OK': 200,
                 'Internal Server Error': 500}
 
 
-# ------------- general_operations.feature -----------------------------------------
 behave.use_step_matcher("re")
 __logger__ = logging.getLogger("steps")
 
