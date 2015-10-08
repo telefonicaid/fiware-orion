@@ -122,7 +122,7 @@ This libraries will be install into `requirements.txt`
 - context_broker_env
     * CB_PROTOCOL: web protocol used (http by default)
     * CB_HOST: context broker host (localhost by default)
-    * CB_PORT: sth port (8666 by default)
+    * CB_PORT: sth port (1026 by default)
     * CB_VERSION: context broker version (x.y.z by default)
     * CB_VERIFY_VERSION: determine whether the version is verified or not (True or False).
     * CB_FABRIC_USER: user used to connect by Fabric
@@ -151,10 +151,12 @@ This libraries will be install into `requirements.txt`
     * MONGO_DELAY_TO_RETRY: time in seconds to delay in each retry.
 
 
-### BackgroundFeature
+### Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
 
-In certain cases, could be useful define a background by feature instead of `Background` that is by scenario.
-Recommend append `BackgroundFeature` in Feature description and define the steps with `Setup:` or `Check:` prefix.
+In certain cases, could be useful define actions before or/and after of the feature or/and each scenario. This help to read all pre or post actions into the feature. 
+
+Recommend append labels defined (`Actions Before the Feature`, `Actions Before each Scenario`, `Actions After each Scenario`,`Actions After the Feature`)
+into de feature description, these labels are Optional. And define steps with `Setup:` or `Check:` prefix (must be `:` in the step prefix). See `environment.py` in root path.
 Example:
 ```
 Feature: feature name...
@@ -162,10 +164,19 @@ Feature: feature name...
   I would like to execute once several steps in the feature
   So ....
 
-  BackgroundFeature:
-    Setup: update config file
-    Setup: restart service
-    Check: verify if the service is installed successfully
+   Actions Before the Feature:
+      Setup: update config file
+      Setup: start service
+      Check: verify if the service is installed successfully
+  
+   Actions Before each Scenario:
+      Setup: reinit the configuration
+  
+   Actions After each Scenario:
+      Setup: delete database
+
+   Actions After the Feature:
+       Setup: stop service
 ```
 
 
@@ -176,19 +187,29 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 
 ### Tests Suites Coverage (features):
 
-  - entities
-    * general_operations - 16 testcases
-    * create_entities - 559 testcases                   POST - /v2/entities/ plus payload
-    * list_all_entities - 200 testcases                 GET - /v2/entities/
-    * list_an_entity_by_id - 209 testcases              GET - /v2/entities/<entity_id>
-    * list_an_attribute_by_id - 198 testcases           GET - /v2/entities/<entity_id>/attrs/<attr_name>
-    * update_append_attribute_by_id - 766 testcases     POST - /v2/entities/<entity_id> plus payload
-    * update_attribute_by_id - 654 testcases            PATCH - /v2/entities/<entity_id> plus payload
-    * replace_attributes_by_id 511 testcases            PUT - /v2/entities/<entity_id> plus payload  
-    * remove_entity (pending) 
+|           FEATURE                         |  TEST CASES  | METHOD  |            URL                                      |  PAYLOAD       |  
+|:------------------------------------------|:------------:|--------:|:----------------------------------------------------|:--------------:|      
+|**general folder**                                                                                                                         |
+| - general_operations                      |      16      | GET     | /version   /statistics    /v2                       | No             |
+|                                                                                                                                           |
+|**entities folder**                                                                                                                        |
+| - create_entities                         |     559      | POST   | /v2/entities/                                        | Yes            |      
+| - list_all_entities                       |     200      | GET    | /v2/entities/                                        | No             | 
+|                                                                                                                                           |
+| - update_append_attribute_by_id           |     766      | POST   | /v2/entities/`<entity_id>`                           | Yes            |   
+| - list_an_entity_by_id                    |     209      | GET    | /v2/entities/`<entity_id>`                           | No             | 
+| - replace_attributes_by_id                |     511      | PUT    | /v2/entities/`<entity_id>`                           | Yes            |   
+| - update_attribute_by_id                  |     654      | PATCH  | /v2/entities/`<entity_id>`                           | Yes            | 
+| - delete_entity_by_id                     |  (pending)   | DELETE | /v2/entities/`<entity_id>`                           | No             |
+|                                                                                                                                           |
+| - list_an_attribute_by_id                 |     198      | GET    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |   
+| - update_only_one_attribute_by_id         |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes            | 
+| - delete_attribute_by_id                  |  (pending)   | DELETE | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |
+|                                                                                                                                           |
+| - update_only_one_attribute_value_by_id   |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes            |   
+|                                                                                                                                           |
+|**alarms folder**                          |  (pending)   |                                                                                |
 
-  -  alarms (pending)
-  
   
 ### Hints:
   - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).

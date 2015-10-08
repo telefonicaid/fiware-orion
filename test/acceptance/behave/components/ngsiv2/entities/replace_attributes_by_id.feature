@@ -33,11 +33,18 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
   I would like to replace attributes by entity ID using NGSI v2
   So that I can manage and use them in my scripts
 
-  BackgroundFeature:
-  Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-  Setup: update contextBroker config file and restart service
-  Check: verify contextBroker is installed successfully
-  Check: verify mongo is installed successfully
+  Actions Before the Feature:
+     Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
+     Setup: update contextBroker config file
+     Setup: start ContextBroker
+     Check: verify contextBroker is installed successfully
+     Check: verify mongo is installed successfully
+
+  Actions After each Scenario:
+     Setup: delete database in mongo
+
+  Actions After the Feature:
+     Setup: stop ContextBroker
 
   @happy_path
   Scenario:  replace attributes by entity ID using NGSI v2
@@ -71,7 +78,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
     Then verify that receive an "No Content" http code
     And verify that an entity is updated in mongo
 
-  @more_entities_replace @BUG_1320 @skip
+  @more_entities_replace @BUG_1320
   Scenario:  try to replace attributes by entity ID using NGSI v2 with more than one entity with the same id
     Given  a definition of headers
       | parameter          | value                      |
@@ -565,7 +572,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
 
   # --------------------- attribute name  ------------------------------------
 
-  @attribute_name_replace @BUG_1323 @skip
+  @attribute_name_replace @BUG_1323
   Scenario Outline:  replace attributes by entity ID using NGSI v2 with several attribute names
     Given  a definition of headers
       | parameter          | value                       |

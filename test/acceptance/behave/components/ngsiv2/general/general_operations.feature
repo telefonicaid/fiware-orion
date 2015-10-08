@@ -32,11 +32,18 @@ Feature: general operations in Context Broker using NGSI API v1 and v2
   I would like to verify general operations in Context Broker using NGSI API v1 and v2
   So that I can manage and use them in my scripts
 
-  BackgroundFeature:
-  Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
-  Setup: update contextBroker config file and restart service
-  Check: verify contextBroker is installed successfully
-  Check: verify mongo is installed successfully
+  Actions Before the Feature:
+     Setup: update properties test file from "epg_contextBroker.txt" and sudo local "false"
+     Setup: update contextBroker config file
+     Setup: start ContextBroker
+     Check: verify contextBroker is installed successfully
+     Check: verify mongo is installed successfully
+
+  Actions After each Scenario:
+     Setup: delete database in mongo
+
+  Actions After the Feature:
+     Setup: stop ContextBroker
 
   @version
   Scenario: launch Context broker version request

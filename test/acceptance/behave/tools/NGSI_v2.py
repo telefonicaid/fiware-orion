@@ -102,7 +102,6 @@ class NGSI:
     def __verify_attributes(self, entity, entities_contexts):
         """
         verify attributes from mongo
-        :return:
         """
         # verify attributes
         for a in range(int(entities_contexts["attributes_number"])):    # manages N attributes
@@ -362,10 +361,9 @@ class NGSI:
     def verify_entity_raw_mode_http_response(self, entities_context, resp, field_type):
         """
         verify an entity in raw mode with type in attribute value from http response
-        :param entities_context:
-        :param resp:
-        :param field_type:
-        :return:
+        :param entities_context: entities context
+        :param resp: http response
+        :param field_type: field type (bool | int | float | list | dict | str | NoneType)
         """
         assert resp.text != "[]", "ERROR - It has not returned any entity"
         entity = convert_str_to_dict(resp.text, JSON)[0]   # in raw mode is used only one entity
@@ -531,7 +529,6 @@ class NGSI:
         :param resp:
         :param attribute_name_to_request:
         :param field_type:
-        :return:
         """
         assert resp.text != "[]", "ERROR - It has not returned any entity"
         entity = convert_str_to_dict(resp.text, JSON)   # in raw mode is used only one entity
