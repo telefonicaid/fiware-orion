@@ -116,7 +116,6 @@ def before_feature(context, feature):
     actions before each feature
     in case of backgroundFeature, re-throw steps defined in the feature descriptions
     :param context: It’s a clever place where you and behave can store information to share around. It runs at three levels, automatically managed by behave.
-    :param feature:
     """
     global steps_after_feature, steps_before_scenario, steps_after_scenario
     __logger__.info("\n\n\n\n")
