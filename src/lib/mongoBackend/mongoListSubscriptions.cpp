@@ -30,7 +30,7 @@
 
 #include "mongoBackend/mongoListSubscriptions.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/collectionOperations.h"
+#include "mongoBackend/connectionOperations.h"
 
 #include "mongo/client/dbclient.h"
 
@@ -118,33 +118,40 @@ static void setNotification(Subscription* s, const BSONObj& r)
   s->notification.callback = r.getStringField(CSUB_REFERENCE);
 
   // Throttling
-  long long throttling = r.hasField(CSUB_THROTTLING)? r.getField(CSUB_THROTTLING).numberLong() : -1;
-  if (throttling > -1)
-  {
-    // FIXME P10: int -> str conversion needed
-    s->notification.throttling.set("FIXME");
-  }
+  s->notification.throttling = r.hasField(CSUB_THROTTLING)? r.getField(CSUB_THROTTLING).numberLong() : -1;
+
+  // Last Notification
+  s->notification.lastNotification = r.hasField(CSUB_LASTNOTIFICATION) ? r.getField(CSUB_LASTNOTIFICATION).numberLong() : -1;
+
+  // Count
+  s->notification.timesSent = r.hasField(CSUB_COUNT) ? r.getField(CSUB_COUNT).numberLong() : -1;
+
 }
 
 
 /* ****************************************************************************
 *
-* setDuration -
+* setExpires -
 */
-static void setDuration(Subscription* s, const BSONObj& r)
+static void setExpires(Subscription* s, const BSONObj& r)
 {
-  //long long expiration = r.hasField(CSUB_EXPIRATION)? r.getField(CSUB_EXPIRATION).numberLong() : 0;
-  // FIXME P10: int -> str conversion needed
-  s->duration.set("FIXME");
+  // Last Notification
+  s->expires = r.hasField(CSUB_EXPIRATION) ? r.getField(CSUB_EXPIRATION).numberLong() : -1;
+
+  // Status
+  // FIXME P10: use a enum for this
+  s->status = s->expires > getCurrentTime() ? "active" : "expired";
+
 }
 
 /* ****************************************************************************
 *
 * mongoListSubscriptions -
 */
-OrionError mongoListSubscriptions
+void mongoListSubscriptions
 (
-  std::vector<Subscription>&           subs,
+  std::vector<Subscription>            *subs,
+  OrionError                           *oe,
   std::map<std::string, std::string>&  uriParam,
   const std::string&                   tenant
 )
@@ -166,10 +173,11 @@ OrionError mongoListSubscriptions
   std::string                    conds = std::string(CSUB_CONDITIONS) + "." + CSUB_CONDITIONS_TYPE;
   BSONObj                        q     = BSON(conds << "ONCHANGE");
 
-  if (!query(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
+  if (!collectionQuery(getSubscribeContextCollectionName(tenant), q, &cursor, &err))
   {
     reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
-    return OrionError(SccReceiverInternalError, err);
+    *oe = OrionError(SccReceiverInternalError, err);
+    return;
   }
 
   /* Process query result */
@@ -182,10 +190,11 @@ OrionError mongoListSubscriptions
     setSubscriptionId(&s, r);
     setSubject(&s, r);
     setNotification(&s, r);
-    setDuration(&s, r);
-    subs.push_back(s);
+    setExpires(&s, r);
+    subs->push_back(s);
   }
 
   reqSemGive(__FUNCTION__, "Mongo List Subscriptions", reqSemTaken);
-  return OrionError(SccOk);
+  *oe = OrionError(SccOk);
+  return;
 }

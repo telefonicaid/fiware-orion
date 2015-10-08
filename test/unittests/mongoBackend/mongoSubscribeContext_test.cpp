@@ -7478,12 +7478,12 @@ TEST(mongoSubscribeContext, MongoDbInsertFail)
     EXPECT_EQ(SccReceiverInternalError, res.subscribeError.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.subscribeError.errorCode.reasonPhrase);
 
-    std::string s1 = res.subscribeError.errorCode.details.substr(0, 53);
-    std::string s2 = res.subscribeError.errorCode.details.substr(53+24, res.subscribeError.errorCode.details.size()-53-24);
-    EXPECT_EQ("collection: utest.csubs "
+    std::string s1 = res.subscribeError.errorCode.details.substr(0, 69);
+    std::string s2 = res.subscribeError.errorCode.details.substr(69+24, res.subscribeError.errorCode.details.size()-69-24);
+    EXPECT_EQ("Database Error (collection: utest.csubs "
               "- insert(): { _id: ObjectId('", s1);
     EXPECT_EQ("'), expiration: 1360236300, reference: \"http://notify.me\", entities: [ { id: \"E1\", type: \"T1\", isPattern: \"false\" } ], attrs: [], conditions: [ { type: \"ONTIMEINTERVAL\", value: 60 } ], format: \"XML\" } "
-              "- exception: boom!!", s2);
+              "- exception: boom!!)", s2);
 
     /* Release mocks */
     setMongoConnectionForUnitTest(NULL);

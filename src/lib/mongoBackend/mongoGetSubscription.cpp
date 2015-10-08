@@ -30,7 +30,7 @@
 
 #include "mongoBackend/mongoGetSubscription.h"
 #include "mongoBackend/MongoGlobal.h"
-#include "mongoBackend/collectionOperations.h"
+#include "mongoBackend/connectionOperations.h"
 
 #include "mongo/client/dbclient.h"
 

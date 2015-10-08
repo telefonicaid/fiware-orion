@@ -28,6 +28,8 @@
 #include "logMsg/logMsg.h"
 #include "logMsg/traceLevels.h"
 
+#include "common/string.h"
+
 #include "common/globals.h"
 #include "common/tag.h"
 #include "orionTypes/OrionValueType.h"
@@ -35,11 +37,6 @@
 #include "ngsi/ContextAttribute.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/uriParamNames.h"
-
-// FIXME P5: we have the same macro in parseArg library. That is not efficient: the macro (along
-// with probably more stuff) should be isolated in a separate library, invoked but all the other
-// libraries which need it)
-#define FT(x) (x == true)? "true" : "false"
 
 using namespace orion;
 

@@ -34,6 +34,7 @@
 #include "common/string.h"
 #include "mongoBackend/mongoConnectionPool.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/connectionOperations.h"
 
 
 
@@ -206,8 +207,8 @@ static DBClientBase* mongoConnect
   //
   mongo::WriteConcern wc = writeConcern == 1 ? mongo::WriteConcern::acknowledged : mongo::WriteConcern::unacknowledged;
 
-  connection->setWriteConcern((mongo::WriteConcern) wc);
-  writeConcernCheck = (mongo::WriteConcern) connection->getWriteConcern();
+  setWriteConcern(connection, wc, &err);
+  getWriteConcern(connection, &writeConcernCheck, &err);
 
   if (writeConcernCheck.nodes() != wc.nodes())
   {
@@ -225,12 +226,8 @@ static DBClientBase* mongoConnect
   {
     if (strlen(username) != 0 && strlen(passwd) != 0)
     {
-      if (!connection->auth("admin", std::string(username), std::string(passwd), err))
+      if (!connectionAuth(connection, "admin", std::string(username), std::string(passwd), &err))
       {
-        LM_E(("Database Startup Error (authentication: db='admin', username='%s', password='*****': %s)",
-              username,
-              err.c_str()));
-
         return NULL;
       }
     }
@@ -239,22 +236,17 @@ static DBClientBase* mongoConnect
   {
     if (strlen(db) != 0 && strlen(username) != 0 && strlen(passwd) != 0)
     {
-      if (!connection->auth(std::string(db), std::string(username), std::string(passwd), err))
+      if (!connectionAuth(connection, std::string(db), std::string(username), std::string(passwd), &err))
       {
-        LM_E(("Database Startup Error (authentication: db='%s', username='%s', password='*****': %s)",
-              db,
-              username,
-              err.c_str()));
-
         return NULL;
       }
     }
   }
 
   /* Get mongo version with the 'buildinfo' command */
-  BSONObj result;
+  BSONObj     result;
   std::string extra;
-  connection->runCommand("admin", BSON("buildinfo" << 1), result);
+  runCollectionCommand(connection, "admin", BSON("buildinfo" << 1), &result, &err);
   std::string versionString = std::string(result.getStringField("version"));
   if (!versionParse(versionString, mongoVersionMayor, mongoVersionMinor, extra))
   {
@@ -457,6 +449,5 @@ void mongoPoolConnectionSemWaitingTimeReset(void)
   semWaitingTime.tv_sec  = 0;
   semWaitingTime.tv_nsec = 0;
 }
-
 
 

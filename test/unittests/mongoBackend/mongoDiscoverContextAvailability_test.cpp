@@ -2389,12 +2389,12 @@ TEST(mongoDiscoverContextAvailabilityRequest, mongoDbQueryFail)
     EXPECT_EQ(SccReceiverInternalError, res.errorCode.code);
     EXPECT_EQ("Internal Server Error", res.errorCode.reasonPhrase);
 
-    EXPECT_EQ("collection: utest.registrations "
+    EXPECT_EQ("Database Error (collection: utest.registrations "
               "- query(): { query: { $or: [ { contextRegistration.entities: { $in: [ { id: \"E3\", type: \"T3\" }, { type: \"T3\", id: \"E3\" } ] } }, "
               "{ contextRegistration.entities.id: { $in: [] } } ], "
               "expiration: { $gt: 1360232700 }"
               ", servicePath: { $in: [ /^/.*/, null ] } }"
-              ", orderby: { _id: 1 } } - exception: boom!!", res.errorCode.details);
+              ", orderby: { _id: 1 } } - exception: boom!!)", res.errorCode.details);
     EXPECT_EQ(0,res.responseVector.size());
 
     /* Release connection */

@@ -34,7 +34,6 @@
 #include "common/defaultValues.h"
 #include "serviceRoutines/postRegisterContext.h"
 #include "mongoBackend/mongoRegisterContext.h"
-#include "mongoBackend/mongoConfManOperations.h"
 #include "ngsi/ParseData.h"
 #include "rest/ConnectionInfo.h"
 #include "rest/httpRequestSend.h"

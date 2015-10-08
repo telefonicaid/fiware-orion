@@ -60,11 +60,13 @@ static void prepareDatabaseV1Subs(void) {
     /* Set database */
     setupDatabase();
 
+    // 10000000 -> Sun, 26 Apr 1970 17:46:40 GMT -> "1970-04-26T17:46:40.00Z"
+    // 20000000 -> Thu, 20 Aug 1970 11:33:20 GMT -> "1970-08-20T11:33:20.00Z"
+    // 25000000 -> Sat, 17 Oct 1970 08:26:40 GMT -> "1970-19-17T08:26:40.00Z"
     DBClientBase* connection = getMongoConnection();
 
     BSONObj sub1 = BSON("_id" << OID("51307b66f481db11bf860001") <<
-                        "expiration" << 10000000 <<
-                        "lastNotification" << 15000000 <<
+                        "expiration" << 10000000 <<                        
                         "reference" << "http://notify1.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E1" << "type" << "T1" << "isPattern" << "false")) <<
                         "attrs" << BSONArray() <<
@@ -75,8 +77,9 @@ static void prepareDatabaseV1Subs(void) {
                         );
 
     BSONObj sub2 = BSON("_id" << OID("51307b66f481db11bf860002") <<
-                        "expiration" << 20000000 <<
-                        "lastNotification" << 25000000 <<
+                        "expiration" << 25000000 <<
+                        "lastNotification" << 20000000 <<
+                        "count" << 24 <<
                         "reference" << "http://notify2.me" <<
                         "entities" << BSON_ARRAY(BSON("id" << "E.*" << "type" << "T2" << "isPattern" << "true")) <<
                         "attrs" << BSON_ARRAY("A1" << "A2") <<
@@ -118,7 +121,7 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
 
   /* Invoke the function in mongoBackend library */
   std::vector<Subscription> subs;
-  oe = mongoListSubscriptions(subs, uriParams, "");
+  mongoListSubscriptions(&subs, &oe, uriParams, "");
 
   /* Check response is as expected */
   EXPECT_EQ(SccOk, oe.code);
@@ -148,8 +151,10 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   attrs = s.notification.attributes;
   ASSERT_EQ(0, attrs.size());
   EXPECT_EQ("http://notify1.me", s.notification.callback);
-  EXPECT_TRUE(s.notification.throttling.isEmpty());
-  EXPECT_EQ("FIXME", s.duration.get());
+  EXPECT_EQ(-1, s.notification.timesSent);;
+  EXPECT_EQ(-1, s.notification.lastNotification);
+  EXPECT_EQ(-1, s.notification.throttling);
+  EXPECT_EQ(10000000, s.expires);
 
   /* Subscription #2 */
   s = subs[1];
@@ -171,7 +176,9 @@ TEST(mongoListSubscriptions, getAllSubscriptionsV1Info)
   EXPECT_EQ("A1", attrs[0]);
   EXPECT_EQ("A2", attrs[1]);
   EXPECT_EQ("http://notify2.me", s.notification.callback);
-  EXPECT_EQ("FIXME", s.notification.throttling.get());
-  EXPECT_EQ("FIXME", s.duration.get());
+  EXPECT_EQ(24, s.notification.timesSent);;
+  EXPECT_EQ(20000000, s.notification.lastNotification);
+  EXPECT_EQ(5, s.notification.throttling);
+  EXPECT_EQ(25000000, s.expires);
 
 }
