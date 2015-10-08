@@ -52,36 +52,11 @@ sudo make install  # installation puts .h files in /usr/local/include and librar
 sudo ldconfig      # just in case... it doesn't hurt :)
 cd ..
 
-# Install cantcoap
-git clone https://github.com/staropram/cantcoap
-cd cantcoap
-git checkout 749e22376664dd3adae17492090e58882d3b28a7
-make
-sudo cp cantcoap.h /usr/local/include
-sudo cp dbg.h /usr/local/include
-sudo cp nethelper.h /usr/local/include
-sudo cp libcantcoap.a /usr/local/lib
-cd ..
-
-# Install CoAP Client
-wget http://sourceforge.net/projects/libcoap/files/coap-18/libcoap-4.1.1.tar.gz/download
-mv download libcoap-4.1.1.tar.gz
-tar xvzf libcoap-4.1.1.tar.gz
-cd libcoap-4.1.1
-./configure
-make
-sudo cp examples/coap-client /usr/local/bin
-cd ..
+# Install Rapidjson
+wget https://github.com/miloyip/rapidjson/archive/v1.0.2.tar.gz
+tar xfvz v1.0.2.tar.gz
+sudo mv rapidjson-1.0.2/include/rapidjson/ /usr/local/include
 
 # Start MongoDB
 sudo apt-get install libpcre3            # otherwise, mongod crashes in CentOS 6.3
 sudo service mongodb start
-
-# Set up a more convenient workspace
-ln -fs /vagrant /home/vagrant/fiware-orion
-
-# Qt Creator building, Projects->Build Steps->Custom Process Step
-# command:
-#   vagrant 
-# arguments:
-#   ssh -c 'make di -C fiware-orion'
