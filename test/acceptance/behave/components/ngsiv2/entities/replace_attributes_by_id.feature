@@ -2153,7 +2153,7 @@ Feature: replace attributes by entity ID using NGSI v2. "PUT" - /v2/entities/<en
       | Fiware-Service     | attribute_metadata_type_update |
       | Fiware-ServicePath | /test                          |
       | Content-Type       | application/json               |
-    When update an attribute by ID "<entity_id>" if it exists   "
+    When update an attribute by ID "<entity_id>" if it exists
       | parameter       | value                  |
       | attributes_name | temperature            |
       | metadatas_name  | very_hot_0             |
