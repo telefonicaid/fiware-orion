@@ -171,7 +171,7 @@ Feature: feature name...
 
 ### Logs
 
-The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
+The log is stored in `logs` folder (if this folder does not exist it is created) and is called `behave.log` see `logging.ini`.
 
 
 ### Tests Suites Coverage (features):
@@ -183,13 +183,13 @@ The log is stored in `logs` folder and is called `behave.log` see `logging.ini`.
     * list_an_entity_by_id - 209 testcases              GET - /v2/entities/<entity_id>
     * list_an_attribute_by_id - 198 testcases           GET - /v2/entities/<entity_id>/attrs/<attr_name>
     * update_append_attribute_by_id - 766 testcases     POST - /v2/entities/<entity_id> plus payload
-    * update_attribute_by_id - 654 testcases            PATCH - /v2/entities/<entity_id> plus payload  
-    * replace_attributes_by_id (pending)
-    * remove_entity (pending)
+    * update_attribute_by_id - 654 testcases            PATCH - /v2/entities/<entity_id> plus payload
+    * replace_attributes_by_id 511 testcases            PUT - /v2/entities/<entity_id> plus payload  
+    * remove_entity (pending) 
 
   -  alarms (pending)
-
-
+  
+  
 ### Hints:
   - If we need " char, use \' and it will be replaced (`mappping_quotes` method in `helpers_utils.py` library) (limitation in behave and lettuce).
   - If value is "max length allowed", per example, it is a generated random value with max length allowed and characters allowed.

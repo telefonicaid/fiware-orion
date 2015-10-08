@@ -278,6 +278,32 @@ def update_an_attribute_by_ID_if_it_exists_in_raw_mode(context, entity_id):
     resp = cb.update_or_append_an_attribute_in_raw_by_id("PATCH", context, entity_id)
     __logger__.debug("...updated or appended an attribute by id in raw mode if it exists...")
 
+
+@step(u'replace attributes by ID "([^"]*)"')
+def replace_attributes_by_id(context, entity_id):
+    """
+    replace attributes by ID
+    :param context:
+    :param entity_id: id name
+    """
+    global cb, resp
+    __logger__.debug("replacing attributes by id...")
+    resp = cb.update_or_append_an_attribute_by_id("PUT", context, entity_id)
+    __logger__.debug("...replaced attributes by id...")
+
+
+@step(u'replace attributes by ID "([^"]*)" in raw mode')
+def replace_attributes_by_idin_raw_mode(context, entity_id):
+    """
+    replace attributes by ID
+    :param context:
+    :param entity_id: id name
+    """
+    global cb, resp
+    __logger__.debug("replacing attributes by id in raw mode...")
+    resp = cb.update_or_append_an_attribute_in_raw_by_id("PUT", context, entity_id)
+    __logger__.debug("...replaced attributes by id in raw mode...")
+
 # ------------------------------------- validations ----------------------------------------------
 
 
@@ -294,7 +320,7 @@ def verify_that_receive_an_http_code(context, http_code):
                                                         " expected: %s \n" \
                                                         " received: %s" % (
                                                         str(status_codes[http_code]), str(resp.status_code))
-    __logger__.info("...Verified that http code returned is %s" % http_code)
+    __logger__.info('...Verified that http code returned is "%s"' % http_code)
 
 
 @step(u'verify "([^"]*)" url with "([^"]*)" value in response')
