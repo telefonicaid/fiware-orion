@@ -153,7 +153,7 @@ This libraries will be install into `requirements.txt`
 
 ### Actions pre-defined in Feature Descriptions (Pre and/or Post Actions)
 
-In certain cases, could be useful define actions before or/and after of the feature or/and each scenario. This help to read all pre or post actions into the feature. 
+In certain cases, could be useful to define actions before or/and after of the feature or/and each scenario. This help to read all pre or post actions into the feature. 
 
 Recommend append labels defined (`Actions Before the Feature`, `Actions Before each Scenario`, `Actions After each Scenario`,`Actions After the Feature`)
 into de feature description, these labels are Optional. And define steps with `Setup:` or `Check:` prefix (must be `:` in the step prefix). See `environment.py` in root path.
@@ -217,11 +217,11 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
   - "attr_name", "attr_value", "attr_type", "meta_name", "meta_type" and "meta_value" could be generated with random values.
       The number after "=" is the number of chars
         ex: | attr_name | random=10 |
-  - If entities number is "1", the entity id is without consecutive, ex: `entity_id=room`
-    Else entities number is major than "1" the entities number are prefix plus consecutive, ex:
+  - If entities number is "1", the entity id has not suffix, ex: `entity_id=room`
+    Else entities number is major than "1" the entities id are value plus a suffix (consecutive), ex:
         `entity_id=room_0, entity_id=room_1, ..., entity_id=room_N`
-  - If attribute number is "1", the attribute name is without consecutive, ex: `attributes_name=temperature`
-    Else attributes number is major than "1" the attributes name are prefix plus consecutive, ex:
+  - If attribute number is "1", the attribute name has not suffix, ex: `attributes_name=temperature`
+    Else attributes number is major than "1" the attributes name are value plus a suffix (consecutive), ex:
         `attributes_name=temperature_0, attributes_name=temperature_1, ..., temperature_N`
   - If would like a wrong query parameter name, use `qp_` prefix   
   - the `-harakiri` option is used to kill contextBroker (must be compiled in DEBUG mode)
