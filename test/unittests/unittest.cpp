@@ -137,7 +137,7 @@ void utInit(void)
   servicePathVector.clear();
 
   // Init subs cache (this initialization is overriden in test that use csubs)
-  subscriptionCacheInit("");
+  orion::subscriptionCacheInit("");
 }
 
 

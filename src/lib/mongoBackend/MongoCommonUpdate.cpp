@@ -42,6 +42,7 @@
 #include "cache/subCache.h"
 #include "orionTypes/OrionValueType.h"
 #include "mongoBackend/MongoGlobal.h"
+#include "mongoBackend/connectionOperations.h"
 #include "mongoBackend/TriggeredSubscription.h"
 
 #include "ngsi/Scope.h"
@@ -51,6 +52,7 @@
 using std::string;
 using std::map;
 using std::auto_ptr;
+using namespace orion;
 
 
 /* ****************************************************************************
@@ -739,7 +741,7 @@ static bool updateAttribute
     }
 
     toSet->append(effectiveName, newAttr.obj());
-    toPush->append(effectiveName);
+    toPush->append(caP->name);
   }
   else
   {
@@ -2058,9 +2060,7 @@ static bool removeEntity
   const std::string    idString          = "_id." ENT_ENTITY_ID;
   const std::string    typeString        = "_id." ENT_ENTITY_TYPE;
   const std::string    servicePathString = "_id." ENT_SERVICE_PATH;
-  DBClientBase*        connection        = NULL;
   BSONObjBuilder       bob;
-  BSONObj              query;
 
   bob.append(idString, entityId);
   if (entityType == "")
@@ -2081,41 +2081,10 @@ static bool removeEntity
     bob.append(servicePathString, servicePath);
   }
 
-  query = bob.obj();
-
-  try
+  std::string err;
+  if (!collectionRemove(getEntitiesCollectionName(tenant), bob.obj(), &err))
   {
-    LM_T(LmtMongo, ("remove() in '%s' collection: {%s}", getEntitiesCollectionName(tenant).c_str(),
-                    query.toString().c_str()));
-
-    connection = getMongoConnection();
-    connection->remove(getEntitiesCollectionName(tenant).c_str(), query);
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (remove %s)", query.toString().c_str()));
-  }
-  catch (const DBException &e)
-  {
-    releaseMongoConnection(connection);
-
-    cerP->statusCode.fill(SccReceiverInternalError,
-                          std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                          " - remove() query: " + query.toString() +
-                          " - exception: " + e.what());
-
-    LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
-    return false;
-  }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-
-    cerP->statusCode.fill(SccReceiverInternalError,
-                          std::string("collection: ") + getEntitiesCollectionName(tenant).c_str() +
-                          " - remove() query: " + query.toString() +
-                          " - exception: " + "generic");
-
-    LM_E(("Database Error (%s)", cerP->statusCode.details.c_str()));
+    cerP->statusCode.fill(SccReceiverInternalError, err);
     return false;
   }
 
@@ -2240,7 +2209,8 @@ void processContextElement
   const std::vector<std::string>&      servicePathV,
   std::map<std::string, std::string>&  uriParams,   // FIXME P7: we need this to implement "restriction-based" filters
   const std::string&                   xauthToken,
-  const std::string&                   apiVersion
+  const std::string&                   apiVersion,
+  bool                                 checkEntityExistance
 )
 {
   DBClientBase* connection                  = NULL;
@@ -2382,7 +2352,12 @@ void processContextElement
       return;  // Error already in responseP
     }
 
-    if (entitiesNumber > 1)
+    if (entitiesNumber > 0 && checkEntityExistance && action == "APPEND_STRICT")
+    {
+        buildGeneralErrorResponse(ceP, NULL, responseP, SccInvalidModification, "Already Exists");
+        return;
+    }
+    else if (entitiesNumber > 1)
     {
       buildGeneralErrorResponse(ceP, NULL, responseP, SccConflict, "There is more than one entity that match the update. Please refine your query.");
       return;
@@ -2745,7 +2720,6 @@ void processContextElement
     responseP->contextElementResponseVector.push_back(cerP);
   }
   LM_T(LmtServicePath, ("Docs found: %d", docs));
-
 
   /*
    * If the entity doesn't already exist, we create it. Note that alternatively, we could do a count()

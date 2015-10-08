@@ -1,9 +1,9 @@
-#ifndef MONGO_CONFMAN_OPERATIONS_H
-#define MONGO_CONFMAN_OPERATIONS_H
+#ifndef SRC_LIB_SERVICEROUTINESV2_GETSUBCRIPTION_H_
+#define SRC_LIB_SERVICEROUTINESv2_GETSUBCRIPTION_H_
 
 /*
 *
-* Copyright 2013 Telefonica Investigacion y Desarrollo, S.A.U
+* Copyright 2015 Telefonica Investigacion y Desarrollo, S.A.U
 *
 * This file is part of Orion Context Broker.
 *
@@ -23,20 +23,26 @@
 * For those usages not covered by this license please contact with
 * iot_support at tid dot es
 *
-* Author: Fermin Galan Marquez
+* Author: Orion dev team
 */
 #include <string>
+#include <vector>
+
+#include "ngsi/ParseData.h"
+#include "rest/ConnectionInfo.h"
+
 
 /* ****************************************************************************
 *
-* mongoSetFwdRegId -
+* getSubcription -
 */
-extern void mongoSetFwdRegId(const std::string& regId, const std::string& fwdRegId, const std::string& tenant = "");
+extern std::string getSubscription
+(
+  ConnectionInfo*            ciP,
+  int                        components,
+  std::vector<std::string>&  compV,
+  ParseData*                 parseDataP
+);
 
-/* ****************************************************************************
-*
-* mongoGetFwdRegId -
-*/
-extern std::string mongoGetFwdRegId(const std::string& regId, const std::string& tenant = "");
+#endif  // SRC_LIB_SERVICEROUTINESv2_GETSUBCRIPTION_H_
 
-#endif

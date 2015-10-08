@@ -71,22 +71,6 @@ Format stringToFormat(const std::string& s)
   return NOFORMAT;
 }
 
-/* ****************************************************************************
-*
-* isFloat -
-*
-* Thanks to http://stackoverflow.com/questions/447206/c-isfloat-function
-*
-*/
-bool isFloat(const std::string& s)
-{
-  std::istringstream iss(s);
-  float              f;
-
-  // Check the entire string was consumed and if either failbit or badbit is set
-  iss >> std::noskipws >> f; // noskipws considers leading whitespace invalid
-  return iss.eof() && !iss.fail();
-}
 
 
 /* ****************************************************************************

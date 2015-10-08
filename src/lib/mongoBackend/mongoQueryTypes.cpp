@@ -32,6 +32,8 @@
 #include "mongoBackend/MongoGlobal.h"
 #include "mongoBackend/mongoQueryTypes.h"
 
+#include "mongoBackend/connectionOperations.h"
+
 /* ****************************************************************************
 *
 * attributeType -
@@ -54,40 +56,10 @@ static std::string attributeType
                        attributeName << BSON("$exists" << true));
 
   std::auto_ptr<DBClientCursor> cursor;
-  DBClientBase*                 connection = NULL;
+  std::string                   err;
 
-  LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
-                  getEntitiesCollectionName(tenant).c_str(),
-                  query.toString().c_str()));
-
-  try
+  if (!collectionQuery(getEntitiesCollectionName(tenant), query, &cursor, &err))
   {
-    connection = getMongoConnection();
-    cursor     = connection->query(getEntitiesCollectionName(tenant).c_str(), query);
-
-    /*
-     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
-     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
-     * exception ourselves
-     */
-    if (cursor.get() == NULL)
-    {
-      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
-    }
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
-  }
-  catch (const DBException &e)
-  {
-    releaseMongoConnection(connection);
-    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
-    return "";
-  }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
     return "";
   }
 
@@ -113,40 +85,21 @@ static std::string attributeType
 *
 */
 static long long countEntities(const std::string& tenant, const std::vector<std::string>& servicePathV,std::string entityType)
-{
-  DBClientBase*  connection    = NULL;
+{  
   std::string    idType        = std::string("_id.") + ENT_ENTITY_TYPE;
   std::string    idServicePath = std::string("_id.") + ENT_SERVICE_PATH;
 
   BSONObj query = BSON(idType        << entityType <<
                        idServicePath << fillQueryServicePath(servicePathV));
 
-  LM_T(LmtMongo, ("count() in '%s' collection: '%s'",
-                  getEntitiesCollectionName(tenant).c_str(),
-                  query.toString().c_str()));
-
-  try
+  std::string        err;
+  unsigned long long c;
+  if (!collectionCount(getEntitiesCollectionName(tenant), query, &c, &err))
   {
-    connection  = getMongoConnection();
-    long long c = connection->count(getEntitiesCollectionName(tenant).c_str(), query);
-
-    releaseMongoConnection(connection);
-    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
-
-    return c;
+    return -1;
   }
-  catch (const DBException& e)
-  {
-    releaseMongoConnection(connection);
-    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), e.what()));
-  }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-    LM_E(("Database Error ('%s', '%s')", query.toString().c_str(), "generic exception"));
-  }
+  return c;
 
-  return -1;
 }
 
 
@@ -165,8 +118,7 @@ HttpStatusCode mongoEntityTypes
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
   unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
-  bool           details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;
-  DBClientBase*  connection     = NULL;
+  bool           details        = (strcasecmp("on", detailsString.c_str()) == 0)? true : false;  
   bool           reqSemTaken    = false;
 
   LM_T(LmtMongo, ("Query Entity Types"));
@@ -236,42 +188,11 @@ HttpStatusCode mongoEntityTypes
                                              )
                      );
 
-  LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
-
-  try
+  std::string err;
+  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
   {
-    connection = getMongoConnection();
-    connection->runCommand(composeDatabaseName(tenant).c_str(), cmd, result);
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (%s)", cmd.toString().c_str()));
-  }
-  catch (const DBException& e)
-  {
-    releaseMongoConnection(connection);
-
-    std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
-      " - command: " + cmd.toString() +
-      " - exception: " + e.what();
-
-    LM_E(("Database Error (%s)", err.c_str()));
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
-
-    return SccOk;
-  }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-
-    std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
-      " - command: " + cmd.toString() +
-      " - exception: " + "generic";
-
-    LM_E(("Database Error (%s)", err.c_str()));
-    responseP->statusCode.fill(SccReceiverInternalError, err);
-    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
-
     return SccOk;
   }
 
@@ -372,8 +293,7 @@ HttpStatusCode mongoAttributesForEntityType
   const std::vector<std::string>&       servicePathV,
   std::map<std::string, std::string>&   uriParams
 )
-{
-  DBClientBase*  connection     = NULL;
+{  
   unsigned int   offset         = atoi(uriParams[URI_PARAM_PAGINATION_OFFSET].c_str());
   unsigned int   limit          = atoi(uriParams[URI_PARAM_PAGINATION_LIMIT].c_str());
   std::string    detailsString  = uriParams[URI_PARAM_PAGINATION_DETAILS];
@@ -417,42 +337,11 @@ HttpStatusCode mongoAttributesForEntityType
                                              )
                     );
 
-  LM_T(LmtMongo, ("runCommand() in '%s' database: '%s'", composeDatabaseName(tenant).c_str(), cmd.toString().c_str()));
-
-  try
+  std::string err;
+  if (!runCollectionCommand(composeDatabaseName(tenant), cmd, &result, &err))
   {
-    connection = getMongoConnection();
-    connection->runCommand(composeDatabaseName(tenant).c_str(), cmd, result);
-    releaseMongoConnection(connection);
-
-    LM_I(("Database Operation Successful (%s)", cmd.toString().c_str()));
-  }
-  catch (const DBException& e)
-  {
-    releaseMongoConnection(connection);
-
-    std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
-      " - command: " + cmd.toString() +
-      " - exception: " + e.what();
-
-    LM_E(("Database Error (%s)", err.c_str()));
     responseP->statusCode.fill(SccReceiverInternalError, err);
     reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
-
-    return SccOk;
-  }
-  catch (...)
-  {
-    releaseMongoConnection(connection);
-
-    std::string err = std::string("database: ") + composeDatabaseName(tenant).c_str() +
-      " - command: " + cmd.toString() +
-      " - exception: " + "generic";
-
-    LM_E(("Database Error (%s)", err.c_str()));
-    responseP->statusCode.fill(SccReceiverInternalError, err);
-    reqSemGive(__FUNCTION__, "query types request", reqSemTaken);
-
     return SccOk;
   }
 

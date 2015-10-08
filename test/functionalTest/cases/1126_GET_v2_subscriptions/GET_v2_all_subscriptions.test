@@ -30,40 +30,163 @@ brokerStart CB
 --SHELL--
 
 #
-# 01. GET /v2/subscriptions
+# 01. Create 2 subscriptions
+# 02. GET /v2/subscriptions
+# 03. Create entity (to trigger notification in 1 sub)
+# 04. GET /v2/subscriptions (now seeing the timesSent and lastNotification in one sub)
 #
 
-echo "01. GET /v2/subscriptions"
-echo "========================="
-orionCurl --url /v2/subscriptions?options=count --json
+echo "01. Create 2 subscriptions"
+echo "=========================="
+payload='{
+  "entities": [
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "ConferenceRoom"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OfficeRoom"
+    }
+  ],
+  "attributes": [
+    "temperature",
+    "occupancy",
+    "lightstatus"
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "temperature",
+        "timestamp"
+      ]
+    }
+  ],
+  "throttling": "PT5S"
+}'
+orionCurl --url /v1/subscribeContext --payload "${payload}" --json
 echo
 echo
 
+payload='{
+  "entities": [
+    {
+      "type": "Car",
+      "isPattern": "false",
+      "id": "MyCar"
+    },
+    {
+      "type": "Room",
+      "isPattern": "false",
+      "id": "OtherCar"
+    }
+  ],
+  "attributes": [
+    "speed",
+    "location"
+  ],
+  "reference": "http://127.0.0.1:'${LISTENER_PORT}'/notify",
+  "duration": "P5Y",
+  "notifyConditions": [
+    {
+      "type": "ONCHANGE",
+      "condValues": [
+        "speed"
+      ]
+    }
+  ]
+}'
+orionCurl --url /v1/subscribeContext --payload "${payload}" --json
+echo
+echo
+
+echo "02. GET /v2/subscriptions"
+echo "========================="
+orionCurl --url /v2/subscriptions --json
+echo
+echo
+
+
+echo "03. Create entity (to trigger notification in 1 sub)"
+echo "===================================================="
+payload='{
+  "id": "MyCar",
+  "type": "Car",
+  "speed": "1"
+}'
+orionCurl --url /v2/entities --payload "$payload" --json
+echo
+echo
+
+
+echo "04. GET /v2/subscriptions (now seeing the timesSent and lastNotification in one sub)"
+echo "===================================================================================="
+orionCurl --url /v2/subscriptions --json
+echo
+echo
+
+
 --REGEXPECT--
-01. GET /v2/subscriptions
+01. Create 2 subscriptions
+==========================
+HTTP/1.1 200 OK
+Content-Length: 135
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})",
+        "throttling": "PT5S"
+    }
+}
+
+
+HTTP/1.1 200 OK
+Content-Length: 108
+Content-Type: application/json
+Date: REGEX(.*)
+
+{
+    "subscribeResponse": {
+        "duration": "P5Y",
+        "subscriptionId": "REGEX([0-9a-f]{24})"
+    }
+}
+
+
+02. GET /v2/subscriptions
 =========================
 HTTP/1.1 200 OK
-Content-Length: 513
+Content-Length: 837
 Content-Type: application/json
-X-Total-Count: 2
 Date: REGEX(.*)
 
 [
     {
-        "id": "s1",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "id": "REGEX([0-9a-f]{24})",
         "notification": {
             "attributes": [
-                "notification attributes 1",
-                "notification attributes 2"
+                "temperature",
+                "occupancy",
+                "lightstatus"
             ],
-            "callback": ""
+            "callback": "http://127.0.0.1:9997/notify",
+            "throttling": 5
         },
+        "status": "active",
         "subject": {
             "condition": {
                 "attributes": [
-                    "A \nsc sub 1",
-                    "B \tsc sub 1",
-                    "Z \fsc sub 2"
+                    "temperature",
+                    "timestamp"
                 ],
                 "expression": {
                     "coords": "",
@@ -73,33 +196,147 @@ Date: REGEX(.*)
             },
             "entities": [
                 {
-                    "id": "ID1",
+                    "id": "ConferenceRoom",
                     "idPattern": "",
-                    "type": ""
+                    "type": "Room"
+                },
+                {
+                    "id": "OfficeRoom",
+                    "idPattern": "",
+                    "type": "Room"
                 }
             ]
         }
     },
     {
-        "id": "s2",
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "id": "REGEX([0-9a-f]{24})",
         "notification": {
-            "attributes": [],
-            "callback": ""
+            "attributes": [
+                "speed",
+                "location"
+            ],
+            "callback": "http://127.0.0.1:9997/notify"
         },
+        "status": "active",
         "subject": {
             "condition": {
-                "attributes": [],
+                "attributes": [
+                    "speed"
+                ],
                 "expression": {
-                    "coords": "C",
-                    "geometry": "G",
-                    "q": "Q"
+                    "coords": "",
+                    "geometry": "",
+                    "q": ""
                 }
             },
             "entities": [
                 {
-                    "id": "",
-                    "idPattern": "IDP2",
-                    "type": "FENOTIPO"
+                    "id": "MyCar",
+                    "idPattern": "",
+                    "type": "Car"
+                },
+                {
+                    "id": "OtherCar",
+                    "idPattern": "",
+                    "type": "Room"
+                }
+            ]
+        }
+    }
+]
+
+
+03. Create entity (to trigger notification in 1 sub)
+====================================================
+HTTP/1.1 201 Created
+Content-Length: 0
+Location: /v2/entities/MyCar
+Date: REGEX(.*)
+
+
+
+04. GET /v2/subscriptions (now seeing the timesSent and lastNotification in one sub)
+====================================================================================
+HTTP/1.1 200 OK
+Content-Length: 896
+Content-Type: application/json
+Date: REGEX(.*)
+
+[
+    {
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attributes": [
+                "temperature",
+                "occupancy",
+                "lightstatus"
+            ],
+            "callback": "http://127.0.0.1:9997/notify",
+            "throttling": 5
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attributes": [
+                    "temperature",
+                    "timestamp"
+                ],
+                "expression": {
+                    "coords": "",
+                    "geometry": "",
+                    "q": ""
+                }
+            },
+            "entities": [
+                {
+                    "id": "ConferenceRoom",
+                    "idPattern": "",
+                    "type": "Room"
+                },
+                {
+                    "id": "OfficeRoom",
+                    "idPattern": "",
+                    "type": "Room"
+                }
+            ]
+        }
+    },
+    {
+        "expires": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+        "id": "REGEX([0-9a-f]{24})",
+        "notification": {
+            "attributes": [
+                "speed",
+                "location"
+            ],
+            "callback": "http://127.0.0.1:9997/notify",            
+            "lastNotification": "REGEX(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.00Z)",
+            "timesSent": 1
+        },
+        "status": "active",
+        "subject": {
+            "condition": {
+                "attributes": [
+                    "speed"
+                ],
+                "expression": {
+                    "coords": "",
+                    "geometry": "",
+                    "q": ""
+                }
+            },
+            "entities": [
+                {
+                    "id": "MyCar",
+                    "idPattern": "",
+                    "type": "Car"
+                },
+                {
+                    "id": "OtherCar",
+                    "idPattern": "",
+                    "type": "Room"
                 }
             ]
         }

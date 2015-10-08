@@ -42,7 +42,7 @@ This walkthrough adopts a practical approach that we hope will help our
 readers to get familiar with the Orion Context Broker and have some fun
 in the process :).
 
-The Walkthrough can be also found (partically) in apiary format [here](http://telefonicaid.github.io/fiware-orion/api/v1/).
+The walkthrough can be also found (partially) in Apiary format [here](http://telefonicaid.github.io/fiware-orion/api/v1/).
 
 The first two sections on [Context management using
 NGSI10](#context-management-using-ngsi10) and [Context
@@ -52,12 +52,12 @@ main ones. They describe the basic context broker functionality, both
 for context management (information about entities, such as the
 temperature of a car) and context availability management (information
 not about the entities themselves, but about the providers of that
-information). Some remarks to take into account to use this stuff:
+information). Some remarks to take into account in order to use this stuff:
 
 -   Context management and context availability management are
     independent functionalities (corresponding to different parts of the
     NGSI interface, NGS10 and NGSI9 respectively), so you can use the
-    broker for one purpose, the other purpose, or both of them.
+    broker for one purpose, the other, or both of them.
 -   Note that each main section is divided in two sub-sections: the
     first being about standard operations while the second is about
     convenience operations. In fact, each sub-section is an independent
@@ -65,7 +65,7 @@ information). Some remarks to take into account to use this stuff:
     can be done in a step-by-step manner, just copy-pasting the commands
     from this document.
 -   Before starting (or if you get lost in the middle and
-    need to start from scratch :), restart Orion Context Broker as
+    need to start from scratch :) ), restart Orion Context Broker as
     described in [starting the broker for the
     tutorials](#starting-the-broker-for-the_tutorials).
 -   It is recommended to start with the part on standard operations,
@@ -92,7 +92,7 @@ tutorials and how to run and interact with Orion Context Broker.
 Let's assume we have a building with several rooms and that we want to
 use Orion Context Broker to manage its context information. The rooms
 are Room1, Room2, Room3 and Room4 and each room has two sensors:
-temperature and (atmospheric) pressure (except Room4, that only has a
+temperature and (atmospheric) pressure (except Room4, which only has a
 pressure sensor). In addition, let's consider that we have two cars
 (Car1 and Car2) with sensors able to measure speed and location (in GPS
 sense).
@@ -161,10 +161,10 @@ The accumulator-server.py is also part of the contextBroker-test package (see in
 
 ### Issuing commands to the broker
 
-To issue requests to the broker, we use the **curl** command line tool.
-We have chosen curl because it is almost ubiquitous in any GNU/Linux
+To issue requests to the broker, we use the `curl` command line tool.
+We have chosen `curl` because it is almost ubiquitous in any GNU/Linux
 system and simplifies including examples in this document that can
-easily be copied and pasted. Of course, it is not mandatory to use curl,
+easily be copied and pasted. Of course, it is not mandatory to use it,
 you can use any REST client tool instead (e.g.
 [RESTClient](http://restclient.net/)). Indeed, in a real case, you will
 probably interact with the Orion Context Broker using a programming

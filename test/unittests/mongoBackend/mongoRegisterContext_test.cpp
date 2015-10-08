@@ -2715,12 +2715,14 @@ TEST(mongoRegisterContextRequest, MongoDbUpsertRegistrationFail)
      * random. ObjectId is 24 characters long.*/
     /* FIXME: a better approach would be to pass a regex filter to relace ObjectId by a constant string,
      * but I don't know how to work with regex in C++ */
-    std::string s1 = res.errorCode.details.substr(0, 68);
-    std::string s2 = res.errorCode.details.substr(68+24, res.errorCode.details.size()-68-24);
-    EXPECT_EQ("collection: utest.registrations "
-              "- upsert update(): { _id: ObjectId('",s1);
-    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"XML\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] } "
-              "- exception: boom!!", s2);
+    std::string s1 = res.errorCode.details.substr(0, 78);
+    std::string s2 = res.errorCode.details.substr(78+24, 22);
+    std::string s3 = res.errorCode.details.substr(78+24+22+24, res.errorCode.details.size()-78-24-22-24);
+    EXPECT_EQ("Database Error (collection: utest.registrations "
+              "- update(): <{ _id: ObjectId('",s1);
+    EXPECT_EQ("') },{ _id: ObjectId('", s2);
+    EXPECT_EQ("'), expiration: 1360232760, servicePath: \"/\", format: \"XML\", contextRegistration: [ { entities: [ { id: \"E1\", type: \"T1\" } ], attrs: [], providingApplication: \"http://dummy.com\" } ] }> "
+              "- exception: boom!!)", s3);
 
     /* Release mock */
     setMongoConnectionForUnitTest(NULL);

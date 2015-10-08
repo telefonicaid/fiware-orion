@@ -48,19 +48,19 @@
 class TriggeredSubscription
 {
  public:
-  long long     throttling;
-  long long     lastNotification;
-  Format        format;
-  std::string   reference;
-  AttributeList attrL;
-  Subscription* cacheSubReference;
+  long long            throttling;
+  long long            lastNotification;
+  Format               format;
+  std::string          reference;
+  AttributeList        attrL;
+  orion::Subscription* cacheSubReference;
 
-  TriggeredSubscription(long long          _throttling,
-                        long long          _lastNotification,
-                        Format             _format,
-                        const std::string& _reference,
-                        AttributeList      _attrL,
-                        Subscription*      _cacheSubReference);
+  TriggeredSubscription(long long            _throttling,
+                        long long            _lastNotification,
+                        Format               _format,
+                        const std::string&   _reference,
+                        AttributeList        _attrL,
+                        orion::Subscription* _cacheSubReference);
 
   TriggeredSubscription(Format             _format,
                         const std::string& _reference,

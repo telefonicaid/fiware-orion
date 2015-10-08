@@ -34,7 +34,7 @@
 #include "ngsi/Scope.h"
 #include "parse/forbiddenChars.h"
 
-
+using namespace orion;
 
 /* ****************************************************************************
 *

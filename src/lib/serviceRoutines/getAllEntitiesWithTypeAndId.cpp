@@ -113,7 +113,7 @@ std::string getAllEntitiesWithTypeAndId
   else
   {
     // 03. Fill in QueryContextRequest
-    parseDataP->qcr.res.fill(entityId, entityType, "");
+    parseDataP->qcr.res.fill(entityId, entityType, "false", typeInfo, "");
 
 
     // 04. Call standard operation postQueryContext

@@ -188,7 +188,6 @@ SET (SOURCES
     ngsi/Throttling_test.cpp
     ngsi/UpdateActionType_test.cpp
 
-    mongoBackend/mongoConfManOperations_test.cpp
     mongoBackend/mongoDiscoverContextAvailability_test.cpp
     mongoBackend/mongoOntimeintervalOperations_test.cpp
     mongoBackend/mongoQueryContext_test.cpp
@@ -213,6 +212,7 @@ SET (SOURCES
     mongoBackend/mongoContextProvidersUpdate_test.cpp
     mongoBackend/mongoQueryTypes_test.cpp
     mongoBackend/mongoQueryContextFilterExistEntity_test.cpp
+    mongoBackend/mongoListSubscriptions_test.cpp
 
     parse/CompoundValueNode_test.cpp
     parse/compoundValue_test.cpp

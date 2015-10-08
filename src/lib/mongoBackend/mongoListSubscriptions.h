@@ -37,12 +37,12 @@
 *
 * mongoListSubscriptions -
 */
-OrionError mongoListSubscriptions
+void mongoListSubscriptions
 (
-  std::vector<Subscription>& vec,
-  std::map<std::string, std::string>&  uriParam,
-  const std::string&                   tenant,
-  const std::vector<std::string>&      servicePathV
+  std::vector<ngsiv2::Subscription>   *vec,
+  OrionError                          *oe,
+  std::map<std::string, std::string>& uriParam,
+  const std::string&                  tenant
 );
 
 #endif // MONGOLISTSUBSCRIPTIONS_H

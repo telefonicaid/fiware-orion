@@ -31,6 +31,9 @@
 
 #include "common/JsonHelper.h"
 
+namespace ngsiv2
+{
+
 /* ****************************************************************************
 *
 * Subscription::toJson -
@@ -40,10 +43,11 @@ std::string Subscription::toJson()
   JsonHelper jh;
 
   jh.addString("id", this->id);
-  if (!this->duration.isEmpty())
-  {
-    jh.addRaw("duration: ",this->duration.render(JSON,"", false));
+  if (this->expires > 0)
+  {    
+    jh.addDate("expires", this->expires);
   }
+  jh.addString("status", this->status);
   jh.addRaw("subject", this->subject.toJson());
   jh.addRaw("notification", this->notification.toJson());
 
@@ -60,10 +64,18 @@ std::string Notification::toJson()
 {
   JsonHelper jh;
 
-  jh.addString("callback", this->callback);
-  if (!this->throttling.isEmpty())
+  jh.addString("callback", this->callback);  
+  if (this->throttling > 0)
   {
-    jh.addRaw("throttling", this->throttling.render(JSON,"",false));
+    jh.addNumber("throttling", this->throttling);
+  }
+  if (this->timesSent > 0)
+  {
+    jh.addNumber("timesSent", this->timesSent);
+  }
+  if (this->lastNotification > 0)
+  {
+    jh.addDate("lastNotification", this->lastNotification);
   }
   jh.addRaw("attributes", vectorToJson(this->attributes));
 
@@ -126,4 +138,6 @@ std::string EntID::toJson()
   jh.addString("type", this->type);
 
   return jh.str();
+}
+
 }

@@ -52,8 +52,10 @@ std::string getAllSubscriptions
 )
 {
 
-  std::vector<Subscription> subs;
-  OrionError                oe = mongoListSubscriptions(subs, ciP->uriParam, ciP->tenant, ciP->servicePathV);
+  std::vector<ngsiv2::Subscription> subs;
+  OrionError                        oe;
+
+  mongoListSubscriptions(&subs, &oe, ciP->uriParam, ciP->tenant);
 
   if (oe.code != SccOk)
   {

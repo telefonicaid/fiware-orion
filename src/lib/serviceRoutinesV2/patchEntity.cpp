@@ -75,7 +75,6 @@ std::string patchEntity
   // 02. Call standard op postUpdateContext
   postUpdateContext(ciP, components, compV, parseDataP);
 
-
   // 03. Check output from mongoBackend - any errors?
   if (parseDataP->upcrs.res.contextElementResponseVector.size() == 1)
   {
@@ -93,6 +92,7 @@ std::string patchEntity
         OrionError orionError(SccConflict, "There is more than one entity that match the update. Please refine your query.");
         answer = orionError.render(ciP, "");
       } 
+
     }
   }
 
@@ -102,6 +102,13 @@ std::string patchEntity
   {
     ciP->httpStatusCode = SccNoContent;
   }
+  else if (ciP->httpStatusCode == SccInvalidParameter)
+  {
+    ciP->httpStatusCode = SccContextElementNotFound;
+    OrionError orionError(SccContextElementNotFound, "No context element found");
+    answer = orionError.render(ciP, "");
+  }
+
 
 
   // 05. Cleanup and return result
