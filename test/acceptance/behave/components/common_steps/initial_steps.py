@@ -22,8 +22,6 @@
 """
 __author__ = 'Iván Arias León (ivan dot ariasleon at telefonica dot com)'
 
-#import behave
-#from behave import step
 
 from components.common_steps.general_steps import *
 from iotqatools.fabric_utils import FabricSupport
