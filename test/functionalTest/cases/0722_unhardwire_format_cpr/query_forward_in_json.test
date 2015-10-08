@@ -206,7 +206,7 @@ Content-Length: 138
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "entities" : [
@@ -226,7 +226,7 @@ Content-Length: 138
 User-Agent: orion/REGEX(\d+\.\d+\.\d+.*)
 Host: localhost:REGEX(\d+)
 Accept: application/json
-Content-Type: application/json
+Content-Type: application/json; charset=utf-8
 
 {
   "entities" : [
