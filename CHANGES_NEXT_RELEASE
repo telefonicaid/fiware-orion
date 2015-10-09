@@ -1,0 +1,1 @@
+Fix: Fix Conv op to std op mapping wrongly using patterns in some GET operations (Issue #1322)
