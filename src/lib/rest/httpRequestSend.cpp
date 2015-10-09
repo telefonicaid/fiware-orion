@@ -163,7 +163,7 @@ std::string httpRequestSend
    const std::string&     servicePath,
    const std::string&     xauthToken,
    const std::string&     resource,
-   const std::string&     content_type,
+   const std::string&     orig_content_type,
    const std::string&     content,
    bool                   useRush,
    bool                   waitForResponse,
@@ -181,8 +181,15 @@ std::string httpRequestSend
   int                        outgoingMsgSize       = 0;
   CURL*                      curl;
   struct curl_context        cc;
+  std::string                content_type(orig_content_type);
 
   ++callNo;
+
+  // For content-type application/json we add charset=utf-8
+  if (orig_content_type == "application/json")
+  {
+    content_type += "; charset=utf-8";
+  }
 
   if (timeoutInMilliseconds == -1)
   {
