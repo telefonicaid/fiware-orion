@@ -1,2 +1,3 @@
 Fix: Fix Conv op to std op mapping wrongly using patterns in some GET operations (Issue #1322)
 Fix: Add charset=utf-8 for notifications (Issue #1340)
+Hotfix: recovering $where from 0.23.0 code bases to search for subscriptions (-noCache flag)

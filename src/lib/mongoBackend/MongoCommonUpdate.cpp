@@ -1079,7 +1079,7 @@ std::string servicePathSubscriptionRegex(const std::string servicePath, std::vec
 * addTriggeredSubscriptions
 *
 */
-static bool addTriggeredSubscriptions
+static bool addTriggeredSubscriptions_withCache
 (
   std::string                               entityId,
   std::string                               entityType,
@@ -1252,6 +1252,198 @@ static bool addTriggeredSubscriptions
   }
 
   return true;
+}
+
+
+/* ****************************************************************************
+*
+* addTriggeredSubscriptions. Recovered almost verbatim from 0.23.0 release
+*
+*/
+static bool addTriggeredSubscriptions_noCache
+(
+  std::string                               entityId,
+  std::string                               entityType,
+  std::string                               attr,
+  std::map<string, TriggeredSubscription*>& subs,
+  std::string&                              err,
+  std::string                               tenant,
+  const std::vector<std::string>&           servicePathV
+)
+{
+  DBClientBase*             connection      = NULL;
+  std::string               servicePath     = (servicePathV.size() > 0)? servicePathV[0] : "";
+  std::string               spathRegex      = "";
+  std::vector<std::string>  spathV;
+
+
+  //
+  // Create the REGEX for the Service Path
+  //
+  spathRegex = servicePathSubscriptionRegex(servicePath, spathV);
+  spathRegex = std::string("/") + spathRegex + "/";
+
+
+  /* Build query */
+  std::string entIdQ       = CSUB_ENTITIES   "." CSUB_ENTITY_ID;
+  std::string entTypeQ     = CSUB_ENTITIES   "." CSUB_ENTITY_TYPE;
+  std::string entPatternQ  = CSUB_ENTITIES   "." CSUB_ENTITY_ISPATTERN;
+  std::string condTypeQ    = CSUB_CONDITIONS "." CSUB_CONDITIONS_TYPE;
+  std::string condValueQ   = CSUB_CONDITIONS "." CSUB_CONDITIONS_VALUE;
+  std::string inRegex      = "{ $in: [ " + spathRegex + ", null ] }";
+  BSONObj     spBson       = fromjson(inRegex);
+
+  /* Note the $or on entityType, to take into account matching in subscriptions with no entity type */
+  BSONObj queryNoPattern = BSON(
+                entIdQ << entityId <<
+                "$or" << BSON_ARRAY(
+                    BSON(entTypeQ << entityType) <<
+                    BSON(entTypeQ << BSON("$exists" << false))) <<
+                entPatternQ << "false" <<
+                condTypeQ << ON_CHANGE_CONDITION <<
+                condValueQ << attr <<
+                CSUB_EXPIRATION   << BSON("$gt" << (long long) getCurrentTime()) <<
+                CSUB_SERVICE_PATH << spBson);
+
+  /* This is JavaScript code that runs in MongoDB engine. As far as I know, this is the only
+   * way to do a "reverse regex" query in MongoDB (see
+   * http://stackoverflow.com/questions/15966991/mongodb-reverse-regex/15989520).
+   * Note that although we are using a isPattern=true in the MongoDB query besides $where, we
+   * also need to check that in the if statement in the JavaScript function given that a given
+   * sub document could include both isPattern=true and isPattern=false documents */
+  std::string function = std::string("function()") +
+         "{" +
+            "for (var i=0; i < this."+CSUB_ENTITIES+".length; i++) {" +
+                "if (this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ISPATTERN+" == \"true\" && " +
+                    "(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \""+entityType+"\" || " +
+                        "this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_TYPE+" == \"\" || " +
+                        "!(\""+CSUB_ENTITY_TYPE+"\" in this."+CSUB_ENTITIES+"[i])) && " +
+                    "\""+entityId+"\".match(this."+CSUB_ENTITIES+"[i]."+CSUB_ENTITY_ID+")) {" +
+                    "return true; " +
+                "}" +
+            "}" +
+            "return false; " +
+         "}";
+  LM_T(LmtMongo, ("JS function: %s", function.c_str()));
+
+  BSONObjBuilder  queryPattern;
+
+  queryPattern.append(entPatternQ, "true");
+  queryPattern.append(condTypeQ, ON_CHANGE_CONDITION);
+  queryPattern.append(condValueQ, attr);
+  queryPattern.append(CSUB_EXPIRATION, BSON("$gt" << (long long) getCurrentTime()));
+  queryPattern.append(CSUB_SERVICE_PATH, spBson);
+  queryPattern.appendCode("$where", function);
+
+  // FIXME: condTypeQ, condValueQ and servicePath part could be "factorized" out of the $or clause
+  BSONObj query = BSON("$or" << BSON_ARRAY(queryNoPattern << queryPattern.obj()));
+
+  LM_T(LmtMongo, ("query() in '%s' collection: '%s'",
+                  getSubscribeContextCollectionName(tenant).c_str(),
+                  query.toString().c_str()));
+
+  /* Do the query */
+  auto_ptr<DBClientCursor> cursor;
+  try
+  {
+    connection      = getMongoConnection();
+    cursor = connection->query(getSubscribeContextCollectionName(tenant).c_str(), query);
+
+    /*
+     * We have observed that in some cases of DB errors (e.g. the database daemon is down) instead of
+     * raising an exception, the query() method sets the cursor to NULL. In this case, we raise the
+     * exception ourselves
+     */
+    if (cursor.get() == NULL)
+    {
+      throw DBException("Null cursor from mongo (details on this is found in the source code)", 0);
+    }
+    releaseMongoConnection(connection);
+
+    LM_I(("Database Operation Successful (%s)", query.toString().c_str()));
+  }
+  catch (const DBException &e)
+  {
+    releaseMongoConnection(connection);
+    err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
+               " - query(): " + query.toString() +
+               " - exception: " + e.what();
+    LM_E(("Database Error (%s)", err.c_str()));
+    return false;
+  }
+  catch (...)
+  {
+    releaseMongoConnection(connection);
+    err = std::string("collection: ") + getSubscribeContextCollectionName(tenant).c_str() +
+               " - query(): " + query.toString() +
+               " - exception: " + "generic";
+    LM_E(("Database Error (%s)", err.c_str()));
+    return false;
+  }
+
+  /* For each one of the subscriptions found, add it to the map (if not already there) */
+  while (cursor->more())
+  {
+    BSONObj      sub      = cursor->next();
+    BSONElement  idField  = sub.getField("_id");
+
+    //
+    // BSONElement::eoo returns true if 'not found', i.e. the field "_id" doesn't exist in 'sub'
+    //
+    // Now, if 'sub.getField("_id")' is not found, if we continue, calling OID() on it, then we get
+    // an exception and the broker crashes.
+    //
+    if (idField.eoo() == true)
+    {
+      LM_E(("Database Error (error retrieving _id field in doc: %s)", sub.toString().c_str()));
+      continue;
+    }
+
+    std::string subIdStr = idField.OID().toString();
+
+    if (subs.count(subIdStr) == 0)
+    {
+      LM_T(LmtMongo, ("adding subscription: '%s'", sub.toString().c_str()));
+
+      long long throttling       = sub.hasField(CSUB_THROTTLING) ? sub.getField(CSUB_THROTTLING).numberLong() : -1;
+      long long lastNotification = sub.hasField(CSUB_LASTNOTIFICATION) ? sub.getIntField(CSUB_LASTNOTIFICATION) : -1;
+
+      TriggeredSubscription* trigs = new TriggeredSubscription
+        (
+          throttling,
+          lastNotification,
+          sub.hasField(CSUB_FORMAT) ? stringToFormat(STR_FIELD(sub, CSUB_FORMAT)) : XML,
+          STR_FIELD(sub, CSUB_REFERENCE),
+          //subToAttributeList(sub)); siganture changed in TriggeredSubscription() constructor in 0.24.0
+          subToAttributeList(sub), NULL);
+
+      subs.insert(std::pair<string, TriggeredSubscription*>(subIdStr, trigs));
+    }
+  }
+
+  return true;
+}
+
+static bool addTriggeredSubscriptions
+(
+  std::string                               entityId,
+  std::string                               entityType,
+  std::string                               attr,
+  std::map<string, TriggeredSubscription*>& subs,
+  std::string&                              err,
+  std::string                               tenant,
+  const std::vector<std::string>&           servicePathV
+)
+{
+  extern bool noCache;
+  if (noCache)
+  {
+    return addTriggeredSubscriptions_noCache(entityId, entityType, attr, subs, err, tenant, servicePathV);
+  }
+  else
+  {
+    return addTriggeredSubscriptions_withCache(entityId, entityType, attr, subs, err, tenant, servicePathV);
+  }
 }
 
 

@@ -232,6 +232,7 @@ bool            mutexTimeStat;
 int             writeConcern;
 unsigned        cprForwardLimit;
 int             subCacheInterval;
+bool            noCache;
 
 
 
@@ -273,6 +274,7 @@ int             subCacheInterval;
 #define WRITE_CONCERN_DESC  "db write concern (0:unacknowledged, 1:acknowledged)"
 #define CPR_FORWARD_LIMIT_DESC "maximum number of forwarded requests to Context Providers for a single client request"
 #define SUB_CACHE_IVAL_DESC "interval in seconds between calls to Subscription Cache refresh"
+#define NO_CACHE             "disable csubs cache in lookups"
 
 
 
@@ -317,6 +319,9 @@ PaArgument paArgs[] =
   { "-corsOrigin",    allowedOrigin, "ALLOWED_ORIGIN", PaString, PaOpt, _i "",      PaNL,   PaNL,  ALLOWED_ORIGIN_DESC},
   { "-cprForwardLimit", &cprForwardLimit, "CPR_FORWARD_LIMIT", PaUInt, PaOpt, 1000, 0, UINT_MAX, CPR_FORWARD_LIMIT_DESC},
   { "-subCacheIval",  &subCacheInterval, "SUBCACHE_IVAL", PaInt, PaOpt, 10,         0,     3600,  SUB_CACHE_IVAL_DESC },
+
+  // ADDED FOR THE HOTFIX
+  { "-noCache",       &noCache,           "NOCACHE",     PaBool,   PaOpt, false,      false,  true,  NO_CACHE            },
 
 
   PA_END_OF_ARGS
