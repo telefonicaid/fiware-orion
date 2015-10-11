@@ -2891,7 +2891,7 @@ std::string dbDotDecode(std::string s)
 */
 void subscriptionsTreat(std::string database, MongoTreatFunction treatFunction)
 {
-  BSONObj                   query;
+  BSONObj                   query      = BSON("conditions.type" << "ONCHANGE" << CSUB_ENTITIES "." CSUB_ENTITY_ISPATTERN << "true");
   DBClientBase*             connection = getMongoConnection();
   auto_ptr<DBClientCursor>  cursor;
 
