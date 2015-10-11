@@ -1212,11 +1212,15 @@ void restInit
   else
     strncpy(bindIp, _bindAddress, MAX_LEN_IP - 1);
 
+#if 0
+  // FIXME P7: string copy from one var to the very same var ...
+
   if ((_ipVersion == IPV4) || (_ipVersion == IPDUAL))
      strncpy(bindIp, bindIp, MAX_LEN_IP - 1);
 
   if ((_ipVersion == IPV6) || (_ipVersion == IPDUAL))
      strncpy(bindIPv6, bindIPv6, MAX_LEN_IP - 1);
+#endif
 
   // Starting REST interface
   int r;
