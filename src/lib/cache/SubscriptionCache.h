@@ -100,10 +100,12 @@ public:
                         const std::string&           type,
                         const std::string&           attributeName,
                         std::vector<Subscription*>*  subV);
-private:
-  void           semInit(void);
+
   void           semTake(void);
   void           semGive(void);
+
+private:
+  void           semInit(void);
 };
 
 }  // namespace orion

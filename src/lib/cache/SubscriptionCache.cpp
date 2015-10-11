@@ -235,7 +235,10 @@ static void subToCache(std::string tenant, BSONObj& bobj)
 void SubscriptionCache::init(void)
 {
   semInit();
+
+  semTake();
   fillFromDb();
+  semGive();
 }
 
 
@@ -275,9 +278,7 @@ void SubscriptionCache::insert(Subscription* subP)
     return;
   }
 
-  semTake();
   subs.push_back(subP);
-  semGive();
 
   ++noOfSubCacheEntries;
 }
@@ -457,15 +458,11 @@ int SubscriptionCache::remove(Subscription* subP)
   {
     if (subs[ix] == subP)
     {
-      semTake();
-
       subP->release();
       delete(subP);
 
       subs.erase(subs.begin() + ix);
       
-      semGive();
-
       ++noOfSubCacheRemovals;
       --noOfSubCacheEntries;
       return 0;
@@ -524,10 +521,8 @@ void SubscriptionCache::release(void)
 */
 int SubscriptionCache::refresh(void)
 {
-  semTake();
   release();
   fillFromDb();
-  semGive();
 
   return 0;
 }

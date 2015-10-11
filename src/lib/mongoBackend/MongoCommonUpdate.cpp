@@ -1214,6 +1214,7 @@ static bool addTriggeredSubscriptions_withCache
   //
   std::vector<Subscription*> subVec;
 
+  subCache->semTake();
   subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
 
   int now = getCurrentTime();
@@ -1250,6 +1251,7 @@ static bool addTriggeredSubscriptions_withCache
                                                            sP);
     subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
   }
+  subCache->semGive();
 
   return true;
 }

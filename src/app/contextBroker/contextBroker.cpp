@@ -1189,7 +1189,9 @@ void exitFunc(void)
 {
   if (subCache != NULL)
   {
+    subCache->semTake();
     subCache->release();
+    // semaphore not given back as the subCache no longer exists ...
     delete subCache;
     subCache = NULL;
   }
@@ -1606,7 +1608,9 @@ int main(int argC, char* argV[])
     if (subCacheInterval != 0)
     {
       sleep(subCacheInterval);
+      orion::subCache->semTake();
       orion::subCache->refresh();
+      orion::subCache->semGive();
     }
     else
     {

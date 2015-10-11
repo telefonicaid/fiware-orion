@@ -288,6 +288,9 @@ HttpStatusCode mongoUpdateContextSubscription
   std::string servicePath;
 
   servicePath = (servicePathV.size() == 0)? "" : servicePathV[0];
+
+  subCache->semTake();
+
   Subscription* subP = subCache->lookupById(tenant, servicePath, requestP->subscriptionId.get());
 
   // 1. Remove 'sub' from sub-cache (if present)
@@ -298,6 +301,8 @@ HttpStatusCode mongoUpdateContextSubscription
 
   // 2. Create 'newSub' in sub-cache (if applicable)
   subCache->insert(tenant, newSub.obj());  // The insert method takes care of making sure isPattern and ONCHANGE is there
+
+  subCache->semGive();
 
   return SccOk;
 }

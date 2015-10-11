@@ -56,6 +56,9 @@
 
 #include "common/wsStrip.h"
 
+#include "cache/subCache.h"
+#include "cache/SubscriptionCache.h"
+
 using namespace mongo;
 using std::auto_ptr;
 
@@ -2924,10 +2927,12 @@ void subscriptionsTreat(std::string database, MongoTreatFunction treatFunction)
   }
 
   // Call the treat function for each subscription
+  subCache->semTake();
   while (cursor->more())
   {
     BSONObj sub = cursor->next();
 
     treatFunction(tenant, sub);
   }
+  subCache->semGive();
 }
