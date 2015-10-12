@@ -331,10 +331,12 @@ std::string tenantFromDb(std::string& database)
 {
   std::string r;
   std::string prefix  = dbPrefix + "-";
+
   if (strncmp(prefix.c_str(), database.c_str(), strlen(prefix.c_str())) == 0)
   {
     char tenant[MAX_SERVICE_NAME_LEN];
-    strcpy(tenant, prefix.c_str() + strlen(prefix.c_str()));
+
+    strncpy(tenant, database.c_str() + strlen(prefix.c_str()), sizeof(tenant));
     r = std::string(tenant);
   }
   else
