@@ -1,5 +1,5 @@
-#ifndef TRIGGERED_SUBSCRIPTION_H_
-#define TRIGGERED_SUBSCRIPTION_H_
+#ifndef SRC_LIB_MONGOBACKEND_TRIGGEREDSUBSCRIPTION_H_
+#define SRC_LIB_MONGOBACKEND_TRIGGEREDSUBSCRIPTION_H_
 
 /*
 *
@@ -29,7 +29,8 @@
 #include <string>
 #include "common/Format.h"
 #include "ngsi/AttributeList.h"
-#include "cache/SubscriptionCache.h"
+
+
 
 /* ****************************************************************************
 *
@@ -53,22 +54,20 @@ class TriggeredSubscription
   Format        format;
   std::string   reference;
   AttributeList attrL;
-  Subscription* cacheSubReference;
+  std::string   cacheSubId;
 
   TriggeredSubscription(long long          _throttling,
                         long long          _lastNotification,
                         Format             _format,
                         const std::string& _reference,
                         AttributeList      _attrL,
-                        Subscription*      _cacheSubReference);
+                        const std::string& _cacheSubId);
 
   TriggeredSubscription(Format             _format,
                         const std::string& _reference,
                         AttributeList      _attrL);
 
   std::string toString(const std::string& delimiter);
-
-
 };
 
-#endif // TRIGGERED_SUBSCRIPTION_H
+#endif  // SRC_LIB_MONGOBACKEND_TRIGGEREDSUBSCRIPTION_H_

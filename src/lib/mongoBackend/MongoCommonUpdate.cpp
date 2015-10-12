@@ -1248,13 +1248,14 @@ static bool addTriggeredSubscriptions_withCache
                                                            sP->format,
                                                            sP->reference.get(),
                                                            aList,
-                                                           sP);
+                                                           sP->subscriptionId);
     subs.insert(std::pair<string, TriggeredSubscription*>(sP->subscriptionId, sub));
   }
   subCache->semGive();
 
   return true;
 }
+
 
 
 /* ****************************************************************************
@@ -1523,18 +1524,29 @@ static bool processSubscriptions
               update.toString().c_str(),
               query.toString().c_str()));
 
+#if 0
         //
         // Saving lastNotificationTime for cached subscription
         //
-        if (trigs->cacheSubReference != NULL)
+        if (trigs->cacheSubId != "")
         {
-          trigs->cacheSubReference->pendingNotifications -= 1;
+          Subscription* subP = subCache->lookupById(trigs->tenant, trigs->cacheSubId);
 
-          if (trigs->cacheSubReference->pendingNotifications == 0)
+          if (subP != NULL)
           {
-            trigs->cacheSubReference->lastNotificationTime = getCurrentTime();
+            subP->pendingNotifications -= 1;
+
+            if (subP->pendingNotifications == 0)
+            {
+              subP->lastNotificationTime = getCurrentTime();
+            }
+          }
+          else
+          {
+            LM_E(("Runtime Error (cached subscription '%s' not found)", trigs->cacheSubId.c_str()));
           }
         }
+#endif
       }
       catch (const DBException &e)
       {

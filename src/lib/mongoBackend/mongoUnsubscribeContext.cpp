@@ -34,6 +34,7 @@
 #include "ngsi10/UnsubscribeContextRequest.h"
 #include "ngsi10/UnsubscribeContextResponse.h"
 #include "cache/subCache.h"
+#include "cache/SubscriptionCache.h"
 
 
 

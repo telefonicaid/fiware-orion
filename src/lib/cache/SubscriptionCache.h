@@ -94,6 +94,8 @@ public:
                             const std::string&       servicePath,
                             const std::string&       subId);
 
+  Subscription*  lookupById(const std::string&       subId);
+
   void           lookup(const std::string&           tenant,
                         const std::string&           servicePath,
                         const std::string&           id,
