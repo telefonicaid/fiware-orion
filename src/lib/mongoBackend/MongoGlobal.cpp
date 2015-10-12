@@ -2928,6 +2928,9 @@ void subscriptionsTreat(std::string database, MongoTreatFunction treatFunction)
     return;
   }
 
+  bool        reqSemTaken;
+  reqSemTake(__FUNCTION__, "cache refresh", SemWriteOp, &reqSemTaken);
+
   // Call the treat function for each subscription
   subCache->semTake();
   while (cursor->more())
@@ -2937,4 +2940,6 @@ void subscriptionsTreat(std::string database, MongoTreatFunction treatFunction)
     treatFunction(tenant, sub);
   }
   subCache->semGive();
+  
+  reqSemGive(__FUNCTION__, "cache refresh", reqSemTaken);
 }

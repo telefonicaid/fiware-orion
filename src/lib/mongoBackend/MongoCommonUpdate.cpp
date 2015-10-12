@@ -1215,7 +1215,7 @@ static bool addTriggeredSubscriptions_withCache
   std::vector<Subscription*> subVec;
 
   subCache->semTake();
-  subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
+  //subCache->lookup(tenant, servicePath, entityId, entityType, attr, &subVec);
 
   int now = getCurrentTime();
   for (unsigned int ix = 0; ix < subVec.size(); ++ix)

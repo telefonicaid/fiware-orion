@@ -310,12 +310,12 @@ HttpStatusCode mongoQueryContext
                        limit,
                        &limitReached,
                        countP);
-    reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
 
     if (!ok)
     {
         responseP->errorCode.fill(SccReceiverInternalError, err);
         rawCerV.release();
+        reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
         return SccOk;
     }
 
@@ -437,5 +437,7 @@ HttpStatusCode mongoQueryContext
     }
 
     rawCerV.release();
+    
+    reqSemGive(__FUNCTION__, "ngsi10 query request", reqSemTaken);
     return SccOk;
 }
