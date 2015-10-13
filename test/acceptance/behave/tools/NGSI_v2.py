@@ -204,7 +204,7 @@ class NGSI:
             # verify if the entity is not stored in mongo
             else:
                 assert len(curs_list) == 0, "  ERROR - the entities should not have been saved in mongo"
-                __logger__.debug(" Entity id: \"%s\" is stored in mongo not as expected" % entities_contexts["entities_id"])
+                __logger__.debug(" Entity id: \"%s\" is not stored in mongo as expected" % entities_contexts["entities_id"])
         mongo_driver.disconnect()
 
     def verify_entity_updated_in_mongo(self, mongo_driver, entities_contexts, headers):

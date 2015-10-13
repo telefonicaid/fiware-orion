@@ -27,6 +27,7 @@ from components.common_steps.initial_steps import *
 from components.common_steps.general_steps import *
 from components.common_steps.entities.create_update_replace_steps import *
 from components.common_steps.entities.get_steps import *
+from components.common_steps.entities.delete_steps import *
 
 #  common steps
 # ---- initial_steps.py --------------------------------------------------------------
@@ -82,4 +83,9 @@ from components.common_steps.entities.get_steps import *
 @step(u'verify that the entity by ID is returned')
 @step(u'verify that the attribute by ID is returned')
 @step(u'verify an attribute by ID in raw mode with type "([^"]*)" in attribute value from http response')
+"""
+
+# ---- entities.delete_steps.py -------------------------------------------------------------
+"""
+@step(u'delete entity with id "([^"]*)"')
 """

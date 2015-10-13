@@ -574,7 +574,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     Then verify that receive several "Created" http code
     And verify that entities are stored in mongo
 
-  @entities_type_error @BUG_1093 @BUG_1200
+  @entities_type_error @BUG_1093 @BUG_1200 @BUG_1351 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong entities type values
     Given  a definition of headers
       | parameter          | value                    |
@@ -601,6 +601,10 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house'flat'   |
       | house;flat    |
       | house(flat)   |
+      | house_?       |
+      | house_&       |
+      | house_/       |
+      | house_#       |
 
   @entities_type_no_string_error @BUG_1108
   Scenario Outline:  try to create an entity using NGSI v2 with wrong json in entities_type
@@ -722,7 +726,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     Then verify that receive several "Bad Request" http code
     And verify that entities are not stored in mongo
 
-  @entities_id_error @BUG_1093 @BUG_1200
+  @entities_id_error @BUG_1093 @BUG_1200 @BUG_1351 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong entities id values
     Given  a definition of headers
       | parameter          | value                  |
@@ -749,6 +753,10 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | house'flat' |
       | house;flat  |
       | house(flat) |
+      | house_?     |
+      | house_&     |
+      | house_/     |
+      | house_#     |
 
   @entities_id_no_string_error @BUG_1108
   Scenario Outline:  try to create an entity using NGSI v2 with several invalid entities id without attribute type (integer, boolean, no-string, etc)
@@ -893,7 +901,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | random=10000    |
       | random=100000   |
 
-  @attributes_name_error @BUG1093 @BUG_1200
+  @attributes_name_error @BUG1093 @BUG_1200 @BUG_1351 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes names
     Given  a definition of headers
       | parameter          | value                      |
@@ -914,12 +922,16 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | attributes_name |
-      | room_2      | house<flat>     |
-      | room_3      | house=flat      |
-      | room_4      | house"flat"     |
-      | room_5      | house'flat'     |
-      | room_6      | house;flat      |
-      | room_8      | house(flat)     |
+      | room_1      | house<flat>     |
+      | room_2      | house=flat      |
+      | room_3      | house"flat"     |
+      | room_4      | house'flat'     |
+      | room_5      | house;flat      |
+      | room_6      | house(flat)     |
+      | room_7      | house_?         |
+      | room_8      | house_&         |
+      | room_9      | house_/         |
+      | room_10     | house_#         |
 
   @attributes_name_no_string_error
   Scenario Outline:  try to create an entity using NGSI v2 with several wrong attributes name (integer, boolean, no-string, etc)
@@ -1023,7 +1035,7 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
       | random=10000     |
       | random=100000    |
 
-  @attributes_value_error @BUG_1093 @BUG_1200
+  @attributes_value_error @BUG_1093 @BUG_1200 @BUG_1351 @skip
   Scenario Outline:  try to create entities using NGSI v2 with several wrong attributes values
     Given  a definition of headers
       | parameter          | value                       |
@@ -1044,12 +1056,17 @@ Feature: create entities requests (POST) using NGSI v2. "POST" - /v2/entities/ p
     And verify that entities are not stored in mongo
     Examples:
       | entities_id | attributes_value |
-      | room_2      | house<flat>      |
-      | room_3      | house=flat       |
-      | room_4      | house"flat"      |
-      | room_5      | house'flat'      |
-      | room_6      | house;flat       |
-      | room_8      | house(flat)      |
+      | room_1      | house<flat>      |
+      | room_2      | house=flat       |
+      | room_3      | house"flat"      |
+      | room_4      | house'flat'      |
+      | room_5      | house;flat       |
+      | room_6      | house(flat)      |
+      | room_7      | house_?          |
+      | room_8      | house_&          |
+      | room_9      | house_/          |
+      | room_10     | house_#          |
+
 
   @attributes_value_without
   Scenario:  try to create entities using NGSI v2 without attributes values

@@ -187,28 +187,28 @@ The log is stored in `logs` folder (if this folder does not exist it is created)
 
 ### Tests Suites Coverage (features):
 
-|           FEATURE                         |  TEST CASES  | METHOD  |            URL                                      |  PAYLOAD       |  
-|:------------------------------------------|:------------:|--------:|:----------------------------------------------------|:--------------:|      
-|**general folder**                                                                                                                         |
-| - general_operations                      |      16      | GET     | /version   /statistics    /v2                       | No             |
-|                                                                                                                                           |
-|**entities folder**                                                                                                                        |
-| - create_entities                         |     559      | POST   | /v2/entities/                                        | Yes            |      
-| - list_all_entities                       |     200      | GET    | /v2/entities/                                        | No             | 
-|                                                                                                                                           |
-| - update_append_attribute_by_id           |     766      | POST   | /v2/entities/`<entity_id>`                           | Yes            |   
-| - list_an_entity_by_id                    |     209      | GET    | /v2/entities/`<entity_id>`                           | No             | 
-| - replace_attributes_by_id                |     511      | PUT    | /v2/entities/`<entity_id>`                           | Yes            |   
-| - update_attribute_by_id                  |     654      | PATCH  | /v2/entities/`<entity_id>`                           | Yes            | 
-| - delete_entity_by_id                     |  (pending)   | DELETE | /v2/entities/`<entity_id>`                           | No             |
-|                                                                                                                                           |
-| - list_an_attribute_by_id                 |     198      | GET    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |   
-| - update_only_one_attribute_by_id         |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes            | 
-| - delete_attribute_by_id                  |  (pending)   | DELETE | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |
-|                                                                                                                                           |
-| - update_only_one_attribute_value_by_id   |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes            |   
-|                                                                                                                                           |
-|**alarms folder**                          |  (pending)   |                                                                                |
+|           FEATURE                           |  TEST CASES  | METHOD  |            URL                                      |  PAYLOAD       |  
+|:--------------------------------------------|:------------:|--------:|:----------------------------------------------------|:--------------:|      
+|**general folder**                                                                                                                           |
+| - general_operations                        |      16      | GET     | /version   /statistics    /v2                       | No             |
+|                                                                                                                                             |
+|**entities folder**                                                                                                                          |
+| - create_entities                           |     559      | POST   | /v2/entities/                                        | Yes            |      
+| - list_all_entities                         |     200      | GET    | /v2/entities/                                        | No             | 
+|                                                                                                                                             |
+| - update_append_attribute_by_id             |     766      | POST   | /v2/entities/`<entity_id>`                           | Yes            |   
+| - list_an_entity_by_id                      |     209      | GET    | /v2/entities/`<entity_id>`                           | No             | 
+| - replace_attributes_by_id                  |     511      | PUT    | /v2/entities/`<entity_id>`                           | Yes            |   
+| - update_attribute_by_id                    |     654      | PATCH  | /v2/entities/`<entity_id>`                           | Yes            | 
+| - delete_entity_by_id                       |      65      | DELETE | /v2/entities/`<entity_id>`                           | No             |
+|                                                                                                                                             |
+| - list_an_attribute_by_id                   |     198      | GET    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |   
+| - update_only_one_attribute_by_id           |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | Yes            | 
+| - delete_attribute_by_id                    |  (pending)   | DELETE | /v2/entities/`<entity_id>`/attrs/`<attr_name>`       | No             |
+|                                                                                                                                             |
+| - update_only_one_attribute_value_by_id     |  (pending)   | PUT    | /v2/entities/`<entity_id>`/attrs/`<attr_name>`/value | Yes            |   
+|                                                                                                                                             |
+|**alarms folder**                            |  (pending)   |                                                                                |
 
   
 ### Hints:
